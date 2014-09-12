@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "find_node_visitor.h" 
 
 namespace effects 
 { 
@@ -160,6 +161,9 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
 {
     float animationLength = 10.0f;
 
+
+    static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","a_319_aeroflot.png"};
+
     osg::AnimationPath* animationPath = createAnimationPath(center,radius,animationLength);
 
     osg::Group* model = new osg::Group;
@@ -185,17 +189,27 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
         model->addChild(xform);
     }
 
-    osg::Node* cessna = osgDB::readNodeFile("an_124.dae");
+    osg::Node* airplane_file = osgDB::readNodeFile("a_319.dae"); //    "an_124.dae"
     
-    if (cessna)
+    findNodeVisitor findNode("Lod0"); 
+    airplane_file->accept(findNode);
+
+    auto airplane =  findNode.getFirst();
+
+    if (airplane)
     {
-        cessna->setName("airplane");
+        airplane->setName("airplane");
+        
+        //osg::Image *img_plane = osgDB::readImageFile(texs[2]);
+        //osg::Texture2D *tex_plane = new osg::Texture2D;
+        //tex_plane ->setImage(img_plane);
+        //airplane_file->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex_plane );
 
-        const osg::BoundingSphere& bs = cessna->getBound();
+        const osg::BoundingSphere& bs = airplane->getBound();
 
-        const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
-                              osg::inDegrees(0.0f)  , osg::Y_AXIS,
-                              osg::inDegrees(0.0f)  , osg::Z_AXIS ); 
+        const osg::Quat quat0(osg::inDegrees(0.f/*-90.0f*/), osg::X_AXIS,                      
+                              osg::inDegrees(0.f)  , osg::Y_AXIS,
+                              osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
         float size = radius/bs.radius()*0.7f;
         osg::MatrixTransform* positioned = new osg::MatrixTransform;
@@ -204,13 +218,14 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
             osg::Matrix::scale(size,size,size)*
             osg::Matrix::rotate(quat0));
 
-        positioned->addChild(cessna);
+        positioned->addChild(airplane);
         
         osg::MatrixTransform* xform = new osg::MatrixTransform;
         xform->setUpdateCallback(new osg::AnimationPathCallback(animationPath,0.0f,2.0));
         xform->addChild(positioned);
 
         model->addChild(xform);
+
 
 
 
