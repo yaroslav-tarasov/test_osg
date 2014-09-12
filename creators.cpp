@@ -162,7 +162,7 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
     float animationLength = 10.0f;
 
 
-    static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","a_319_aeroflot.png"};
+    static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","./a_319_aeroflot.png"};
 
     osg::AnimationPath* animationPath = createAnimationPath(center,radius,animationLength);
 
@@ -200,10 +200,23 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
     {
         airplane->setName("airplane");
         
-        //osg::Image *img_plane = osgDB::readImageFile(texs[2]);
-        //osg::Texture2D *tex_plane = new osg::Texture2D;
-        //tex_plane ->setImage(img_plane);
-        //airplane_file->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex_plane );
+        osg::Image *img_plane = osgDB::readImageFile(texs[2]);
+        osg::Texture2D *tex_plane = new osg::Texture2D;
+        tex_plane->setDataVariance(osg::Object::DYNAMIC);
+        
+        tex_plane ->setImage(img_plane);
+        //airplane->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex_plane ,osg::StateAttribute::ON);
+        // Create a new StateSet with default settings: 
+        osg::StateSet* stateOne = new osg::StateSet();
+
+        // Assign texture unit 0 of our new StateSet to the texture 
+        // we just created and enable the texture.
+        stateOne->setTextureAttributeAndModes
+            (0,tex_plane,osg::StateAttribute::ON);
+        // Associate this state set with the Geode that contains
+        // the pyramid: 
+        airplane->setStateSet(stateOne);
+
 
         const osg::BoundingSphere& bs = airplane->getBound();
 
@@ -225,9 +238,6 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
         xform->addChild(positioned);
 
         model->addChild(xform);
-
-
-
 
     }
 
