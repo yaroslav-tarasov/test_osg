@@ -89,7 +89,7 @@ int main( int argc, char** argv )
         bb.expandBy(loaded_bs);
 
         // tilt the scene so the default eye position is looking down on the model.
-        osg::MatrixTransform* rootnode = new osg::MatrixTransform;
+        osg::ref_ptr<osg::MatrixTransform> rootnode = new osg::MatrixTransform;
         rootnode->setMatrix(osg::Matrix::rotate(osg::inDegrees(30.0f),1.0f,0.0f,0.0f));
         rootnode->addChild(model);
 
@@ -184,7 +184,6 @@ int main( int argc, char** argv )
         }
 #endif
 
-        // viewer.setSceneData(model);
 
         osg::ref_ptr<osgGA::StateSetManipulator> statesetManipulator = new osgGA::StateSetManipulator(viewer.getCamera()->getStateSet());
         viewer.addEventHandler(statesetManipulator.get());
