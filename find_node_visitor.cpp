@@ -4,17 +4,20 @@
 
 // Default constructor - initialize searchForName to "" and    
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor() : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),    
-    searchForName()    
+findNodeVisitor::findNodeVisitor(match_type_t m) 
+    : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+    , searchForName()
+    , m_(m) 
 {    
 }    
 
 // Constructor that accepts string argument   
 // Initializes searchForName to user string   
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor(const std::string &searchName) :    
-osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),    
-    searchForName(searchName)    
+findNodeVisitor::findNodeVisitor(const std::string &searchName, match_type_t m) 
+    : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)    
+    , searchForName(searchName)
+    , m_(m)
 {    
 }    
 
@@ -23,7 +26,17 @@ osg::NodeVisitor(TRAVERSE_ALL_CHILDREN),
 //If the strings match, add this node to our list   
 void findNodeVisitor::apply(osg::Node &searchNode)    
 {    
-    if (searchNode.getName() == searchForName)   
+    bool matching = false;
+    if(m_==exact)
+    {
+         matching = searchNode.getName() == searchForName;
+    }
+    else
+    {
+         matching = searchNode.getName().find(searchForName) !=std::string::npos ;
+    }
+    
+    if (matching)   
     {   
         foundNodeList.push_back(&searchNode);   
     }   
@@ -44,4 +57,12 @@ osg::Node* findNodeVisitor::getFirst()
         return *(foundNodeList.begin());
     else
         return nullptr;
-}   
+}  
+
+osg::Node* findNodeVisitor::getLast()   
+{   
+    if(foundNodeList.size()>0) 
+        return foundNodeList.back();
+    else
+        return nullptr;
+} 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "find_node_visitor.h" 
+#include "creators.h"
 
 namespace effects 
 { 
@@ -15,8 +16,8 @@ namespace effects
             radius * (((float)rand() / (float)RAND_MAX)-0.5)*2.0,
             0.0f);
 
-        float scale = 10.0f * ((float)rand() / (float)RAND_MAX);
-        float intensity = 1.0f;
+        float scale = 50.0f * ((float)rand() / (float)RAND_MAX);
+        float intensity = 10.0f;
 
         osgParticle::ExplosionEffect* explosion = new osgParticle::ExplosionEffect(position, scale, intensity);
         osgParticle::ExplosionDebrisEffect* explosionDebri = new osgParticle::ExplosionDebrisEffect(position, scale, intensity);
@@ -26,6 +27,10 @@ namespace effects
             smoke =  new osgParticle::SmokeTrailEffect(position, scale, intensity);
         //else
         //    smoke =  new osgParticle::SmokeEffect(position, scale, intensity);
+       
+       // Если раскомментить форма дыма поменяется но это будет жеееееесть
+       // smoke->setTextureFileName("Images/continous_black_smoke.rgb");
+       
 
         explosion->setWind(wind);
         explosionDebri->setWind(wind);
@@ -64,6 +69,8 @@ namespace effects
 
 namespace creators 
 {
+    
+
 
 osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,double looptime)
 {
@@ -157,7 +164,7 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     return geode;
 }
 
-osg::Node* createMovingModel(const osg::Vec3& center, float radius)
+nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 {
     float animationLength = 10.0f;
 
@@ -178,7 +185,8 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
         positioned->setMatrix(osg::Matrix::translate(-bs.center())*
             osg::Matrix::scale(size,size,size)*
             osg::Matrix::rotate(osg::inDegrees(-90.0f),0.0f,0.0f,1.0f));
-
+        
+       
         positioned->addChild(glider);
 
         osg::PositionAttitudeTransform* xform = new osg::PositionAttitudeTransform;
@@ -188,14 +196,54 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
         model->addChild(xform);
     }
 
-    osg::Node* airplane_file = osgDB::readNodeFile("a_319.dae"); //  "a_319.dae"  "an_124.dae"
+    osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.dae"  "an_124.dae"
     
+    osg::Node* tail = nullptr; 
+
+#ifdef ANIMATION_TEST
+    if(airplane_file)
+    {
+        findNodeVisitor findNode("animgroup_shassi_r_r_lod0"); 
+        airplane_file->accept(findNode);
+
+        auto anim =  findNode.getFirst();
+
+        auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( anim->getUpdateCallback() );
+
+        if ( manager_ )
+        {   
+            const osgAnimation::AnimationList& animations =
+                manager_->getAnimationList();
+
+            std::cout << "**** Animations ****" << std::endl;
+
+            for ( unsigned int i=0; i<animations.size(); ++i )
+            {
+                const std::string& name = animations[i]-> getName();
+                std::cout << "Animation name: " << name << std::endl;
+            }
+
+            std::cout << "********************" << std::endl;
+        }
+    }
+#endif
+
+    airplane_file->setName("all_nodes");
+
     if(airplane_file)
 	{
 		findNodeVisitor findNode("Lod0"); 
 		airplane_file->accept(findNode);
 
 		auto airplane =  findNode.getFirst();
+        
+        findNodeVisitor findTail("engine",findNodeVisitor::not_exact); 
+        airplane_file->accept(findTail);
+
+        tail =  findTail.getLast();
+
+
+        airplane = airplane_file;
 
     if (airplane)
     {
@@ -221,7 +269,7 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
 
         const osg::BoundingSphere& bs = airplane->getBound();
 
-        const osg::Quat quat0(osg::inDegrees(0.f/*-90.0f*/), osg::X_AXIS,                      
+        const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
                               osg::inDegrees(0.f)  , osg::Y_AXIS,
                               osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
@@ -244,11 +292,11 @@ osg::Node* createMovingModel(const osg::Vec3& center, float radius)
 
 	}
 
-
-    return model;
+    nodes_array_t retval = {model,airplane_file,tail};
+    return retval;
 }
 
-osg::Node* createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
+nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
     osg::Vec3 center(0.0f,0.0f,0.0f);
     float radius = 100.0f;
@@ -257,7 +305,9 @@ osg::Node* createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique techn
 
     float baseHeight = center.z()-radius*0.5;
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius);
-    osg::Node* movingModel = createMovingModel(center,radius*0.8f);
+    auto ret_array  = createMovingModel(center,radius*0.8f);
+    
+    osg::Node* movingModel = ret_array[0];
 
     if (overlay)
     {
@@ -278,7 +328,9 @@ osg::Node* createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique techn
 
     root->addChild(movingModel);
 
-    return root;
+    ret_array[0] = root;
+    
+    return ret_array;
 }
 
 } // ns creators

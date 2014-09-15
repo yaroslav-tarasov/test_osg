@@ -45,5 +45,7 @@
 
 #include <iostream>
 
-#include <functional> 
+#include <functional>
+
+#include <array>
                                          
