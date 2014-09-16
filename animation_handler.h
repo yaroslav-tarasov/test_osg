@@ -3,10 +3,14 @@
 class AnimationHandler : public osgGA::GUIEventHandler 
 {
 public: 
-    typedef std::function<void()> on_fire_f;
+    typedef std::function<void()> on_effect_f;
+    typedef std::function<void(bool)> on_effect2_f;
 
-
-    AnimationHandler(osg::Node* model,const std::string animationName,on_fire_f on_fire);
+    AnimationHandler(osg::Node* model,const std::string animationName
+        ,on_effect_f on_fire
+        ,on_effect2_f on_test_effect
+        ,on_effect2_f on_lod_effect
+        );
     ~AnimationHandler() {}
 
     bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
@@ -18,5 +22,7 @@ protected:
     osg::ref_ptr<osgAnimation::BasicAnimationManager> manager_;
     osg::ref_ptr<osg::Node>                           model_;
     std::string                                       animationName_;
-    on_fire_f                                         on_fire_;
+    on_effect_f                                       on_fire_;
+    on_effect2_f                                      on_test_effect_;
+    on_effect2_f                                      on_lod_effect_;
 };

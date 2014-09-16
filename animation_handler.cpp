@@ -3,11 +3,16 @@
 
 
 
-AnimationHandler::AnimationHandler(osg::Node* model,const std::string animationName,on_fire_f on_fire)
+AnimationHandler::AnimationHandler(osg::Node* model,const std::string animationName
+                                                   ,on_effect_f on_fire
+                                                   ,on_effect2_f on_test_effect
+                                                   ,on_effect2_f on_lod_effect)
     : model_         (model)
     , animationName_ (animationName)
     , manager_       (nullptr)
     , on_fire_       (on_fire)
+    , on_test_effect_(on_test_effect)
+    , on_lod_effect_ (on_lod_effect)
 {
 
     //auto p = model_->getUpdateCallback();
@@ -56,7 +61,23 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
                 osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
                 if(on_fire_) on_fire_();
             }
-
+            else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F7)
+            {
+                static bool off = true;
+                osg::notify(osg::NOTICE)<<"Test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+                off = !off;
+                if(on_test_effect_)
+                    on_test_effect_(off);
+            }
+            else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F5)
+            {
+                static bool low = false;
+                osg::notify(osg::NOTICE)<<"Test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+                low = !low;
+                if(on_lod_effect_)
+                    on_lod_effect_(low);
+            }
+ 
             return false;
         }
         //case(osgGA::GUIEventAdapter::PUSH):

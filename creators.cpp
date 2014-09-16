@@ -7,7 +7,7 @@ namespace effects
     
     osg::Vec3 wind(10.0f,0.0f,0.0f); 
 
-    void insertParticle(osg::Group* root,osg::Group* rootModel, const osg::Vec3& center, float radius)
+    void insertParticle(osg::Group* root,osg::Node* rootModel, const osg::Vec3& center, float radius)
     {
         bool handleMovingModels = false;
 
@@ -15,6 +15,7 @@ namespace effects
             osg::Vec3( radius * (((float)rand() / (float)RAND_MAX)-0.5)*2.0,
             radius * (((float)rand() / (float)RAND_MAX)-0.5)*2.0,
             0.0f);
+   
 
         float scale = 50.0f * ((float)rand() / (float)RAND_MAX);
         float intensity = 10.0f;
@@ -48,6 +49,42 @@ namespace effects
         explosionDebri->setUseLocalParticleSystem(false);
         smoke->setUseLocalParticleSystem(false);
         fire->setUseLocalParticleSystem(false);
+       
+        osg::ref_ptr<osg::Node> hitNode = rootModel;// hit.nodePath.back();
+        osg::Node::ParentList parents = hitNode->getParents();                
+        osg::Group* insertGroup = 0;
+        unsigned int numGroupsFound = 0;
+        for(osg::Node::ParentList::iterator itr=parents.begin();
+            itr!=parents.end();
+            ++itr)
+        {
+            if (typeid(*(*itr))==typeid(osg::Group))
+            {
+                ++numGroupsFound;
+                insertGroup = *itr;
+            }
+        }         
+
+        if (numGroupsFound==parents.size() && numGroupsFound==1 && insertGroup)
+        {
+            osg::notify(osg::INFO)<<"PickHandler::pick(,) hit node's parent is a single osg::Group so we can simple the insert the particle effects group here."<<std::endl;
+
+            // just reuse the existing group.
+            insertGroup->addChild(effectsGroup);
+        }
+        else
+        {            
+            osg::notify(osg::INFO)<<"PickHandler::pick(,) hit node doesn't have an appropriate osg::Group node to insert particle effects into, inserting a new osg::Group."<<std::endl;
+            insertGroup = new osg::Group;
+            for(osg::Node::ParentList::iterator itr=parents.begin();
+                itr!=parents.end();
+                ++itr)
+            {
+                (*itr)->replaceChild(rootModel/*hit.nodePath.back()*/,insertGroup);
+            }
+            insertGroup->addChild(hitNode.get());
+            insertGroup->addChild(effectsGroup);
+        }
 
         // finally insert the particle systems into a Geode and attach to the root of the scene graph so the particle system
         // can be rendered.
@@ -58,10 +95,28 @@ namespace effects
         geode->addDrawable(fire->getParticleSystem());
         
         root->addChild(geode);
-
-        rootModel->addChild(effectsGroup);
+        
+        // rootModel->addChild(effectsGroup);
     }
 
+    osg::Node* createLightSource( unsigned int num,
+        const osg::Vec3& trans,
+        const osg::Vec4& color )
+    {
+        osg::ref_ptr<osg::Light> light = new osg::Light;
+        light->setLightNum( num );
+        light->setDiffuse( color );
+        light->setPosition( osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f) );
+        osg::ref_ptr<osg::LightSource> lightSource = new
+            osg::LightSource;
+        lightSource->setLight( light );
+
+        osg::ref_ptr<osg::MatrixTransform> sourceTrans =
+            new osg::MatrixTransform;
+        sourceTrans->setMatrix( osg::Matrix::translate(trans) );
+        sourceTrans->addChild( lightSource.get() );
+        return sourceTrans.release();
+    }
 
 }
 
@@ -175,6 +230,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     osg::Group* model = new osg::Group;
 
     osg::Node* glider = osgDB::readNodeFile("glider.osgt");
+
     if (glider)
     {
         const osg::BoundingSphere& bs = glider->getBound();
@@ -197,8 +253,11 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     }
 
     osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.dae"  "an_124.dae"
-    
-    osg::Node* tail = nullptr; 
+
+    osg::Node* engine = nullptr; 
+    osg::Node* engine_geode = nullptr; 
+    osg::Node* lod0 = nullptr; 
+    osg::Node* lod3 = nullptr; 
 
 #ifdef ANIMATION_TEST
     if(airplane_file)
@@ -232,18 +291,48 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     if(airplane_file)
 	{
-		findNodeVisitor findNode("Lod0"); 
-		airplane_file->accept(findNode);
 
-		auto airplane =  findNode.getFirst();
+        auto fcolor = osg::Vec4(0.0f, 0.0f, 255.0f, 100.0f);
+        osg::ref_ptr<osg::ShapeDrawable> shape2 = new osg::ShapeDrawable;
+        shape2->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f),
+            0.2f) );
+        shape2->setColor( fcolor );
         
-        findNodeVisitor findTail("engine",findNodeVisitor::not_exact); 
+        osg::ref_ptr<osg::Geode> tail_light = new osg::Geode;
+        tail_light->addDrawable( shape2.get() );
+        
+        findNodeVisitor findTail("tail"); 
         airplane_file->accept(findTail);
+        auto tail =  findTail.getFirst();
+        if(tail)  tail->asGroup()->addChild(tail_light);
 
-        tail =  findTail.getLast();
+        osg::Node* light0 = effects::createLightSource(
+            0, osg::Vec3(-20.0f,0.0f,0.0f), fcolor);
+
+        tail->getOrCreateStateSet()->setMode( GL_LIGHT0,
+            osg::StateAttribute::ON );
+
+        tail->asGroup()->addChild( light0 );
+
+        
+        findNodeVisitor findLod3("Lod3"); 
+		airplane_file->accept(findLod3);
+		lod3 =  findLod3.getFirst();
+        
+        lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
+
+        findNodeVisitor findLod0("Lod0"); 
+        airplane_file->accept(findLod0);
+        lod0 =  findLod0.getFirst();
 
 
-        airplane = airplane_file;
+        findNodeVisitor findEngine("engine",findNodeVisitor::not_exact); 
+        airplane_file->accept(findEngine);
+
+        engine =  findEngine.getFirst();
+        engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
+        
+        auto airplane = airplane_file;
 
     if (airplane)
     {
@@ -292,7 +381,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
 	}
 
-    nodes_array_t retval = {model,airplane_file,tail};
+    nodes_array_t retval = {model,airplane_file,engine,engine_geode,lod0,lod3};
     return retval;
 }
 

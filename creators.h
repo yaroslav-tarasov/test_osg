@@ -2,7 +2,7 @@
 
 namespace creators 
 {
-    typedef std::array<osg::Node*, 3> nodes_array_t;
+    typedef std::array<osg::Node*, 6> nodes_array_t;
 
     osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,double looptime);
     osg::Node*    createBase(const osg::Vec3& center,float radius);
@@ -13,5 +13,8 @@ namespace creators
 
 namespace effects
 {
-     void insertParticle(osg::Group* root,osg::Group* rootModel, const osg::Vec3& center, float radius);
+     void insertParticle(osg::Group* root,osg::Node* rootModel, const osg::Vec3& center, float radius);
+     osg::Node* createLightSource( unsigned int num,
+         const osg::Vec3& trans,
+         const osg::Vec4& color );
 }

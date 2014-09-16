@@ -7,15 +7,29 @@
 
 #include "targetver.h"
 
+//////////////////////////////////////
+//
+//  std include
+//
 #include <stdio.h>
 #include <tchar.h>
 
 
+#include <iostream>
+#include <functional>
+#include <array>
+
+//////////////////////////////////////
+//
+//  osg include
+//
 #include <osg/Notify>
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>
 #include <osg/Geometry>
 #include <osg/Geode>
+#include <osg/ShapeDrawable>
+
 
 #include <osgUtil/Optimizer>
 
@@ -43,9 +57,6 @@
 #include <osgParticle/SmokeTrailEffect>
 #include <osgParticle/FireEffect>
 
-#include <iostream>
 
-#include <functional>
-
-#include <array>
+ #include <osgFX/Outline>
                                          

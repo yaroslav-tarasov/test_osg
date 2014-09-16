@@ -5,6 +5,9 @@
 #include "creators.h"
 #include "animation_handler.h"
 #include "find_node_visitor.h" 
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include "info_visitor.h"
 
 osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 {
@@ -18,32 +21,15 @@ osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
     return l2w;
 }
 
-osg::Node* createLightSource( unsigned int num,
-    const osg::Vec3& trans,
-    const osg::Vec4& color )
-{
-    osg::ref_ptr<osg::Light> light = new osg::Light;
-    light->setLightNum( num );
-    light->setDiffuse( color );
-    light->setPosition( osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f) );
-    osg::ref_ptr<osg::LightSource> lightSource = new
-        osg::LightSource;
-    lightSource->setLight( light );
 
-    osg::ref_ptr<osg::MatrixTransform> sourceTrans =
-        new osg::MatrixTransform;
-    sourceTrans->setMatrix( osg::Matrix::translate(trans) );
-    sourceTrans->addChild( lightSource.get() );
-    return sourceTrans.release();
-}
 
 void AddLight( osg::ref_ptr<osg::MatrixTransform> rootnode ) 
 {
-    osg::Node* light0 = createLightSource(
+    osg::Node* light0 = effects::createLightSource(
         0, osg::Vec3(-20.0f,0.0f,0.0f), osg::Vec4(
         1.0f,1.0f,1.0f,100.0f) );
 
-    osg::Node* light1 = createLightSource(
+    osg::Node* light1 = effects::createLightSource(
         1, osg::Vec3(0.0f,-20.0f,0.0f), osg::Vec4(1.0f,1.0f,1.0f,100.0f)
         );
 
@@ -56,6 +42,24 @@ void AddLight( osg::ref_ptr<osg::MatrixTransform> rootnode )
     rootnode->addChild( light1 );
 }
 
+class circleAimlessly : public osg::NodeCallback 
+{
+public:
+    circleAimlessly(float angle=0.f): _angle(angle) {}
+    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    {
+        osg::MatrixTransform *tx = dynamic_cast<osg::MatrixTransform *>(node);
+        if( tx != NULL)
+        {
+            _angle += M_PI/180.0;
+            tx->setMatrix( osg::Matrix::translate( 30.0, 0.0, 5.0) * 
+                osg::Matrix::rotate( _angle, 0, 0, 1 ) );
+        }
+        traverse(node, nv);
+    }
+private:
+    float _angle;
+};
 
 int main( int argc, char** argv )
 {
@@ -133,6 +137,15 @@ int main( int argc, char** argv )
         rootnode->setMatrix(osg::Matrix::rotate(osg::inDegrees(30.0f),1.0f,0.0f,0.0f));
         rootnode->addChild(model);
 
+        {
+            // create outline effect
+            osg::ref_ptr<osgFX::Outline> outline = new osgFX::Outline;
+            model_parts[1]->asGroup()->addChild(outline.get());
+
+            outline->setWidth(4);
+            outline->setColor(osg::Vec4(1,1,0,1));
+            outline->addChild(model_parts[3]);
+        }
        
         
         AddLight(rootnode);
@@ -144,6 +157,11 @@ int main( int argc, char** argv )
 
         // set the scene to render
         viewer.setSceneData(rootnode);
+
+        // must clear stencil buffer...
+        unsigned int clearMask = viewer.getCamera()->getClearMask();
+        viewer.getCamera()->setClearMask(clearMask | GL_STENCIL_BUFFER_BIT);
+        viewer.getCamera()->setClearStencil(0);
 
 #ifdef ENABLE_CUSTOM_ANIMATION
         std::list<std::string>  l; 
@@ -238,11 +256,17 @@ int main( int argc, char** argv )
 
         auto node =  findNode.getFirst();
         if(node)
-            viewer.addEventHandler(new AnimationHandler(/*node*/model_parts[1],animationName,
-                   [&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]->asGroup(),osg::Vec3(00.f,00.f,00.f),0.f);}
+            viewer.addEventHandler(new AnimationHandler(/*node*/model_parts[1],animationName
+                   ,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}
+                   ,[&](bool off){model_parts[2]->setUpdateCallback(off?nullptr:new circleAimlessly());}
+                   ,[&](bool low){model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);}
             ));
-          
         
+        //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
+        //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
+        InfoVisitor infoVisitor;
+        model->accept( infoVisitor );
+
         return viewer.run();
     }
 
