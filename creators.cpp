@@ -2,6 +2,15 @@
 #include "find_node_visitor.h" 
 #include "creators.h"
 
+namespace
+{
+    const osg::Vec4 red_color   = osg::Vec4(255.0f, 0.0f, 0.0f, 100.0f);
+    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 255.0f, 100.0f);
+    const osg::Vec4 green_color = osg::Vec4(0.0f, 255.0f, 0.0f, 100.0f);
+    const osg::Vec4 white_color = osg::Vec4(255.0f, 255.0f, 255.0f, 100.0f);
+    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,1.0f);
+}
+
 namespace effects 
 { 
     
@@ -118,9 +127,145 @@ namespace effects
         return sourceTrans.release();
     }
 
+
+    class BlinkNode: public osg::NodeCallback
+    {
+    
+        float     _previous;
+        short     _curr_interval;
+        osg::Vec4 _first_color;
+        osg::Vec4 _second_color;
+    public:
+        BlinkNode(osg::Vec4 first_color,osg::Vec4 second_color)
+        : _previous (0.0f)
+        , _curr_interval(0)
+        , _first_color(first_color/*osg::Vec4(255.0f, 255.0f, 255.0f, 100.0f)*/)
+        , _second_color(second_color/*osg::Vec4(0.0f, 0.0f, 0.0f, 100.0f)*/)
+        {
+
+        }
+
+        void operator()(osg::Node* node, osg::NodeVisitor* nv) {
+            if (!dynamic_cast<osg::Geode *>(node)) return;
+            const osg::Vec4 f_color[] = {_first_color,_second_color,_first_color,_second_color};
+            const float     _intervals[] = {0.5f, 0.5f,.5f,2.f};
+
+            static_assert(sizeof(_intervals)/sizeof(_intervals[0]) == sizeof(f_color)/sizeof(f_color[0]),"Size of time intervals array and colors array must be same");
+
+            double t = nv->getFrameStamp()->getSimulationTime();
+
+            if(_previous == 0.0f) _previous = t;
+
+            // _motion->update(t - _previous);
+            if (t - _previous > _intervals[_curr_interval])
+            {
+                _previous = t;
+                _curr_interval =  ++_curr_interval % static_cast<short>(sizeof(_intervals)/sizeof(_intervals[0]));
+                dynamic_cast<osg::ShapeDrawable *>(node->asGeode()->getDrawable(0))->setColor( f_color[_curr_interval] );
+            }
+
+        }
+
+    };
+
 }
 
+namespace lights
+{
+    osg::Image* createSpotLightImage(const osg::Vec4& centerColour, const osg::Vec4& backgroudColour, unsigned int size, float power)
+    {
+        osg::Image* image = new osg::Image;
+        image->allocateImage(size,size,1,
+            GL_RGBA,GL_UNSIGNED_BYTE);
 
+
+        float mid = (float(size)-1)*0.5f;
+        float div = 2.0f/float(size);
+        for(unsigned int r=0;r<size;++r)
+        {
+            unsigned char* ptr = image->data(0,r,0);
+            for(unsigned int c=0;c<size;++c)
+            {
+                float dx = (float(c) - mid)*div;
+                float dy = (float(r) - mid)*div;
+                float r = powf(1.0f-sqrtf(dx*dx+dy*dy),power);
+                if (r<0.0f) r=0.0f;
+                osg::Vec4 color = centerColour*r+backgroudColour*(1.0f-r);
+                *ptr++ = (unsigned char)((color[0])*255.0f);
+                *ptr++ = (unsigned char)((color[1])*0.0f);
+                *ptr++ = (unsigned char)((color[2])*0.0f);
+                *ptr++ = (unsigned char)((color[3])*255.0f);
+            }
+        }
+        return image;
+
+        //return osgDB::readImageFile("spot.dds");
+    }
+
+    osg::StateSet* createSpotLightDecoratorState(unsigned int lightNum, unsigned int textureUnit)
+    {
+        osg::StateSet* stateset = new osg::StateSet;
+
+        stateset->setMode(GL_LIGHT0+lightNum, osg::StateAttribute::ON);
+
+        osg::Vec4 centerColour(1.0f,0.0f,0.0f,1.0f);
+        osg::Vec4 ambientColour(0.05f,0.f,0.f,1.0f); 
+
+        // set up spot light texture
+        osg::Texture2D* texture = new osg::Texture2D();
+        texture->setImage(createSpotLightImage(centerColour, ambientColour, 64, 1.0));
+        texture->setBorderColor(osg::Vec4(ambientColour));
+        texture->setWrap(osg::Texture::WRAP_S,osg::Texture::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture::WRAP_T,osg::Texture::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture::WRAP_R,osg::Texture::CLAMP_TO_BORDER);
+
+        stateset->setTextureAttributeAndModes(textureUnit, texture, osg::StateAttribute::ON);
+
+        // set up tex gens
+        stateset->setTextureMode(textureUnit, GL_TEXTURE_GEN_S, osg::StateAttribute::ON);
+        stateset->setTextureMode(textureUnit, GL_TEXTURE_GEN_T, osg::StateAttribute::ON);
+        stateset->setTextureMode(textureUnit, GL_TEXTURE_GEN_R, osg::StateAttribute::ON);
+        stateset->setTextureMode(textureUnit, GL_TEXTURE_GEN_Q, osg::StateAttribute::ON);
+
+        return stateset;
+    }
+
+
+    osg::Node* createSpotLightNode(const osg::Vec3& position, const osg::Vec3& direction, float angle, unsigned int lightNum, unsigned int textureUnit)
+    {
+        osg::Group* group = new osg::Group;
+
+        // create light source.
+        osg::LightSource* lightsource = new osg::LightSource;
+        osg::Light* light = lightsource->getLight();
+        light->setLightNum(lightNum);
+        light->setPosition(osg::Vec4(position,1.0f));
+        light->setAmbient(osg::Vec4(0.00f,0.00f,0.05f,1.0f));
+        light->setDiffuse(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+        group->addChild(lightsource);
+
+        // create tex gen.
+
+        osg::Vec3 up(0.0f,0.0f,1.0f);
+        up = (direction ^ up) ^ direction;
+        up.normalize();
+
+        osg::TexGenNode* texgenNode = new osg::TexGenNode;
+        texgenNode->setTextureUnit(textureUnit);
+        osg::TexGen* texgen = texgenNode->getTexGen();
+        texgen->setMode(osg::TexGen::EYE_LINEAR);
+        texgen->setPlanesFromMatrix(osg::Matrixd::lookAt(position, position+direction, up)*
+            osg::Matrixd::perspective(angle,1.0,0.1,100)*
+            osg::Matrixd::translate(1.0,1.0,1.0)*
+            osg::Matrixd::scale(0.5,0.5,0.5));
+
+
+        group->addChild(texgenNode);
+
+        return group;
+
+    }
+}
 
 namespace creators 
 {
@@ -248,6 +393,8 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
         osg::PositionAttitudeTransform* xform = new osg::PositionAttitudeTransform;
         xform->setUpdateCallback(new osg::AnimationPathCallback(animationPath,0.0,1.0));
         xform->addChild(positioned);
+        
+        xform->addChild(lights::createSpotLightNode(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(0.0f,1.0f,-1.0f), 60.0f, 0, 1));
 
         model->addChild(xform);
     }
@@ -292,27 +439,46 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     if(airplane_file)
 	{
 
-        auto fcolor = osg::Vec4(0.0f, 0.0f, 255.0f, 100.0f);
-        osg::ref_ptr<osg::ShapeDrawable> shape2 = new osg::ShapeDrawable;
-        shape2->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f),
-            0.2f) );
-        shape2->setColor( fcolor );
-        
-        osg::ref_ptr<osg::Geode> tail_light = new osg::Geode;
-        tail_light->addDrawable( shape2.get() );
-        
-        findNodeVisitor findTail("tail"); 
-        airplane_file->accept(findTail);
-        auto tail =  findTail.getFirst();
-        if(tail)  tail->asGroup()->addChild(tail_light);
 
-        osg::Node* light0 = effects::createLightSource(
-            0, osg::Vec3(-20.0f,0.0f,0.0f), fcolor);
 
-        tail->getOrCreateStateSet()->setMode( GL_LIGHT0,
-            osg::StateAttribute::ON );
+        auto CreateLight = [=](const osg::Vec4& fcolor,effects::BlinkNode* callback=nullptr)->osg::Geode* {
+            osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
+            shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
+            // shape1->setColor( fcolor );
+            osg::Geode* light = new osg::Geode;
+            light->addDrawable( shape1.get() );
+            dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
+            light->setUpdateCallback(callback);
+            return light;
+        };
 
-        tail->asGroup()->addChild( light0 );
+        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,nullptr);
+        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,nullptr);
+        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,nullptr);
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,new effects::BlinkNode(white_color,black_color));
+
+        auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
+            findNodeVisitor findTail(root.c_str()); 
+            airplane_file->accept(findTail);
+            auto tail =  findTail.getFirst();
+            if(tail)  tail->asGroup()->addChild(child);
+            return tail;
+         };
+
+        auto tail = addAsChild("tail",white_light);
+        auto strobe_r = addAsChild("strobe_r",white_light);
+        auto strobe_l = addAsChild("strobe_l",white_light);
+
+        auto port = addAsChild("port",green_light);
+        auto star_board = addAsChild("starboard",red_light);
+
+        //osg::Node* light0 = effects::createLightSource(
+        //    0, osg::Vec3(-20.0f,0.0f,0.0f), red_color);
+
+        //airplane_file->getOrCreateStateSet()->setMode( GL_LIGHT0,
+        //    osg::StateAttribute::ON );
+
+        //airplane_file->asGroup()->addChild( light0 );
 
         
         findNodeVisitor findLod3("Lod3"); 
@@ -416,6 +582,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     movingModel->setName("moving_model");
 
     root->addChild(movingModel);
+    
+    //root->setStateSet(lights::createSpotLightDecoratorState(10,1));
 
     ret_array[0] = root;
     

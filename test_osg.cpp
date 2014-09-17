@@ -148,8 +148,7 @@ int main( int argc, char** argv )
         }
        
         
-        AddLight(rootnode);
-
+        // AddLight(rootnode);
 
         // run optimization over the scene graph
         //osgUtil::Optimizer optimzer;
