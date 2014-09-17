@@ -438,9 +438,6 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     if(airplane_file)
 	{
-
-
-
         auto CreateLight = [=](const osg::Vec4& fcolor,effects::BlinkNode* callback=nullptr)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
             shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
@@ -559,7 +556,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     osg::Group* root = new osg::Group;
 
     float baseHeight = center.z()-radius*0.5;
-    osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius);
+    osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];

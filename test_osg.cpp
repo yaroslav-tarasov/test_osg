@@ -61,6 +61,33 @@ private:
     float _angle;
 };
 
+
+class MyGustCallback : public osg::NodeCallback
+{
+
+    public:
+
+        MyGustCallback() {}
+
+        virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+        {
+            osgParticle::PrecipitationEffect* pe = dynamic_cast<osgParticle::PrecipitationEffect*>(node);
+            
+            float value = sin(nv->getFrameStamp()->getSimulationTime());
+            if (value<-0.5)
+            {
+                pe->snow(1.0);
+            }
+            else
+            {
+                pe->rain(0.5);
+            }
+        
+            traverse(node, nv);
+        }
+};
+
+
 int main( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -263,6 +290,21 @@ int main( int argc, char** argv )
         
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
+		
+	    osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
+
+		// create the light    
+		//osg::LightSource* lightSource = new osg::LightSource;
+		//model->asGroup()->addChild(lightSource);
+
+		//osg::Light* light = lightSource->getLight();
+		//light->setLightNum(0);
+		//light->setPosition(osg::Vec4(0.0f,0.0f,1.0f,0.0f)); // directional light from above
+		//light->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
+		//light->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+		//light->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));			
+		model->asGroup()->addChild(precipitationEffect.get());
+		precipitationEffect->snow(0.3);
         InfoVisitor infoVisitor;
         model->accept( infoVisitor );
 

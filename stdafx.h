@@ -57,6 +57,7 @@
 #include <osgParticle/SmokeTrailEffect>
 #include <osgParticle/FireEffect>
 
+#include <osgParticle/PrecipitationEffect>
 
- #include <osgFX/Outline>
+#include <osgFX/Outline>
                                          
