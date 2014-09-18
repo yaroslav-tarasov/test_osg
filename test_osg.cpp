@@ -8,6 +8,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "info_visitor.h"
+#include "SkyBox.h"
+
 
 osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 {
@@ -25,12 +27,13 @@ osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 
 void AddLight( osg::ref_ptr<osg::MatrixTransform> rootnode ) 
 {
+
+    
     osg::Node* light0 = effects::createLightSource(
-        0, osg::Vec3(-20.0f,0.0f,0.0f), osg::Vec4(
-        1.0f,1.0f,1.0f,100.0f) );
+        0, osg::Vec3(0.0f,0.0f,1000.0f), osg::Vec4(0.0f,0.0f,0.0f,0.0f) );
 
     osg::Node* light1 = effects::createLightSource(
-        1, osg::Vec3(0.0f,-20.0f,0.0f), osg::Vec4(1.0f,1.0f,1.0f,100.0f)
+        1, osg::Vec3(/*0.0f,-20.0f,0.0f*/0.0f,0.0f,1000.0f), osg::Vec4(1.5f,1.5f,1.5f,1.0f)
         );
 
 
@@ -159,10 +162,24 @@ int main( int argc, char** argv )
         osg::BoundingBox bb;
         bb.expandBy(loaded_bs);
 
+        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+        geode->addDrawable( new osg::ShapeDrawable(
+            new osg::Sphere(osg::Vec3(), model->getBound().radius())) );
+        geode->setCullingActive( false );
+
+        osg::ref_ptr<SkyBox> skybox = new SkyBox;
+        skybox->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::TexGen );
+        skybox->setEnvironmentMap( 0,
+            osgDB::readImageFile("Cubemap_snow/posx.jpg"), osgDB::readImageFile("Cubemap_snow/negx.jpg"),
+            osgDB::readImageFile("Cubemap_snow/posy.jpg"), osgDB::readImageFile("Cubemap_snow/negy.jpg"),
+            osgDB::readImageFile("Cubemap_snow/posz.jpg"), osgDB::readImageFile("Cubemap_snow/negz.jpg") );
+        skybox->addChild( geode.get() );
+
         // tilt the scene so the default eye position is looking down on the model.
         osg::ref_ptr<osg::MatrixTransform> rootnode = new osg::MatrixTransform;
         rootnode->setMatrix(osg::Matrix::rotate(osg::inDegrees(30.0f),1.0f,0.0f,0.0f));
         rootnode->addChild(model);
+        rootnode->addChild( skybox.get() );
 
         {
             // create outline effect
@@ -175,7 +192,7 @@ int main( int argc, char** argv )
         }
        
         
-        // AddLight(rootnode);
+        //AddLight(rootnode);
 
         // run optimization over the scene graph
         //osgUtil::Optimizer optimzer;
@@ -291,7 +308,7 @@ int main( int argc, char** argv )
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
 		
-	    osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
+	    //osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
 
 		// create the light    
 		//osg::LightSource* lightSource = new osg::LightSource;
@@ -303,11 +320,14 @@ int main( int argc, char** argv )
 		//light->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
 		//light->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
 		//light->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));			
-		model->asGroup()->addChild(precipitationEffect.get());
-		precipitationEffect->snow(0.3);
+		
+        // model->asGroup()->addChild(precipitationEffect.get());
+		// precipitationEffect->snow(0.3);
+
+#ifdef  WEWANTTOPRINTSRUCTURE
         InfoVisitor infoVisitor;
         model->accept( infoVisitor );
-
+#endif
         return viewer.run();
     }
 

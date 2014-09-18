@@ -14,7 +14,7 @@ namespace
 namespace effects 
 { 
     
-    osg::Vec3 wind(10.0f,0.0f,0.0f); 
+    osg::Vec3 wind(10.0f,10.0f,0.0f); 
 
     void insertParticle(osg::Group* root,osg::Node* rootModel, const osg::Vec3& center, float radius)
     {
@@ -112,9 +112,24 @@ namespace effects
         const osg::Vec3& trans,
         const osg::Vec4& color )
     {
+        auto CreateLight = [=](const osg::Vec4& fcolor)->osg::Geode* {
+            osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
+            shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 2.f) );
+            shape1->setColor( fcolor );
+            osg::Geode* light = new osg::Geode;
+            light->addDrawable( shape1.get() );
+            return light;
+        };
+
+        osg::ref_ptr<osg::Geode> light_src   = CreateLight(osg::Vec4(255.0f,0.0f,0.0f,255.0f));
+
+
         osg::ref_ptr<osg::Light> light = new osg::Light;
         light->setLightNum( num );
         light->setDiffuse( color );
+        //light->setDiffuse(osg::Vec4(1.0,1.0,1.0,1.0));
+        //light->setSpecular(osg::Vec4(1,1,1,1));  // some examples don't have this one
+
         light->setPosition( osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f) );
         osg::ref_ptr<osg::LightSource> lightSource = new
             osg::LightSource;
@@ -124,6 +139,7 @@ namespace effects
             new osg::MatrixTransform;
         sourceTrans->setMatrix( osg::Matrix::translate(trans) );
         sourceTrans->addChild( lightSource.get() );
+        sourceTrans->addChild( light_src.get() );
         return sourceTrans.release();
     }
 
@@ -278,7 +294,7 @@ osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,dou
     osg::AnimationPath* animationPath = new osg::AnimationPath;
     animationPath->setLoopMode(osg::AnimationPath::LOOP);
 
-    int numSamples = 40;
+    int numSamples = 400;
     float yaw = 0.0f;
     float yaw_delta = 2.0f*osg::PI/((float)numSamples-1.0f);
     float roll = osg::inDegrees(30.0f);
@@ -287,8 +303,8 @@ osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,dou
     double time_delta = looptime/(double)numSamples;
     for(int i=0;i<numSamples;++i)
     {
-        osg::Vec3 position(center+osg::Vec3(sinf(yaw)*radius,cosf(yaw)*radius,0.0f));
-        osg::Quat rotation(osg::Quat(roll,osg::Vec3(0.0,1.0,0.0))*osg::Quat(-(yaw+osg::inDegrees(90.0f)),osg::Vec3(0.0,0.0,1.0)));
+        osg::Vec3 position(center+osg::Vec3(sinf(yaw)*radius,0.0f,cosf(yaw)*radius));
+        osg::Quat rotation(osg::Quat(roll,osg::Vec3(0.0,0.0,1.0))*osg::Quat(/*-*/(yaw+osg::inDegrees(90.0f)),osg::Vec3(0.0,/*-*/1.0,0.0)));
 
         animationPath->insert(time,osg::AnimationPath::ControlPoint(position,rotation));
 
@@ -366,7 +382,8 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 {
-    float animationLength = 10.0f;
+    float animationLength = 50.0f;
+    float model_size = 100.0f;
 
     static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","./a_319_aeroflot.png"};
 
@@ -380,12 +397,12 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     {
         const osg::BoundingSphere& bs = glider->getBound();
 
-        float size = radius/bs.radius()*0.3f;
+        float size = model_size/bs.radius()*0.3f;
         osg::MatrixTransform* positioned = new osg::MatrixTransform;
         positioned->setDataVariance(osg::Object::STATIC);
         positioned->setMatrix(osg::Matrix::translate(-bs.center())*
             osg::Matrix::scale(size,size,size)*
-            osg::Matrix::rotate(osg::inDegrees(-90.0f),0.0f,0.0f,1.0f));
+            osg::Matrix::rotate(osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),1.0f));
         
        
         positioned->addChild(glider);
@@ -393,9 +410,10 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
         osg::PositionAttitudeTransform* xform = new osg::PositionAttitudeTransform;
         xform->setUpdateCallback(new osg::AnimationPathCallback(animationPath,0.0,1.0));
         xform->addChild(positioned);
-        
-        xform->addChild(lights::createSpotLightNode(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(0.0f,1.0f,-1.0f), 60.0f, 0, 1));
 
+#ifdef SPOT_LIGHT        
+        //xform->addChild(lights::createSpotLightNode(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(0.0f,1.0f,-1.0f), 60.0f, 0, 1));
+#endif
         model->addChild(xform);
     }
 
@@ -438,7 +456,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     if(airplane_file)
 	{
-        auto CreateLight = [=](const osg::Vec4& fcolor,effects::BlinkNode* callback=nullptr)->osg::Geode* {
+        auto CreateLight = [=](const osg::Vec4& fcolor,effects::BlinkNode* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
             shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
             // shape1->setColor( fcolor );
@@ -521,11 +539,11 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
         const osg::BoundingSphere& bs = airplane->getBound();
 
-        const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
+        const osg::Quat quat0(osg::inDegrees(0.f/*-90.0f*/), osg::X_AXIS,                      
                               osg::inDegrees(0.f)  , osg::Y_AXIS,
                               osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
-        float size = radius/bs.radius()*0.7f;
+        float size = model_size/bs.radius()*0.7f;
         osg::MatrixTransform* positioned = new osg::MatrixTransform;
         positioned->setDataVariance(osg::Object::DYNAMIC);
         positioned->setMatrix(osg::Matrix::translate(-bs.center())*
@@ -550,13 +568,18 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
 nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
-    osg::Vec3 center(0.0f,0.0f,0.0f);
-    float radius = 100.0f;
+    osg::Vec3 center(0.0f,-200.0f,0.0f);
+    float radius = 600.0f;
+
 
     osg::Group* root = new osg::Group;
 
     float baseHeight = center.z()-radius*0.5;
+#if 0
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
+#else
+    osg::Node* baseModel = osgDB::readNodeFile("adler.osgb");
+#endif
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
@@ -578,9 +601,12 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     
     movingModel->setName("moving_model");
 
+
     root->addChild(movingModel);
-    
+
+#ifdef SPOT_LIGHT
     //root->setStateSet(lights::createSpotLightDecoratorState(10,1));
+#endif
 
     ret_array[0] = root;
     

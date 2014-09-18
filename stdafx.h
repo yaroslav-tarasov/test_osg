@@ -61,3 +61,10 @@
 
 #include <osgFX/Outline>
                                          
+
+#include <osg/Depth>
+                 
+#include <osgUtil/CullVisitor> 
+
+#include <osg/TextureCubeMap>
+#include <osg/Transform>
