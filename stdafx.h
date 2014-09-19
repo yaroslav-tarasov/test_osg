@@ -68,3 +68,13 @@
 
 #include <osg/TextureCubeMap>
 #include <osg/Transform>
+
+#include <osgViewer/ViewerEventHandlers>
+
+#include <math/primitives.h>
+#include <math/primitives/vector.h>
+#include <math/primitives/range.h>
+#include <math/primitives/rectangle.h>
+#include <math/lerp.h>
+#include <math/eq.h>
+using namespace Kongsberg::math;

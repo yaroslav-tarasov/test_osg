@@ -56,7 +56,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -67,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -75,7 +75,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>osgFX.lib;OpenThreads.lib;osg.lib;osgDB.lib;osgViewer.lib;osgAnimation.lib;osgGA.lib;osgUtil.lib;osgSim.lib;osgParticle.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>osgFX.lib;osgEphemeris.lib;OpenThreads.lib;osg.lib;osgDB.lib;osgViewer.lib;osgAnimation.lib;osgGA.lib;osgUtil.lib;osgSim.lib;osgParticle.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -88,6 +88,7 @@
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="SkyBox.h" />
+    <ClInclude Include="StarField.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -96,6 +97,7 @@
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="StarField.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
