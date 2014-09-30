@@ -71,10 +71,13 @@
 
 #include <osgViewer/ViewerEventHandlers>
 
-#include <math/primitives.h>
-#include <math/primitives/vector.h>
-#include <math/primitives/range.h>
-#include <math/primitives/rectangle.h>
-#include <math/lerp.h>
-#include <math/eq.h>
-using namespace Kongsberg::math;
+#include <osg/StateSet>
+#include <osg/LightModel>
+
+#include <osgShadow/ShadowedScene>
+#include <osgShadow/ShadowMap>
+
+#include <osgGA/NodeTrackerManipulator>
+
+int main_scene( int argc, char** argv );
+int main_hud( int argc, char** argv );

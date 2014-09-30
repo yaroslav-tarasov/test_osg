@@ -40,9 +40,8 @@ namespace effects
        
        // Если раскомментить форма дыма поменяется но это будет жеееееесть
        // smoke->setTextureFileName("Images/continous_black_smoke.rgb");
-       
-
-        explosion->setWind(wind);
+        
+	    explosion->setWind(wind);
         explosionDebri->setWind(wind);
         smoke->setWind(wind);
         fire->setWind(wind);
@@ -303,9 +302,14 @@ osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,dou
     double time_delta = looptime/(double)numSamples;
     for(int i=0;i<numSamples;++i)
     {
+
+#ifdef  YAW_Y_AXE
         osg::Vec3 position(center+osg::Vec3(sinf(yaw)*radius,0.0f,cosf(yaw)*radius));
         osg::Quat rotation(osg::Quat(roll,osg::Vec3(0.0,0.0,1.0))*osg::Quat(/*-*/(yaw+osg::inDegrees(90.0f)),osg::Vec3(0.0,/*-*/1.0,0.0)));
-
+#else
+        osg::Vec3 position(center+osg::Vec3(sinf(yaw)*radius,cosf(yaw)*radius,0.0f));
+        osg::Quat rotation(osg::Quat(roll,osg::Vec3(0.0,1.0,0.0))*osg::Quat(-(yaw+osg::inDegrees(90.0f)),osg::Vec3(0.0,0.0,1.0)));
+#endif
         animationPath->insert(time,osg::AnimationPath::ControlPoint(position,rotation));
 
         yaw += yaw_delta;
@@ -376,6 +380,9 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
     osg::Geode* geode = new osg::Geode;
     geode->addDrawable(geom);
+	//
+	//osg::MatrixTransform* positioned = new osg::MatrixTransform;
+	//positioned->addChild(geode);
 
     return geode;
 }
@@ -391,7 +398,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     osg::Group* model = new osg::Group;
 
-    osg::Node* glider = osgDB::readNodeFile("glider.osgt");
+    osg::Node* glider = osgDB::readNodeFile("t72-tank_des.flt");// glider.osgt
 
     if (glider)
     {
@@ -456,7 +463,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     if(airplane_file)
 	{
-        auto CreateLight = [=](const osg::Vec4& fcolor,effects::BlinkNode* callback)->osg::Geode* {
+        auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,effects::BlinkNode* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
             shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
             // shape1->setColor( fcolor );
@@ -464,14 +471,15 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
             light->addDrawable( shape1.get() );
             dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
             light->setUpdateCallback(callback);
+			light->setName(name);
             return light;
         };
 
-        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,nullptr);
-        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,nullptr);
-        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,nullptr);
-        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,new effects::BlinkNode(white_color,black_color));
-
+        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
+        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
+        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,black_color));
+		
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
             findNodeVisitor findTail(root.c_str()); 
             airplane_file->accept(findTail);
@@ -518,36 +526,42 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     if (airplane)
     {
         airplane->setName("airplane");
+
+#if 0   // Texture on board
+        osg::Image *img_plane = osgDB::readImageFile(texs[2]);
+        osg::Texture2D *tex_plane = new osg::Texture2D;
+        tex_plane->setDataVariance(osg::Object::DYNAMIC);
         
-        //osg::Image *img_plane = osgDB::readImageFile(texs[2]);
-        //osg::Texture2D *tex_plane = new osg::Texture2D;
-        //tex_plane->setDataVariance(osg::Object::DYNAMIC);
-        //
-        //tex_plane ->setImage(img_plane);
-        ////airplane->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex_plane ,osg::StateAttribute::ON);
-        //// Create a new StateSet with default settings: 
-        //osg::StateSet* stateOne = new osg::StateSet();
+        tex_plane ->setImage(img_plane);
+        //airplane->getOrCreateStateSet()->setTextureAttributeAndModes(0, tex_plane ,osg::StateAttribute::ON);
+        // Create a new StateSet with default settings: 
+        osg::StateSet* stateOne = new osg::StateSet();
 
-        //// Assign texture unit 0 of our new StateSet to the texture 
-        //// we just created and enable the texture.
-        //stateOne->setTextureAttributeAndModes
-        //    (0,tex_plane,osg::StateAttribute::ON);
-        //// Associate this state set with the Geode that contains
-        //// the pyramid: 
-        //airplane->setStateSet(stateOne);
-
+        // Assign texture unit 0 of our new StateSet to the texture 
+        // we just created and enable the texture.
+        stateOne->setTextureAttributeAndModes
+            (0,tex_plane,osg::StateAttribute::ON);
+        // Associate this state set with the Geode that contains
+        // the pyramid: 
+        airplane->setStateSet(stateOne);
+#endif
 
         const osg::BoundingSphere& bs = airplane->getBound();
-
+#ifdef  YAW_Y_AXE
         const osg::Quat quat0(osg::inDegrees(0.f/*-90.0f*/), osg::X_AXIS,                      
                               osg::inDegrees(0.f)  , osg::Y_AXIS,
                               osg::inDegrees(0.f)  , osg::Z_AXIS ); 
+#else
+        const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
+                              osg::inDegrees(0.f)  , osg::Y_AXIS,
+                              osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
+#endif
         float size = model_size/bs.radius()*0.7f;
         osg::MatrixTransform* positioned = new osg::MatrixTransform;
         positioned->setDataVariance(osg::Object::DYNAMIC);
         positioned->setMatrix(osg::Matrix::translate(-bs.center())*
-            osg::Matrix::scale(size,size,size)*
+            //osg::Matrix::scale(size,size,size)*
             osg::Matrix::rotate(quat0));
 
         positioned->addChild(airplane);
@@ -568,14 +582,13 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
 nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
-    osg::Vec3 center(0.0f,-200.0f,0.0f);
+    osg::Vec3 center(0.0f,0.0f,300.0f);
     float radius = 600.0f;
-
 
     osg::Group* root = new osg::Group;
 
-    float baseHeight = center.z()-radius*0.5;
-#if 0
+    float baseHeight = 0.0f; //center.z();//-radius*0.5;
+#if 1
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #else
     osg::Node* baseModel = osgDB::readNodeFile("adler.osgb");
@@ -583,6 +596,65 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
+	
+	osg::Group* test_model = new osg::Group;
+
+    const bool add_planes = true;
+    if (add_planes)
+    {
+		osg::Node* p_copy = dynamic_cast<osg::Node*>(ret_array[1]->clone(osg::CopyOp::DEEP_COPY_ALL)); 
+        findNodeVisitor findNodes("white_blink"); 
+		p_copy->accept(findNodes);
+
+	    findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+		
+		for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+		{
+			(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
+		}
+
+		const unsigned inst_num = 12;
+        for (unsigned i = 0; i < inst_num; ++i)
+        {
+            float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
+            /*cg::point_3f*/ osg::Vec3 pos(radius * sin (angle), radius * cos(angle), 0.f);
+
+            //cg::transform_4f rottrans = cg::transform_4f(
+            //    as_translation(cg::point_3f(pos)),
+            //    cg::cprf(180.f * (i & 1) + cg::rad2grad(angle), 0.f, 0.f),
+            //    as_scale(cg::point_3f(1.f, 1.f, 1.f)));
+
+            //transform_node_ptr cur_trans = m_pVictory->scenegraph()->create(node::NT_Transform)->as_transform();
+            //cur_trans->set_transform(rottrans);
+
+			const osg::Quat quat(osg::inDegrees(-90.f), osg::X_AXIS,                      
+                                 osg::inDegrees(0.f) , osg::Y_AXIS,
+                                 osg::inDegrees(180.f * (i & 1)) - angle  , osg::Z_AXIS ); 
+
+
+			osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(pos));
+			positioned->setDataVariance(osg::Object::STATIC);
+			
+			osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
+			rotated->setDataVariance(osg::Object::STATIC);
+			
+			positioned->addChild(rotated);
+			rotated->addChild(p_copy/*ret_array[1]*/);
+
+
+            //node_ptr ptrCessnaNode = m_pVictory->scenegraph()->load("learjet60/learjet60.scg");
+            //cur_trans->add(ptrCessnaNode.get());
+
+
+
+            // add it
+            // m_pScene->get_objects()->add(cur_trans.get());
+			//if(i%2==0) 
+			//	root->addChild(positioned);
+			//else
+				movingModel->asGroup()->addChild(positioned);
+        }
+    }
 
     if (overlay)
     {
@@ -601,8 +673,19 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     
     movingModel->setName("moving_model");
 
-
+#if 0 
+	osg::ref_ptr<osgShadow::ShadowedScene> shadowScene
+		= new osgShadow::ShadowedScene;
+	osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
+	shadowScene->setShadowTechnique(sm.get());
+	shadowScene->addChild(ret_array[1]);
+	shadowScene->addChild(movingModel);
+	root->addChild(shadowScene/*movingModel*/);
+#else
     root->addChild(movingModel);
+#endif
+
+
 
 #ifdef SPOT_LIGHT
     //root->setStateSet(lights::createSpotLightDecoratorState(10,1));
