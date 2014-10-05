@@ -6,5 +6,5 @@
 int main( int argc, char** argv )
 {
 
-    return main_hud(argc, argv);
+    return main_select(argc, argv);
 }

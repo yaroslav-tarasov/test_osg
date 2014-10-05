@@ -10,6 +10,11 @@
 
 #include <osgEphemeris/EphemerisModel.h>
 
+// #define TEST_EPHEMERIS
+// #define TEST_PRECIP
+// #define TEST_NODE_TRACKER
+// #define TEST_SKYBOX
+
 osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 {
     osg::Matrix l2w;
@@ -276,7 +281,7 @@ int main_scene( int argc, char** argv )
         osg::BoundingBox bb;
         bb.expandBy(loaded_bs);
 
- #ifdef USINGSKYBOX
+ #ifdef TEST_SKYBOX
         osg::ref_ptr<osg::Geode> geode = new osg::Geode;
         geode->addDrawable( new osg::ShapeDrawable(
             new osg::Sphere(osg::Vec3(), model->getBound().radius())) );
@@ -295,15 +300,14 @@ int main_scene( int argc, char** argv )
 
         rootnode->addChild(model);
 
-#ifdef USINGSKYBOX
+#ifdef TEST_SKYBOX
         rootnode->addChild( skybox.get() );
 #endif
         //auto _skyStarField = new svSky::StarField();
 
         //rootnode->addChild(_skyStarField);
         //_skyStarField->setIlluminationFog(10.0f/*_illumination*/, 0.3f/*_fogDensity*/);
-        osg::BoundingSphere bs = model->getBound();
-        osg::ref_ptr<osgEphemeris::EphemerisModel> ephemerisModel = new osgEphemeris::EphemerisModel;
+
 
         {
             // create outline effect
@@ -314,7 +318,11 @@ int main_scene( int argc, char** argv )
             outline->setColor(osg::Vec4(1,1,0,1));
             outline->addChild(model_parts[3]);
         }
-		
+
+#ifdef  TEST_EPHEMERIS
+        osg::BoundingSphere bs = model->getBound();
+        osg::ref_ptr<osgEphemeris::EphemerisModel> ephemerisModel = new osgEphemeris::EphemerisModel;
+
 		ephemerisModel->setSkyDomeMirrorSouthernHemisphere(false);
 		ephemerisModel->setSkyDomeUseSouthernHemisphere(false);
 
@@ -322,7 +330,7 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setAutoDateTime( false );
 
         // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
-        //ephemerisModel->setMoveWithEyePoint(false);
+        // ephemerisModel->setMoveWithEyePoint(false);
         // ephemerisModel->setEphemerisUpdateCallback( new EphemerisDataUpdateCallback );
 
         rootnode->addChild( ephemerisModel.get() );
@@ -340,6 +348,7 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setDateTime( dateTime );
         ephemerisModel->setSkyDomeRadius( radius );
 		ephemerisModel->setMoveWithEyePoint(false);
+#endif  // TEST_EPHEMERIS
 
         //AddLight(rootnode);
 
@@ -454,7 +463,9 @@ int main_scene( int argc, char** argv )
                    ,[&](bool low){model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);}
             ));
 
+#ifdef  TEST_EPHEMERIS
         viewer.addEventHandler( new TimeChangeHandler( ephemerisModel.get() ) );
+#endif
 
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
@@ -478,15 +489,16 @@ int main_scene( int argc, char** argv )
 		//light->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
 		//light->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
 
+#ifdef TEST_PRECIP   // здесь у нас будет снег 
 	     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
          model->asGroup()->addChild(precipitationEffect.get());
 		 precipitationEffect->snow(0.3);
-
+#endif
 		// Useless
 		//rootnode->getOrCreateStateSet()->setMode( GL_LINE_SMOOTH, osg::StateAttribute::ON );
 		//rootnode->getOrCreateStateSet()->setMode( GL_POLYGON_SMOOTH, osg::StateAttribute::ON );
 
-#if 0   // Странный эффект и для модели и для 
+#if TEST_NODE_TRACKER  // Странный эффект для модели
 		osg::ref_ptr<osgGA::NodeTrackerManipulator> manip
 			= new osgGA::NodeTrackerManipulator;
 		 manip->setTrackNode(model_parts[1]/*.get()*/);

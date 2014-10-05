@@ -78,6 +78,8 @@
 #include <osgShadow/ShadowMap>
 
 #include <osgGA/NodeTrackerManipulator>
+#include <osgUtil/LineSegmentIntersector>
 
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
+int main_select( int argc, char** argv );

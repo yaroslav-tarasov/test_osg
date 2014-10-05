@@ -96,6 +96,7 @@
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="main_scene.cpp" />
+    <ClCompile Include="select_geometry.cpp" />
     <ClCompile Include="SimpleHUD.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -65,5 +65,8 @@
     <ClCompile Include="main_scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="select_geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

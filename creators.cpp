@@ -2,6 +2,9 @@
 #include "find_node_visitor.h" 
 #include "creators.h"
 
+// #define TEST_SHADOWS
+// #define TEST_TEXTURE
+
 namespace
 {
     const osg::Vec4 red_color   = osg::Vec4(255.0f, 0.0f, 0.0f, 100.0f);
@@ -387,43 +390,8 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     return geode;
 }
 
-nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
+nodes_array_t loadAirplane()
 {
-    float animationLength = 50.0f;
-    float model_size = 100.0f;
-
-    static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","./a_319_aeroflot.png"};
-
-    osg::AnimationPath* animationPath = createAnimationPath(center,radius,animationLength);
-
-    osg::Group* model = new osg::Group;
-
-    osg::Node* glider = osgDB::readNodeFile("t72-tank_des.flt");// glider.osgt
-
-    if (glider)
-    {
-        const osg::BoundingSphere& bs = glider->getBound();
-
-        float size = model_size/bs.radius()*0.3f;
-        osg::MatrixTransform* positioned = new osg::MatrixTransform;
-        positioned->setDataVariance(osg::Object::STATIC);
-        positioned->setMatrix(osg::Matrix::translate(-bs.center())*
-            osg::Matrix::scale(size,size,size)*
-            osg::Matrix::rotate(osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),1.0f));
-        
-       
-        positioned->addChild(glider);
-
-        osg::PositionAttitudeTransform* xform = new osg::PositionAttitudeTransform;
-        xform->setUpdateCallback(new osg::AnimationPathCallback(animationPath,0.0,1.0));
-        xform->addChild(positioned);
-
-#ifdef SPOT_LIGHT        
-        //xform->addChild(lights::createSpotLightNode(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(0.0f,1.0f,-1.0f), 60.0f, 0, 1));
-#endif
-        model->addChild(xform);
-    }
-
     osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.dae"  "an_124.dae"
 
     osg::Node* engine = nullptr; 
@@ -520,14 +488,57 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
         engine =  findEngine.getFirst();
         engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
+	}
+
+    nodes_array_t retval = {nullptr,airplane_file,engine,engine_geode,lod0,lod3};
+    return retval;
+}
+
+nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
+{
+    float animationLength = 50.0f;
+    float model_size = 100.0f;
+
+    static std::string texs[] = {"a_319_kuban.png","a_319_airfrance.png","./a_319_aeroflot.png"};
+
+    osg::AnimationPath* animationPath = createAnimationPath(center,radius,animationLength);
+
+    osg::Group* model = new osg::Group;
+
+    osg::Node* glider = osgDB::readNodeFile("t72-tank_des.flt");// glider.osgt
+
+    if (glider)
+    {
+        const osg::BoundingSphere& bs = glider->getBound();
+
+        float size = model_size/bs.radius()*0.3f;
+        osg::MatrixTransform* positioned = new osg::MatrixTransform;
+        positioned->setDataVariance(osg::Object::STATIC);
+        positioned->setMatrix(osg::Matrix::translate(-bs.center())*
+            osg::Matrix::scale(size,size,size)*
+            osg::Matrix::rotate(osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),osg::inDegrees(-90.0f),1.0f));
         
-        auto airplane = airplane_file;
+       
+        positioned->addChild(glider);
+
+        osg::PositionAttitudeTransform* xform = new osg::PositionAttitudeTransform;
+        xform->setUpdateCallback(new osg::AnimationPathCallback(animationPath,0.0,1.0));
+        xform->addChild(positioned);
+
+#ifdef SPOT_LIGHT        
+        //xform->addChild(lights::createSpotLightNode(osg::Vec3(0.0f,0.0f,0.0f), osg::Vec3(0.0f,1.0f,-1.0f), 60.0f, 0, 1));
+#endif
+        model->addChild(xform);
+    }
+	
+	nodes_array_t plane = loadAirplane();
+	auto airplane = plane[1];
 
     if (airplane)
     {
         airplane->setName("airplane");
 
-#if 0   // Texture on board
+#if  TEST_TEXTURE   // Texture on board
         osg::Image *img_plane = osgDB::readImageFile(texs[2]);
         osg::Texture2D *tex_plane = new osg::Texture2D;
         tex_plane->setDataVariance(osg::Object::DYNAMIC);
@@ -574,9 +585,9 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 
     }
 
-	}
 
-    nodes_array_t retval = {model,airplane_file,engine,engine_geode,lod0,lod3};
+
+    nodes_array_t retval = {model,airplane,/*engine*/plane[2],/*engine_geode*/plane[3],/*lod0*/plane[4],/*lod3*/plane[5]};
     return retval;
 }
 
@@ -602,18 +613,20 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     const bool add_planes = true;
     if (add_planes)
     {
-		osg::Node* p_copy = dynamic_cast<osg::Node*>(ret_array[1]->clone(osg::CopyOp::DEEP_COPY_ALL)); 
-        findNodeVisitor findNodes("white_blink"); 
-		p_copy->accept(findNodes);
+		//osg::Node* p_copy = dynamic_cast<osg::Node*>(ret_array[1]->clone(osg::CopyOp::DEEP_COPY_ALL)); 
+        //findNodeVisitor findNodes("white_blink"); 
+		//p_copy->accept(findNodes);
 
-	    findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+	    //findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 		
-		for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
-		{
-			(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
-		}
-
-		const unsigned inst_num = 12;
+		//for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+		//{
+		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
+		//}
+		nodes_array_t plane = loadAirplane();
+		auto p_copy = plane[1];
+		
+		const unsigned inst_num = 1;
         for (unsigned i = 0; i < inst_num; ++i)
         {
             float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
@@ -639,7 +652,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 			rotated->setDataVariance(osg::Object::STATIC);
 			
 			positioned->addChild(rotated);
-			rotated->addChild(p_copy/*ret_array[1]*/);
+			rotated->addChild(/*p_copy*/ret_array[1]);
 
 
             //node_ptr ptrCessnaNode = m_pVictory->scenegraph()->load("learjet60/learjet60.scg");
@@ -650,9 +663,9 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
             // add it
             // m_pScene->get_objects()->add(cur_trans.get());
 			//if(i%2==0) 
-			//	root->addChild(positioned);
+				root->addChild(positioned);
 			//else
-				movingModel->asGroup()->addChild(positioned);
+			//	movingModel->asGroup()->addChild(positioned);
         }
     }
 
@@ -673,7 +686,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     
     movingModel->setName("moving_model");
 
-#if 0 
+#if TEST_SHADOWS
 	osg::ref_ptr<osgShadow::ShadowedScene> shadowScene
 		= new osgShadow::ShadowedScene;
 	osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
