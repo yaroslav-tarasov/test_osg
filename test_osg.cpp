@@ -6,5 +6,7 @@
 int main( int argc, char** argv )
 {
 
-    return main_select(argc, argv);
+    // return main_select(argc, argv);
+    
+    return main_scene(argc, argv);
 }

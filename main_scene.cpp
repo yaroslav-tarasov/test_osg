@@ -10,8 +10,8 @@
 
 #include <osgEphemeris/EphemerisModel.h>
 
-// #define TEST_EPHEMERIS
-// #define TEST_PRECIP
+#define TEST_EPHEMERIS
+#define TEST_PRECIP
 // #define TEST_NODE_TRACKER
 // #define TEST_SKYBOX
 

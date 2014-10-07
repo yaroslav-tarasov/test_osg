@@ -2,8 +2,9 @@
 #include "find_node_visitor.h" 
 #include "creators.h"
 
-// #define TEST_SHADOWS
+#define TEST_SHADOWS
 // #define TEST_TEXTURE
+// #define TEST_ADLER_SCENE
 
 namespace
 {
@@ -12,6 +13,91 @@ namespace
     const osg::Vec4 green_color = osg::Vec4(0.0f, 255.0f, 0.0f, 100.0f);
     const osg::Vec4 white_color = osg::Vec4(255.0f, 255.0f, 255.0f, 100.0f);
     const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,1.0f);
+
+#define   STRINGIFY(x) #x ;
+
+    char vertexShaderSource_simple[] =  STRINGIFY ( 
+        uniform vec4 coeff;
+        void main(void)
+        {
+            gl_TexCoord[0] = gl_Vertex; 
+            vec4 vert = gl_Vertex;
+            vert.z = gl_Vertex.x*coeff[0] + gl_Vertex.x*gl_Vertex.x* coeff[1] + 
+                gl_Vertex.y*coeff[2] + gl_Vertex.y*gl_Vertex.y* coeff[3];
+            gl_Position = gl_ModelViewProjectionMatrix * vert;
+        }
+    
+    )
+
+    static const char vertSource[] = STRINGIFY ( 
+        // #pragma debug(on)
+        //uniform vec3 LightPosition;
+        uniform vec4 coeff;
+        // const vec3 LightPosition = vec3(0.0, 0.0, 4.0);
+
+        const float specularContribution = 0.3;
+        const float diffuseContribution  = (1.0 - specularContribution);
+
+        varying float LightIntensity;
+        varying vec2  MCposition;
+
+        void main(void)
+        {
+            vec3 LightPosition = vec3(100.0, 100.0, 400.0) * coeff.xyz;
+            vec4 ecPosition = gl_ModelViewMatrix * gl_Vertex;
+            vec3 tnorm      = normalize(gl_NormalMatrix * gl_Normal);
+            vec3 lightVec   = normalize(LightPosition - vec3 (ecPosition));
+            vec3 reflectVec = reflect(-lightVec, tnorm);
+            vec3 viewVec    = normalize(vec3 (-ecPosition));
+            float spec      = max(dot(reflectVec, viewVec), 0.0);
+            spec            = pow(spec, 16.0);
+            LightIntensity  = diffuseContribution * max(dot(lightVec, tnorm), 0.0) +
+                specularContribution * spec;
+            MCposition      = gl_Vertex.xz;
+            gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
+        }
+    )
+
+    static const char fragSource[] = STRINGIFY ( 
+            // uniform vec3  BrickColor, MortarColor;
+            // uniform float ColumnWidth, RowHeight;
+            // uniform float Bwf, Bhf;
+
+            const vec3 BrickColor = vec3(1.0, 0.3, 0.2);
+            const vec3 MortarColor = vec3(0.85, 0.85, 0.85);
+            const float ColumnWidth = 0.30;
+            const float RowHeight = 0.15;
+            const float Bwf = 0.95;
+            const float Bhf = 0.90;
+
+            varying vec2  MCposition;
+            varying float LightIntensity;
+
+            void main(void)
+            {
+                vec3 color;
+                float ss;
+                float tt;
+                float w;
+                float h;
+
+                ss = MCposition.x / ColumnWidth;
+                tt = MCposition.y / RowHeight;
+
+                if (fract(tt * 0.5) > 0.5)
+                    ss += 0.5;
+
+                ss = fract(ss);
+                tt = fract(tt);
+
+                w = step(ss, Bwf);
+                h = step(tt, Bhf);
+
+                color = mix(MortarColor, BrickColor, w * h) * LightIntensity;
+                gl_FragColor = vec4 (color, 1.0);
+            }
+    )
+
 }
 
 namespace effects 
@@ -185,6 +271,44 @@ namespace effects
         }
 
     };
+    
+    class UniformVarying : public osg::Uniform::Callback
+    {
+        virtual void operator () (osg::Uniform* uniform, osg::NodeVisitor* nv)
+        {
+            const osg::FrameStamp* fs = nv->getFrameStamp();
+            float value = sinf(fs->getSimulationTime());
+            std::string  name = uniform->getName();
+            uniform->set(osg::Vec4(value,-value,-value,value));
+        }
+    };
+
+    void createShader(osg::Geometry* geom)
+    {
+        osg::StateSet* stateset = geom->getOrCreateStateSet();
+
+        osg::Program* program = new osg::Program;
+        stateset->setAttribute(program);
+
+        program->addShader( new osg::Shader(osg::Shader::VERTEX, vertSource));
+        program->addShader( new osg::Shader( osg::Shader::FRAGMENT, fragSource ) );
+        
+        //std::string log;
+        //program->getGlProgramInfoLog(0,log);
+        
+
+        osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
+
+        stateset->addUniform(coeff);
+
+        if (true)
+        {
+            coeff->setUpdateCallback(new UniformVarying);
+            coeff->setDataVariance(osg::Object::DYNAMIC);
+            stateset->setDataVariance(osg::Object::DYNAMIC);
+        }
+
+    }
 
 }
 
@@ -386,6 +510,7 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 	//
 	//osg::MatrixTransform* positioned = new osg::MatrixTransform;
 	//positioned->addChild(geode);
+    effects::createShader(geom) ;
 
     return geode;
 }
@@ -538,7 +663,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     {
         airplane->setName("airplane");
 
-#if  TEST_TEXTURE   // Texture on board
+#ifdef  TEST_TEXTURE   // Texture on board
         osg::Image *img_plane = osgDB::readImageFile(texs[2]);
         osg::Texture2D *tex_plane = new osg::Texture2D;
         tex_plane->setDataVariance(osg::Object::DYNAMIC);
@@ -599,11 +724,23 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     osg::Group* root = new osg::Group;
 
     float baseHeight = 0.0f; //center.z();//-radius*0.5;
-#if 1
-    osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
+#ifdef TEST_ADLER_SCENE 
+    const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
+        osg::inDegrees(0.f)  , osg::Y_AXIS,
+        osg::inDegrees(0.f)  , osg::Z_AXIS ); 
+
+    osg::Node* adler = osgDB::readNodeFile("adler.osgb");
+    osg::MatrixTransform* baseModel = new osg::MatrixTransform;
+    baseModel->setMatrix(
+        // osg::Matrix::translate(-bs.center())*  
+        // osg::Matrix::scale(size,size,size)*
+        osg::Matrix::rotate(quat0));
+
+    baseModel->addChild(adler);
 #else
-    osg::Node* baseModel = osgDB::readNodeFile("adler.osgb");
+    osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #endif
+
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
@@ -626,7 +763,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		nodes_array_t plane = loadAirplane();
 		auto p_copy = plane[1];
 		
-		const unsigned inst_num = 1;
+		const unsigned inst_num = 12;
         for (unsigned i = 0; i < inst_num; ++i)
         {
             float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
@@ -652,7 +789,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 			rotated->setDataVariance(osg::Object::STATIC);
 			
 			positioned->addChild(rotated);
-			rotated->addChild(/*p_copy*/ret_array[1]);
+			rotated->addChild(p_copy/*ret_array[1]*/);
 
 
             //node_ptr ptrCessnaNode = m_pVictory->scenegraph()->load("learjet60/learjet60.scg");
@@ -686,12 +823,12 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     
     movingModel->setName("moving_model");
 
-#if TEST_SHADOWS
+#ifdef TEST_SHADOWS
 	osg::ref_ptr<osgShadow::ShadowedScene> shadowScene
 		= new osgShadow::ShadowedScene;
 	osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
 	shadowScene->setShadowTechnique(sm.get());
-	shadowScene->addChild(ret_array[1]);
+	//shadowScene->addChild(ret_array[1]);
 	shadowScene->addChild(movingModel);
 	root->addChild(shadowScene/*movingModel*/);
 #else

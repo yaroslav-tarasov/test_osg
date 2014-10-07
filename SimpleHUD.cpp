@@ -120,7 +120,7 @@ int main_hud( int argc, char** argv )
  
    //viewer.setUpViewer(osgProducer::Viewer::STANDARD_SETTINGS);
    viewer.setSceneData( root );
-   viewer.setCameraManipulator(new osgGA::TrackballManipulator());
+   viewer.setCameraManipulator(new osgGA::FirstPersonManipulator()/*new osgGA::TrackballManipulator()*/);
 
    viewer.realize();
 
