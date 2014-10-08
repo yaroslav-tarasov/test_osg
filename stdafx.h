@@ -80,6 +80,11 @@
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
 
+#include <osg/Texture1D>
+#include <osg/Texture2D>
+#include <osg/Texture3D>
+#include <osgUtil/PerlinNoise>
+
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
 int main_select( int argc, char** argv );

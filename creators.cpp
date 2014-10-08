@@ -4,7 +4,11 @@
 
 #define TEST_SHADOWS
 // #define TEST_TEXTURE
-// #define TEST_ADLER_SCENE
+#define TEST_ADLER_SCENE
+
+#define TEXUNIT_SINE         1
+#define TEXUNIT_NOISE        2
+#define STRINGIFY(x) #x ;
 
 namespace
 {
@@ -14,7 +18,7 @@ namespace
     const osg::Vec4 white_color = osg::Vec4(255.0f, 255.0f, 255.0f, 100.0f);
     const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,1.0f);
 
-#define   STRINGIFY(x) #x ;
+
 
     char vertexShaderSource_simple[] =  STRINGIFY ( 
         uniform vec4 coeff;
@@ -97,7 +101,56 @@ namespace
                 gl_FragColor = vec4 (color, 1.0);
             }
     )
+    
+    namespace marible
+    {
+    static const char vertSource[] = STRINGIFY ( 
+        const float Scale = 1.0;
+        const vec3  LightPos = vec3( 0.0, 0.0, 4.0 );
 
+        varying float LightIntensity;
+        varying vec3  MCposition;
+
+        void main(void)
+        {
+            vec4 ECposition = gl_ModelViewMatrix * gl_Vertex;
+            MCposition      = vec3 (gl_Vertex) * Scale;
+            vec3 tnorm      = normalize(vec3 (gl_NormalMatrix * gl_Normal));
+            LightIntensity  = dot(normalize(LightPos - vec3 (ECposition)), tnorm) * 1.5;
+            gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
+        }
+    )
+
+    static const char fragSource[] = STRINGIFY ( 
+        varying float LightIntensity; 
+        varying vec3  MCposition;
+
+        const vec3 MarbleColor = vec3( 0.7, 0.7, 0.7 );
+        const vec3 VeinColor = vec3( 0.0, 0.15, 0.0 );
+
+        uniform sampler3D NoiseTex;
+        uniform sampler1D SineTex;
+        uniform vec3 Offset;
+
+        void main (void)
+        {
+            vec4 noisevec   = texture3D(NoiseTex, MCposition + Offset.yzx);
+
+            float intensity = abs(noisevec[0] - 0.25) +
+                abs(noisevec[1] - 0.125) +
+                abs(noisevec[2] - 0.0625) +
+                abs(noisevec[3] - 0.03125);
+
+            vec4 unswiz = texture1D(SineTex, MCposition.z + intensity * 2.0);
+            float sineval = unswiz.s;
+            vec3 color   = mix(VeinColor, MarbleColor, sineval);
+            color       *= LightIntensity;
+            color = clamp(color, 0.0, 1.0);
+            gl_FragColor = vec4 (color, 1.0);
+        }
+    )
+
+    }
 }
 
 namespace effects 
@@ -272,6 +325,40 @@ namespace effects
 
     };
     
+    osg::Image*
+        make1DSineImage( int texSize )
+    {
+        const float PI = 3.1415927;
+
+        osg::Image* image = new osg::Image;
+        image->setImage(texSize, 1, 1,
+            4, GL_RGBA, GL_UNSIGNED_BYTE,
+            new unsigned char[4 * texSize],
+            osg::Image::USE_NEW_DELETE);
+
+        GLubyte* ptr = image->data();
+        float inc = 2. * PI / (float)texSize;
+        for(int i = 0; i < texSize; i++)
+        {
+            *ptr++ = (GLubyte)((sinf(i * inc) * 0.5 + 0.5) * 255.);
+            *ptr++ = 0;
+            *ptr++ = 0;
+            *ptr++ = 1;
+        }
+        return image;        
+    }
+
+    osg::Texture1D*
+        make1DSineTexture( int texSize )
+    {
+        osg::Texture1D* sineTexture = new osg::Texture1D;
+        sineTexture->setWrap(osg::Texture1D::WRAP_S, osg::Texture1D::REPEAT);
+        sineTexture->setFilter(osg::Texture1D::MIN_FILTER, osg::Texture1D::LINEAR);
+        sineTexture->setFilter(osg::Texture1D::MAG_FILTER, osg::Texture1D::LINEAR);
+        sineTexture->setImage( make1DSineImage(texSize) );
+        return sineTexture;
+    }
+
     class UniformVarying : public osg::Uniform::Callback
     {
         virtual void operator () (osg::Uniform* uniform, osg::NodeVisitor* nv)
@@ -283,29 +370,75 @@ namespace effects
         }
     };
 
-    void createShader(osg::Geometry* geom)
+    class AnimateCallback: public osg::Uniform::Callback
+    {
+    public:
+        virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
+        {
+                float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
+                float sine = sinf( angle );        // -1 -> 1
+                float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
+                float v10 = 1.0f - v01;                //  1 -> 0
+
+                uniform->set( osg::Vec3(0.505f, 0.8f*v01, 0.0f) ); 
+        }
+    };
+
+    template<typename G>
+    void createShader(G* geom)
     {
         osg::StateSet* stateset = geom->getOrCreateStateSet();
+        
+        osg::Texture3D* noiseTexture = osgUtil::create3DNoiseTexture( 32 /*128*/ );
+        osg::Texture1D* sineTexture = make1DSineTexture( 32 /*1024*/ );
+
+        stateset->setTextureAttribute(TEXUNIT_NOISE, noiseTexture);
+        stateset->setTextureAttribute(TEXUNIT_SINE, sineTexture);
 
         osg::Program* program = new osg::Program;
+
+
         stateset->setAttribute(program);
 
-        program->addShader( new osg::Shader(osg::Shader::VERTEX, vertSource));
-        program->addShader( new osg::Shader( osg::Shader::FRAGMENT, fragSource ) );
+        program->addShader( new osg::Shader(osg::Shader::VERTEX, marible::vertSource));
+        program->addShader( new osg::Shader( osg::Shader::FRAGMENT, marible::fragSource ) );
         
+        // FIXME Здесь получаем ошибки и прерываение выполнения шейдеров
         //std::string log;
         //program->getGlProgramInfoLog(0,log);
         
 
-        osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
-
-        stateset->addUniform(coeff);
+        //osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
+        //stateset->addUniform(coeff);
+        
+        stateset->addUniform( new osg::Uniform("NoiseTex", TEXUNIT_NOISE) );
+        stateset->addUniform( new osg::Uniform("SineTex", TEXUNIT_SINE) ); 
+        osg::Uniform* uni_offset = new osg::Uniform("Offset", osg::Vec3(0.0f, 0.0f, 0.0f));
+        stateset->addUniform( uni_offset );
 
         if (true)
         {
-            coeff->setUpdateCallback(new UniformVarying);
-            coeff->setDataVariance(osg::Object::DYNAMIC);
+            //coeff->setUpdateCallback(new UniformVarying);
+            //coeff->setDataVariance(osg::Object::DYNAMIC);
+            uni_offset->setUpdateCallback(new AnimateCallback);
+            uni_offset->setDataVariance(osg::Object::DYNAMIC);
             stateset->setDataVariance(osg::Object::DYNAMIC);
+        }
+
+        findNodeVisitor::nodeNamesList list_name;
+        list_name.push_back("white_blink");
+        list_name.push_back("red");
+        list_name.push_back("blue");
+        list_name.push_back("green");
+
+        findNodeVisitor findNodes(list_name); 
+        geom->accept(findNodes);
+
+        findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+
+        for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+        {
+            (*it)->getOrCreateStateSet()->setAttribute(new osg::Program(), osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF);
         }
 
     }
@@ -510,7 +643,7 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 	//
 	//osg::MatrixTransform* positioned = new osg::MatrixTransform;
 	//positioned->addChild(geode);
-    effects::createShader(geom) ;
+    // 
 
     return geode;
 }
@@ -564,7 +697,7 @@ nodes_array_t loadAirplane()
             light->addDrawable( shape1.get() );
             dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
             light->setUpdateCallback(callback);
-			light->setName(name);
+            light->setName(name);
             return light;
         };
 
@@ -740,6 +873,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 #else
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #endif
+    
+    
 
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
@@ -762,7 +897,9 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		//}
 		nodes_array_t plane = loadAirplane();
 		auto p_copy = plane[1];
-		
+	
+        effects::createShader(p_copy/*geom*/) ;
+
 		const unsigned inst_num = 12;
         for (unsigned i = 0; i < inst_num; ++i)
         {
