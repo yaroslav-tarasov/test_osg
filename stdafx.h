@@ -35,6 +35,7 @@
 
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
 
 #include <osgGA/TrackballManipulator>
 #include <osgGA/FlightManipulator>
@@ -76,6 +77,7 @@
 
 #include <osgShadow/ShadowedScene>
 #include <osgShadow/ShadowMap>
+#include <osgShadow/SoftShadowMap>
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
@@ -88,3 +90,6 @@
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
 int main_select( int argc, char** argv );
+int main_shadows(int argc, char *argv[]);
+int main_shadows_2( int argc, char** argv );
+int main_shadows_3(int argc, char** argv);

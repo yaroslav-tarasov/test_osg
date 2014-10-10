@@ -68,5 +68,14 @@
     <ClCompile Include="select_geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="main_shadows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main_shadows_2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shadow3\Tuto12.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

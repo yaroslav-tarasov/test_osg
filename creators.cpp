@@ -2,9 +2,9 @@
 #include "find_node_visitor.h" 
 #include "creators.h"
 
-#define TEST_SHADOWS
+// #define TEST_SHADOWS
 // #define TEST_TEXTURE
-#define TEST_ADLER_SCENE
+// #define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -151,6 +151,31 @@ namespace
     )
 
     }
+
+    namespace circles
+    {
+        static const char vs[] = STRINGIFY ( 
+
+            void main(void)
+            {
+                // gl_Position = gl_Vertex;
+                gl_Position     = ftransform();//gl_ModelViewProjectionMatrix *  gl_Vertex; 
+            }
+        )
+
+        static const char fs[] = STRINGIFY ( 
+         void main(void)
+         {
+                vec2 pos = mod(gl_FragCoord.xy, vec2(50.0)) - vec2(25.0);
+                float dist_squared = dot(pos, pos);
+            
+                gl_FragColor = (dist_squared < 400.0) 
+                    ? vec4(.90, .90, .90, 1.0)
+                    : vec4(.20, .20, .40, 1.0);
+         }
+        )
+
+    }
 }
 
 namespace effects 
@@ -264,7 +289,6 @@ namespace effects
 
         osg::ref_ptr<osg::Geode> light_src   = CreateLight(osg::Vec4(255.0f,0.0f,0.0f,255.0f));
 
-
         osg::ref_ptr<osg::Light> light = new osg::Light;
         light->setLightNum( num );
         light->setDiffuse( color );
@@ -272,8 +296,7 @@ namespace effects
         //light->setSpecular(osg::Vec4(1,1,1,1));  // some examples don't have this one
 
         light->setPosition( osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f) );
-        osg::ref_ptr<osg::LightSource> lightSource = new
-            osg::LightSource;
+        osg::ref_ptr<osg::LightSource> lightSource = new   osg::LightSource;
         lightSource->setLight( light );
 
         osg::ref_ptr<osg::MatrixTransform> sourceTrans =
@@ -400,13 +423,16 @@ namespace effects
 
         stateset->setAttribute(program);
 
-        program->addShader( new osg::Shader(osg::Shader::VERTEX, marible::vertSource));
-        program->addShader( new osg::Shader( osg::Shader::FRAGMENT, marible::fragSource ) );
+        auto vs = new osg::Shader(osg::Shader::VERTEX, marible::vertSource);
+        auto fs = new osg::Shader( osg::Shader::FRAGMENT, marible::fragSource );
+        program->addShader( vs );
+        program->addShader( fs );
         
         // FIXME Здесь получаем ошибки и прерываение выполнения шейдеров
         //std::string log;
         //program->getGlProgramInfoLog(0,log);
         
+
 
         //osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
         //stateset->addUniform(coeff);
@@ -443,6 +469,20 @@ namespace effects
 
     }
 
+    template<typename G>
+    void createShaders(G* geom,std::string vs,std::string fs )
+    {
+        osg::StateSet* stateset = geom->getOrCreateStateSet();
+
+        osg::Program* program = new osg::Program;
+
+        stateset->setAttribute(program);
+
+        auto vs_ = new osg::Shader(osg::Shader::VERTEX, vs);
+        auto fs_ = new osg::Shader( osg::Shader::FRAGMENT, fs );
+        program->addShader( vs_ );
+        program->addShader( fs_ );
+    }
 }
 
 namespace lights
@@ -648,7 +688,7 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     return geode;
 }
 
-nodes_array_t loadAirplane()
+nodes_array_t loadAirplaneParts()
 {
     osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.dae"  "an_124.dae"
 
@@ -752,6 +792,12 @@ nodes_array_t loadAirplane()
     return retval;
 }
 
+
+osg::Node* loadAirplane()
+{
+    return loadAirplaneParts()[1];
+}
+
 nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 {
     float animationLength = 50.0f;
@@ -789,7 +835,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
         model->addChild(xform);
     }
 	
-	nodes_array_t plane = loadAirplane();
+	nodes_array_t plane = loadAirplaneParts();
 	auto airplane = plane[1];
 
     if (airplane)
@@ -874,8 +920,6 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #endif
     
-    
-
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
@@ -895,10 +939,13 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		//{
 		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
 		//}
-		nodes_array_t plane = loadAirplane();
+		nodes_array_t plane = loadAirplaneParts();
 		auto p_copy = plane[1];
-	
-        effects::createShader(p_copy/*geom*/) ;
+
+#if 1
+        // effects::createShader(p_copy/*geom*/) ;
+        effects::createShaders(p_copy,circles::vs,circles::fs) ;
+#endif 
 
 		const unsigned inst_num = 12;
         for (unsigned i = 0; i < inst_num; ++i)
@@ -967,7 +1014,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 	shadowScene->setShadowTechnique(sm.get());
 	//shadowScene->addChild(ret_array[1]);
 	shadowScene->addChild(movingModel);
-	root->addChild(shadowScene/*movingModel*/);
+	root->addChild(shadowScene);
 #else
     root->addChild(movingModel);
 #endif
@@ -979,7 +1026,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 #endif
 
     ret_array[0] = root;
-    
+
+
     return ret_array;
 }
 

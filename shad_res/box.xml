@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<compositor>
+    <shader name="boxVert" type="vertex">
+        <file>/tmp/box.vert</file>
+    </shader>
+    <shader name="boxFrag" type="fragment">
+        <file>/tmp/box.frag</file>
+    </shader>
+    <!--
+    <buffer name="sceneData" type="2d" width="512" height="512">
+        <internal_format>rgba</internal_format>
+        <source_format>rgba</source_format>
+        <source_type>ubyte</source_type>
+    </buffer>
+    -->
+    <technique>
+        <forward_pass name="BoxOriginal">
+            <clear_color>0 0 0 1</clear_color>
+            <!--<output_buffer target="color">sceneData</output_buffer>-->
+            <shader>boxVert</shader>
+            <shader>boxFrag</shader>
+        </forward_pass>
+    </technique>
+</compositor>

@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -96,7 +96,10 @@
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="main_scene.cpp" />
+    <ClCompile Include="main_shadows.cpp" />
+    <ClCompile Include="main_shadows_2.cpp" />
     <ClCompile Include="select_geometry.cpp" />
+    <ClCompile Include="shadow3\Tuto12.cpp" />
     <ClCompile Include="SimpleHUD.cpp" />
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="stdafx.cpp">

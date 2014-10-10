@@ -14,6 +14,8 @@
 #define TEST_PRECIP
 // #define TEST_NODE_TRACKER
 // #define TEST_SKYBOX
+// #define TEST_CAMERA
+// #define TEST_SHADOWS
 
 osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 {
@@ -187,8 +189,6 @@ int main_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
 
-
-
 #if 0
     // create the window to draw to.
     osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
@@ -207,6 +207,18 @@ int main_scene( int argc, char** argv )
         osg::notify(osg::NOTICE)<<"Error: unable to create graphics window."<<std::endl;
         return 1;
     }
+#endif
+
+#ifdef TEST_CAMERA
+    osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+    camera->setClearMask( GL_DEPTH_BUFFER_BIT );
+    camera->setRenderOrder( osg::Camera::POST_RENDER );
+    camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
+    camera->setViewMatrixAsLookAt(
+        osg::Vec3(0.0f,-5.0f,5.0f), osg::Vec3(),
+        osg::Vec3(0.0f,1.0f,1.0f)
+        );
+    
 #endif
 
 	osg::DisplaySettings::instance()->setNumMultiSamples( 8 );
@@ -299,8 +311,26 @@ int main_scene( int argc, char** argv )
         skybox->addChild( geode.get() );
 #endif
 
+#ifdef TEST_SHADOWS        
+        // Light.
+        osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+        source->getLight()->setPosition(osg::Vec4(0, 0, 0, 0));
+        source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+        source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
 
-        rootnode->addChild(model);
+        //int shadowsize = 4096;//1024;
+        //osg::ref_ptr<osgShadow::SoftShadowMap> sm = new osgShadow::SoftShadowMap;
+        //sm->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
+        //sm->setTextureUnit(1);
+        //sm->setJitteringScale(16);
+        //// Scene
+        //osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene;
+        //root->setShadowTechnique(sm.get());
+        //root->addChild(model);
+        model->asGroup()->addChild(source);
+#endif
+       rootnode->addChild(model);
+
 
 #ifdef TEST_SKYBOX
         rootnode->addChild( skybox.get() );
@@ -309,7 +339,6 @@ int main_scene( int argc, char** argv )
 
         //rootnode->addChild(_skyStarField);
         //_skyStarField->setIlluminationFog(10.0f/*_illumination*/, 0.3f/*_fogDensity*/);
-
 
         {
             // create outline effect
@@ -320,6 +349,8 @@ int main_scene( int argc, char** argv )
             outline->setColor(osg::Vec4(1,1,0,1));
             outline->addChild(model_parts[3]);
         }
+        
+        osg::ref_ptr<osg::LightSource> sun_light /*= source*/;
 
 #ifdef  TEST_EPHEMERIS
         osg::BoundingSphere bs = model->getBound();
@@ -350,7 +381,13 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setDateTime( dateTime );
         ephemerisModel->setSkyDomeRadius( radius );
 		ephemerisModel->setMoveWithEyePoint(false);
+        sun_light = ephemerisModel->getSunLightSource();
 #endif  // TEST_EPHEMERIS
+        
+#ifdef TEST_SHADOWS
+        //if (sun_light.valid())
+        //    sm->setLight(sun_light.get());
+#endif
 
         //AddLight(rootnode);
 
@@ -464,6 +501,9 @@ int main_scene( int argc, char** argv )
                    ,[&](bool off){model_parts[2]->setUpdateCallback(off?nullptr:new circleAimlessly());}
                    ,[&](bool low){model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);}
             ));
+#ifdef TEST_CAMERA        
+        camera->addChild( model_parts[1] );
+#endif
 
 #ifdef  TEST_EPHEMERIS
         viewer.addEventHandler( new TimeChangeHandler( ephemerisModel.get() ) );
@@ -471,7 +511,8 @@ int main_scene( int argc, char** argv )
 
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
-		
+
+#if 0
 		//Experiment with setting the LightModel to very dark to get better sun lighting effects
 		{
 			osg::ref_ptr<osg::StateSet> sset = rootnode->getOrCreateStateSet();
@@ -479,6 +520,7 @@ int main_scene( int argc, char** argv )
 			lightModel->setAmbientIntensity( osg::Vec4( 0.0025, 0.0025,0.0025, 1.0 ));
 			sset->setAttributeAndModes( lightModel.get() );
 		}
+#endif
 
 		// create the light    
 		//osg::LightSource* lightSource = new osg::LightSource;
