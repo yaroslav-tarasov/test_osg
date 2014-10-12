@@ -93,3 +93,5 @@ int main_select( int argc, char** argv );
 int main_shadows(int argc, char *argv[]);
 int main_shadows_2( int argc, char** argv );
 int main_shadows_3(int argc, char** argv);
+int main_texturedGeometry(int argc, char** argv);
+int main_TestState(int argc, char** argv);

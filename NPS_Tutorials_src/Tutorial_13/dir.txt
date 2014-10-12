@@ -1,0 +1,4 @@
+findNodeVisitor.cpp
+FollowNodeManip.cpp
+TestMultiCamera.cpp
+TransformAccumulator.cpp

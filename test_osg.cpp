@@ -10,9 +10,11 @@ std::function<int( int, char**)> pmain[] = {
                                              ,main_shadows_2  //3
                                              ,main_hud        //4
                                              ,main_shadows_3  //5
+											 ,main_texturedGeometry
+											 ,main_TestState
                                            };       
 
 int main( int argc, char** argv )
 {
-    return pmain[0](argc, argv);
+    return pmain[7](argc, argv);
 }

@@ -77,5 +77,11 @@
     <ClCompile Include="shadow3\Tuto12.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
