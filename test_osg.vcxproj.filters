@@ -13,9 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\shaders">
+      <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="shaders\tess.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess.geo">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess_quad.tcs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess_quad.tes">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess_tri.tcs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\tess_tri.tes">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -81,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tess_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

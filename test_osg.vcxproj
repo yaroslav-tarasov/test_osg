@@ -81,6 +81,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="shaders\tess.frag" />
+    <None Include="shaders\tess.geo" />
+    <None Include="shaders\tess.vs" />
+    <None Include="shaders\tess_quad.tcs" />
+    <None Include="shaders\tess_quad.tes" />
+    <None Include="shaders\tess_tri.tcs" />
+    <None Include="shaders\tess_tri.tes" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
@@ -108,6 +115,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

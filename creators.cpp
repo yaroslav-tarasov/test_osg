@@ -8,7 +8,7 @@
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
-#define STRINGIFY(x) #x ;
+
 
 namespace
 {
@@ -31,9 +31,9 @@ namespace
             gl_Position = gl_ModelViewProjectionMatrix * vert;
         }
     
-    )
+    );
 
-    static const char vertSource[] = STRINGIFY ( 
+    const char vs[] = STRINGIFY ( 
         // #pragma debug(on)
         //uniform vec3 LightPosition;
         uniform vec4 coeff;
@@ -42,8 +42,8 @@ namespace
         const float specularContribution = 0.3;
         const float diffuseContribution  = (1.0 - specularContribution);
 
-        varying float LightIntensity;
-        varying vec2  MCposition;
+        /*varying*/out float LightIntensity;
+        /*varying*/out vec2  MCposition;
 
         void main(void)
         {
@@ -60,9 +60,9 @@ namespace
             MCposition      = gl_Vertex.xz;
             gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
         }
-    )
+    );
 
-    static const char fragSource[] = STRINGIFY ( 
+    const char fs[] = STRINGIFY ( 
             // uniform vec3  BrickColor, MortarColor;
             // uniform float ColumnWidth, RowHeight;
             // uniform float Bwf, Bhf;
@@ -74,8 +74,8 @@ namespace
             const float Bwf = 0.95;
             const float Bhf = 0.90;
 
-            varying vec2  MCposition;
-            varying float LightIntensity;
+            /*varying*/in vec2  MCposition;
+            /*varying*/in float LightIntensity;
 
             void main(void)
             {
@@ -100,55 +100,72 @@ namespace
                 color = mix(MortarColor, BrickColor, w * h) * LightIntensity;
                 gl_FragColor = vec4 (color, 1.0);
             }
-    )
+    );
     
     namespace marible
     {
-    static const char vertSource[] = STRINGIFY ( 
-        const float Scale = 1.0;
-        const vec3  LightPos = vec3( 0.0, 0.0, 4.0 );
+        const char vs[] = {"#version 110 \n"  
+            STRINGIFY ( 
+                //layout (location = 0) out float LightIntensity ;
+                //layout (location = 1) out vec3  MCposition ;
+                varying float LightIntensity ;
+                varying vec3  MCposition ;
+        
+                const float Scale = 1.0;
+                const vec3  LightPos = vec3( 0.0, 0.0, 4.0 ) ;
 
-        varying float LightIntensity;
-        varying vec3  MCposition;
+                //uniform mat4 gl_NormalMatrix;
+                //uniform mat4 gl_ModelViewProjectionMatrix;
+                //uniform mat4 gl_ModelViewMatrix;
+                //uniform vec4 gl_Vertex;
+                //uniform vec4 gl_Normal;
 
-        void main(void)
-        {
-            vec4 ECposition = gl_ModelViewMatrix * gl_Vertex;
-            MCposition      = vec3 (gl_Vertex) * Scale;
-            vec3 tnorm      = normalize(vec3 (gl_NormalMatrix * gl_Normal));
-            LightIntensity  = dot(normalize(LightPos - vec3 (ECposition)), tnorm) * 1.5;
-            gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
-        }
-    )
+                void main(void)
+                {
+                    vec4 ECposition = gl_ModelViewMatrix * gl_Vertex;
+                    MCposition      = vec3 (gl_Vertex) * Scale;
+                    vec3 tnorm      = normalize(vec3 (gl_NormalMatrix * gl_Normal));
+                    LightIntensity  = dot(normalize(LightPos - vec3 (ECposition)), tnorm) * 1.5;
+                    gl_Position     = gl_ModelViewProjectionMatrix * gl_Vertex;
+                }
+            )
+        };
 
-    static const char fragSource[] = STRINGIFY ( 
-        varying float LightIntensity; 
-        varying vec3  MCposition;
+    const char fs[] = { "#version 110 \n"
+        STRINGIFY ( 
 
-        const vec3 MarbleColor = vec3( 0.7, 0.7, 0.7 );
-        const vec3 VeinColor = vec3( 0.0, 0.15, 0.0 );
+            //layout (location = 0) in float LightIntensity; 
+            //layout (location = 1) in vec3  MCposition;
+            varying float LightIntensity ;
+            varying vec3  MCposition ;
+        
+            const vec3 MarbleColor = vec3( 0.7, 0.7, 0.7 );
+            const vec3 VeinColor = vec3( 0.0, 0.15, 0.0 );
 
-        uniform sampler3D NoiseTex;
-        uniform sampler1D SineTex;
-        uniform vec3 Offset;
+            uniform sampler3D NoiseTex;
+            uniform sampler1D SineTex;
+            uniform vec3 Offset;
 
-        void main (void)
-        {
-            vec4 noisevec   = texture3D(NoiseTex, MCposition + Offset.yzx);
+            //out vec4 gl_FragColor;
 
-            float intensity = abs(noisevec[0] - 0.25) +
-                abs(noisevec[1] - 0.125) +
-                abs(noisevec[2] - 0.0625) +
-                abs(noisevec[3] - 0.03125);
+            void main (void)
+            {
+                vec4 noisevec   = texture3D(NoiseTex, MCposition + Offset.yzx);// texture(NoiseTex, MCposition + Offset.yzx);
 
-            vec4 unswiz = texture1D(SineTex, MCposition.z + intensity * 2.0);
-            float sineval = unswiz.s;
-            vec3 color   = mix(VeinColor, MarbleColor, sineval);
-            color       *= LightIntensity;
-            color = clamp(color, 0.0, 1.0);
-            gl_FragColor = vec4 (color, 1.0);
-        }
-    )
+                float intensity = abs(noisevec[0] - 0.25) +
+                    abs(noisevec[1] - 0.125) +
+                    abs(noisevec[2] - 0.0625) +
+                    abs(noisevec[3] - 0.03125);
+
+                vec4 unswiz = texture1D(SineTex, MCposition.z + intensity * 2.0);//texture(SineTex, MCposition.z + intensity * 2.0);
+                float sineval = unswiz.s;
+                vec3 color   = mix(VeinColor, MarbleColor, sineval);
+                color       *= LightIntensity;
+                color = clamp(color, 0.0, 1.0);
+                gl_FragColor = vec4 (color, 1.0);
+            }
+        )
+    };
 
     }
 
@@ -161,7 +178,7 @@ namespace
                 // gl_Position = gl_Vertex;
                 gl_Position     = ftransform();//gl_ModelViewProjectionMatrix *  gl_Vertex; 
             }
-        )
+        );
 
         static const char fs[] = STRINGIFY ( 
          void main(void)
@@ -173,7 +190,7 @@ namespace
                     ? vec4(.90, .90, .90, 1.0)
                     : vec4(.20, .20, .40, 1.0);
          }
-        )
+        );
 
     }
 }
@@ -423,8 +440,8 @@ namespace effects
 
         stateset->setAttribute(program);
 
-        auto vs = new osg::Shader(osg::Shader::VERTEX, marible::vertSource);
-        auto fs = new osg::Shader( osg::Shader::FRAGMENT, marible::fragSource );
+        auto vs = new osg::Shader(osg::Shader::VERTEX, marible::vs);
+        auto fs = new osg::Shader( osg::Shader::FRAGMENT, marible::fs );
         program->addShader( vs );
         program->addShader( fs );
         
@@ -469,20 +486,7 @@ namespace effects
 
     }
 
-    template<typename G>
-    void createShaders(G* geom,std::string vs,std::string fs )
-    {
-        osg::StateSet* stateset = geom->getOrCreateStateSet();
 
-        osg::Program* program = new osg::Program;
-
-        stateset->setAttribute(program);
-
-        auto vs_ = new osg::Shader(osg::Shader::VERTEX, vs);
-        auto fs_ = new osg::Shader( osg::Shader::FRAGMENT, fs );
-        program->addShader( vs_ );
-        program->addShader( fs_ );
-    }
 }
 
 namespace lights
@@ -943,8 +947,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		auto p_copy = plane[1];
 
 #if 1
-        // effects::createShader(p_copy/*geom*/) ;
-        effects::createShaders(p_copy,circles::vs,circles::fs) ;
+        //effects::createShader(p_copy/*geom*/) ;
+        effects::createProgram(p_copy,circles::vs,circles::fs) ;
 #endif 
 
 		const unsigned inst_num = 12;

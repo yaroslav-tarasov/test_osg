@@ -30,12 +30,14 @@
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
 
+#include <osg/PatchParameter>
 
 #include <osgUtil/Optimizer>
 
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
+#include <osgDB/FileUtils>
 
 #include <osgGA/TrackballManipulator>
 #include <osgGA/FlightManipulator>
@@ -81,11 +83,13 @@
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
+#include <osg/io_utils>
 
 #include <osg/Texture1D>
 #include <osg/Texture2D>
 #include <osg/Texture3D>
 #include <osgUtil/PerlinNoise>
+#include <osg/TriangleFunctor>
 
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
@@ -95,3 +99,4 @@ int main_shadows_2( int argc, char** argv );
 int main_shadows_3(int argc, char** argv);
 int main_texturedGeometry(int argc, char** argv);
 int main_TestState(int argc, char** argv);
+int main_tess_test( int argc, char** argv );
