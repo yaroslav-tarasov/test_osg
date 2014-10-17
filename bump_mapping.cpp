@@ -70,12 +70,36 @@ public:
     }
 };
 
+osg::Geometry* createOctahedron( const osg::Vec3& center )
+{
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array(6);
+    (*vertices)[0].set( 0.0f, 0.0f, 1.0f); (*vertices)[0] += center;
+    (*vertices)[1].set(-0.5f,-0.5f, 0.0f); (*vertices)[0] += center;
+    (*vertices)[2].set( 0.5f,-0.5f, 0.0f); (*vertices)[0] += center;
+    (*vertices)[3].set( 0.5f, 0.5f, 0.0f); (*vertices)[0] += center;
+    (*vertices)[4].set(-0.5f, 0.5f, 0.0f); (*vertices)[0] += center;
+    (*vertices)[5].set( 0.0f, 0.0f,-1.0f); (*vertices)[0] += center;
+
+    osg::ref_ptr<osg::DrawElementsUInt> indices = new osg::DrawElementsUInt(GL_TRIANGLES, 24);
+    (*indices)[0] = 0; (*indices)[1] = 1; (*indices)[2] = 2;
+    (*indices)[3] = 0; (*indices)[4] = 2; (*indices)[5] = 3;
+    (*indices)[6] = 0; (*indices)[7] = 3; (*indices)[8] = 4;
+    (*indices)[9] = 0; (*indices)[10]= 4; (*indices)[11]= 1;
+    (*indices)[12]= 5; (*indices)[13]= 2; (*indices)[14]= 1;
+    (*indices)[15]= 5; (*indices)[16]= 3; (*indices)[17]= 2;
+    (*indices)[18]= 5; (*indices)[19]= 4; (*indices)[20]= 3;
+    (*indices)[21]= 5; (*indices)[22]= 1; (*indices)[23]= 4;
+
+    osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
+    geom->setVertexArray( vertices.get() );
+    geom->addPrimitiveSet( indices.get() );
+    // osgUtil::SmoothingVisitor::smooth( *geom );
+    return geom.release();
+}
 
 osg::Node* CreateEarth()
 {
     const double r_earth = 63.137;
-    const double r_sun = 69.0;
-    const double AU = 1490.0;
 
     osg::ShapeDrawable *earth_sd = new osg::ShapeDrawable;
     osg::Sphere* earth_sphere = new osg::Sphere;
@@ -87,27 +111,14 @@ osg::Node* CreateEarth()
     osg::Geode* earth_geode = new osg::Geode;
     earth_geode->setName("EarthGeode");
     earth_geode->addDrawable(earth_sd);
-
-    // Create the Sun, in yellow
-    osg::ShapeDrawable *sun_sd = new osg::ShapeDrawable;
-    osg::Sphere* sun_sphere = new osg::Sphere;
-    sun_sphere->setName("SunSphere");
-    sun_sphere->setRadius(r_sun);
-    sun_sd->setShape(sun_sphere);
-    sun_sd->setColor(osg::Vec4(1.0, 0.0, 0.0, 1.0));
-
-    osg::Geode* sun_geode = new osg::Geode;
-    sun_geode->setName("SunGeode");
-    sun_geode->addDrawable(sun_sd);
-    
-    osg::PositionAttitudeTransform *pat = new osg::PositionAttitudeTransform;
-    pat->setPosition(osg::Vec3d(0.0, AU, 0.0));
-    pat->addChild(sun_geode);
+     
+    osg::ref_ptr<osg::Geode> oct = new osg::Geode;
+    oct->addDrawable( createOctahedron(osg::Vec3()) );
 
     osg::Group* root = new osg::Group;
-    root->addChild(pat);
     root->addChild(earth_geode);
-
+    //root->addChild(osgDB::readNodeFile("cessna2.osgt")); 
+    root->addChild(oct);
     return root ;
 }
 
@@ -142,6 +153,7 @@ int main_bump_map( int argc, char** argv )
     stateset->setTextureAttributeAndModes( 0, colorTex.get(), value );
     stateset->setTextureAttributeAndModes( 1, normalTex.get(), value );
     
+    osgDB::writeNodeFile(*scene,"bump_mapping_test.osgt");
     osgViewer::Viewer viewer;
     viewer.setSceneData( scene.get() );
     return viewer.run();
