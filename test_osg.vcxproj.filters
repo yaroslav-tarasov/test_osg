@@ -110,5 +110,14 @@
     <ClCompile Include="tess_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tex_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bump_mapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CommonFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

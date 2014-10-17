@@ -90,6 +90,9 @@
 #include <osg/Texture3D>
 #include <osgUtil/PerlinNoise>
 #include <osg/TriangleFunctor>
+#include <osg/ImageSequence>
+#include <osgFX/BumpMapping>
+#include <osgUtil/TangentSpaceGenerator>
 
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
@@ -100,3 +103,5 @@ int main_shadows_3(int argc, char** argv);
 int main_texturedGeometry(int argc, char** argv);
 int main_TestState(int argc, char** argv);
 int main_tess_test( int argc, char** argv );
+int main_tex_test( int argc, char** argv );
+int main_bump_map( int argc, char** argv );

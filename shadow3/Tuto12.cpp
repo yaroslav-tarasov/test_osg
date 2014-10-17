@@ -51,8 +51,9 @@ int main_shadows_3(int argc, char** argv)
 	//Now we can define our world made of several objects  
 	
 	//The capsule
-	objectGeode->getOrCreateStateSet()->setTextureAttributeAndModes(0, new Texture2D(osgDB::readImageFile("Fieldstone.jpg")));
+	objectGeode->getOrCreateStateSet()->setTextureAttributeAndModes(0, new Texture2D(osgDB::readImageFile("Fieldstone.jpg"))); // Fieldstone.jpg
 	objectGeode->addDrawable(new ShapeDrawable(new Capsule(Vec3(1,-1,1),0.3f,0.5f)));
+    objectGeode->getOrCreateStateSet()->setTextureAttributeAndModes(0, new Texture2D(osgDB::readImageFile("foo.jpg")));
 
 	//The box
 	objectGeode->addDrawable(new ShapeDrawable(new Box(Vec3(-1,1,1),1,1,1)));

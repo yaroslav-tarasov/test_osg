@@ -26,6 +26,8 @@ std::function<int( int, char**)> pmain[] = {
 											 ,main_texturedGeometry //6
 											 ,main_TestState        //7
                                              ,main_tess_test        //8 
+                                             ,main_tex_test         //9
+                                             ,main_bump_map         //10
                                            };       
 
 int main( int argc, char** argv )
@@ -34,5 +36,5 @@ int main( int argc, char** argv )
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
     osg::notify(osg::INFO) << "Start this program \n";
-    return pmain[8](argc, argv);
+    return pmain[10](argc, argv);
 }

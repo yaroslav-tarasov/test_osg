@@ -57,4 +57,56 @@ private:
 
 };
 
+template<typename T>
+class findNodeByType : public osg::NodeVisitor 
+{
+public: 
+    // typedef a vector of node pointers for convenience
+    typedef std::vector<osg::Node*> nodeListType; 
+
+    typedef T nodeType; 
+
+    findNodeByType()
+        : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+    {    
+    }  
+
+    virtual void apply(osg::Node &searchNode)
+    {    
+        if (dynamic_cast<T*>(&searchNode))   
+        {   
+            foundNodeList.push_back(&searchNode);   
+        }   
+        traverse(searchNode);    
+    } 
+
+    // Return a pointer to the first node in the list
+    // with a matching name
+    osg::Node* getFirst()   
+    {   
+        if(foundNodeList.size()>0) 
+            return *(foundNodeList.begin());
+        else
+            return nullptr;
+    }  
+
+    osg::Node* getLast()   
+    {   
+        if(foundNodeList.size()>0) 
+            return foundNodeList.back();
+        else
+            return nullptr;
+    } 
+
+
+    // return a reference to the list of nodes we found
+    nodeListType& getNodeList() { return foundNodeList; }
+
+private:
+
+    // List of nodes with names that match the searchForName string
+    nodeListType foundNodeList;
+
+};
+
 #endif

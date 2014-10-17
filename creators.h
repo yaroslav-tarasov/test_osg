@@ -9,6 +9,7 @@ namespace creators
     nodes_array_t createMovingModel(const osg::Vec3& center, float radius);
     nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
     osg::Node*    loadAirplane();
+    nodes_array_t loadAirplaneParts();
 }
 
 namespace effects

@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>common;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -67,7 +67,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -100,6 +100,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animation_handler.cpp" />
+    <ClCompile Include="bump_mapping.cpp" />
+    <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="main_scene.cpp" />
@@ -117,6 +119,7 @@
     </ClCompile>
     <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />
+    <ClCompile Include="tex_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
