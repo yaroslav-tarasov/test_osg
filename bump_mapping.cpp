@@ -7,41 +7,41 @@
 #include "creators.h"
 #include "CommonFunctions"
 
-static const char* vertSource = {
-    "attribute vec3 tangent;\n"
-    "attribute vec3 binormal;\n"
-    "varying vec3 lightDir;\n"
-    "void main()\n"
-    "{\n"
-    "    vec3 normal = normalize(gl_NormalMatrix * gl_Normal);\n"
-    "    mat3 rotation = mat3(tangent, binormal, normal);\n"
-    "    vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;\n"
-    "    lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);\n"
-    "    lightDir = normalize(rotation * normalize(lightDir));\n"
-    "    gl_Position = ftransform();\n"
-    "    gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-    "}\n"
-};
+static const char* vertSource = STRINGIFY ( 
+    attribute vec3 tangent;
+    attribute vec3 binormal;
+    varying   vec3 lightDir;
+    void main()
+    {
+        vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+        mat3 rotation = mat3(tangent, binormal, normal);
+        vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
+        lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
+        lightDir = normalize(rotation * normalize(lightDir));
+        gl_Position = ftransform();
+        gl_TexCoord[0] = gl_MultiTexCoord1;
+    }
+    );
 
-static const char* fragSource = {
-    "uniform sampler2D colorTex;\n"
-    "uniform sampler2D normalTex;\n"
-    "varying vec3 lightDir;\n"
-    "void main (void)\n"
-    "{\n"
-    "    vec4 base = texture2D(colorTex, gl_TexCoord[0].xy);\n"
-    "    vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;\n"
-    "    bump = normalize(bump * 2.0 - 1.0);\n"
+static const char* fragSource = STRINGIFY ( 
+    uniform sampler2D colorTex;
+    uniform sampler2D normalTex;
+    varying vec3 lightDir;
+    void main (void)
+    {
+        vec4 base = texture2D(colorTex, gl_TexCoord[0].xy);
+        vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;
+        bump = normalize(bump * 2.0 - 1.0);
     
-    "    float lambert = max(dot(bump, lightDir), 0.0);\n"
-    "    if (lambert > 0.0)\n"
-    "    {\n"
-    "        gl_FragColor = base * gl_LightSource[0].diffuse * lambert;\n"
-    "        gl_FragColor += gl_LightSource[0].specular * pow(lambert, 2.0);\n"
-    "    }\n"
-    "    gl_FragColor += gl_LightSource[0].ambient;\n"
-    "}\n"
-};
+        float lambert = max(dot(bump, lightDir), 0.0);
+        if (lambert > 0.0)
+        {
+            gl_FragColor = base * gl_LightSource[0].diffuse * lambert;
+            gl_FragColor += gl_LightSource[0].specular * pow(lambert, 2.0);
+        }
+        gl_FragColor += gl_LightSource[0].ambient;
+    }
+    );
 
 class ComputeTangentVisitor : public osg::NodeVisitor
 {
@@ -61,12 +61,11 @@ public:
     void generateTangentArray( osg::Geometry* geom )
     {
         osg::ref_ptr<osgUtil::TangentSpaceGenerator> tsg = new osgUtil::TangentSpaceGenerator;
-        tsg->generate( geom );
-        osg::Vec4Array* a = tsg->getTangentArray();
-        geom->setVertexAttribArray( 6, static_cast<osg::Array*>(tsg->getTangentArray()->cloneType()) );
+        tsg->generate( geom, 1 );
+        geom->setVertexAttribArray( 6, static_cast<osg::Array*>(tsg->getTangentArray()) );
         geom->setVertexAttribBinding( 6, osg::Geometry::BIND_PER_VERTEX );
-        //geom->setVertexAttribArray( 7, static_cast<osg::Array*>(tsg->getBinormalArray()->cloneType()) );
-        //geom->setVertexAttribBinding( 7, osg::Geometry::BIND_PER_VERTEX );
+        geom->setVertexAttribArray( 7, static_cast<osg::Array*>(tsg->getTangentArray()) );
+        geom->setVertexAttribBinding( 7, osg::Geometry::BIND_PER_VERTEX );
     }
 };
 
@@ -89,10 +88,20 @@ osg::Geometry* createOctahedron( const osg::Vec3& center )
     (*indices)[15]= 5; (*indices)[16]= 3; (*indices)[17]= 2;
     (*indices)[18]= 5; (*indices)[19]= 4; (*indices)[20]= 3;
     (*indices)[21]= 5; (*indices)[22]= 1; (*indices)[23]= 4;
+    
+    osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+    texcoords->push_back( osg::Vec2(0.0f, 0.0f) );
+    texcoords->push_back( osg::Vec2(0.0f, 1.0f) );
+    texcoords->push_back( osg::Vec2(1.0f, 1.0f) );
+    texcoords->push_back( osg::Vec2(1.0f, 0.0f) );
+    texcoords->push_back( osg::Vec2(0.5f, 1.0f) );
+    texcoords->push_back( osg::Vec2(1.0f, 0.5f) );
 
     osg::ref_ptr<osg::Geometry> geom = new osg::Geometry;
     geom->setVertexArray( vertices.get() );
     geom->addPrimitiveSet( indices.get() );
+    geom->setTexCoordArray( 0, texcoords.get() );
+
     // osgUtil::SmoothingVisitor::smooth( *geom );
     return geom.release();
 }
@@ -116,7 +125,7 @@ osg::Node* CreateEarth()
     oct->addDrawable( createOctahedron(osg::Vec3()) );
 
     osg::Group* root = new osg::Group;
-    root->addChild(earth_geode);
+    //root->addChild(earth_geode);
     //root->addChild(osgDB::readNodeFile("cessna2.osgt")); 
     root->addChild(oct);
     return root ;
@@ -126,7 +135,7 @@ int main_bump_map( int argc, char** argv )
 {
     osg::ArgumentParser arguments( &argc, argv );
     osg::ref_ptr<osg::Node> scene = osgDB::readNodeFiles( arguments );
-    if ( !scene ) scene = CreateEarth(); //osgDB::readNodeFile("spaceship.osgt"); // creators::loadAirplane();// osgDB::readNodeFile("skydome.osgt");
+    if ( !scene ) scene = creators::loadAirplane();// CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
     
     ComputeTangentVisitor ctv;
     ctv.setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
@@ -137,13 +146,19 @@ int main_bump_map( int argc, char** argv )
     program->addShader( new osg::Shader(osg::Shader::FRAGMENT, fragSource) );
     program->addBindAttribLocation( "tangent", 6 );
     program->addBindAttribLocation( "binormal", 7 );
-    
+                                                         
+    //osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
+    //colorTex->setImage( osgDB::readImageFile("Images/whitemetal_diffuse.jpg") );
+    //
+    //osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
+    //normalTex->setImage( osgDB::readImageFile("Images/whitemetal_normal.jpg") );
+
     osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
-    colorTex->setImage( osgDB::readImageFile("Images/whitemetal_diffuse.jpg") );
+    colorTex->setImage( osgDB::readImageFile("a_319_airfrance.png") );
     
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile("Images/whitemetal_normal.jpg") );
-    
+    normalTex->setImage( osgDB::readImageFile("a_319_n.png") );  
+
     osg::StateSet* stateset = scene->getOrCreateStateSet();
     stateset->addUniform( new osg::Uniform("colorTex", 0) );
     stateset->addUniform( new osg::Uniform("normalTex", 1) );
