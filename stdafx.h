@@ -94,6 +94,8 @@
 #include <osgFX/BumpMapping>
 #include <osgUtil/TangentSpaceGenerator>
 
+#include <osg/AlphaFunc>
+
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
 int main_select( int argc, char** argv );

@@ -12,12 +12,12 @@
 
 namespace
 {
-    const osg::Vec4 red_color   = osg::Vec4(255.0f, 0.0f, 0.0f, 100.0f);
-    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 255.0f, 100.0f);
-    const osg::Vec4 green_color = osg::Vec4(0.0f, 255.0f, 0.0f, 100.0f);
-    const osg::Vec4 white_color = osg::Vec4(255.0f, 255.0f, 255.0f, 100.0f);
-    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,1.0f);
-
+    const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
+    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);
+    const osg::Vec4 green_color = osg::Vec4(0.0f, 100.0f, 0.0f, 100.0f);
+    const osg::Vec4 white_color = osg::Vec4(100.0f, 100.0f, 100.0f, 100.0f);
+    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,100.0f);
+    const osg::Vec4 gray_color  = osg::Vec4(0.8f,0.8f,0.8f,100.0f);
 
 
     char vertexShaderSource_simple[] =  STRINGIFY ( 
@@ -733,7 +733,7 @@ nodes_array_t loadAirplaneParts()
 
     if(airplane_file)
 	{
-        auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,effects::BlinkNode* callback)->osg::Geode* {
+        auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
             shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
             // shape1->setColor( fcolor );
@@ -742,13 +742,17 @@ nodes_array_t loadAirplaneParts()
             dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
             light->setUpdateCallback(callback);
             light->setName(name);
+            const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+            light->getOrCreateStateSet()->setAttribute(new osg::Program(),value);
+            light->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+            light->getOrCreateStateSet()->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
             return light;
         };
 
         osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
         osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
         osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
-        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,black_color));
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
 		
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
             findNodeVisitor findTail(root.c_str()); 
