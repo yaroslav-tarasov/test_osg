@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "find_node_visitor.h" 
 #include "creators.h"
+#include <windows.h>
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
@@ -694,7 +695,8 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts()
 {
-    osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.dae"  "an_124.dae"
+
+    osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.part.dae"  "an_124.dae"
 
     osg::Node* engine = nullptr; 
     osg::Node* engine_geode = nullptr; 
@@ -782,7 +784,8 @@ nodes_array_t loadAirplaneParts()
 		airplane_file->accept(findLod3);
 		lod3 =  findLod3.getFirst();
         
-        lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
+        if(lod3) 
+            lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
 
         findNodeVisitor findLod0("Lod0"); 
         airplane_file->accept(findLod0);
@@ -793,7 +796,7 @@ nodes_array_t loadAirplaneParts()
         airplane_file->accept(findEngine);
 
         engine =  findEngine.getFirst();
-        engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
+        if (engine) engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
 	}
 
     nodes_array_t retval = {nullptr,airplane_file,engine,engine_geode,lod0,lod3};

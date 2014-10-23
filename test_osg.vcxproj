@@ -56,7 +56,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies> osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,7 +75,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>osgText.lib;osgShadow.lib;osgFX.lib;osgEphemeris.lib;OpenThreads.lib;osg.lib;osgDB.lib;osgViewer.lib;osgAnimation.lib;osgGA.lib;osgUtil.lib;osgSim.lib;osgParticle.lib;Opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -111,7 +111,9 @@
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
     <ClCompile Include="select_geometry.cpp" />
     <ClCompile Include="shadow3\Tuto12.cpp" />
-    <ClCompile Include="SimpleHUD.cpp" />
+    <ClCompile Include="SimpleHUD.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

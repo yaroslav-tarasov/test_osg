@@ -107,3 +107,20 @@ int main_TestState(int argc, char** argv);
 int main_tess_test( int argc, char** argv );
 int main_tex_test( int argc, char** argv );
 int main_bump_map( int argc, char** argv );
+
+
+#ifndef _DEBUG
+    #pragma comment(lib, "osgText.lib")
+    #pragma comment(lib, "osgShadow.lib")
+    #pragma comment(lib, "osgFX.lib")
+    #pragma comment(lib, "osgEphemeris.lib")
+    #pragma comment(lib, "OpenThreads.lib")
+    #pragma comment(lib, "osg.lib")
+    #pragma comment(lib, "osgDB.lib")
+    #pragma comment(lib, "osgViewer.lib")
+    #pragma comment(lib, "osgAnimation.lib")
+    #pragma comment(lib, "osgGA.lib")
+    #pragma comment(lib, "osgUtil.lib")
+    #pragma comment(lib, "osgSim.lib")
+    #pragma comment(lib, "osgParticle.lib")
+#endif

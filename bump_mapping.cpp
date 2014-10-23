@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "creators.h"
 #include "CommonFunctions"
+#include "find_node_visitor.h"  
+#include "animation_handler.h"
+
+static const std::string animationName("Default");
 
 static const char* vertSource = STRINGIFY ( 
     attribute vec3 tangent;
@@ -353,7 +357,7 @@ int main_bump_map( int argc, char** argv )
     // create a local light.
     osg::Vec4f lightPosition2 (osg::Vec4f(-200.0,-100.0,-300.0,0.0f));
     osg::ref_ptr<osg::Light> myLight2 = new osg::Light;
-    myLight2->setLightNum(0);
+    myLight2->setLightNum(1);
     myLight2->setPosition(lightPosition2);
 
 #if 1
@@ -395,7 +399,7 @@ int main_bump_map( int argc, char** argv )
     normalTex->setImage( osgDB::readImageFile("Images/whitemetal_normal.jpg") );
 #else
     osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
-    colorTex->setImage( osgDB::readImageFile("a_319_airfrance.png") );//
+    colorTex->setImage( osgDB::readImageFile("a_319_airfrance.dds"/*,new osgDB::Options("dds_flip")*/) );//
     
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
     normalTex->setImage( osgDB::readImageFile("a_319_n.png") );  
@@ -421,8 +425,6 @@ int main_bump_map( int argc, char** argv )
 #endif
 
     osgDB::writeNodeFile(*scene,"bump_mapping_test.osgt");
-
-
     
     root->addChild(scene.get());
 	root->addChild(lightSource2.get());
@@ -436,6 +438,14 @@ int main_bump_map( int argc, char** argv )
     viewer.addEventHandler(new osgViewer::StatsHandler);
     viewer.addEventHandler(new osgViewer::HelpHandler);
     viewer.addEventHandler(new LightChangeHandler(lightSource2.get()));
+
+    viewer.addEventHandler(new AnimationHandler(scene,animationName
+            ,[&](){/*effects::insertParticle(model->asGroup(),model_parts[2],osg::Vec3(00.f,00.f,00.f),0.f);*/}
+            ,[&](bool off){/*model_parts[2]->setUpdateCallback(off?nullptr:new circleAimlessly());*/}
+            ,[&](bool low){/*model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);*/}
+    ));
+
+
     // add the state manipulator
     viewer.addEventHandler( new osgGA::StateSetManipulator(viewer.getCamera()->getOrCreateStateSet()) );
 

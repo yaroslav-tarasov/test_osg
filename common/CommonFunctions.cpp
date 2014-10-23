@@ -9,8 +9,10 @@
 namespace osgCookBook
 {
 
-    osg::ref_ptr<osgText::Font> g_font = osgText::readFontFile("fonts/arial.ttf");
-    
+    //FIXME  Эта интересная строчка приводит к краху программы в релиз версии 
+    // osg::ref_ptr<osgText::Font> g_font = osgText::readFontFile("fonts/arial.ttf");
+    osg::ref_ptr<osgText::Font> g_font;
+
     osg::AnimationPathCallback* createAnimationPathCallback( float radius, float time )
     {
         osg::ref_ptr<osg::AnimationPath> path = new osg::AnimationPath;
@@ -85,7 +87,8 @@ namespace osgCookBook
     }
     
     osgText::Text* createText( const osg::Vec3& pos, const std::string& content, float size )
-    {
+    {   
+        g_font = osgText::readFontFile("fonts/arial.ttf");
         osg::ref_ptr<osgText::Text> text = new osgText::Text;
         text->setDataVariance( osg::Object::DYNAMIC );
         text->setFont( g_font.get() );
