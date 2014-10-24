@@ -1,9 +1,6 @@
 #ifndef FIND_NODE_VISITOR_H
 #define FIND_NODE_VISITOR_H
 
-#include <osg/NodeVisitor>
-#include <osg/Node>
-
 class findNodeVisitor : public osg::NodeVisitor 
 {
 public: 

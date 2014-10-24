@@ -18,7 +18,7 @@ class LogFileHandler : public osg::NotifyHandler
 
 // int main_hud( int argc, char** argv ){return 0;};
 
-#if 1
+
 std::function<int( int, char**)> pmain[] = {
                                               main_scene            //0
                                              ,main_select           //1
@@ -32,7 +32,7 @@ std::function<int( int, char**)> pmain[] = {
                                              ,main_tex_test         //9
                                              ,main_bump_map         //10
                                            };       
-#endif
+
 
 int main( int argc, char** argv )
 {  

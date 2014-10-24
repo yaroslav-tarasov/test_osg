@@ -4,7 +4,8 @@
 #include "stdafx.h"
 #include "creators.h"
 #include "animation_handler.h"
-#include "find_node_visitor.h" 
+#include "find_node_visitor.h"
+
 #include "info_visitor.h"
 #include "SkyBox.h"
 

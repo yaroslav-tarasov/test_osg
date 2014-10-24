@@ -59,7 +59,8 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3)
             {
                 osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
-                if(on_fire_) on_fire_();
+                if(on_fire_) 
+                    on_fire_();
             }
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F7)
             {

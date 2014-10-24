@@ -108,6 +108,7 @@ int main_tess_test( int argc, char** argv );
 int main_tex_test( int argc, char** argv );
 int main_bump_map( int argc, char** argv );
 
+#define STRINGIFY(x) #x 
 
 #ifndef _DEBUG
     #pragma comment(lib, "osgText.lib")

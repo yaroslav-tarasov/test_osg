@@ -97,4 +97,3 @@ namespace effects
      }
 }
 
-#define STRINGIFY(x) #x 

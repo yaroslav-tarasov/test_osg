@@ -696,7 +696,7 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 nodes_array_t loadAirplaneParts()
 {
 
-    osg::Node* airplane_file = osgDB::readNodeFile("a_319.part.dae"); // a_319.open.dae "a_319.part.dae"  "an_124.dae"
+    osg::Node* airplane_file = osgDB::readNodeFile("a_319.tang.dae"); // a_319.open.dae "a_319.part.dae"  "an_124.dae"
 
     osg::Node* engine = nullptr; 
     osg::Node* engine_geode = nullptr; 

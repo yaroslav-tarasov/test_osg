@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "find_node_visitor.h" 
-#include "creators.h"
 #include "info_visitor.h"
+#include "find_tex_visitor.h"
+#include "creators.h"
+
 
 osg::Image* createSpotLight( const osg::Vec4& centerColor, const osg::Vec4& bgColor, unsigned int size, float power )
 {
@@ -30,68 +32,12 @@ osg::Image* createSpotLight( const osg::Vec4& centerColor, const osg::Vec4& bgCo
     return image.release();
 }
 
-class FindTextureVisitor : public osg::NodeVisitor
-{
-public:
-    FindTextureVisitor( osg::Texture* tex ) : _texture(tex)
-    {
-        setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
-    }
-
-    virtual void apply( osg::Node& node )
-    {
-        replaceTexture( node.getStateSet() );
-        traverse( node );
-    }
-
-    virtual void apply( osg::Geode& geode )
-    {
-        replaceTexture( geode.getStateSet() );
-        for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
-        {
-            replaceTexture( geode.getDrawable(i)->getStateSet() );
-        }
-        traverse( geode );
-    }
-
-    void replaceTexture( osg::StateSet* stateset )
-    {
-        if ( stateset )
-        {
-
-            size_t tl_s = stateset->getTextureAttributeList().size();
-            
-            for(unsigned i = 0;i< tl_s;i++)
-            {
-                osg::Texture* oldTexture = dynamic_cast<osg::Texture*>(
-                    stateset->getTextureAttribute(i, osg::StateAttribute::TEXTURE) );
-
-                if ( oldTexture )
-                {  
-                    if(!_old_texture) _old_texture = new  osg::Texture2D(oldTexture->getImage(0));
-                   stateset->setTextureAttribute( i, _texture.get() );
-                   
-                }
-            }
-        }
-    }
-
-    inline osg::Texture* getOldTexture()
-    {
-         return  _old_texture.release();
-    }
-
-protected:
-    osg::ref_ptr<osg::Texture> _texture;
-    osg::ref_ptr<osg::Texture> _old_texture;
-};
 
 class TexChangeHandler : public osgGA::GUIEventHandler
 {
 public:
     TexChangeHandler(osg::Node * root,osg::Texture *texture) 
       :_texture    (texture)
-      /*,_old_texture(texture)*/
       ,_root       (root)
       {}
 
@@ -99,11 +45,11 @@ public:
     {
         if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
         {            
-            if (ea.getKey()=='<' || ea.getKey()=='>')
-            {
-               FindTextureVisitor ftv( _texture.get() );
+            if (ea.getKey()==osgGA::GUIEventAdapter::KEY_KP_Add || ea.getKey()== osgGA::GUIEventAdapter::KEY_KP_Subtract)
+            { 
                 if ( _root )
                 { 
+                    ReplaceTextureVisitor ftv( _texture.get() );
                     _root->accept( ftv );
                     _texture =  ftv.getOldTexture();
                 }
@@ -116,14 +62,9 @@ public:
 
     virtual void getUsage(osg::ApplicationUsage& usage) const
     {
-        usage.addKeyboardMouseBinding("Keypad +",       "Increment time by one minute");
-        usage.addKeyboardMouseBinding("Shift Keypad +", "Increment time by one hour"  );
-        usage.addKeyboardMouseBinding("Alt Keypad +",   "Increment time by one day"   );
-        usage.addKeyboardMouseBinding("Ctrl Keypad +",  "Increment time by one month" );
-        usage.addKeyboardMouseBinding("Keypad -",       "Decrement time by one minute");
-        usage.addKeyboardMouseBinding("Shift Keypad -", "Decrement time by one hour"  );
-        usage.addKeyboardMouseBinding("Alt Keypad -",   "Decrement time by one day"   );
-        usage.addKeyboardMouseBinding("Ctrl Keypad -",  "Decrement time by one month" );
+        usage.addKeyboardMouseBinding("Keypad +",       "Change texture");
+        usage.addKeyboardMouseBinding("Keypad -",       "Change texture");
+
     }
 
     osg::ref_ptr<osg::Texture> _texture;

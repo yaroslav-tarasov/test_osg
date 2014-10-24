@@ -7,9 +7,9 @@ public:
     typedef std::function<void(bool)> on_effect2_f;
 
     AnimationHandler(osg::Node* model,const std::string animationName
-        ,on_effect_f on_fire
-        ,on_effect2_f on_test_effect
-        ,on_effect2_f on_lod_effect
+        ,on_effect_f on_fire         = nullptr
+        ,on_effect2_f on_test_effect = nullptr
+        ,on_effect2_f on_lod_effect  = nullptr
         );
     ~AnimationHandler() {}
 
