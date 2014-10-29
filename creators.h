@@ -10,6 +10,8 @@ namespace creators
     nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
     osg::Node*    loadAirplane();
     nodes_array_t loadAirplaneParts();
+    osg::Node*    loadBMAirplane();
+    void createMaterial(osg::Node* model,std::string mat_name);
 }
 
 namespace effects

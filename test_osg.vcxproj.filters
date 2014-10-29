@@ -69,6 +69,12 @@
     <ClInclude Include="find_tex_visitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ct_visitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="materials_visitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

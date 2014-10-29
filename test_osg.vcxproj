@@ -92,9 +92,11 @@
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="creators.h" />
+    <ClInclude Include="ct_visitor.h" />
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="find_tex_visitor.h" />
     <ClInclude Include="info_visitor.h" />
+    <ClInclude Include="materials_visitor.h" />
     <ClInclude Include="shaders.h" />
     <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stdafx.h" />

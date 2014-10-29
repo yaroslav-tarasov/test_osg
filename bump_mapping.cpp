@@ -6,34 +6,10 @@
 #include "find_node_visitor.h"  
 #include "find_tex_visitor.h"
 #include "animation_handler.h"
+#include "ct_visitor.h"
 
 static const std::string animationName("Default");
 
-class ComputeTangentVisitor : public osg::NodeVisitor
-{
-public:
-    void apply( osg::Node& node ) { traverse(node); }
-    
-    void apply( osg::Geode& node )
-    {
-        for ( unsigned int i=0; i<node.getNumDrawables(); ++i )
-        {
-            osg::Geometry* geom = dynamic_cast<osg::Geometry*>( node.getDrawable(i) );
-            if ( geom ) generateTangentArray( geom );
-        }
-        traverse( node );
-    }
-    
-    void generateTangentArray( osg::Geometry* geom )
-    {
-        osg::ref_ptr<osgUtil::TangentSpaceGenerator> tsg = new osgUtil::TangentSpaceGenerator;
-        tsg->generate( geom, 1 );
-        geom->setVertexAttribArray( 6, static_cast<osg::Array*>(tsg->getTangentArray()) );
-        geom->setVertexAttribBinding( 6, osg::Geometry::BIND_PER_VERTEX );
-        geom->setVertexAttribArray( 7, static_cast<osg::Array*>(tsg->getBinormalArray()) );
-        geom->setVertexAttribBinding( 7, osg::Geometry::BIND_PER_VERTEX );
-    }
-};
 
 osg::Geometry* createOctahedron( const osg::Vec3& center )
 {
@@ -201,20 +177,54 @@ int main_bump_map( int argc, char** argv )
     lightSource2->setStateSetModes(*lightSS,osg::StateAttribute::ON);
 
 
+    auto loadAdler = [&]() ->osg::Node* 
+    {  
+        auto root = osgDB::readNodeFile("adler.open.dae");
+        findNodeVisitor findLod3("lod3"); 
+        root->accept(findLod3);
+        auto lod3 =  findLod3.getFirst();
+
+        if(lod3) 
+            lod3->setNodeMask(0); // Убираем нафиг Lod3 
+        return root;
+    };
+
+
 /////////////////////////////////////////////////////////////////////////    
     osg::ref_ptr<osg::Node> model = osgDB::readNodeFiles( arguments );
     if ( !model ) 
-        model = creators::loadAirplane();// CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
-   
+        model = creators::loadBMAirplane(); //loadAdler();//  CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
+
+#if 0   
     ComputeTangentVisitor ctv;
     ctv.setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
     model->accept( ctv );
-    
+
+
     osg::ref_ptr<osg::Program> program = new osg::Program;
     program->addShader( new osg::Shader(osg::Shader::VERTEX,   shaders::plane_mat::get_shader(shaders::VS)) );
     program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::plane_mat::get_shader(shaders::FS)) );
     program->addBindAttribLocation( "tangent", 6 );
     program->addBindAttribLocation( "binormal", 7 );
+    
+
+    findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
+    model->accept(findS);
+    auto shassis =  findS.getFirst();
+
+    if (shassis)
+    {
+        osg::ref_ptr<osg::Program> program = new osg::Program;
+        program->addShader( new osg::Shader(osg::Shader::VERTEX,   shaders::default_mat::get_shader(shaders::VS)) );
+        program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::default_mat::get_shader(shaders::FS)) );
+        program->addBindAttribLocation( "tangent", 6 );
+        program->addBindAttribLocation( "binormal", 7 );
+
+        osg::StateSet* stateset = shassis->getOrCreateStateSet();
+        stateset->addUniform( new osg::Uniform("colorTex", 0) );
+        stateset->addUniform( new osg::Uniform("normalTex", 1) );
+        stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
+    }
 
 #if 0
     osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
@@ -243,7 +253,7 @@ int main_bump_map( int argc, char** argv )
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
     stateset->setTextureAttributeAndModes( 0, colorTex.get(), value );
     stateset->setTextureAttributeAndModes( 1, normalTex.get(), value );
-
+#endif
 
 
 #if 0  // Очень интересно и прозрачно, но работает только в отсутствии шейдера
@@ -255,12 +265,17 @@ int main_bump_map( int argc, char** argv )
     stateset->setAttributeAndModes( new osg::AlphaFunc( osg::AlphaFunc::GREATER, 0.0f ) );
 #endif
 
-    osgDB::writeNodeFile(*model,"bump_mapping_test.osgt");
+    //osgDB::writeNodeFile(*model,"bump_mapping_test.osgt");
     
     root->addChild(model.get());
 	root->addChild(lightSource2.get());
+    
+    osgUtil::Optimizer optimzer;
+    optimzer.optimize(root);
 
     osgViewer::Viewer viewer(arguments);
+    viewer.getCamera()->setComputeNearFarMode(osg::CullSettings::COMPUTE_NEAR_FAR_USING_PRIMITIVES);
+    viewer.getCamera()->setNearFarRatio(0.00001f);
     viewer.setSceneData( root.get() );
 
     // Use a default camera manipulator

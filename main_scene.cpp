@@ -134,6 +134,7 @@ public:
                 // Increment time
                 // Hopefully the DateTime will wrap around correctly if we get 
                 // to invalid dates / times...
+
                 osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
                 if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
                     data->dateTime.setHour( data->dateTime.getHour() + 1 );
@@ -143,6 +144,12 @@ public:
                     data->dateTime.setMonth( data->dateTime.getMonth() + 1 );
                 else                                                                    // Increment by one minute
                     data->dateTime.setMinute( data->dateTime.getMinute() + 1 );
+
+                //auto sls = m_ephem->getSunLightSource()->getLight();
+                //osg::Vec4 a   = sls->getAmbient();
+                //osg::Vec4 d   = sls->getDiffuse();
+                //a[3] = 0;//(d[0] + d[1] + d[2])/3.0;
+                //sls->setAmbient(a);
 
                 return true;
             }
@@ -513,7 +520,7 @@ int main_scene( int argc, char** argv )
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
 
-#if 0
+#if 1
 		//Experiment with setting the LightModel to very dark to get better sun lighting effects
 		{
 			osg::ref_ptr<osg::StateSet> sset = rootnode->getOrCreateStateSet();

@@ -43,5 +43,5 @@ int main( int argc, char** argv )
     
     osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip"));
 
-    return pmain[10](argc, argv);
+    return pmain[0](argc, argv);
 }

@@ -2,10 +2,14 @@
 #include "find_node_visitor.h" 
 #include "creators.h"
 #include <windows.h>
+#include "shaders.h"
+#include "ct_visitor.h"
+#include "find_tex_visitor.h"
+#include "materials_visitor.h"
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
-// #define TEST_ADLER_SCENE
+#define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -809,6 +813,219 @@ osg::Node* loadAirplane()
     return loadAirplaneParts()[1];
 }
 
+osg::Node* loadBMAirplane()
+{
+    osg::Node* model = loadAirplane();
+
+    ComputeTangentVisitor ctv;
+    ctv.setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
+    model->accept( ctv );
+
+    osg::ref_ptr<osg::Program> program = new osg::Program;
+    program->addShader( new osg::Shader(osg::Shader::VERTEX,   shaders::plane_mat::get_shader(shaders::VS)) );
+    program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::plane_mat::get_shader(shaders::FS)) );
+    program->addBindAttribLocation( "tangent", 6 );
+    program->addBindAttribLocation( "binormal", 7 );
+
+
+    findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
+    model->accept(findS);
+    auto shassis =  findS.getFirst();
+
+    if (shassis)
+    {
+        osg::ref_ptr<osg::Program> program = new osg::Program;
+        program->addShader( new osg::Shader(osg::Shader::VERTEX,   shaders::default_mat::get_shader(shaders::VS)) );
+        program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::default_mat::get_shader(shaders::FS)) );
+        program->addBindAttribLocation( "tangent", 6 );
+        program->addBindAttribLocation( "binormal", 7 );
+
+        osg::StateSet* stateset = shassis->getOrCreateStateSet();
+        stateset->addUniform( new osg::Uniform("colorTex", 0) );
+        stateset->addUniform( new osg::Uniform("normalTex", 1) );
+        stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
+    }
+
+
+    //osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
+    //colorTex->setImage( osgDB::readImageFile("a_319_airfrance.dds"/*,new osgDB::Options("dds_flip")*/) );//
+
+    FindTextureVisitor ft("a_319");
+    model->accept( ft );
+    osg::ref_ptr<osg::Texture2D> colorTex =  new osg::Texture2D(ft.getTexture()->getImage(0));
+
+    osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
+    normalTex->setImage( osgDB::readImageFile("a_319_n.dds") );  
+
+    osg::StateSet* stateset = model->getOrCreateStateSet();
+    stateset->addUniform( new osg::Uniform("colorTex", 0) );
+    stateset->addUniform( new osg::Uniform("normalTex", 1) );
+    stateset->setAttributeAndModes( program.get() );
+
+    osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+    stateset->setTextureAttributeAndModes( 0, colorTex.get(), value );
+    stateset->setTextureAttributeAndModes( 1, normalTex.get(), value );
+    
+    return model;
+}
+
+class texturesHolder
+{
+public:
+    struct textures_t
+    {
+        osg::ref_ptr<osg::Texture2D> colorTex;
+        osg::ref_ptr<osg::Texture2D> nightTex;
+        osg::ref_ptr<osg::Texture2D> detailsTex;
+    };
+
+public:
+    static inline const textures_t& Create(std::string mat_name)
+    {
+        if (mat_name.find("building") !=std::string::npos)
+        {
+           return buildingTexCreator(mat_name); 
+        }
+        else
+        if (mat_name.find("tree") !=std::string::npos)
+        {
+            return treeTexCreator(mat_name); 
+        }
+    }
+
+private:
+    static const textures_t&  buildingTexCreator(std::string mat_name)
+    {
+        if(GetTextures().find(mat_name)==GetTextures().end())
+        {
+            textures_t  t; 
+            t.colorTex = new osg::Texture2D;
+            t.nightTex = new osg::Texture2D;
+            t.detailsTex = new osg::Texture2D;
+
+            if(mat_name=="building_mat")
+            {
+                t.colorTex->setImage( osgDB::readImageFile("building_part1.dds") );
+                //t.nightTex->setImage( osgDB::readImageFile("building_adler_texture_g.dds") );  
+                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );            
+            } 
+            else
+            {
+                t.colorTex->setImage( osgDB::readImageFile("building_adler_texture.tga") );
+                t.nightTex->setImage( osgDB::readImageFile("building_adler_texture_g.dds") );  
+                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
+            }
+
+            GetTextures()[mat_name] = t;
+        }
+
+        return  GetTextures()[mat_name];
+    }
+
+    static const textures_t&  treeTexCreator(std::string mat_name)
+    {
+        if(GetTextures().find(mat_name)==GetTextures().end())
+        {
+            textures_t  t; 
+            t.colorTex =   new osg::Texture2D;
+            t.nightTex =   new osg::Texture2D;
+            t.detailsTex = new osg::Texture2D;
+
+            std::string tex_n;
+            if(mat_name == "tree_mat2" ) tex_n = "branch_1_summer.tga";
+            else if(mat_name == "tree_mat_3" || mat_name == "tree_mat_5" ) tex_n = "branch_3_summer.tga";
+            else if(mat_name == "tree_mat_4" ) tex_n = "branch_2_summer.tga";
+            else
+                return t;
+
+            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
+            t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
+
+            GetTextures()[mat_name] = t;
+        }
+
+        return  GetTextures()[mat_name];
+    }
+
+
+    static inline std::map<std::string,textures_t>& GetTextures()
+    {
+            static std::map<std::string,textures_t>     textures;
+            return textures;
+    }
+ 
+};
+
+
+
+class programsHolder
+{
+public:
+    struct program_t
+    {
+        osg::ref_ptr<osg::Program> program;
+    };
+
+public:
+    static inline const program_t& Create(std::string mat_name)
+    {
+        if(GetPrograms().find(mat_name)==GetPrograms().end())
+        {
+            program_t p;
+            p.program = new osg::Program;
+            p.program->addShader( new osg::Shader(osg::Shader::VERTEX,   GetShader(shaders::VS,mat_name)) );
+            p.program->addShader( new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name)) );
+            GetPrograms()[mat_name]=p;
+        }
+
+        return GetPrograms()[mat_name];
+    }
+
+private:
+
+    static inline const char* GetShader(shaders::shader_t t, std::string mat_name)
+    {
+        if (mat_name.find("building") !=std::string::npos)
+        {
+            return shaders::building_mat::get_shader(t); 
+        }
+        else
+        if (mat_name.find("tree") !=std::string::npos)
+        {
+            return shaders::tree_mat::get_shader(t);  
+        }
+
+    }
+
+
+    static inline std::map<std::string,program_t>& GetPrograms()
+    {
+        static std::map<std::string,program_t>     programs;
+        return programs;
+    }
+
+};
+
+void createMaterial(osg::Node* model,std::string mat_name)
+{
+    texturesHolder::textures_t t = texturesHolder::Create(mat_name);
+
+    programsHolder::program_t  p = programsHolder::Create(mat_name);
+
+    osg::StateSet* stateset = model->getOrCreateStateSet();
+    stateset->addUniform( new osg::Uniform("colorTex", 0) );
+    stateset->addUniform( new osg::Uniform("NightTex", 1) );
+    stateset->addUniform( new osg::Uniform("Detail", 2) );   
+    stateset->setAttributeAndModes( p.program.get() );
+
+    osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+    stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
+    stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
+    stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
+
+}
+
+
 nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
 {
     float animationLength = 50.0f;
@@ -920,6 +1137,14 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
     osg::Node* adler = osgDB::readNodeFile("adler.osgb");
+    
+    findNodeVisitor findLod3("lod3"); 
+    adler->accept(findLod3);
+    auto lod3 =  findLod3.getFirst();
+
+    if(lod3) 
+        lod3->setNodeMask(0); // Убираем нафиг Lod3 
+
     osg::MatrixTransform* baseModel = new osg::MatrixTransform;
     baseModel->setMatrix(
         // osg::Matrix::translate(-bs.center())*  
@@ -927,6 +1152,15 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
         osg::Matrix::rotate(quat0));
 
     baseModel->addChild(adler);
+    
+    MaterialVisitor::namesList nl;
+    nl.push_back("building");
+    nl.push_back("tree");
+    MaterialVisitor mv ( nl, createMaterial);
+    adler->accept(mv);
+
+    // auto build =  mv.getFirst();
+    
 #else
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #endif
@@ -940,6 +1174,9 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     const bool add_planes = true;
     if (add_planes)
     {
+        //  Видимо бага, при копировании опухает программа до полного выедания памяти
+        //  По возможности тестировать и фиксить
+        //  Может быть связанно с тем, что пытаюсь скопировать часть модели? 
 		//osg::Node* p_copy = dynamic_cast<osg::Node*>(ret_array[1]->clone(osg::CopyOp::DEEP_COPY_ALL)); 
         //findNodeVisitor findNodes("white_blink"); 
 		//p_copy->accept(findNodes);
@@ -950,11 +1187,14 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		//{
 		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
 		//}
-		nodes_array_t plane = loadAirplaneParts();
-		auto p_copy = plane[1];
+		     
+  //      nodes_array_t plane = loadAirplaneParts();
+		//auto p_copy = plane[1];
+        auto p_copy = loadBMAirplane();
 
-#if 1
+#if 0   // Интересный эффект надо подумать над использованием 
         //effects::createShader(p_copy/*geom*/) ;
+        
         effects::createProgram(p_copy,circles::vs,circles::fs) ;
 #endif 
 
