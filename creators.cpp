@@ -928,17 +928,21 @@ private:
             t.nightTex = new osg::Texture2D;
             t.detailsTex = new osg::Texture2D;
 
+            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+
             if(mat_name=="building_mat")
             {
                 t.colorTex->setImage( osgDB::readImageFile("building_part1.dds") );
                 //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );            
+          
             } 
             else if(mat_name=="building_mat2")
             {
                 t.colorTex->setImage( osgDB::readImageFile("building_adler_texture.tga") );
                 t.nightTex->setImage( osgDB::readImageFile("building_adler_texture_g.dds") );  
-                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
+                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
             }
             else if(mat_name=="building_stone_mat") 
             {
@@ -946,7 +950,7 @@ private:
                 t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
                 t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                 //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
+                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
             }
             else if(mat_name=="building_wall_mat")
             {
@@ -954,7 +958,7 @@ private:
                 t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
                 t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                 //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
+                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
             } 
             else if(mat_name=="buildingtrack_mat")
             {
@@ -962,7 +966,7 @@ private:
                 t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
                 t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                 //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
+                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
             }
 
             GetTextures()[mat_name] = t;
@@ -1018,7 +1022,9 @@ private:
             t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
             t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
             //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
+            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
             GetTextures()[mat_name] = t;
         }

@@ -916,7 +916,7 @@ namespace shaders
                 dif_tex_col *= fma(dif_tex_col, rainy_value.xxx, vec3(1.0 - rainy_value));
                 float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
                 vec3 normal_noise = vec3(0.0);
-                //if (detail_factor > 0.01)
+                if (detail_factor > 0.01)
                 {
                     normal_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
                     dif_tex_col = hardlight(dif_tex_col, normal_noise.ggg);
@@ -1150,7 +1150,7 @@ namespace shaders
                 // APPLY_DECAL(f_in, dif_tex_col);
                 vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
                 // dif_col.rgb = fma(dif_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);        // FIXME
-                decal_data.a = 0.0; //FIXME Dummy code 
+                decal_data.a = 1.0; //FIXME Dummy code 
 
                 // get dist to point and normalized to-eye vector
                 float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
