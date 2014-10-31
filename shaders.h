@@ -2,7 +2,7 @@
 
 namespace shaders
 {
-    enum shader_t {VS,GS,FS};
+    enum shader_t {VS,TES,TCS,GS,FS};
 
     namespace plane_mat
     {
@@ -22,6 +22,22 @@ namespace shaders
     namespace tree_mat
     {
         const char* get_shader(shader_t t);
+    }      
+
+    namespace ground_mat
+    {
+        const char* get_shader(shader_t t);
+    }     
+    
+    namespace concrete_mat
+    {
+        const char* get_shader(shader_t t);
     }
+
+    namespace railing_mat
+    {
+        const char* get_shader(shader_t t);
+    }
+    
 
 }

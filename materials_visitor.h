@@ -2,12 +2,14 @@
 
 class MaterialVisitor : public osg::NodeVisitor
 {
+public:         
+    typedef std::function<void(osg::StateSet* stateset,std::string)>       creator_f;
+    typedef std::function<void(osg::Node*,std::string)>                    computer_f;    
+    typedef std::list<std::string>                                         namesList;
 public:
-    typedef std::function<void(osg::Node*,std::string)>       creator_f;
-    typedef std::list<std::string>                            namesList;
-public:
-    MaterialVisitor( const namesList &searchNames, creator_f cr ) 
+    MaterialVisitor( const namesList &searchNames, creator_f cr , computer_f cm) 
         : _cr(cr)
+        , _cm(cm)
         , _found_texture(false)
         , searchForName(searchNames)
     {
@@ -17,7 +19,10 @@ public:
     virtual void apply( osg::Node& node )
     {
         if(findTexture( &node, node.getStateSet() ))
-            _cr(&node,_found_mat_name);
+        {   
+            _cm(&node,_found_mat_name);
+            _cr(node.getStateSet(),_found_mat_name);
+        }
 
         traverse( node );
     }
@@ -25,13 +30,18 @@ public:
     virtual void apply( osg::Geode& geode )
     {
         bool ret = findTexture( &geode,geode.getStateSet() );
+        if (ret)
+            _cr(geode.getStateSet(),_found_mat_name);
         for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
         {
             ret |= findTexture( &geode, geode.getDrawable(i)->getStateSet() );
+            if (ret)
+                _cr(geode.getDrawable(i)->getStateSet(),_found_mat_name);
         }
 
-        if (ret)
-            _cr(&geode,_found_mat_name);
+        if(ret)
+            _cm(&geode,_found_mat_name);
+
 
         traverse( geode );
     }
@@ -78,6 +88,7 @@ protected:
     std::set<std::string>  _found_mat_names;
     std::string            _found_mat_name;
     creator_f              _cr;
+    computer_f             _cm; 
     bool                   _found_texture;
 
     // the name we are looking for

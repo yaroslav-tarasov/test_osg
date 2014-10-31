@@ -144,8 +144,16 @@ public:
                     data->dateTime.setMonth( data->dateTime.getMonth() + 1 );
                 else                                                                    // Increment by one minute
                     data->dateTime.setMinute( data->dateTime.getMinute() + 1 );
-
+                
+                //std::cout << "**** Sun light ****" << std::endl;
                 //auto sls = m_ephem->getSunLightSource()->getLight();
+
+                //std::cout << "Ambient: " << sls->getAmbient() << std::endl;
+                //std::cout << "Diffuse: " << sls->getDiffuse() << std::endl;
+                //std::cout << "Specular: " << sls->getSpecular() << std::endl;
+
+                //std::cout << "********************" << std::endl;
+                //
                 //osg::Vec4 a   = sls->getAmbient();
                 //osg::Vec4 d   = sls->getDiffuse();
                 //a[3] = 0;//(d[0] + d[1] + d[2])/3.0;
@@ -402,6 +410,8 @@ int main_scene( int argc, char** argv )
         // run optimization over the scene graph
         //osgUtil::Optimizer optimzer;
         //optimzer.optimize(rootnode);
+        
+        // osgDB::writeNodeFile(*model,"adler_test.osgt");
 
         // set the scene to render
         viewer.setSceneData(rootnode);

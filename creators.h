@@ -11,7 +11,7 @@ namespace creators
     osg::Node*    loadAirplane();
     nodes_array_t loadAirplaneParts();
     osg::Node*    loadBMAirplane();
-    void createMaterial(osg::Node* model,std::string mat_name);
+    void createMaterial(osg::StateSet* stateset,std::string mat_name);
 }
 
 namespace effects
