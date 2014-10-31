@@ -810,7 +810,7 @@ namespace shaders
                 v_out.binormal  = binormal;
                  
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.detail_uv = gl_TexCoord[0].xy * 0.03;
+                v_out.detail_uv = gl_Vertex.xy * 0.03;
                 v_out.texcoord  = gl_TexCoord[0].xy;
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента

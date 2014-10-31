@@ -852,7 +852,7 @@ osg::Node* loadBMAirplane()
 
     FindTextureVisitor ft("a_319");
     model->accept( ft );
-    osg::ref_ptr<osg::Texture2D> colorTex =  new osg::Texture2D(ft.getTexture()->getImage(0));
+    //osg::ref_ptr<osg::Texture2D> colorTex =  new osg::Texture2D(ft.getTexture()->getImage(0));
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
     normalTex->setImage( osgDB::readImageFile("a_319_n.dds") );  
@@ -863,7 +863,7 @@ osg::Node* loadBMAirplane()
     stateset->setAttributeAndModes( program.get() );
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-    stateset->setTextureAttributeAndModes( 0, colorTex.get(), value );
+    stateset->setTextureAttributeAndModes( 0, /*colorTex.get()*/ft.getTexture(), value );
     stateset->setTextureAttributeAndModes( 1, normalTex.get(), value );
     
     return model;
@@ -1049,6 +1049,8 @@ private:
             t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
             //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
             t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
             GetTextures()[mat_name] = t;
         }
@@ -1075,6 +1077,8 @@ private:
             t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
             //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
             t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
             GetTextures()[mat_name] = t;
         }
@@ -1103,6 +1107,8 @@ private:
             t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
             //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
             t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
             GetTextures()[mat_name] = t;
         }
@@ -1137,6 +1143,8 @@ private:
             t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
             //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
             t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
             GetTextures()[mat_name] = t;
         }
