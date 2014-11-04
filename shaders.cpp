@@ -72,7 +72,8 @@ namespace shaders
     };
 
 
-    const char* fs = { "#extension GL_ARB_gpu_shader5 : enable \n "
+    const char* fs = { "#extension GL_ARB_gpu_shader5 : enable \n"
+		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
         STRINGIFY ( 
     
         // layout(early_fragment_tests) in;
