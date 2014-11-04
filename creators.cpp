@@ -1235,39 +1235,17 @@ public:
 public:
     static inline const textures_t& Create(std::string mat_name)
     {
-        if (mat_name.find("building") !=std::string::npos)
+        if (    mat_name.find("building") !=std::string::npos 
+			 || mat_name.find("ground")   !=std::string::npos
+			 || mat_name.find("tree")     !=std::string::npos
+			 || mat_name.find("ground")   !=std::string::npos
+			 || mat_name.find("concrete") !=std::string::npos
+			 || mat_name.find("sea")      !=std::string::npos
+			 || mat_name.find("mountain") !=std::string::npos
+			 || mat_name.find("railing")  !=std::string::npos
+			)
         {
            return texCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("tree") !=std::string::npos)
-        {
-            return texCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("ground") !=std::string::npos)
-        {
-            return texCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("concrete") !=std::string::npos)
-        {
-            return texCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("sea") !=std::string::npos)
-        {
-            return texCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("mountain") !=std::string::npos)
-        {
-           return texCreator(mat_name); 
-        } 
-        else
-        if (mat_name.find("railing") !=std::string::npos)
-        {
-            return texCreator(mat_name); 
         }
     }
 
