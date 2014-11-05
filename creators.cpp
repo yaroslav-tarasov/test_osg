@@ -8,6 +8,7 @@
 #include "materials_visitor.h"
 #include "pugixml.hpp"
 
+
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
 #define TEST_ADLER_SCENE
@@ -15,6 +16,7 @@
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
 
+#define GL_SAMPLE_ALPHA_TO_COVERAGE 0x809E
 
 namespace
 {
@@ -199,6 +201,58 @@ namespace
         );
 
     }
+}
+
+namespace mat
+{
+
+    struct reader
+    {
+        reader()
+        {
+        }
+
+        reader(std::string full_path)
+        {
+            mats_ = read (full_path);
+        }
+
+        static materials_t  read (std::string full_path)
+        {
+            pugi::xml_document doc;
+            materials_t mats_;
+
+            std::string in_file_name = /*fs::path(*/full_path/*).leaf()*/ + ".mat.xml";
+
+            bool l = doc.load_file(in_file_name.c_str());
+            if(l)
+            {
+            pugi::xml_node root = doc.child("root");
+
+            for (pugi::xml_node m = root.first_child(); m; m = m.next_sibling())
+            {
+                for (pugi::xml_node t = m.first_child(); t; t = t.next_sibling())
+                {
+                    texture_t tex;
+                    tex.path = t.attribute("path").as_string();
+                    tex.unit = t.attribute("unit").as_int();
+                    mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
+                }
+            }	
+
+            }
+            else
+                std::cerr << "File not found: " << in_file_name;
+
+            return mats_;
+        }
+
+        materials_t get () {return mats_;}
+
+    private:
+        materials_t mats_;
+    };
+
 }
 
 namespace effects 
@@ -870,61 +924,6 @@ osg::Node* loadBMAirplane()
     return model;
 }
 
-namespace mat
-{
-
-struct texture_t
-{
-	int         unit;
-	std::string path;
-};
-
-typedef std::multimap<std::string,texture_t> materials_t;
-
-struct reader
-{
-	reader()
-	{
-    }
-
-	reader(std::string full_path)
-	{
-		mats_ = read (full_path);
-	}
-
-	static materials_t  read (std::string full_path)
-	{
-		pugi::xml_document doc;
-		materials_t mats_;
-
-		std::string in_file_name = /*fs::path(*/full_path/*).leaf()*/ + ".mat.xml";
-		
-		bool l = doc.load_file(in_file_name.c_str());
-		
-		pugi::xml_node root = doc.child("root");
-
-		for (pugi::xml_node m = root.first_child(); m; m = m.next_sibling())
-		{
-			for (pugi::xml_node t = m.first_child(); t; t = t.next_sibling())
-			{
-				texture_t tex;
-				tex.path = t.attribute("path").as_string();
-				tex.unit = t.attribute("unit").as_int();
-				mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
-			}
-		}	
-
-		return mats_;
-	}
-
-	materials_t get () {return mats_;}
-
-private:
-	materials_t mats_;
-};
-
-}
-
 class texturesHolder
 {
 public:
@@ -934,306 +933,9 @@ public:
         osg::ref_ptr<osg::Texture2D> nightTex;
         osg::ref_ptr<osg::Texture2D> detailsTex;
     };
-
-public:
-    static inline const textures_t& Create(std::string mat_name)
-    {
-        if (mat_name.find("building") !=std::string::npos)
-        {
-           return buildingTexCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("tree") !=std::string::npos)
-        {
-            return treeTexCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("ground") !=std::string::npos)
-        {
-            return groundTexCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("concrete") !=std::string::npos)
-        {
-            return concreteTexCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("sea") !=std::string::npos)
-        {
-            return seaTexCreator(mat_name); 
-        }
-        else
-        if (mat_name.find("mountain") !=std::string::npos)
-        {
-           return mountainTexCreator(mat_name); 
-        } 
-        else
-        if (mat_name.find("railing") !=std::string::npos)
-        {
-            return railingTexCreator(mat_name); 
-        }
-    }
-
-private:
-    static const textures_t&  buildingTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex = new osg::Texture2D;
-            t.nightTex = new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            if(mat_name=="building_mat")
-            {
-                t.colorTex->setImage( osgDB::readImageFile("building_part1.dds") );
-                //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-          
-            } 
-            else if(mat_name=="building_mat2")
-            {
-                t.colorTex->setImage( osgDB::readImageFile("building_adler_texture.tga") );
-                t.nightTex->setImage( osgDB::readImageFile("building_adler_texture_g.dds") );  
-                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
-            }
-            else if(mat_name=="building_stone_mat") 
-            {
-                t.colorTex->setImage( osgDB::readImageFile("stone.tga") );
-                t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
-            }
-            else if(mat_name=="building_wall_mat")
-            {
-                t.colorTex->setImage( osgDB::readImageFile("wall.tga") );
-                t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
-            } 
-            else if(mat_name=="buildingtrack_mat")
-            {
-                t.colorTex->setImage( osgDB::readImageFile("track1a.tga") );
-                t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-                //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) ); 
-            }
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static const textures_t&  treeTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            if(mat_name == "tree_mat2" ) tex_n = "branch_1_summer.tga";
-            else if(mat_name == "tree_mat_3" || mat_name == "tree_mat_5" ) tex_n = "branch_3_summer.tga";
-            else if(mat_name == "tree_mat_4" ) tex_n = "branch_2_summer.tga";
-
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static const textures_t&  concreteTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            if(mat_name == "concrete_road_mat" )        tex_n = "road.tga";
-            else if(mat_name == "concrete_road_2_mat" ) tex_n = "road_2.tga";
-            else if(mat_name == "concrete_1Material" )  tex_n = "asfalt.tga";
-            else if(mat_name == "concrete_vpp_mat" )    tex_n = "vpp.tga";
-
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static const textures_t&  groundTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            tex_n = "ground_00_summer.tga";
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
     
-    static const textures_t&  seaTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            if(mat_name == "sea_01_mat" )               tex_n = "ground_01_summer.tga";
-            else if(mat_name == "sea_02_mat" )          tex_n = "ground_02_summer.tga";
-
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static const textures_t&  mountainTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            if(mat_name == "mountain_big_1Material" )       tex_n = "trees_big_summer.tga";
-            else if(mat_name == "mountain_4_mat" )          tex_n = "ground_04_summer.tga";
-            else if(mat_name == "mountain_01_mat" )         tex_n = "ground_01_summer.tga";
-            else if(mat_name == "mountain_3_2Material" )    tex_n = "ground_03_summer.tga";
-            else if(mat_name == "mountain_02_mat" )         tex_n = "ground_02_summer.tga";
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static const textures_t&  railingTexCreator(std::string mat_name)
-    {
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex =   new osg::Texture2D;
-            t.nightTex =   new osg::Texture2D;
-            t.detailsTex = new osg::Texture2D;
-
-            std::string tex_n;
-            if(mat_name == "railing_gp_07l_01_mat" )       tex_n = "gp_07l_01.tga";
-            else if(mat_name == "railing_RED_1Material" )          tex_n = "railing_RED.tga";
-            else if(mat_name == "railing_gp_07l_02_mat" )         tex_n = "gp_07l_02.tga";
-            else if(mat_name == "railing_loc_07l_mat" )    tex_n = "loc_07l.tga";
-            else if(mat_name == "railing_mat1" )         tex_n = "railing.tga";
-            else if(mat_name == "railing_Flag_2_1Material" )    tex_n = "Flag_2.tga";
-            else if(mat_name == "railing_Flag_1Material" )         tex_n = "Flag.tga";
-            else if(mat_name == "railing_Flag_3_1Material" )         tex_n = "Flag_3.tga";
-            else if(mat_name == "railing_drl_mat" )    tex_n = "drl.tga";
-            else if(mat_name == "railing_wheel_Mat" )         tex_n = "wheel.tga";
-            else if(mat_name == "railing_digitals_mat" )         tex_n = "digitals.tga";
-
-            t.colorTex->setImage( osgDB::readImageFile(tex_n) );
-            t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            //t.nightTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-            t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static inline std::map<std::string,textures_t>& GetTextures()
-    {
-            static std::map<std::string,textures_t>     textures;
-            return textures;
-    }
- 
-};
-
-class texturesHolder2
-{
 public:
-    struct textures_t
-    {
-        osg::ref_ptr<osg::Texture2D> colorTex;
-        osg::ref_ptr<osg::Texture2D> nightTex;
-        osg::ref_ptr<osg::Texture2D> detailsTex;
-    };
-    
-	texturesHolder2(mat::materials_t&  mats)
-		// : mats_(mats)
-	{
-		GetMaterials() = mats;
-    }
-
-public:
-    static inline const textures_t& Create(std::string mat_name)
+    static inline const textures_t& Create(const mat::materials_t&  mats, std::string mat_name)
     {
         if (    mat_name.find("building") !=std::string::npos 
 			 || mat_name.find("ground")   !=std::string::npos
@@ -1243,14 +945,21 @@ public:
 			 || mat_name.find("sea")      !=std::string::npos
 			 || mat_name.find("mountain") !=std::string::npos
 			 || mat_name.find("railing")  !=std::string::npos
+             || mat_name.find("panorama")  !=std::string::npos
+             
 			)
         {
-           return texCreator(mat_name); 
+           return texCreator(mats,mat_name); 
         }
     }
 
 private:
-    static const textures_t&  texCreator(std::string mat_name)
+    
+    texturesHolder()
+    {
+    }
+
+    static inline const textures_t&  texCreator(const mat::materials_t&  mats, std::string mat_name)
     {
         if(GetTextures().find(mat_name)==GetTextures().end())
         {
@@ -1263,7 +972,7 @@ private:
             t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
             t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
 
-			auto range = GetMaterials().equal_range(mat_name);
+			auto range = mats.equal_range(mat_name);
 			
 			bool night_tex = false; 
 			
@@ -1301,12 +1010,6 @@ private:
             static std::map<std::string,textures_t>     textures;
             return textures;
     }
-
-    static inline mat::materials_t& GetMaterials()
-    {
-            static mat::materials_t  mats_;
-            return mats_;
-    }	
 
 };
 
@@ -1366,6 +1069,12 @@ private:
         {
             return shaders::railing_mat::get_shader(t);  
         } 
+        else
+        if (mat_name.find("panorama") !=std::string::npos)
+        {
+            return shaders::panorama_mat::get_shader(t);  
+        }
+        
     }
 
 
@@ -1392,15 +1101,23 @@ void computeAttributes(osg::Node* model,std::string mat_name)
 }
 
 
-void createMaterial(osg::StateSet* stateset,std::string mat_name)
+void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m)
 {
-    texturesHolder2::textures_t t = texturesHolder2::Create(mat_name);
+    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name);
     
     stateset->addUniform( new osg::Uniform("colorTex", 0) );
     stateset->addUniform( new osg::Uniform("NightTex", 1) );
     stateset->addUniform( new osg::Uniform("Detail", 2) );   
     stateset->setAttributeAndModes( p.program.get() );
+                                                          
+    if (   mat_name.find("panorama") !=std::string::npos
+        || mat_name.find("railing")  !=std::string::npos 
+        || mat_name.find("tree")     !=std::string::npos 
+       )
+    { 
+        stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
+    }
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
     stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
@@ -1517,9 +1234,13 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
-
-    osg::Node* adler = osgDB::readNodeFile("adler.osgb");
     
+    const char* scene_name = "sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
+    const char* mat_file_name = "sheremetyevo.open.dae"; //scene_name;//
+
+    osg::Node* adler = osgDB::readNodeFile(scene_name);  // "adler.osgb"
+    adler->setNodeMask(0xffffffff);
+
     findNodeVisitor findLod3("lod3"); 
     adler->accept(findLod3);
     auto lod3 =  findLod3.getFirst();
@@ -1535,7 +1256,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 
     baseModel->addChild(adler);
     
-	mat::reader mr("adler.open.dae.mat.xml");
+	//mat::reader mr("adler.open.dae.mat.xml");
 
     MaterialVisitor::namesList nl;
     nl.push_back("building");
@@ -1545,7 +1266,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     nl.push_back("mountain");
     nl.push_back("sea");
     nl.push_back("railing");
-    MaterialVisitor mv ( nl, createMaterial,computeAttributes);
+    nl.push_back("panorama");
+    MaterialVisitor mv ( nl, createMaterial,computeAttributes,mat::reader::read(mat_file_name));
     adler->accept(mv);
 
     // auto build =  mv.getFirst();

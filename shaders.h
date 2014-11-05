@@ -38,6 +38,11 @@ namespace shaders
     {
         const char* get_shader(shader_t t);
     }
+
+    namespace panorama_mat
+    {
+        const char* get_shader(shader_t t);
+    }
     
 
 }

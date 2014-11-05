@@ -1,15 +1,27 @@
 #pragma once
 
+namespace mat
+{
+    struct texture_t
+    {
+        int         unit;
+        std::string path;
+    };
+
+    typedef std::multimap<std::string,texture_t> materials_t;
+}
+
 class MaterialVisitor : public osg::NodeVisitor
 {
 public:         
-    typedef std::function<void(osg::StateSet* stateset,std::string)>       creator_f;
+    typedef std::function<void(osg::StateSet* stateset,std::string,const mat::materials_t& m)>       creator_f;
     typedef std::function<void(osg::Node*,std::string)>                    computer_f;    
     typedef std::list<std::string>                                         namesList;
 public:
-    MaterialVisitor( const namesList &searchNames, creator_f cr , computer_f cm) 
+    MaterialVisitor( const namesList &searchNames, creator_f cr , computer_f cm,const mat::materials_t& m) 
         : _cr(cr)
         , _cm(cm)
+        , _mats(m)
         , _found_texture(false)
         , searchForName(searchNames)
     {
@@ -21,7 +33,7 @@ public:
         if(findTexture( &node, node.getStateSet() ))
         {   
             _cm(&node,_found_mat_name);
-            _cr(node.getStateSet(),_found_mat_name);
+            _cr(node.getStateSet(),_found_mat_name,_mats);
         }
 
         traverse( node );
@@ -31,12 +43,12 @@ public:
     {
         bool ret = findTexture( &geode,geode.getStateSet() );
         if (ret)
-            _cr(geode.getStateSet(),_found_mat_name);
+            _cr(geode.getStateSet(),_found_mat_name,_mats);
         for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
         {
             ret |= findTexture( &geode, geode.getDrawable(i)->getStateSet() );
             if (ret)
-                _cr(geode.getDrawable(i)->getStateSet(),_found_mat_name);
+                _cr(geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
         }
 
         if(ret)
@@ -89,6 +101,7 @@ protected:
     std::string            _found_mat_name;
     creator_f              _cr;
     computer_f             _cm; 
+    mat::materials_t       _mats;
     bool                   _found_texture;
 
     // the name we are looking for

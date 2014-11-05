@@ -1,5 +1,6 @@
 #pragma once
 
+
 namespace creators 
 {
     typedef std::array<osg::Node*, 6> nodes_array_t;
@@ -11,7 +12,6 @@ namespace creators
     osg::Node*    loadAirplane();
     nodes_array_t loadAirplaneParts();
     osg::Node*    loadBMAirplane();
-    void createMaterial(osg::StateSet* stateset,std::string mat_name);
 }
 
 namespace effects

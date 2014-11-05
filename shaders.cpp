@@ -424,7 +424,7 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_TexCoord[0].xy ;
                 
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse * 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -555,7 +555,7 @@ namespace shaders
                 // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
                 // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
-                vec3 lightmap_color = vec3(0.2f,0.2f,0.2f); // FIXME dummy code
+                vec3 lightmap_color = vec3(0.5f,0.5f,0.5f); // FIXME dummy code
 
 
                 //    LIGHTMAP_BUILDING_HEIGHT_TRICK;
@@ -586,11 +586,9 @@ namespace shaders
                 float night_factor = step(ambient.a, 0.35);
                 vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
                
-                // gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
                 
-                
-                gl_FragColor = vec4( result,1.0);
-
+                gl_FragColor = vec4( result,1.0);  
+                /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
             }
             )
 
@@ -1387,5 +1385,112 @@ namespace shaders
         }
 
     }  // ns railing_mat
+
+    namespace panorama_mat 
+    {
+        const char* vs = {  
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+            STRINGIFY ( 
+            attribute vec3 tangent;
+            attribute vec3 binormal;
+            varying   vec3 lightDir;
+
+            out block
+            {
+                vec2 texcoord;
+                vec3 normal;
+                vec3 viewpos;
+            } v_out;
+
+            void main()
+            {
+                // vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+                // mat3 rotation = mat3(tangent, binormal, normal);
+                vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
+
+                lightDir = vec3(gl_LightSource[0].position.xyz);
+                gl_Position = ftransform();
+                gl_TexCoord[0] = gl_MultiTexCoord1;
+
+                v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
+                v_out.viewpos   = vertexInEye.xyz;
+                v_out.texcoord  = gl_TexCoord[0].xy;
+
+            }       
+            )
+        };
+
+
+        const char* fs = { 
+            "#extension GL_ARB_gpu_shader5 : enable \n "
+
+            STRINGIFY ( 
+
+            uniform sampler2D           ViewLightMap;
+            uniform sampler2D           Detail;
+            uniform samplerCube         Env;
+            uniform sampler2DShadow     ShadowSplit0;
+            uniform sampler2DShadow     ShadowSplit1;
+            uniform sampler2DShadow     ShadowSplit2;
+            uniform sampler2D           ViewDecalMap;    
+
+            // saturation helper
+            float saturate( const in float x )
+            {
+                return clamp(x, 0.0, 1.0);
+            }   
+
+            )
+
+            STRINGIFY ( 
+
+            uniform sampler2D colorTex;
+            varying vec3 lightDir;
+
+            in block
+            {
+                vec2 texcoord;
+                vec3 normal;
+                vec3 viewpos;
+                vec4 shadow_view;
+                vec4 lightmap_coord;
+            } f_in;
+
+            mat4 viewworld_matrix;
+
+            void main (void)
+            {
+                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+
+                vec4  light_vec_view = vec4(lightDir,1);
+                viewworld_matrix = gl_ModelViewMatrixInverse;
+                // FIXME dummy code
+
+                vec3 normal = normalize(f_in.normal);
+                float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
+
+                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
+                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
+
+                gl_FragColor = vec4( result,dif_tex_col.a);
+                //gl_FragColor = vec4( 1.0,0.0,0.0,dif_tex_col.a);
+            }
+            )
+
+        };   
+
+        const char* get_shader(shader_t t)
+        {
+            if(t==VS)
+                return vs;
+            else if(t==FS)
+                return fs;
+            else 
+                return nullptr;
+        }
+
+    }  // ns panorama_mat
 
 }  // ns shaders
