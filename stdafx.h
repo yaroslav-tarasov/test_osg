@@ -96,6 +96,13 @@
 
 #include <osg/AlphaFunc>
 
+#include <osg/TexGen>
+#include <osg/TexEnvCombine>
+
+#include <osgUtil/ReflectionMapGenerator>
+#include <osgUtil/HighlightMapGenerator>
+#include <osgUtil/HalfWayMapGenerator>
+
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
 int main_select( int argc, char** argv );

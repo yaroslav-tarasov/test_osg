@@ -213,7 +213,7 @@ namespace shaders
 
     namespace default_mat 
     {
-       const char* vs = {  
+       const char* vs = {       
            "#extension GL_ARB_gpu_shader5 : enable \n"
            STRINGIFY ( 
            attribute vec3 tangent;
@@ -252,7 +252,7 @@ namespace shaders
        };
 
 
-       const char* fs = { 
+       const char* fs = {  
        "#extension GL_ARB_gpu_shader5 : enable \n "
 
         STRINGIFY ( 
@@ -578,7 +578,7 @@ namespace shaders
                     refl_vec_world.z = abs(refl_vec_world.z);
                     float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
                     vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
-                    cube_color = vec3(1.0f,1.0f,1.0f); // FIXME dummy code
+                    //cube_color = vec3(1.0f,1.0f,1.0f); // FIXME dummy code
                     day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
                     night_tex = texture2D(NightTex, f_in.texcoord).rgb;
                 }
@@ -1421,7 +1421,8 @@ namespace shaders
         };
 
 
-        const char* fs = { 
+        const char* fs = {
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             STRINGIFY ( 
@@ -1433,12 +1434,36 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
             uniform sampler2D           ViewDecalMap;    
+            uniform vec4                fog_params; 
+
+            mat4 viewworld_matrix;
 
             // saturation helper
             float saturate( const in float x )
             {
                 return clamp(x, 0.0, 1.0);
             }   
+            
+            //
+            // FOG FUNCTIONS
+            //
+
+            // vector-based fog
+            float fog_decay_factor( const in vec3 view_pos )
+            {
+                return exp(-fog_params.a * dot(view_pos, view_pos));
+            }
+            // vector-based fog with emap modulation
+            vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )
+            {
+                vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);
+                return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));
+            }
+            // vector-based fog
+            vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )
+            {
+                return mix(fog_params.rgb, color, fog_decay_factor(view_pos));
+            }
 
             )
 
@@ -1456,8 +1481,6 @@ namespace shaders
                 vec4 lightmap_coord;
             } f_in;
 
-            mat4 viewworld_matrix;
-
             void main (void)
             {
                 vec4  specular       = gl_LightSource[0].specular;     // FIXME 
@@ -1474,6 +1497,7 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
 
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 gl_FragColor = vec4( result,dif_tex_col.a);
                 //gl_FragColor = vec4( 1.0,0.0,0.0,dif_tex_col.a);
             }

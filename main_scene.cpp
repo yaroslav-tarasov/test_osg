@@ -179,6 +179,25 @@ public:
 
                 return true;
             }
+            else
+            if (ea.getKey() == osgGA::GUIEventAdapter::KEY_I)
+            {
+
+                osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
+                
+                data->turbidity += 1 ;
+
+                return true;
+            }
+            else
+            if (ea.getKey() == osgGA::GUIEventAdapter::KEY_O)
+            {
+                osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
+                                                                                     // Increment by one minute
+                data->turbidity -= 1 ;
+
+                return true;
+            }
 
         }
 
@@ -373,7 +392,7 @@ int main_scene( int argc, char** argv )
         osg::ref_ptr<osgEphemeris::EphemerisModel> ephemerisModel = new osgEphemeris::EphemerisModel;
 
 		ephemerisModel->setSkyDomeMirrorSouthernHemisphere(false);
-		ephemerisModel->setSkyDomeUseSouthernHemisphere(false);
+		ephemerisModel->setSkyDomeUseSouthernHemisphere(true);
 
         // Optionally, Set the AutoDate and Time to false so we can control it with the GUI
         ephemerisModel->setAutoDateTime( false );
@@ -555,6 +574,7 @@ int main_scene( int argc, char** argv )
 	     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
          model->asGroup()->addChild(precipitationEffect.get());
 		 precipitationEffect->snow(0.3);
+         precipitationEffect->setWind(osg::Vec3(20.2f,20.2f,20.2f));
 #endif
 		// Useless
 		//rootnode->getOrCreateStateSet()->setMode( GL_LINE_SMOOTH, osg::StateAttribute::ON );
