@@ -1107,13 +1107,13 @@ private:
 
 };
 
-class programsHolder
+class programsHolder: public programsHolder_base
 {
-public:
-    struct program_t
-    {
-        osg::ref_ptr<osg::Program> program;
-    };
+//public:
+//    struct program_t
+//    {
+//        osg::ref_ptr<osg::Program> program;
+//    };
 
 public:
     static inline const program_t& Create(std::string mat_name)
@@ -1123,7 +1123,7 @@ public:
             program_t p;
             p.program = new osg::Program;
             p.program->setName(mat_name);
-            auto vs = new osg::Shader( osg::Shader::VERTEX,   GetShader(shaders::VS,mat_name));
+            auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
             p.program->addShader( vs );
             auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
             p.program->addShader( fs );
@@ -1168,6 +1168,11 @@ private:
         {
             return shaders::panorama_mat::get_shader(t);  
         }
+        else
+        if (mat_name.find("sky") !=std::string::npos)
+        {
+            return shaders::sky_fog_mat::get_shader(t);  
+        }
         
     }
 
@@ -1199,12 +1204,15 @@ class FogCallback: public osg::Uniform::Callback
 public:
     virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
     {
-        float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
-        float sine = sinf( angle );        // -1 -> 1
-        float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
-        float v10 = 1.0f - v01;                //  1 -> 0
+        //float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
+        //float sine = sinf( angle );        // -1 -> 1
+        //float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
+        //float v10 = 1.0f - v01;                //  1 -> 0
+        
+        double  fractpart, intpart;
+        fractpart = modf (nv->getFrameStamp()->getSimulationTime() / 100.0f , &intpart);
 
-        uniform->set( osg::Vec4(1.505f, 0.8f*v01, 1.0f, angle) ); 
+        uniform->set( osg::Vec4(/*1.505f*/1.5f, /*0.8f*v01*/1.5f, 1.5f, 100*fractpart) ); 
     }
 };
 
@@ -1252,6 +1260,13 @@ void create_specular_highlights(osg::StateSet* ss)
     ss->setTextureAttributeAndModes(0, te, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON);
 }
 
+
+ programsHolder_base::program_t  CreateProgram(std::string mat_name)
+ {
+     return programsHolder::Create(mat_name);
+ }
+
+
 void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m)
 {
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name);
@@ -1276,14 +1291,15 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
         || mat_name.find("tree")     !=std::string::npos 
        )
     { 
-        stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
+       // stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
     }
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
     stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
     stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
     stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
-    stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );
+    stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );  
+    stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 
 

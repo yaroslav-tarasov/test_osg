@@ -8,11 +8,14 @@
 
 #include "info_visitor.h"
 #include "SkyBox.h"
+#include "sv/FogLayer.h"
 
 #include <osgEphemeris/EphemerisModel.h>
 
 #define TEST_EPHEMERIS
 #define TEST_PRECIP
+
+// #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
 // #define TEST_SKYBOX
 // #define TEST_CAMERA
@@ -370,11 +373,8 @@ int main_scene( int argc, char** argv )
 #ifdef TEST_SKYBOX
         rootnode->addChild( skybox.get() );
 #endif
-        //auto _skyStarField = new svSky::StarField();
 
-        //rootnode->addChild(_skyStarField);
-        //_skyStarField->setIlluminationFog(10.0f/*_illumination*/, 0.3f/*_fogDensity*/);
-
+#ifdef TEST_OUTLINE
         {
             // create outline effect
             osg::ref_ptr<osgFX::Outline> outline = new osgFX::Outline;
@@ -384,7 +384,8 @@ int main_scene( int argc, char** argv )
             outline->setColor(osg::Vec4(1,1,0,1));
             outline->addChild(model_parts[3]);
         }
-        
+#endif
+
         osg::ref_ptr<osg::LightSource> sun_light /*= source*/;
 
 #ifdef  TEST_EPHEMERIS
@@ -418,7 +419,24 @@ int main_scene( int argc, char** argv )
 		ephemerisModel->setMoveWithEyePoint(false);
         sun_light = ephemerisModel->getSunLightSource();
 #endif  // TEST_EPHEMERIS
-        
+
+
+#ifdef  TEST_OSG_FOG 
+        // Да не плохо конечно только материалы должны быть без шейдеров
+        osg::ref_ptr<osg::Fog> fog = new osg::Fog;
+        fog->setMode( osg::Fog::LINEAR );
+        fog->setStart( 500.0f );
+        fog->setEnd( 2500.0f );
+        fog->setColor( osg::Vec4(1.0f, 1.0f, 0.0f, 1.0f) );
+
+        rootnode->getOrCreateStateSet()->setAttributeAndModes( fog.get() );
+#endif
+
+         osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(model->asGroup());
+         rootnode->asGroup()->addChild(skyFogLayer.get());
+         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),1.0);    // (вроде начинаем с 0.1 до максимум 1.0)
+         float coeff = skyFogLayer->getFogExp2Coef();
+
 #ifdef TEST_SHADOWS
         //if (sun_light.valid())
         //    sm->setLight(sun_light.get());
@@ -572,9 +590,9 @@ int main_scene( int argc, char** argv )
 
 #ifdef TEST_PRECIP   // здесь у нас будет снег 
 	     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
-         model->asGroup()->addChild(precipitationEffect.get());
+         /*model->asGroup()->*/rootnode->addChild(precipitationEffect.get());
 		 precipitationEffect->snow(0.3);
-         precipitationEffect->setWind(osg::Vec3(20.2f,20.2f,20.2f));
+         precipitationEffect->setWind(osg::Vec3(2.2f,8.2f,0.2f));
 #endif
 		// Useless
 		//rootnode->getOrCreateStateSet()->setMode( GL_LINE_SMOOTH, osg::StateAttribute::ON );

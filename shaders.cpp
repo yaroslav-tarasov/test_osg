@@ -963,7 +963,7 @@ namespace shaders
                 }
 
                 gl_FragColor = vec4( result,1.0);
-
+                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
 
@@ -1196,6 +1196,7 @@ namespace shaders
                 }
 
                 gl_FragColor = vec4( result,1.0);
+                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
 
@@ -1404,8 +1405,6 @@ namespace shaders
 
             void main()
             {
-                // vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
                 lightDir = vec3(gl_LightSource[0].position.xyz);
@@ -1414,7 +1413,133 @@ namespace shaders
 
                 v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.texcoord  = gl_TexCoord[0].xy;
+                v_out.texcoord  = gl_TexCoord[0].xy; 
+
+            }       
+            )
+        };
+
+
+        const char* fs = {
+            "#version 130 \n"
+            "#extension GL_ARB_gpu_shader5 : enable \n "
+
+            STRINGIFY ( 
+
+            uniform sampler2D           ViewLightMap;
+            uniform sampler2D           Detail;
+            uniform samplerCube         Env;
+            uniform sampler2DShadow     ShadowSplit0;
+            uniform sampler2DShadow     ShadowSplit1;
+            uniform sampler2DShadow     ShadowSplit2;
+            uniform sampler2D           ViewDecalMap;    
+            uniform vec4                fog_params; 
+            uniform vec4                SceneFogParams;
+
+            mat4 viewworld_matrix;
+
+            // saturation helper
+            float saturate( const in float x )
+            {
+                return clamp(x, 0.0, 1.0);
+            }   
+            
+            //
+            // FOG FUNCTIONS
+            //
+
+            // vector-based fog
+            float fog_decay_factor( const in vec3 view_pos )
+            {
+                return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));
+            }
+            // vector-based fog with emap modulation
+            vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )
+            {
+                vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);
+                return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));
+            }
+
+            // vector-based fog
+            vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )
+            {
+                return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));
+            }
+
+            )
+
+            STRINGIFY ( 
+
+            uniform sampler2D colorTex;
+            varying vec3 lightDir;
+
+            in block
+            {
+                vec2 texcoord;
+                vec3 normal;
+                vec3 viewpos;
+            } f_in;
+
+            void main (void)
+            {
+                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+
+                vec4  light_vec_view =  vec4(lightDir,1);
+                viewworld_matrix = gl_ModelViewMatrixInverse;
+                // FIXME dummy code
+
+                vec3 normal = normalize(f_in.normal);
+                float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
+
+                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
+                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
+                
+                gl_FragColor = vec4(apply_clear_fog(f_in.viewpos, result), dif_tex_col.a);
+                // gl_FragColor = vec4( result,dif_tex_col.a);
+                //gl_FragColor = vec4(SceneFogParams.rgb,dif_tex_col.a);
+            }
+            )
+
+        };   
+
+        const char* get_shader(shader_t t)
+        {
+            if(t==VS)
+                return vs;
+            else if(t==FS)
+                return fs;
+            else 
+                return nullptr;
+        }
+
+    }  // ns panorama_mat
+
+    namespace sky_fog_mat 
+    {
+        const char* vs = {  
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+            STRINGIFY ( 
+            attribute vec3 tangent;
+            attribute vec3 binormal;
+            varying   vec3 lightDir;
+
+            out block
+            {
+                vec3 pos;
+            } v_out;
+
+            void main()
+            {
+                vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
+                
+
+                lightDir = vec3(gl_LightSource[0].position.xyz);
+                gl_Position = ftransform();
+                v_out.pos = gl_Vertex;
+                gl_Position.z = gl_Position.w;
+                gl_Position.z = 0.0;
 
             }       
             )
@@ -1443,42 +1568,19 @@ namespace shaders
             {
                 return clamp(x, 0.0, 1.0);
             }   
-            
-            //
-            // FOG FUNCTIONS
-            //
-
-            // vector-based fog
-            float fog_decay_factor( const in vec3 view_pos )
-            {
-                return exp(-fog_params.a * dot(view_pos, view_pos));
-            }
-            // vector-based fog with emap modulation
-            vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )
-            {
-                vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);
-                return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));
-            }
-            // vector-based fog
-            vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )
-            {
-                return mix(fog_params.rgb, color, fog_decay_factor(view_pos));
-            }
 
             )
 
             STRINGIFY ( 
-
-            uniform sampler2D colorTex;
+            
+            uniform vec4 SkyFogParams;
+            const float fTwoOverPi = 2.0 / 3.141593;
+            
             varying vec3 lightDir;
 
             in block
             {
-                vec2 texcoord;
-                vec3 normal;
-                vec3 viewpos;
-                vec4 shadow_view;
-                vec4 lightmap_coord;
+                vec3 pos;
             } f_in;
 
             void main (void)
@@ -1489,17 +1591,25 @@ namespace shaders
 
                 vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
-                // FIXME dummy code
+                
+                // get point direction
+                vec3 vPnt = normalize(f_in.pos.xyz);
 
-                vec3 normal = normalize(f_in.normal);
-                float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
+                // fog color
+                float fHorizonFactor = fTwoOverPi * acos(max(vPnt.z, 0.0));
 
-                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
-                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
+                // simulate fogging here based on input density
+                float fFogDensity = SkyFogParams.a;
+                float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity);
+                float fFogDensityRamp = fFogDensity;
+                //float fFogFactor = mix(pow(fHorizonFactor, 40.0 - 37.0 * fFogHeightRamp), 1.0, fFogDensityRamp);
+                float fFogFactor = pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp);
 
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                gl_FragColor = vec4( result,dif_tex_col.a);
-                //gl_FragColor = vec4( 1.0,0.0,0.0,dif_tex_col.a);
+                // make fogging
+                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor);
+
+                //gl_FragColor = vec4( result,dif_tex_col.a);
+                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
 
@@ -1515,6 +1625,7 @@ namespace shaders
                 return nullptr;
         }
 
-    }  // ns panorama_mat
+    }  // ns sky_fog_mat
+
 
 }  // ns shaders

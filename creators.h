@@ -12,6 +12,18 @@ namespace creators
     osg::Node*    loadAirplane();
     nodes_array_t loadAirplaneParts();
     osg::Node*    loadBMAirplane();
+
+    class programsHolder_base{
+    public:
+        struct program_t
+        {
+            osg::ref_ptr<osg::Program> program;
+        };
+    };
+
+
+    programsHolder_base::program_t   CreateProgram(std::string mat_name);
+
 }
 
 namespace effects

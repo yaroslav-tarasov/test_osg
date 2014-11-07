@@ -43,6 +43,10 @@ namespace shaders
     {
         const char* get_shader(shader_t t);
     }
-    
+
+    namespace sky_fog_mat
+    {
+        const char* get_shader(shader_t t);
+    }   
 
 }

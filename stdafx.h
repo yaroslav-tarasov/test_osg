@@ -30,6 +30,8 @@
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
 
+#include <osg/BlendFunc>
+
 #include <osg/PatchParameter>
 
 #include <osgUtil/Optimizer>
