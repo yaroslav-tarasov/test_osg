@@ -11,7 +11,7 @@
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
-#define TEST_ADLER_SCENE
+// #define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -1125,7 +1125,9 @@ public:
             p.program->setName(mat_name);
             auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
             p.program->addShader( vs );
-            auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
+			//std::string fs_shader(GetShader(shaders::FS,mat_name));
+			//fs_shader.replace('','');
+			auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
             p.program->addShader( fs );
             p.program->addBindAttribLocation( "tangent" , 6 );
             p.program->addBindAttribLocation( "binormal", 7 );

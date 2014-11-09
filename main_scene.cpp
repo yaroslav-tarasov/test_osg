@@ -433,8 +433,8 @@ int main_scene( int argc, char** argv )
 #endif
 
          osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(model->asGroup());
-         rootnode->asGroup()->addChild(skyFogLayer.get());
-         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),1.0);    // (вроде начинаем с 0.1 до максимум 1.0)
+         ephemerisModel->asGroup()->addChild(skyFogLayer.get());
+         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),.1);    // (вроде начинаем с 0.1 до максимум 1.0)
          float coeff = skyFogLayer->getFogExp2Coef();
 
 #ifdef TEST_SHADOWS

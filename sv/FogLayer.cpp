@@ -106,8 +106,8 @@ void FogLayer::_buildStateSet()
     osg::StateSet * sset = getOrCreateStateSet();
 
     // set render bin
-    //sset->setRenderBinDetails(RENDER_BIN_SKYFOG, "RenderBin");
-    //sset->setNestRenderBins(false);
+    sset->setRenderBinDetails(RENDER_BIN_SKYFOG, "RenderBin");
+    sset->setNestRenderBins(false);
 
     // create clarity shader
     osg::ref_ptr<osg::Program> cFogLayerProg = creators::CreateProgram("sky").program; //new osg::Program();

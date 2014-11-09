@@ -3,7 +3,7 @@
 #include "info_visitor.h"
 #include "find_tex_visitor.h"
 #include "creators.h"
-
+#include "sv/FogLayer.h"
 
 osg::Image* createSpotLight( const osg::Vec4& centerColor, const osg::Vec4& bgColor, unsigned int size, float power )
 {
@@ -68,8 +68,59 @@ public:
     }
 
     osg::ref_ptr<osg::Texture> _texture;
-    //osg::ref_ptr<osg::Texture> _old_texture;
     osg::ref_ptr<osg::Node> _root;
+};
+
+
+
+class FogHandler : public osgGA::GUIEventHandler
+{
+public:
+	typedef std::function<void(osg::Vec4f)> on_fog_change_f;
+public:
+    FogHandler(const on_fog_change_f& f_fog_changer) 
+      :_f_fog_changer    (f_fog_changer)
+	   , _intensivity(0.1)
+      {}
+
+    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+    {
+        if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
+        {            
+            if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3 )
+            { 
+				_intensivity += 0.1;
+                if ( _f_fog_changer )
+                { 
+					_f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
+                }
+                return true;
+            } else
+            if (ea.getKey()== osgGA::GUIEventAdapter::KEY_F4)
+            { 
+				_intensivity -= 0.1;
+                if ( _f_fog_changer )
+                { 
+					_f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
+                }
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    virtual void getUsage(osg::ApplicationUsage& usage) const
+    {
+        usage.addKeyboardMouseBinding("F3",       "+ fog");
+        usage.addKeyboardMouseBinding("F4",       "- fog");
+
+    }
+
+    on_fog_change_f _f_fog_changer;
+	float           _intensivity; 
+    
 };
 
 int main_tex_test( int argc, char** argv )
@@ -149,6 +200,14 @@ int main_tex_test( int argc, char** argv )
     // effet->prepareChildren();
     effet->setEnabled(false);
 
+         osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(root->asGroup());
+         root->addChild(skyFogLayer.get());
+         skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),0.1);    // (вроде начинаем с 0.1 до максимум 1.0)
+         float coeff = skyFogLayer->getFogExp2Coef();
+    
+    osg::StateSet * pCommonStateSet = airplane->getOrCreateStateSet();
+    pCommonStateSet->setNestRenderBins(false);
+    pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/0, "RenderBin");
 
     // effet->setUpDemo();
     // effet->setEnabled(false);
@@ -159,8 +218,12 @@ int main_tex_test( int argc, char** argv )
     //if ( root ) root->accept( ftv );
     
     // osgDB::writeNodeFile(*root,"tex_test_blank.osgt");
+	
+	// Set the clear color to black
+    viewer.getCamera()->setClearColor(osg::Vec4(1.0,0,0,1));
 
     viewer.addEventHandler( new TexChangeHandler( root.get(), texture.get() ) );
+	viewer.addEventHandler( new FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),v.w());} ));
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
     viewer.addEventHandler(new osgGA::StateSetManipulator(root->getOrCreateStateSet()));

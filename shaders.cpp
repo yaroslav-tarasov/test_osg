@@ -1523,7 +1523,7 @@ namespace shaders
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            varying   vec3 lightDir;
+            //varying   vec3 lightDir;
 
             out block
             {
@@ -1535,11 +1535,19 @@ namespace shaders
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 
 
-                lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = ftransform();
-                v_out.pos = gl_Vertex;
-                gl_Position.z = gl_Position.w;
-                gl_Position.z = 0.0;
+                ////lightDir = vec3(gl_LightSource[0].position.xyz);
+                //gl_Position = ftransform();
+                v_out.pos = gl_Vertex.xyz;
+                ////gl_Position.z = gl_Position.w;
+                //gl_Position.z = 0.0;
+				    // perform conversion to post-projective space
+
+				vec3 vLocalSpaceCamPos = gl_ModelViewMatrixInverse[3].xyz;
+				gl_Position = gl_ModelViewProjectionMatrix * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+
+				// explicitly move to some good unclipped position (depth writes disabled, depth clamp enabled - so doesn't matter)
+				// this avoids undesirable clipping when camera on water level or far plane clipping also
+				gl_Position.z = 0.0;
 
             }       
             )
@@ -1547,66 +1555,67 @@ namespace shaders
 
 
         const char* fs = {
-            "#version 130 \n"
+ //           "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
-            uniform vec4                fog_params; 
-
-            mat4 viewworld_matrix;
-
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-
+            uniform sampler2D           ViewLightMap;   \n
+            uniform sampler2D           Detail;         \n  
+            uniform samplerCube         Env;            \n
+            uniform sampler2DShadow     ShadowSplit0;   \n
+            uniform sampler2DShadow     ShadowSplit1;   \n
+            uniform sampler2DShadow     ShadowSplit2;   \n
+            uniform sampler2D           ViewDecalMap;   \n 
+            uniform vec4                fog_params;     \n
+                                                        \n  
+            mat4 viewworld_matrix;                      \n 
+			                                            \n
+            // saturation helper                         
+            float saturate( const in float x )          \n
+            {                                           \n
+                return clamp(x, 0.0, 1.0);              \n 
+            }                                           \n
+			                                            \n 
             )
 
             STRINGIFY ( 
             
-            uniform vec4 SkyFogParams;
-            const float fTwoOverPi = 2.0 / 3.141593;
+            uniform vec4 SkyFogParams;                  \n
+            const float fTwoOverPi = 2.0 / 3.141593;    \n 
             
-            varying vec3 lightDir;
+            // varying vec3 lightDir;
 
-            in block
+            in block                                    \n
+            {                                           \n
+                vec3 pos;                               \n
+            } f_in;                                     \n
+			\n
+            void main (void)                            \n  
             {
-                vec3 pos;
-            } f_in;
-
-            void main (void)
-            {
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-
-                vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+                vec4  specular       = gl_LightSource[0].specular; \n    // FIXME 
+                vec4  diffuse        = gl_LightSource[0].diffuse;  \n    // FIXME 
+                vec4  ambient        = gl_LightSource[0].ambient;  \n    // FIXME 
+				
+				\n
+                // vec4  light_vec_view = vec4(lightDir,1);
+                viewworld_matrix = gl_ModelViewMatrixInverse;       \n
                 
                 // get point direction
-                vec3 vPnt = normalize(f_in.pos.xyz);
+                vec3 vPnt = normalize(f_in.pos.xyz);                \n
 
                 // fog color
-                float fHorizonFactor = fTwoOverPi * acos(max(vPnt.z, 0.0));
+                float fHorizonFactor = fTwoOverPi * acos(max(vPnt.z, 0.0)); \n
 
                 // simulate fogging here based on input density
-                float fFogDensity = SkyFogParams.a;
-                float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity);
-                float fFogDensityRamp = fFogDensity;
+                float fFogDensity = SkyFogParams.a; \n
+                float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity); \n
+                float fFogDensityRamp = fFogDensity; \n
                 //float fFogFactor = mix(pow(fHorizonFactor, 40.0 - 37.0 * fFogHeightRamp), 1.0, fFogDensityRamp);
-                float fFogFactor = pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp);
+                float fFogFactor = pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp); \n
 
                 // make fogging
-                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor);
+                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor); \n
 
                 //gl_FragColor = vec4( result,dif_tex_col.a);
                 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
