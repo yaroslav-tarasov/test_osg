@@ -11,7 +11,7 @@
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
-// #define TEST_ADLER_SCENE
+#define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -1445,7 +1445,21 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     MaterialVisitor mv ( nl, createMaterial,computeAttributes,mat::reader::read(mat_file_name));
     adler->accept(mv);
 
-    // auto build =  mv.getFirst();
+    // All solid objects
+    osg::StateSet * pCommonStateSet = adler->getOrCreateStateSet();
+    pCommonStateSet->setNestRenderBins(false);
+    pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/0, "RenderBin");
+    //pCommonStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    //pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+
+    // Scene 
+    // Add backface culling to the whole bunch
+    //osg::StateSet * pSS = adler->getOrCreateStateSet();
+    //pSS->setNestRenderBins(false);
+    //pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    // disable alpha writes for whole bunch
+    //pSS->setAttribute(new osg::ColorMask(true, true, true, false));
+
     
 #else
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
@@ -1570,3 +1584,41 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 }
 
 } // ns creators
+
+namespace utils
+{
+    bool replace(std::string& str, const std::string& from, const std::string& to) {
+        size_t start_pos = str.find(from);
+        if(start_pos == std::string::npos)
+            return false;
+        str.replace(start_pos, from.length(), to);
+        return true;
+    }
+
+    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        if(from.empty())
+            return;
+        size_t start_pos = 0;
+        while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+        }
+    }
+
+    std::string format( const char * str )
+    {
+        std::string source(str);
+        replaceAll(source,std::string("$define"), std::string("\n#define"));
+        replaceAll(source,std::string("$if"), std::string("\n#if"));
+        replaceAll(source,std::string("$else"), std::string("\n#else"));
+        replaceAll(source,std::string("$endif"), std::string("\n#endif"));
+        replaceAll(source,std::string("$extention"), std::string("\n#extention"));
+        replaceAll(source,std::string("$"), std::string("\n "));
+        return source;
+    }
+
+    std::string format( std::string const & str )
+    {
+        return format(str.c_str());
+    }
+}

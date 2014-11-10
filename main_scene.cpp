@@ -14,6 +14,7 @@
 
 #define TEST_EPHEMERIS
 #define TEST_PRECIP
+#define TEST_SV_FOG
 
 // #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
@@ -416,7 +417,7 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setLatitudeLongitude( latitude, longitude );
         ephemerisModel->setDateTime( dateTime );
         ephemerisModel->setSkyDomeRadius( radius );
-		ephemerisModel->setMoveWithEyePoint(false);
+		//ephemerisModel->setMoveWithEyePoint(false);
         sun_light = ephemerisModel->getSunLightSource();
 #endif  // TEST_EPHEMERIS
 
@@ -432,10 +433,21 @@ int main_scene( int argc, char** argv )
         rootnode->getOrCreateStateSet()->setAttributeAndModes( fog.get() );
 #endif
 
-         osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(model->asGroup());
+#ifdef TEST_SV_FOG
+         osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(/*ephemerisModel*/model->asGroup());
          ephemerisModel->asGroup()->addChild(skyFogLayer.get());
-         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),.1);    // (вроде начинаем с 0.1 до максимум 1.0)
+         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),1.0);    // (вроде начинаем с 0.1 до максимум 1.0)
          float coeff = skyFogLayer->getFogExp2Coef();
+         viewer.addEventHandler( new FogHandler(
+             [&](osg::Vec4f v){
+                 skyFogLayer->setFogParams(osg::Vec3f(v.x(),v.y(),v.z()),v.w());
+                 float coeff = skyFogLayer->getFogExp2Coef();
+                 char str[255];
+                 sprintf(str,"setFogParams coeff = %f",coeff);
+                 osg::notify(osg::INFO) << str;
+             }
+             ,osg::Vec3f(0.5,0.5,0.5) ));
+#endif
 
 #ifdef TEST_SHADOWS
         //if (sun_light.valid())

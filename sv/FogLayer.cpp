@@ -41,13 +41,14 @@ static float convertTraineeDensityToExp2SceneFog( float fTraineeDensity, float *
     static const double dLN256 = log(256.0);
     const double
         dDistFactor = pow(1.0 - fTraineeDensity, g_fogPowRampCoef),
-        dRealVisDist = cg::lerp01(g_totalFogVisibility, g_clearDayVisibility, dDistFactor);
+        dRealVisDist = cg::lerp01(dDistFactor,g_totalFogVisibility, g_clearDayVisibility );
     // save vis dist
     if (fVisDistPtr)
         *fVisDistPtr = float(dRealVisDist);
     // calculate fogging exponent
     return float(dLN256 / cg::sqr(dRealVisDist));
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * fVisDistPtr )
@@ -56,7 +57,7 @@ static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
     static const double dLN256 = log(256.0);
     const double
         dDistFactor = pow(1.0 - fTraineeDensity, g_fogPowRampCoef),
-        dRealVisDist = cg::lerp01(g_totalFogVisibility, g_clearDayVisibility, dDistFactor);
+        dRealVisDist = cg::lerp01(dDistFactor, g_totalFogVisibility, g_clearDayVisibility);
     // save vis dist
     if (fVisDistPtr)
         *fVisDistPtr = float(dRealVisDist);

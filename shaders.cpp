@@ -17,13 +17,67 @@ namespace shaders
     //    return S(0.2127f * col.r + 0.7152f * col.g + 0.0722f * col.b);
     //}
 
+    namespace include_mat
+    {
+#define INCLUDE_MAT                                                                                      \
+        STRINGIFY (                                                                                      \
+        float saturate( const in float x )                                                               \
+        {                                                                                                \
+            return clamp(x, 0.0, 1.0);                                                                   \
+        }                                                                                                \
+        \
+        \
+        float fog_decay_factor( const in vec3 view_pos )                                                 \
+        {                                                                                                \
+            return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       \
+        }                                                                                                \
+        vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
+        {                                                                                                \
+            vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
+            return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));   \
+        }                                                                                                \
+        \
+        vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
+        {                                                                                                \
+            return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));             \
+        }                                                                                                \
+                                                                                                         \
+        vec3 hardlight( const in vec3 color, const in vec3 hl )                                          \
+        {                                                                                                \
+            vec3 hl_pos = step(vec3(0.0), hl);                                                           \
+            return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +                                     \
+                hl_pos * mix(color, vec3(1.0), hl);                                                      \
+        }                                                                                                \
+                                                                                                         \
+        float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )                          \
+        {                                                                                                \
+            vec2 grad_vec = fwidth(tex_c_mod);                                                           \
+            float detail_fac = exp(coef * dot(grad_vec, grad_vec));                                      \
+            return detail_fac * (2.0 - detail_fac);                                                      \
+        }                                                                                                \
+                                                                                                         \
+        float ramp_up( const in float x )                                                                \
+        {                                                                                                \
+            return x * fma(x, -0.5, 1.5);                                                                \
+        }                                                                                                \
+                                                                                                         \
+        float ramp_down( const in float x )                                                              \
+        {                                                                                                \
+            return x * fma(x, 0.5, 0.5);                                                                 \
+        }                                                                                                \
+                                                                                                         \
+                                                                                                         \
+        )                                                                                                \
+
+
+    }  
 
     namespace plane_mat
     {
 
     const char* vs = {
         "#extension GL_ARB_gpu_shader5 : enable \n"
-
+        
         STRINGIFY ( 
         attribute vec3 tangent;
         attribute vec3 binormal;
@@ -72,8 +126,12 @@ namespace shaders
     };
 
 
-    const char* fs = { "#extension GL_ARB_gpu_shader5 : enable \n"
+    const char* fs = {
+        "#version 130 \n"
+        "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
+        
+        
         STRINGIFY ( 
     
         // layout(early_fragment_tests) in;
@@ -85,14 +143,12 @@ namespace shaders
         uniform sampler2DShadow     ShadowSplit1;
         uniform sampler2DShadow     ShadowSplit2;
         uniform sampler2D           ViewDecalMap;    
+        uniform vec4                SceneFogParams;
 
-        // saturation helper
-        float saturate( const in float x )
-        {
-            return clamp(x, 0.0, 1.0);
-        }   
-
+        mat4 viewworld_matrix;
         )
+
+        INCLUDE_MAT
 
         STRINGIFY ( 
 
@@ -113,7 +169,6 @@ namespace shaders
             vec4 lightmap_coord;
         } f_in;
 
-        mat4 viewworld_matrix;
 
         void main (void)
         {
@@ -193,7 +248,8 @@ namespace shaders
             vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
             //ALFA-TEST// gl_FragColor = vec4( glass_factor,0,0,1.0f);
             //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
-            gl_FragColor = vec4( result,1.0);
+            // gl_FragColor = vec4( result,1.0);
+            gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
         }
     )
 
@@ -252,8 +308,11 @@ namespace shaders
        };
 
 
-       const char* fs = {  
+       const char* fs = {
+       "#version 130 \n"
        "#extension GL_ARB_gpu_shader5 : enable \n "
+       
+
 
         STRINGIFY ( 
 
@@ -264,14 +323,12 @@ namespace shaders
            uniform sampler2DShadow     ShadowSplit1;
            uniform sampler2DShadow     ShadowSplit2;
            uniform sampler2D           ViewDecalMap;    
+           uniform vec4                SceneFogParams;
 
-           // saturation helper
-           float saturate( const in float x )
-           {
-               return clamp(x, 0.0, 1.0);
-           }   
-
+           mat4 viewworld_matrix;
        )
+       
+       INCLUDE_MAT
 
        STRINGIFY ( 
 
@@ -290,7 +347,6 @@ namespace shaders
                vec4 lightmap_coord;
            } f_in;
 
-           mat4 viewworld_matrix;
 
            void main (void)
            {
@@ -431,7 +487,9 @@ namespace shaders
 
 
         const char* fs = { 
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            
 
             STRINGIFY ( 
 
@@ -442,43 +500,12 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
             uniform sampler2D           ViewDecalMap;    
+            uniform vec4                SceneFogParams;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-            
-            // hardlight function
-            vec3 hardlight( const in vec3 color, const in vec3 hl )
-            {
-                vec3 hl_pos = step(vec3(0.0), hl);
-                return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +
-                    hl_pos * mix(color, vec3(1.0), hl);
-            }
-
-            // texture detail factor
-            float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )
-            {
-                vec2 grad_vec = fwidth(tex_c_mod);
-                float detail_fac = exp(coef * dot(grad_vec, grad_vec));
-                return detail_fac * (2.0 - detail_fac);
-            }
-
-            // ramp_up
-            float ramp_up( const in float x )
-            {
-                return x * fma(x, -0.5, 1.5);
-            }
-
-            // ramp_down
-            float ramp_down( const in float x )
-            {
-                return x * fma(x, 0.5, 0.5);
-            }
-
-
+            mat4 viewworld_matrix;
             )
+
+            INCLUDE_MAT
 
             STRINGIFY ( 
 
@@ -495,8 +522,6 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
-
-            mat4 viewworld_matrix;
 
             void main (void)
             {
@@ -586,8 +611,8 @@ namespace shaders
                 float night_factor = step(ambient.a, 0.35);
                 vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
                
-                
-                gl_FragColor = vec4( result,1.0);  
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+                // gl_FragColor = vec4( result,1.0);  
                 /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
             }
             )
@@ -650,8 +675,11 @@ namespace shaders
         };
 
 
-        const char* fs = { 
+        const char* fs = {
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            
+            
 
             STRINGIFY ( 
 
@@ -662,43 +690,12 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
             uniform sampler2D           ViewDecalMap;    
+            uniform vec4                SceneFogParams;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-
-            // hardlight function
-            vec3 hardlight( const in vec3 color, const in vec3 hl )
-            {
-                vec3 hl_pos = step(vec3(0.0), hl);
-                return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +
-                    hl_pos * mix(color, vec3(1.0), hl);
-            }
-
-            // texture detail factor
-            float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )
-            {
-                vec2 grad_vec = fwidth(tex_c_mod);
-                float detail_fac = exp(coef * dot(grad_vec, grad_vec));
-                return detail_fac * (2.0 - detail_fac);
-            }
-
-            // ramp_up
-            float ramp_up( const in float x )
-            {
-                return x * fma(x, -0.5, 1.5);
-            }
-
-            // ramp_down
-            float ramp_down( const in float x )
-            {
-                return x * fma(x, 0.5, 0.5);
-            }
-
-
+            mat4 viewworld_matrix;
             )
+            
+            INCLUDE_MAT
 
             STRINGIFY ( 
 
@@ -715,8 +712,6 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
-
-            mat4 viewworld_matrix;
 
             void main (void)
             {
@@ -746,7 +741,8 @@ namespace shaders
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
 
                 // FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                gl_FragColor = vec4( result, dif_tex_col.a);
+                // gl_FragColor = vec4( result, dif_tex_col.a);
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
             }
 
             )
@@ -818,9 +814,10 @@ namespace shaders
         };
 
 
-        const char* fs = { 
+        const char* fs = {
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
-
+            
             STRINGIFY ( 
 
             uniform sampler2D           ViewLightMap;
@@ -830,44 +827,13 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
             uniform sampler2D           ViewDecalMap;    
+            uniform vec4                SceneFogParams;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-
-            // hardlight function
-            vec3 hardlight( const in vec3 color, const in vec3 hl )
-            {
-                vec3 hl_pos = step(vec3(0.0), hl);
-                return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +
-                    hl_pos * mix(color, vec3(1.0), hl);
-            }
-
-            // texture detail factor
-            float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )
-            {
-                vec2 grad_vec = fwidth(tex_c_mod);
-                float detail_fac = exp(coef * dot(grad_vec, grad_vec));
-                return detail_fac * (2.0 - detail_fac);
-            }
-
-            // ramp_up
-            float ramp_up( const in float x )
-            {
-                return x * fma(x, -0.5, 1.5);
-            }
-
-            // ramp_down
-            float ramp_down( const in float x )
-            {
-                return x * fma(x, 0.5, 0.5);
-            }
-
-
+            mat4 viewworld_matrix;
             )
-
+            
+            INCLUDE_MAT
+            
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
@@ -886,59 +852,57 @@ namespace shaders
                 vec4 lightmap_coord;
             } f_in;
 
-            mat4 viewworld_matrix;
-
             void main (void)
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; 
-                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
-                //if (split_test.x) 
-                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
-                //else if (split_test.y) 
-                //    shadow = textureProj(ShadowSplit1, shadow1_matrix * in_frag.shadow_view); 
-                //else if (split_test.z) 
-                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
-
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-                vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
-                // FIXME dummy code
-                specular.a = 0; // it's not rainy day hallelujah
-
-                float rainy_value = 0.666 * specular.a;
-
-                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
-                dif_tex_col *= fma(dif_tex_col, rainy_value.xxx, vec3(1.0 - rainy_value));
-                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
-                vec3 normal_noise = vec3(0.0);
-                if (detail_factor > 0.01)
-                {
-                    normal_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
-                    dif_tex_col = hardlight(dif_tex_col, normal_noise.ggg);
-                }
-
-                vec3 normal = normalize(0.8 * f_in.normal + (normal_noise.x * f_in.tangent + normal_noise.y * f_in.binormal));
-                float n_dot_l = saturate(dot(normal, light_vec_view.xyz));
-
-
+\n                float shadow = 1.0;                                                                                                      
+\n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders);                                              
+\n                //if (split_test.x)                                                                                                      
+\n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
+\n                //else if (split_test.y) 
+\n                //    shadow = textureProj(ShadowSplit1, shadow1_matrix * in_frag.shadow_view); 
+\n                //else if (split_test.z) 
+\n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
+\n
+\n                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+\n                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+\n                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+\n                vec4  light_vec_view = vec4(lightDir,1);
+\n                viewworld_matrix = gl_ModelViewMatrixInverse;
+\n                // FIXME dummy code
+\n                specular.a = 0; // it's not rainy day hallelujah
+\n
+\n                float rainy_value = 0.666 * specular.a;
+\n
+\n                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
+\n                dif_tex_col *= fma(dif_tex_col, vec3(rainy_value,rainy_value,rainy_value)/*rainy_value.xxx*/, vec3(1.0 - rainy_value));
+\n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
+\n                vec3 normal_noise = vec3(0.0);
+\n                if (detail_factor > 0.01)
+\n                {
+\n                    normal_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
+\n                    dif_tex_col = hardlight(dif_tex_col, normal_noise.ggg);
+\n                }
+\n
+\n                vec3 normal = normalize(0.8 * f_in.normal + (normal_noise.x * f_in.tangent + normal_noise.y * f_in.binormal));
+\n                float n_dot_l = saturate(dot(normal, light_vec_view.xyz));
+\n
+\n
                 // get dist to point and normalized to-eye vector
-                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
-                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
-                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
-                vec3 to_pnt = dist_to_pnt_rcp * f_in.viewpos;
-
-                // reflection vector
-                float incidence_dot = dot(-to_pnt, normal);
-                vec3 refl_vec_view = fma(normal, vec3(2.0 * incidence_dot), to_pnt);
-
-                // specular
-                float specular_val = pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), fma(rainy_value, 3.0, 3.0)) * fma(rainy_value, 0.8, 0.3);
-                vec3 specular_color = specular_val * specular.rgb;
-
+\n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n                vec3 to_pnt = dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n                // reflection vector
+\n                float incidence_dot = dot(-to_pnt, normal);
+\n                vec3 refl_vec_view = fma(normal, vec3(2.0 * incidence_dot), to_pnt);
+\n
+\n                // specular
+\n                float specular_val = pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), fma(rainy_value, 3.0, 3.0)) * fma(rainy_value, 0.8, 0.3);
+\n                vec3 specular_color = specular_val * specular.rgb;
+\n
                 // GET_LIGHTMAP(f_in.viewpos, f_in);
                 // #define GET_LIGHTMAP(viewpos, in_frag) 
                 // float height_world_lm      = in_frag.lightmap_coord.z; 
@@ -946,25 +910,28 @@ namespace shaders
                 // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
                 // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
-                vec3 lightmap_color = vec3(0.0f,0.0f,0.0f); // FIXME dummy code
-
-                // LIGHTMAP_SHADOW_TRICK(shadow);
-                vec3 non_ambient_term = max(lightmap_color, shadow * (diffuse.rgb * n_dot_l + specular_color));
-
-                // result
-                vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
-                // reflection when rain
-                if (rainy_value >= 0.01)
-                {
-                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
-                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.25, 0.05));
-                    vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
-                    result = mix(result, lightmap_color + cube_color + specular_color, fresnel * rainy_value);
-                }
-
-                gl_FragColor = vec4( result,1.0);
-                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-            }
+\n                vec3 lightmap_color = vec3(0.0f,0.0f,0.0f); // FIXME dummy code
+\n
+\n                // LIGHTMAP_SHADOW_TRICK(shadow);
+\n               vec3 non_ambient_term = max(lightmap_color, shadow * (diffuse.rgb * n_dot_l + specular_color));
+\n
+\n                // result
+\n                vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
+\n                // reflection when rain
+\n                if (rainy_value >= 0.01)
+\n                {
+\n                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+\n                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.25, 0.05));
+\n                    vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
+\n                    result = mix(result, lightmap_color + cube_color + specular_color, fresnel * rainy_value);
+\n                }
+\n
+\n                //gl_FragColor = vec4( result,1.0);
+\n
+\n                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n
+\n                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+\n            }
             )
 
         };   
@@ -1040,6 +1007,7 @@ namespace shaders
 
 
         const char* fs = { 
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             STRINGIFY ( 
@@ -1051,44 +1019,13 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
             uniform sampler2D           ViewDecalMap;    
+            uniform vec4                SceneFogParams;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-
-            // hardlight function
-            vec3 hardlight( const in vec3 color, const in vec3 hl )
-            {
-                vec3 hl_pos = step(vec3(0.0), hl);
-                return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +
-                    hl_pos * mix(color, vec3(1.0), hl);
-            }
-
-            // texture detail factor
-            float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )
-            {
-                vec2 grad_vec = fwidth(tex_c_mod);
-                float detail_fac = exp(coef * dot(grad_vec, grad_vec));
-                return detail_fac * (2.0 - detail_fac);
-            }
-
-            // ramp_up
-            float ramp_up( const in float x )
-            {
-                return x * fma(x, -0.5, 1.5);
-            }
-
-            // ramp_down
-            float ramp_down( const in float x )
-            {
-                return x * fma(x, 0.5, 0.5);
-            }
-
-
+            mat4 viewworld_matrix;
             )
-
+            
+            INCLUDE_MAT
+            
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
@@ -1107,8 +1044,6 @@ namespace shaders
                 vec4 lightmap_coord;
                 vec4 decal_coord;
             } f_in;
-
-            mat4 viewworld_matrix;
 
             void main (void)
             {
@@ -1195,7 +1130,8 @@ namespace shaders
                     result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
                 }
 
-                gl_FragColor = vec4( result,1.0);
+                // gl_FragColor = vec4( result,1.0);
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
                 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
@@ -1259,7 +1195,8 @@ namespace shaders
         };
 
 
-        const char* fs = { 
+        const char* fs = {
+            "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             STRINGIFY ( 
@@ -1270,45 +1207,14 @@ namespace shaders
             uniform sampler2DShadow     ShadowSplit0;
             uniform sampler2DShadow     ShadowSplit1;
             uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
+            uniform sampler2D           ViewDecalMap;   
+            uniform vec4                SceneFogParams;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-
-            // hardlight function
-            vec3 hardlight( const in vec3 color, const in vec3 hl )
-            {
-                vec3 hl_pos = step(vec3(0.0), hl);
-                return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +
-                    hl_pos * mix(color, vec3(1.0), hl);
-            }
-
-            // texture detail factor
-            float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )
-            {
-                vec2 grad_vec = fwidth(tex_c_mod);
-                float detail_fac = exp(coef * dot(grad_vec, grad_vec));
-                return detail_fac * (2.0 - detail_fac);
-            }
-
-            // ramp_up
-            float ramp_up( const in float x )
-            {
-                return x * fma(x, -0.5, 1.5);
-            }
-
-            // ramp_down
-            float ramp_down( const in float x )
-            {
-                return x * fma(x, 0.5, 0.5);
-            }
-
-
+            mat4 viewworld_matrix;
             )
 
+            INCLUDE_MAT
+            
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
@@ -1324,7 +1230,6 @@ namespace shaders
                 vec4 lightmap_coord;
             } f_in;
 
-            mat4 viewworld_matrix;
 
             void main (void)
             {
@@ -1368,7 +1273,8 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
 
-                gl_FragColor = vec4( result,dif_tex_col.a);
+                // gl_FragColor = vec4( result,dif_tex_col.a);
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 
             }
             )
@@ -1423,6 +1329,8 @@ namespace shaders
         const char* fs = {
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            
+            
 
             STRINGIFY ( 
 
@@ -1438,35 +1346,9 @@ namespace shaders
 
             mat4 viewworld_matrix;
 
-            // saturation helper
-            float saturate( const in float x )
-            {
-                return clamp(x, 0.0, 1.0);
-            }   
-            
-            //
-            // FOG FUNCTIONS
-            //
-
-            // vector-based fog
-            float fog_decay_factor( const in vec3 view_pos )
-            {
-                return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));
-            }
-            // vector-based fog with emap modulation
-            vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )
-            {
-                vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);
-                return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));
-            }
-
-            // vector-based fog
-            vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )
-            {
-                return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));
-            }
-
             )
+
+            INCLUDE_MAT
 
             STRINGIFY ( 
 
@@ -1496,9 +1378,9 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
                 
-                gl_FragColor = vec4(apply_clear_fog(f_in.viewpos, result), dif_tex_col.a);
+                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 // gl_FragColor = vec4( result,dif_tex_col.a);
-                //gl_FragColor = vec4(SceneFogParams.rgb,dif_tex_col.a);
+                // gl_FragColor = vec4(SceneFogParams.rgb * (1-SceneFogParams.a),dif_tex_col.a);
             }
             )
 
@@ -1548,74 +1430,78 @@ namespace shaders
 				// explicitly move to some good unclipped position (depth writes disabled, depth clamp enabled - so doesn't matter)
 				// this avoids undesirable clipping when camera on water level or far plane clipping also
 				gl_Position.z = 0.0;
-
+                // gl_Position.z = gl_Position.w;
             }       
             )
         };
 
 
         const char* fs = {
- //           "#version 130 \n"
-            "#extension GL_ARB_gpu_shader5 : enable \n "
+            "#version 130 \n"
+            "#extension GL_ARB_gpu_shader5 : enable  "
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;   \n
-            uniform sampler2D           Detail;         \n  
-            uniform samplerCube         Env;            \n
-            uniform sampler2DShadow     ShadowSplit0;   \n
-            uniform sampler2DShadow     ShadowSplit1;   \n
-            uniform sampler2DShadow     ShadowSplit2;   \n
-            uniform sampler2D           ViewDecalMap;   \n 
-            uniform vec4                fog_params;     \n
-                                                        \n  
-            mat4 viewworld_matrix;                      \n 
-			                                            \n
+            uniform sampler2D           ViewLightMap;   
+            uniform sampler2D           Detail;           
+            uniform samplerCube         Env;            
+            uniform sampler2DShadow     ShadowSplit0;   
+            uniform sampler2DShadow     ShadowSplit1;   
+            uniform sampler2DShadow     ShadowSplit2;   
+            uniform sampler2D           ViewDecalMap;    
+            uniform vec4                fog_params;     
+            uniform vec4                SkyFogParams;  
+
+            mat4 viewworld_matrix;                       
+			                                            
             // saturation helper                         
-            float saturate( const in float x )          \n
-            {                                           \n
-                return clamp(x, 0.0, 1.0);              \n 
-            }                                           \n
-			                                            \n 
+            float saturate( const in float x )          
+            {                                           
+                return clamp(x, 0.0, 1.0);               
+            }                                           
+			                                            
             )
 
             STRINGIFY ( 
             
-            uniform vec4 SkyFogParams;                  \n
-            const float fTwoOverPi = 2.0 / 3.141593;    \n 
+                            
+            const float fTwoOverPi = 2.0 / 3.141593;     
             
             // varying vec3 lightDir;
 
-            in block                                    \n
-            {                                           \n
-                vec3 pos;                               \n
-            } f_in;                                     \n
-			\n
-            void main (void)                            \n  
+            in block                                    
+            {                                           
+                vec3 pos;                               
+            } f_in;                                     
+			
+            void main (void)                              
             {
-                vec4  specular       = gl_LightSource[0].specular; \n    // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;  \n    // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;  \n    // FIXME 
+                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 				
-				\n
+			
                 // vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;       \n
+                viewworld_matrix = gl_ModelViewMatrixInverse;       
                 
                 // get point direction
-                vec3 vPnt = normalize(f_in.pos.xyz);                \n
+                vec3 vPnt = normalize(f_in.pos.xyz);                
 
                 // fog color
-                float fHorizonFactor = fTwoOverPi * acos(max(vPnt.z, 0.0)); \n
+                float fHorizonFactor = fTwoOverPi * acos(max(vPnt.z, 0.0)); 
+                //if (vPnt.z<0)
+                //    discard;
 
                 // simulate fogging here based on input density
-                float fFogDensity = SkyFogParams.a; \n
-                float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity); \n
-                float fFogDensityRamp = fFogDensity; \n
+                float fFogDensity = SkyFogParams.a; 
+                float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity); 
+                float fFogDensityRamp = fFogDensity; 
                 //float fFogFactor = mix(pow(fHorizonFactor, 40.0 - 37.0 * fFogHeightRamp), 1.0, fFogDensityRamp);
-                float fFogFactor = pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp); \n
+                float fFogFactor = lerp(pow(fHorizonFactor, 30.0 - 25.0 * fFogHeightRamp), 1.0, fFogDensityRamp); 
+                // pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp); 
 
                 // make fogging
-                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor); \n
+                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor); 
 
                 //gl_FragColor = vec4( result,dif_tex_col.a);
                 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);

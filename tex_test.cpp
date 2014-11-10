@@ -73,56 +73,6 @@ public:
 
 
 
-class FogHandler : public osgGA::GUIEventHandler
-{
-public:
-	typedef std::function<void(osg::Vec4f)> on_fog_change_f;
-public:
-    FogHandler(const on_fog_change_f& f_fog_changer) 
-      :_f_fog_changer    (f_fog_changer)
-	   , _intensivity(0.1)
-      {}
-
-    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
-    {
-        if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
-        {            
-            if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3 )
-            { 
-				_intensivity += 0.1;
-                if ( _f_fog_changer )
-                { 
-					_f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
-                }
-                return true;
-            } else
-            if (ea.getKey()== osgGA::GUIEventAdapter::KEY_F4)
-            { 
-				_intensivity -= 0.1;
-                if ( _f_fog_changer )
-                { 
-					_f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
-                }
-                return true;
-            }
-
-        }
-
-        return false;
-    }
-
-    virtual void getUsage(osg::ApplicationUsage& usage) const
-    {
-        usage.addKeyboardMouseBinding("F3",       "+ fog");
-        usage.addKeyboardMouseBinding("F4",       "- fog");
-
-    }
-
-    on_fog_change_f _f_fog_changer;
-	float           _intensivity; 
-    
-};
-
 int main_tex_test( int argc, char** argv )
 {
 
@@ -207,7 +157,7 @@ int main_tex_test( int argc, char** argv )
     
     osg::StateSet * pCommonStateSet = airplane->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
-    pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/0, "RenderBin");
+    pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/100, "RenderBin");
 
     // effet->setUpDemo();
     // effet->setEnabled(false);
@@ -223,7 +173,7 @@ int main_tex_test( int argc, char** argv )
     viewer.getCamera()->setClearColor(osg::Vec4(1.0,0,0,1));
 
     viewer.addEventHandler( new TexChangeHandler( root.get(), texture.get() ) );
-	viewer.addEventHandler( new FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),v.w());} ));
+	viewer.addEventHandler( new FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),v.w());}, osg::Vec3f(0.5,0.5,0.5) ));
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
     viewer.addEventHandler(new osgGA::StateSetManipulator(root->getOrCreateStateSet()));
