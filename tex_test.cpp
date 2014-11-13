@@ -173,7 +173,7 @@ int main_tex_test( int argc, char** argv )
     viewer.getCamera()->setClearColor(osg::Vec4(1.0,0,0,1));
 
     viewer.addEventHandler( new TexChangeHandler( root.get(), texture.get() ) );
-	viewer.addEventHandler( new FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),v.w());}, osg::Vec3f(0.5,0.5,0.5) ));
+	viewer.addEventHandler( new FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.0,1.0,1.0),v.w());}, osg::Vec3f(0.5,0.5,0.5) ));
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
     viewer.addEventHandler(new osgGA::StateSetManipulator(root->getOrCreateStateSet()));

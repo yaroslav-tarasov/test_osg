@@ -1005,11 +1005,15 @@ private:
          detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
          detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
          detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-         
+         detailsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+         detailsTex->setMaxAnisotropy(16.0f);
+
          emptyTex = new osg::Texture2D;
          emptyTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
          emptyTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
          emptyTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+         emptyTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+         emptyTex->setMaxAnisotropy(16.0f);
 
          // create and setup the texture object
          envTex = new osg::TextureCubeMap;
@@ -1078,12 +1082,16 @@ private:
 					t.colorTex->setImage( osgDB::readImageFile(it->second.path) );
 					t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
 					t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+                    t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+                    t.colorTex->setMaxAnisotropy(16.0f);
 				} else 	
 			    if(it->second.unit == 2) 
 				{
 					t.nightTex->setImage( osgDB::readImageFile(it->second.path) );
 					t.nightTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
 					t.nightTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+                    t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+                    t.nightTex->setMaxAnisotropy(16.0f);
 					night_tex = true;
 				}
 			}
@@ -1174,6 +1182,11 @@ private:
         if (mat_name.find("sky") !=std::string::npos)
         {
             return shaders::sky_fog_mat::get_shader(t);  
+        }            
+        else
+        if (mat_name.find("clouds") !=std::string::npos)
+        {
+            return shaders::clouds_mat::get_shader(t);  
         }
         
     }
@@ -1448,7 +1461,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     // All solid objects
     osg::StateSet * pCommonStateSet = adler->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
-    pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/0, "RenderBin");
+    pCommonStateSet->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
     //pCommonStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
     //pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
 

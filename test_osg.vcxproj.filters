@@ -78,6 +78,9 @@
     <ClInclude Include="sv\FogLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cg_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sv\FogLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sv\CloudLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

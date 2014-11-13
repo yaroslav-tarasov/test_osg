@@ -118,3 +118,9 @@ namespace utils
     std::string format( const char * str );
     std::string format( std::string const & str );
 }
+
+enum {
+    RENDER_BIN_SCENE                    =  0,
+    RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
+    RENDER_BIN_CLOUDS                   = -2, 
+};

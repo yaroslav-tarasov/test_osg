@@ -9,26 +9,6 @@
 //
 // Static functions
 //
-enum {
-   RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
-};
-
-namespace cg
-{
-
-template<typename T, typename D>
-__forceinline D lerp01( const T x, const D & y0, const D & y1 )
-{
-    return y0 + (y1 - y0) * x;
-}
-
-template<typename T> 
-__forceinline T sqr( const T val )
-{
-    return val * val;
-}
-
-}
 
 static const double g_clearDayVisibility = 35000.0;
 static const double g_totalFogVisibility = 400.0;
@@ -70,6 +50,7 @@ static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
 FogLayer::FogLayer(osg::Group * pScene)
     : m_fRealVisDist(30000.0f)
     , m_realExp2Density(0.f)
+    , m_fogDensity (0.f)
 {
     // create fog uniform for the whole scene
     osg::StateSet * pSceneSS = pScene->getOrCreateStateSet();
@@ -86,6 +67,8 @@ FogLayer::FogLayer(osg::Group * pScene)
 // set fog params
 void FogLayer::setFogParams( const osg::Vec3f & vFogColor, float fFogDensity )
 {
+    m_fogDensity =  fFogDensity;
+
     // for sky
     _skyFogUniform->set(osg::Vec4f(vFogColor, fFogDensity));
 
@@ -123,7 +106,14 @@ void FogLayer::_buildStateSet()
     // create fog uniform for the sky layer
     _skyFogUniform = new osg::Uniform("SkyFogParams", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
     sset->addUniform(_skyFogUniform.get());
+    
+    
+    // enable depth test but disable depth write
+    osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
+    sset->setAttribute(pDepth);
 
+    // disable cull-face just for the case
+    sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
 
 
     return;

@@ -20,7 +20,7 @@ public:
         osg::ref_ptr<osgUtil::TangentSpaceGenerator> tsg = new osgUtil::TangentSpaceGenerator;
 
         unsigned int tca = geom->getNumTexCoordArrays();
-        for(int i=0;i<tca;i++)
+        for(unsigned i=0;i<tca;i++)
         {
             if(geom->getTexCoordArray(i))
             {

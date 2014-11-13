@@ -97,6 +97,7 @@
 #include <osgUtil/TangentSpaceGenerator>
 
 #include <osg/AlphaFunc>
+#include <osg/BlendEquation>
 
 #include <osg/TexGen>
 #include <osg/TexEnvCombine>
@@ -104,6 +105,9 @@
 #include <osgUtil/ReflectionMapGenerator>
 #include <osgUtil/HighlightMapGenerator>
 #include <osgUtil/HalfWayMapGenerator>
+
+#include "meta.h"
+#include "cg_math.h"
 
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );

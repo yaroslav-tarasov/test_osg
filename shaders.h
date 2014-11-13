@@ -47,6 +47,10 @@ namespace shaders
     namespace sky_fog_mat
     {
         const char* get_shader(shader_t t);
-    }   
+    }       
 
+    namespace clouds_mat
+    {
+        const char* get_shader(shader_t t);
+    } 
 }

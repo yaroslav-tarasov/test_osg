@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
+    <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="ct_visitor.h" />
     <ClInclude Include="find_node_visitor.h" />
@@ -123,6 +124,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="sv\CloudLayer.cpp" />
     <ClCompile Include="sv\FogLayer.cpp" />
     <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />

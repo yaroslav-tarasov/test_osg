@@ -9,12 +9,14 @@
 #include "info_visitor.h"
 #include "SkyBox.h"
 #include "sv/FogLayer.h"
+#include "sv/CloudLayer.h"
 
 #include <osgEphemeris/EphemerisModel.h>
 
 #define TEST_EPHEMERIS
 #define TEST_PRECIP
 #define TEST_SV_FOG
+#define TEST_SV_CLOUD
 
 // #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
@@ -33,7 +35,6 @@ osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
     }
     return l2w;
 }
-
 
 
 void AddLight( osg::ref_ptr<osg::MatrixTransform> rootnode ) 
@@ -75,7 +76,6 @@ private:
     float _angle;
 };
 
-
 class MyGustCallback : public osg::NodeCallback
 {
 
@@ -101,24 +101,135 @@ class MyGustCallback : public osg::NodeCallback
         }
 };
 
-class EphemerisDataUpdateCallback : public osgEphemeris::EphemerisUpdateCallback
+class EphemerisDataUpdateCallback : virtual public osgEphemeris::EphemerisUpdateCallback
 {
 public:
-    EphemerisDataUpdateCallback(): EphemerisUpdateCallback( "EphemerisDataUpdateCallback" )
+    EphemerisDataUpdateCallback(osgEphemeris::EphemerisModel *ephem ,FogLayer* fogLayer,CloudsLayer* skyClouds) 
+        : EphemerisUpdateCallback( "EphemerisDataUpdateCallback" )
+        , _ephem      (ephem)
+        , _fogLayer   (fogLayer)
+        , _skyClouds  (skyClouds)
+        , _handler    (new handler(_skyClouds.get()))
     {}
 
     void operator()( osgEphemeris::EphemerisData *data )
     {
-        time_t seconds = time(0L);
-        struct tm *_tm = localtime(&seconds);
+        //time_t seconds = time(0L);
+        //struct tm *_tm = localtime(&seconds);
 
-        data->dateTime.setYear( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
-        data->dateTime.setMonth( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
-        data->dateTime.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
-        data->dateTime.setHour( _tm->tm_hour );
-        data->dateTime.setMinute( _tm->tm_min );
-        data->dateTime.setSecond( _tm->tm_sec );
+        //data->dateTime.setYear( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
+        //data->dateTime.setMonth( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
+        //data->dateTime.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
+        //data->dateTime.setHour( _tm->tm_hour );
+        //data->dateTime.setMinute( _tm->tm_min );
+        //data->dateTime.setSecond( _tm->tm_sec );
+
+        // Sun color and altitude little bit dummy 
+         auto sls = _ephem->getSunLightSource()->getLight();
+         auto _sunAltitude = data->data[0].alt;
+         auto _sunColor    = sls->getDiffuse(); 
+        // try to calculate some diffuse term (base luminance level for diffuse term is [0, 0.9])
+        static const float g_fDiffuseMax = 0.9f;
+
+        osg::Vec3 _globalDiffuse = osg::Vec3(_sunColor.x(),_sunColor.y(),_sunColor.z());// _sunColor;
+        // let's additionally fade diffuse when sun is absent
+        const float
+            fBelowHorizonFactorR = pow(cg::clamp(-2.0f, 8.0f, 0.f, 1.f)(_sunAltitude), 1.25f),
+            fBelowHorizonFactorG = powf(fBelowHorizonFactorR, 1.2f),
+            fBelowHorizonFactorB = powf(fBelowHorizonFactorR, 1.5f);
+        _globalDiffuse = osg::componentMultiply(_globalDiffuse,osg::Vec3(fBelowHorizonFactorR,fBelowHorizonFactorG,fBelowHorizonFactorB));
+        //_globalDiffuse.g *= fBelowHorizonFactorG;
+        //_globalDiffuse.b *= fBelowHorizonFactorB;
+        _globalDiffuse *= g_fDiffuseMax;
+///////////////////////////////////////////////////////////////////////////////////////////////
+//       ¬ пор€дке бреда
+///////////////////////////////////////////////////////////////////////////////////////////////
+        // ambient-diffuse when fog or overcast - increase ambient, decrease diffuse
+        const float fDiffuseOvercast = std::max(_fogLayer->getFogDensity()*_fogLayer->getFogDensity(), _skyClouds->getOvercastCoef());
+        auto cFogDifCut = sls->getDiffuse()* (0.55f * fDiffuseOvercast);//osg::Vec4f(_globalDiffuse * (0.55f * fDiffuseOvercast),1.0f);
+        // decrease diffuse with fog
+        auto cFogDif = sls->getDiffuse() - cFogDifCut;
+        // increase ambient with fog
+        auto cFogAmb = sls->getAmbient() +  cFogDifCut * 0.5f;
+        // dim specular
+        const float fSpecularOvercastCoef = pow(1.f - fDiffuseOvercast, 0.5f);
+        auto cFogSpec = sls->getSpecular() * fSpecularOvercastCoef;
+
+        // recalc illumination based on new foggy values
+        const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
+        auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+
+        // when ambient is low - get it's color directly (to make more realistic fog at dusk/dawn)
+        // also when overcast - modulate color with ambient
+        const float fFogDesatFactor = cg::bound(cFogAmb.x() * 1.5f, 0.f, 1.f);
+        auto fog_color = cg::lerp01(fFogDesatFactor,/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0) );
+
+        // save fog
+        _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());
+        //data_.fog_exp_coef = _fogLayer->getFogExp2Coef();
+
+        const float fCloudLum = cg::max(0.06f, illumination);
+        _skyClouds->setCloudsColors(osg::Vec3f(fCloudLum,fCloudLum,fCloudLum), osg::Vec3f(fCloudLum,fCloudLum,fCloudLum));
+       
+        _skyClouds->setRotationSiderealTime(-float(fmod(data->localSiderealTime / 24.0, 1.0)) * 360.0f);
     }
+    
+    osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
+
+private:
+    class handler : public osgGA::GUIEventHandler
+    {
+
+    public:  
+        handler(CloudsLayer* skyClouds) 
+              : _skyClouds  (skyClouds)
+              , _currCloud  (CloudsLayer::cirrus)
+              {}
+
+        virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+        {
+            if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
+            {
+                if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Insert)
+                {
+                    int cc = _currCloud;cc++;
+                    _currCloud = static_cast<CloudsLayer::cloud_type>(cc);
+                    if(_currCloud >= CloudsLayer::clouds_types_num)
+                        _currCloud = CloudsLayer::none;
+                
+                    _skyClouds->setCloudsTexture(_currCloud);
+
+                    return true;
+                }
+                else
+                if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Page_Up)
+                {
+                    _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() +.1f,.0f,1.0f));
+
+                    return true;
+                }
+                else
+                if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Page_Down)
+                {
+                    _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() -.1f,.0f,1.0f));
+
+                    return true;
+                }
+            }
+            return false;
+        } 
+
+    private:
+        osg::ref_ptr<CloudsLayer>                  _skyClouds;
+        CloudsLayer::cloud_type                    _currCloud;
+    };
+
+private:
+    osg::ref_ptr<osgEphemeris::EphemerisModel> _ephem;
+    osg::ref_ptr<FogLayer>                     _fogLayer;
+    osg::ref_ptr<CloudsLayer>                  _skyClouds;
+    osg::ref_ptr<handler>                      _handler;
+    
 };
 
 // This handler lets you control the passage of time using keys.
@@ -394,7 +505,7 @@ int main_scene( int argc, char** argv )
         osg::ref_ptr<osgEphemeris::EphemerisModel> ephemerisModel = new osgEphemeris::EphemerisModel;
 
 		ephemerisModel->setSkyDomeMirrorSouthernHemisphere(false);
-		ephemerisModel->setSkyDomeUseSouthernHemisphere(true);
+		// ephemerisModel->setSkyDomeUseSouthernHemisphere(true);
 
         // Optionally, Set the AutoDate and Time to false so we can control it with the GUI
         ephemerisModel->setAutoDateTime( false );
@@ -419,6 +530,9 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setSkyDomeRadius( radius );
 		//ephemerisModel->setMoveWithEyePoint(false);
         sun_light = ephemerisModel->getSunLightSource();
+        
+
+
 #endif  // TEST_EPHEMERIS
 
 
@@ -433,10 +547,11 @@ int main_scene( int argc, char** argv )
         rootnode->getOrCreateStateSet()->setAttributeAndModes( fog.get() );
 #endif
 
-#ifdef TEST_SV_FOG
+#ifdef TEST_SV_FOG   
          osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(/*ephemerisModel*/model->asGroup());
          ephemerisModel->asGroup()->addChild(skyFogLayer.get());
-         skyFogLayer->setFogParams(osg::Vec3f(0.5,0.5,0.5),1.0);    // (вроде начинаем с 0.1 до максимум 1.0)
+         auto fogColor =osg::Vec3f(1.0,1.0,1.0);
+         skyFogLayer->setFogParams(fogColor,0.1);    // (начинаем с 0.1 до максимум 1.0)
          float coeff = skyFogLayer->getFogExp2Coef();
          viewer.addEventHandler( new FogHandler(
              [&](osg::Vec4f v){
@@ -446,8 +561,27 @@ int main_scene( int argc, char** argv )
                  sprintf(str,"setFogParams coeff = %f",coeff);
                  osg::notify(osg::INFO) << str;
              }
-             ,osg::Vec3f(0.5,0.5,0.5) ));
+             , fogColor ));
 #endif
+
+#ifdef TEST_SV_CLOUD
+             osg::ref_ptr<CloudsLayer> cloudsLayer = new CloudsLayer(/*ephemerisModel*/model->asGroup());
+             /*ephemerisModel*/rootnode->asGroup()->addChild(cloudsLayer.get());
+             cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+
+             //viewer.addEventHandler( new FogHandler(
+             //    [&](osg::Vec4f v){
+             //        skyFogLayer->setFogParams(osg::Vec3f(v.x(),v.y(),v.z()),v.w());
+             //        float coeff = skyFogLayer->getFogExp2Coef();
+             //        char str[255];
+             //        sprintf(str,"setFogParams coeff = %f",coeff);
+             //        osg::notify(osg::INFO) << str;
+             //}
+             //,osg::Vec3f(0.5,0.5,0.5) ));
+#endif
+             // Optionally, use a callback to update the Ephemeris Data
+             osg::ref_ptr<EphemerisDataUpdateCallback> eCallback = new EphemerisDataUpdateCallback(ephemerisModel.get(),skyFogLayer.get(),cloudsLayer.get());
+             ephemerisModel->setEphemerisUpdateCallback( eCallback );
 
 #ifdef TEST_SHADOWS
         //if (sun_light.valid())
@@ -574,6 +708,7 @@ int main_scene( int argc, char** argv )
 
 #ifdef  TEST_EPHEMERIS
         viewer.addEventHandler( new TimeChangeHandler( ephemerisModel.get() ) );
+        viewer.addEventHandler( eCallback->GetHandler() );
 #endif
 
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // ƒелаем узел невидимым

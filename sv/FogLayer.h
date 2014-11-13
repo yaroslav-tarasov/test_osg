@@ -19,18 +19,20 @@ public:
             if (ea.getKey()==osgGA::GUIEventAdapter::KEY_Rightbracket )
             { 
                 _intensivity += 0.1;
+                if(_intensivity > 1.0) _intensivity = 1.0;  
                 if ( _f_fog_changer )
                 { 
-                    _f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
+                    _f_fog_changer(osg::Vec4f(_color.x(),_color.y(),_color.z(),_intensivity));
                 }
                 return true;
             } else
                 if (ea.getKey()== osgGA::GUIEventAdapter::KEY_Leftbracket)
                 { 
                     _intensivity -= 0.1;
+                    if(_intensivity < 0.0) _intensivity = 0.0;
                     if ( _f_fog_changer )
                     { 
-                        _f_fog_changer(osg::Vec4f(1.0,1.0,1.0,_intensivity));
+                        _f_fog_changer(osg::Vec4f(_color.x(),_color.y(),_color.z(),_intensivity));
                     }
                     return true;
                 }
@@ -40,12 +42,21 @@ public:
         return false;
     }
 
+    void setFogColor(osg::Vec3f color)
+    {
+       _color =  color;
+       if ( _f_fog_changer )  _f_fog_changer(osg::Vec4f(_color.x(),_color.y(),_color.z(),_intensivity));
+    }
+    
+
     virtual void getUsage(osg::ApplicationUsage& usage) const
     {
         usage.addKeyboardMouseBinding("]",       "+ fog");
         usage.addKeyboardMouseBinding("[",       "- fog");
 
     }
+
+private:
 
     on_fog_change_f _f_fog_changer;
     float           _intensivity;
@@ -74,6 +85,9 @@ public:
     // get fog coefficient
     float getFogExp2Coef() const { return m_realExp2Density; }
 
+    // get fog density
+    float getFogDensity() const { return m_fogDensity; }
+
 private:
 
     // scene ptr
@@ -89,6 +103,7 @@ private:
     // real vis distance
     float m_fRealVisDist;
     float m_realExp2Density;
+    float m_fogDensity;
 
     // create geometry
     void _createGeometry();

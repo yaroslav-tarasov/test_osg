@@ -67,8 +67,17 @@ namespace shaders
         }                                                                                                \
                                                                                                          \
                                                                                                          \
-        )                                                                                                \
+        )                     
 
+
+#define INCLUDE_VS                                                                                     \
+    STRINGIFY (                                                                                        \
+\n    float luminance_crt( const in vec4 col )                                                         \
+\n    {                                                                                                \
+\n        const vec4 crt = vec4(0.299, 0.587, 0.114, 0.0);                                             \
+\n        return dot(col,crt);                                                                         \
+\n    }                                                                                                \
+      )                                                                                               
 
     }  
 
@@ -78,18 +87,14 @@ namespace shaders
     const char* vs = {
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
+        INCLUDE_VS
+
         STRINGIFY ( 
         attribute vec3 tangent;
         attribute vec3 binormal;
         varying   vec3 lightDir;
         varying   float illum; 
         
-        float luminance_crt(  const in vec4 col )
-        {
-            return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-        }        
-
-
         out block
         {
             vec2 texcoord;
@@ -446,13 +451,11 @@ namespace shaders
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+            
+            INCLUDE_VS
+
             STRINGIFY ( 
             
-            float luminance_crt(  const in vec4 col )
-            {
-                return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-            }
-
             varying   vec3  lightDir;
             varying   float illum; 
 
@@ -635,12 +638,10 @@ namespace shaders
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            STRINGIFY ( 
 
-            float luminance_crt(  const in vec4 col )
-            {
-                return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-            }
+            INCLUDE_VS
+
+            STRINGIFY ( 
 
             varying   vec3  lightDir;
             varying   float illum; 
@@ -765,17 +766,15 @@ namespace shaders
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+            
+            INCLUDE_VS
+
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
             varying   float illum; 
             
-            float luminance_crt(  const in vec4 col )
-            {
-                return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-            }
-
             out block
             {
                 vec2 texcoord;
@@ -952,6 +951,9 @@ namespace shaders
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            INCLUDE_VS
+
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
@@ -959,11 +961,6 @@ namespace shaders
             varying   float illum; 
             
             mat4 decal_matrix;
-
-            float luminance_crt(  const in vec4 col )
-            {
-                return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-            }
 
             out block
             {
@@ -1012,132 +1009,132 @@ namespace shaders
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
-            uniform vec4                SceneFogParams;
-
-            mat4 viewworld_matrix;
-            )
+\n            uniform sampler2D           ViewLightMap;
+\n            uniform sampler2D           Detail;
+\n            uniform samplerCube         Env;
+\n            uniform sampler2DShadow     ShadowSplit0;
+\n            uniform sampler2DShadow     ShadowSplit1;
+\n            uniform sampler2DShadow     ShadowSplit2;
+\n            uniform sampler2D           ViewDecalMap;    
+\n            uniform vec4                SceneFogParams;
+\n
+\n            mat4 viewworld_matrix;
+\n            )
             
-            INCLUDE_MAT
+              INCLUDE_MAT
             
-            STRINGIFY ( 
+              STRINGIFY ( 
+\n
+\n            uniform sampler2D colorTex;
+\n            varying vec3 lightDir;
+\n            varying float illum;
+\n
+\n            in block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 tangent;
+\n                vec3 binormal;
+\n                vec3 viewpos;
+\n                vec2 detail_uv;
+\n                vec4 shadow_view;
+\n                vec4 lightmap_coord;
+\n                vec4 decal_coord;
+\n            } f_in;
+\n
+\n            void main (void)
+\n            {
+\n                // GET_SHADOW(f_in.viewpos, f_in);
+\n                //#define GET_SHADOW(viewpos, in_frag) 
+\n                float shadow = 1.0; 
+\n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
+\n                //if (split_test.x) 
+\n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
+\n                //else if (split_test.y) 
+\n                //    shadow = textureProj(ShadowSplit1, shadow1_matrix * in_frag.shadow_view); 
+\n                //else if (split_test.z) 
+\n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
+\n
+\n                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+\n                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+\n                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+\n
+\n                vec4  light_vec_view = vec4(lightDir,1);
+\n                viewworld_matrix = gl_ModelViewMatrixInverse;
+\n                // FIXME dummy code
+\n                specular.a = 0; // it's not rainy day hallelujah
+\n
+\n                float rainy_value = specular.a;
+\n
+\n                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
+\n                float tex_mix_val = rainy_value * 0.7;
+\n                dif_tex_col *= fma(dif_tex_col, vec3(tex_mix_val,tex_mix_val,tex_mix_val)/*tex_mix_val.xxx*/, vec3(1.0 - tex_mix_val));
+\n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.015);
+\n                vec3 concrete_noise = vec3(0.0);
+\n                if (detail_factor > 0.01)
+\n                {
+\n                    concrete_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.48), vec3(-0.24));
+\n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
+\n                }
+\n
+\n                // FIXME
+\n                // APPLY_DECAL(f_in, dif_tex_col);
+\n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
+\n                // dif_col.rgb = fma(dif_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);        // FIXME
+\n                decal_data.a = 1.0; //FIXME Dummy code 
+\n
+\n                // get dist to point and normalized to-eye vector
+\n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n                vec3 to_pnt = dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n                // reflection vector
+\n
+\n                vec3 normal = normalize(f_in.normal + (concrete_noise.x * f_in.tangent + concrete_noise.y * f_in.binormal) * (1.0 - decal_data.a));
+\n                float incidence_dot = dot(-to_pnt, normal);
+\n                vec3 refl_vec_view = fma(normal, vec3(2.0 * incidence_dot), to_pnt);
+\n                
+\n                // diffuse term
+\n                float n_dot_l = shadow * saturate(dot(normal, light_vec_view.xyz)) * fma(rainy_value, -0.7, 1.0);
+\n
+\n                // specular
+\n                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), fma(rainy_value, 5.0, 1.5)) * fma(rainy_value, 0.9, 0.7);
+\n                vec3 specular_color = specular_val * specular.rgb;
+\n
+\n                // GET_LIGHTMAP(f_in.viewpos, f_in);
+\n                // #define GET_LIGHTMAP(viewpos, in_frag) 
+\n                // float height_world_lm      = in_frag.lightmap_coord.z; 
+\n                // vec4  lightmap_data        = textureProj(ViewLightMap, in_frag.lightmap_coord).rgba; 
+\n                // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
+\n                // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
-            uniform sampler2D colorTex;
-            varying vec3 lightDir;
-            varying float illum;
-
-            in block
-            {
-                vec2 texcoord;
-                vec3 normal;
-                vec3 tangent;
-                vec3 binormal;
-                vec3 viewpos;
-                vec2 detail_uv;
-                vec4 shadow_view;
-                vec4 lightmap_coord;
-                vec4 decal_coord;
-            } f_in;
-
-            void main (void)
-            {
-                // GET_SHADOW(f_in.viewpos, f_in);
-                //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; 
-                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
-                //if (split_test.x) 
-                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
-                //else if (split_test.y) 
-                //    shadow = textureProj(ShadowSplit1, shadow1_matrix * in_frag.shadow_view); 
-                //else if (split_test.z) 
-                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
-
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-
-                vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
-                // FIXME dummy code
-                specular.a = 0; // it's not rainy day hallelujah
-
-                float rainy_value = specular.a;
-
-                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
-                float tex_mix_val = rainy_value * 0.7;
-                dif_tex_col *= fma(dif_tex_col, tex_mix_val.xxx, vec3(1.0 - tex_mix_val));
-                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.015);
-                vec3 concrete_noise = vec3(0.0);
-                if (detail_factor > 0.01)
-                {
-                    concrete_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.48), vec3(-0.24));
-                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
-                }
-
-                // FIXME
-                // APPLY_DECAL(f_in, dif_tex_col);
-                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
-                // dif_col.rgb = fma(dif_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);        // FIXME
-                decal_data.a = 1.0; //FIXME Dummy code 
-
-                // get dist to point and normalized to-eye vector
-                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
-                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
-                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
-                vec3 to_pnt = dist_to_pnt_rcp * f_in.viewpos;
-
-                // reflection vector
-
-                vec3 normal = normalize(f_in.normal + (concrete_noise.x * f_in.tangent + concrete_noise.y * f_in.binormal) * (1.0 - decal_data.a));
-                float incidence_dot = dot(-to_pnt, normal);
-                vec3 refl_vec_view = fma(normal, vec3(2.0 * incidence_dot), to_pnt);
-                
-                // diffuse term
-                float n_dot_l = shadow * saturate(dot(normal, light_vec_view.xyz)) * fma(rainy_value, -0.7, 1.0);
-
-                // specular
-                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), fma(rainy_value, 5.0, 1.5)) * fma(rainy_value, 0.9, 0.7);
-                vec3 specular_color = specular_val * specular.rgb;
-
-                // GET_LIGHTMAP(f_in.viewpos, f_in);
-                // #define GET_LIGHTMAP(viewpos, in_frag) 
-                // float height_world_lm      = in_frag.lightmap_coord.z; 
-                // vec4  lightmap_data        = textureProj(ViewLightMap, in_frag.lightmap_coord).rgba; 
-                // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
-                // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
-
-                vec3 lightmap_color = vec3(0.0f,0.0f,0.0f); // FIXME dummy code
-
-                // FIXME
-                // LIGHTMAP_SHADOW_TRICK(shadow);
-
-                vec3 non_ambient_term = max(lightmap_color, diffuse.rgb * n_dot_l + specular_color);
-
-                // result
-                vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
-                // reflection when rain
-                if (rainy_value >= 0.01)
-                {
-                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
-                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.45, 0.05));
-                    vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
-                    result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
-                }
-
-                // gl_FragColor = vec4( result,1.0);
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-            }
+ \n               vec3 lightmap_color = vec3(0.0f,0.0f,0.0f); // FIXME dummy code
+ \n
+ \n               // FIXME
+ \n               // LIGHTMAP_SHADOW_TRICK(shadow);
+ \n
+ \n               vec3 non_ambient_term = max(lightmap_color, diffuse.rgb * n_dot_l + specular_color);
+ \n
+ \n               // result
+ \n               vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
+ \n               // reflection when rain
+ \n               if (rainy_value >= 0.01)
+ \n               {
+ \n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+ \n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.45, 0.05));
+ \n                   vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
+ \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
+ \n               }
+ \n
+ \n               // gl_FragColor = vec4( result,1.0);
+ \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+ \n               //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+ \n           }
             )
-
+ 
         };   
-
+ 
         const char* get_shader(shader_t t)
         {
             if(t==VS)
@@ -1154,16 +1151,14 @@ namespace shaders
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            INCLUDE_VS
+
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
             varying   float illum; 
-
-            float luminance_crt(  const in vec4 col )
-            {
-                return (0.299f * col.r + 0.587f * col.g + 0.114f * col.b);
-            }
 
             out block
             {
@@ -1416,21 +1411,14 @@ namespace shaders
             {
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 
-
-                ////lightDir = vec3(gl_LightSource[0].position.xyz);
-                //gl_Position = ftransform();
                 v_out.pos = gl_Vertex.xyz;
-                ////gl_Position.z = gl_Position.w;
-                //gl_Position.z = 0.0;
 				    // perform conversion to post-projective space
 
 				vec3 vLocalSpaceCamPos = gl_ModelViewMatrixInverse[3].xyz;
 				gl_Position = gl_ModelViewProjectionMatrix * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
 
-				// explicitly move to some good unclipped position (depth writes disabled, depth clamp enabled - so doesn't matter)
-				// this avoids undesirable clipping when camera on water level or far plane clipping also
 				gl_Position.z = 0.0;
-                // gl_Position.z = gl_Position.w;
+                //gl_Position.z = gl_Position.w;
             }       
             )
         };
@@ -1438,7 +1426,7 @@ namespace shaders
 
         const char* fs = {
             "#version 130 \n"
-            "#extension GL_ARB_gpu_shader5 : enable  "
+            "#extension GL_ARB_gpu_shader5 : enable  \n"
 
             STRINGIFY ( 
 
@@ -1459,7 +1447,12 @@ namespace shaders
             {                                           
                 return clamp(x, 0.0, 1.0);               
             }                                           
-			                                            
+            
+            float lerp(float a, float b, float w)
+            {
+                return a + w*(b-a);
+            }
+
             )
 
             STRINGIFY ( 
@@ -1522,5 +1515,96 @@ namespace shaders
 
     }  // ns sky_fog_mat
 
+    namespace clouds_mat 
+    {
+        const char* vs = {  
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+            STRINGIFY ( 
+
+            uniform mat4 MVP;
+            const mat4 k = mat4(0.31,-0.95,0.0,0.0,    0.95,0.31,0.0,0.0,    0.0,0.0,1.0,0.0,   0.0,0.0,0.0,1.0);
+            out block
+            {
+                vec3 pos;
+            } v_out;
+            
+            void main()
+            {
+                //vec4 vertexInEye = gl_ModelViewMatrix  * gl_Vertex;
+
+                v_out.pos = gl_Vertex.xyz;
+                mat4 im = inverse(gl_ModelViewMatrix*MVP);
+                vec3 vLocalSpaceCamPos = im[3].xyz;//gl_ModelViewMatrixInverse[3].xyz;
+
+               // gl_Position = gl_ModelViewProjectionMatrix   * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+                gl_Position =  gl_ModelViewProjectionMatrix * MVP * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+                gl_Position.z = 0.0;
+                //gl_Position.z = gl_Position.w;
+            }       
+            )
+        };
+
+
+        const char* fs = {
+            "#version 130 \n"
+            "#extension GL_ARB_gpu_shader5 : enable  \n"
+
+            STRINGIFY ( 
+
+            uniform sampler2D Clouds;
+
+            // uniforms for sundisc and sunrays
+            uniform vec3  frontColor;
+            uniform vec3  backColor;
+            uniform float density;
+            
+            
+            )
+
+            STRINGIFY ( 
+
+
+            const float fOneOver2Pi = 0.5 / 3.141593;
+            const float fTwoOverPi = 2.0 / 3.141593;   
+
+            // varying vec3 lightDir;
+
+            in block                                    
+            {                                           
+                vec3 pos;                               
+            } f_in;                                     
+
+            void main (void)                              
+            {
+               // get point direction
+                vec3 vPnt = normalize(f_in.pos);
+
+                // calculate texel coords based on polar angles
+                vec2 vTexCoord = vec2(fOneOver2Pi * atan(vPnt.y, vPnt.x) + 0.5, fTwoOverPi * acos(abs(vPnt.z)));
+
+                // get clouds color
+                vec4 cl_color = textureLod(Clouds, vTexCoord, 0.0);
+
+                // make fogging
+                gl_FragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
+
+                //gl_FragColor = vec4( result,dif_tex_col.a);
+                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+            }
+            )
+
+        };   
+
+        const char* get_shader(shader_t t)
+        {
+            if(t==VS)
+                return vs;
+            else if(t==FS)
+                return fs;
+            else 
+                return nullptr;
+        }
+
+    }  // ns sky_fog_mat
 
 }  // ns shaders
