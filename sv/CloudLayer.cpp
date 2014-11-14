@@ -94,7 +94,7 @@ bool CloudsLayer::setCloudsTexture( cloud_type cl_type )
         osg::StateSet * sset = getOrCreateStateSet();
         
         osg::ref_ptr<osg::Texture2D> cloudsTex = new osg::Texture2D;
-        cloudsTex->setImage( osgDB::readImageFile(tex_names[cl_type]) );
+        cloudsTex->setImage( osgDB::readImageFile(tex_names[cl_type],new osgDB::Options("")) );
         cloudsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
         cloudsTex->setMaxAnisotropy(16.0f);
         cloudsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );

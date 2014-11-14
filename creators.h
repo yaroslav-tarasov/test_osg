@@ -33,10 +33,10 @@ namespace effects
          const osg::Vec3& trans,
          const osg::Vec4& color );
 
-     template<typename G>
-     void createProgram(G* geom,std::string vs = "",std::string fs = "",std::string gs = "", std::string tcs = "", std::string tes = "" )
+     // template<typename G>
+     inline  osg::Program* createProgram(osg::StateSet* stateset,std::string vs = "",std::string fs = "",std::string gs = "", std::string tcs = "", std::string tes = "" )
      {
-         osg::StateSet* stateset = geom->getOrCreateStateSet();
+         //osg::StateSet* stateset = geom->getOrCreateStateSet();
 
          osg::Program* program = new osg::Program;
 
@@ -72,6 +72,8 @@ namespace effects
              auto s_ = new osg::Shader( osg::Shader::TESSEVALUATION, tes );
              program->addShader( s_ );
          }
+
+         return program;
      }
 
      template<typename G>

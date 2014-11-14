@@ -109,6 +109,7 @@
     <ClCompile Include="bump_mapping.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
+    <ClCompile Include="exp_test.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="main_shadows.cpp" />

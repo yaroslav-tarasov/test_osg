@@ -1522,7 +1522,6 @@ namespace shaders
             STRINGIFY ( 
 
             uniform mat4 MVP;
-            const mat4 k = mat4(0.31,-0.95,0.0,0.0,    0.95,0.31,0.0,0.0,    0.0,0.0,1.0,0.0,   0.0,0.0,0.0,1.0);
             out block
             {
                 vec3 pos;
@@ -1530,8 +1529,6 @@ namespace shaders
             
             void main()
             {
-                //vec4 vertexInEye = gl_ModelViewMatrix  * gl_Vertex;
-
                 v_out.pos = gl_Vertex.xyz;
                 mat4 im = inverse(gl_ModelViewMatrix*MVP);
                 vec3 vLocalSpaceCamPos = im[3].xyz;//gl_ModelViewMatrixInverse[3].xyz;
@@ -1605,6 +1602,6 @@ namespace shaders
                 return nullptr;
         }
 
-    }  // ns sky_fog_mat
+    }  // ns clouds_mat
 
 }  // ns shaders

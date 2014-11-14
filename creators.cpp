@@ -1509,7 +1509,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 #if 0   // Интересный эффект надо подумать над использованием 
         //effects::createShader(p_copy/*geom*/) ;
         
-        effects::createProgram(p_copy,circles::vs,circles::fs) ;
+        effects::createProgram(p_copy->getOrCreateStateSet(),circles::vs,circles::fs) ;
 #endif 
 
 		const unsigned inst_num = 12;
