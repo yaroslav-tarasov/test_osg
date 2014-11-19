@@ -16,6 +16,9 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\bi">
+      <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -79,6 +82,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cg_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hi_res_timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="light_maps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -147,6 +156,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="exp_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bi\osgbullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bi\BulletInterface.cpp">
+      <Filter>Source Files\bi</Filter>
+    </ClCompile>
+    <ClCompile Include="light_maps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sv\PreRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

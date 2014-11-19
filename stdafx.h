@@ -106,6 +106,10 @@
 #include <osgUtil/HighlightMapGenerator>
 #include <osgUtil/HalfWayMapGenerator>
 
+#include <osg/ComputeBoundsVisitor>
+#include <osg/CameraNode>
+#include <osg/FrontFace>
+
 #include "meta.h"
 #include "cg_math.h"
 
@@ -121,6 +125,7 @@ int main_tess_test( int argc, char** argv );
 int main_tex_test( int argc, char** argv );
 int main_bump_map( int argc, char** argv );
 int main_exp_test( int argc, char** argv );
+int main_bi( int argc, char** argv );
 
 #define STRINGIFY(x) #x 
 
@@ -138,4 +143,14 @@ int main_exp_test( int argc, char** argv );
     #pragma comment(lib, "osgUtil.lib")
     #pragma comment(lib, "osgSim.lib")
     #pragma comment(lib, "osgParticle.lib")
+    #pragma comment(lib, "BulletCollision.lib")
+    #pragma comment(lib, "LinearMath.lib")
+    #pragma comment(lib, "BulletDynamics.lib")
+#else 
+    #pragma comment(lib, "BulletCollision_Debug.lib")
+    #pragma comment(lib, "LinearMath_Debug.lib")
+    #pragma comment(lib, "BulletDynamics_Debug.lib")
 #endif
+
+#include "Windows.h"
+#undef max

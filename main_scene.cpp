@@ -404,11 +404,11 @@ int main_scene( int argc, char** argv )
 
 
     // report any errors if they have occurred when parsing the program arguments.
-    if (arguments.errors())
-    {
-        arguments.writeErrorMessages(std::cout);
-        return 1;
-    }
+    //if (arguments.errors())
+    //{
+    //    arguments.writeErrorMessages(std::cout);
+    //    return 1;
+    //}
 
     std::string animationName("Default");
     

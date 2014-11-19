@@ -49,14 +49,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>ext\pugixml-1.4\src;common;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Work\bullet-2.82-r2704\src;ext\pugixml-1.4\src;common;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>pugixmld.lib;osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -67,7 +68,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>ext\pugixml-1.4\src;common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>ext\pugixml-1.4\src;common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\osgEphemeris\osgEphemeris\include;C:\Work\bullet-2.82-r2704\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -76,7 +77,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -96,7 +100,9 @@
     <ClInclude Include="ct_visitor.h" />
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="find_tex_visitor.h" />
+    <ClInclude Include="hi_res_timer.h" />
     <ClInclude Include="info_visitor.h" />
+    <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials_visitor.h" />
     <ClInclude Include="shaders.h" />
     <ClInclude Include="SkyBox.h" />
@@ -106,11 +112,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animation_handler.cpp" />
+    <ClCompile Include="bi\BulletInterface.cpp" />
+    <ClCompile Include="bi\osgbullet.cpp" />
     <ClCompile Include="bump_mapping.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="exp_test.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
+    <ClCompile Include="light_maps.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="main_shadows.cpp" />
     <ClCompile Include="main_shadows_2.cpp" />
@@ -127,6 +138,7 @@
     </ClCompile>
     <ClCompile Include="sv\CloudLayer.cpp" />
     <ClCompile Include="sv\FogLayer.cpp" />
+    <ClCompile Include="sv\PreRender.cpp" />
     <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />
     <ClCompile Include="tex_test.cpp" />
