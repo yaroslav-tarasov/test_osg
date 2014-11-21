@@ -101,7 +101,7 @@ void FogLayer::_buildStateSet()
     // set appropriate mix blending
     osg::BlendFunc * pBlendFunc = new osg::BlendFunc();
     pBlendFunc->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-    sset->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
+    sset->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON| osg::StateAttribute::PROTECTED);
 
     // create fog uniform for the sky layer
     _skyFogUniform = new osg::Uniform("SkyFogParams", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
@@ -110,7 +110,7 @@ void FogLayer::_buildStateSet()
     
     // enable depth test but disable depth write
     osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
-    sset->setAttribute(pDepth);
+    sset->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     // disable cull-face just for the case
     sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);

@@ -121,6 +121,7 @@
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="light_maps.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="main_shadows.cpp" />

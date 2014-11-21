@@ -1426,7 +1426,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
     
-    const char* scene_name = "sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
+    const char* scene_name = "sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
     const char* mat_file_name = "sheremetyevo.open.dae"; //scene_name;//
 
     osg::Node* adler = osgDB::readNodeFile(scene_name);  // "adler.osgb"

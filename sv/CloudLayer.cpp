@@ -140,7 +140,7 @@ void CloudsLayer::_buildStateSet()
     
     // enable depth test but disable depth write
     osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
-    sset->setAttribute(pDepth);
+    sset->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     // disable cull-face just for the case
     sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);

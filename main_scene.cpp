@@ -335,6 +335,45 @@ public:
 };
 
 
+
+
+osg::Node*
+    preRender( osg::Node* node)
+{
+
+    const int tex_width = 1024, tex_height = 1024;
+
+
+    osg::ref_ptr<osg::Texture2D> textureFBO = new osg::Texture2D;
+    textureFBO->setTextureSize( tex_width, tex_height );
+    textureFBO->setInternalFormat( GL_RGB );  // GL_RGB   // FIXME GL_RGBA8 - интересный эффект проге плохеет
+    textureFBO->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR_MIPMAP_LINEAR );
+    textureFBO->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
+    textureFBO->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_BORDER);
+    textureFBO->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_BORDER);
+
+    osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+    camera->setViewport( 0, 0, tex_width, tex_height );
+    //camera->setClearColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+    //camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+    
+    //camera->setCullingMode(osg::CullSettings::NO_CULLING);
+    //camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+    //camera->setClearDepth(0.0f);
+    //camera->getOrCreateStateSet()->setAttribute(new osg::Depth(osg::Depth::GEQUAL, 1.0, 0.0, true), osg::StateAttribute::OVERRIDE);
+
+    camera->setRenderOrder( osg::Camera::PRE_RENDER );
+    camera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT );
+    camera->attach( osg::Camera::COLOR_BUFFER, textureFBO.get() );
+    // camera->setProjectionMatrixAsFrustum(-1.f, +1.f, -1.f, +1.f, 1.f, 10.f);
+    camera->setViewMatrixAsLookAt(osg::Vec3(0.0,0.0,0.0),osg::Vec3(0,1,0), osg::Z_AXIS);
+        
+    
+    camera->addChild( node );
+
+    return( camera.release() );
+} 
+
 int main_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -392,7 +431,7 @@ int main_scene( int argc, char** argv )
     osgGA::TrackballManipulator* manip = new osgGA::TrackballManipulator;
     viewer.setCameraManipulator(manip);
     // Initially, place the TrackballManipulator so it's in the center of the scene
-    manip->setHomePosition(osg::Vec3(0,1000,1000), osg::Vec3(0,1,0), osg::Vec3(0,0,1));
+    manip->setHomePosition(osg::Vec3(0,1000,1000), osg::Vec3(0,1,0), osg::Z_AXIS);
     manip->home(0);
 
     // Add some useful handlers to see stats, wireframe and onscreen help
@@ -774,6 +813,12 @@ int main_scene( int argc, char** argv )
         printf("GL Version (integer) : %d.%d\n", major, minor);
         printf("GLSL Version : %s\n", glslVersion);	
 #endif
+        osg::ref_ptr<osg::MatrixTransform> fbo_node = new osg::MatrixTransform;
+
+        fbo_node->addChild(model);
+        fbo_node->addChild(ephemerisModel.get());
+        fbo_node->addChild(cloudsLayer);
+        rootnode->addChild(preRender( fbo_node));
 
         return viewer.run();
     }
