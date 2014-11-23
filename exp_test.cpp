@@ -128,7 +128,7 @@ namespace exp_mat
     };
 
     const char* gs = {  
-        "#version 430 compatibility \n"
+        "#version 330 compatibility \n"
         "#extension GL_EXT_geometry_shader4: enable \n"
         "#extension GL_EXT_gpu_shader4: enable \n"
         "uniform mat4 osg_ProjectionMatrix; \n"    
