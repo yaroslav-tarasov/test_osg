@@ -90,6 +90,9 @@
     <ClInclude Include="light_maps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shadow_map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -168,6 +171,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sv\PreRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shadow_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -49,6 +49,7 @@
 #include <osgSim/OverlayNode>
 
 #include <osgViewer/Viewer>
+#include <osgViewer/config/SingleScreen>
 
 #include <osgAnimation/BasicAnimationManager>
 #include <osgAnimation/TimelineAnimationManager>
@@ -82,6 +83,8 @@
 #include <osgShadow/ShadowedScene>
 #include <osgShadow/ShadowMap>
 #include <osgShadow/SoftShadowMap>
+#include <osgShadow/LightSpacePerspectiveShadowMap>
+#include <osgShadow/ShadowTexture>
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
@@ -109,6 +112,7 @@
 #include <osg/ComputeBoundsVisitor>
 #include <osg/CameraNode>
 #include <osg/FrontFace>
+#include <osg/CullFace>
 
 #include "meta.h"
 #include "cg_math.h"

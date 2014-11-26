@@ -831,6 +831,7 @@ nodes_array_t loadAirplaneParts()
         auto port = addAsChild("port",green_light);
         auto star_board = addAsChild("starboard",red_light);
 
+
         //osg::Node* light0 = effects::createLightSource(
         //    0, osg::Vec3(-20.0f,0.0f,0.0f), red_color);
 
@@ -882,6 +883,15 @@ osg::Node* loadBMAirplane()
     program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::plane_mat::get_shader(shaders::FS)) );
     program->addBindAttribLocation( "tangent", 6 );
     program->addBindAttribLocation( "binormal", 7 );
+    
+    // create and setup the texture object
+    osg::TextureCubeMap *tcm = creators::GetTextureHolder().GetEnvTexture().get(); //new osg::TextureCubeMap;
+
+    FindTextureVisitor ft("a_319");
+    model->accept( ft );
+
+    osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
+    normalTex->setImage( osgDB::readImageFile("a_319_n.dds") );  
 
 
     findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
@@ -898,60 +908,19 @@ osg::Node* loadBMAirplane()
 
         osg::StateSet* stateset = shassis->getOrCreateStateSet();
         stateset->addUniform( new osg::Uniform("colorTex", 0) );
-        stateset->addUniform( new osg::Uniform("normalTex", 1) );
+        stateset->addUniform( new osg::Uniform("normalTex", 1) ); 
+        stateset->addUniform( new osg::Uniform("Env", 3) );
         stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
+        stateset->setTextureAttributeAndModes( 3, tcm);
     }
-
-    // create and setup the texture object
-    osg::TextureCubeMap *tcm = new osg::TextureCubeMap;
-
-#if 1
-    tcm->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
-    tcm->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
-    tcm->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP);
-    tcm->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-    tcm->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);    
-    // assign the six images to the texture object
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("day_posx.jpg"));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("day_negx.jpg"));
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("day_posy.jpg"));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("day_negy.jpg"));
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("day_posz.jpg"));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("day_negz.jpg"));
-    // tcm->setUseHardwareMipMapGeneration(true);
-#else
-    // generate the six highlight map images (light direction = [1, 1, -1])
-    osgUtil::HighlightMapGenerator *mapgen = new osgUtil::HighlightMapGenerator(
-        osg::Vec3(1, 1, -1),            // light direction
-        osg::Vec4(1, 0.9f, 0.8f, 1),    // light color
-        8);                             // specular exponent
-
-    mapgen->generateMap();
-
-    // assign the six images to the texture object
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_X, mapgen->getImage(osg::TextureCubeMap::POSITIVE_X));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_X, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_X));
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_Y, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Y));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_Y, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Y));
-    tcm->setImage(osg::TextureCubeMap::POSITIVE_Z, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Z));
-    tcm->setImage(osg::TextureCubeMap::NEGATIVE_Z, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Z));
-#endif
-
-    //osg::ref_ptr<osg::Texture2D> colorTex = new osg::Texture2D;
-    //colorTex->setImage( osgDB::readImageFile("a_319_airfrance.dds"/*,new osgDB::Options("dds_flip")*/) );//
-
-    FindTextureVisitor ft("a_319");
-    model->accept( ft );
-    //osg::ref_ptr<osg::Texture2D> colorTex =  new osg::Texture2D(ft.getTexture()->getImage(0));
-
-    osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile("a_319_n.dds") );  
+    
 
     osg::StateSet* stateset = model->getOrCreateStateSet();
     stateset->addUniform( new osg::Uniform("colorTex", 0) );
     stateset->addUniform( new osg::Uniform("normalTex", 1) );
-    stateset->addUniform( new osg::Uniform("Env"     , 3) ); 
-
+    stateset->addUniform( new osg::Uniform("Env", 3) );
+    stateset->setDataVariance(osg::Object::DYNAMIC);
+    stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON);
     stateset->setAttributeAndModes( program.get() );
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
@@ -962,14 +931,14 @@ osg::Node* loadBMAirplane()
     return model;
 }
 
-class texturesHolder
+class texturesHolder  : public texturesHolder_base
 {
 public:
     struct textures_t
     {
-        osg::ref_ptr<osg::Texture2D> colorTex;
-        osg::ref_ptr<osg::Texture2D> nightTex;
-        osg::ref_ptr<osg::Texture2D> detailsTex;
+        osg::ref_ptr<osg::Texture2D>      colorTex;
+        osg::ref_ptr<osg::Texture2D>      nightTex;
+        osg::ref_ptr<osg::Texture2D>      detailsTex;
         osg::ref_ptr<osg::TextureCubeMap> envTex; 
     };
     
@@ -990,12 +959,21 @@ public:
         {
            return texCreator(mats,mat_name); 
         }
+
+        return texCreator(mats,"default");
     }
+
+    osg::ref_ptr<osg::TextureCubeMap>   GetEnvTexture()
+    {
+        return   envTex;
+    }
+
+    friend texturesHolder_base&   GetTextureHolder();
 
 private:
     
-    osg::ref_ptr<osg::Texture2D> detailsTex;
-    osg::ref_ptr<osg::Texture2D> emptyTex;
+    osg::ref_ptr<osg::Texture2D>      detailsTex;
+    osg::ref_ptr<osg::Texture2D>      emptyTex;
     osg::ref_ptr<osg::TextureCubeMap> envTex;
 
 
@@ -1017,6 +995,21 @@ private:
 
          // create and setup the texture object
          envTex = new osg::TextureCubeMap;
+         const unsigned envSize = 256;
+         envTex->setInternalFormat(GL_RGB);
+         envTex->setTextureSize(envSize, envSize);
+         envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/); // CLAMP_TO_BORDER/*CLAMP_TO_EDGE*/
+         envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
+         envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
+         envTex->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR_MIPMAP_LINEAR/*LINEAR*/);
+         envTex->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
+         envTex->setMaxAnisotropy(16.0f);
+         envTex->setNumMipmapLevels(3);
+         envTex->setUseHardwareMipMapGeneration(true);
+         
+         
+
+#if 0
 #if 1
          envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
          envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
@@ -1048,12 +1041,21 @@ private:
          envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Z));
          envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Z));
 #endif
+#endif
 
+    }
+    
+
+
+    static texturesHolder& getTextureHolder()
+    {
+        static texturesHolder th;
+        return th;
     }
 
     static inline const textures_t&  texCreator(const mat::materials_t&  mats, std::string mat_name)
     {
-        static texturesHolder th;
+        texturesHolder& th = getTextureHolder();
 
         if(GetTextures().find(mat_name)==GetTextures().end())
         {
@@ -1084,8 +1086,9 @@ private:
 					t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                     t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.colorTex->setMaxAnisotropy(16.0f);
-				} else 	
-			    if(it->second.unit == 2) 
+				} 
+                else 	
+			    if(it->second.unit == 2)
 				{
 					t.nightTex->setImage( osgDB::readImageFile(it->second.path) );
 					t.nightTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
@@ -1114,6 +1117,11 @@ private:
     }
 
 };
+ 
+texturesHolder_base&   GetTextureHolder()
+{
+    return texturesHolder::getTextureHolder();
+}
 
 class programsHolder: public programsHolder_base
 {
@@ -1188,6 +1196,8 @@ private:
         {
             return shaders::clouds_mat::get_shader(t);  
         }
+
+        return nullptr;
         
     }
 
@@ -1267,10 +1277,10 @@ void create_specular_highlights(osg::StateSet* ss)
 
     // use TexEnvCombine to add the highlights to the original lighting
     osg::TexEnvCombine *te = new osg::TexEnvCombine;    
-    te->setCombine_RGB(osg::TexEnvCombine::ADD);
-    te->setSource0_RGB(osg::TexEnvCombine::TEXTURE);
+    te->setCombine_RGB (osg::TexEnvCombine::ADD);
+    te->setSource0_RGB (osg::TexEnvCombine::TEXTURE);
     te->setOperand0_RGB(osg::TexEnvCombine::SRC_COLOR);
-    te->setSource1_RGB(osg::TexEnvCombine::PRIMARY_COLOR);
+    te->setSource1_RGB (osg::TexEnvCombine::PRIMARY_COLOR);
     te->setOperand1_RGB(osg::TexEnvCombine::SRC_COLOR);
     ss->setTextureAttributeAndModes(0, te, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON);
 }
@@ -1306,7 +1316,7 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
         || mat_name.find("tree")     !=std::string::npos 
        )
     { 
-       // stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
+       stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
     }
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
@@ -1425,14 +1435,20 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
-    
+
+#if 1
     const char* scene_name = "sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
     const char* mat_file_name = "sheremetyevo.open.dae"; //scene_name;//
+#else
+    const char* scene_name = "adler.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
+    const char* mat_file_name = "adler.open.dae"; //scene_name;//
+#endif
 
-    osg::Node* adler = osgDB::readNodeFile(scene_name);  // "adler.osgb"
+
+    osg::Node* scene = osgDB::readNodeFile(scene_name);  // "adler.osgb"
 
     findNodeVisitor findLod3("lod3"); 
-    adler->accept(findLod3);
+    scene->accept(findLod3);
     auto lod3 =  findLod3.getFirst();
 
     if(lod3) 
@@ -1444,7 +1460,7 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
         // osg::Matrix::scale(size,size,size)*
         osg::Matrix::rotate(quat0));
 
-    baseModel->addChild(adler);
+    baseModel->addChild(scene);
     
     MaterialVisitor::namesList nl;
     nl.push_back("building");
@@ -1456,14 +1472,14 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     nl.push_back("railing");
     nl.push_back("panorama");
     MaterialVisitor mv ( nl, createMaterial,computeAttributes,mat::reader::read(mat_file_name));
-    adler->accept(mv);
+    scene->accept(mv);
 
     // All solid objects
-    osg::StateSet * pCommonStateSet = adler->getOrCreateStateSet();
+    osg::StateSet * pCommonStateSet = scene->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
     pCommonStateSet->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
-    //pCommonStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-    //pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+    pCommonStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
 
     // Scene 
     // Add backface culling to the whole bunch
@@ -1502,8 +1518,6 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
 		//}
 		     
-  //      nodes_array_t plane = loadAirplaneParts();
-		//auto p_copy = plane[1];
         auto p_copy = loadBMAirplane();
 
 #if 0   // Интересный эффект надо подумать над использованием 
@@ -1532,18 +1546,13 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 
 
 			osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(pos));
-			positioned->setDataVariance(osg::Object::STATIC);
+			//positioned->setDataVariance(osg::Object::STATIC);
 			
 			osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
-			rotated->setDataVariance(osg::Object::STATIC);
+			//rotated->setDataVariance(osg::Object::STATIC);
 			
 			positioned->addChild(rotated);
-			rotated->addChild(p_copy/*ret_array[1]*/);
-
-
-            //node_ptr ptrCessnaNode = m_pVictory->scenegraph()->load("learjet60/learjet60.scg");
-            //cur_trans->add(ptrCessnaNode.get());
-
+			rotated->addChild(p_copy);
 
 
             // add it
@@ -1577,7 +1586,6 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
 		= new osgShadow::ShadowedScene;
 	osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
 	shadowScene->setShadowTechnique(sm.get());
-	//shadowScene->addChild(ret_array[1]);
 	shadowScene->addChild(movingModel);
 	root->addChild(shadowScene);
 #else

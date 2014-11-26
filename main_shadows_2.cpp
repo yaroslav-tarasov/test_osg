@@ -20,15 +20,23 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     //source->getLight()->setSpecular(osg::Vec4(0.8, 0.8, 0.8, 1));
 
     int shadowsize = 4096;//1024;
-    osg::ref_ptr<osgShadow::SoftShadowMap> sm = new osgShadow::SoftShadowMap;
-    sm->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
-    sm->setTextureUnit(1);
-    sm->setJitteringScale(16);
-    sm->setSoftnessWidth(0.00005);
+#ifdef SOFT_SHADOW_MAP    
+    osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
+    st->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
+    st->setTextureUnit(1);
+    st->setJitteringScale(16);
+    st->setSoftnessWidth(0.00005);
+#else
+    osg::ref_ptr<osgShadow::StandardShadowMap> st = new osgShadow::StandardShadowMap;
+    //osg::ref_ptr<osgShadow::ShadowTexture> st = new osgShadow::ShadowTexture;
+#endif
+
+    //osg::ref_ptr<osgShadow::LightSpacePerspectiveShadowMap> st = new osgShadow::LightSpacePerspectiveShadowMap;
+
     // Scene
     osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene;
-    root->setShadowTechnique(sm.get());
-    sm->setLight(source.get());
+    root->setShadowTechnique(st.get());
+    st->setLight(source->getLight()/*.get()*/);
 
 
 

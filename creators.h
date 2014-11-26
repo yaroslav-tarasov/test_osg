@@ -6,14 +6,14 @@ namespace creators
     typedef std::array<osg::Node*, 6> nodes_array_t;
 
     osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,double looptime);
-    osg::Node*    createBase(const osg::Vec3& center,float radius);
-    nodes_array_t createMovingModel(const osg::Vec3& center, float radius);
-    nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
-    osg::Node*    loadAirplane();
-    nodes_array_t loadAirplaneParts();
-    osg::Node*    loadBMAirplane();
+    osg::Node*          createBase(const osg::Vec3& center,float radius);
+    nodes_array_t       createMovingModel(const osg::Vec3& center, float radius);
+    nodes_array_t       createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
+    osg::Node*          loadAirplane();
+    nodes_array_t       loadAirplaneParts();
+    osg::Node*          loadBMAirplane();
 
-    class programsHolder_base{
+    class programsHolder_base {
     public:
         struct program_t
         {
@@ -21,6 +21,12 @@ namespace creators
         };
     };
 
+    class texturesHolder_base {
+        public:
+        virtual osg::ref_ptr<osg::TextureCubeMap>   GetEnvTexture() = 0;
+    };    
+    
+    texturesHolder_base&             GetTextureHolder();
 
     programsHolder_base::program_t   CreateProgram(std::string mat_name);
 
@@ -126,3 +132,49 @@ enum {
     RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
     RENDER_BIN_CLOUDS                   = -2, 
 };
+
+namespace utils
+{
+
+template <class T>
+class NodeCallback : public osg::NodeCallback
+{
+public:
+
+    NodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
+        : _object(object)
+        , _func(func)
+        , _isPureCallback(isPure)
+    {
+    }
+
+    NodeCallback( const NodeCallback & other, const osg::CopyOp & copyop = osg::CopyOp::SHALLOW_COPY )
+        : osg::NodeCallback(other, copyop)
+        , _object(other._object)
+        , _func(other._func)
+        , _isPureCallback(other._isPureCallback)
+    {
+    }
+
+    virtual void operator()( osg::Node * node, osg::NodeVisitor * nv )
+    {
+        (_object->*_func)(nv);
+
+        if (!_isPureCallback)
+            osg::NodeCallback::operator()(_object, nv);
+    }
+
+private:
+
+    T * _object;
+    void (T::*_func)( osg::NodeVisitor * nv );
+    bool _isPureCallback;
+};
+
+template<class T>
+inline NodeCallback<T> * makeNodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
+{
+    return new NodeCallback<T>(object, func, isPure);
+}
+
+}

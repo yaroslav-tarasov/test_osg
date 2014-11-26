@@ -10,6 +10,8 @@
 #include "SkyBox.h"
 #include "sv/FogLayer.h"
 #include "sv/CloudLayer.h"
+#include "sv/PreRender.h"
+#include "shadow_map.h"
 
 #include <osgEphemeris/EphemerisModel.h>
 
@@ -126,6 +128,10 @@ public:
 
         // Sun color and altitude little bit dummy 
          auto sls = _ephem->getSunLightSource()->getLight();
+         
+         osg::Vec4 lightpos = sls->getPosition();
+         osg::Vec3 lightDir = sls->getDirection();
+
          auto _sunAltitude = data->data[0].alt;
          auto _sunColor    = sls->getDiffuse(); 
         // try to calculate some diffuse term (base luminance level for diffuse term is [0, 0.9])
@@ -172,6 +178,8 @@ public:
         _skyClouds->setCloudsColors(osg::Vec3f(fCloudLum,fCloudLum,fCloudLum), osg::Vec3f(fCloudLum,fCloudLum,fCloudLum));
        
         _skyClouds->setRotationSiderealTime(-float(fmod(data->localSiderealTime / 24.0, 1.0)) * 360.0f);
+
+        // creators::GetTextureHolder().GetEnvTexture()->apply();
     }
     
     osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
@@ -336,21 +344,33 @@ public:
 
 
 
-
+#if 1
 osg::Node*
     preRender( osg::Node* node)
 {
-
-    const int tex_width = 1024, tex_height = 1024;
-
+    const int tex_width = 512, tex_height = 512;
 
     osg::ref_ptr<osg::Texture2D> textureFBO = new osg::Texture2D;
     textureFBO->setTextureSize( tex_width, tex_height );
-    textureFBO->setInternalFormat( GL_RGB );  // GL_RGB   // FIXME GL_RGBA8 - интересный эффект проге плохеет
-    textureFBO->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR_MIPMAP_LINEAR );
-    textureFBO->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
+    // textureFBO->setInternalFormat( GL_DEPTH_COMPONENT24 );  // GL_RGB   // FIXME GL_RGBA8 - интересный эффект проге плохеет
+    // Чет совсем плохо с в форматами   GL_DEPTH_COMPONENT24 тоже изжогу вызывает
+    
+    textureFBO->setSourceFormat(GL_DEPTH_COMPONENT); 
+    textureFBO->setInternalFormat(GL_DEPTH_COMPONENT32); 
+    textureFBO->setSourceType(GL_UNSIGNED_INT); 
+    
+    //textureFBO->setInternalFormat(GL_DEPTH_COMPONENT); 
+
+    textureFBO->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR/*NEAREST*/ );
+    textureFBO->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR/*NEAREST*/ );
+    textureFBO->setBorderColor(osg::Vec4(1.0f, 0.0f, 0.0f, 0.0f));
     textureFBO->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_BORDER);
     textureFBO->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_BORDER);
+    // NB GL_COMPARE_REF_TO_TEXTURE и GL_COMPARE_R_TO_TEXTURE are equal
+    textureFBO->setShadowComparison(true);            // Sets GL_TEXTURE_COMPARE_MODE_ARB to GL_COMPARE_R_TO_TEXTURE_ARB
+    textureFBO->setShadowCompareFunc(osg::Texture::LESS);
+    
+
 
     osg::ref_ptr<osg::Camera> camera = new osg::Camera;
     camera->setViewport( 0, 0, tex_width, tex_height );
@@ -358,21 +378,212 @@ osg::Node*
     //camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
     
     //camera->setCullingMode(osg::CullSettings::NO_CULLING);
-    //camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+    camera->setClearMask(GL_DEPTH_BUFFER_BIT);
     //camera->setClearDepth(0.0f);
     //camera->getOrCreateStateSet()->setAttribute(new osg::Depth(osg::Depth::GEQUAL, 1.0, 0.0, true), osg::StateAttribute::OVERRIDE);
 
     camera->setRenderOrder( osg::Camera::PRE_RENDER );
     camera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT );
-    camera->attach( osg::Camera::COLOR_BUFFER, textureFBO.get() );
+    camera->attach( osg::Camera::DEPTH_BUFFER/*COLOR_BUFFER*/, textureFBO.get() );
     // camera->setProjectionMatrixAsFrustum(-1.f, +1.f, -1.f, +1.f, 1.f, 10.f);
-    camera->setViewMatrixAsLookAt(osg::Vec3(0.0,0.0,0.0),osg::Vec3(0,1,0), osg::Z_AXIS);
-        
+    // camera->setViewMatrixAsLookAt(osg::Vec3(0.0,0.0,0.0),osg::Vec3(0,1,0), osg::Z_AXIS);
+    
+    camera->setComputeNearFarMode(osg::Camera::DO_NOT_COMPUTE_NEAR_FAR);
+
+    camera->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+    osg::ref_ptr<osg::CullFace> cf = new osg::CullFace;
+    cf->setMode(osg::CullFace::FRONT);
+    camera->getStateSet()->setAttributeAndModes(cf.get(), osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);      
     
     camera->addChild( node );
 
+
     return( camera.release() );
 } 
+#else
+osg::Node*
+    preRender( osg::Node* node)
+{
+    const int tex_width = 512, tex_height = 512;
+
+    osg::ref_ptr<osg::Texture2D> textureFBO = new osg::Texture2D;
+    textureFBO->setTextureSize( tex_width, tex_height );
+    textureFBO->setInternalFormat(GL_DEPTH_COMPONENT);
+    textureFBO->setShadowComparison(true);
+    textureFBO->setShadowTextureMode(osg::Texture2D::LUMINANCE);
+    textureFBO->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+    textureFBO->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+
+    // the shadow comparison should fail if object is outside the texture
+    textureFBO->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
+    textureFBO->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
+    textureFBO->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+
+
+
+    osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+    camera->setViewport( 0, 0, tex_width, tex_height );
+    //camera->setClearColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+    //camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+
+    //camera->setCullingMode(osg::CullSettings::NO_CULLING);
+    camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+    //camera->setClearDepth(0.0f);
+    //camera->getOrCreateStateSet()->setAttribute(new osg::Depth(osg::Depth::GEQUAL, 1.0, 0.0, true), osg::StateAttribute::OVERRIDE);
+
+    camera->setRenderOrder( osg::Camera::PRE_RENDER );
+    camera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT );
+    camera->attach( osg::Camera::DEPTH_BUFFER/*COLOR_BUFFER*/, textureFBO.get() );
+    // camera->setProjectionMatrixAsFrustum(-1.f, +1.f, -1.f, +1.f, 1.f, 10.f);
+    // camera->setViewMatrixAsLookAt(osg::Vec3(0.0,0.0,0.0),osg::Vec3(0,1,0), osg::Z_AXIS);
+
+    camera->setComputeNearFarMode(osg::Camera::DO_NOT_COMPUTE_NEAR_FAR);
+
+    
+    osg::ref_ptr<osg::CullFace> cf = new osg::CullFace;
+    cf->setMode(osg::CullFace::FRONT);
+    camera->getStateSet()->setAttributeAndModes(cf.get(), osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);      
+    camera->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+
+    camera->addChild( node );
+
+
+    return( camera.release() );
+} 
+
+#endif
+
+class UpdateCameraAndTexGenCallback : public osg::NodeCallback
+{
+public:
+
+    typedef std::vector< osg::ref_ptr<osg::Camera> >  CameraList;
+
+    UpdateCameraAndTexGenCallback(osg::NodePath& reflectorNodePath, CameraList& Cameras)
+        :  _reflectorNodePath(reflectorNodePath)
+        ,  _Cameras(Cameras)
+    {
+    }
+
+    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    {
+        // first update subgraph to make sure objects are all moved into position
+        traverse(node,nv);
+
+        // compute the position of the center of the reflector subgraph
+        osg::Matrixd worldToLocal = osg::computeWorldToLocal(nv->getNodePath()/*_reflectorNodePath*/);
+        osg::BoundingSphere bs = nv->getNodePath().back()->getBound(); //_reflectorNodePath.back()->getBound();
+        osg::Vec3 position = bs.center();
+
+        typedef std::pair<osg::Vec3, osg::Vec3> ImageData;
+        const ImageData id[] =
+        {
+            ImageData( osg::Vec3( 1,  0,  0), osg::Vec3( 0, -1,  0) ), // +X
+            ImageData( osg::Vec3(-1,  0,  0), osg::Vec3( 0, -1,  0) ), // -X
+            ImageData( osg::Vec3( 0,  1,  0), osg::Vec3( 0,  0,  1) ), // +Y
+            ImageData( osg::Vec3( 0, -1,  0), osg::Vec3( 0,  0, -1) ), // -Y
+            ImageData( osg::Vec3( 0,  0,  1), osg::Vec3( 0, -1,  0) ), // +Z
+            ImageData( osg::Vec3( 0,  0, -1), osg::Vec3( 0, -1,  0) )  // -Z
+
+        };
+
+        for(unsigned int i=0; 
+            i<6 && i<_Cameras.size();
+            ++i)
+        {
+            osg::Matrix localOffset;
+            localOffset.makeLookAt(position,position+id[i].first,id[i].second);
+
+            osg::Matrix viewMatrix = worldToLocal*localOffset;
+            
+            _Cameras[i]->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
+            _Cameras[i]->setProjectionMatrixAsFrustum(-1.0,1.0,-1.0,1.0,1.0,10/*10000.0*/);
+            _Cameras[i]->setViewMatrix(viewMatrix);
+        }
+    }
+
+protected:
+
+    virtual ~UpdateCameraAndTexGenCallback() {}
+
+    osg::NodePath               _reflectorNodePath;        
+    CameraList                  _Cameras;
+};
+
+osg::Group* createPrerenderedScene(osg::Node* reflectedSubgraph, osg::NodePath reflectorNodePath, unsigned int unit, const osg::Vec4& clearColor,  osg::Camera::RenderTargetImplementation renderImplementation)
+{
+
+    osg::Group* group = new osg::Group;
+
+    osg::TextureCubeMap* texture = creators::GetTextureHolder().GetEnvTexture(); 
+    unsigned tex_width = texture->getTextureWidth();
+    unsigned tex_height = texture->getTextureHeight();
+    
+    // set up the render to texture cameras.
+    UpdateCameraAndTexGenCallback::CameraList Cameras;
+    for(unsigned int i=0; i<6; ++i)
+    {
+        // create the camera
+        osg::Camera* camera = new osg::Camera;
+
+        camera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //camera->setClearColor(clearColor);
+
+        // set viewport
+        camera->setViewport(0,0,tex_width,tex_height);
+
+        // set the camera to render before the main camera.
+        camera->setRenderOrder(osg::Camera::PRE_RENDER);
+
+        // tell the camera to use OpenGL frame buffer object where supported.
+        camera->setRenderTargetImplementation(renderImplementation);
+
+        // attach the texture and use it as the color buffer.
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, i);
+
+        // add subgraph to render
+        camera->addChild(reflectedSubgraph);
+
+        group->addChild(camera);
+
+        Cameras.push_back(camera);
+    }
+
+#if 0
+    // create the texgen node to project the tex coords onto the subgraph
+    osg::TexGenNode* texgenNode = new osg::TexGenNode;
+    texgenNode->getTexGen()->setMode(osg::TexGen::REFLECTION_MAP);
+    texgenNode->setTextureUnit(unit);
+    group->addChild(texgenNode);
+
+    // set the reflected subgraph so that it uses the texture and tex gen settings.    
+    {
+        osg::Node* reflectorNode = reflectorNodePath.front();
+        group->addChild(reflectorNode);
+
+        osg::StateSet* stateset = reflectorNode->getOrCreateStateSet();
+        stateset->setTextureAttributeAndModes(unit,texture,osg::StateAttribute::ON);
+        stateset->setTextureMode(unit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
+        stateset->setTextureMode(unit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);
+        stateset->setTextureMode(unit,GL_TEXTURE_GEN_R,osg::StateAttribute::ON);
+        stateset->setTextureMode(unit,GL_TEXTURE_GEN_Q,osg::StateAttribute::ON);
+
+        osg::TexMat* texmat = new osg::TexMat;
+        stateset->setTextureAttributeAndModes(unit,texmat,osg::StateAttribute::ON);
+
+        reflectorNode->setCullCallback(new TexMatCullCallback(texmat));
+    }
+#endif
+
+    // add the reflector scene to draw just as normal
+    group->addChild(reflectedSubgraph);
+
+    // set an update callback to keep moving the camera and tex gen in the right direction.
+    group->setUpdateCallback(new UpdateCameraAndTexGenCallback(reflectorNodePath, Cameras));
+
+    return group;
+}
+
 
 int main_scene( int argc, char** argv )
 {
@@ -414,8 +625,10 @@ int main_scene( int argc, char** argv )
 
     osgViewer::Viewer viewer(arguments);
     arguments.reportRemainingOptionsAsUnrecognized();
-
-	    // Set the clear color to black
+    //viewer.setUpViewOnSingleScreen(1);
+    viewer.apply(new osgViewer::SingleScreen(1));
+	
+        // Set the clear color to black
     viewer.getCamera()->setClearColor(osg::Vec4(0,0,0,1));
 
 #if 0
@@ -605,22 +818,37 @@ int main_scene( int argc, char** argv )
 
 #ifdef TEST_SV_CLOUD
              osg::ref_ptr<CloudsLayer> cloudsLayer = new CloudsLayer(/*ephemerisModel*/model->asGroup());
-             /*ephemerisModel*/rootnode->asGroup()->addChild(cloudsLayer.get());
+             ephemerisModel->asGroup()->addChild(cloudsLayer.get());
              cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
-
-             //viewer.addEventHandler( new FogHandler(
-             //    [&](osg::Vec4f v){
-             //        skyFogLayer->setFogParams(osg::Vec3f(v.x(),v.y(),v.z()),v.w());
-             //        float coeff = skyFogLayer->getFogExp2Coef();
-             //        char str[255];
-             //        sprintf(str,"setFogParams coeff = %f",coeff);
-             //        osg::notify(osg::INFO) << str;
-             //}
-             //,osg::Vec3f(0.5,0.5,0.5) ));
 #endif
              // Optionally, use a callback to update the Ephemeris Data
              osg::ref_ptr<EphemerisDataUpdateCallback> eCallback = new EphemerisDataUpdateCallback(ephemerisModel.get(),skyFogLayer.get(),cloudsLayer.get());
              ephemerisModel->setEphemerisUpdateCallback( eCallback );
+
+#if 1  // TEST_FBO
+             //osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
+             //fbo_node->addChild(ephemerisModel.get());
+             //rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+
+             //osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
+             //fbo_shadow_node->addChild(model);
+             //rootnode->addChild(preRender( fbo_shadow_node));
+             
+             osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
+             fbo_shadow_node->addChild(model);
+             ShadowMap* sm =  new ShadowMap(512);
+             sm->setLightGetter([&ephemerisModel]()->osg::Light* {return ephemerisModel->getSunLightSource()->getLight();});
+             sm->/*addChild*/setScene(fbo_shadow_node);
+             rootnode->addChild(sm);
+
+
+             //osg::ref_ptr<osg::Group> g = new osg::Group;
+             //osg::ref_ptr<Prerender>  p = new Prerender(1024,1024);
+             //p->asGroup()->addChild(fbo_node);
+             //g->addChild(p);
+             //rootnode->addChild(g);
+             
+#endif
 
 #ifdef TEST_SHADOWS
         //if (sun_light.valid())
@@ -813,12 +1041,6 @@ int main_scene( int argc, char** argv )
         printf("GL Version (integer) : %d.%d\n", major, minor);
         printf("GLSL Version : %s\n", glslVersion);	
 #endif
-        osg::ref_ptr<osg::MatrixTransform> fbo_node = new osg::MatrixTransform;
-
-        fbo_node->addChild(model);
-        fbo_node->addChild(ephemerisModel.get());
-        fbo_node->addChild(cloudsLayer);
-        rootnode->addChild(preRender( fbo_node));
 
         return viewer.run();
     }

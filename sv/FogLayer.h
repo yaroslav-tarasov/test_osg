@@ -19,7 +19,9 @@ public:
             if (ea.getKey()==osgGA::GUIEventAdapter::KEY_Rightbracket )
             { 
                 _intensivity += 0.1;
-                if(_intensivity > 1.0) _intensivity = 1.0;  
+                if(_intensivity > 1.0)
+                    _intensivity = 1.0;
+                else
                 if ( _f_fog_changer )
                 { 
                     _f_fog_changer(osg::Vec4f(_color.x(),_color.y(),_color.z(),_intensivity));
@@ -29,7 +31,9 @@ public:
                 if (ea.getKey()== osgGA::GUIEventAdapter::KEY_Leftbracket)
                 { 
                     _intensivity -= 0.1;
-                    if(_intensivity < 0.0) _intensivity = 0.0;
+                    if(_intensivity < 0.0) 
+                        _intensivity = 0.0;
+                    else
                     if ( _f_fog_changer )
                     { 
                         _f_fog_changer(osg::Vec4f(_color.x(),_color.y(),_color.z(),_intensivity));

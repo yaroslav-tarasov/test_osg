@@ -34,7 +34,8 @@ namespace shaders
         vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
         {                                                                                                \
             vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-            return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));   \
+            return mix(textureCube(Env, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));   \
+            /*return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
         }                                                                                                \
         \
         vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
@@ -109,7 +110,7 @@ namespace shaders
         void main()
         {
             vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-            mat3 rotation = mat3(tangent, binormal, normal);
+            // mat3 rotation = mat3(tangent, binormal, normal);
             vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
             // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
             // lightDir = normalize(rotation * normalize(lightDir));
@@ -125,7 +126,7 @@ namespace shaders
             v_out.viewpos   = vertexInEye.xyz;
             v_out.texcoord  = gl_TexCoord[0].xy ;
 
-            illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+            illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse* 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
         }
     )
     };
@@ -230,7 +231,6 @@ namespace shaders
 
             // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
             vec3 cube_color = textureCube(Env, refl_vec_world).rgb + pure_spec_color;
-            //vec3 cube_color = vec3(0.5f,0.5f,0.5f);
 
 
             vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
@@ -241,7 +241,7 @@ namespace shaders
             // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
             // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
-            vec3 lightmap_color = vec3(0.1f,0.1f,0.1f); // FIXME dummy code
+            vec3 lightmap_color = vec3(0.6f,0.6f,0.6f); // FIXME dummy code
 
             float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
             non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
@@ -255,6 +255,7 @@ namespace shaders
             //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
             // gl_FragColor = vec4( result,1.0);
             gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+
         }
     )
 
@@ -428,8 +429,7 @@ namespace shaders
                float night_factor = step(ambient.a, 0.35);
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
-               gl_FragColor = vec4( result,1.0);
-
+               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
            }
        )
 
