@@ -130,6 +130,7 @@ int main_tex_test( int argc, char** argv );
 int main_bump_map( int argc, char** argv );
 int main_exp_test( int argc, char** argv );
 int main_bi( int argc, char** argv );
+int main_teapot( int argc, char** argv );
 
 #define STRINGIFY(x) #x 
 

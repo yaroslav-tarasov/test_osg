@@ -26,6 +26,11 @@
 // #define TEST_CAMERA
 // #define TEST_SHADOWS
 
+////You can compute a vertex in the absolute coordinate frame by using the
+////    osg::computeLocalToWorld() function:
+//osg::Vec3 posInWorld = node->getBound().center() *
+//    osg::computeLocalToWorld(node->getParentalNodePaths()[0]);
+
 osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 {
     osg::Matrix l2w;
@@ -164,6 +169,7 @@ public:
         // recalc illumination based on new foggy values
         const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
         auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+        // FIXME Надо передавать в программы скоррестированые значения освещения 
 
         // when ambient is low - get it's color directly (to make more realistic fog at dusk/dawn)
         // also when overcast - modulate color with ambient
@@ -780,7 +786,7 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setLatitudeLongitude( latitude, longitude );
         ephemerisModel->setDateTime( dateTime );
         ephemerisModel->setSkyDomeRadius( radius );
-		//ephemerisModel->setMoveWithEyePoint(false);
+		ephemerisModel->setMoveWithEyePoint(false);
         sun_light = ephemerisModel->getSunLightSource();
         
 
@@ -825,22 +831,20 @@ int main_scene( int argc, char** argv )
              osg::ref_ptr<EphemerisDataUpdateCallback> eCallback = new EphemerisDataUpdateCallback(ephemerisModel.get(),skyFogLayer.get(),cloudsLayer.get());
              ephemerisModel->setEphemerisUpdateCallback( eCallback );
 
+             osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
+             fbo_node->addChild(ephemerisModel.get());
+             rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+
 #if 1  // TEST_FBO
-             //osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
-             //fbo_node->addChild(ephemerisModel.get());
-             //rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 
              //osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
              //fbo_shadow_node->addChild(model);
              //rootnode->addChild(preRender( fbo_shadow_node));
              
-             osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
-             fbo_shadow_node->addChild(model);
-             ShadowMap* sm =  new ShadowMap(512);
+             ShadowMap* sm = creators::GetShadowMap(); // new ShadowMap(1024);     
              sm->setLightGetter([&ephemerisModel]()->osg::Light* {return ephemerisModel->getSunLightSource()->getLight();});
-             sm->/*addChild*/setScene(fbo_shadow_node);
+             sm->setScene(model);
              rootnode->addChild(sm);
-
 
              //osg::ref_ptr<osg::Group> g = new osg::Group;
              //osg::ref_ptr<Prerender>  p = new Prerender(1024,1024);

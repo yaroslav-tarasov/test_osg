@@ -33,6 +33,7 @@ std::function<int( int, char**)> pmain[] = {
                                              ,main_bump_map         //10
                                              ,main_exp_test         //11
                                              ,main_bi               //12
+                                             ,main_teapot           //13
                                            };       
 
 

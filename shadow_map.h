@@ -1,6 +1,8 @@
 #pragma once
 
-class ShadowMap : public osg::CameraNode
+
+
+class ShadowMap : public osg::Group // CameraNode
 {
 public:
     typedef std::function<osg::Light*()> get_light_f;
@@ -18,14 +20,15 @@ public:
     osg::Texture2D        * getTexture() const { return _texture.get(); }
 
     void setLightGetter(get_light_f lg)     {_get_light = lg;};
-    void setScene      (osg::Group* scene );
+    void setScene      (osg::Node* scene );
 
 protected:
-#if 0
+    virtual bool addChild( Node *child ){return osg::Group::addChild(child);};
+#if 1
     void traverse(osg::NodeVisitor& nv);
 #endif
 
-    void cull( osg::NodeVisitor * pNV );
+    void cull( osgUtil::CullVisitor & pNV  );
     
     osg::Vec3 computeOrthogonalVector(const osg::Vec3& direction) const;
 
@@ -37,5 +40,11 @@ private:
     get_light_f                          _get_light;
     osg::BoundingBox                     _bb;
     osg::BoundingSphere                  _bs;
+    osg::ref_ptr<osg::Camera>            _camera;
+    osg::ref_ptr<osg::Uniform>           _shadowMat;
 };
 
+namespace creators
+{
+    osg::ref_ptr<ShadowMap> GetShadowMap();
+}

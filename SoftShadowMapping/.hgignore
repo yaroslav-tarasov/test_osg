@@ -1,0 +1,4 @@
+syntax: glob
+*.osg
+test
+log.txt

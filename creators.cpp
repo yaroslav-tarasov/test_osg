@@ -7,7 +7,7 @@
 #include "find_tex_visitor.h"
 #include "materials_visitor.h"
 #include "pugixml.hpp"
-
+#include "shadow_map.h"
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
@@ -1086,6 +1086,11 @@ private:
 					t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                     t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.colorTex->setMaxAnisotropy(16.0f);
+                    
+                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
+                    //t.colorTex->setInternalFormatMode(
+                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
+                    //t.colorTex->setUnRefImageDataAfterApply( true );
 				} 
                 else 	
 			    if(it->second.unit == 2)
@@ -1095,6 +1100,12 @@ private:
 					t.nightTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
                     t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.nightTex->setMaxAnisotropy(16.0f);
+                   
+                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
+                    //t.nightTex->setInternalFormatMode(
+                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
+                    //t.nightTex->setUnRefImageDataAfterApply( true );
+
 					night_tex = true;
 				}
 			}
@@ -1297,10 +1308,12 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name);
     
-    stateset->addUniform( new osg::Uniform("colorTex", 0) );
-    stateset->addUniform( new osg::Uniform("NightTex", 1) );
-    stateset->addUniform( new osg::Uniform("Detail"  , 2) ); 
-    stateset->addUniform( new osg::Uniform("Env"     , 3) ); 
+    stateset->addUniform( new osg::Uniform("colorTex"    , 0) );
+    stateset->addUniform( new osg::Uniform("NightTex"    , 1) );
+    stateset->addUniform( new osg::Uniform("Detail"      , 2) ); 
+    stateset->addUniform( new osg::Uniform("Env"         , 3) ); 
+    stateset->addUniform( new osg::Uniform("ShadowSplit0", 4) );
+
     stateset->setAttributeAndModes( p.program.get() );
     
     if ( mat_name.find("panorama") !=std::string::npos )
@@ -1323,7 +1336,8 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
     stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
     stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
-    stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );  
+    stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );
+    stateset->setTextureAttributeAndModes( 4, GetShadowMap()->getTexture(), value ); 
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 

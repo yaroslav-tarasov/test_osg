@@ -34,8 +34,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     //osg::ref_ptr<osgShadow::LightSpacePerspectiveShadowMap> st = new osgShadow::LightSpacePerspectiveShadowMap;
 
     // Scene
-    osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene;
-    root->setShadowTechnique(st.get());
+    osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene(st.get());
     st->setLight(source->getLight()/*.get()*/);
 
 

@@ -68,7 +68,7 @@ namespace shaders
         }                                                                                                \
                                                                                                          \
                                                                                                          \
-        )                     
+        )
 
 
 #define INCLUDE_VS                                                                                     \
@@ -78,9 +78,12 @@ namespace shaders
 \n        const vec4 crt = vec4(0.299, 0.587, 0.114, 0.0);                                             \
 \n        return dot(col,crt);                                                                         \
 \n    }                                                                                                \
-      )                                                                                               
+\n                                                                                                     \
+\n      uniform mat4      shadow0_matrix;                                                              \
+\n                                                                                                     \
+      )                                                                                                
 
-    }  
+    }                                                                                                  
 
     namespace plane_mat
     {
@@ -96,6 +99,8 @@ namespace shaders
         varying   vec3 lightDir;
         varying   float illum; 
         
+
+
         out block
         {
             vec2 texcoord;
@@ -116,7 +121,7 @@ namespace shaders
             // lightDir = normalize(rotation * normalize(lightDir));
             lightDir = vec3(gl_LightSource[0].position.xyz);
 
-            gl_Position = ftransform();
+            gl_Position    = ftransform();
             gl_TexCoord[0] = gl_MultiTexCoord1;
 
 
@@ -125,6 +130,7 @@ namespace shaders
             v_out.normal    = normal;
             v_out.viewpos   = vertexInEye.xyz;
             v_out.texcoord  = gl_TexCoord[0].xy ;
+            v_out.shadow_view = shadow0_matrix*gl_Vertex;
 
             illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse* 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
         }
@@ -163,6 +169,8 @@ namespace shaders
         uniform sampler2D normalTex;
         varying   vec3 lightDir;
         varying   float illum; 
+        
+        
 
         in block
         {
@@ -181,6 +189,7 @@ namespace shaders
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag) 
             float shadow = 1.0; 
+            shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
             //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
             //if (split_test.x) 
             //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -255,7 +264,7 @@ namespace shaders
             //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
             // gl_FragColor = vec4( result,1.0);
             gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-
+            gl_FragColor = vec4( shadow,shadow,shadow,1.0);           
         }
     )
 
@@ -277,6 +286,9 @@ namespace shaders
     {
        const char* vs = {       
            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+           INCLUDE_VS
+
            STRINGIFY ( 
            attribute vec3 tangent;
            attribute vec3 binormal;
@@ -309,6 +321,7 @@ namespace shaders
                v_out.normal    = normal;
                v_out.viewpos   = vertexInEye.xyz;
                v_out.texcoord  = gl_TexCoord[0].xy ;
+               v_out.shadow_view = shadow0_matrix*gl_Vertex;
            }       
        )
        };
@@ -359,6 +372,7 @@ namespace shaders
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
                float shadow = 1.0; 
+               shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                //if (split_test.x) 
                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -407,8 +421,6 @@ namespace shaders
 
                // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
                vec3 cube_color = textureCube(Env, refl_vec_world).rgb + pure_spec_color;
-               //vec3 cube_color = vec3(0.5f,0.5f,0.5f);
-
 
                vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
                // GET_LIGHTMAP(f_in.viewpos, f_in);
@@ -430,6 +442,7 @@ namespace shaders
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+               gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
            }
        )
 
@@ -467,7 +480,7 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } v_out;
-
+             
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
@@ -482,7 +495,7 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_TexCoord[0].xy ;
-                
+                v_out.shadow_view = shadow0_matrix * gl_Vertex;
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse * 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
@@ -530,7 +543,8 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; 
+                float shadow = 1.0;
+                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -606,7 +620,6 @@ namespace shaders
                     refl_vec_world.z = abs(refl_vec_world.z);
                     float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
                     vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
-                    //cube_color = vec3(1.0f,1.0f,1.0f); // FIXME dummy code
                     day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
                     night_tex = texture2D(NightTex, f_in.texcoord).rgb;
                 }
@@ -617,6 +630,7 @@ namespace shaders
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
                 // gl_FragColor = vec4( result,1.0);  
                 /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
+                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
             }
             )
 
@@ -669,6 +683,7 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_TexCoord[0].xy ;
+                v_out.shadow_view = shadow0_matrix*gl_Vertex;
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -719,6 +734,7 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
+                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -744,6 +760,7 @@ namespace shaders
                 // FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 // gl_FragColor = vec4( result, dif_tex_col.a);
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
             }
 
             )
@@ -806,6 +823,7 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.detail_uv = gl_Vertex.xy * 0.03;
                 v_out.texcoord  = gl_TexCoord[0].xy;
+                v_out.shadow_view = shadow0_matrix*gl_Vertex;
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -855,7 +873,8 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-\n                float shadow = 1.0;                                                                                                      
+\n                float shadow = 1.0;  
+\n                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders);                                              
 \n                //if (split_test.x)                                                                                                      
 \n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -929,7 +948,7 @@ namespace shaders
 \n
 \n                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n
-\n                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+\n                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
 \n            }
             )
 
@@ -997,6 +1016,8 @@ namespace shaders
                 // SAVE_DECAL_VARYINGS_VP
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
+                v_out.shadow_view = shadow0_matrix*gl_Vertex;
+                
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
@@ -1047,6 +1068,7 @@ namespace shaders
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
 \n                float shadow = 1.0; 
+\n                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
 \n                //if (split_test.x) 
 \n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -1129,7 +1151,7 @@ namespace shaders
  \n
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
- \n               //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+ \n               gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
  \n           }
             )
  
@@ -1182,7 +1204,7 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_TexCoord[0].xy;
-
+                v_out.shadow_view = shadow0_matrix*gl_Vertex;
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -1230,7 +1252,8 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; 
+                float shadow = 1.0;
+                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -1270,6 +1293,7 @@ namespace shaders
 
                 // gl_FragColor = vec4( result,dif_tex_col.a);
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+                gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
                 
             }
             )
