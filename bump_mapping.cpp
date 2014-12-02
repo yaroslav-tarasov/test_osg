@@ -193,7 +193,7 @@ int main_bump_map( int argc, char** argv )
 /////////////////////////////////////////////////////////////////////////    
     osg::ref_ptr<osg::Node> model = osgDB::readNodeFiles( arguments );
     if ( !model ) 
-        model = creators::loadBMAirplane(); //loadAdler();//  CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
+        model = creators::loadBMAirplane(true); //loadAdler();//  CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
 
 #if 0   
     ComputeTangentVisitor ctv;
@@ -266,7 +266,7 @@ int main_bump_map( int argc, char** argv )
 #endif
 
     //osgDB::writeNodeFile(*model,"bump_mapping_test.osgt");
-    
+
     root->addChild(model.get());
 	root->addChild(lightSource2.get());
     

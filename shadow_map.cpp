@@ -6,7 +6,7 @@ namespace creators
 {
     osg::ref_ptr<ShadowMap> GetShadowMap()
     {
-        static osg::ref_ptr<ShadowMap> sm = new ShadowMap(512);
+        static osg::ref_ptr<ShadowMap> sm = new ShadowMap(512*8);
         return sm;
     }
 
@@ -138,12 +138,14 @@ void ShadowMap::cull( osgUtil::CullVisitor & cv )
          osg::Vec4 lightpos = selectLight->getPosition();
          osg::Vec3 lightDir = selectLight->getDirection();
 
-         //osg::Matrix eyeToWorld;
-         //eyeToWorld.invert(*cv.getModelViewMatrix());
+#if 0
+         osg::Matrix eyeToWorld;
+         eyeToWorld.invert(*cv.getModelViewMatrix());
 
-         //lightpos = lightpos * eyeToWorld;     
-         //lightDir = osg::Matrix::transform3x3( lightDir, eyeToWorld );
-         //lightDir.normalize();
+         lightpos = lightpos * eyeToWorld;     
+         lightDir = osg::Matrix::transform3x3( lightDir, eyeToWorld );
+#endif
+         lightDir.normalize();
 
          float fov = selectLight->getSpotCutoff() * 2;
          if(fov < 180.0f)   // spotlight, then we don't need the bounding box
@@ -222,17 +224,18 @@ void ShadowMap::cull( osgUtil::CullVisitor & cv )
                  //up.normalize();
 
                  _camera->setProjectionMatrixAsOrtho(-right, right, -top, top, znear, zfar);
-                 _camera->setViewMatrixAsLookAt(position,bb.center(),osg::Vec3(0.0f, 0.0f, 1.0f)/*computeOrthogonalVector(lightDir)*/);
+                 _camera->setViewMatrixAsLookAt(position,bb.center(),/*osg::Vec3(0.0f, 0.0f, 1.0f)*/computeOrthogonalVector(lightDir));
                  //_camera->setViewMatrixAsLookAt(position,center,up); 
 
-                 //const osg::Matrix shadowBias = osg::Matrix( 0.5f,0.0f,0.0f,0.0f,
-                 //                                            0.0f,0.5f,0.0f,0.0f,
-                 //                                            0.0f,0.0f,0.5f,0.0f,
-                 //                                            0.5f,0.5f,0.5f,1.0f
-                 //                                           );
+                 const osg::Matrix shadowBias = osg::Matrix( 0.5f,0.0f,0.0f,0.0f,
+                     0.0f,0.5f,0.0f,0.0f,
+                     0.0f,0.0f,0.5f,0.0f,
+                     0.5f,0.5f,0.5f,1.0f
+                     );
 
-                 //osg::Matrix lightPV = shadowBias * _camera->getProjectionMatrix() * _camera->getViewMatrix();
-                 _shadowMat->set(osg::Matrix());
+                 osg::Matrix lightPV = shadowBias * _camera->getProjectionMatrix() * _camera->getViewMatrix();
+
+                 _shadowMat->set( osg::Matrix() /*lightPV*/ );
 
              }
 

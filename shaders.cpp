@@ -264,7 +264,7 @@ namespace shaders
             //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
             // gl_FragColor = vec4( result,1.0);
             gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-            gl_FragColor = vec4( shadow,shadow,shadow,1.0);           
+            //gl_FragColor = vec4( shadow,shadow,shadow,1.0);           
         }
     )
 
@@ -442,7 +442,7 @@ namespace shaders
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-               gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
            }
        )
 
@@ -630,7 +630,7 @@ namespace shaders
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
                 // gl_FragColor = vec4( result,1.0);  
                 /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
-                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
             }
             )
 
@@ -760,7 +760,7 @@ namespace shaders
                 // FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 // gl_FragColor = vec4( result, dif_tex_col.a);
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
             }
 
             )
@@ -948,7 +948,7 @@ namespace shaders
 \n
 \n                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n
-\n                gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+\n                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
 \n            }
             )
 
@@ -1151,7 +1151,7 @@ namespace shaders
  \n
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
- \n               gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+ \n               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
  \n           }
             )
  
@@ -1293,7 +1293,7 @@ namespace shaders
 
                 // gl_FragColor = vec4( result,dif_tex_col.a);
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
+                //gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
                 
             }
             )

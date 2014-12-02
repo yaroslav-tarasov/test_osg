@@ -11,7 +11,7 @@
 
 // #define TEST_SHADOWS
 // #define TEST_TEXTURE
-#define TEST_ADLER_SCENE
+// #define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -200,6 +200,57 @@ namespace
                     : vec4(.20, .20, .40, 1.0);
          }
         );
+
+    }
+
+    namespace base_model
+    {           
+        
+        static const char* vs =  {
+        "#extension GL_ARB_gpu_shader5 : enable \n"
+
+        STRINGIFY ( 
+        uniform mat4      shadow0_matrix;
+
+        out block
+        {
+            vec4 shadow_view;
+            vec4 color;
+        } v_out;
+
+        void main(void)
+        {
+            v_out.shadow_view = shadow0_matrix*gl_Vertex;
+            gl_Position     = ftransform();
+            v_out.color     = gl_Color;
+        }
+        )
+
+        };
+        
+
+        static const char* fs = {
+        "#version 130 \n"
+        "#extension GL_ARB_gpu_shader5 : enable \n "
+        
+        STRINGIFY ( 
+        
+        uniform sampler2DShadow     ShadowSplit0;
+        in block
+        {
+            vec4 shadow_view;
+            vec4 color;
+        } f_in;
+
+
+        void main(void)
+        { 
+            float shadow = 1.0; 
+            shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+            gl_FragColor = f_in.color *  shadow;
+        }
+        )
+        };
 
     }
 }
@@ -749,6 +800,12 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 	//osg::MatrixTransform* positioned = new osg::MatrixTransform;
 	//positioned->addChild(geode);
     // 
+    
+    effects::createProgram(geode->getOrCreateStateSet(),base_model::vs,base_model::fs) ;
+     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+    geode->getOrCreateStateSet()->addUniform( new osg::Uniform("ShadowSplit0", 4) );
+    geode->getOrCreateStateSet()->setTextureAttributeAndModes( 4, GetShadowMap()->getTexture(), value ); 
+
 
     return geode;
 }
@@ -870,7 +927,7 @@ osg::Node* loadAirplane()
     return loadAirplaneParts()[1];
 }
 
-osg::Node* loadBMAirplane()
+osg::Node* loadBMAirplane(bool set_env_tex )
 {
     osg::Node* model = loadAirplane();
 
@@ -885,7 +942,18 @@ osg::Node* loadBMAirplane()
     program->addBindAttribLocation( "binormal", 7 );
     
     // create and setup the texture object
-    osg::TextureCubeMap *tcm = creators::GetTextureHolder().GetEnvTexture().get(); //new osg::TextureCubeMap;
+    osg::TextureCubeMap *tcm = creators::GetTextureHolder().GetEnvTexture().get(); 
+
+    if(set_env_tex)
+    {
+        tcm->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("day_posx.jpg"));
+        tcm->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("day_negx.jpg"));
+        tcm->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("day_posy.jpg"));
+        tcm->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("day_negy.jpg"));
+        tcm->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("day_posz.jpg"));
+        tcm->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("day_negz.jpg"));
+    }
+
 
     FindTextureVisitor ft("a_319");
     model->accept( ft );
@@ -1437,12 +1505,36 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     return retval;
 }
 
-nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
+nodes_array_t createModel( osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
     osg::Vec3 center(0.0f,0.0f,300.0f);
     float radius = 600.0f;
 
+#ifdef TEST_SHADOWS
+    const int fbo_tex_size = 1024*4;
+    osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
+    st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
+    st->setTextureUnit(1);
+    st->setJitteringScale(16);
+    st->setSoftnessWidth(0.00005);
+
+    osg::ref_ptr<osgShadow::ShadowedScene> root
+        = new osgShadow::ShadowedScene(st.get());  
+
+    osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+    source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
+    source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+    source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+    // Scene
+    st->setLight(source->getLight());
+    
+    ssm = st;
+
+    root->addChild(source.get());
+#else
     osg::Group* root = new osg::Group;
+#endif
+
 
     float baseHeight = 0.0f; //center.z();//-radius*0.5;
 #ifdef TEST_ADLER_SCENE 
@@ -1595,16 +1687,8 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     
     movingModel->setName("moving_model");
 
-#ifdef TEST_SHADOWS
-	osg::ref_ptr<osgShadow::ShadowedScene> shadowScene
-		= new osgShadow::ShadowedScene;
-	osg::ref_ptr<osgShadow::ShadowMap> sm = new osgShadow::ShadowMap;
-	shadowScene->setShadowTechnique(sm.get());
-	shadowScene->addChild(movingModel);
-	root->addChild(shadowScene);
-#else
+
     root->addChild(movingModel);
-#endif
 
 
 
@@ -1612,7 +1696,11 @@ nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique te
     //root->setStateSet(lights::createSpotLightDecoratorState(10,1));
 #endif
 
+#ifdef TEST_SHADOWS
+    ret_array[0] = root.release();
+#else
     ret_array[0] = root;
+#endif
 
 
     return ret_array;

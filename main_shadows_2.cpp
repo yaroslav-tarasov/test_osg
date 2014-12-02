@@ -5,6 +5,7 @@
 // #define TEST_SHADOWS
 
 namespace {
+#define SOFT_SHADOW_MAP
 
 creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
@@ -14,12 +15,12 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     // osg::Group* root = new osg::Group;
     // Light.
     osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
-    source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
+    source->getLight()->setPosition(osg::Vec4(0, 0, 2, 0));
     source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
     source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
     //source->getLight()->setSpecular(osg::Vec4(0.8, 0.8, 0.8, 1));
 
-    int shadowsize = 4096;//1024;
+    int shadowsize = 512*8;//1024;
 #ifdef SOFT_SHADOW_MAP    
     osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
     st->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
@@ -35,7 +36,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
 
     // Scene
     osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene(st.get());
-    st->setLight(source->getLight()/*.get()*/);
+    st->setLight(source->getLight());
 
 
 
@@ -68,7 +69,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     const bool add_planes = true;
     if (add_planes)
     {
-        auto p_copy = creators::loadAirplane();
+        auto p_copy = creators::loadBMAirplane(true);
        
         //effects::createShader(p_copy) ;
 
@@ -103,7 +104,6 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
 
 
     ret_array[0] = root.release();
-
 
     return ret_array;
 }
@@ -162,7 +162,7 @@ int main_shadows_2( int argc, char** argv )
         source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
         source->getLight()->setSpecular(osg::Vec4(0.8, 0.8, 0.8, 1));
 
-        int shadowsize = 4096;//1024;
+        int shadowsize = 1024;//1024;
         osg::ref_ptr<osgShadow::SoftShadowMap> sm = new osgShadow::SoftShadowMap;
         sm->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
         sm->setTextureUnit(1);
@@ -178,13 +178,12 @@ int main_shadows_2( int argc, char** argv )
         rootnode->addChild(model);
 
 
-
         // run optimization over the scene graph
         //osgUtil::Optimizer optimzer;
         //optimzer.optimize(rootnode);
 
         // set the scene to render
-        viewer.setSceneData(/*rootnode*/model);
+        viewer.setSceneData(rootnode/*model*/);
 
 
         osg::ref_ptr<osgGA::StateSetManipulator> statesetManipulator = new osgGA::StateSetManipulator(viewer.getCamera()->getStateSet());

@@ -15,16 +15,16 @@
 
 #include <osgEphemeris/EphemerisModel.h>
 
-#define TEST_EPHEMERIS
-#define TEST_PRECIP
-#define TEST_SV_FOG
-#define TEST_SV_CLOUD
+// #define TEST_EPHEMERIS
+// #define TEST_PRECIP
+// #define TEST_SV_FOG
+// #define TEST_SV_CLOUD
 
 // #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
 // #define TEST_SKYBOX
 // #define TEST_CAMERA
-// #define TEST_SHADOWS
+//#define TEST_SHADOWS
 
 ////You can compute a vertex in the absolute coordinate frame by using the
 ////    osg::computeLocalToWorld() function:
@@ -111,6 +111,9 @@ class MyGustCallback : public osg::NodeCallback
 class EphemerisDataUpdateCallback : virtual public osgEphemeris::EphemerisUpdateCallback
 {
 public:
+    typedef std::function<void()> on_callback_f;
+
+public:
     EphemerisDataUpdateCallback(osgEphemeris::EphemerisModel *ephem ,FogLayer* fogLayer,CloudsLayer* skyClouds) 
         : EphemerisUpdateCallback( "EphemerisDataUpdateCallback" )
         , _ephem      (ephem)
@@ -121,6 +124,16 @@ public:
 
     void operator()( osgEphemeris::EphemerisData *data )
     {
+        if(_func)
+            _func();
+        else
+            _func =nullptr;
+        
+        auto sls = _ephem->getSunLightSource()->getLight();
+
+        if(!_fogLayer || !_skyClouds)
+            return;
+
         //time_t seconds = time(0L);
         //struct tm *_tm = localtime(&seconds);
 
@@ -132,7 +145,7 @@ public:
         //data->dateTime.setSecond( _tm->tm_sec );
 
         // Sun color and altitude little bit dummy 
-         auto sls = _ephem->getSunLightSource()->getLight();
+
          
          osg::Vec4 lightpos = sls->getPosition();
          osg::Vec3 lightDir = sls->getDirection();
@@ -177,7 +190,7 @@ public:
         auto fog_color = cg::lerp01(fFogDesatFactor,/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0) );
 
         // save fog
-        _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());
+         _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());
         //data_.fog_exp_coef = _fogLayer->getFogExp2Coef();
 
         const float fCloudLum = cg::max(0.06f, illumination);
@@ -189,7 +202,7 @@ public:
     }
     
     osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
-
+    void extCallback(on_callback_f f) {_func = f; };
 private:
     class handler : public osgGA::GUIEventHandler
     {
@@ -206,26 +219,28 @@ private:
             {
                 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Insert)
                 {
-                    int cc = _currCloud;cc++;
-                    _currCloud = static_cast<CloudsLayer::cloud_type>(cc);
-                    if(_currCloud >= CloudsLayer::clouds_types_num)
-                        _currCloud = CloudsLayer::none;
+                    if(_skyClouds)
+                    {
+                        int cc = _currCloud;cc++;
+                        _currCloud = static_cast<CloudsLayer::cloud_type>(cc);
+                        if(_currCloud >= CloudsLayer::clouds_types_num)
+                            _currCloud = CloudsLayer::none;
                 
-                    _skyClouds->setCloudsTexture(_currCloud);
-
+                        _skyClouds->setCloudsTexture(_currCloud);
+                    }
                     return true;
                 }
                 else
                 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Page_Up)
                 {
-                    _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() +.1f,.0f,1.0f));
+                    if(_skyClouds) _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() +.1f,.0f,1.0f));
 
                     return true;
                 }
                 else
                 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Page_Down)
                 {
-                    _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() -.1f,.0f,1.0f));
+                    if(_skyClouds) _skyClouds->setCloudsDensity(cg::bound(_skyClouds->getCloudsDensity() -.1f,.0f,1.0f));
 
                     return true;
                 }
@@ -243,6 +258,7 @@ private:
     osg::ref_ptr<FogLayer>                     _fogLayer;
     osg::ref_ptr<CloudsLayer>                  _skyClouds;
     osg::ref_ptr<handler>                      _handler;
+    on_callback_f                              _func;
     
 };
 
@@ -680,10 +696,11 @@ int main_scene( int argc, char** argv )
     //while (arguments.read("--object")) { technique = osgSim::OverlayNode::OBJECT_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY; overlay=true; }
     //while (arguments.read("--ortho") || arguments.read("--orthographic")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY; overlay=true; }
     //while (arguments.read("--persp") || arguments.read("--perspective")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_PERSPECTIVE_OVERLAY; overlay=true; }
-
+    
+    osg::ref_ptr<osgShadow::SoftShadowMap> ssm;
 
     // load the nodes from the commandline arguments.
-    auto model_parts  = creators::createModel(overlay, technique);
+    auto model_parts  = creators::createModel(ssm, overlay, technique);
     
     osg::ref_ptr<osg::MatrixTransform> turn_node = new osg::MatrixTransform;
     //turn_node->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
@@ -721,23 +738,28 @@ int main_scene( int argc, char** argv )
 
 #ifdef TEST_SHADOWS        
         // Light.
-        osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
-        source->getLight()->setPosition(osg::Vec4(0, 0, 0, 0));
-        source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
-        source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+        //osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+        //source->getLight()->setPosition(osg::Vec4(0, 0, 0, 0));
+        //source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+        //source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
 
-        //int shadowsize = 4096;//1024;
-        //osg::ref_ptr<osgShadow::SoftShadowMap> sm = new osgShadow::SoftShadowMap;
-        //sm->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
-        //sm->setTextureUnit(1);
-        //sm->setJitteringScale(16);
-        //// Scene
-        //osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene;
-        //root->setShadowTechnique(sm.get());
-        //root->addChild(model);
-        model->asGroup()->addChild(source);
+        int shadowsize = 1024*2/**16*/;//1024;
+        osg::ref_ptr<osgShadow::SoftShadowMap> sm = new osgShadow::SoftShadowMap;
+        sm->setTextureSize(osg::Vec2s(shadowsize, shadowsize));
+        sm->setTextureUnit(1);
+        sm->setJitteringScale(16);
+        // Scene
+        osg::ref_ptr<osgShadow::ShadowedScene> root = new osgShadow::ShadowedScene;
+        root->setShadowTechnique(sm.get());
+        root->addChild(model);
+
+        //model->asGroup()->addChild(source);
+        rootnode->addChild(root); 
+        
+#else
+        rootnode->addChild(model);
 #endif
-       rootnode->addChild(model);
+      
 
 
 #ifdef TEST_SKYBOX
@@ -756,7 +778,7 @@ int main_scene( int argc, char** argv )
         }
 #endif
 
-        osg::ref_ptr<osg::LightSource> sun_light /*= source*/;
+         osg::ref_ptr<osg::LightSource> sun_light;
 
 #ifdef  TEST_EPHEMERIS
         osg::BoundingSphere bs = model->getBound();
@@ -768,11 +790,6 @@ int main_scene( int argc, char** argv )
         // Optionally, Set the AutoDate and Time to false so we can control it with the GUI
         ephemerisModel->setAutoDateTime( false );
 
-        // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
-        // ephemerisModel->setMoveWithEyePoint(false);
-        // ephemerisModel->setEphemerisUpdateCallback( new EphemerisDataUpdateCallback );
-
-        rootnode->addChild( ephemerisModel.get() );
 
         // Set some acceptable defaults.
         double latitude = 43.4444;                                  // Adler, RF
@@ -786,9 +803,11 @@ int main_scene( int argc, char** argv )
         ephemerisModel->setLatitudeLongitude( latitude, longitude );
         ephemerisModel->setDateTime( dateTime );
         ephemerisModel->setSkyDomeRadius( radius );
+         // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
 		ephemerisModel->setMoveWithEyePoint(false);
-        sun_light = ephemerisModel->getSunLightSource();
+        // sun_light = ephemerisModel->getSunLightSource(); 
         
+        rootnode->addChild( ephemerisModel.get() );
 
 
 #endif  // TEST_EPHEMERIS
@@ -820,13 +839,21 @@ int main_scene( int argc, char** argv )
                  osg::notify(osg::INFO) << str;
              }
              , fogColor ));
+#else
+        osg::ref_ptr<FogLayer> skyFogLayer;
 #endif
 
 #ifdef TEST_SV_CLOUD
              osg::ref_ptr<CloudsLayer> cloudsLayer = new CloudsLayer(/*ephemerisModel*/model->asGroup());
              ephemerisModel->asGroup()->addChild(cloudsLayer.get());
              cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+#else 
+        osg::ref_ptr<CloudsLayer> cloudsLayer;
 #endif
+
+             
+
+#ifdef  TEST_EPHEMERIS  
              // Optionally, use a callback to update the Ephemeris Data
              osg::ref_ptr<EphemerisDataUpdateCallback> eCallback = new EphemerisDataUpdateCallback(ephemerisModel.get(),skyFogLayer.get(),cloudsLayer.get());
              ephemerisModel->setEphemerisUpdateCallback( eCallback );
@@ -834,6 +861,7 @@ int main_scene( int argc, char** argv )
              osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
              fbo_node->addChild(ephemerisModel.get());
              rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+#endif
 
 #if 1  // TEST_FBO
 
@@ -841,8 +869,13 @@ int main_scene( int argc, char** argv )
              //fbo_shadow_node->addChild(model);
              //rootnode->addChild(preRender( fbo_shadow_node));
              
-             ShadowMap* sm = creators::GetShadowMap(); // new ShadowMap(1024);     
-             sm->setLightGetter([&ephemerisModel]()->osg::Light* {return ephemerisModel->getSunLightSource()->getLight();});
+             osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+             source->getLight()->setPosition(osg::Vec4(0, /*0.001*/0, 20, 0));    // osg::Vec4(0, 20 , 0, 0) - вид с боку
+             source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+             source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+
+             ShadowMap* sm = creators::GetShadowMap();    
+             sm->setLightGetter([&]()->osg::Light* {return source->getLight() /*ephemerisModel->getSunLightSource()->getLight()*/;});
              sm->setScene(model);
              rootnode->addChild(sm);
 
@@ -855,9 +888,26 @@ int main_scene( int argc, char** argv )
 #endif
 
 #ifdef TEST_SHADOWS
-        //if (sun_light.valid())
-        //    sm->setLight(sun_light.get());
+        if (sun_light.valid())
+            sm->setLight(sun_light.get());
 #endif
+
+#ifdef  TEST_EPHEMERIS 
+        if(ssm.valid())
+        {
+            
+            // ssm->setLight(sun_light->getLight()/*.get()*/);
+            eCallback->extCallback( [&ephemerisModel,&ssm,&rootnode]()->void 
+            {   
+                
+                auto l = ephemerisModel->getSunLightSource()->getLight();
+                // rootnode->addChild(ephemerisModel->getSunLightSource());
+                ssm->setLight(l);
+            });
+        }
+#endif
+
+        
 
         //AddLight(rootnode);
 

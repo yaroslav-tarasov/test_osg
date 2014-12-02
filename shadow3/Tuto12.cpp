@@ -32,12 +32,12 @@ int main_shadows_3(int argc, char** argv)
 	shadowedScene->addChild(lightMarkerGeode.get());
 	//Next we define the material property of our objects 
 	// material
-        ref_ptr<Material> matirial = new Material;
-        matirial->setColorMode(Material::DIFFUSE);
-        matirial->setAmbient(Material::FRONT_AND_BACK, Vec4(0, 0, 0, 1));
-        matirial->setSpecular(Material::FRONT_AND_BACK, Vec4(1, 1, 1, 1));
-        matirial->setShininess(Material::FRONT_AND_BACK, 64);
-        scene->getOrCreateStateSet()->setAttributeAndModes(matirial.get(), StateAttribute::ON);
+    ref_ptr<Material> matirial = new Material;
+    matirial->setColorMode(Material::DIFFUSE);
+    matirial->setAmbient(Material::FRONT_AND_BACK, Vec4(0, 0, 0, 1));
+    matirial->setSpecular(Material::FRONT_AND_BACK, Vec4(1, 1, 1, 1));
+    matirial->setShininess(Material::FRONT_AND_BACK, 64);
+    scene->getOrCreateStateSet()->setAttributeAndModes(matirial.get(), StateAttribute::ON);
 
 	//Adding the terrain and object nodes to the root node
 	scene->addChild(objectGeode.get());
