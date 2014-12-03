@@ -9,9 +9,18 @@
 #include "pugixml.hpp"
 #include "shadow_map.h"
 
-// #define TEST_SHADOWS
+#include "sm/ShadowedScene.h"
+#include "sm/ShadowMap.h"
+#include "sm/ViewDependentShadowMap.h"
+
+
+#define TEST_SHADOWS
 // #define TEST_TEXTURE
-// #define TEST_ADLER_SCENE
+#if defined(DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG) 
+#else
+#define TEST_ADLER_SCENE
+#endif
+#define TEST_ADLER_SCENE
 
 #define TEXUNIT_SINE         1
 #define TEXUNIT_NOISE        2
@@ -182,22 +191,22 @@ namespace
     {
         static const char vs[] = STRINGIFY ( 
 
-            void main(void)
-            {
-                // gl_Position = gl_Vertex;
-                gl_Position     = ftransform();//gl_ModelViewProjectionMatrix *  gl_Vertex; 
-            }
-        );
-
-        static const char fs[] = STRINGIFY ( 
-         void main(void)
-         {
-                vec2 pos = mod(gl_FragCoord.xy, vec2(50.0)) - vec2(25.0);
-                float dist_squared = dot(pos, pos);
-            
-                gl_FragColor = (dist_squared < 400.0) 
-                    ? vec4(.90, .90, .90, 1.0)
-                    : vec4(.20, .20, .40, 1.0);
+\n              void main(void)
+\n              {
+\n                  // gl_Position = gl_Vertex;
+\n                  gl_Position     = ftransform();//gl_ModelViewProjectionMatrix *  gl_Vertex; 
+\n              }
+\n          );
+  
+          static const char fs[] = STRINGIFY ( 
+           void main(void)
+\n           {
+\n                  vec2 pos = mod(gl_FragCoord.xy, vec2(50.0)) - vec2(25.0);
+\n                  float dist_squared = dot(pos, pos);
+\n              
+\n                  gl_FragColor = (dist_squared < 400.0) 
+\n                      ? vec4(.90, .90, .90, 1.0)
+\n                      : vec4(.20, .20, .40, 1.0);
          }
         );
 
@@ -210,21 +219,22 @@ namespace
         "#extension GL_ARB_gpu_shader5 : enable \n"
 
         STRINGIFY ( 
-        uniform mat4      shadow0_matrix;
+\n         uniform mat4      shadow0_matrix;
+\n 
+\n         out block
+\n         {
+\n             vec4 shadow_view;
+\n             vec4 color;
+\n         } v_out;
 
-        out block
-        {
-            vec4 shadow_view;
-            vec4 color;
-        } v_out;
-
-        void main(void)
-        {
-            v_out.shadow_view = shadow0_matrix*gl_Vertex;
-            gl_Position     = ftransform();
-            v_out.color     = gl_Color;
-        }
-        )
+\n         void main(void)
+\n         {
+\n             v_out.shadow_view = shadow0_matrix*gl_Vertex;  
+\n             gl_Position     = ftransform();
+\n             v_out.color     = gl_Vertex;
+               gl_TexCoord[0] = gl_MultiTexCoord0;
+\n         }
+         )
 
         };
         
@@ -235,21 +245,22 @@ namespace
         
         STRINGIFY ( 
         
-        uniform sampler2DShadow     ShadowSplit0;
-        in block
-        {
-            vec4 shadow_view;
-            vec4 color;
-        } f_in;
+\n         uniform sampler2DShadow     ShadowSplit0;
+\n         in block
+\n         {
+\n             vec4 shadow_view;
+\n             vec4 color;
+\n         } f_in;
 
-
-        void main(void)
-        { 
-            float shadow = 1.0; 
-            shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
-            gl_FragColor = f_in.color *  shadow;
-        }
-        )
+\n         void main(void)
+\n         { 
+               vec2 uv = gl_TexCoord[0].xy;
+\n             float shadow = 1.0; 
+\n             shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+\n             gl_FragColor =   vec4(1.0,1.0,1.0,1.0) * shadow;// f_in.color *
+               //gl_FragColor =    f_in.color * f_in.shadow_view;
+\n         }
+           )
         };
 
     }
@@ -800,12 +811,14 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 	//osg::MatrixTransform* positioned = new osg::MatrixTransform;
 	//positioned->addChild(geode);
     // 
-    
-    effects::createProgram(geode->getOrCreateStateSet(),base_model::vs,base_model::fs) ;
-     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-    geode->getOrCreateStateSet()->addUniform( new osg::Uniform("ShadowSplit0", 4) );
-    geode->getOrCreateStateSet()->setTextureAttributeAndModes( 4, GetShadowMap()->getTexture(), value ); 
-
+#if defined(DEVELOP_SHADOWS)
+    {
+        effects::createProgram(geode->getOrCreateStateSet(),base_model::vs,base_model::fs) ;
+        osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+        geode->getOrCreateStateSet()->addUniform( new osg::Uniform("ShadowSplit0", 4) );
+        geode->getOrCreateStateSet()->setTextureAttributeAndModes( 4, GetShadowMap()->getTexture(), value ); 
+    }
+#endif
 
     return geode;
 }
@@ -989,7 +1002,7 @@ osg::Node* loadBMAirplane(bool set_env_tex )
     stateset->addUniform( new osg::Uniform("Env", 3) );
     stateset->setDataVariance(osg::Object::DYNAMIC);
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON);
-    stateset->setAttributeAndModes( program.get() );
+    stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
     stateset->setTextureAttributeAndModes( 0, /*colorTex.get()*/ft.getTexture(), value );
@@ -1505,21 +1518,59 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     return retval;
 }
 
-nodes_array_t createModel( osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
+nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
     osg::Vec3 center(0.0f,0.0f,300.0f);
     float radius = 600.0f;
 
-#ifdef TEST_SHADOWS
+#if defined(TEST_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
+
     const int fbo_tex_size = 1024*4;
-    osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
+#if defined(TEST_SHADOWS)
+    //osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
+    //st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
+    //st->setTextureUnit(1);
+    //st->setJitteringScale(16);
+    //st->setSoftnessWidth(0.00005);
+    
+    osg::ref_ptr<testShadow::ViewDependentShadowMap> st = new testShadow::ViewDependentShadowMap;
+    //st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
+    //st->setTextureUnit(1);
+
+    osg::ref_ptr<testShadow::ShadowedScene> root
+        = new testShadow::ShadowedScene(st.get());  
+    
+    testShadow::ShadowSettings* settings = root->getShadowSettings();
+    
+    settings->setShadowMapProjectionHint(testShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
+    settings->setBaseShadowTextureUnit(1);
+    // settings->setMinimumShadowMapNearFarRatio(n);
+    // settings->setNumShadowMapsPerLight(numShadowMaps);
+    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
+    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
+    settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
+    settings->setLightNum(0);
+
+    //osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+    //source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
+    //source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+    //source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+    // Scene
+    //st->setLight(source->getLight());
+    
+    // ssm = st;
+
+    //root->addChild(source.get());
+#else
+
+    osg::ref_ptr<testShadow::ShadowMap> st = new testShadow::ShadowMap;
     st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
     st->setTextureUnit(1);
-    st->setJitteringScale(16);
-    st->setSoftnessWidth(0.00005);
+    //st->setJitteringScale(16);
+    //st->setSoftnessWidth(0.00005);
 
-    osg::ref_ptr<osgShadow::ShadowedScene> root
-        = new osgShadow::ShadowedScene(st.get());  
+    osg::ref_ptr<testShadow::ShadowedScene> root
+        = new testShadow::ShadowedScene(st.get());  
 
     osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
     source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
@@ -1527,10 +1578,12 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool over
     source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
     // Scene
     st->setLight(source->getLight());
-    
-    ssm = st;
+
+    //ssm = st;
 
     root->addChild(source.get());
+#endif
+
 #else
     osg::Group* root = new osg::Group;
 #endif
@@ -1571,9 +1624,11 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool over
     MaterialVisitor::namesList nl;
     nl.push_back("building");
     nl.push_back("tree");
+    // Для теней
     nl.push_back("ground"); 
-    nl.push_back("concrete");
+    //nl.push_back("concrete");
     nl.push_back("mountain");
+
     nl.push_back("sea");
     nl.push_back("railing");
     nl.push_back("panorama");
@@ -1696,7 +1751,7 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool over
     //root->setStateSet(lights::createSpotLightDecoratorState(10,1));
 #endif
 
-#ifdef TEST_SHADOWS
+#if defined(TEST_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
     ret_array[0] = root.release();
 #else
     ret_array[0] = root;

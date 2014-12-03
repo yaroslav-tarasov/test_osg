@@ -8,7 +8,7 @@ namespace creators
     osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,double looptime);
     osg::Node*          createBase(const osg::Vec3& center,float radius);
     nodes_array_t       createMovingModel(const osg::Vec3& center, float radius);
-    nodes_array_t       createModel(osg::ref_ptr<osgShadow::SoftShadowMap>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
+    nodes_array_t       createModel(osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
     osg::Node*          loadAirplane();
     nodes_array_t       loadAirplaneParts();
     osg::Node*          loadBMAirplane(bool set_env_tex = false);

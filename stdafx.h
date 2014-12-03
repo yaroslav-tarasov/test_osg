@@ -85,6 +85,9 @@
 #include <osgShadow/SoftShadowMap>
 #include <osgShadow/LightSpacePerspectiveShadowMap>
 #include <osgShadow/ShadowTexture>
+#include <osgShadow/ViewDependentShadowMap>
+
+                                   
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
@@ -159,3 +162,7 @@ int main_teapot( int argc, char** argv );
 
 #include "Windows.h"
 #undef max
+
+
+// #define DEVELOP_SHADOWS
+#define TEST_SHADOWS_FROM_OSG

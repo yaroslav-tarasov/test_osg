@@ -189,7 +189,7 @@ namespace shaders
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag) 
             float shadow = 1.0; 
-            shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+            //shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
             //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
             //if (split_test.x) 
             //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -372,7 +372,7 @@ namespace shaders
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
                float shadow = 1.0; 
-               shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+               /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                //if (split_test.x) 
                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -544,7 +544,7 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0;
-                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -734,7 +734,7 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
-                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -874,7 +874,7 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
 \n                float shadow = 1.0;  
-\n                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+\n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders);                                              
 \n                //if (split_test.x)                                                                                                      
 \n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -1023,10 +1023,25 @@ namespace shaders
             )
         };
 
+        //"uniform sampler2D baseTexture;                                          \n"
+        //    "uniform int baseTextureUnit;                                            \n"
+        //    "uniform sampler2DShadow shadowTexture0;                                 \n"
+        //    "uniform int shadowTextureUnit0;                                         \n"
+        //    "                                                                        \n"
+        //    "void main(void)                                                         \n"
+        //    "{                                                                       \n"
+        //    "  vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     \n"
+        //    "  vec4 color = texture2D( baseTexture, gl_TexCoord[baseTextureUnit].xy );                                              \n"
+        //    "  color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r );     \n"
+        //    "  gl_FragColor = color;                                                                                                \n"
+        //    "} \n";
 
         const char* fs = { 
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
+
+            "uniform sampler2DShadow shadowTexture0;                                 \n"
+            "uniform int shadowTextureUnit0;                                         \n"
 
             STRINGIFY ( 
 
@@ -1068,7 +1083,7 @@ namespace shaders
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
 \n                float shadow = 1.0; 
-\n                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+\n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
 \n                //if (split_test.x) 
 \n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -1152,6 +1167,13 @@ namespace shaders
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
  \n               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+
+                 vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     
+                 vec4 color = vec4(dif_tex_col,1);//texture2D( baseTexture, gl_TexCoord[baseTextureUnit].xy );                                              
+                 // color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ); 
+                 shadow =  shadowTextureUnit0;// shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ;
+                 // gl_FragColor = color;   
+                 gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
  \n           }
             )
  
@@ -1253,7 +1275,7 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0;
-                shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
                 //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 

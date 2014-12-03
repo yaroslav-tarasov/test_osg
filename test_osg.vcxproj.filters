@@ -19,6 +19,9 @@
     <Filter Include="Source Files\bi">
       <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\sm">
+      <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -178,6 +181,21 @@
     </ClCompile>
     <ClCompile Include="teapot.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sm\ShadowedScene.cpp">
+      <Filter>Source Files\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="sm\ShadowMap.cpp">
+      <Filter>Source Files\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="sm\ShadowTechnique.cpp">
+      <Filter>Source Files\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="sm\ViewDependentShadowMap.cpp">
+      <Filter>Source Files\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="sm\ShadowSettings.cpp">
+      <Filter>Source Files\sm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

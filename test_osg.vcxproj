@@ -135,6 +135,11 @@
     <ClCompile Include="shadow_map.cpp" />
     <ClCompile Include="SimpleHUD.cpp" />
     <ClCompile Include="SkyBox.cpp" />
+    <ClCompile Include="sm\ShadowedScene.cpp" />
+    <ClCompile Include="sm\ShadowMap.cpp" />
+    <ClCompile Include="sm\ShadowSettings.cpp" />
+    <ClCompile Include="sm\ShadowTechnique.cpp" />
+    <ClCompile Include="sm\ViewDependentShadowMap.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

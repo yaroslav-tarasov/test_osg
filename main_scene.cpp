@@ -15,16 +15,24 @@
 
 #include <osgEphemeris/EphemerisModel.h>
 
+#if defined (DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
+#if !defined(TEST_SHADOWS_FROM_OSG)
+#define TEST_SHADOWS_2
+#endif
+#else
+#define TEST_EPHEMERIS
+#define TEST_PRECIP
+#define TEST_SV_FOG
+#define TEST_SV_CLOUD
+#endif
+
 // #define TEST_EPHEMERIS
-// #define TEST_PRECIP
-// #define TEST_SV_FOG
-// #define TEST_SV_CLOUD
 
 // #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
 // #define TEST_SKYBOX
 // #define TEST_CAMERA
-//#define TEST_SHADOWS
+// #define TEST_SHADOWS
 
 ////You can compute a vertex in the absolute coordinate frame by using the
 ////    osg::computeLocalToWorld() function:
@@ -697,7 +705,7 @@ int main_scene( int argc, char** argv )
     //while (arguments.read("--ortho") || arguments.read("--orthographic")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY; overlay=true; }
     //while (arguments.read("--persp") || arguments.read("--perspective")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_PERSPECTIVE_OVERLAY; overlay=true; }
     
-    osg::ref_ptr<osgShadow::SoftShadowMap> ssm;
+    osg::ref_ptr<osgShadow::ShadowTechnique> ssm;
 
     // load the nodes from the commandline arguments.
     auto model_parts  = creators::createModel(ssm, overlay, technique);
@@ -806,7 +814,9 @@ int main_scene( int argc, char** argv )
          // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
 		ephemerisModel->setMoveWithEyePoint(false);
         // sun_light = ephemerisModel->getSunLightSource(); 
-        
+        // ephemerisModel->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+        //osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
+        //ephemerisModel->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
         rootnode->addChild( ephemerisModel.get() );
 
 
@@ -863,7 +873,7 @@ int main_scene( int argc, char** argv )
              rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 #endif
 
-#if 1  // TEST_FBO
+#ifdef TEST_SHADOWS_2  // TEST_FBO
 
              //osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
              //fbo_shadow_node->addChild(model);
@@ -902,7 +912,7 @@ int main_scene( int argc, char** argv )
                 
                 auto l = ephemerisModel->getSunLightSource()->getLight();
                 // rootnode->addChild(ephemerisModel->getSunLightSource());
-                ssm->setLight(l);
+                //ssm->setLight(l);
             });
         }
 #endif

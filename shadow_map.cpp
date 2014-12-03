@@ -194,7 +194,7 @@ void ShadowMap::cull( osgUtil::CullVisitor & cv )
                  osg::Vec3 lightDir(lightpos.x(), lightpos.y(), lightpos.z());
                  lightDir.normalize();
 
-                 const double radius =  bb.radius() /** 0.05*/;
+                 const double radius =  bb.radius() * 0.1;
 
                  // set the position far away along the light direction
                  osg::Vec3 position = bb.center() + lightDir * radius * 2;
@@ -216,7 +216,15 @@ void ShadowMap::cull( osgUtil::CullVisitor & cv )
                  osg::Vec3f up;
                  float lookDistance=1.0f;
                  _camera->getViewMatrixAsLookAt(eye,center,up,lookDistance);
-                 
+
+                 double fru_left;
+                 double fru_right;
+                 double fru_bottom;
+                 double fru_top;
+                 double fru_znear;
+                 double fru_zfar;
+
+                 cv.getCurrentCamera()->getProjectionMatrixAsFrustum(fru_left, fru_right, fru_bottom, fru_top, fru_znear, fru_zfar);
                  //position.normalize();
                  //osg::Vec3 center = bb.center();
                  //center.normalize();
@@ -235,8 +243,8 @@ void ShadowMap::cull( osgUtil::CullVisitor & cv )
 
                  osg::Matrix lightPV = shadowBias * _camera->getProjectionMatrix() * _camera->getViewMatrix();
 
-                 _shadowMat->set( osg::Matrix() /*lightPV*/ );
-
+                 _shadowMat->set( lightPV/**cv.getCurrentCamera()->getInverseViewMatrix()*/ );
+                   
              }
 
 
