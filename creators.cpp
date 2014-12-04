@@ -825,7 +825,6 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts()
 {
-
     osg::Node* airplane_file = osgDB::readNodeFile("a_319.tang.dae"); // a_319.open.dae "a_319.part.dae"  "an_124.dae"
 
     osg::Node* engine = nullptr; 
@@ -861,10 +860,11 @@ nodes_array_t loadAirplaneParts()
     }
 #endif
 
-    airplane_file->setName("all_nodes");
-
     if(airplane_file)
 	{
+        airplane_file->setName("all_nodes");
+
+
         auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
             shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
@@ -943,6 +943,9 @@ osg::Node* loadAirplane()
 osg::Node* loadBMAirplane(bool set_env_tex )
 {
     osg::Node* model = loadAirplane();
+    
+    if (!model)
+       return nullptr;
 
     ComputeTangentVisitor ctv;
     ctv.setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
@@ -1231,14 +1234,23 @@ public:
             program_t p;
             p.program = new osg::Program;
             p.program->setName(mat_name);
-            auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
-            p.program->addShader( vs );
-			//std::string fs_shader(GetShader(shaders::FS,mat_name));
+            if(GetShader(shaders::VS,mat_name))
+            {
+                auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
+                p.program->addShader( vs );
+
+            }
+            //std::string fs_shader(GetShader(shaders::FS,mat_name));
 			//fs_shader.replace('','');
-			auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
-            p.program->addShader( fs );
+            if(GetShader(shaders::FS,mat_name))
+            {
+			    auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
+                p.program->addShader( fs );
+            }
+
             p.program->addBindAttribLocation( "tangent" , 6 );
             p.program->addBindAttribLocation( "binormal", 7 );
+
             GetPrograms()[mat_name]=p;
         }
 
@@ -1389,11 +1401,21 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name);
     
+    const osg::StateSet::UniformList& ul = stateset->getUniformList();
+    for(osg::StateSet::UniformList::const_iterator itr = ul.begin();
+        itr != ul.end();
+        ++itr)
+    {   
+        std::string name = itr->first;
+        // pcp->apply(*(itr->second.first));
+    }    
+
     stateset->addUniform( new osg::Uniform("colorTex"    , 0) );
     stateset->addUniform( new osg::Uniform("NightTex"    , 1) );
     stateset->addUniform( new osg::Uniform("Detail"      , 2) ); 
     stateset->addUniform( new osg::Uniform("Env"         , 3) ); 
     stateset->addUniform( new osg::Uniform("ShadowSplit0", 4) );
+    stateset->addUniform( new osg::Uniform("shadowTexture0", 5) );
 
     stateset->setAttributeAndModes( p.program.get() );
     
@@ -1518,14 +1540,14 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
     return retval;
 }
 
-nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
+nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgSim::OverlayNode::OverlayTechnique technique)
 {
     osg::Vec3 center(0.0f,0.0f,300.0f);
     float radius = 600.0f;
 
 #if defined(TEST_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
 
-    const int fbo_tex_size = 1024*4;
+    const int fbo_tex_size = 1024*8;
 #if defined(TEST_SHADOWS)
     //osg::ref_ptr<osgShadow::SoftShadowMap> st = new osgShadow::SoftShadowMap;
     //st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
@@ -1543,24 +1565,26 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool ov
     testShadow::ShadowSettings* settings = root->getShadowSettings();
     
     settings->setShadowMapProjectionHint(testShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
-    settings->setBaseShadowTextureUnit(1);
-    // settings->setMinimumShadowMapNearFarRatio(n);
-    // settings->setNumShadowMapsPerLight(numShadowMaps);
+    settings->setBaseShadowTextureUnit(5);
+    settings->setMinimumShadowMapNearFarRatio(.5);
+    //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
-    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
+    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
-    settings->setLightNum(0);
+    //settings->setLightNum(2);
+    //settings->setMaximumShadowMapDistance(1000);
 
-    //osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
-    //source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
-    //source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
-    //source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+    osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
+    source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
+    source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+    source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
     // Scene
     //st->setLight(source->getLight());
-    
+    source->getLight()->setLightNum(2);
     // ssm = st;
+    ls = source;
 
-    //root->addChild(source.get());
+    root->addChild(source.get());
 #else
 
     osg::ref_ptr<testShadow::ShadowMap> st = new testShadow::ShadowMap;
@@ -1605,6 +1629,8 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool ov
 
 
     osg::Node* scene = osgDB::readNodeFile(scene_name);  // "adler.osgb"
+    
+    scene->setName("scene");
 
     findNodeVisitor findLod3("lod3"); 
     scene->accept(findLod3);
@@ -1626,7 +1652,7 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool ov
     nl.push_back("tree");
     // Для теней
     nl.push_back("ground"); 
-    //nl.push_back("concrete");
+    nl.push_back("concrete");
     nl.push_back("mountain");
 
     nl.push_back("sea");
@@ -1659,8 +1685,6 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool ov
     
     osg::Node* movingModel = ret_array[0];
 	
-	osg::Group* test_model = new osg::Group;
-
     const bool add_planes = true;
 
     if (add_planes)
@@ -1739,8 +1763,9 @@ nodes_array_t createModel( osg::ref_ptr<osgShadow::ShadowTechnique>& ssm,bool ov
 
         root->addChild(baseModel);
     }
-    
-    movingModel->setName("moving_model");
+
+    baseModel->setName("baseModel");
+    movingModel->setName("movingModel");
 
 
     root->addChild(movingModel);

@@ -1023,19 +1023,6 @@ namespace shaders
             )
         };
 
-        //"uniform sampler2D baseTexture;                                          \n"
-        //    "uniform int baseTextureUnit;                                            \n"
-        //    "uniform sampler2DShadow shadowTexture0;                                 \n"
-        //    "uniform int shadowTextureUnit0;                                         \n"
-        //    "                                                                        \n"
-        //    "void main(void)                                                         \n"
-        //    "{                                                                       \n"
-        //    "  vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     \n"
-        //    "  vec4 color = texture2D( baseTexture, gl_TexCoord[baseTextureUnit].xy );                                              \n"
-        //    "  color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r );     \n"
-        //    "  gl_FragColor = color;                                                                                                \n"
-        //    "} \n";
-
         const char* fs = { 
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
@@ -1169,22 +1156,180 @@ namespace shaders
  \n               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
 
                  vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     
-                 vec4 color = vec4(dif_tex_col,1);//texture2D( baseTexture, gl_TexCoord[baseTextureUnit].xy );                                              
+                 vec4 color = texture2D( colorTex, gl_TexCoord[0].xy );                                              
                  // color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ); 
-                 shadow =  shadowTextureUnit0;// shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ;
-                 // gl_FragColor = color;   
-                 gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
+                 // shadow =  shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ;
+                 color *= mix( vec4(0.0), vec4(1.0), shadow2DProj( shadowTexture0, gl_TexCoord[0] ).r );  
+                 gl_FragColor = color;   
+                 //gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
  \n           }
             )
  
         };   
- 
+        
+        const char* vs_test = {
+
+            STRINGIFY ( 
+            vec4 Ambient;
+            vec4 Diffuse;
+            vec4 Specular;
+
+
+            void pointLight(in int i, in vec3 normal, in vec3 eye, in vec3 ecPosition3)
+            {
+                float nDotVP;       // normal . light direction
+                float nDotHV;       // normal . light half vector
+                float pf;           // power factor
+                float attenuation;  // computed attenuation factor
+                float d;            // distance from surface to light source
+                vec3  VP;           // direction from surface to light position
+                vec3  halfVector;   // direction of maximum highlights
+
+                // Compute vector from surface to light position
+                VP = vec3 (gl_LightSource[i].position) - ecPosition3;
+
+                // Compute distance between surface and light position
+                d = length(VP);
+
+                // Normalize the vector from surface to light position
+                VP = normalize(VP);
+
+                // Compute attenuation
+                attenuation = 1.0 / (gl_LightSource[i].constantAttenuation +
+                    gl_LightSource[i].linearAttenuation * d +
+                    gl_LightSource[i].quadraticAttenuation * d * d);
+
+                halfVector = normalize(VP + eye);
+
+                nDotVP = max(0.0, dot(normal, VP));
+                nDotHV = max(0.0, dot(normal, halfVector));
+
+                if (nDotVP == 0.0)
+                {
+                    pf = 0.0;
+                }
+                else
+                {
+                    pf = pow(nDotHV, gl_FrontMaterial.shininess);
+
+                }
+                Ambient  += gl_LightSource[i].ambient * attenuation;
+                Diffuse  += gl_LightSource[i].diffuse * nDotVP * attenuation;
+                Specular += gl_LightSource[i].specular * pf * attenuation;
+            }
+
+            void directionalLight(in int i, in vec3 normal)
+            {
+                float nDotVP;         // normal . light direction
+                float nDotHV;         // normal . light half vector
+                float pf;             // power factor
+
+                nDotVP = max(0.0, dot(normal, normalize(vec3 (gl_LightSource[i].position))));
+                nDotHV = max(0.0, dot(normal, vec3 (gl_LightSource[i].halfVector)));
+
+                if (nDotVP == 0.0)
+                {
+                    pf = 0.0;
+                }
+                else
+                {
+                    pf = pow(nDotHV, gl_FrontMaterial.shininess);
+
+                }
+                Ambient  += gl_LightSource[i].ambient;
+                Diffuse  += gl_LightSource[i].diffuse * nDotVP;
+                Specular += gl_LightSource[i].specular * pf;
+            }
+
+            vec3 fnormal(void)
+            {
+                //Compute the normal 
+                vec3 normal = gl_NormalMatrix * gl_Normal;
+                normal = normalize(normal);
+                return normal;
+            }
+
+            void flight(in vec3 normal, in vec4 ecPosition, float alphaFade)
+            {
+                vec4 color;
+                vec3 ecPosition3;
+                vec3 eye;
+
+                ecPosition3 = (vec3 (ecPosition)) / ecPosition.w;
+                eye = vec3 (0.0, 0.0, 1.0);
+
+                // Clear the light intensity accumulators
+                Ambient  = vec4 (0.0);
+                Diffuse  = vec4 (0.0);
+                Specular = vec4 (0.0);
+
+                pointLight(0, normal, eye, ecPosition3);
+
+                pointLight(1, normal, eye, ecPosition3);
+
+                directionalLight(2, normal);
+
+                color = gl_FrontLightModelProduct.sceneColor +
+                    Ambient  * gl_FrontMaterial.ambient +
+                    Diffuse  * gl_FrontMaterial.diffuse;
+                color += Specular * gl_FrontMaterial.specular;
+                color = clamp( color, 0.0, 1.0 );
+                gl_FrontColor = color;
+
+                gl_FrontColor.a *= alphaFade;
+            }
+
+
+            void main (void)
+            {
+                vec3  transformedNormal;
+                float alphaFade = 1.0;
+
+                // Eye-coordinate position of vertex, needed in various calculations
+                vec4 ecPosition = gl_ModelViewMatrix * gl_Vertex;
+
+                // Do fixed functionality vertex transform
+                gl_Position = ftransform();
+                transformedNormal = fnormal();
+                flight(transformedNormal, ecPosition, alphaFade);
+            }
+            )
+        };
+        
+        const char* vs_test2 = { 
+            "uniform int shadowTextureUnit0;                                         \n "
+            "void main (void)"
+            "{"
+            "   gl_Position =  ftransform();  \n "
+            "   gl_TexCoord[0] = gl_MultiTexCoord1; \n "
+            "   // gl_TexCoord[shadowTextureUnit0]=gl_MultiTexCoord7; \n "
+            "   gl_FrontColor = gl_Color; \n"
+            "   gl_BackColor = gl_Color;  \n"
+            "}"
+        };
+
+        const char* fs_test = { 
+            "uniform sampler2D baseTexture;                                          \n"
+            "uniform int baseTextureUnit;                                            \n"
+            "uniform sampler2DShadow shadowTexture0;                                 \n"
+            "uniform int shadowTextureUnit0;                                         \n"
+            "                                                                        \n"
+            "void main(void)                                                         \n"
+            "{                                                                       \n"
+            "  vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     \n"
+            "  vec4 color = texture2D( baseTexture, gl_TexCoord[1].xy );                                              \n"
+            "  color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r );     \n"
+            "  gl_FragColor = color;                                                                                                \n"
+            "  // gl_FragColor = gl_TexCoord[baseTextureUnit]; \n"
+            "} \n"
+        };
+
         const char* get_shader(shader_t t)
         {
             if(t==VS)
-                return vs;
+                return nullptr;
             else if(t==FS)
-                return fs;
+                return fs_test;
             else 
                 return nullptr;
         }

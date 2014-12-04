@@ -26,7 +26,10 @@
 #define TEST_SV_CLOUD
 #endif
 
-// #define TEST_EPHEMERIS
+#define TEST_EPHEMERIS
+#define TEST_PRECIP
+#define TEST_SV_FOG
+#define TEST_SV_CLOUD
 
 // #define TEST_OSG_FOG
 // #define TEST_NODE_TRACKER
@@ -138,6 +141,15 @@ public:
             _func =nullptr;
         
         auto sls = _ephem->getSunLightSource()->getLight();
+        
+        
+        if(_light_src.valid())
+        {
+            _light_src->getLight()->setPosition(sls->getPosition());
+            _light_src->getLight()->setDiffuse(sls->getDiffuse());
+            _light_src->getLight()->setAmbient(sls->getAmbient());
+            _light_src->getLight()->setSpecular(sls->getSpecular());
+        }
 
         if(!_fogLayer || !_skyClouds)
             return;
@@ -210,7 +222,8 @@ public:
     }
     
     osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
-    void extCallback(on_callback_f f) {_func = f; };
+    void                                 extCallback(on_callback_f f) {_func = f; };
+    void setLightSource (osg::LightSource* src){_light_src=src;};
 private:
     class handler : public osgGA::GUIEventHandler
     {
@@ -267,6 +280,7 @@ private:
     osg::ref_ptr<CloudsLayer>                  _skyClouds;
     osg::ref_ptr<handler>                      _handler;
     on_callback_f                              _func;
+    osg::ref_ptr<osg::LightSource>             _light_src;
     
 };
 
@@ -287,17 +301,30 @@ public:
                 // Increment time
                 // Hopefully the DateTime will wrap around correctly if we get 
                 // to invalid dates / times...
-
-                osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
-                if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
-                    data->dateTime.setHour( data->dateTime.getHour() + 1 );
-                else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
-                    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() + 1 );
-                else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
-                    data->dateTime.setMonth( data->dateTime.getMonth() + 1 );
-                else                                                                    // Increment by one minute
-                    data->dateTime.setMinute( data->dateTime.getMinute() + 1 );
                 
+                // Модификация Дельты не имеет общих данных  
+                //osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
+                //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
+                //    data->dateTime.setHour( data->dateTime.getHour() + 1 );
+                //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
+                //    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() + 1 );
+                //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
+                //    data->dateTime.setMonth( data->dateTime.getMonth() + 1 );
+                //else                                                                    // Increment by one minute
+                //    data->dateTime.setMinute( data->dateTime.getMinute() + 1 );
+
+                osgEphemeris::DateTime dt = m_ephem->getDateTime();
+                
+                if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
+                    dt.setHour( dt.getHour() + 1 );
+                else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
+                    dt.setDayOfMonth( dt.getDayOfMonth() + 1 );
+                else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
+                    dt.setMonth( dt.getMonth() + 1 );
+                else                                                                    // Increment by one minute
+                    dt.setMinute( dt.getMinute() + 1 );
+
+                m_ephem->setDateTime(dt);
                 //std::cout << "**** Sun light ****" << std::endl;
                 //auto sls = m_ephem->getSunLightSource()->getLight();
 
@@ -320,16 +347,27 @@ public:
                 // Decrement time
                 // Hopefully the DateTime will wrap around correctly if we get 
                 // to invalid dates / times...
-                osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
+                //osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
+                //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Decrement by one hour
+                //    data->dateTime.setHour( data->dateTime.getHour() - 1 );
+                //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Decrement by one day
+                //    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() - 1 );
+                //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Decrement by one month
+                //    data->dateTime.setMonth( data->dateTime.getMonth() - 1 );
+                //else                                                                    // Decrement by one minute
+                //    data->dateTime.setMinute( data->dateTime.getMinute() - 1 );
+                osgEphemeris::DateTime dt = m_ephem->getDateTime();
                 if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Decrement by one hour
-                    data->dateTime.setHour( data->dateTime.getHour() - 1 );
+                    dt.setHour( dt.getHour() - 1 );
                 else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Decrement by one day
-                    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() - 1 );
+                    dt.setDayOfMonth( dt.getDayOfMonth() - 1 );
                 else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Decrement by one month
-                    data->dateTime.setMonth( data->dateTime.getMonth() - 1 );
+                    dt.setMonth( dt.getMonth() - 1 );
                 else                                                                    // Decrement by one minute
-                    data->dateTime.setMinute( data->dateTime.getMinute() - 1 );
+                    dt.setMinute( dt.getMinute() - 1 );
 
+                m_ephem->setDateTime(dt);
+                
                 return true;
             }
             else
@@ -705,11 +743,11 @@ int main_scene( int argc, char** argv )
     //while (arguments.read("--ortho") || arguments.read("--orthographic")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_ORTHOGRAPHIC_OVERLAY; overlay=true; }
     //while (arguments.read("--persp") || arguments.read("--perspective")) { technique = osgSim::OverlayNode::VIEW_DEPENDENT_WITH_PERSPECTIVE_OVERLAY; overlay=true; }
     
-    osg::ref_ptr<osgShadow::ShadowTechnique> ssm;
+    osg::ref_ptr<osg::LightSource> ls;
 
     // load the nodes from the commandline arguments.
-    auto model_parts  = creators::createModel(ssm, overlay, technique);
-    
+    auto model_parts  = creators::createModel(ls, overlay, technique);
+   
     osg::ref_ptr<osg::MatrixTransform> turn_node = new osg::MatrixTransform;
     //turn_node->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
     turn_node->addChild(model_parts[0]);
@@ -873,6 +911,10 @@ int main_scene( int argc, char** argv )
              rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 #endif
 
+#ifdef  TEST_EPHEMERIS 
+             eCallback->setLightSource(ls);
+#endif 
+
 #ifdef TEST_SHADOWS_2  // TEST_FBO
 
              //osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
@@ -902,20 +944,20 @@ int main_scene( int argc, char** argv )
             sm->setLight(sun_light.get());
 #endif
 
-#ifdef  TEST_EPHEMERIS 
-        if(ssm.valid())
-        {
-            
-            // ssm->setLight(sun_light->getLight()/*.get()*/);
-            eCallback->extCallback( [&ephemerisModel,&ssm,&rootnode]()->void 
-            {   
-                
-                auto l = ephemerisModel->getSunLightSource()->getLight();
-                // rootnode->addChild(ephemerisModel->getSunLightSource());
-                //ssm->setLight(l);
-            });
-        }
-#endif
+//#ifdef  TEST_EPHEMERIS 
+//        if(ssm.valid())
+//        {
+//            
+//            // ssm->setLight(sun_light->getLight()/*.get()*/);
+//            eCallback->extCallback( [&ephemerisModel,&ssm,&rootnode]()->void 
+//            {   
+//                
+//                auto l = ephemerisModel->getSunLightSource()->getLight();
+//                // rootnode->addChild(ephemerisModel->getSunLightSource());
+//                //ssm->setLight(l);
+//            });
+//        }
+//#endif
 
         
 
@@ -925,7 +967,7 @@ int main_scene( int argc, char** argv )
         //osgUtil::Optimizer optimzer;
         //optimzer.optimize(rootnode);
         
-        // osgDB::writeNodeFile(*model,"adler_test.osgt");
+        //osgDB::writeNodeFile(*rootnode,"test_osg_struct.osgt");
 
         // set the scene to render
         viewer.setSceneData(rootnode);
@@ -1055,16 +1097,22 @@ int main_scene( int argc, char** argv )
 		}
 #endif
 
+#if 0
 		// create the light    
-		//osg::LightSource* lightSource = new osg::LightSource;
-		//model->asGroup()->addChild(lightSource);
+		osg::LightSource* lightSource = new osg::LightSource;
+		rootnode->addChild(lightSource);
 
-		//osg::Light* light = lightSource->getLight();
-		//light->setLightNum(0);
-		//light->setPosition(osg::Vec4(0.0f,0.0f,1.0f,0.0f)); // directional light from above
-		//light->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
-		//light->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
-		//light->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+		osg::Light* light = lightSource->getLight();
+		light->setLightNum(2);
+		light->setPosition(osg::Vec4(0.0f,0.0f,1.0f,0.0f)); // directional light from above
+		light->setAmbient(osg::Vec4(0.8f,0.8f,0.8f,1.0f));
+		light->setDiffuse(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+		light->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+
+#ifdef  TEST_EPHEMERIS 
+        eCallback->setLightSource(lightSource);
+#endif
+#endif
 
 #ifdef TEST_PRECIP   // здесь у нас будет снег 
 	     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
