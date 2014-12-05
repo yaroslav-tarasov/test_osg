@@ -81,7 +81,30 @@ namespace shaders
 \n                                                                                                     \
 \n      uniform mat4      shadow0_matrix;                                                              \
 \n                                                                                                     \
-      )                                                                                                
+\n        float PCF(sampler2DShadow depths,vec4 stpq){                                                 \
+\n            float result = 0.0;                                                                      \
+\n            int   count = 0;                                                                         \
+\n            for(int x=-2; x<=2; x++){                                                                \
+\n                for(int y=-2; y<=2; y++){                                                            \
+\n                    count++;                                                                         \
+\n                    result += shadow2DProjOffset(depths, stpq, ivec2(x,y)).r;                        \
+\n                }                                                                                    \
+\n            }                                                                                        \
+\n            return result/count;                                                                     \
+        }                                                                                              \
+                                                                                                       \
+                                                                                                       \
+     vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
+     {                                                                                                 \
+         return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] ),dot( posEye, gl_EyePlaneR[index]),dot( posEye, gl_EyePlaneQ[index] ) );  \
+     }                                                                                                  \
+                                                                                                        \
+     uniform sampler2D baseTexture;                                                                     \
+     uniform int baseTextureUnit;                                                                       \
+     uniform sampler2DShadow shadowTexture0;                                                            \
+     uniform int shadowTextureUnit0;                                                                    \
+                                                                                                        \
+     )
 
     }                                                                                                  
 
@@ -122,15 +145,14 @@ namespace shaders
             lightDir = vec3(gl_LightSource[0].position.xyz);
 
             gl_Position    = ftransform();
-            gl_TexCoord[0] = gl_MultiTexCoord1;
 
 
             v_out.tangent   = tangent;
             v_out.binormal  = binormal;
             v_out.normal    = normal;
             v_out.viewpos   = vertexInEye.xyz;
-            v_out.texcoord  = gl_TexCoord[0].xy ;
-            v_out.shadow_view = shadow0_matrix*gl_Vertex;
+            v_out.texcoord  = gl_MultiTexCoord1.xy;
+            v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
             illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse* 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
         }
@@ -162,6 +184,8 @@ namespace shaders
 
         INCLUDE_MAT
 
+        INCLUDE_VS
+
         STRINGIFY ( 
 
         
@@ -188,7 +212,7 @@ namespace shaders
         {
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag) 
-            float shadow = 1.0; 
+            float shadow = PCF(shadowTexture0, f_in.shadow_view); 
             //shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
             //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
             //if (split_test.x) 
@@ -314,14 +338,13 @@ namespace shaders
                // lightDir = normalize(rotation * normalize(lightDir));
                lightDir = vec3(gl_LightSource[0].position.xyz);
                gl_Position = ftransform();
-               gl_TexCoord[0] = gl_MultiTexCoord1;
 
                v_out.tangent   = tangent;
                v_out.binormal  = binormal;
                v_out.normal    = normal;
                v_out.viewpos   = vertexInEye.xyz;
-               v_out.texcoord  = gl_TexCoord[0].xy ;
-               v_out.shadow_view = shadow0_matrix*gl_Vertex;
+               v_out.texcoord  = gl_MultiTexCoord1.xy;
+               v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0); 
            }       
        )
        };
@@ -330,8 +353,6 @@ namespace shaders
        const char* fs = {
        "#version 130 \n"
        "#extension GL_ARB_gpu_shader5 : enable \n "
-       
-
 
         STRINGIFY ( 
 
@@ -348,6 +369,8 @@ namespace shaders
        )
        
        INCLUDE_MAT
+
+       INCLUDE_VS
 
        STRINGIFY ( 
 
@@ -371,7 +394,7 @@ namespace shaders
            {
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
-               float shadow = 1.0; 
+               float shadow = PCF(shadowTexture0, f_in.shadow_view); 
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                //if (split_test.x) 
@@ -490,12 +513,11 @@ namespace shaders
                 //lightDir = normalize(rotation * normalize(lightDir));
                 lightDir = vec3(gl_LightSource[0].position.xyz);;
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.texcoord  = gl_TexCoord[0].xy ;
-                v_out.shadow_view = shadow0_matrix * gl_Vertex;
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
+                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse * 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
@@ -523,6 +545,8 @@ namespace shaders
 
             INCLUDE_MAT
 
+            INCLUDE_VS
+
             STRINGIFY ( 
 
             uniform sampler2D           colorTex;
@@ -543,7 +567,7 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0;
+                float shadow = PCF(shadowTexture0, f_in.shadow_view);
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
@@ -678,12 +702,11 @@ namespace shaders
                 //lightDir = normalize(rotation * normalize(lightDir));
                 lightDir = vec3(gl_LightSource[0].position.xyz);;
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.texcoord  = gl_TexCoord[0].xy ;
-                v_out.shadow_view = shadow0_matrix*gl_Vertex;
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
+                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -713,6 +736,8 @@ namespace shaders
             
             INCLUDE_MAT
 
+            INCLUDE_VS
+
             STRINGIFY ( 
 
             uniform sampler2D       colorTex;
@@ -733,7 +758,7 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; 
+                float shadow = PCF(shadowTexture0, f_in.shadow_view);
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
@@ -813,7 +838,6 @@ namespace shaders
                 // lightDir = normalize(rotation * normalize(lightDir));
                 lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 
                 v_out.normal    = normal;
@@ -822,8 +846,8 @@ namespace shaders
                  
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.detail_uv = gl_Vertex.xy * 0.03;
-                v_out.texcoord  = gl_TexCoord[0].xy;
-                v_out.shadow_view = shadow0_matrix*gl_Vertex;
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
+                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -850,6 +874,8 @@ namespace shaders
             )
             
             INCLUDE_MAT
+
+            INCLUDE_VS
             
             STRINGIFY ( 
 
@@ -873,7 +899,7 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-\n                float shadow = 1.0;  
+\n                float shadow = PCF(shadowTexture0, f_in.shadow_view);  
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders);                                              
 \n                //if (split_test.x)                                                                                                      
@@ -1002,7 +1028,6 @@ namespace shaders
 
                 lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 v_out.normal    = normal;
                 v_out.tangent   = tangent;
@@ -1011,12 +1036,12 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 // v_out.detail_uv = position.xy * 0.045;
                 v_out.detail_uv = gl_Vertex.xy * 0.045; // FIXME dont no how
-                v_out.texcoord  = gl_TexCoord[0].xy;
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
                 
                 // SAVE_DECAL_VARYINGS_VP
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
-                v_out.shadow_view = shadow0_matrix*gl_Vertex;
+                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -1027,8 +1052,6 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
-            "uniform sampler2DShadow shadowTexture0;                                 \n"
-            "uniform int shadowTextureUnit0;                                         \n"
 
             STRINGIFY ( 
 
@@ -1045,6 +1068,8 @@ namespace shaders
 \n            )
             
               INCLUDE_MAT
+
+              INCLUDE_VS
             
               STRINGIFY ( 
 \n
@@ -1069,8 +1094,8 @@ namespace shaders
 \n            {
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
-\n                float shadow = 1.0; 
-\n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+\n                float shadow = PCF(shadowTexture0, f_in.shadow_view); 
+                  // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
 \n                //if (split_test.x) 
 \n                //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -1153,15 +1178,8 @@ namespace shaders
  \n
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
- \n               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+ \n               // gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
 
-                 vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     
-                 vec4 color = texture2D( colorTex, gl_TexCoord[0].xy );                                              
-                 // color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ); 
-                 // shadow =  shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r ;
-                 color *= mix( vec4(0.0), vec4(1.0), shadow2DProj( shadowTexture0, gl_TexCoord[0] ).r );  
-                 gl_FragColor = color;   
-                 //gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
  \n           }
             )
  
@@ -1297,39 +1315,80 @@ namespace shaders
         };
         
         const char* vs_test2 = { 
-            "uniform int shadowTextureUnit0;                                         \n "
-            "void main (void)"
-            "{"
-            "   gl_Position =  ftransform();  \n "
-            "   gl_TexCoord[0] = gl_MultiTexCoord1; \n "
-            "   // gl_TexCoord[shadowTextureUnit0]=gl_MultiTexCoord7; \n "
-            "   gl_FrontColor = gl_Color; \n"
-            "   gl_BackColor = gl_Color;  \n"
-            "}"
+            INCLUDE_VS
+
+            STRINGIFY ( 
+            uniform mat4  shadowMatrix;                                \n 
+            uniform mat4  refMatrix;
+
+            void main (void)
+            {
+               vec4 posEye =  gl_ModelViewMatrix * gl_Vertex;
+               gl_Position    =  gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex; //ftransform();                       
+               gl_TexCoord[0] =  gl_MultiTexCoord1;                  
+               gl_FrontColor  =  gl_Color;                          
+               gl_BackColor   =  gl_Color;                          
+
+               //gl_TexCoord[1].s = dot( posEye, gl_EyePlaneS[5] );
+               //gl_TexCoord[1].t = dot( posEye, gl_EyePlaneT[5] );
+               //gl_TexCoord[1].p = dot( posEye, gl_EyePlaneR[5] );
+               //gl_TexCoord[1].q = dot( posEye, gl_EyePlaneQ[5] );
+               
+               gl_TexCoord[1] = get_shadow_coords(posEye, 5);
+
+               //gl_TexCoord[1] =   shadowMatrix * refMatrix * gl_Vertex  ;   //  shadowMatrix * gl_ModelViewMatrix *  refMatrix
+               
+            }
+            )
         };
 
         const char* fs_test = { 
-            "uniform sampler2D baseTexture;                                          \n"
-            "uniform int baseTextureUnit;                                            \n"
-            "uniform sampler2DShadow shadowTexture0;                                 \n"
-            "uniform int shadowTextureUnit0;                                         \n"
-            "                                                                        \n"
-            "void main(void)                                                         \n"
-            "{                                                                       \n"
-            "  vec4 colorAmbientEmissive = gl_FrontLightModelProduct.sceneColor;     \n"
-            "  vec4 color = texture2D( baseTexture, gl_TexCoord[1].xy );                                              \n"
-            "  color *= mix( colorAmbientEmissive, gl_Color, shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0] ).r );     \n"
-            "  gl_FragColor = color;                                                                                                \n"
-            "  // gl_FragColor = gl_TexCoord[baseTextureUnit]; \n"
-            "} \n"
+
+            INCLUDE_VS
+
+            STRINGIFY ( 
+
+            
+            float texture2DCompare(sampler2D depths, vec2 uv, float compare){
+                float depth = texture2D(depths, uv).r;
+                return step(compare, depth);
+             } 
+
+            float PCF2(sampler2D depths, vec2 size, vec2 uv, float compare){
+                float result = 0.0;
+                for(int x=-2; x<=2; x++){
+                    for(int y=-2; y<=2; y++){
+                        vec2 off = vec2(x,y)/size;
+                        result += texture2DCompare(depths, uv+off, compare);
+                    }
+                }
+                return result/25.0;
+             }
+
+
+            void main(void)                                                         \n
+            {                                                                       \n
+                vec4 colorAmbientEmissive = vec4(1.0);//gl_FrontLightModelProduct.sceneColor;       \n
+                vec4 color = texture2D( baseTexture, gl_TexCoord[0].xy );  // baseTextureUnit             \n
+
+                float shadow = PCF(shadowTexture0, gl_TexCoord[1]); // shadowTextureUnit0
+            
+                float illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse);
+
+                color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , shadow /*shadow2DProj( shadowTexture0, gl_TexCoord[shadowTextureUnit0]).r*/ );     \n
+                gl_FragColor = color;                                                                                                \n
+                //gl_FragColor = gl_TexCoord[1]; \n
+                //gl_FragColor = colorAmbientEmissive*shadow; \n
+            }
+            )
         };
 
         const char* get_shader(shader_t t)
         {
             if(t==VS)
-                return nullptr;
+                return vs; // vs_test2; - рабочий тестовый вариант
             else if(t==FS)
-                return fs_test;
+                return fs; // fs_test; - тоже
             else 
                 return nullptr;
         }
@@ -1366,12 +1425,11 @@ namespace shaders
 
                 lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.texcoord  = gl_TexCoord[0].xy;
-                v_out.shadow_view = shadow0_matrix*gl_Vertex;
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
+                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
                 illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
@@ -1398,6 +1456,8 @@ namespace shaders
             )
 
             INCLUDE_MAT
+
+            INCLUDE_VS
             
             STRINGIFY ( 
 
@@ -1419,7 +1479,7 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0;
+                float shadow = PCF(shadowTexture0, f_in.shadow_view);
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
@@ -1501,11 +1561,10 @@ namespace shaders
 
                 lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
-                gl_TexCoord[0] = gl_MultiTexCoord1;
 
                 v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
                 v_out.viewpos   = vertexInEye.xyz;
-                v_out.texcoord  = gl_TexCoord[0].xy; 
+                v_out.texcoord  = gl_MultiTexCoord1.xy;
 
             }       
             )
@@ -1535,6 +1594,8 @@ namespace shaders
             )
 
             INCLUDE_MAT
+
+            INCLUDE_VS
 
             STRINGIFY ( 
 

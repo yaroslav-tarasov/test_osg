@@ -1225,6 +1225,12 @@ void ViewDependentShadowMap::createShaders()
             _uniforms.push_back(shadowTextureUnit.get());
         }
     }
+    
+    _shadowMatrix = new osg::Uniform("shadowMatrix",osg::Matrixf());
+    _uniforms.push_back(_shadowMatrix.get());
+    
+    _refMatrix = new osg::Uniform("refMatrix",osg::Matrixf());
+    _uniforms.push_back(_refMatrix.get());
 
     switch(settings->getShaderHint())
     {
@@ -2292,18 +2298,27 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
     OSG_INFO<<"assignTexGenSettings() textureUnit="<<textureUnit<<" texgen="<<texgen<<std::endl;
 
     texgen->setMode(osg::TexGen::EYE_LINEAR);
-
+    
     // compute the matrix which takes a vertex from local coords into tex coords
     // We actually use two matrices one used to define texgen
-    // and second that will be used as modelview when appling to OpenGL
-    texgen->setPlanesFromMatrix( camera->getProjectionMatrix() *
-                                 osg::Matrix::translate(1.0,1.0,1.0) *
-                                 osg::Matrix::scale(0.5,0.5,0.5) );
+    // and second that will be used as modelview when appling to OpenGL    
+    
+    osg::Matrix planes (    camera->getProjectionMatrix() *
+                            osg::Matrix::translate(1.0,1.0,1.0) *
+                            osg::Matrix::scale(0.5,0.5,0.5));
+
+    if(_shadowMatrix.valid())
+        _shadowMatrix->set(planes);
+
+    texgen->setPlanesFromMatrix( planes );
 
     // Place texgen with modelview which removes big offsets (making it float friendly)
     osg::ref_ptr<osg::RefMatrix> refMatrix =
         new osg::RefMatrix( camera->getInverseViewMatrix() * (*(cv->getModelViewMatrix())) );
-
+    
+    if(_refMatrix.valid())
+        _refMatrix->set(refMatrix);
+    
     osgUtil::RenderStage* currentStage = cv->getCurrentRenderBin()->getStage();
     currentStage->getPositionalStateContainer()->addPositionedTextureAttribute( textureUnit, refMatrix.get(), texgen );
     return true;

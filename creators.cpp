@@ -1417,6 +1417,7 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     stateset->addUniform( new osg::Uniform("ShadowSplit0", 4) );
     stateset->addUniform( new osg::Uniform("shadowTexture0", 5) );
 
+
     stateset->setAttributeAndModes( p.program.get() );
     
     if ( mat_name.find("panorama") !=std::string::npos )
