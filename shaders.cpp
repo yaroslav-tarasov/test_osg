@@ -81,11 +81,11 @@ namespace shaders
 \n                                                                                                     \
 \n      uniform mat4      shadow0_matrix;                                                              \
 \n                                                                                                     \
-\n        float PCF(sampler2DShadow depths,vec4 stpq){                                                 \
+\n        float PCF2(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
 \n            float result = 0.0;                                                                      \
 \n            int   count = 0;                                                                         \
-\n            for(int x=-2; x<=2; x++){                                                                \
-\n                for(int y=-2; y<=2; y++){                                                            \
+\n            for(int x=-size.x; x<=size.x; x++){                                                      \
+\n                for(int y=-size.y; y<=size.y; y++){                                                  \
 \n                    count++;                                                                         \
 \n                    result += shadow2DProjOffset(depths, stpq, ivec2(x,y)).r;                        \
 \n                }                                                                                    \
@@ -93,6 +93,16 @@ namespace shaders
 \n            return result/count;                                                                     \
         }                                                                                              \
                                                                                                        \
+\n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+\n            float result = 0.0;                                                                      \
+\n            int   count = 4;                                                                         \
+\n                    result += shadow2DProjOffset(depths, stpq, ivec2(0,-1)).r;                       \
+\n                    result += shadow2DProjOffset(depths, stpq, ivec2(0,1)).r;                        \
+\n                    result += shadow2DProjOffset(depths, stpq, ivec2(1,0)).r;                        \
+\n                    result += shadow2DProjOffset(depths, stpq, ivec2(-1,0)).r;                       \
+\n            return result/count;                                                                     \
+    }                                                                                                  \
+      const ivec2 pcf_size = ivec2(1,1);                                                               \
                                                                                                        \
      vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
      {                                                                                                 \
@@ -212,8 +222,9 @@ namespace shaders
         {
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag) 
-            float shadow = PCF(shadowTexture0, f_in.shadow_view); 
-            //shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
+            float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+            //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
             //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
             //if (split_test.x) 
             //    shadow = textureProj(ShadowSplit0, shadow0_matrix * in_frag.shadow_view); 
@@ -394,7 +405,9 @@ namespace shaders
            {
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
-               float shadow = PCF(shadowTexture0, f_in.shadow_view); 
+               float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+               //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                //if (split_test.x) 
@@ -567,7 +580,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF(shadowTexture0, f_in.shadow_view);
+                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
@@ -758,7 +773,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF(shadowTexture0, f_in.shadow_view);
+                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 
@@ -899,7 +916,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-\n                float shadow = PCF(shadowTexture0, f_in.shadow_view);  
+                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders);                                              
 \n                //if (split_test.x)                                                                                                      
@@ -1094,7 +1113,8 @@ namespace shaders
 \n            {
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
-\n                float shadow = PCF(shadowTexture0, f_in.shadow_view); 
+                  float shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size); 
+                  //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
                   // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
 \n                //if (split_test.x) 
@@ -1371,7 +1391,7 @@ namespace shaders
                 vec4 colorAmbientEmissive = vec4(1.0);//gl_FrontLightModelProduct.sceneColor;       \n
                 vec4 color = texture2D( baseTexture, gl_TexCoord[0].xy );  // baseTextureUnit             \n
 
-                float shadow = PCF(shadowTexture0, gl_TexCoord[1]); // shadowTextureUnit0
+                float shadow = PCF2(shadowTexture0, gl_TexCoord[1],pcf_size); // shadowTextureUnit0
             
                 float illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse);
 
@@ -1479,7 +1499,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF(shadowTexture0, f_in.shadow_view);
+                float shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size); 
+                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
+
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
                 //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
                 //if (split_test.x) 

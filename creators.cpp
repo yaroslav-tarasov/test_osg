@@ -1569,11 +1569,12 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     settings->setBaseShadowTextureUnit(5);
     settings->setMinimumShadowMapNearFarRatio(.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
-    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
-    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
+    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
+    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
-    //settings->setMaximumShadowMapDistance(1000);
+    settings->setMaximumShadowMapDistance(2000);
+    settings->setShaderHint(testShadow::ShadowSettings::NO_SHADERS);
 
     osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
     source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
@@ -1621,7 +1622,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 #if 1
-    const char* scene_name = "sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
+    const char* scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
     const char* mat_file_name = "sheremetyevo.open.dae"; //scene_name;//
 #else
     const char* scene_name = "adler.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
@@ -1712,7 +1713,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         effects::createProgram(p_copy->getOrCreateStateSet(),circles::vs,circles::fs) ;
 #endif 
 
-		const unsigned inst_num = 12;
+		const unsigned inst_num = 24;
         for (unsigned i = 0; i < inst_num; ++i)
         {
             float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
@@ -1771,7 +1772,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
     root->addChild(movingModel);
 
-
+    // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
 #ifdef SPOT_LIGHT
     //root->setStateSet(lights::createSpotLightDecoratorState(10,1));

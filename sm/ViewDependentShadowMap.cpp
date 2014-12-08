@@ -867,6 +867,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
         // if we are using multiple shadow maps and CastShadowTraversalMask is being used
         // traverse the scene to compute the extents of the objects
+
         if (/*numShadowMapsPerLight>1 &&*/ _shadowedScene->getCastsShadowTraversalMask()!=0xffffffff)
         {
             // osg::ElapsedTime timer;
@@ -2317,7 +2318,7 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
         new osg::RefMatrix( camera->getInverseViewMatrix() * (*(cv->getModelViewMatrix())) );
     
     if(_refMatrix.valid())
-        _refMatrix->set(refMatrix);
+        _refMatrix->set(*refMatrix.get());
     
     osgUtil::RenderStage* currentStage = cv->getCurrentRenderBin()->getStage();
     currentStage->getPositionalStateContainer()->addPositionedTextureAttribute( textureUnit, refMatrix.get(), texgen );

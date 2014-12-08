@@ -37,7 +37,7 @@ std::function<int( int, char**)> pmain[] = {
 
 int main( int argc, char** argv )
 {  
-    osg::setNotifyLevel( osg::INFO );
+    osg::setNotifyLevel( osg::WARN );
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
     osg::notify(osg::INFO) << "Start this program \n";

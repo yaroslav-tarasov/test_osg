@@ -142,15 +142,6 @@ public:
         
         auto sls = _ephem->getSunLightSource()->getLight();
         
-        
-        if(_light_src.valid())
-        {
-            _light_src->getLight()->setPosition(sls->getPosition());
-            _light_src->getLight()->setDiffuse(sls->getDiffuse());
-            _light_src->getLight()->setAmbient(sls->getAmbient());
-            _light_src->getLight()->setSpecular(sls->getSpecular());
-        }
-
         if(!_fogLayer || !_skyClouds)
             return;
 
@@ -223,7 +214,6 @@ public:
     
     osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
     void                                 extCallback(on_callback_f f) {_func = f; };
-    void setLightSource (osg::LightSource* src){_light_src=src;};
 private:
     class handler : public osgGA::GUIEventHandler
     {
@@ -280,7 +270,6 @@ private:
     osg::ref_ptr<CloudsLayer>                  _skyClouds;
     osg::ref_ptr<handler>                      _handler;
     on_callback_f                              _func;
-    osg::ref_ptr<osg::LightSource>             _light_src;
     
 };
 
@@ -747,7 +736,7 @@ int main_scene( int argc, char** argv )
 
     // load the nodes from the commandline arguments.
     auto model_parts  = creators::createModel(ls, overlay, technique);
-   
+    
     osg::ref_ptr<osg::MatrixTransform> turn_node = new osg::MatrixTransform;
     //turn_node->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
     turn_node->addChild(model_parts[0]);
@@ -760,6 +749,15 @@ int main_scene( int argc, char** argv )
     }
     else
     {
+        findNodeVisitor findCameraTower("camera_tower"); 
+        model->accept(findCameraTower);
+        auto ct =  findCameraTower.getFirst();
+
+        if(ct) 
+            manip->setHomePosition(ct->getBound().center(), osg::Vec3(0,1,0), osg::Z_AXIS);
+
+
+
         osg::BoundingSphere loaded_bs = model->getBound();
 
         // create a bounding box, which we'll use to size the room.
@@ -911,8 +909,8 @@ int main_scene( int argc, char** argv )
              rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 #endif
 
-#ifdef  TEST_EPHEMERIS 
-             eCallback->setLightSource(ls);
+#ifdef  TEST_EPHEMERIS
+             ephemerisModel->setSunLightSource(ls); 
 #endif 
 
 #ifdef TEST_SHADOWS_2  // TEST_FBO
@@ -967,7 +965,7 @@ int main_scene( int argc, char** argv )
         //osgUtil::Optimizer optimzer;
         //optimzer.optimize(rootnode);
         
-        //osgDB::writeNodeFile(*rootnode,"test_osg_struct.osgt");
+        // osgDB::writeNodeFile(*model,"test_osg_struct.osgt");
 
         // set the scene to render
         viewer.setSceneData(rootnode);
@@ -1118,7 +1116,7 @@ int main_scene( int argc, char** argv )
 	     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
          /*model->asGroup()->*/rootnode->addChild(precipitationEffect.get());
 		 precipitationEffect->snow(0.3);
-         precipitationEffect->setWind(osg::Vec3(2.2f,8.2f,0.2f));
+         precipitationEffect->setWind(osg::Vec3(0.2f,0.2f,0.2f));
 #endif
 		// Useless
 		//rootnode->getOrCreateStateSet()->setMode( GL_LINE_SMOOTH, osg::StateAttribute::ON );
