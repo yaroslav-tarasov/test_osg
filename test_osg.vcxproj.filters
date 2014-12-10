@@ -22,6 +22,9 @@
     <Filter Include="Source Files\sm">
       <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\spark">
+      <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -196,6 +199,27 @@
     </ClCompile>
     <ClCompile Include="sm\ShadowSettings.cpp">
       <Filter>Source Files\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\explosion_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\fire_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\osgspark.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\rain_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\simple_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\SparkDrawable.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="spark\SparkUpdatingHandler.cpp">
+      <Filter>Source Files\spark</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

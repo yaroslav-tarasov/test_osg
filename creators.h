@@ -32,6 +32,11 @@ namespace creators
 
 }
 
+namespace bi
+{
+    osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater();
+}
+
 namespace effects
 {
      void insertParticle(osg::Group* root,osg::Node* rootModel, const osg::Vec3& center, float radius);
@@ -132,6 +137,14 @@ enum {
     RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
     RENDER_BIN_CLOUDS                   = -2, 
 };
+
+namespace spark
+{   
+    typedef std::pair<osg::Node*, osgGA::GUIEventHandler*> spark_pair_t;  
+    enum spark_t {EXPLOSION,FIRE,RAIN,SMOKE};
+    void init();
+    spark_pair_t create(spark_t effectType,osg::Transform* model=nullptr);
+}
 
 namespace utils
 {

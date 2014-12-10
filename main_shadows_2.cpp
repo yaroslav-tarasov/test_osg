@@ -41,7 +41,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
 
 
     float baseHeight = 0.0f; //center.z();//-radius*0.5;
-#ifdef TEST_ADLER_SCENE 
+#ifdef TEST_REAL_SCENE 
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 

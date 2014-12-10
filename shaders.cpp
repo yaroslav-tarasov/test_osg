@@ -221,8 +221,12 @@ namespace shaders
         void main (void)
         {
             // GET_SHADOW(f_in.viewpos, f_in);
-            //#define GET_SHADOW(viewpos, in_frag) 
-            float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+            //#define GET_SHADOW(viewpos, in_frag)   
+            float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+            if(illum > 0.35)
+               shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
+
+
             //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
             //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
@@ -328,7 +332,7 @@ namespace shaders
            attribute vec3 tangent;
            attribute vec3 binormal;
            varying   vec3 lightDir;
-
+           varying   float illum; 
            out block
            {
                vec2 texcoord;
@@ -355,7 +359,8 @@ namespace shaders
                v_out.normal    = normal;
                v_out.viewpos   = vertexInEye.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
-               v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0); 
+               v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+               illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента 
            }       
        )
        };
@@ -388,6 +393,7 @@ namespace shaders
            uniform sampler2D colorTex;
            uniform sampler2D normalTex;
            varying vec3 lightDir;
+           varying float illum;
 
            in block
            {
@@ -405,7 +411,9 @@ namespace shaders
            {
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
-               float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+               float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+               if(illum > 0.35)
+                   shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -580,7 +588,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                if(illum > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -773,7 +783,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                if(illum > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -916,7 +928,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size); 
+                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                if(illum > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1113,7 +1127,9 @@ namespace shaders
 \n            {
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
-                  float shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size); 
+                  float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                  if(illum > 0.35)
+                      shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
                   //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
                   // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
@@ -1343,7 +1359,7 @@ namespace shaders
 
             void main (void)
             {
-               vec4 posEye =  gl_ModelViewMatrix * gl_Vertex;
+               vec4 posEye    =  gl_ModelViewMatrix * gl_Vertex;
                gl_Position    =  gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex; //ftransform();                       
                gl_TexCoord[0] =  gl_MultiTexCoord1;                  
                gl_FrontColor  =  gl_Color;                          
@@ -1499,7 +1515,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size); 
+                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                if(illum > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;  
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);

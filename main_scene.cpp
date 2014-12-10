@@ -400,7 +400,6 @@ public:
 };
 
 
-
 #if 1
 osg::Node*
     preRender( osg::Node* node)
@@ -677,6 +676,8 @@ int main_scene( int argc, char** argv )
         );
     
 #endif
+    
+    spark::init();
 
 	osg::DisplaySettings::instance()->setNumMultiSamples( 8 );
 
@@ -698,11 +699,15 @@ int main_scene( int argc, char** argv )
     //rootnode->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
 
     // Use a default camera manipulator
-    osgGA::TrackballManipulator* manip = new osgGA::TrackballManipulator;
+    osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
+    
+    manip->setAcceleration(0);
+    manip->setMaxVelocity(1);
+    manip->setWheelMovement(0.001,true);
     viewer.setCameraManipulator(manip);
     // Initially, place the TrackballManipulator so it's in the center of the scene
-    manip->setHomePosition(osg::Vec3(0,1000,1000), osg::Vec3(0,1,0), osg::Z_AXIS);
-    manip->home(0);
+    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
+    // manip->home(0);
 
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
@@ -855,6 +860,16 @@ int main_scene( int argc, char** argv )
         //ephemerisModel->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
         rootnode->addChild( ephemerisModel.get() );
 
+        time_t seconds = time(0L);
+        struct tm *_tm = localtime(&seconds);
+        osgEphemeris::DateTime dt;
+        dt.setYear( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
+        dt.setMonth( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
+        dt.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
+        dt.setHour( _tm->tm_hour );
+        dt.setMinute( _tm->tm_min );
+        dt.setSecond( _tm->tm_sec );
+        ephemerisModel->setDateTime( dt );
 
 #endif  // TEST_EPHEMERIS
 
@@ -967,6 +982,15 @@ int main_scene( int argc, char** argv )
         
         // osgDB::writeNodeFile(*model,"test_osg_struct.osgt");
 
+        spark::spark_pair_t sp =   spark::create(spark::FIRE);
+        spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
+
+        osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
+        posed->addChild(sp.first);
+        posed->addChild(sp2.first);
+
+        rootnode->addChild(posed);
+
         // set the scene to render
         viewer.setSceneData(rootnode);
 
@@ -1059,7 +1083,6 @@ int main_scene( int argc, char** argv )
         }
 #endif
 
-
         osg::ref_ptr<osgGA::StateSetManipulator> statesetManipulator = new osgGA::StateSetManipulator(viewer.getCamera()->getStateSet());
         viewer.addEventHandler(statesetManipulator.get());
 
@@ -1069,7 +1092,13 @@ int main_scene( int argc, char** argv )
         auto node =  findNode.getFirst();
         if(node)
             viewer.addEventHandler(new AnimationHandler(/*node*/model_parts[1],animationName
-                   ,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}
+                   //,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}
+                   ,[&](){ 
+                      
+                       spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,model->asGroup()->asTransform());
+                       model->asGroup()->asTransform()->addChild(sp3.first);
+                       
+                    }
                    ,[&](bool off){model_parts[2]->setUpdateCallback(off?nullptr:new circleAimlessly());}
                    ,[&](bool low){model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);}
             ));
@@ -1082,10 +1111,13 @@ int main_scene( int argc, char** argv )
         viewer.addEventHandler( eCallback->GetHandler() );
 #endif
 
+        viewer.addEventHandler( bi::getUpdater().get() );
+
+        viewer.addEventHandler(sp.second);
         //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
         //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
 
-#if 1
+#if 0
 		//Experiment with setting the LightModel to very dark to get better sun lighting effects
 		{
 			osg::ref_ptr<osg::StateSet> sset = rootnode->getOrCreateStateSet();
