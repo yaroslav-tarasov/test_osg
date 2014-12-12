@@ -5,6 +5,8 @@
     GLuint var = 0; itr = textureIDMap.find(name); \
     if ( itr!=textureIDMap.end() ) var = itr->second;
 
+#define SCALE_COEFF 2
+
 SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
 {
     SparkDrawable::TextureIDMap::const_iterator itr;
@@ -13,7 +15,7 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
     
     // Renderers
     SPK::GL::GLQuadRenderer* fireRenderer = SPK::GL::GLQuadRenderer::create();
-    fireRenderer->setScale(0.3f,0.3f);
+    fireRenderer->setScale(0.3f*SCALE_COEFF,0.3f*SCALE_COEFF);
     fireRenderer->setTexturingMode(SPK::TEXTURE_2D);
     fireRenderer->setTexture(textureFire);
     fireRenderer->setTextureBlending(GL_MODULATE);
@@ -22,7 +24,7 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
     fireRenderer->setAtlasDimensions(2,2);
 
     SPK::GL::GLQuadRenderer* smokeRenderer = SPK::GL::GLQuadRenderer::create();
-    smokeRenderer->setScale(0.3f,0.3f);
+    smokeRenderer->setScale(0.3f*SCALE_COEFF,0.3f*SCALE_COEFF);
     smokeRenderer->setTexturingMode(SPK::TEXTURE_2D);
     smokeRenderer->setTexture(textureSmoke);
     smokeRenderer->setTextureBlending(GL_MODULATE);
@@ -72,33 +74,33 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
     // Emitters
     // The emitters are arranged so that the fire looks realistic
     SPK::StraightEmitter* fireEmitter1 = SPK::StraightEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f));
-    fireEmitter1->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,-1.0f),0.5f));
-    fireEmitter1->setFlow(40);
+    fireEmitter1->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,-1.0f),0.5f * SCALE_COEFF));
+    fireEmitter1->setFlow(40 *SCALE_COEFF);
     fireEmitter1->setForce(1.0f,2.5f);
 
     SPK::StraightEmitter* fireEmitter2 = SPK::StraightEmitter::create(SPK::Vector3D(1.0f,0.0f,0.6f));
-    fireEmitter2->setZone(SPK::Sphere::create(SPK::Vector3D(0.15f,0.075f,-1.2f),0.1f));
-    fireEmitter2->setFlow(15);
+    fireEmitter2->setZone(SPK::Sphere::create(SPK::Vector3D(0.15f,0.075f,-1.2f),0.1f * SCALE_COEFF));
+    fireEmitter2->setFlow(15*SCALE_COEFF);
     fireEmitter2->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter3 = SPK::StraightEmitter::create(SPK::Vector3D(-0.6f,-0.8f,0.8f));
-    fireEmitter3->setZone(SPK::Sphere::create(SPK::Vector3D(-0.375f,-0.375f,-1.15f),0.3f));
-    fireEmitter3->setFlow(15);
+    fireEmitter3->setZone(SPK::Sphere::create(SPK::Vector3D(-0.375f,-0.375f,-1.15f),0.3f * SCALE_COEFF));
+    fireEmitter3->setFlow(15*SCALE_COEFF);
     fireEmitter3->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter4 = SPK::StraightEmitter::create(SPK::Vector3D(-0.8f,0.2f,0.5f));
-    fireEmitter4->setZone(SPK::Sphere::create(SPK::Vector3D(-0.255f,0.225f,-1.2f),0.2f));
-    fireEmitter4->setFlow(10);
+    fireEmitter4->setZone(SPK::Sphere::create(SPK::Vector3D(-0.255f,0.225f,-1.2f),0.2f* SCALE_COEFF));
+    fireEmitter4->setFlow(10*SCALE_COEFF);
     fireEmitter4->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter5 = SPK::StraightEmitter::create(SPK::Vector3D(0.1f,-1.0f,0.8f));
-    fireEmitter5->setZone(SPK::Sphere::create(SPK::Vector3D(-0.075f,-0.3f,-1.2f),0.2f));
-    fireEmitter5->setFlow(10);
+    fireEmitter5->setZone(SPK::Sphere::create(SPK::Vector3D(-0.075f,-0.3f,-1.2f),0.2f * SCALE_COEFF ));
+    fireEmitter5->setFlow(10*SCALE_COEFF);
     fireEmitter5->setForce(0.5f,1.5f);
 
-    SPK::SphericEmitter* smokeEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),0.0f,0.5f * osg::PI);
-    smokeEmitter->setZone(SPK::Sphere::create(SPK::Vector3D(),1.2f));
-    smokeEmitter->setFlow(25);
+    SPK::SphericEmitter* smokeEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),0.0f,0.5f * osg::PI*SCALE_COEFF);
+    smokeEmitter->setZone(SPK::Sphere::create(SPK::Vector3D(),1.2f * SCALE_COEFF));
+    smokeEmitter->setFlow(25*SCALE_COEFF);
     smokeEmitter->setForce(0.5f,1.0f);
 
     // Groups

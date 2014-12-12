@@ -12,6 +12,7 @@
 #include "sv/CloudLayer.h"
 #include "sv/PreRender.h"
 #include "shadow_map.h"
+#include "teapot.h"
 
 #include <osgEphemeris/EphemerisModel.h>
 
@@ -509,6 +510,54 @@ osg::Node*
 
 #endif
 
+osg::Node*
+    decalRender( osgViewer::Viewer& viewer)
+{
+    osg::Camera* rootCamera( viewer.getCamera() );
+
+    // Create the texture; we'll use this as our color buffer.
+    // Note it has no image data; not required.
+    osg::Texture2D* tex = creators::GetTextureHolder().GetDecalTexture().get();// new osg::Texture2D;
+
+
+    // Attach the texture to the camera. Tell it to use multisampling.
+    // Internally, OSG allocates a multisampled renderbuffer, renders to it,
+    // and at the end of the frame performs a BlitFramebuffer into our texture.
+    //rootCamera->attach( osg::Camera::COLOR_BUFFER0, tex, 0, 0, false, 8, 8 );
+    //rootCamera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::FRAME_BUFFER );
+#if( OSGWORKS_OSG_VERSION >= 20906 )
+    rootCamera->setImplicitBufferAttachmentMask(
+        osg::Camera::IMPLICIT_COLOR_BUFFER_ATTACHMENT|osg::Camera::IMPLICIT_DEPTH_BUFFER_ATTACHMENT,
+        osg::Camera::IMPLICIT_COLOR_BUFFER_ATTACHMENT );
+#endif
+
+
+    // Configure postRenderCamera to draw fullscreen textured quad
+    osg::ref_ptr< osg::Camera > postRenderCamera( new osg::Camera );
+
+    postRenderCamera->setClearMask( 0 );
+    postRenderCamera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::FRAME_BUFFER );
+    postRenderCamera->attach( osg::Camera::COLOR_BUFFER/*COLOR_BUFFER0*/, tex);// , 0, 0, false, 8, 8 );
+
+    postRenderCamera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
+    postRenderCamera->setRenderOrder( osg::Camera::PRE_RENDER );
+    postRenderCamera->setViewMatrix( osg::Matrixd::identity() );
+    postRenderCamera->setProjectionMatrix( osg::Matrixd::identity() );
+   
+    //osg::Geode* geode( new osg::Geode );
+    //geode->addDrawable( osgwTools::makePlane(
+    //    osg::Vec3( -1,-1,0 ), osg::Vec3( 2,0,0 ), osg::Vec3( 0,2,0 ) ) );
+    //geode->getOrCreateStateSet()->setTextureAttributeAndModes(
+    //    0, tex, osg::StateAttribute::ON );
+    //geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    //geode->getOrCreateStateSet()->setMode( GL_DEPTH_TEST, osg::StateAttribute::OFF );
+
+    //postRenderCamera->addChild( geode );
+
+    return( postRenderCamera.release() );
+}
+
+
 class UpdateCameraAndTexGenCallback : public osg::NodeCallback
 {
 public:
@@ -928,6 +977,15 @@ int main_scene( int argc, char** argv )
              ephemerisModel->setSunLightSource(ls); 
 #endif 
 
+            auto dr = decalRender(viewer);
+            
+            
+            osg::ref_ptr<osg::Geode> tn = new osg::Geode;
+            tn->addDrawable( new TeapotDrawable(1.0f) );
+            dr->asTransform()->addChild(tn);
+            rootnode->addChild(tn);
+            rootnode->addChild(dr);
+
 #ifdef TEST_SHADOWS_2  // TEST_FBO
 
              //osg::ref_ptr<osg::Group> fbo_shadow_node = new osg::Group;
@@ -1092,13 +1150,13 @@ int main_scene( int argc, char** argv )
         auto node =  findNode.getFirst();
         if(node)
             viewer.addEventHandler(new AnimationHandler(/*node*/model_parts[1],animationName
-                   //,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}
-                   ,[&](){ 
-                      
-                       spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,model->asGroup()->asTransform());
-                       model->asGroup()->asTransform()->addChild(sp3.first);
-                       
-                    }
+                   ,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}
+                   //,[&](){ 
+                   //   
+                   //    spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,model->asGroup()->asTransform());
+                   //    model->asGroup()->asTransform()->addChild(sp3.first);
+                   //    
+                   // }
                    ,[&](bool off){model_parts[2]->setUpdateCallback(off?nullptr:new circleAimlessly());}
                    ,[&](bool low){model_parts[4]->setNodeMask(low?0:0xffffffff);model_parts[5]->setNodeMask(low?0xffffffff:0);}
             ));

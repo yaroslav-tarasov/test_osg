@@ -111,6 +111,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="sv\FogLayer.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="teapot.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animation_handler.cpp" />

@@ -273,11 +273,20 @@ namespace bi
     class RigidUpdater : public osgGA::GUIEventHandler
     {
     public:
-        RigidUpdater( osg::Group* root ) : _root(root) {}
+        typedef std::function<void(osg::MatrixTransform* mt)> on_collision_f;
+    public:
+        RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ) 
+            : _root        (root)
+            , _on_collision(on_collision) 
+        {}
 
         void addGround( const osg::Vec3& gravity )
         {
-            BulletInterface::instance()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity );
+            BulletInterface::instance()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
+                [&](int id){
+                    if(_on_collision)
+                        _on_collision(_physicsNodes[id].get());   
+            } );
         }
 
         void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -383,11 +392,12 @@ namespace bi
             BulletInterface::instance()->setVelocity( id, vel );
             _physicsNodes[id] = mt;
         }
-
+  private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
         NodeMap _physicsNodes;
         osg::observer_ptr<osg::Group> _root;
         high_res_timer                _hr_timer;
+        on_collision_f                _on_collision;
     };
 
     osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater()
@@ -395,6 +405,7 @@ namespace bi
         static osg::ref_ptr<osgGA::GUIEventHandler> updater;
         return  updater;
     }
+
 
 }
 
@@ -1155,7 +1166,8 @@ public:
         osg::ref_ptr<osg::Texture2D>      colorTex;
         osg::ref_ptr<osg::Texture2D>      nightTex;
         osg::ref_ptr<osg::Texture2D>      detailsTex;
-        osg::ref_ptr<osg::TextureCubeMap> envTex; 
+        osg::ref_ptr<osg::TextureCubeMap> envTex;
+        osg::ref_ptr<osg::Texture2D>      decalTex;
     };
     
 public:
@@ -1183,6 +1195,11 @@ public:
     {
         return   envTex;
     }
+    
+    osg::ref_ptr<osg::Texture2D>   GetDecalTexture()
+    {
+        return   decalTex;
+    }
 
     friend texturesHolder_base&   GetTextureHolder();
 
@@ -1191,7 +1208,7 @@ private:
     osg::ref_ptr<osg::Texture2D>      detailsTex;
     osg::ref_ptr<osg::Texture2D>      emptyTex;
     osg::ref_ptr<osg::TextureCubeMap> envTex;
-
+    osg::ref_ptr<osg::Texture2D>      decalTex;
 
     texturesHolder()
     {          
@@ -1223,8 +1240,12 @@ private:
          envTex->setNumMipmapLevels(3);
          envTex->setUseHardwareMipMapGeneration(true);
          
-         
-
+         decalTex = new osg::Texture2D;
+         decalTex->setTextureSize(1024, 1024);
+         decalTex->setInternalFormat( GL_RGBA );
+         decalTex->setBorderWidth( 0 );
+         decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
+         decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
 #if 0
 #if 1
          envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
@@ -1546,7 +1567,7 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     stateset->addUniform( new osg::Uniform("NightTex"    , 1) );
     stateset->addUniform( new osg::Uniform("Detail"      , 2) ); 
     stateset->addUniform( new osg::Uniform("Env"         , 3) ); 
-    stateset->addUniform( new osg::Uniform("ShadowSplit0", 4) );
+    stateset->addUniform( new osg::Uniform("ViewDecalMap", 4) );
     stateset->addUniform( new osg::Uniform("shadowTexture0", 5) );
 
 
@@ -1573,7 +1594,7 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
     stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
     stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );
-    stateset->setTextureAttributeAndModes( 4, GetShadowMap()->getTexture(), value ); 
+    stateset->setTextureAttributeAndModes( 4, GetTextureHolder().GetDecalTexture().get()/*GetShadowMap()->getTexture()*/, value ); 
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 
@@ -1677,6 +1698,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 {
     osg::Vec3 center(0.0f,0.0f,300.0f);
     float radius = 600.0f;
+    high_res_timer                _hr_timer;
 
 #if defined(TEST_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
 
@@ -1747,6 +1769,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 #endif
 
 
+
     float baseHeight = 0.0f; //center.z();//-radius*0.5;
 #ifdef TEST_REAL_SCENE 
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
@@ -1815,6 +1838,9 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     osg::Node* baseModel = createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
 #endif
     
+
+    OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
+
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
@@ -1845,7 +1871,19 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         effects::createProgram(p_copy->getOrCreateStateSet(),circles::vs,circles::fs) ;
 #endif 
         
-        bi::RigidUpdater* rigidUpdater = new bi::RigidUpdater( root.get() );
+        bi::RigidUpdater* rigidUpdater = new bi::RigidUpdater( root.get() 
+            ,[&](osg::MatrixTransform* mt){ 
+                findNodeVisitor findFire("fire"); 
+                mt->accept(findFire);
+                if(!findFire.getFirst())
+                {
+                    spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
+                    sp3.first->setName("fire");
+                    mt->addChild(sp3.first);
+                }
+            }
+            );
+
         rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
         for ( unsigned int i=0; i<10; ++i )
         {
@@ -1901,7 +1939,42 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
             // add it
      		root->addChild(positioned);
-            //root->addChild(positioned2);
+
+            if (i==1) 
+            {    
+                auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( p_copy->getUpdateCallback() );
+                if ( manager_ )
+                {   
+
+                    const osgAnimation::AnimationList& animations =
+                        manager_->getAnimationList();
+
+                    for ( unsigned int i=0; i<animations.size(); ++i )
+                    {
+                        const std::string& name = animations[i]-> getName();
+                        if ( name==std::string("Default") )
+                        {
+                            auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
+                            // manager->unregisterAnimation(animations[i].get());
+                            // manager->registerAnimation  (anim/*.get()*/);
+
+                            animations[i]->setPlayMode(osgAnimation::Animation::ONCE);                   
+                            manager_->playAnimation( /*anim*/ animations[i].get(),2,2.0 );
+
+                        }
+
+                    }
+               }
+
+
+            }
+
+            p_copy = osg::clone(p_copy, osg::CopyOp::DEEP_COPY_ALL 
+                & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+                & ~osg::CopyOp::DEEP_COPY_ARRAYS
+                & ~osg::CopyOp::DEEP_COPY_IMAGES
+                & ~osg::CopyOp::DEEP_COPY_TEXTURES
+                );
         }
     }
 
@@ -1927,6 +2000,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
 
     root->addChild(movingModel);
+    
+    OSG_WARN << "Время загрузки копирования самолетов: " << _hr_timer.get_delta() << "\n";
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 

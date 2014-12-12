@@ -20,6 +20,7 @@ public:
          : _last_point(0)
      {
         ::QueryPerformanceFrequency(&_frequency);
+        get_delta();
      }
     
      double get_delta() 

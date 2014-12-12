@@ -24,6 +24,7 @@ namespace creators
     class texturesHolder_base {
         public:
         virtual osg::ref_ptr<osg::TextureCubeMap>   GetEnvTexture() = 0;
+        virtual osg::ref_ptr<osg::Texture2D>   GetDecalTexture() =0;
     };    
     
     texturesHolder_base&             GetTextureHolder();

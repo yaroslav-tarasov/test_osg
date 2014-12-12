@@ -1166,7 +1166,7 @@ namespace shaders
 \n                // APPLY_DECAL(f_in, dif_tex_col);
 \n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
 \n                // dif_col.rgb = fma(dif_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);        // FIXME
-\n                decal_data.a = 1.0; //FIXME Dummy code 
+\n                // decal_data.a = 1.0; //FIXME Dummy code 
 \n
 \n                // get dist to point and normalized to-eye vector
 \n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
