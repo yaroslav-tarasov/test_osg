@@ -1083,9 +1083,9 @@ osg::Node* loadAirplane()
     return loadAirplaneParts()[1];
 }
 
-osg::Node* loadBMAirplane(bool set_env_tex )
+osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 {
-    osg::Node* model = loadAirplane();
+    //osg::Node* model = loadAirplane();
     
     if (!model)
        return nullptr;
@@ -1114,11 +1114,11 @@ osg::Node* loadBMAirplane(bool set_env_tex )
     }
 
 
-    FindTextureVisitor ft("a_319");
+    FindTextureVisitor ft(name); //"a_319"
     model->accept( ft );
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile("a_319_n.dds") );  
+    normalTex->setImage( osgDB::readImageFile(name + "_n.dds") ); // "a_319_n.dds"  
 
 
     findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
@@ -1156,6 +1156,137 @@ osg::Node* loadBMAirplane(bool set_env_tex )
     stateset->setTextureAttributeAndModes( 3, tcm, value );
 
     return model;
+}
+
+class rotateIt : public osg::NodeCallback 
+{
+public:
+    rotateIt(float angle=0.f): _angle(angle) {}
+    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+    {
+        osg::MatrixTransform *tx = dynamic_cast<osg::MatrixTransform *>(node);
+        if( tx != NULL)
+        {
+            _angle += osg::PI/180.0; 
+
+            std::string name = tx->getName();
+            osg::Matrix m;
+            m.setTrans(-tx->getMatrix().getTrans());
+            m.setRotate(osg::Matrix::rotate( _angle, 0, 0, 1 ).getRotate());
+            tx->setMatrix( m );
+        }
+
+        traverse(node, nv);
+    }
+private:
+    float _angle;
+};
+
+osg::Node* loadHelicopter()
+{
+    osg::Node* model_file = osgDB::readNodeFile("mi_8.dae"); 
+
+    osg::Node* lod0 = nullptr; 
+    osg::Node* lod3 = nullptr; 
+
+    if(model_file)
+    {
+        model_file->setName("all_nodes");
+
+
+        auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
+            osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
+            shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
+            osg::Geode* light = new osg::Geode;
+            light->addDrawable( shape1.get() );
+            dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
+            light->setUpdateCallback(callback);
+            light->setName(name);
+            const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+            light->getOrCreateStateSet()->setAttribute(new osg::Program(),value);
+            light->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+            light->getOrCreateStateSet()->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+            return light;
+        };
+
+        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
+        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
+        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
+
+        auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
+            findNodeVisitor findTail(root.c_str()); 
+            model_file->accept(findTail);
+            auto tail =  findTail.getFirst();
+            if(tail)  tail->asGroup()->addChild(child);
+            return tail;
+        };
+
+///      We don't have this lighty shit now 
+        //auto tail = addAsChild("tail",white_light);
+        //auto strobe_r = addAsChild("strobe_r",white_light);
+        //auto strobe_l = addAsChild("strobe_l",white_light);
+
+        //auto port = addAsChild("port",green_light);
+        //auto star_board = addAsChild("starboard",red_light);
+
+        findNodeVisitor findLod3("Lod3"); 
+        model_file->accept(findLod3);
+        lod3 =  findLod3.getFirst();
+
+        if(lod3)
+        { 
+            lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
+        }
+
+        findNodeVisitor findSagged("Sagged",findNodeVisitor::not_exact); 
+        model_file->accept(findSagged);
+        auto sag =  findSagged.getFirst();
+
+        if(sag)
+        { 
+            //sag->setNodeMask(0);
+             sag->setUpdateCallback(new rotateIt());
+        }
+        
+        findNodeVisitor findDyn("Dynamic",findNodeVisitor::not_exact); 
+        model_file->accept(findDyn);
+        auto dyn =  findDyn.getFirst();
+
+        if(dyn)
+        { 
+            dyn->setNodeMask(0); 
+        }
+        
+        findNodeVisitor findMR("Main",findNodeVisitor::not_exact); 
+        model_file->accept(findMR);
+        auto main_rotor =  findMR.getFirst();
+
+        if(main_rotor)
+        {   
+            main_rotor->setNodeMask(0);
+            main_rotor->setUpdateCallback(new rotateIt());
+        }
+
+        findNodeVisitor findTR("tailrotorstatic",findNodeVisitor::not_exact); 
+        model_file->accept(findTR);
+        auto tail_rotor =  findTR.getFirst();
+
+        if(tail_rotor)
+        { 
+            tail_rotor->setUpdateCallback(new rotateIt());
+        }
+
+        findNodeVisitor findLod0("Lod0"); 
+        model_file->accept(findLod0);
+        lod0 =  findLod0.getFirst();     
+        
+        /// osgDB::writeNodeFile(*model_file,"helicopter.osgt");
+
+
+    }
+
+    return lod0;
 }
 
 class texturesHolder  : public texturesHolder_base
@@ -1844,7 +1975,10 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
     osg::Node* movingModel = ret_array[0];
-	
+    
+    auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
+    root->addChild(heli);
+
     const bool add_planes = true;
 
     if (add_planes)
@@ -1863,7 +1997,9 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
 		//}
 		     
-        auto p_copy = loadBMAirplane();
+        auto p_copy = //loadBMAirplane();
+        creators::applyBM(creators::loadAirplane(),"a_319",true);
+        
 
 #if 0   // Интересный эффект надо подумать над использованием 
         //effects::createShader(p_copy/*geom*/) ;
@@ -1939,7 +2075,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
             // add it
      		root->addChild(positioned);
-
+            
+                     
             if (i==1) 
             {    
                 auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( p_copy->getUpdateCallback() );

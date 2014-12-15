@@ -11,7 +11,7 @@ namespace creators
     nodes_array_t       createModel(osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
     osg::Node*          loadAirplane();
     nodes_array_t       loadAirplaneParts();
-    osg::Node*          loadBMAirplane(bool set_env_tex = false);
+    osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
 
     class programsHolder_base {
     public:

@@ -69,8 +69,9 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     const bool add_planes = true;
     if (add_planes)
     {
-        auto p_copy = creators::loadBMAirplane(true);
-       
+        auto p_copy = //creators::loadBMAirplane(true);
+        creators::applyBM(creators::loadAirplane(),"a_319");
+
         //effects::createShader(p_copy) ;
 
         const unsigned inst_num = 12;
