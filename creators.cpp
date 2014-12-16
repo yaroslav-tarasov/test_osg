@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "find_node_visitor.h" 
+#include "find_tex_visitor.h"
+#include "find_animation.h"
+
 #include "creators.h"
 #include <windows.h>
 #include "shaders.h"
 #include "ct_visitor.h"
-#include "find_tex_visitor.h"
+
 #include "materials_visitor.h"
 #include "pugixml.hpp"
 #include "shadow_map.h"
@@ -1161,26 +1164,65 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 class rotateIt : public osg::NodeCallback 
 {
 public:
-    rotateIt(float angle=0.f): _angle(angle) {}
+    rotateIt(const osg::Vec3f axis,const osg::Vec3f offset)
+        : _angle (0.0f)
+        , _axis  (axis)
+        , _offset(offset)
+    {}
     virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
     {
         osg::MatrixTransform *tx = dynamic_cast<osg::MatrixTransform *>(node);
         if( tx != NULL)
-        {
-            _angle += osg::PI/180.0; 
+        {   
+            double dt = _hr_timer.get_delta();
+            const float angular_velocity = 3000 * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
+            _angle += angular_velocity * dt;// osg::PI/180.0 ; 
 
             std::string name = tx->getName();
-            osg::Matrix m;
-            m.setTrans(-tx->getMatrix().getTrans());
-            m.setRotate(osg::Matrix::rotate( _angle, 0, 0, 1 ).getRotate());
-            tx->setMatrix( m );
+            osg::Vec3 b = tx->getBound().center();
+            osg::Vec3 tr = tx->getMatrix().getTrans();
+            
+            findNodeByType<osg::Geode> findGeode; 
+            node->accept(findGeode);
+            auto g_node =  findGeode.getFirst();
+            b = g_node->getBound().center();
+            b +=  _offset ;
+            tx->setMatrix( osg::Matrix::translate(-b)   
+                           * osg::Matrix::rotate( _angle, _axis ) 
+                           * osg::Matrix::translate(b) );
         }
 
-        traverse(node, nv);
+        traverse(node, nv); 
     }
 private:
-    float _angle;
+    float           _angle;
+    osg::Vec3f      _axis;
+    osg::Vec3f      _offset;
+    high_res_timer  _hr_timer;
 };
+
+void AnimateIt(osgAnimation::Animation::PlayMode pm,osg::Node* model_)
+{   
+    auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( model_->getUpdateCallback() );
+    if ( manager_ )
+    {   
+
+        const osgAnimation::AnimationList& animations =
+            manager_->getAnimationList();
+
+        for ( unsigned int i=0; i<animations.size(); ++i )
+        {
+            const std::string& name = animations[i]-> getName();
+            // if ( name==animationName_ )
+            {
+                animations[i]->setPlayMode(pm);                   
+                manager_->playAnimation( animations[i].get(),2,2.0 );
+
+            }
+
+        }
+    }
+} 
 
 osg::Node* loadHelicopter()
 {
@@ -1196,7 +1238,7 @@ osg::Node* loadHelicopter()
 
         auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
-            shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
+            shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.05f) );
             osg::Geode* light = new osg::Geode;
             light->addDrawable( shape1.get() );
             dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
@@ -1245,8 +1287,8 @@ osg::Node* loadHelicopter()
 
         if(sag)
         { 
-            //sag->setNodeMask(0);
-             sag->setUpdateCallback(new rotateIt());
+            sag->setNodeMask(0);
+            sag->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-0.075,0.89,0)));
         }
         
         findNodeVisitor findDyn("Dynamic",findNodeVisitor::not_exact); 
@@ -1258,32 +1300,71 @@ osg::Node* loadHelicopter()
             dyn->setNodeMask(0); 
         }
         
-        findNodeVisitor findMR("Main",findNodeVisitor::not_exact); 
+        findNodeVisitor findMR("main_rotor",findNodeVisitor::not_exact); 
         model_file->accept(findMR);
         auto main_rotor =  findMR.getFirst();
 
         if(main_rotor)
         {   
-            main_rotor->setNodeMask(0);
-            main_rotor->setUpdateCallback(new rotateIt());
+            //main_rotor->setNodeMask(0);
+            main_rotor->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-.01,0.89,0)));// osg::Vec3f(0.075,-0.85,0)
         }
 
         findNodeVisitor findTR("tailrotorstatic",findNodeVisitor::not_exact); 
         model_file->accept(findTR);
         auto tail_rotor =  findTR.getFirst();
 
+        const osg::Vec3 pivot(-0.1245227,-8.765233,4.587939); 
         if(tail_rotor)
-        { 
-            tail_rotor->setUpdateCallback(new rotateIt());
+        {   
+            const osg::BoundingSphere bs2( tail_rotor->getBound() );
+            //tail_rotor->setUpdateCallback(new rotateIt(osg::X_AXIS,osg::Vec3f(0,0,-0.45)));
+            tail_rotor->setUpdateCallback(new rotateIt(osg::X_AXIS,pivot - bs2.center()));
         }
+            
+        // -0.1245227 -8.765233 4.587939      // real pivot  from dae
+        // -0.42335910 -8.8255844  4.9434242 // bs
 
         findNodeVisitor findLod0("Lod0"); 
         model_file->accept(findLod0);
         lod0 =  findLod0.getFirst();     
         
-        /// osgDB::writeNodeFile(*model_file,"helicopter.osgt");
+        FindAnimationVisitor fanim;
+        model_file->accept(fanim);
+
+        AnimateIt(osgAnimation::Animation::LOOP, model_file);
+        // osgDB::writeNodeFile(*model_file,"helicopter.osgt");
+        
+        osg::ref_ptr< osg::Group > decorations = new osg::Group;
+        lod0->asGroup()->addChild( decorations.get() );
+        {
+            osg::StateSet* ss = decorations->getOrCreateStateSet();
+            ss->setMode( GL_LINE_SMOOTH, osg::StateAttribute::ON );
+            ss->setAttributeAndModes( new osg::BlendFunc );
+
+            ss->setAttributeAndModes( new osg::PolygonMode( osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE ) );
+            ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        }
+
+        osg::ref_ptr< osg::MatrixTransform > mt = new osg::MatrixTransform;
+        osg::ref_ptr< osg::Geode > geode = new osg::Geode;
+
+        decorations->addChild( mt.get() );
+        mt->addChild( geode.get() );
+
+        const osg::BoundingSphere bs( main_rotor->getBound() );
+        mt->setMatrix( osg::Matrix::translate( bs._center ) );
+        osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
+        shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), bs._radius) );
+        geode->addDrawable(shape1);
 
 
+        const osg::BoundingSphere bs2( tail_rotor->getBound() );
+        osg::ref_ptr< osg::MatrixTransform > mt2 = new osg::MatrixTransform;
+        osg::BoundingSphere::vec_type c = pivot;//bs2._center;
+        mt2->setMatrix( osg::Matrix::translate( c ) );
+        mt2->addChild(red_light);
+        lod0->asGroup()->addChild( mt2.get() );
     }
 
     return lod0;

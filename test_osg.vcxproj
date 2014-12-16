@@ -99,6 +99,7 @@
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="ct_visitor.h" />
+    <ClInclude Include="find_animation.h" />
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="find_tex_visitor.h" />
     <ClInclude Include="hi_res_timer.h" />
