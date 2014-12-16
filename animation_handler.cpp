@@ -116,7 +116,7 @@ void AnimationHandler::AnimateIt(osgAnimation::Animation::PlayMode pm)
             const std::string& name = animations[i]-> getName();
             if ( name==animationName_ )
             {
-                auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
+                // auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
                 // manager->unregisterAnimation(animations[i].get());
                 // manager->registerAnimation  (anim/*.get()*/);
 
