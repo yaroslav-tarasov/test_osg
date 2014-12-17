@@ -9,6 +9,8 @@
 //
 // Static functions
 //
+namespace avSky
+{
 
 static const double g_clearDayVisibility = 35000.0;
 static const double g_totalFogVisibility = 400.0;
@@ -170,4 +172,8 @@ void FogLayer::_createGeometry()
 
     // all is done, so add box to this geode
     addDrawable(box_geometry);
+}
+
+
+
 }

@@ -55,6 +55,7 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public testShadow::ShadowTec
         /** Clean scene graph from any shadow technique specific nodes, state and drawables.*/
         virtual void cleanSceneGraph();
 
+        void setNightMode(bool nightMode){ _nightMode = nightMode;}
 
         struct /*OSGSHADOW_EXPORT*/ Frustum
         {
@@ -193,6 +194,9 @@ protected:
         osg::ref_ptr<osg::Program>              _program;
         osg::ref_ptr<osg::Uniform>              _shadowMatrix;
         osg::ref_ptr<osg::Uniform>              _refMatrix;
+ private:
+        bool  _nightMode;
+
 };
 
 }

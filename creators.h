@@ -12,6 +12,7 @@ namespace creators
     osg::Node*          loadAirplane();
     nodes_array_t       loadAirplaneParts();
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
+    osg::Node*          loadHelicopter();
 
     class programsHolder_base {
     public:

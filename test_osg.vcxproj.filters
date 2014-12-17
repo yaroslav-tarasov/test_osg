@@ -25,6 +25,12 @@
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\sv">
+      <UniqueIdentifier>{ccef160f-0d6b-4c67-91c4-2c60a2b1f36c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av">
+      <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -105,6 +111,18 @@
     <ClInclude Include="find_animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ephemeris.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -164,12 +182,6 @@
     <ClCompile Include="shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sv\FogLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sv\CloudLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="exp_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -226,6 +238,27 @@
     </ClCompile>
     <ClCompile Include="spark\SparkUpdatingHandler.cpp">
       <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="sv\CloudLayer.cpp">
+      <Filter>Source Files\sv</Filter>
+    </ClCompile>
+    <ClCompile Include="sv\FogLayer.cpp">
+      <Filter>Source Files\sv</Filter>
+    </ClCompile>
+    <ClCompile Include="Ephemeris.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="EnvRenderer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="main_scene2.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

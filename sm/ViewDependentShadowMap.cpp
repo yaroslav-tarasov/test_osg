@@ -672,8 +672,9 @@ void ViewDependentShadowMap::ViewDependentData::releaseGLObjects(osg::State* sta
 //
 // ViewDependentShadowMap
 //
-ViewDependentShadowMap::ViewDependentShadowMap():
-    ShadowTechnique()
+ViewDependentShadowMap::ViewDependentShadowMap()
+    : ShadowTechnique()
+    , _nightMode(false)
 {
     _shadowRecievingPlaceholderStateSet = new osg::StateSet;
 }
@@ -731,7 +732,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 {
     OSG_INFO<<std::endl<<std::endl<<"ViewDependentShadowMap::cull(osg::CullVisitor&"<<&cv<<")"<<std::endl;
 
-    if (!_shadowCastingStateSet)
+    if (!_shadowCastingStateSet || _nightMode)
     {
         OSG_INFO<<"Warning, init() has not yet been called so ShadowCastingStateSet has not been setup yet, unable to create shadows."<<std::endl;
         _shadowedScene->osg::Group::traverse(cv);

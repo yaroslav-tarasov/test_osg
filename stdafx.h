@@ -135,6 +135,7 @@ int main_exp_test( int argc, char** argv );
 int main_bi( int argc, char** argv );
 int main_teapot( int argc, char** argv );
 int main_spark( int argc, char** argv );
+int main_scene2( int argc, char** argv );
 
 #define STRINGIFY(x) #x 
 

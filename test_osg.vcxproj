@@ -99,6 +99,8 @@
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="ct_visitor.h" />
+    <ClInclude Include="EnvRenderer.h" />
+    <ClInclude Include="Ephemeris.h" />
     <ClInclude Include="find_animation.h" />
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="find_tex_visitor.h" />
@@ -106,6 +108,7 @@
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials_visitor.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="shaders.h" />
     <ClInclude Include="shadow_map.h" />
     <ClInclude Include="SkyBox.h" />
@@ -113,6 +116,7 @@
     <ClInclude Include="sv\FogLayer.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="teapot.h" />
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animation_handler.cpp" />
@@ -121,6 +125,8 @@
     <ClCompile Include="bump_mapping.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
+    <ClCompile Include="EnvRenderer.cpp" />
+    <ClCompile Include="Ephemeris.cpp" />
     <ClCompile Include="exp_test.cpp" />
     <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="light_maps.cpp">
@@ -128,10 +134,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main_scene.cpp" />
+    <ClCompile Include="main_scene2.cpp" />
     <ClCompile Include="main_shadows.cpp" />
     <ClCompile Include="main_shadows_2.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
     <ClCompile Include="shaders.cpp" />
     <ClCompile Include="shadow3\Tuto12.cpp" />
@@ -158,6 +166,7 @@
     <ClCompile Include="sv\FogLayer.cpp" />
     <ClCompile Include="sv\PreRender.cpp" />
     <ClCompile Include="teapot.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />
     <ClCompile Include="tex_test.cpp" />

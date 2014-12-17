@@ -1925,6 +1925,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     osg::ref_ptr<testShadow::ViewDependentShadowMap> st = new testShadow::ViewDependentShadowMap;
     //st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
     //st->setTextureUnit(1);
+    
+    // st->setNightMode(true);
 
     osg::ref_ptr<testShadow::ShadowedScene> root
         = new testShadow::ShadowedScene(st.get());  

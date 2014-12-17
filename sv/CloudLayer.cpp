@@ -3,15 +3,12 @@
 #include "CloudLayer.h"
 #include "../creators.h"
 
-
-
 //
 // Global namespace
 //
-//
-// Static functions
-//
 
+namespace avSky
+{
 
 // constructor
 CloudsLayer::CloudsLayer(osg::Group * pScene)
@@ -211,4 +208,7 @@ void CloudsLayer::_createGeometry()
 
     // all is done, so add box to this geode
     addDrawable(box_geometry);
+}
+
+
 }

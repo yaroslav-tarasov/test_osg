@@ -3,6 +3,8 @@
 //
 // Post-applied fog sky dome layer
 //
+namespace avSky
+{
 
 class CloudsLayer : public osg::Geode
 {
@@ -59,3 +61,4 @@ private:
 
 };
 
+}

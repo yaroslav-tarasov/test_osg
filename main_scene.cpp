@@ -11,6 +11,8 @@
 #include "sv/FogLayer.h"
 #include "sv/CloudLayer.h"
 #include "sv/PreRender.h"
+#include "EnvRenderer.h"
+
 #include "shadow_map.h"
 #include "teapot.h"
 
@@ -123,10 +125,7 @@ class MyGustCallback : public osg::NodeCallback
 class EphemerisDataUpdateCallback : virtual public osgEphemeris::EphemerisUpdateCallback
 {
 public:
-    typedef std::function<void()> on_callback_f;
-
-public:
-    EphemerisDataUpdateCallback(osgEphemeris::EphemerisModel *ephem ,FogLayer* fogLayer,CloudsLayer* skyClouds) 
+    EphemerisDataUpdateCallback(osgEphemeris::EphemerisModel *ephem ,avSky::FogLayer* fogLayer,avSky::CloudsLayer* skyClouds) 
         : EphemerisUpdateCallback( "EphemerisDataUpdateCallback" )
         , _ephem      (ephem)
         , _fogLayer   (fogLayer)
@@ -136,11 +135,6 @@ public:
 
     void operator()( osgEphemeris::EphemerisData *data )
     {
-        if(_func)
-            _func();
-        else
-            _func =nullptr;
-        
         auto sls = _ephem->getSunLightSource()->getLight();
         
         if(!_fogLayer || !_skyClouds)
@@ -214,15 +208,15 @@ public:
     }
     
     osg::ref_ptr<osgGA::GUIEventHandler> GetHandler() {return _handler.release();};
-    void                                 extCallback(on_callback_f f) {_func = f; };
+
 private:
     class handler : public osgGA::GUIEventHandler
     {
 
     public:  
-        handler(CloudsLayer* skyClouds) 
+        handler(avSky::CloudsLayer* skyClouds) 
               : _skyClouds  (skyClouds)
-              , _currCloud  (CloudsLayer::cirrus)
+              , _currCloud  (avSky::CloudsLayer::cirrus)
               {}
 
         virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
@@ -234,9 +228,9 @@ private:
                     if(_skyClouds)
                     {
                         int cc = _currCloud;cc++;
-                        _currCloud = static_cast<CloudsLayer::cloud_type>(cc);
-                        if(_currCloud >= CloudsLayer::clouds_types_num)
-                            _currCloud = CloudsLayer::none;
+                        _currCloud = static_cast<avSky::CloudsLayer::cloud_type>(cc);
+                        if(_currCloud >= avSky::CloudsLayer::clouds_types_num)
+                            _currCloud = avSky::CloudsLayer::none;
                 
                         _skyClouds->setCloudsTexture(_currCloud);
                     }
@@ -261,16 +255,15 @@ private:
         } 
 
     private:
-        osg::ref_ptr<CloudsLayer>                  _skyClouds;
-        CloudsLayer::cloud_type                    _currCloud;
+        osg::ref_ptr<avSky::CloudsLayer>                  _skyClouds;
+        avSky::CloudsLayer::cloud_type                    _currCloud;
     };
 
 private:
     osg::ref_ptr<osgEphemeris::EphemerisModel> _ephem;
-    osg::ref_ptr<FogLayer>                     _fogLayer;
-    osg::ref_ptr<CloudsLayer>                  _skyClouds;
+    osg::ref_ptr<avSky::FogLayer>              _fogLayer;
+    osg::ref_ptr<avSky::CloudsLayer>           _skyClouds;
     osg::ref_ptr<handler>                      _handler;
-    on_callback_f                              _func;
     
 };
 
@@ -558,138 +551,6 @@ osg::Node*
 }
 
 
-class UpdateCameraAndTexGenCallback : public osg::NodeCallback
-{
-public:
-
-    typedef std::vector< osg::ref_ptr<osg::Camera> >  CameraList;
-
-    UpdateCameraAndTexGenCallback(osg::NodePath& reflectorNodePath, CameraList& Cameras)
-        :  _reflectorNodePath(reflectorNodePath)
-        ,  _Cameras(Cameras)
-    {
-    }
-
-    virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
-    {
-        // first update subgraph to make sure objects are all moved into position
-        traverse(node,nv);
-
-        // compute the position of the center of the reflector subgraph
-        osg::Matrixd worldToLocal = osg::computeWorldToLocal(nv->getNodePath()/*_reflectorNodePath*/);
-        osg::BoundingSphere bs = nv->getNodePath().back()->getBound(); //_reflectorNodePath.back()->getBound();
-        osg::Vec3 position = bs.center();
-
-        typedef std::pair<osg::Vec3, osg::Vec3> ImageData;
-        const ImageData id[] =
-        {
-            ImageData( osg::Vec3( 1,  0,  0), osg::Vec3( 0, -1,  0) ), // +X
-            ImageData( osg::Vec3(-1,  0,  0), osg::Vec3( 0, -1,  0) ), // -X
-            ImageData( osg::Vec3( 0,  1,  0), osg::Vec3( 0,  0,  1) ), // +Y
-            ImageData( osg::Vec3( 0, -1,  0), osg::Vec3( 0,  0, -1) ), // -Y
-            ImageData( osg::Vec3( 0,  0,  1), osg::Vec3( 0, -1,  0) ), // +Z
-            ImageData( osg::Vec3( 0,  0, -1), osg::Vec3( 0, -1,  0) )  // -Z
-
-        };
-
-        for(unsigned int i=0; 
-            i<6 && i<_Cameras.size();
-            ++i)
-        {
-            osg::Matrix localOffset;
-            localOffset.makeLookAt(position,position+id[i].first,id[i].second);
-
-            osg::Matrix viewMatrix = worldToLocal*localOffset;
-            
-            _Cameras[i]->setReferenceFrame(osg::Camera::ABSOLUTE_RF);
-            _Cameras[i]->setProjectionMatrixAsFrustum(-1.0,1.0,-1.0,1.0,1.0,10/*10000.0*/);
-            _Cameras[i]->setViewMatrix(viewMatrix);
-        }
-    }
-
-protected:
-
-    virtual ~UpdateCameraAndTexGenCallback() {}
-
-    osg::NodePath               _reflectorNodePath;        
-    CameraList                  _Cameras;
-};
-
-osg::Group* createPrerenderedScene(osg::Node* reflectedSubgraph, osg::NodePath reflectorNodePath, unsigned int unit, const osg::Vec4& clearColor,  osg::Camera::RenderTargetImplementation renderImplementation)
-{
-
-    osg::Group* group = new osg::Group;
-
-    osg::TextureCubeMap* texture = creators::GetTextureHolder().GetEnvTexture(); 
-    unsigned tex_width = texture->getTextureWidth();
-    unsigned tex_height = texture->getTextureHeight();
-    
-    // set up the render to texture cameras.
-    UpdateCameraAndTexGenCallback::CameraList Cameras;
-    for(unsigned int i=0; i<6; ++i)
-    {
-        // create the camera
-        osg::Camera* camera = new osg::Camera;
-
-        camera->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //camera->setClearColor(clearColor);
-
-        // set viewport
-        camera->setViewport(0,0,tex_width,tex_height);
-
-        // set the camera to render before the main camera.
-        camera->setRenderOrder(osg::Camera::PRE_RENDER);
-
-        // tell the camera to use OpenGL frame buffer object where supported.
-        camera->setRenderTargetImplementation(renderImplementation);
-
-        // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, i);
-
-        // add subgraph to render
-        camera->addChild(reflectedSubgraph);
-
-        group->addChild(camera);
-
-        Cameras.push_back(camera);
-    }
-
-#if 0
-    // create the texgen node to project the tex coords onto the subgraph
-    osg::TexGenNode* texgenNode = new osg::TexGenNode;
-    texgenNode->getTexGen()->setMode(osg::TexGen::REFLECTION_MAP);
-    texgenNode->setTextureUnit(unit);
-    group->addChild(texgenNode);
-
-    // set the reflected subgraph so that it uses the texture and tex gen settings.    
-    {
-        osg::Node* reflectorNode = reflectorNodePath.front();
-        group->addChild(reflectorNode);
-
-        osg::StateSet* stateset = reflectorNode->getOrCreateStateSet();
-        stateset->setTextureAttributeAndModes(unit,texture,osg::StateAttribute::ON);
-        stateset->setTextureMode(unit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
-        stateset->setTextureMode(unit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);
-        stateset->setTextureMode(unit,GL_TEXTURE_GEN_R,osg::StateAttribute::ON);
-        stateset->setTextureMode(unit,GL_TEXTURE_GEN_Q,osg::StateAttribute::ON);
-
-        osg::TexMat* texmat = new osg::TexMat;
-        stateset->setTextureAttributeAndModes(unit,texmat,osg::StateAttribute::ON);
-
-        reflectorNode->setCullCallback(new TexMatCullCallback(texmat));
-    }
-#endif
-
-    // add the reflector scene to draw just as normal
-    group->addChild(reflectedSubgraph);
-
-    // set an update callback to keep moving the camera and tex gen in the right direction.
-    group->setUpdateCallback(new UpdateCameraAndTexGenCallback(reflectorNodePath, Cameras));
-
-    return group;
-}
-
-
 int main_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -756,7 +617,7 @@ int main_scene( int argc, char** argv )
     viewer.setCameraManipulator(manip);
     // Initially, place the TrackballManipulator so it's in the center of the scene
     manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
-    // manip->home(0);
+    //manip->home(0);
 
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
@@ -935,12 +796,12 @@ int main_scene( int argc, char** argv )
 #endif
 
 #ifdef TEST_SV_FOG   
-         osg::ref_ptr<FogLayer> skyFogLayer = new FogLayer(/*ephemerisModel*/model->asGroup());
+         osg::ref_ptr<avSky::FogLayer> skyFogLayer = new avSky::FogLayer(/*ephemerisModel*/model->asGroup());
          ephemerisModel->asGroup()->addChild(skyFogLayer.get());
          auto fogColor =osg::Vec3f(1.0,1.0,1.0);
          skyFogLayer->setFogParams(fogColor,0.1);    // (начинаем с 0.1 до максимум 1.0)
          float coeff = skyFogLayer->getFogExp2Coef();
-         viewer.addEventHandler( new FogHandler(
+         viewer.addEventHandler( new avSky::FogHandler(
              [&](osg::Vec4f v){
                  skyFogLayer->setFogParams(osg::Vec3f(v.x(),v.y(),v.z()),v.w());
                  float coeff = skyFogLayer->getFogExp2Coef();
@@ -950,13 +811,13 @@ int main_scene( int argc, char** argv )
              }
              , fogColor ));
 #else
-        osg::ref_ptr<FogLayer> skyFogLayer;
+        osg::ref_ptr<avSky::FogLayer> skyFogLayer;
 #endif
 
 #ifdef TEST_SV_CLOUD
-             osg::ref_ptr<CloudsLayer> cloudsLayer = new CloudsLayer(/*ephemerisModel*/model->asGroup());
-             ephemerisModel->asGroup()->addChild(cloudsLayer.get());
-             cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+        osg::ref_ptr<avSky::CloudsLayer> cloudsLayer = new avSky::CloudsLayer(/*ephemerisModel*/model->asGroup());
+        ephemerisModel->asGroup()->addChild(cloudsLayer.get());
+        cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
 #else 
         osg::ref_ptr<CloudsLayer> cloudsLayer;
 #endif
@@ -970,7 +831,7 @@ int main_scene( int argc, char** argv )
 
              osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
              fbo_node->addChild(ephemerisModel.get());
-             rootnode->addChild(createPrerenderedScene(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+             rootnode->addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 #endif
 
 #ifdef  TEST_EPHEMERIS
@@ -1172,8 +1033,6 @@ int main_scene( int argc, char** argv )
         viewer.addEventHandler( bi::getUpdater().get() );
 
         viewer.addEventHandler(sp.second);
-        //model_parts[2]->setNodeMask(/*0xffffffff*/0);           // Делаем узел невидимым
-        //model_parts[2]->setUpdateCallback(new circleAimlessly()); // Если model_parts[2] заявлен двигателем будем иметь интересный эффект
 
 #if 0
 		//Experiment with setting the LightModel to very dark to get better sun lighting effects

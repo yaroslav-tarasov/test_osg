@@ -1,6 +1,9 @@
 #pragma once
 
 
+namespace avSky
+{
+
 class FogHandler : public osgGA::GUIEventHandler
 {
 public:
@@ -115,3 +118,5 @@ private:
     void _buildStateSet();
 };
 
+
+}
