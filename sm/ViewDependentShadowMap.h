@@ -23,17 +23,17 @@
 
 #include "ShadowTechnique.h"
 
-namespace testShadow {
+namespace avShadow {
 
 /** ViewDependentShadowMap provides an base implementation of view dependent shadow mapping techniques.*/
-class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public testShadow::ShadowTechnique
+class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechnique
 {
     public :
         ViewDependentShadowMap();
 
         ViewDependentShadowMap(const ViewDependentShadowMap& vdsm, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
-        META_Object(testShadow, ViewDependentShadowMap);
+        META_Object(avShadow, ViewDependentShadowMap);
 
         /** initialize the ShadowedScene and local cached data structures.*/
         virtual void init();
@@ -54,8 +54,6 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public testShadow::ShadowTec
 
         /** Clean scene graph from any shadow technique specific nodes, state and drawables.*/
         virtual void cleanSceneGraph();
-
-        void setNightMode(bool nightMode){ _nightMode = nightMode;}
 
         struct /*OSGSHADOW_EXPORT*/ Frustum
         {
@@ -194,8 +192,6 @@ protected:
         osg::ref_ptr<osg::Program>              _program;
         osg::ref_ptr<osg::Uniform>              _shadowMatrix;
         osg::ref_ptr<osg::Uniform>              _refMatrix;
- private:
-        bool  _nightMode;
 
 };
 

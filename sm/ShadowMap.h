@@ -22,7 +22,7 @@
 
 #include "ShadowTechnique.h"
 
-namespace testShadow {
+namespace avShadow {
 
 /** ShadowedTexture provides an implementation of shadow textures.*/
 class /*OSGSHADOW_EXPORT*/ ShadowMap : public ShadowTechnique
@@ -32,7 +32,7 @@ class /*OSGSHADOW_EXPORT*/ ShadowMap : public ShadowTechnique
 
         ShadowMap(const ShadowMap& es, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
             
-        META_Object(testShadow, ShadowMap);
+        META_Object(avShadow, ShadowMap);
         
         /** Set the texture unit that the shadow texture will be applied on.*/
         void setTextureUnit(unsigned int unit);

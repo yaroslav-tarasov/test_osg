@@ -2,6 +2,10 @@
 #include "Scene.h"
 #include "creators.h"
 #include "Ephemeris.h"
+#include "sm/ShadowedScene.h"
+#include "sm/ShadowMap.h"
+#include "sm/ViewDependentShadowMap.h"
+#include "Terrain.h"
 
 using namespace avScene;
 
@@ -43,7 +47,7 @@ Scene* Scene::GetInstance()
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene()
 {
-    // Common nodes for scene, ships, anchors, buoys, etc.
+    // Common nodes for scene etc.
     _commonNode = new Group();
     osg::StateSet * pCommonStateSet = _commonNode->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
@@ -117,11 +121,16 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
    
     // Use a default camera manipulator
     osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
+     //new osgGA::DriveManipulator()
+     //new osgGA::TerrainManipulator() 
+     //new osgGA::OrbitManipulator() 
+     //new osgGA::FirstPersonManipulator() 
+     //new osgGA::SphericalManipulator() 
 
     manip->setAcceleration(0);
     manip->setMaxVelocity(1);
     manip->setWheelMovement(10,true);
-    // manip->setWheelMovement(0.001,true);
+    //manip->setWheelMovement(0.001,true);
     _viewerPtr->setCameraManipulator(manip);
     manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
     manip->home(0);
@@ -130,26 +139,31 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Add event handlers to the viewer
     //
-    _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(this->getOrCreateStateSet()/*getCamera()->getOrCreateStateSet()*/));
+    _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
-    // _viewerPtr->realize();
-    
+    _viewerPtr->realize();
     
     //
     // Create terrain / shadowed scene
     //
-    bool overlay = false;
-    // load the nodes from the command line arguments.
-    auto model_parts  = creators::createModel(_ls, overlay, osgSim::OverlayNode::VIEW_DEPENDENT_WITH_PERSPECTIVE_OVERLAY);
-    osg::Node* model = model_parts[0];
+    auto terrainRoot = createTerrainRoot();
+    addChild(terrainRoot);
+    
+    _terrainNode =  new avTerrain::Terrain (terrainRoot);
+    _terrainNode->create("adler");
 
-    addChild(model);
+    if(avTerrain::bi::getUpdater().valid())
+        _viewerPtr->addEventHandler( avTerrain::bi::getUpdater().get() );
 
     //
     // Create ephemeris
-    //
-    _ephemerisNode = new avSky::Ephemeris( this, model->asGroup() );
-    _ephemerisNode->setSunLightSource(_ls);
+    //                                                                       
+    _ephemerisNode = new avSky::Ephemeris( this,
+                                           _terrainNode.get(),
+                                          [=](float illum){ _st->setNightMode(illum < .35);  } //  FIXME magic night value    
+    );  
+
+    if(_ls.valid()) _ephemerisNode->setSunLightSource(_ls);
     addChild( _ephemerisNode.get() );
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
@@ -165,6 +179,46 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
-
     return true;
+}
+
+
+osg::Group *  Scene::createTerrainRoot()
+{
+
+#if defined(TEST_SHADOWS_FROM_OSG)
+
+    const int fbo_tex_size = 1024*8;
+
+    /*osg::ref_ptr<avShadow::ViewDependentShadowMap>*/ _st = new avShadow::ViewDependentShadowMap;
+
+    osg::ref_ptr<avShadow::ShadowedScene> root
+        = new avShadow::ShadowedScene(_st.get());  
+
+    avShadow::ShadowSettings* settings = root->getShadowSettings();
+
+    settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
+    settings->setBaseShadowTextureUnit(5);
+    settings->setMinimumShadowMapNearFarRatio(.5);
+    //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
+    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
+    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
+    settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
+    //settings->setLightNum(2);
+    settings->setMaximumShadowMapDistance(2000);
+    settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
+
+    _ls = new osg::LightSource;
+    _ls->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
+    //_ls->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
+    //_ls->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
+    _ls->getLight()->setLightNum(0);
+
+    root->addChild(_ls.get());
+
+#else
+    osg::ref_ptr<osg::Group> root = new osg::Group;
+#endif
+
+    return root.release();
 }

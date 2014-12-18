@@ -19,10 +19,10 @@
 #include "ShadowedScene.h"
 
 
-using namespace testShadow;
+using namespace avShadow;
 
-ShadowTechnique::CameraCullCallback::CameraCullCallback(ShadowTechnique* st):
-    _shadowTechnique(st)
+ShadowTechnique::CameraCullCallback::CameraCullCallback(ShadowTechnique* st)
+    : _shadowTechnique(st)
 {
 }
 
@@ -40,10 +40,11 @@ ShadowTechnique::ShadowTechnique():
 {
 }
 
-ShadowTechnique::ShadowTechnique(const ShadowTechnique& copy, const osg::CopyOp& copyop):
-    osg::Object(copy,copyop),
-    _shadowedScene(0),
-    _dirty(true)
+ShadowTechnique::ShadowTechnique(const ShadowTechnique& copy, const osg::CopyOp& copyop)
+    : osg::Object(copy,copyop)
+    , _shadowedScene(0)
+    , _dirty(true)
+    , _nightMode(false)
 {
 }
 

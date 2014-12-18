@@ -116,6 +116,14 @@ namespace shaders
                                                                                                         \
      )
 
+#define INCLUDE_SCENE_PARAM                                                                             \
+     STRINGIFY (                                                                                        \
+        uniform vec4 ambient;                                                                           \
+        uniform vec4 diffuse;                                                                           \
+        uniform vec4 specular;                                                                          \
+     )
+
+
     }                                                                                                  
 
     namespace plane_mat
@@ -130,7 +138,7 @@ namespace shaders
         attribute vec3 tangent;
         attribute vec3 binormal;
         varying   vec3 lightDir;
-        varying   float illum; 
+        //varying   float illum; 
         
 
 
@@ -164,7 +172,7 @@ namespace shaders
             v_out.texcoord  = gl_MultiTexCoord1.xy;
             v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-            illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse* 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+            //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
         }
     )
     };
@@ -196,13 +204,15 @@ namespace shaders
 
         INCLUDE_VS
 
+        INCLUDE_SCENE_PARAM
+
         STRINGIFY ( 
 
         
         uniform sampler2D colorTex;
         uniform sampler2D normalTex;
         varying   vec3 lightDir;
-        varying   float illum; 
+        //varying   float illum; 
         
         
 
@@ -223,8 +233,8 @@ namespace shaders
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag)   
             float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-            if(illum > 0.35)
-               shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
+            if(ambient.a > 0.35)
+               shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
 
             //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
@@ -237,12 +247,12 @@ namespace shaders
             //else if (split_test.z) 
             //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-            vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-            vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-            vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+            //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
+            //vec4  diffuse        = gl_LightSource[0].diffuse ;      // FIXME 
+            //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
             vec4  light_vec_view = vec4(lightDir,1);
             
-            ambient.a = illum;   
+            //ambient.a = illum;   
 
             viewworld_matrix = gl_ModelViewMatrixInverse;
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
@@ -332,7 +342,7 @@ namespace shaders
            attribute vec3 tangent;
            attribute vec3 binormal;
            varying   vec3 lightDir;
-           varying   float illum; 
+           //varying   float illum; 
            out block
            {
                vec2 texcoord;
@@ -360,7 +370,7 @@ namespace shaders
                v_out.viewpos   = vertexInEye.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-               illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента 
+               //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента 
            }       
        )
        };
@@ -388,12 +398,14 @@ namespace shaders
 
        INCLUDE_VS
 
+       INCLUDE_SCENE_PARAM
+
        STRINGIFY ( 
 
            uniform sampler2D colorTex;
            uniform sampler2D normalTex;
            varying vec3 lightDir;
-           varying float illum;
+          // varying float illum;
 
            in block
            {
@@ -412,8 +424,8 @@ namespace shaders
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-               if(illum > 0.35)
-                   shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
+               if(ambient.a > 0.35)
+                   shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -425,10 +437,11 @@ namespace shaders
                //else if (split_test.z) 
                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-               vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-               vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-               vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+               //vec4  specular       = gl_LightSource[0].specular  ;     // FIXME 
+               //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
+               //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
                vec4  light_vec_view = vec4(lightDir,1);
+               //ambient.a = illum;
 
                viewworld_matrix = gl_ModelViewMatrixInverse;
                vec4 base = texture2D(colorTex, gl_TexCoord[0].xy);
@@ -514,7 +527,7 @@ namespace shaders
             STRINGIFY ( 
             
             varying   vec3  lightDir;
-            varying   float illum; 
+            //varying   float illum; 
 
             out block
             {
@@ -539,7 +552,7 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse * 0.5); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -568,12 +581,14 @@ namespace shaders
 
             INCLUDE_VS
 
+            INCLUDE_SCENE_PARAM
+
             STRINGIFY ( 
 
             uniform sampler2D           colorTex;
             uniform sampler2D           NightTex;
             varying   vec3  lightDir;
-            varying   float illum;
+            //varying   float illum;
 
             in block
             {
@@ -589,8 +604,8 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-                if(illum > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
+                if(ambient.a > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -602,11 +617,11 @@ namespace shaders
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+                //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
+                //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
+                //vec4  ambient        = gl_LightSource[0].ambient ;      // FIXME 
 
-                ambient.a = illum;
+                //ambient.a = illum;
 
                 vec4  light_vec_view = vec4(lightDir,1);
 
@@ -707,7 +722,7 @@ namespace shaders
             STRINGIFY ( 
 
             varying   vec3  lightDir;
-            varying   float illum; 
+            //varying   float illum; 
 
             out block
             {
@@ -733,7 +748,7 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -763,12 +778,14 @@ namespace shaders
 
             INCLUDE_VS
 
+            INCLUDE_SCENE_PARAM
+
             STRINGIFY ( 
 
             uniform sampler2D       colorTex;
             uniform sampler2D       NightTex;
             varying   vec3  lightDir;
-            varying   float illum;
+            //varying   float illum;
 
             in block
             {
@@ -784,8 +801,8 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-                if(illum > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;
+                if(ambient.a > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -797,9 +814,9 @@ namespace shaders
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+                //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
+                //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
+                //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
                 // ambient.a = illum;
                 vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
@@ -844,7 +861,7 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            varying   float illum; 
+            //varying   float illum; 
             
             out block
             {
@@ -878,7 +895,7 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -906,11 +923,13 @@ namespace shaders
 
             INCLUDE_VS
             
+            INCLUDE_SCENE_PARAM
+
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
             varying vec3 lightDir;
-            varying float illum;
+            //varying float illum;
 
             in block
             {
@@ -929,8 +948,8 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-                if(illum > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
+                if(ambient.a > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -942,13 +961,14 @@ namespace shaders
 \n                //else if (split_test.z) 
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
-\n                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-\n                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-\n                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+\n                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+\n                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+\n                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+
 \n                vec4  light_vec_view = vec4(lightDir,1);
 \n                viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
-\n                specular.a = 0; // it's not rainy day hallelujah
+\n                // specular.a = 0; // it's not rainy day hallelujah
 \n
 \n                float rainy_value = 0.666 * specular.a;
 \n
@@ -1036,7 +1056,7 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            varying   float illum; 
+            //varying   float illum; 
             
             mat4 decal_matrix;
 
@@ -1076,7 +1096,7 @@ namespace shaders
 
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -1104,11 +1124,13 @@ namespace shaders
 
               INCLUDE_VS
             
+              INCLUDE_SCENE_PARAM
+
               STRINGIFY ( 
 \n
 \n            uniform sampler2D colorTex;
 \n            varying vec3 lightDir;
-\n            varying float illum;
+\n            //varying float illum;
 \n
 \n            in block
 \n            {
@@ -1128,8 +1150,8 @@ namespace shaders
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
                   float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-                  if(illum > 0.35)
-                      shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4; 
+                  if(ambient.a > 0.35)
+                      shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                   //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
                   // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
@@ -1140,14 +1162,14 @@ namespace shaders
 \n                //else if (split_test.z) 
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
-\n                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-\n                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-\n                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+\n                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+\n                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+\n                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 \n
 \n                vec4  light_vec_view = vec4(lightDir,1);
 \n                viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
-\n                specular.a = 0; // it's not rainy day hallelujah
+\n                //specular.a = 0; // it's not rainy day hallelujah
 \n
 \n                float rainy_value = specular.a;
 \n
@@ -1442,7 +1464,7 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            varying   float illum; 
+            //varying   float illum; 
 
             out block
             {
@@ -1467,7 +1489,7 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -1495,11 +1517,13 @@ namespace shaders
 
             INCLUDE_VS
             
+            INCLUDE_SCENE_PARAM
+
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
             varying vec3 lightDir;
-            varying float illum;
+            //varying float illum;
 
             in block
             {
@@ -1516,8 +1540,8 @@ namespace shaders
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-                if(illum > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * illum * 0.4;  
+                if(ambient.a > 0.35)
+                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1529,9 +1553,9 @@ namespace shaders
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 
                 vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
@@ -1637,6 +1661,8 @@ namespace shaders
 
             INCLUDE_VS
 
+            INCLUDE_SCENE_PARAM
+
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
@@ -1651,9 +1677,9 @@ namespace shaders
 
             void main (void)
             {
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 
                 vec4  light_vec_view =  vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
@@ -1663,7 +1689,7 @@ namespace shaders
                 float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
 
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
-                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
+                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb * 0.5;
                 
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
                 // gl_FragColor = vec4( result,dif_tex_col.a);
@@ -1719,6 +1745,8 @@ namespace shaders
         const char* fs = {
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable  \n"
+            
+            INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
 
@@ -1731,6 +1759,7 @@ namespace shaders
             uniform sampler2D           ViewDecalMap;    
             uniform vec4                fog_params;     
             uniform vec4                SkyFogParams;  
+            
 
             mat4 viewworld_matrix;                       
 			                                            
@@ -1761,9 +1790,9 @@ namespace shaders
 			
             void main (void)                              
             {
-                vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
+                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
+                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
+                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 				
 			
                 // vec4  light_vec_view = vec4(lightDir,1);

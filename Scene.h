@@ -5,6 +5,16 @@ namespace avSky
     class Ephemeris;
 }
 
+namespace avTerrain
+{
+    class Terrain;
+}
+
+namespace avShadow
+{
+    class ShadowTechnique;
+}
+
 namespace avScene {
 
     //
@@ -24,13 +34,14 @@ namespace avScene {
         inline osg::Group*                          getEphemerisNode();
         inline osg::Group*                          getCommonNode();
         inline osg::Camera*                         getCamera();
-
+        
 
     private:
         Scene();
         virtual									    ~Scene();
         bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth = 0, int nHeight = 0);
-
+        osg::Group *                                createTerrainRoot();
+    
     private:
 
         static osg::ref_ptr<Scene>                  _scenePtr;
@@ -38,8 +49,9 @@ namespace avScene {
         osg::ref_ptr<osg::Group>                    _commonNode;
         osg::ref_ptr<avSky::Ephemeris>              _ephemerisNode;
         osg::ref_ptr<osg::Group>                    _weatherNode;
-        osg::ref_ptr<osg::LightSource>              _ls;
-                  
+        osg::ref_ptr<avTerrain::Terrain>            _terrainNode; 
+        osg::ref_ptr<osg::LightSource>              _ls;        
+        osg::ref_ptr<avShadow::ShadowTechnique>     _st;     
     };
 
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }

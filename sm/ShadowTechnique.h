@@ -12,18 +12,7 @@
  * OpenSceneGraph Public License for more details.
 */
 
-//#ifndef OSGSHADOW_SHADOWEDTECHNIQUE
-//#define OSGSHADOW_SHADOWEDTECHNIQUE 1
-
-//#include <osg/buffered_value>
-//#include <osg/Camera>
-//#include <osg/Texture2D>
-//#include <osg/TexGenNode>
-//#include <osgUtil/CullVisitor>
-
-
-
-namespace testShadow {
+namespace avShadow {
 
 // forward declare ShadowedScene
 class ShadowedScene;
@@ -36,7 +25,7 @@ class /*OSGSHADOW_EXPORT*/ ShadowTechnique : public osg::Object
 
         ShadowTechnique(const ShadowTechnique& es, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
-        META_Object(osgShadow, ShadowTechnique);
+        META_Object(avShadow, ShadowTechnique);
 
         ShadowedScene* getShadowedScene() { return _shadowedScene; }
 
@@ -58,6 +47,8 @@ class /*OSGSHADOW_EXPORT*/ ShadowTechnique : public osg::Object
 
         /** Dirty so that cached data structures are updated.*/
         virtual void dirty() { _dirty = true; }
+                
+        void setNightMode(bool nightMode){ _nightMode = nightMode;}
 
     protected :
 
@@ -82,7 +73,7 @@ class /*OSGSHADOW_EXPORT*/ ShadowTechnique : public osg::Object
 
         ShadowedScene*  _shadowedScene;
         bool            _dirty;
-
+        bool            _nightMode;
 };
 
 }

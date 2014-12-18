@@ -415,18 +415,17 @@ namespace bi
 namespace mat
 {
 
-    struct reader
-    {
-        reader()
+
+        reader::reader()
         {
         }
 
-        reader(std::string full_path)
+        reader::reader(std::string full_path)
         {
             mats_ = read (full_path);
         }
 
-        static materials_t  read (std::string full_path)
+        materials_t  reader::read (std::string full_path)
         {
             pugi::xml_document doc;
             materials_t mats_;
@@ -455,12 +454,6 @@ namespace mat
 
             return mats_;
         }
-
-        materials_t get () {return mats_;}
-
-    private:
-        materials_t mats_;
-    };
 
 }
 
@@ -1679,6 +1672,7 @@ private:
 
 };
 
+
 void computeAttributes(osg::Node* model,std::string mat_name)
 {
     if (   mat_name.find("ground")   !=std::string::npos   
@@ -1922,27 +1916,27 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     //st->setJitteringScale(16);
     //st->setSoftnessWidth(0.00005);
     
-    osg::ref_ptr<testShadow::ViewDependentShadowMap> st = new testShadow::ViewDependentShadowMap;
+    osg::ref_ptr<avShadow::ViewDependentShadowMap> st = new avShadow::ViewDependentShadowMap;
     //st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
     //st->setTextureUnit(1);
     
     // st->setNightMode(true);
 
-    osg::ref_ptr<testShadow::ShadowedScene> root
-        = new testShadow::ShadowedScene(st.get());  
+    osg::ref_ptr<avShadow::ShadowedScene> root
+        = new avShadow::ShadowedScene(st.get());  
     
-    testShadow::ShadowSettings* settings = root->getShadowSettings();
+    avShadow::ShadowSettings* settings = root->getShadowSettings();
     
-    settings->setShadowMapProjectionHint(testShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
+    settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(5);
     settings->setMinimumShadowMapNearFarRatio(.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
-    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
+    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
     settings->setMaximumShadowMapDistance(2000);
-    settings->setShaderHint(testShadow::ShadowSettings::NO_SHADERS);
+    settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 
     osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
     source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
@@ -1957,14 +1951,14 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     root->addChild(source.get());
 #else
 
-    osg::ref_ptr<testShadow::ShadowMap> st = new testShadow::ShadowMap;
+    osg::ref_ptr<avShadow::ShadowMap> st = new avShadow::ShadowMap;
     st->setTextureSize(osg::Vec2s(fbo_tex_size, fbo_tex_size));
     st->setTextureUnit(1);
     //st->setJitteringScale(16);
     //st->setSoftnessWidth(0.00005);
 
-    osg::ref_ptr<testShadow::ShadowedScene> root
-        = new testShadow::ShadowedScene(st.get());  
+    osg::ref_ptr<avShadow::ShadowedScene> root
+        = new avShadow::ShadowedScene(st.get());  
 
     osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
     source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));

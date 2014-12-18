@@ -20,7 +20,7 @@
 //#include <osgUtil/CullVisitor>
 #include "ShadowedScene.h"
 
-using namespace testShadow;
+using namespace avShadow;
 
 ShadowedScene::ShadowedScene(ShadowTechnique* st)
 {
@@ -38,7 +38,7 @@ ShadowedScene::ShadowedScene(const ShadowedScene& ss, const osg::CopyOp& copyop)
 
     if (ss._shadowTechnique.valid())
     {
-        setShadowTechnique( dynamic_cast<testShadow::ShadowTechnique*>(ss._shadowTechnique->clone(copyop)) );
+        setShadowTechnique( dynamic_cast<avShadow::ShadowTechnique*>(ss._shadowTechnique->clone(copyop)) );
     }
 
     if (ss._shadowSettings)

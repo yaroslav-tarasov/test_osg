@@ -45,6 +45,10 @@
 #include <osgGA/FlightManipulator>
 #include <osgGA/DriveManipulator>
 #include <osgGA/StateSetManipulator>
+#include <osgGA/FirstPersonManipulator>
+#include <osgGA/SphericalManipulator>
+#include <osgGA/OrbitManipulator>
+#include <osgGA/TerrainManipulator>
 
 #include <osgSim/OverlayNode>
 

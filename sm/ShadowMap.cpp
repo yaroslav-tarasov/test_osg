@@ -19,7 +19,7 @@
 #include <osg/PolygonOffset>
 
 
-using namespace testShadow;
+using namespace avShadow;
 
 #include <iostream>
 

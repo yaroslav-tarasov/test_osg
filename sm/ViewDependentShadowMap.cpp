@@ -20,7 +20,7 @@
 
 #include <sstream>
 
-using namespace testShadow;
+using namespace avShadow;
 
 //////////////////////////////////////////////////////////////////
 // fragment shader
@@ -674,7 +674,6 @@ void ViewDependentShadowMap::ViewDependentData::releaseGLObjects(osg::State* sta
 //
 ViewDependentShadowMap::ViewDependentShadowMap()
     : ShadowTechnique()
-    , _nightMode(false)
 {
     _shadowRecievingPlaceholderStateSet = new osg::StateSet;
 }
@@ -1405,7 +1404,7 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
 
     osg::Vec3d lightSide;
 
-    const testShadow::ShadowSettings* settings = getShadowedScene()->getShadowSettings();
+    const avShadow::ShadowSettings* settings = getShadowedScene()->getShadowSettings();
 
     double dotProduct_v = positionedLight.lightDir * frustum.frustumCenterLine;
     double gamma_v = acos(dotProduct_v);

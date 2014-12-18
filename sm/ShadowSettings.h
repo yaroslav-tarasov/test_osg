@@ -14,12 +14,7 @@
 */
 
 
-//
-//#include <osg/Uniform>
-//#include <osg/CullSettings>
-//#include <osgShadow/Export>
-
-namespace testShadow {
+namespace avShadow {
 
 /** ShadowSettings provides the parameters that the ShadowTechnique should use as a guide for setting up shadowing.*/
 class /*OSGSHADOW_EXPORT*/ ShadowSettings : public osg::Object
@@ -28,7 +23,7 @@ class /*OSGSHADOW_EXPORT*/ ShadowSettings : public osg::Object
         ShadowSettings();
         ShadowSettings(const ShadowSettings& ss, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
-        META_Object(testShadow, ShadowSettings);
+        META_Object(avShadow, ShadowSettings);
 
         void setReceivesShadowTraversalMask(unsigned int mask) { _receivesShadowTraversalMask = mask; }
         unsigned int getReceivesShadowTraversalMask() const { return _receivesShadowTraversalMask; }

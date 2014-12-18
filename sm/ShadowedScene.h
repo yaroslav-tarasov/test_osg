@@ -15,14 +15,11 @@
 
 
 #include <osg/buffered_value>
-//#include <osg/Camera>
-//#include <osg/Texture2D>
-//#include <osg/TexGenNode>
 
 #include "ShadowTechnique.h"
 #include "ShadowSettings.h"
 
-namespace testShadow {
+namespace avShadow {
 
 /** ShadowedScene provides a mechansim for decorating a scene that the needs to have shadows cast upon it.*/
 class /*OSGSHADOW_EXPORT*/ ShadowedScene : public osg::Group
@@ -33,7 +30,7 @@ class /*OSGSHADOW_EXPORT*/ ShadowedScene : public osg::Group
 
         ShadowedScene(const ShadowedScene& es, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
-        META_Node(testShadow, ShadowedScene);
+        META_Node(avShadow, ShadowedScene);
 
         virtual void traverse(osg::NodeVisitor& nv);
 

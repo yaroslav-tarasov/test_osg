@@ -12,11 +12,6 @@
 
 #include "materials_visitor.h"
 #include "pugixml.hpp"
-#include "shadow_map.h"
-
-#include "sm/ShadowedScene.h"
-#include "sm/ShadowMap.h"
-#include "sm/ViewDependentShadowMap.h"
 
 #include "high_res_timer.h"
 #include "bi/BulletInterface.h"
@@ -165,56 +160,22 @@ namespace bi
 
 }
 
-
-osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
+Terrain::Terrain (osg::Group* sceneRoot)
+    : _sceneRoot(sceneRoot)
 {
-    osg::Vec3 center(0.0f,0.0f,300.0f);
-    float radius = 600.0f;
+    sceneRoot->addChild(this);
+}
+
+/*osg::Node* */void  Terrain::create( std::string name )
+{
+    const   osg::Vec3 center(0.0f,0.0f,300.0f);
+    const   float radius = 600.0f;
     high_res_timer                _hr_timer;
+    osg::MatrixTransform*         baseModel = new osg::MatrixTransform;
 
-#if defined(TEST_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
-
-    const int fbo_tex_size = 1024*8;
-
-    osg::ref_ptr<testShadow::ViewDependentShadowMap> st = new testShadow::ViewDependentShadowMap;
-
-    // st->setNightMode(true);
-
-    osg::ref_ptr<testShadow::ShadowedScene> root
-        = new testShadow::ShadowedScene(st.get());  
-
-    testShadow::ShadowSettings* settings = root->getShadowSettings();
-
-    settings->setShadowMapProjectionHint(testShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
-    settings->setBaseShadowTextureUnit(5);
-    settings->setMinimumShadowMapNearFarRatio(.5);
-    //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
-    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
-    settings->setMultipleShadowMapHint(testShadow::ShadowSettings::CASCADED);
-    settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
-    //settings->setLightNum(2);
-    settings->setMaximumShadowMapDistance(2000);
-    settings->setShaderHint(testShadow::ShadowSettings::NO_SHADERS);
-
-    osg::ref_ptr<osg::LightSource> source = new osg::LightSource;
-    source->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
-    source->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
-    source->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
-    // Scene
-    //st->setLight(source->getLight());
-    source->getLight()->setLightNum(2);
-    // ssm = st;
-    ls = source;
-
-    root->addChild(source.get());
-
-
-#else
-    osg::Group* root = new osg::Group;
-#endif
-
-    float baseHeight = 0.0f; //center.z();//-radius*0.5;
-#ifdef TEST_REAL_SCENE 
+    float baseHeight = 0.0f; 
+    if(name != "empty" && !name.empty() )
+    {
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
@@ -239,22 +200,21 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
     if(lod3) 
         lod3->setNodeMask(0); // Убираем нафиг Lod3 
 
-    osg::MatrixTransform* baseModel = new osg::MatrixTransform;
+    baseModel = new osg::MatrixTransform;
     baseModel->setMatrix(osg::Matrix::rotate(quat0));
     baseModel->addChild(scene);
 
     MaterialVisitor::namesList nl;
     nl.push_back("building");
     nl.push_back("tree");
-    // Для теней
     nl.push_back("ground"); 
     nl.push_back("concrete");
     nl.push_back("mountain");
-
     nl.push_back("sea");
     nl.push_back("railing");
     nl.push_back("panorama");
-    MaterialVisitor mv ( nl, createMaterial,computeAttributes,mat::reader::read(mat_file_name));
+
+    MaterialVisitor mv ( nl, creators::createMaterial,creators::computeAttributes,mat::reader::read(mat_file_name));
     scene->accept(mv);
 
     // All solid objects
@@ -272,10 +232,11 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
     // disable alpha writes for whole bunch
     //pSS->setAttribute(new osg::ColorMask(true, true, true, false));
 
-
-#else
-    osg::Node* baseModel = creators::createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3);
-#endif
+   }
+   else
+   {  
+       baseModel->addChild( creators::createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3));
+   }
 
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
@@ -285,7 +246,7 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
     osg::Node* movingModel = ret_array[0];
 
     auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
-    root->addChild(heli);
+   /* _sceneRoot->*/addChild(heli);
 
     const bool add_planes = true;
 
@@ -293,7 +254,7 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
     {
         auto p_copy = creators::applyBM(creators::loadAirplane(),"a_319",true);
 
-        bi::RigidUpdater* rigidUpdater = new bi::RigidUpdater( root.get() 
+        bi::RigidUpdater* rigidUpdater = new bi::RigidUpdater( _sceneRoot.get() 
             ,[&](osg::MatrixTransform* mt){ 
                 findNodeVisitor findFire("fire"); 
                 mt->accept(findFire);
@@ -347,7 +308,7 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
                 pos2, osg::Vec3(0,60,0), 1000.0f );
 
             // add it
-            root->addChild(positioned);
+            /*_sceneRoot->*/addChild(positioned);
 
             p_copy = osg::clone(p_copy, osg::CopyOp::DEEP_COPY_ALL 
                 & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
@@ -358,19 +319,18 @@ osg::Node* createModel( osg::ref_ptr<osg::LightSource>& ls)
         }
     }
 
-    root->addChild(baseModel);
-
-
+    /*_sceneRoot->*/addChild(baseModel);
     baseModel->setName("baseModel");
-    movingModel->setName("movingModel");
 
-    root->addChild(movingModel);
+
+   /* _sceneRoot->*/addChild(movingModel);
+    movingModel->setName("movingModel");
 
     OSG_WARN << "Время загрузки копирования самолетов: " << _hr_timer.get_delta() << "\n";
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
-    return root.release();
+    // return _sceneRoot.release();
 }
 
 

@@ -15,7 +15,7 @@
 #include "ShadowSettings.h"
 #include <float.h>
 
-using namespace testShadow;
+using namespace avShadow;
 
 ShadowSettings::ShadowSettings():
     _receivesShadowTraversalMask(0xffffffff),

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "materials_visitor.h"
 
 namespace creators 
 {
@@ -31,6 +32,27 @@ namespace creators
     texturesHolder_base&             GetTextureHolder();
 
     programsHolder_base::program_t   CreateProgram(std::string mat_name);
+    
+    void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m);
+    void computeAttributes(osg::Node* model,std::string mat_name);
+
+
+}
+
+namespace mat
+{
+
+    struct reader
+    {
+        reader();
+
+        reader(std::string full_path);
+        static materials_t  read (std::string full_path);
+        materials_t get () {return mats_;}
+
+    private:
+        materials_t mats_;
+    };
 
 }
 
