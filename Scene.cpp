@@ -371,7 +371,7 @@ osg::Group *  Scene::createTerrainRoot()
 
 #if defined(TEST_SHADOWS_FROM_OSG)
 
-    const int fbo_tex_size = 1024*8;
+    const int fbo_tex_size = 1024*4;
 
     /*osg::ref_ptr<avShadow::ViewDependentShadowMap>*/ _st = new avShadow::ViewDependentShadowMap;
 
