@@ -100,7 +100,7 @@ namespace avSky
              osg::Vec4 specular = cFogSpec*1.8;     // sls->getSpecular();
              
              ambient.w() = illumination;
-             specular.w() = 0;
+             specular.w() = 0;                    // FIXME power of rain here
 
             _ephem->_specularUniform->set(specular);
             _ephem->_ambientUniform->set(ambient);

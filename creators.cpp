@@ -35,12 +35,6 @@
 
 namespace
 {
-    const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
-    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);
-    const osg::Vec4 green_color = osg::Vec4(0.0f, 100.0f, 0.0f, 100.0f);
-    const osg::Vec4 white_color = osg::Vec4(100.0f, 100.0f, 100.0f, 100.0f);
-    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,100.0f);
-    const osg::Vec4 gray_color  = osg::Vec4(0.8f,0.8f,0.8f,100.0f);
 
 
     char vertexShaderSource_simple[] =  STRINGIFY ( 

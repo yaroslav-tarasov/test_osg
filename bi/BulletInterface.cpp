@@ -2,6 +2,30 @@
 
 #include "BulletInterface.h"
 
+#include <osgbDynamics/RigidBody.h>
+#include <osgbDynamics/MotionState.h>
+#include <osgbDynamics/GroundPlane.h>
+#include <osgbCollision/CollisionShapes.h>
+#include <osgbCollision/RefBulletObject.h>
+#include <osgbCollision/Utils.h>
+#include <osgbDynamics/TripleBuffer.h>
+#include <osgbDynamics/PhysicsThread.h>
+#include <osgbInteraction/DragHandler.h>
+#include <osgbInteraction/LaunchHandler.h>
+#include <osgbInteraction/SaveRestoreHandler.h>
+
+#ifndef _DEBUG
+#pragma comment(lib, "osgwTools.lib")
+#pragma comment(lib, "osgbDynamics.lib")
+#pragma comment(lib, "osgbInteraction.lib")
+#pragma comment(lib, "osgbCollision.lib")
+#else 
+#pragma comment(lib, "osgwToolsd.lib")
+#pragma comment(lib, "osgbDynamicsd.lib")
+#pragma comment(lib, "osgbInteractiond.lib")
+#pragma comment(lib, "osgbCollisiond.lib")
+#endif
+
 struct FilterCallback : public btOverlapFilterCallback
 {
     // return true when pairs need collision
@@ -13,7 +37,12 @@ struct FilterCallback : public btOverlapFilterCallback
         //add some additional logic here that modified 'collides'
         return collides;
     }
-};
+};                 
+
+osgbDynamics::TripleBuffer tBuf;
+osgbDynamics::MotionStateList msl;
+
+
 
 BulletInterface* BulletInterface::instance()
 {
@@ -23,12 +52,17 @@ BulletInterface* BulletInterface::instance()
 
 BulletInterface::BulletInterface()
     : _scene(nullptr)
-    , _on_collision(nullptr) 
+    , _on_collision(nullptr)
+    , _srh(new osgbInteraction::SaveRestoreHandler)
 {
+    // Increase triple buffer size to hold lots of transform data.
+    tBuf.resize( 16384 );
+
     _configuration = new btDefaultCollisionConfiguration;
     _dispatcher = new btCollisionDispatcher( _configuration );
     _overlappingPairCache = new btDbvtBroadphase;
     _solver = new btSequentialImpulseConstraintSolver;
+
 }
 
 BulletInterface::~BulletInterface()
@@ -54,11 +88,14 @@ BulletInterface::~BulletInterface()
     delete _configuration;
 }
 
+
 void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gravity, on_collision_f on_collision )
 {
     _scene = new btDiscreteDynamicsWorld( _dispatcher, _overlappingPairCache, _solver, _configuration );
     _scene->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
     
+    static osgbDynamics::PhysicsThread pt( _scene, &tBuf );
+
     osg::Vec3 norm = plane.getNormal();
     btCollisionShape* groundShape = new btStaticPlaneShape( btVector3(norm[0], norm[1], norm[2]), plane[3] );
     btTransform groundTransform;
@@ -68,9 +105,37 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( 0.0, motionState, groundShape, btVector3(0.0, 0.0, 0.0) );
     btRigidBody* body = new btRigidBody(rigidInfo);
     _scene->addRigidBody( body );
+     
+    body->setActivationState(DISABLE_SIMULATION);
 
     _on_collision = on_collision;
+
 }
+
+void BulletInterface::createCow( osg::Node* node, osg::Vec3 pos,const osg::Matrix& m, osg::Transform* amt )
+{
+    btCollisionShape* cs = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( node );
+    osgbDynamics::MotionState* motion = new osgbDynamics::MotionState();
+    motion->setTransform( amt );
+    motion->setParentTransform( m );
+    btScalar mass( 2. );
+    btVector3 inertia( 0, 0, 0 );
+    cs->calculateLocalInertia( mass, inertia );
+    btRigidBody::btRigidBodyConstructionInfo rb( mass, motion, cs, inertia );
+
+    // Set up for multithreading and triple buffering.
+    motion->registerTripleBuffer( &tBuf );
+    msl.insert( motion );
+
+    btRigidBody* body = new btRigidBody( rb );
+    body->setActivationState( DISABLE_DEACTIVATION );
+    _scene->addRigidBody( body );
+
+    _srh->add( "cow", body );
+    amt->setUserData( new osgbCollision::RefRigidBody( body ) );
+
+}
+
 
 void BulletInterface::createBox( int id, const osg::Vec3& dim, double density )
 {

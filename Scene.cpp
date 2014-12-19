@@ -7,7 +7,173 @@
 #include "sm/ViewDependentShadowMap.h"
 #include "Terrain.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 using namespace avScene;
+
+std::vector<osg::ref_ptr<osg::Node>> _lamps;
+
+namespace {
+
+    inline osg::Vec3f lights_offset(std::string name)
+    {
+        if (name == "sheremetyevo")
+            return osg::Vec3f(18, 17, .2f);
+        else if (name == "adler")
+            return osg::Vec3f(0 , 0 , .2f);
+
+        return osg::Vec3f();
+    }
+
+    struct value_getter
+    {
+        value_getter(std::string const& line)
+        {
+            boost::split(values_, line, boost::is_any_of(" \t"), boost::token_compress_on);
+        }
+
+        template <class T>
+        T get(size_t index)
+        {
+            return boost::lexical_cast<T>(values_[index]);
+        }
+
+    private:
+        std::vector<std::string> values_;
+    };
+
+template<typename S> 
+inline osg::Vec3f polar_point_2(S range, S course )
+{
+    return osg::Vec3( (S)range * sin(cg::grad2rad(course)),
+        (S)range * cos(cg::grad2rad(course)),0);
+}
+
+typedef osg::ref_ptr<osg::Group> navaid_group_node_ptr;
+
+void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
+{
+    //     if (!boost::filesystem::is_regular_file(file))
+    //         LogWarn("No lights for airport found: " << file.string());
+    auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
+        osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
+        shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.3f) );
+        osg::Geode* light = new osg::Geode;
+        light->addDrawable( shape1.get() );
+        dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
+        light->setUpdateCallback(callback);
+        light->setName(name);
+        const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+        osg::StateSet* ss = light->getOrCreateStateSet();
+        ss->setAttribute(new osg::Program(),value);
+        ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+        ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+        // light->setCullingActive(false); 
+        ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        // ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+        ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
+        // ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF |  osg::StateAttribute::PROTECTED);
+        
+        return light;
+    };
+
+    //osg::ref_ptr<osg::Geode> red_light   = CreateLight(creators::red_color,std::string("red"),nullptr);
+    //osg::ref_ptr<osg::Geode> blue_light  = CreateLight(creators::blue_color,std::string("blue"),nullptr);
+    //osg::ref_ptr<osg::Geode> green_light = CreateLight(creators::green_color,std::string("green"),nullptr);
+    // osg::ref_ptr<osg::Geode> white_light = CreateLight(creators::white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
+
+    std::ifstream ifs(file);
+
+    for (auto it = cur_lamps.begin(); it != cur_lamps.end(); ++it)
+        parent->removeChild(it->get());
+    cur_lamps.clear();
+
+    navaid_group_node_ptr navid_node_ptr = nullptr;
+
+    bool group_ready = false;
+
+    while (ifs.good())
+    {
+        char buf[0x400] = {};
+        ifs.getline(buf, 0x400);
+
+        std::string line = buf;
+        boost::trim(line);
+
+        // skip comments
+
+        if (line.size()==0) continue;
+
+        if (boost::starts_with(line, "//"))
+        {
+            boost::erase_all(line," ");
+            if (boost::starts_with(line, "//#"))
+            {
+                boost::trim_if(line, boost::is_any_of("/#"));
+                //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
+                navid_node_ptr.release();
+                navid_node_ptr = new osg::Group();
+                navid_node_ptr->setName(line);
+                group_ready = true;
+            }
+            else
+                continue;
+        }
+
+        value_getter items(line);
+
+        if (items.get<std::string>(0) == "FireLine:" || items.get<std::string>(0) == "FireLineHa:")
+        {
+            size_t ofs = items.get<std::string>(0) == "FireLineHa:" ? 3 : 0;
+
+            osg::Vec3f pos (items.get<float>(ofs + 2), items.get<float>(ofs + 4), items.get<float>(ofs + 3));
+            osg::Vec3f dir (polar_point_2(1.f, items.get<float>(ofs + 5)));
+            float      len   = items.get<float>(ofs + 6);
+            float      step  = items.get<float>(ofs + 7);
+            osg::Vec4f clr (items.get<float>(ofs + 8), items.get<float>(ofs + 9), items.get<float>(ofs + 10),1.0f); 
+
+            // special AI, hello from VNIIRA
+            size_t count = 0;
+            if (!cg::eq_zero(step) && !cg::eq_zero(len))
+            {
+                count = size_t(cg::ceil(len / step));
+
+                if (step > 2)
+                    ++count;
+            }
+
+            for (size_t i = 0; i < count; ++i)
+            {
+                osg::Vec3f p = pos + dir * step * i  + offset;
+
+                //victory::navaid_group_node::LightData lamp = {p, clr, .1,40000,/*.01f, 4000.f,*/ cg::range_2f(), cg::range_2f(), 1, 0, 0};
+                //navid_group->AddLight(lamp);
+                osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform();
+             
+                pat->addChild(CreateLight(clr,std::string("light"),nullptr));
+                pat->setPosition(osg::Vec3f(p.x(),p.y(),p.z()));
+                navid_node_ptr->addChild(pat);
+            }
+        }
+
+        if(navid_node_ptr && group_ready)
+        {
+            cur_lamps.push_back(navid_node_ptr);
+            parent->addChild(navid_node_ptr);
+            group_ready = false;
+        }
+
+    }
+
+
+    //cur_lamps.push_back(navid_group);
+    //parent->add(navid_group);
+}
+
+}
+
 
 osg::ref_ptr<Scene>	 Scene::_scenePtr;
 
@@ -59,7 +225,10 @@ Scene::Scene()
     pSS->setNestRenderBins(false);
     pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
     // disable alpha writes for whole bunch
-    pSS->setAttribute(new osg::ColorMask(true, true, true, false));
+    pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
+
+
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -144,6 +313,12 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->realize();
     
     //
+    // Initialize particle engine
+    // 
+
+    spark::init();
+
+    //
     // Create terrain / shadowed scene
     //
     auto terrainRoot = createTerrainRoot();
@@ -173,11 +348,19 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     _weatherNode =  new osg::Group;
     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
-    precipitationEffect->snow(0.3);
+    precipitationEffect->snow(0.0);
     precipitationEffect->setWind(osg::Vec3(0.2f,0.2f,0.2f));
 
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
+
+#if 0
+    fill_navids(
+        "sheremetyevo.txt", 
+        _lamps, 
+        this, 
+        lights_offset("sheremetyevo") ); 
+#endif
 
     return true;
 }
@@ -205,7 +388,7 @@ osg::Group *  Scene::createTerrainRoot()
     settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
-    settings->setMaximumShadowMapDistance(2000);
+    settings->setMaximumShadowMapDistance(1000);
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 
     _ls = new osg::LightSource;
@@ -222,3 +405,4 @@ osg::Group *  Scene::createTerrainRoot()
 
     return root.release();
 }
+

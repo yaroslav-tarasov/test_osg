@@ -36,7 +36,12 @@ namespace creators
     void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m);
     void computeAttributes(osg::Node* model,std::string mat_name);
 
-
+    const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
+    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);
+    const osg::Vec4 green_color = osg::Vec4(0.0f, 100.0f, 0.0f, 100.0f);
+    const osg::Vec4 white_color = osg::Vec4(100.0f, 100.0f, 100.0f, 100.0f);
+    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,100.0f);
+    const osg::Vec4 gray_color  = osg::Vec4(0.8f,0.8f,0.8f,100.0f);
 }
 
 namespace mat

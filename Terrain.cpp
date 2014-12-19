@@ -16,8 +16,13 @@
 #include "high_res_timer.h"
 #include "bi/BulletInterface.h"
 
+#include <osgwTools/AbsoluteModelTransform.h>
+
 namespace avTerrain
 {
+    const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
+        osg::inDegrees(0.f)  , osg::Y_AXIS,
+        osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 namespace bi
 {
@@ -28,7 +33,7 @@ namespace bi
     public:
         RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ) 
             : _root        (root)
-            , _on_collision(on_collision) 
+            , _on_collision(on_collision)
         {}
 
         void addGround( const osg::Vec3& gravity )
@@ -38,6 +43,29 @@ namespace bi
                     if(_on_collision)
                         _on_collision(_physicsNodes[id].get());   
             } );
+
+            //addCow( osg::Vec3( -11., 6., 4. ) );
+        }
+
+        void addCow( osg::Vec3 pos )
+        {
+            osg::Matrix m( osg::Matrix::rotate( 1.5, osg::Vec3( 0., 0., 1. ) ) *
+                osg::Matrix::translate( pos ) );
+            osg::MatrixTransform* root = new osg::MatrixTransform( m );
+            osgwTools::AbsoluteModelTransform* amt = new osgwTools::AbsoluteModelTransform;
+            amt->setDataVariance( osg::Object::DYNAMIC );
+            _root->addChild( amt );
+
+            const std::string fileName( "cow.osg" );
+            osg::Node* node = osgDB::readNodeFile( fileName );
+            if( node == NULL )
+            {
+                osg::notify( osg::FATAL ) << "Can't find \"" << fileName << "\". Make sure OSG_FILE_PATH includes the OSG sample data directory." << std::endl;
+                return;
+            }
+
+            amt->addChild( node );
+            BulletInterface::instance()->createCow(node,pos,m,amt);
         }
 
         void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -176,9 +204,6 @@ Terrain::Terrain (osg::Group* sceneRoot)
     float baseHeight = 0.0f; 
     if(name != "empty" && !name.empty() )
     {
-    const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
-        osg::inDegrees(0.f)  , osg::Y_AXIS,
-        osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 #if 1
     const char* scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
@@ -245,8 +270,8 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
     osg::Node* movingModel = ret_array[0];
 
-    auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
-   /* _sceneRoot->*/addChild(heli);
+    //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
+    //addChild(heli);
 
     const bool add_planes = true;
 
@@ -268,6 +293,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
         );
 
         rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
+
         for ( unsigned int i=0; i<10; ++i )
         {
             for ( unsigned int j=0; j<10; ++j )
@@ -321,17 +347,19 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
     /*_sceneRoot->*/addChild(baseModel);
     baseModel->setName("baseModel");
-
-
+    
    /* _sceneRoot->*/addChild(movingModel);
     movingModel->setName("movingModel");
 
-    OSG_WARN << "Время загрузки копирования самолетов: " << _hr_timer.get_delta() << "\n";
+    OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.get_delta() << "\n";
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
     // return _sceneRoot.release();
 }
+
+
+
 
 
 }

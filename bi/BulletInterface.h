@@ -2,6 +2,7 @@
 #define H_BULLETINTERFACE
 
 #include <btBulletDynamicsCommon.h> 
+#include <osgbInteraction/SaveRestoreHandler.h>
 
 #include <osg/Referenced>
 #include <osg/Vec3>
@@ -32,6 +33,7 @@ public:
     btDiscreteDynamicsWorld* getScene() { return _scene; }
     
     void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
+    void createCow( osg::Node* node,osg::Vec3 pos, const osg::Matrix& m, osg::Transform* amt );
     void createBox    ( int id, const osg::Vec3& dim, double mass );
     void createSphere ( int id, double radius, double mass );
     
@@ -58,6 +60,7 @@ private:
     btSequentialImpulseConstraintSolver*  _solver;
     CollisionPairs                        _pairsLastUpdate;
     on_collision_f                        _on_collision;
+    osg::ref_ptr< osgbInteraction::SaveRestoreHandler > _srh;
 };
 
 #endif

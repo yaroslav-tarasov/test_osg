@@ -1,5 +1,12 @@
 namespace cg
 {
+    // число pi
+    const double pi  = 3.14159265358979323846;
+    const float  pif = 3.14159265f;
+
+    const double pi_2  = 0.5 * pi;
+    const float  pi_2f = float(pi_2);
+
     template<typename T, typename D>
     __forceinline D lerp01( const T x, const D & y0, const D & y1 )
     {
@@ -94,7 +101,10 @@ namespace cg
     __forceinline bool eq (double a,  double b,  double  eps = epsilon< double >( )) { return abs(a - b) <= eps; }
     __forceinline bool eq (double a,  int    b,  double  eps = epsilon< double >( )) { return abs(a - b) <= eps; }
     __forceinline bool eq (float  a,  int    b,  double  eps = epsilon< double >( )) { return abs((double)a - b) <= eps; }
-
+   
+    __forceinline int ceil(double f) { return (int)::ceil( f ); }
+    __forceinline int ceil(float f)  { return (int)::ceil( f ); }
+    
     //
     template <class V>
     __forceinline typename V::value_type luminance_crt( V const & col )
@@ -140,5 +150,10 @@ namespace cg
         return x < vmin ? vmin : x > vmax ? vmax : x;
     }
 
+    // перевод градусы в радианы
+    __forceinline double grad2rad(double grad) { return grad * pi / 180.0; }
+    __forceinline float  grad2rad(float  grad) { return grad * float( pi / 180.0f ); }
+    __forceinline double grad2rad(int    grad) { return grad * pi / 180.0; }
+    __forceinline double grad2rad()            { return pi / 180.0; }
 
 };
