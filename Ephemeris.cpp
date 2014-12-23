@@ -7,6 +7,9 @@
 
 #include <osgEphemeris/EphemerisModel.h>
 
+#include "find_node_visitor.h" 
+#include "creators.h"
+
 namespace avSky
 {
     struct Ephemeris::data : public osg::Referenced
@@ -348,10 +351,11 @@ namespace avSky
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );
 
-
         osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
         fbo_node->addChild(_d->_ephemerisModel.get());
         _sceneRoot->asGroup()->addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+        
+        setStarFieldMask(NODE_STARFIELD_MASK);
 
         return true;
     }
@@ -393,6 +397,19 @@ namespace avSky
     {
         _d->_ephemerisModel->setSunLightSource(ls);
     }
+
+    osg::LightSource* Ephemeris::getSunLightSource()
+    {
+        return _d->_ephemerisModel->getSunLightSource(); 
+    }
+
+    void Ephemeris::setStarFieldMask(osg::Node::NodeMask nm)
+    {
+        auto sf =  findFirstNode(_d->_ephemerisModel,"StarField",findNodeVisitor::not_exact);
+        if(sf) 
+            sf->setNodeMask(nm); 
+    }
+
 
     osgGA::GUIEventHandler* Ephemeris::getEventHandler()
     {

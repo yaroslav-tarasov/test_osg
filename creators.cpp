@@ -18,6 +18,7 @@
 
 #include "high_res_timer.h"
 #include "bi/BulletInterface.h"
+#include "bi/RigidUpdater.h"
 
 #define TEST_SHADOWS
 // #define TEST_TEXTURE
@@ -265,8 +266,10 @@ namespace
     }
 }
 
+
 namespace bi
 {
+#if 0
     class RigidUpdater : public osgGA::GUIEventHandler
     {
     public:
@@ -298,9 +301,13 @@ namespace bi
             float ym = bb.yMax() - bb.yMin();
             float zm = bb.zMax() - bb.zMin();
 
-            osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(0.0,-(bb.yMax() - bb.yMin())/2.0f,-(bb.yMax() - bb.yMin())/2.0f)));
+            osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(0.0,-(bb.zMax() - bb.zMin())/2.0f,-(bb.yMax() - bb.yMin())/2.0f)));
             
-            const osg::Quat quat(osg::inDegrees(-90.f), osg::X_AXIS,                      
+            float rot_angle = -90.f;
+            if(dynamic_cast<osg::LOD*>(node))
+                   rot_angle = 0;
+
+            const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
                 osg::inDegrees(0.f) , osg::Y_AXIS,
                 osg::inDegrees(0.f)   , osg::Z_AXIS ); 
 
@@ -396,6 +403,7 @@ namespace bi
         high_res_timer                _hr_timer;
         on_collision_f                _on_collision;
     };
+#endif
 
     osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater()
     {
@@ -405,6 +413,8 @@ namespace bi
 
 
 }
+
+
 
 namespace mat
 {
@@ -853,7 +863,7 @@ osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,dou
     osg::AnimationPath* animationPath = new osg::AnimationPath;
     animationPath->setLoopMode(osg::AnimationPath::LOOP);
 
-    int numSamples = 400;
+    int numSamples = 10000;
     float yaw = 0.0f;
     float yaw_delta = 2.0f*osg::PI/((float)numSamples-1.0f);
     float roll = osg::inDegrees(30.0f);
@@ -968,10 +978,7 @@ nodes_array_t loadAirplaneParts()
 #ifdef ANIMATION_TEST
     if(airplane_file)
     {
-        findNodeVisitor findNode("animgroup_shassi_r_r_lod0"); 
-        airplane_file->accept(findNode);
-
-        auto anim =  findNode.getFirst();
+        auto anim =  findFirstNode(airplane_file,"animgroup_shassi_r_r_lod0");
 
         auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( anim->getUpdateCallback() );
 
@@ -1011,6 +1018,7 @@ nodes_array_t loadAirplaneParts()
             light->getOrCreateStateSet()->setAttribute(new osg::Program(),value);
             light->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
             light->getOrCreateStateSet()->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+            light->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
             return light;
         };
 
@@ -1020,9 +1028,7 @@ nodes_array_t loadAirplaneParts()
         osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
 		
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
-            findNodeVisitor findTail(root.c_str()); 
-            airplane_file->accept(findTail);
-            auto tail =  findTail.getFirst();
+            auto tail =  findFirstNode(airplane_file,root.c_str());
             if(tail)  tail->asGroup()->addChild(child);
             return tail;
          };
@@ -1034,36 +1040,20 @@ nodes_array_t loadAirplaneParts()
         auto port = addAsChild("port",green_light);
         auto star_board = addAsChild("starboard",red_light);
 
+        lod0 =  findFirstNode(airplane_file,"Lod0");
+     	lod3 =  findFirstNode(airplane_file,"Lod3");
+  //      
+  //      if(lod3) 
+  //          lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
 
-        //osg::Node* light0 = effects::createLightSource(
-        //    0, osg::Vec3(-20.0f,0.0f,0.0f), red_color);
-
-        //airplane_file->getOrCreateStateSet()->setMode( GL_LIGHT0,
-        //    osg::StateAttribute::ON );
-
-        //airplane_file->asGroup()->addChild( light0 );
-
-        
-        findNodeVisitor findLod3("Lod3"); 
-		airplane_file->accept(findLod3);
-		lod3 =  findLod3.getFirst();
-        
-        if(lod3) 
-            lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
-
-        findNodeVisitor findLod0("Lod0"); 
-        airplane_file->accept(findLod0);
-        lod0 =  findLod0.getFirst();
-
-
-        findNodeVisitor findEngine("engine",findNodeVisitor::not_exact); 
-        airplane_file->accept(findEngine);
-
-        engine =  findEngine.getFirst();
+        engine =  findFirstNode(airplane_file,"engine",findNodeVisitor::not_exact);
         if (engine) engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
 	}
 
-    nodes_array_t retval = {nullptr,airplane_file,engine,engine_geode,lod0,lod3};
+    osg::LOD* lod = new osg::LOD; 
+    lod->addChild(lod0,0,750);
+    lod->addChild(lod3,750,50000);
+    nodes_array_t retval = {nullptr,lod,engine,engine_geode,lod0,lod3};
     return retval;
 }
 
@@ -1075,8 +1065,6 @@ osg::Node* loadAirplane()
 
 osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 {
-    //osg::Node* model = loadAirplane();
-    
     if (!model)
        return nullptr;
 
@@ -1110,10 +1098,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
     normalTex->setImage( osgDB::readImageFile(name + "_n.dds") ); // "a_319_n.dds"  
 
-
-    findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
-    model->accept(findS);
-    auto shassis =  findS.getFirst();
+    auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 
     if (shassis)
     {
@@ -1244,9 +1229,7 @@ osg::Node* loadHelicopter()
         osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
 
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
-            findNodeVisitor findTail(root.c_str()); 
-            model_file->accept(findTail);
-            auto tail =  findTail.getFirst();
+            auto tail = findFirstNode(model_file,root.c_str());
             if(tail)  tail->asGroup()->addChild(child);
             return tail;
         };
@@ -1259,18 +1242,14 @@ osg::Node* loadHelicopter()
         //auto port = addAsChild("port",green_light);
         //auto star_board = addAsChild("starboard",red_light);
 
-        findNodeVisitor findLod3("Lod3"); 
-        model_file->accept(findLod3);
-        lod3 =  findLod3.getFirst();
+        lod3 =  findFirstNode(model_file,"Lod3");
 
         if(lod3)
         { 
             lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
         }
 
-        findNodeVisitor findSagged("Sagged",findNodeVisitor::not_exact); 
-        model_file->accept(findSagged);
-        auto sag =  findSagged.getFirst();
+        auto sag =  findFirstNode(model_file,"Sagged",findNodeVisitor::not_exact);
 
         if(sag)
         { 
@@ -1278,18 +1257,14 @@ osg::Node* loadHelicopter()
             sag->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-0.075,0.89,0)));
         }
         
-        findNodeVisitor findDyn("Dynamic",findNodeVisitor::not_exact); 
-        model_file->accept(findDyn);
-        auto dyn =  findDyn.getFirst();
+        auto dyn =  findFirstNode(model_file,"Dynamic",findNodeVisitor::not_exact);
 
         if(dyn)
         { 
             dyn->setNodeMask(0); 
         }
         
-        findNodeVisitor findMR("main_rotor",findNodeVisitor::not_exact); 
-        model_file->accept(findMR);
-        auto main_rotor =  findMR.getFirst();
+        auto main_rotor =  findFirstNode(model_file,"main_rotor",findNodeVisitor::not_exact);
 
         if(main_rotor)
         {   
@@ -1297,9 +1272,7 @@ osg::Node* loadHelicopter()
             main_rotor->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-.01,0.89,0)));// osg::Vec3f(0.075,-0.85,0)
         }
 
-        findNodeVisitor findTR("tailrotorstatic",findNodeVisitor::not_exact); 
-        model_file->accept(findTR);
-        auto tail_rotor =  findTR.getFirst();
+        auto tail_rotor =  findFirstNode(model_file,"tailrotorstatic",findNodeVisitor::not_exact);
 
         const osg::Vec3 pivot(-0.1245227,-8.765233,4.587939); 
         if(tail_rotor)
@@ -1312,9 +1285,7 @@ osg::Node* loadHelicopter()
         // -0.1245227 -8.765233 4.587939      // real pivot  from dae
         // -0.42335910 -8.8255844  4.9434242 // bs
 
-        findNodeVisitor findLod0("Lod0"); 
-        model_file->accept(findLod0);
-        lod0 =  findLod0.getFirst();     
+        lod0 =  findFirstNode(model_file,"Lod3");     
         
         FindAnimationVisitor fanim;
         model_file->accept(fanim);
@@ -1868,7 +1839,11 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
                               osg::inDegrees(0.f)  , osg::Y_AXIS,
                               osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 #else
-        const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
+        float rot_angle = -90.f;
+        if(dynamic_cast<osg::LOD*>(airplane))
+            rot_angle = 0;  
+        
+        const osg::Quat quat0(osg::inDegrees(rot_angle), osg::X_AXIS,                      
                               osg::inDegrees(0.f)  , osg::Y_AXIS,
                               osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
@@ -1991,9 +1966,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     
     scene->setName("scene");
 
-    findNodeVisitor findLod3("lod3"); 
-    scene->accept(findLod3);
-    auto lod3 =  findLod3.getFirst();
+    auto lod3 =  findFirstNode(scene,"lod3");
 
     if(lod3) 
         lod3->setNodeMask(0); // Убираем нафиг Lod3 
@@ -2071,6 +2044,9 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         auto p_copy = //loadBMAirplane();
         creators::applyBM(creators::loadAirplane(),"a_319",true);
         
+        float rot_angle = -90.f;
+        if(dynamic_cast<osg::LOD*>(p_copy))
+            rot_angle = 0;       
 
 #if 0   // Интересный эффект надо подумать над использованием 
         //effects::createShader(p_copy/*geom*/) ;
@@ -2080,9 +2056,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         
         bi::RigidUpdater* rigidUpdater = new bi::RigidUpdater( root.get() 
             ,[&](osg::MatrixTransform* mt){ 
-                findNodeVisitor findFire("fire"); 
-                mt->accept(findFire);
-                if(!findFire.getFirst())
+                
+                if(!findFirstNode(mt,"fire"))
                 {
                     spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
                     sp3.first->setName("fire");
@@ -2091,6 +2066,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
             }
             );
 
+        bi::getUpdater() = rigidUpdater;
+        
         rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
         for ( unsigned int i=0; i<10; ++i )
         {
@@ -2101,7 +2078,6 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
             }
         }
 
-        bi::getUpdater() = rigidUpdater;
 
 		const unsigned inst_num = 24;
         for (unsigned i = 0; i < inst_num; ++i)
@@ -2117,7 +2093,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
             //transform_node_ptr cur_trans = m_pVictory->scenegraph()->create(node::NT_Transform)->as_transform();
             //cur_trans->set_transform(rottrans);
 
-			const osg::Quat quat(osg::inDegrees(-90.f), osg::X_AXIS,                      
+			const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
                                  osg::inDegrees(0.f) , osg::Y_AXIS,
                                  osg::inDegrees(180.f * (i & 1)) - angle  , osg::Z_AXIS ); 
 

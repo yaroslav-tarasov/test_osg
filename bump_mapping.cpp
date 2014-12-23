@@ -180,9 +180,7 @@ int main_bump_map( int argc, char** argv )
     auto loadAdler = [&]() ->osg::Node* 
     {  
         auto root = osgDB::readNodeFile("adler.open.dae");
-        findNodeVisitor findLod3("lod3"); 
-        root->accept(findLod3);
-        auto lod3 =  findLod3.getFirst();
+        auto lod3 =  findFirstNode(root,"lod3");
 
         if(lod3) 
             lod3->setNodeMask(0); // Убираем нафиг Lod3 
@@ -207,10 +205,7 @@ int main_bump_map( int argc, char** argv )
     program->addBindAttribLocation( "tangent", 6 );
     program->addBindAttribLocation( "binormal", 7 );
     
-
-    findNodeVisitor findS("Shassis",findNodeVisitor::not_exact); 
-    model->accept(findS);
-    auto shassis =  findS.getFirst();
+    auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 
     if (shassis)
     {

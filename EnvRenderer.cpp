@@ -95,6 +95,8 @@ osg::Group* createPrerender(osg::Node* reflectedSubgraph, osg::NodePath reflecto
         // add subgraph to render
         camera->addChild(reflectedSubgraph);
 
+        camera->setCullMask(~NODE_STARFIELD_MASK);  // We don't need stars on the mountains
+
         group->addChild(camera);
 
         Cameras.push_back(camera);

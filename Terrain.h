@@ -16,8 +16,4 @@
                       
      };
 
-     namespace bi
-     {
-        osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater();
-     }
  }

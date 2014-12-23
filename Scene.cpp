@@ -1,4 +1,10 @@
 #include "stdafx.h"
+
+#include "high_res_timer.h"
+#include "bi/BulletInterface.h"
+#include "bi/RigidUpdater.h"
+
+
 #include "Scene.h"
 #include "creators.h"
 #include "Ephemeris.h"
@@ -6,6 +12,10 @@
 #include "sm/ShadowMap.h"
 #include "sm/ViewDependentShadowMap.h"
 #include "Terrain.h"
+
+#include "find_node_visitor.h" 
+
+
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
@@ -65,17 +75,18 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
         dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
         light->setUpdateCallback(callback);
         light->setName(name);
+        light->setCullingActive(false);
+#if 0
         const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
         osg::StateSet* ss = light->getOrCreateStateSet();
         ss->setAttribute(new osg::Program(),value);
         ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
         ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-        // light->setCullingActive(false); 
         ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
         // ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
         ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
         // ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF |  osg::StateAttribute::PROTECTED);
-        
+#endif        
         return light;
     };
 
@@ -83,6 +94,7 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
     //osg::ref_ptr<osg::Geode> blue_light  = CreateLight(creators::blue_color,std::string("blue"),nullptr);
     //osg::ref_ptr<osg::Geode> green_light = CreateLight(creators::green_color,std::string("green"),nullptr);
     // osg::ref_ptr<osg::Geode> white_light = CreateLight(creators::white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
+
 
     std::ifstream ifs(file);
 
@@ -155,6 +167,16 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
                 pat->addChild(CreateLight(clr,std::string("light"),nullptr));
                 pat->setPosition(osg::Vec3f(p.x(),p.y(),p.z()));
                 navid_node_ptr->addChild(pat);
+
+                const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+                osg::StateSet* ss = pat->getOrCreateStateSet();
+                ss->setAttribute(new osg::Program(),value);
+                ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+                ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+                ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF| osg::StateAttribute::OVERRIDE );
+                ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
+
+
             }
         }
 
@@ -221,13 +243,11 @@ Scene::Scene()
     addChild(_commonNode.get());
 
     // Add backface culling to the whole bunch
-    osg::StateSet * pSS = getOrCreateStateSet();
-    pSS->setNestRenderBins(false);
-    pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    // disable alpha writes for whole bunch
-    pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
-
-
+    //osg::StateSet * pSS = getOrCreateStateSet();
+    //pSS->setNestRenderBins(false);
+    //pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    //// disable alpha writes for whole bunch
+    //pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
 
 }
 
@@ -301,9 +321,8 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     manip->setWheelMovement(10,true);
     //manip->setWheelMovement(0.001,true);
     _viewerPtr->setCameraManipulator(manip);
-    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
-    manip->home(0);
-
+    //manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
+    //manip->home(0);
 
     //
     // Add event handlers to the viewer
@@ -311,24 +330,53 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
     _viewerPtr->realize();
+
     
     //
     // Initialize particle engine
     // 
 
     spark::init();
+    
+    //
+    // And some fire
+    //
+
+    spark::spark_pair_t sp =   spark::create(spark::FIRE);
+    spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
+
+    osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
+    posed->addChild(sp.first);
+    posed->addChild(sp2.first);
+    _viewerPtr->addEventHandler(sp.second);
+    addChild(posed);
 
     //
     // Create terrain / shadowed scene
     //
-    auto terrainRoot = createTerrainRoot();
-    addChild(terrainRoot);
+    createTerrainRoot();
     
-    _terrainNode =  new avTerrain::Terrain (terrainRoot);
+    
+    _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create("adler");
 
-    if(avTerrain::bi::getUpdater().valid())
-        _viewerPtr->addEventHandler( avTerrain::bi::getUpdater().get() );
+    osg::Node* ct =  findFirstNode(_terrainNode,"camera_tower");
+
+    if(ct) 
+    {
+        osg::Vec3 c = ct->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+        manip->setHomePosition(c, osg::Vec3(0,1,0), osg::Z_AXIS);
+        manip->home(0);
+    }
+    
+
+
+    //
+    // Init physic updater
+    //
+
+    createObjects();
+
 
     //
     // Create ephemeris
@@ -338,7 +386,24 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                                           [=](float illum){ _st->setNightMode(illum < .35);  } //  FIXME magic night value    
     );  
 
-    if(_ls.valid()) _ephemerisNode->setSunLightSource(_ls);
+    //
+    //  Get or create sunlight
+    //
+    
+    if( _ephemerisNode->getSunLightSource())
+    {
+        _ls =_ephemerisNode->getSunLightSource();  
+        _terrainRoot->addChild(_ls.get());
+    }
+    else
+    {
+        _ls = new osg::LightSource;
+        _ls->getLight()->setLightNum(0);
+        _terrainRoot->addChild(_ls.get());
+        _ephemerisNode->setSunLightSource(_ls);
+    }
+
+
     addChild( _ephemerisNode.get() );
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
@@ -366,7 +431,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 }
 
 
-osg::Group *  Scene::createTerrainRoot()
+void  Scene::createTerrainRoot()
 {
 
 #if defined(TEST_SHADOWS_FROM_OSG)
@@ -375,34 +440,156 @@ osg::Group *  Scene::createTerrainRoot()
 
     /*osg::ref_ptr<avShadow::ViewDependentShadowMap>*/ _st = new avShadow::ViewDependentShadowMap;
 
-    osg::ref_ptr<avShadow::ShadowedScene> root
+     _terrainRoot
         = new avShadow::ShadowedScene(_st.get());  
 
-    avShadow::ShadowSettings* settings = root->getShadowSettings();
+    avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(_terrainRoot.get())->getShadowSettings();
 
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(5);
     settings->setMinimumShadowMapNearFarRatio(.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
-    //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
+    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
     settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
-    settings->setMaximumShadowMapDistance(1000);
+    settings->setMaximumShadowMapDistance(1500);
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 
-    _ls = new osg::LightSource;
-    _ls->getLight()->setPosition(osg::Vec4(0, 0, 20, 0));
-    //_ls->getLight()->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
-    //_ls->getLight()->setDiffuse(osg::Vec4(0.8, 0.8, 0.8, 1));
-    _ls->getLight()->setLightNum(0);
-
-    root->addChild(_ls.get());
-
 #else
-    osg::ref_ptr<osg::Group> root = new osg::Group;
-#endif
+    _terrainRoot = new osg::Group;
+#endif     
 
-    return root.release();
+     addChild(_terrainRoot);
 }
 
+void Scene::createObjects()
+{
+    findNodeVisitor findBM("baseModel"); 
+    _terrainRoot->accept(findBM);
+    auto bm =  findBM.getFirst();
+
+    _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
+        ,[&](osg::MatrixTransform* mt){ 
+            if(!findFirstNode(mt,"fire"))
+            {
+                spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
+                sp3.first->setName("fire");
+                mt->addChild(sp3.first);
+            }
+    }
+    );
+
+
+    //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
+    //_terrainRoot->addChild(heli);
+
+    const bool add_planes = true;
+
+    if (add_planes)
+    {
+        osg::Node* p_copy = creators::applyBM(creators::loadAirplane(),"a_319",true);
+        //auto p_copy = creators::loadAirplane(); // А если без BM еще кадров 15-20
+        
+        float rot_angle = -90.f;
+        if(dynamic_cast<osg::LOD*>(p_copy))
+            rot_angle = 0;  
+
+        if(_rigidUpdater.valid())
+            _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
+
+        for ( unsigned int i=0; i<10; ++i )
+        {
+            for ( unsigned int j=0; j<10; ++j )
+            {
+                if(_rigidUpdater.valid())
+                    _rigidUpdater->addPhysicsBox( new osg::Box(osg::Vec3(), 0.99f),
+                    osg::Vec3((float)i, 0.0f, (float)j+0.5f), osg::Vec3(), 1.0f );
+            }
+        }
+
+
+
+        const unsigned inst_num = 24;
+        for (unsigned i = 0; i < inst_num; ++i)
+        {
+            float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
+            osg::Vec3 pos(radius * sin (angle), radius * cos(angle), 0.f);
+
+            const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
+                osg::inDegrees(0.f) , osg::Y_AXIS,
+                osg::inDegrees(180.f * (i & 1)) - angle  , osg::Z_AXIS ); 
+
+
+            osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(pos));
+            //positioned->setDataVariance(osg::Object::STATIC);
+
+            osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
+            //rotated->setDataVariance(osg::Object::STATIC);
+
+            positioned->addChild(rotated);
+            //rotated->addChild(p_copy);
+
+            if(_rigidUpdater.valid())
+             _rigidUpdater->addPhysicsAirplane( p_copy,
+                pos, osg::Vec3(0,0,0), 800.0f );
+
+            osg::Vec3 pos2( radius * sin (angle),   radius * cos(angle), 0.f);
+
+            if(_rigidUpdater.valid())
+                _rigidUpdater->addPhysicsAirplane( p_copy,
+                pos2, osg::Vec3(0,60,0), 1000.0f );
+
+            // add it
+            // _terrainRoot->addChild(positioned);  
+
+            if (i==1) 
+            {    
+                auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( p_copy->getUpdateCallback() );
+                if ( manager_ )
+                {   
+
+                    const osgAnimation::AnimationList& animations =
+                        manager_->getAnimationList();
+
+                    for ( unsigned int i=0; i<animations.size(); ++i )
+                    {
+                        const std::string& name = animations[i]-> getName();
+                        if ( name==std::string("Default") )
+                        {
+                            auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
+                            // manager->unregisterAnimation(animations[i].get());
+                            // manager->registerAnimation  (anim/*.get()*/);
+
+                            animations[i]->setPlayMode(osgAnimation::Animation::ONCE);                   
+                            manager_->playAnimation( /*anim*/ animations[i].get(),2,2.0 );
+
+                        }
+
+                    }
+                }
+
+
+            }
+
+            // FIXME при копировании начинаем падать кадров на 10
+            p_copy = osg::clone(p_copy, osg::CopyOp::DEEP_COPY_ALL 
+                & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+                & ~osg::CopyOp::DEEP_COPY_ARRAYS
+                & ~osg::CopyOp::DEEP_COPY_IMAGES
+                & ~osg::CopyOp::DEEP_COPY_TEXTURES
+                & ~osg::CopyOp::DEEP_COPY_STATESETS  
+                & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+                & ~osg::CopyOp::DEEP_COPY_UNIFORMS
+                & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+                );
+
+            // p_copy = osg::clone(p_copy,(const osg::CopyOp) (osg::CopyOp::DEEP_COPY_CALLBACKS & osg::CopyOp::DEEP_COPY_DRAWABLES) );
+            
+        }
+    }
+
+    if(_rigidUpdater.valid())
+        _viewerPtr->addEventHandler( _rigidUpdater/*avTerrain::bi::getUpdater().get()*/ );
+
+}

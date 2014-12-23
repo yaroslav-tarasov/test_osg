@@ -29,6 +29,7 @@
 #include <osg/Geometry>
 #include <osg/Geode>
 #include <osg/ShapeDrawable>
+#include <osg/Point>
 
 #include <osg/BlendFunc>
 

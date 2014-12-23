@@ -123,6 +123,15 @@
     <ClInclude Include="Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bi\BulletMTInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bi\RigidMTUpdater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bi\RigidUpdater.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -259,6 +268,12 @@
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="bi\BulletMTInterface.cpp">
+      <Filter>Source Files\bi</Filter>
+    </ClCompile>
+    <ClCompile Include="bi\GLDebugDrawer.cpp">
+      <Filter>Source Files\bi</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -11,6 +11,8 @@ class SparkUpdatingHandler : public osgGA::GUIEventHandler
 public:
     SparkUpdatingHandler() {}
     
+    virtual ~SparkUpdatingHandler() {}
+
     void addSpark( SparkDrawable* spark, osg::Transform* trackee=0 )
     { _sparks.push_back(SparkObject(spark, trackee)); }
     

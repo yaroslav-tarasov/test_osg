@@ -16,6 +16,10 @@
 #include "shadow_map.h"
 #include "teapot.h"
 
+#include "high_res_timer.h"
+#include "bi/BulletInterface.h"
+#include "bi/RigidUpdater.h"
+
 #include <osgEphemeris/EphemerisModel.h>
 
 #if defined (DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
@@ -664,9 +668,7 @@ int main_scene( int argc, char** argv )
     }
     else
     {
-        findNodeVisitor findCameraTower("camera_tower"); 
-        model->accept(findCameraTower);
-        auto ct =  findCameraTower.getFirst();
+        auto ct =  findFirstNode(model,"camera_tower");
 
         if(ct) 
             manip->setHomePosition(ct->getBound().center(), osg::Vec3(0,1,0), osg::Z_AXIS);
@@ -1005,10 +1007,7 @@ int main_scene( int argc, char** argv )
         osg::ref_ptr<osgGA::StateSetManipulator> statesetManipulator = new osgGA::StateSetManipulator(viewer.getCamera()->getStateSet());
         viewer.addEventHandler(statesetManipulator.get());
 
-        findNodeVisitor findNode("airplane"); 
-        model->accept(findNode);
-
-        auto node =  findNode.getFirst();
+        auto node =  findFirstNode(model,"airplane");
         if(node)
             viewer.addEventHandler(new AnimationHandler(/*node*/model_parts[1],animationName
                    ,[&](){effects::insertParticle(model->asGroup(),/*node*/model_parts[2]/*->asGroup()*/,osg::Vec3(00.f,00.f,00.f),0.f);}

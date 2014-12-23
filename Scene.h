@@ -1,5 +1,7 @@
 #pragma once 
 
+
+
 namespace avSky
 {
     class Ephemeris;
@@ -13,6 +15,11 @@ namespace avTerrain
 namespace avShadow
 {
     class ShadowTechnique;
+}
+
+namespace bi
+{
+    class RigidUpdater;
 }
 
 namespace avScene {
@@ -40,8 +47,9 @@ namespace avScene {
         Scene();
         virtual									    ~Scene();
         bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth = 0, int nHeight = 0);
-        osg::Group *                                createTerrainRoot();
-    
+        void                                        createTerrainRoot();
+        void                                        createObjects();
+
     private:
 
         static osg::ref_ptr<Scene>                  _scenePtr;
@@ -50,8 +58,10 @@ namespace avScene {
         osg::ref_ptr<avSky::Ephemeris>              _ephemerisNode;
         osg::ref_ptr<osg::Group>                    _weatherNode;
         osg::ref_ptr<avTerrain::Terrain>            _terrainNode; 
-        osg::ref_ptr<osg::LightSource>              _ls;        
-        osg::ref_ptr<avShadow::ShadowTechnique>     _st;     
+        osg::ref_ptr<osg::LightSource>              _ls;
+        osg::ref_ptr<osg::Group>                    _terrainRoot;
+        osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
+        osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
     };
 
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }

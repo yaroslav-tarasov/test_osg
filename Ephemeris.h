@@ -15,12 +15,14 @@ namespace avSky
        bool			           Initialize();
        void                    setSkyDomeRadius(double radius);
        void                    setSunLightSource(osg::LightSource* ls);
+       osg::LightSource*       getSunLightSource();
        osgGA::GUIEventHandler* getEventHandler();
-       inline  float getIllumination() const {return _illum;};
+       inline  float           getIllumination() const {return _illum;};
     protected:      
-       void          setTime();
-       void          setSummerTime();
-       inline  void setIllumination(float illum) { if(_ic) _ic(illum); _illum = illum; }     
+       void                    setTime();
+       void                    setSummerTime();
+       inline  void            setIllumination(float illum) { if(_ic) _ic(illum); _illum = illum; }
+       void                    setStarFieldMask(osg::Node::NodeMask nm);  
     private:
         struct data;
         osg::ref_ptr<data>      _d;

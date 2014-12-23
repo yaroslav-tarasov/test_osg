@@ -286,9 +286,7 @@ int main_exp_test( int argc, char** argv )
     InfoVisitor infoVisitor;
     model->accept( infoVisitor );
 
-    findNodeVisitor findNode("Body_",findNodeVisitor::not_exact); 
-    model->accept(findNode);
-    auto a_node =  findNode.getFirst();
+    auto a_node =  findFirstNode(model,"Body_",findNodeVisitor::not_exact);
     
     findNodeByType<osg::Geode> findGeode; 
     a_node->accept(findGeode);

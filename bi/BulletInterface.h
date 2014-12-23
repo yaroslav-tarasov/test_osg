@@ -2,14 +2,6 @@
 #define H_BULLETINTERFACE
 
 #include <btBulletDynamicsCommon.h> 
-#include <osgbInteraction/SaveRestoreHandler.h>
-
-#include <osg/Referenced>
-#include <osg/Vec3>
-#include <osg/Plane>
-#include <osg/Matrix>
-#include <string>
-#include <map>
 
 class BulletInterface : public osg::Referenced
 {
@@ -33,7 +25,6 @@ public:
     btDiscreteDynamicsWorld* getScene() { return _scene; }
     
     void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
-    void createCow( osg::Node* node,osg::Vec3 pos, const osg::Matrix& m, osg::Transform* amt );
     void createBox    ( int id, const osg::Vec3& dim, double mass );
     void createSphere ( int id, double radius, double mass );
     
@@ -42,7 +33,13 @@ public:
     osg::Matrix getMatrix( int id );
     
     void simulate( double step );
-    
+    void setDebugDrawer(btIDebugDraw* dd)
+    {
+        _dd=dd;    
+        if(_dd)
+        _scene->setDebugDrawer(_dd);
+    }
+
 protected:
     BulletInterface();
     virtual ~BulletInterface();
@@ -60,7 +57,7 @@ private:
     btSequentialImpulseConstraintSolver*  _solver;
     CollisionPairs                        _pairsLastUpdate;
     on_collision_f                        _on_collision;
-    osg::ref_ptr< osgbInteraction::SaveRestoreHandler > _srh;
+    btIDebugDraw*                         _dd;
 };
 
 #endif

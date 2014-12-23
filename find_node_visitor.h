@@ -106,4 +106,11 @@ private:
 
 };
 
+inline static osg::Node * findFirstNode(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact)
+{
+    findNodeVisitor findVis(searchName,m); 
+    root->accept(findVis);
+    return findVis.getFirst();
+}
+
 #endif

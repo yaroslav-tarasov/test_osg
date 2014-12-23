@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\3rdparty\include;C:\Work\bullet-2.82-r2704\src;ext\pugixml-1.4\src;common;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\3rdparty\include;C:\Work\bullet-2.82-r2704\src;ext\pugixml-1.4\src;common;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -64,7 +64,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -96,6 +96,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
+    <ClInclude Include="bi\BulletMTInterface.h" />
+    <ClInclude Include="bi\RigidMTUpdater.h" />
+    <ClInclude Include="bi\RigidUpdater.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="ct_visitor.h" />
@@ -121,6 +124,8 @@
   <ItemGroup>
     <ClCompile Include="animation_handler.cpp" />
     <ClCompile Include="bi\BulletInterface.cpp" />
+    <ClCompile Include="bi\BulletMTInterface.cpp" />
+    <ClCompile Include="bi\GLDebugDrawer.cpp" />
     <ClCompile Include="bi\osgbullet.cpp" />
     <ClCompile Include="bump_mapping.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
