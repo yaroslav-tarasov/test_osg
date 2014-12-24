@@ -63,32 +63,45 @@ inline osg::Vec3f polar_point_2(S range, S course )
 
 typedef osg::ref_ptr<osg::Group> navaid_group_node_ptr;
 
-void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
+osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)
 {
-    //     if (!boost::filesystem::is_regular_file(file))
-    //         LogWarn("No lights for airport found: " << file.string());
-    auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
-        osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
-        shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.3f) );
+    static std::map<osg::Vec4,osg::Geode*> colors;
+    if(colors.find ( fcolor ) == colors.end())
+    {
+
+        osg::ref_ptr<osg::ShapeDrawable> shp = new osg::ShapeDrawable();
+        shp->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.3f) );
         osg::Geode* light = new osg::Geode;
-        light->addDrawable( shape1.get() );
+        light->addDrawable( shp.get() );
         dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
         light->setUpdateCallback(callback);
         light->setName(name);
         light->setCullingActive(false);
-#if 0
-        const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
-        osg::StateSet* ss = light->getOrCreateStateSet();
-        ss->setAttribute(new osg::Program(),value);
-        ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
-        ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-        ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-        // ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
-        ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
-        // ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF |  osg::StateAttribute::PROTECTED);
-#endif        
-        return light;
-    };
+        colors [fcolor] = light;
+    }
+
+
+
+#if 0  // Перенесено см ниже
+    const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+    osg::StateSet* ss = light->getOrCreateStateSet();
+    ss->setAttribute(new osg::Program(),value);
+    ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+    ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+    ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    // ss->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+    ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
+    // ss->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF |  osg::StateAttribute::PROTECTED);
+#endif    
+
+    return  colors [fcolor];
+};
+
+void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
+{
+    //     if (!boost::filesystem::is_regular_file(file))
+    //         LogWarn("No lights for airport found: " << file.string());
+
 
     //osg::ref_ptr<osg::Geode> red_light   = CreateLight(creators::red_color,std::string("red"),nullptr);
     //osg::ref_ptr<osg::Geode> blue_light  = CreateLight(creators::blue_color,std::string("blue"),nullptr);
@@ -419,7 +432,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
-#if 0
+#if 1
     fill_navids(
         "sheremetyevo.txt", 
         _lamps, 
@@ -465,9 +478,9 @@ void  Scene::createTerrainRoot()
 
 void Scene::createObjects()
 {
-    findNodeVisitor findBM("baseModel"); 
-    _terrainRoot->accept(findBM);
-    auto bm =  findBM.getFirst();
+    //findNodeVisitor findBM("baseModel"); 
+    //_terrainRoot->accept(findBM);
+    //auto bm =  findBM.getFirst();
 
     _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
@@ -488,7 +501,8 @@ void Scene::createObjects()
 
     if (add_planes)
     {
-        osg::Node* p_copy = creators::applyBM(creators::loadAirplane(),"a_319",true);
+        const std::string name = "a_319";
+        osg::Node* p_copy = creators::applyBM(creators::loadAirplane(name),name,true);
         //auto p_copy = creators::loadAirplane(); // А если без BM еще кадров 15-20
         
         float rot_angle = -90.f;

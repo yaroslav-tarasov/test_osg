@@ -34,8 +34,8 @@ namespace shaders
         vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
         {                                                                                                \
             vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-            return mix(textureCube(Env, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));   \
-            /*return mix(textureLod(Env, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
+            return mix(textureCube(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));   \
+            /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
         }                                                                                                \
         \
         vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
@@ -81,7 +81,7 @@ namespace shaders
 \n                                                                                                     \
 \n      uniform mat4      shadow0_matrix;                                                              \
 \n                                                                                                     \
-\n        float PCF2(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
+\n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
 \n            float result = 0.0;                                                                      \
 \n            int   count = 0;                                                                         \
 \n            for(int x=-size.x; x<=size.x; x++){                                                      \
@@ -93,14 +93,17 @@ namespace shaders
 \n            return result/count;                                                                     \
         }                                                                                              \
                                                                                                        \
-\n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+\n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
 \n            float result = 0.0;                                                                      \
-\n            int   count = 4;                                                                         \
-\n                    result += shadow2DProjOffset(depths, stpq, ivec2(0,-1)).r;                       \
-\n                    result += shadow2DProjOffset(depths, stpq, ivec2(0,1)).r;                        \
-\n                    result += shadow2DProjOffset(depths, stpq, ivec2(1,0)).r;                        \
-\n                    result += shadow2DProjOffset(depths, stpq, ivec2(-1,0)).r;                       \
-\n            return result/count;                                                                     \
+\n            result += shadow2DProjOffset(depths, stpq, ivec2(0,-1)).r;                               \
+\n            result += shadow2DProjOffset(depths, stpq, ivec2(0,1)).r;                                \
+\n            result += shadow2DProjOffset(depths, stpq, ivec2(1,0)).r;                                \
+\n            result += shadow2DProjOffset(depths, stpq, ivec2(-1,0)).r;                               \
+\n            return result*.25;                                                                       \
+    }                                                                                                  \
+                                                                                                       \
+\n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+\n            return shadow2DProj(depths, stpq).r;                                          \
     }                                                                                                  \
       const ivec2 pcf_size = ivec2(1,1);                                                               \
                                                                                                        \
@@ -123,6 +126,17 @@ namespace shaders
         uniform vec4 specular;                                                                          \
      )
 
+#define INCLUDE_UNIFORMS                                                                                \
+    STRINGIFY (                                                                                         \
+        uniform sampler2D           ViewLightMap;                                                       \
+        uniform sampler2D           detailTex;                                                          \
+        uniform samplerCube         envTex;                                                             \
+        uniform sampler2DShadow     ShadowSplit0;                                                       \
+        uniform sampler2DShadow     ShadowSplit1;                                                       \
+        uniform sampler2DShadow     ShadowSplit2;                                                       \
+        uniform sampler2D           ViewDecalMap;                                                       \
+        uniform vec4                SceneFogParams;                                                     \
+        )
 
     }                                                                                                  
 
@@ -138,9 +152,6 @@ namespace shaders
         attribute vec3 tangent;
         attribute vec3 binormal;
         varying   vec3 lightDir;
-        //varying   float illum; 
-        
-
 
         out block
         {
@@ -183,19 +194,11 @@ namespace shaders
         "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
         
-        
+        INCLUDE_UNIFORMS
+
         STRINGIFY ( 
     
         // layout(early_fragment_tests) in;
-
-        uniform sampler2D           ViewLightMap;
-        uniform sampler2D           Detail;
-        uniform samplerCube         Env;
-        uniform sampler2DShadow     ShadowSplit0;
-        uniform sampler2DShadow     ShadowSplit1;
-        uniform sampler2DShadow     ShadowSplit2;
-        uniform sampler2D           ViewDecalMap;    
-        uniform vec4                SceneFogParams;
 
         mat4 viewworld_matrix;
         )
@@ -232,9 +235,9 @@ namespace shaders
         {
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag)   
-            float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
-            if(ambient.a > 0.35)
-               shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+            float shadow = 1.0; 
+            //if(ambient.a > 0.35)
+               shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
 
             //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
@@ -252,8 +255,6 @@ namespace shaders
             //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
             vec4  light_vec_view = vec4(lightDir,1);
             
-            //ambient.a = illum;   
-
             viewworld_matrix = gl_ModelViewMatrixInverse;
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
             vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
@@ -288,7 +289,7 @@ namespace shaders
 
 
             // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
-            vec3 cube_color = textureCube(Env, refl_vec_world).rgb + pure_spec_color;
+            vec3 cube_color = textureCube(envTex, refl_vec_world).rgb + pure_spec_color;
 
 
             vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
@@ -342,7 +343,7 @@ namespace shaders
            attribute vec3 tangent;
            attribute vec3 binormal;
            varying   vec3 lightDir;
-           //varying   float illum; 
+
            out block
            {
                vec2 texcoord;
@@ -370,7 +371,6 @@ namespace shaders
                v_out.viewpos   = vertexInEye.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-               //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента 
            }       
        )
        };
@@ -379,17 +379,9 @@ namespace shaders
        const char* fs = {
        "#version 130 \n"
        "#extension GL_ARB_gpu_shader5 : enable \n "
+        INCLUDE_UNIFORMS
 
-        STRINGIFY ( 
-
-           uniform sampler2D           ViewLightMap;
-           uniform sampler2D           Detail;
-           uniform samplerCube         Env;
-           uniform sampler2DShadow     ShadowSplit0;
-           uniform sampler2DShadow     ShadowSplit1;
-           uniform sampler2DShadow     ShadowSplit2;
-           uniform sampler2D           ViewDecalMap;    
-           uniform vec4                SceneFogParams;
+       STRINGIFY ( 
 
            mat4 viewworld_matrix;
        )
@@ -405,7 +397,6 @@ namespace shaders
            uniform sampler2D colorTex;
            uniform sampler2D normalTex;
            varying vec3 lightDir;
-          // varying float illum;
 
            in block
            {
@@ -423,9 +414,9 @@ namespace shaders
            {
                // GET_SHADOW(f_in.viewpos, f_in);
                //#define GET_SHADOW(viewpos, in_frag) 
-               float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+               float shadow = 1.0; 
                if(ambient.a > 0.35)
-                   shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                   shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -441,7 +432,6 @@ namespace shaders
                //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
                //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
                vec4  light_vec_view = vec4(lightDir,1);
-               //ambient.a = illum;
 
                viewworld_matrix = gl_ModelViewMatrixInverse;
                vec4 base = texture2D(colorTex, gl_TexCoord[0].xy);
@@ -477,7 +467,7 @@ namespace shaders
 
 
                // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
-               vec3 cube_color = textureCube(Env, refl_vec_world).rgb + pure_spec_color;
+               vec3 cube_color = textureCube(envTex, refl_vec_world).rgb + pure_spec_color;
 
                vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
                // GET_LIGHTMAP(f_in.viewpos, f_in);
@@ -527,7 +517,6 @@ namespace shaders
             STRINGIFY ( 
             
             varying   vec3  lightDir;
-            //varying   float illum; 
 
             out block
             {
@@ -552,7 +541,6 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -562,19 +550,11 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
-            uniform vec4                SceneFogParams;
-
-            mat4 viewworld_matrix;
+             mat4 viewworld_matrix;
             )
 
             INCLUDE_MAT
@@ -586,9 +566,8 @@ namespace shaders
             STRINGIFY ( 
 
             uniform sampler2D           colorTex;
-            uniform sampler2D           NightTex;
-            varying   vec3  lightDir;
-            //varying   float illum;
+            uniform sampler2D           nightTex;
+            varying   vec3              lightDir;
 
             in block
             {
@@ -603,9 +582,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -620,8 +599,6 @@ namespace shaders
                 //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
                 //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
                 //vec4  ambient        = gl_LightSource[0].ambient ;      // FIXME 
-
-                //ambient.a = illum;
 
                 vec4  light_vec_view = vec4(lightDir,1);
 
@@ -674,7 +651,7 @@ namespace shaders
                 // apply detail texture
                 float detail_factor = dif_tex_col.a * tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.075);
                 if (detail_factor > 0.01)
-                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, detail_factor * fma(texture2D(Detail, f_in.texcoord * 9.73f).rrr, vec3(0.5), vec3(-0.25)));
+                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, detail_factor * fma(texture2D(detailTex, f_in.texcoord * 9.73f).rrr, vec3(0.5), vec3(-0.25)));
 
                 vec3 day_result = light_color * dif_tex_col.rgb;
                 vec3 night_tex = vec3(0.0f,0.0f,0.0f); // I'm not sure
@@ -683,9 +660,9 @@ namespace shaders
                     vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
                     refl_vec_world.z = abs(refl_vec_world.z);
                     float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
-                    vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
+                    vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
                     day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
-                    night_tex = texture2D(NightTex, f_in.texcoord).rgb;
+                    night_tex = texture2D(nightTex, f_in.texcoord).rgb;
                 }
 
                 float night_factor = step(ambient.a, 0.35);
@@ -693,7 +670,7 @@ namespace shaders
                
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
                 // gl_FragColor = vec4( result,1.0);  
-                /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(NightTex, f_in.texcoord),night_factor);
+                /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(nightTex, f_in.texcoord),night_factor);
                 //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
             }
             )
@@ -722,7 +699,6 @@ namespace shaders
             STRINGIFY ( 
 
             varying   vec3  lightDir;
-            //varying   float illum; 
 
             out block
             {
@@ -748,7 +724,6 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -758,20 +733,11 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
-            
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
-            uniform vec4                SceneFogParams;
-
-            mat4 viewworld_matrix;
+             mat4 viewworld_matrix;
             )
             
             INCLUDE_MAT
@@ -783,9 +749,8 @@ namespace shaders
             STRINGIFY ( 
 
             uniform sampler2D       colorTex;
-            uniform sampler2D       NightTex;
-            varying   vec3  lightDir;
-            //varying   float illum;
+            uniform sampler2D       nightTex;
+            varying   vec3          lightDir;
 
             in block
             {
@@ -800,9 +765,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -817,8 +782,7 @@ namespace shaders
                 //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
                 //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
                 //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
-                // ambient.a = illum;
-                vec4  light_vec_view = vec4(lightDir,1);
+               vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
 
 
@@ -861,7 +825,6 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            //varying   float illum; 
             
             out block
             {
@@ -895,8 +858,7 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
-            }       
+           }       
             )
         };
 
@@ -905,18 +867,11 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
+            INCLUDE_UNIFORMS
+
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
-            uniform vec4                SceneFogParams;
-
-            mat4 viewworld_matrix;
+           mat4 viewworld_matrix;
             )
             
             INCLUDE_MAT
@@ -929,7 +884,6 @@ namespace shaders
 
             uniform sampler2D colorTex;
             varying vec3 lightDir;
-            //varying float illum;
 
             in block
             {
@@ -947,9 +901,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -978,7 +932,7 @@ namespace shaders
 \n                vec3 normal_noise = vec3(0.0);
 \n                if (detail_factor > 0.01)
 \n                {
-\n                    normal_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
+\n                    normal_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
 \n                    dif_tex_col = hardlight(dif_tex_col, normal_noise.ggg);
 \n                }
 \n
@@ -1019,7 +973,7 @@ namespace shaders
 \n                {
 \n                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
 \n                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.25, 0.05));
-\n                    vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
+\n                    vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
 \n                    result = mix(result, lightmap_color + cube_color + specular_color, fresnel * rainy_value);
 \n                }
 \n
@@ -1056,7 +1010,6 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            //varying   float illum; 
             
             mat4 decal_matrix;
 
@@ -1096,7 +1049,6 @@ namespace shaders
 
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 
-                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -1105,17 +1057,10 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-\n            uniform sampler2D           ViewLightMap;
-\n            uniform sampler2D           Detail;
-\n            uniform samplerCube         Env;
-\n            uniform sampler2DShadow     ShadowSplit0;
-\n            uniform sampler2DShadow     ShadowSplit1;
-\n            uniform sampler2DShadow     ShadowSplit2;
-\n            uniform sampler2D           ViewDecalMap;    
-\n            uniform vec4                SceneFogParams;
 \n
 \n            mat4 viewworld_matrix;
 \n            )
@@ -1130,7 +1075,6 @@ namespace shaders
 \n
 \n            uniform sampler2D colorTex;
 \n            varying vec3 lightDir;
-\n            //varying float illum;
 \n
 \n            in block
 \n            {
@@ -1149,9 +1093,9 @@ namespace shaders
 \n            {
 \n                // GET_SHADOW(f_in.viewpos, f_in);
 \n                //#define GET_SHADOW(viewpos, in_frag) 
-                  float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                  float shadow = 1.0; 
                   if(ambient.a > 0.35)
-                      shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                      shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                   //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
                   // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
@@ -1180,7 +1124,7 @@ namespace shaders
 \n                vec3 concrete_noise = vec3(0.0);
 \n                if (detail_factor > 0.01)
 \n                {
-\n                    concrete_noise = detail_factor * fma(texture2D(Detail, f_in.detail_uv).rgb, vec3(0.48), vec3(-0.24));
+\n                    concrete_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.48), vec3(-0.24));
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
 \n
@@ -1230,7 +1174,7 @@ namespace shaders
  \n               {
  \n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
  \n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.45, 0.05));
- \n                   vec3 cube_color = textureCube(Env, refl_vec_world).rgb;
+ \n                   vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
  \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
  \n               }
  \n
@@ -1464,7 +1408,6 @@ namespace shaders
             attribute vec3 tangent;
             attribute vec3 binormal;
             varying   vec3 lightDir;
-            //varying   float illum; 
 
             out block
             {
@@ -1489,7 +1432,6 @@ namespace shaders
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
 
-                //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             }       
             )
         };
@@ -1498,17 +1440,10 @@ namespace shaders
         const char* fs = {
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
-
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;   
-            uniform vec4                SceneFogParams;
 
             mat4 viewworld_matrix;
             )
@@ -1523,7 +1458,6 @@ namespace shaders
 
             uniform sampler2D colorTex;
             varying vec3 lightDir;
-            //varying float illum;
 
             in block
             {
@@ -1539,9 +1473,9 @@ namespace shaders
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //#define GET_SHADOW(viewpos, in_frag) 
-                float shadow = 1.0; // mix(PCF2(shadowTexture0, f_in.shadow_view,pcf_size),1.0,(1 - illum * 0.4));
+                float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF2(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
+                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1639,20 +1573,11 @@ namespace shaders
             "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
-            
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;
-            uniform sampler2D           Detail;
-            uniform samplerCube         Env;
-            uniform sampler2DShadow     ShadowSplit0;
-            uniform sampler2DShadow     ShadowSplit1;
-            uniform sampler2DShadow     ShadowSplit2;
-            uniform sampler2D           ViewDecalMap;    
             uniform vec4                fog_params; 
-            uniform vec4                SceneFogParams;
-
             mat4 viewworld_matrix;
 
             )
@@ -1748,15 +1673,11 @@ namespace shaders
             
             INCLUDE_SCENE_PARAM
 
+            INCLUDE_UNIFORMS
+
             STRINGIFY ( 
 
-            uniform sampler2D           ViewLightMap;   
-            uniform sampler2D           Detail;           
-            uniform samplerCube         Env;            
-            uniform sampler2DShadow     ShadowSplit0;   
-            uniform sampler2DShadow     ShadowSplit1;   
-            uniform sampler2DShadow     ShadowSplit2;   
-            uniform sampler2D           ViewDecalMap;    
+
             uniform vec4                fog_params;     
             uniform vec4                SkyFogParams;  
             

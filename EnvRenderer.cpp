@@ -90,7 +90,7 @@ osg::Group* createPrerender(osg::Node* reflectedSubgraph, osg::NodePath reflecto
         camera->setRenderTargetImplementation(renderImplementation);
 
         // attach the texture and use it as the color buffer.
-        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, i);
+        camera->attach(osg::Camera::COLOR_BUFFER, texture, 0, i); // ,0,i,true,0,0); //
 
         // add subgraph to render
         camera->addChild(reflectedSubgraph);

@@ -10,8 +10,8 @@ namespace creators
     osg::Node*          createBase(const osg::Vec3& center,float radius);
     nodes_array_t       createMovingModel(const osg::Vec3& center, float radius);
     nodes_array_t       createModel(osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
-    osg::Node*          loadAirplane();
-    nodes_array_t       loadAirplaneParts();
+    osg::Node*          loadAirplane(std::string);
+    nodes_array_t       loadAirplaneParts(std::string);
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
     osg::Node*          loadHelicopter();
 

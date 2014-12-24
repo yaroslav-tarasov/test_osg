@@ -191,7 +191,7 @@ int main_bump_map( int argc, char** argv )
 /////////////////////////////////////////////////////////////////////////    
     osg::ref_ptr<osg::Node> model = osgDB::readNodeFiles( arguments );
     if ( !model ) 
-        model = creators::applyBM(creators::loadAirplane(),"a_319",true); //loadAdler();//  CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
+        model = creators::applyBM(creators::loadAirplane("a_319"),"a_319",true); //loadAdler();//  CreateEarth(); //osgDB::readNodeFile("skydome.osgt");//  //osgDB::readNodeFile("spaceship.osgt"); // 
 
 #if 0   
     ComputeTangentVisitor ctv;

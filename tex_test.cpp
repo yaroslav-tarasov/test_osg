@@ -100,7 +100,7 @@ int main_tex_test( int argc, char** argv )
 
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(osgDB::readImageFile("a_319_aeroflot.png"/*"Fieldstone.jpg"*/));
 
-    creators::nodes_array_t plane = creators::loadAirplaneParts();
+    creators::nodes_array_t plane = creators::loadAirplaneParts("a_319");
     auto airplane = plane[1];
 
     // osg::Node*  airplane = // creators::loadAirplane();

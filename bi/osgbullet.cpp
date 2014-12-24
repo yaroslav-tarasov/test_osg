@@ -134,7 +134,7 @@ int main_bi( int argc, char** argv )
     if ( arguments.read("--rigid") ) mode = 0;
     //else if ( arguments.read("--cloth") ) mode = 1;
     
-    osg::Node*  airplane = creators::loadAirplane();
+    osg::Node*  airplane = creators::loadAirplane("a_319");
 
 
     osg::ref_ptr<osg::Group> root = new osg::Group;

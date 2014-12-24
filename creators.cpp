@@ -966,14 +966,19 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     return geode;
 }
 
-nodes_array_t loadAirplaneParts()
+nodes_array_t loadAirplaneParts(std::string name)
 {
-    osg::Node* airplane_file = osgDB::readNodeFile("a_319.tang.dae"); // a_319.open.dae "a_319.part.dae"  "an_124.dae"
+    osg::Node* airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae"); // "an_124.dae"
+    //osg::LOD* lod = new osg::LOD;
+    //osg::Group* Root = new osg::Group;
 
     osg::Node* engine = nullptr; 
     osg::Node* engine_geode = nullptr; 
     osg::Node* lod0 = nullptr; 
     osg::Node* lod3 = nullptr; 
+
+    osg::Group* root = nullptr; 
+    osg::Group* lod_ = nullptr;
 
 #ifdef ANIMATION_TEST
     if(airplane_file)
@@ -1003,7 +1008,7 @@ nodes_array_t loadAirplaneParts()
     if(airplane_file)
 	{
         airplane_file->setName("all_nodes");
-
+                 
 
         auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
             osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
@@ -1014,11 +1019,11 @@ nodes_array_t loadAirplaneParts()
             dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
             light->setUpdateCallback(callback);
             light->setName(name);
-            const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+            const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED|osg::StateAttribute::OVERRIDE| osg::StateAttribute::OFF;
             light->getOrCreateStateSet()->setAttribute(new osg::Program(),value);
             light->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
             light->getOrCreateStateSet()->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-            light->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+            light->getOrCreateStateSet()->setMode( GL_LIGHTING, value );
             return light;
         };
 
@@ -1026,12 +1031,25 @@ nodes_array_t loadAirplaneParts()
         osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
         osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
         osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
-		
+        
+        lod0 =  findFirstNode(airplane_file,"Lod0");
+        lod3 =  findFirstNode(airplane_file,"Lod3");
+        //      
+        if(lod3) 
+            lod3->setNodeMask(0); // Убираем нафиг Lod3 
+        
+        root =  findFirstNode(airplane_file,"Root")->asGroup();
+        lod_ =  findFirstNode(airplane_file,"lod_",findNodeVisitor::not_exact)->asGroup();
+
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
             auto tail =  findFirstNode(airplane_file,root.c_str());
-            if(tail)  tail->asGroup()->addChild(child);
+            if(tail)  
+            {
+                tail->asGroup()->addChild(child);
+                // Root->addChild(tail);
+            }
             return tail;
-         };
+        };
 
         auto tail = addAsChild("tail",white_light);
         auto strobe_r = addAsChild("strobe_r",white_light);
@@ -1040,27 +1058,28 @@ nodes_array_t loadAirplaneParts()
         auto port = addAsChild("port",green_light);
         auto star_board = addAsChild("starboard",red_light);
 
-        lod0 =  findFirstNode(airplane_file,"Lod0");
-     	lod3 =  findFirstNode(airplane_file,"Lod3");
-  //      
-  //      if(lod3) 
-  //          lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
-
         engine =  findFirstNode(airplane_file,"engine",findNodeVisitor::not_exact);
-        if (engine) engine_geode = engine->asGroup()->getChild(0);//->asGroup()->getChild(0);
+        if (engine) engine_geode = engine->asGroup()->getChild(0);
 	}
 
-    osg::LOD* lod = new osg::LOD; 
-    lod->addChild(lod0,0,750);
-    lod->addChild(lod3,750,50000);
-    nodes_array_t retval = {nullptr,lod,engine,engine_geode,lod0,lod3};
+    //Root->addChild(lod);
+    //lod->addChild(lod0,0,750);
+    //lod->addChild(lod3,750,50000);
+     
+    // osgDB::writeNodeFile(*airplane_file,"airplane_file_osg_struct.osgt");
+    
+    //root->asGroup()->addChild(lod);
+    //root->removeChild(lod_);
+    //bool ret = lod_->removeChild(0,2);
+
+    nodes_array_t retval = {nullptr,airplane_file,engine,engine_geode,lod0,lod3};
     return retval;
 }
 
 
-osg::Node* loadAirplane()
+osg::Node* loadAirplane(std::string name)
 {
-    return loadAirplaneParts()[1];
+    return loadAirplaneParts(name)[1];
 }
 
 osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
@@ -1092,11 +1111,11 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     }
 
 
-    FindTextureVisitor ft(name); //"a_319"
+    FindTextureVisitor ft(name); 
     model->accept( ft );
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile(name + "_n.dds") ); // "a_319_n.dds"  
+    normalTex->setImage( osgDB::readImageFile(name + "/" + name + "_n.dds") ); // "a_319_n.dds"  
 
     auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 
@@ -1111,7 +1130,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
         osg::StateSet* stateset = shassis->getOrCreateStateSet();
         stateset->addUniform( new osg::Uniform("colorTex", 0) );
         stateset->addUniform( new osg::Uniform("normalTex", 1) ); 
-        stateset->addUniform( new osg::Uniform("Env", 3) );
+        stateset->addUniform( new osg::Uniform("envTex", 3) );
         stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
         stateset->setTextureAttributeAndModes( 3, tcm);
     }
@@ -1120,7 +1139,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     osg::StateSet* stateset = model->getOrCreateStateSet();
     stateset->addUniform( new osg::Uniform("colorTex", 0) );
     stateset->addUniform( new osg::Uniform("normalTex", 1) );
-    stateset->addUniform( new osg::Uniform("Env", 3) );
+    stateset->addUniform( new osg::Uniform("envTex", 3) );
     stateset->setDataVariance(osg::Object::DYNAMIC);
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON);
     stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
@@ -1735,9 +1754,9 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     }    
 
     stateset->addUniform( new osg::Uniform("colorTex"    , 0) );
-    stateset->addUniform( new osg::Uniform("NightTex"    , 1) );
-    stateset->addUniform( new osg::Uniform("Detail"      , 2) ); 
-    stateset->addUniform( new osg::Uniform("Env"         , 3) ); 
+    stateset->addUniform( new osg::Uniform("nightTex"    , 1) );
+    stateset->addUniform( new osg::Uniform("detailTex"      , 2) ); 
+    stateset->addUniform( new osg::Uniform("envTex"         , 3) ); 
     stateset->addUniform( new osg::Uniform("ViewDecalMap", 4) );
     stateset->addUniform( new osg::Uniform("shadowTexture0", 5) );
 
@@ -1807,7 +1826,7 @@ nodes_array_t createMovingModel(const osg::Vec3& center, float radius)
         model->addChild(xform);
     }
 	
-	nodes_array_t plane = loadAirplaneParts();
+	nodes_array_t plane = loadAirplaneParts("a_319");
 	auto airplane = plane[1];
 
     if (airplane)
@@ -2041,8 +2060,8 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
 		//}
 		     
-        auto p_copy = //loadBMAirplane();
-        creators::applyBM(creators::loadAirplane(),"a_319",true);
+        auto p_copy = 
+        creators::applyBM(creators::loadAirplane("a_319"),"a_319",true);
         
         float rot_angle = -90.f;
         if(dynamic_cast<osg::LOD*>(p_copy))

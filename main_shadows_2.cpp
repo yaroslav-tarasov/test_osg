@@ -62,7 +62,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     //auto ret_array  = createMovingModel(center,radius*0.8f);
 
     //osg::Node* movingModel = ret_array[0];
-    osg::Node*  airplane = creators::loadAirplane();
+    osg::Node*  airplane = creators::loadAirplane("a_319");
 
     //osg::Group* test_model = new osg::Group;
 
@@ -70,7 +70,7 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
     if (add_planes)
     {
         auto p_copy = //creators::loadBMAirplane(true);
-        creators::applyBM(creators::loadAirplane(),"a_319");
+        creators::applyBM(creators::loadAirplane("a_319"),"a_319");
 
         //effects::createShader(p_copy) ;
 

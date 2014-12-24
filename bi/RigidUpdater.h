@@ -12,7 +12,8 @@ namespace bi
         RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ) 
             : _root        (root)
             , _on_collision(on_collision)
-            , _dbgDraw(nullptr)
+            , _dbgDraw     (nullptr)
+            , _debug       (true)
         {}
 
         void addGround( const osg::Vec3& gravity )
@@ -24,7 +25,7 @@ namespace bi
             } );
 
             //const bool debug( arguments.read( "--debug" ) );
-            if( true/*debug*/ )
+            if( _debug )
             {
                 //osg::notify( osg::INFO ) << "osgbpp: Debug" << std::endl;
                 _dbgDraw = new avCollision::GLDebugDrawer();
@@ -168,6 +169,7 @@ namespace bi
         high_res_timer                _hr_timer;
         on_collision_f                _on_collision;
         avCollision::GLDebugDrawer*   _dbgDraw;
+        bool                          _debug;
     };
 
     //osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater()
