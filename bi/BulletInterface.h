@@ -13,7 +13,9 @@ public:
         THE_GREAT_NOTHING = 0,
         WORLD  = BIT(1),
         SPHERE = BIT(2),
-        BOX    = BIT(3)};
+        BOX    = BIT(3),
+        SHAPE  = BIT(4)
+    };
     struct data
     {
       btRigidBody* _body;
@@ -27,7 +29,8 @@ public:
     void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
     void createBox    ( int id, const osg::Vec3& dim, double mass );
     void createSphere ( int id, double radius, double mass );
-    
+    void createShape  ( osg::Node* node,int id, double density);
+
     void setVelocity  ( int id, const osg::Vec3& pos );
     void setMatrix    ( int id, const osg::Matrix& matrix );
     osg::Matrix getMatrix( int id );

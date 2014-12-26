@@ -45,16 +45,22 @@ void  Terrain::create( std::string name )
     if(name != "empty" && !name.empty() )
     {
 
-#if 1
-    const char* scene_name = "sheremetyevo.open.osgb"; // "sheremetyevo.open.osgb";  
-    const char* mat_file_name = "sheremetyevo.open.dae"; 
-#else
-    const char* scene_name = "adler.osgb";  
-    const char* mat_file_name = "adler.open.dae"; 
-#endif
+    std::string scene_name;
+    std::string mat_file_name;
+
+    if(name == "sheremetyevo")
+    {
+        scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.osgb";// "sheremetyevo.open.osgb";   
+        mat_file_name = "sheremetyevo.open.dae"; 
+    }
+    else
+    {
+        scene_name = "adler.osgb";  
+        mat_file_name = "adler.open.dae"; 
+    }
 
 
-    osg::Node* scene = osgDB::readNodeFile(scene_name);  
+    osg::Node* scene = osgDB::readNodeFile(name + "_dae/"+ scene_name);  
 
     scene->setName("scene");
 
@@ -77,7 +83,7 @@ void  Terrain::create( std::string name )
     nl.push_back("railing");
     nl.push_back("panorama");
 
-    MaterialVisitor mv ( nl, creators::createMaterial,creators::computeAttributes,mat::reader::read(mat_file_name));
+    MaterialVisitor mv ( nl, creators::createMaterial,creators::computeAttributes,mat::reader::read(name + "_dae/"+mat_file_name));
     scene->accept(mv);
 
     // All solid objects
@@ -88,19 +94,19 @@ void  Terrain::create( std::string name )
     pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
 
     // Scene 
-    // Add backface culling to the whole bunch
-    //osg::StateSet * pSS = adler->getOrCreateStateSet();
-    //pSS->setNestRenderBins(false);
-    //pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    // disable alpha writes for whole bunch
-    //pSS->setAttribute(new osg::ColorMask(true, true, true, false));
+    //Add backface culling to the whole bunch
+    //  osg::StateSet * pSS = adler->getOrCreateStateSet();
+    //pCommonStateSet->setNestRenderBins(false);
+    //pCommonStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    //// disable alpha writes for whole bunch
+    //pCommonStateSet->setAttribute(new osg::ColorMask(true, true, true, false));
     
    }
    else
    {  
        baseModel->addChild( creators::createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3));
    }
-
+    baseModel->setDataVariance(osg::Object::STATIC);
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
 

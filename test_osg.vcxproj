@@ -111,6 +111,7 @@
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials_visitor.h" />
+    <ClInclude Include="pickhandler.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="shaders.h" />
     <ClInclude Include="shadow_map.h" />
@@ -138,6 +139,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="LOD.cpp" />
     <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="main_scene2.cpp" />
     <ClCompile Include="main_shadows.cpp" />

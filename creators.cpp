@@ -20,6 +20,8 @@
 #include "bi/BulletInterface.h"
 #include "bi/RigidUpdater.h"
 
+#include "LOD.h"
+
 #define TEST_SHADOWS
 // #define TEST_TEXTURE
 #if defined(DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG) 
@@ -968,8 +970,11 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts(std::string name)
 {
-    osg::Node* airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae"); // "an_124.dae"
-    //osg::LOD* lod = new osg::LOD;
+    osg::Node* airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae"); //".osgb"
+    if (!airplane_file)
+        airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae");
+
+    avLod::LOD* lod = new avLod::LOD;
     //osg::Group* Root = new osg::Group;
 
     osg::Node* engine = nullptr; 
@@ -1035,20 +1040,20 @@ nodes_array_t loadAirplaneParts(std::string name)
         lod0 =  findFirstNode(airplane_file,"Lod0");
         lod3 =  findFirstNode(airplane_file,"Lod3");
         //      
-        if(lod3) 
-            lod3->setNodeMask(0); // Убираем нафиг Lod3 
+        //if(lod3) 
+        //    lod3->setNodeMask(0); // Убираем нафиг Lod3 
         
         root =  findFirstNode(airplane_file,"Root")->asGroup();
         lod_ =  findFirstNode(airplane_file,"lod_",findNodeVisitor::not_exact)->asGroup();
 
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
-            auto tail =  findFirstNode(airplane_file,root.c_str());
-            if(tail)  
+            auto g_point =  findFirstNode(airplane_file,root.c_str());
+            if(g_point)  
             {
-                tail->asGroup()->addChild(child);
+                g_point->asGroup()->addChild(child);
                 // Root->addChild(tail);
             }
-            return tail;
+            return g_point;
         };
 
         auto tail = addAsChild("tail",white_light);
@@ -1062,9 +1067,10 @@ nodes_array_t loadAirplaneParts(std::string name)
         if (engine) engine_geode = engine->asGroup()->getChild(0);
 	}
 
-    //Root->addChild(lod);
-    //lod->addChild(lod0,0,750);
-    //lod->addChild(lod3,750,50000);
+    // Засада при копированиии надо думать avLod::LOD
+    lod_->addChild(lod);
+    lod->addChild(lod0,0,1200);
+    lod->addChild(lod3,1200,50000);
      
     // osgDB::writeNodeFile(*airplane_file,"airplane_file_osg_struct.osgt");
     
@@ -1119,7 +1125,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 
     auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 
-    if (shassis)
+    if (/*shassis*/false)
     {
         osg::ref_ptr<osg::Program> program = new osg::Program;
         program->addShader( new osg::Shader(osg::Shader::VERTEX,   shaders::default_mat::get_shader(shaders::VS)) );

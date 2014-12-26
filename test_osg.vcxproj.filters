@@ -132,6 +132,9 @@
     <ClInclude Include="bi\RigidUpdater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pickhandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -274,6 +277,9 @@
     </ClCompile>
     <ClCompile Include="bi\GLDebugDrawer.cpp">
       <Filter>Source Files\bi</Filter>
+    </ClCompile>
+    <ClCompile Include="LOD.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

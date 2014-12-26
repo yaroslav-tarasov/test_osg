@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #include "BulletInterface.h"
-
+#include <osgbCollision/CollisionShapes.h>
+#include <osgbCollision/Utils.h>
 
 
 struct FilterCallback : public btOverlapFilterCallback
@@ -124,6 +125,33 @@ void BulletInterface::createSphere( int id, double radius, double density )
     body->setRestitution(0.1f);
     _actors[id]._body  = body;
     _actors[id]._type  = SPHERE;
+}
+
+void BulletInterface::createShape(osg::Node* node,int id, double density)
+{
+    btCollisionShape* cs = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( node );
+    btQuaternion quat;
+
+    quat.setEuler(0,180,0);
+
+    btTransform comTransform; 
+    comTransform.setIdentity();
+    comTransform.setOrigin(btVector3(10.15, 10.15, 10.15));
+    comTransform.setRotation(quat);
+
+    btVector3 localInertia(0.0, 0.0, 0.0);
+    if ( density>0.0 )
+        cs->calculateLocalInertia( density, localInertia );
+
+
+    btDefaultMotionState* motionState = new btDefaultMotionState(btTransform::getIdentity());
+    btRigidBody::btRigidBodyConstructionInfo rigidInfo( density, motionState, cs, localInertia );
+    btRigidBody* body = new btRigidBody(rigidInfo);
+    body->setCenterOfMassTransform(comTransform);
+    // body->setAngularVelocity( btVector3( 0., .9, 0. ) );
+    _scene->addRigidBody( body );
+    _actors[id]._body  = body;
+    _actors[id]._type  = SHAPE;
 }
 
 void BulletInterface::setVelocity( int id, const osg::Vec3& vec )

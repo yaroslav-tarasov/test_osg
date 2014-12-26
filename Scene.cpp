@@ -15,7 +15,7 @@
 
 #include "find_node_visitor.h" 
 
-
+#include "pickhandler.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
@@ -308,6 +308,9 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
     //FIXME TODO //setProjectionMatrixFromConfig();
 
+    _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
+    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
+
     _viewerPtr->setSceneData( this );
     //_viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
@@ -342,6 +345,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
+    _viewerPtr->addEventHandler(new PickHandler());
     _viewerPtr->realize();
 
     
@@ -369,9 +373,10 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    
+    std::string scene_name("sheremetyevo"); // "adler" ,"sheremetyevo"
+
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
-    _terrainNode->create("adler");
+    _terrainNode->create(scene_name);
 
     osg::Node* ct =  findFirstNode(_terrainNode,"camera_tower");
 
@@ -432,12 +437,12 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
-#if 1
+#if 0
     fill_navids(
-        "sheremetyevo.txt", 
+        scene_name + ".txt", 
         _lamps, 
         this, 
-        lights_offset("sheremetyevo") ); 
+        lights_offset(scene_name) ); 
 #endif
 
     return true;
@@ -451,7 +456,7 @@ void  Scene::createTerrainRoot()
 
     const int fbo_tex_size = 1024*4;
 
-    /*osg::ref_ptr<avShadow::ViewDependentShadowMap>*/ _st = new avShadow::ViewDependentShadowMap;
+    _st = new avShadow::ViewDependentShadowMap;
 
      _terrainRoot
         = new avShadow::ShadowedScene(_st.get());  
@@ -478,9 +483,6 @@ void  Scene::createTerrainRoot()
 
 void Scene::createObjects()
 {
-    //findNodeVisitor findBM("baseModel"); 
-    //_terrainRoot->accept(findBM);
-    //auto bm =  findBM.getFirst();
 
     _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
@@ -496,6 +498,9 @@ void Scene::createObjects()
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
+    
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
     const bool add_planes = true;
 
@@ -509,8 +514,7 @@ void Scene::createObjects()
         if(dynamic_cast<osg::LOD*>(p_copy))
             rot_angle = 0;  
 
-        if(_rigidUpdater.valid())
-            _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
+
 
         for ( unsigned int i=0; i<10; ++i )
         {
@@ -527,7 +531,7 @@ void Scene::createObjects()
         const unsigned inst_num = 24;
         for (unsigned i = 0; i < inst_num; ++i)
         {
-            float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 200.f;
+            float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 400.f;
             osg::Vec3 pos(radius * sin (angle), radius * cos(angle), 0.f);
 
             const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      

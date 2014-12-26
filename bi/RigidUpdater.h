@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "bi/GLDebugDrawer.h"
+#include "find_node_visitor.h"
 
 namespace bi
 {
@@ -53,7 +54,7 @@ namespace bi
             float zm = bb.zMax() - bb.zMin();
 
             float rot_angle = -90.f;
-            auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(zm)/2.0f,-(ym)/2.0f));
+            auto tr = osg::Matrix::translate(osg::Vec3(0.0,0.0,-(ym)/2.0f));
             if(dynamic_cast<osg::LOD*>(node))
             {
                 rot_angle = 0;
@@ -75,8 +76,16 @@ namespace bi
             {
                half_length = osg::Vec3 ( (bb.xMax() - bb.xMin())/2.0f,(bb.yMax() - bb.yMin())/2.0f,(bb.zMax() - bb.zMin()) /2.0f );
             }
+            
+            osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+
+#if 0
             BulletInterface::instance()->createBox( id, half_length, mass );
             addPhysicsData( id, positioned, pos, vel, mass );
+#else
+            BulletInterface::instance()->createShape(lod3, id, mass);
+            addPhysicsData( id, rotated, pos, vel, mass );
+#endif
         }
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -155,7 +164,7 @@ namespace bi
             const osg::Vec3& vel, double mass )
         {
             osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-            mt->addChild( node/*.get()*/ );
+            mt->addChild( node );
             _root->addChild( mt.get() );
 
             BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );

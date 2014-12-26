@@ -44,7 +44,7 @@ int main( int argc, char** argv )
 
     osg::notify(osg::INFO) << "Start this program \n";
     
-    osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba")); // dds_dxt1_rgba
+    osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
     return pmain[15](argc, argv);
 }
