@@ -68,8 +68,10 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
     static std::map<osg::Vec4,osg::Geode*> colors;
     if(colors.find ( fcolor ) == colors.end())
     {
-
-        osg::ref_ptr<osg::ShapeDrawable> shp = new osg::ShapeDrawable();
+        osg::ref_ptr<osg::TessellationHints> hints = new osg::TessellationHints;
+        hints->setDetailRatio(0.1f); 
+        hints->setTargetNumFaces(2);
+        osg::ref_ptr<osg::ShapeDrawable> shp = new osg::ShapeDrawable(nullptr,hints);
         shp->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.3f) );
         osg::Geode* light = new osg::Geode;
         light->addDrawable( shp.get() );
@@ -437,7 +439,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
-#if 0
+#if 1
     fill_navids(
         scene_name + ".txt", 
         _lamps, 
@@ -508,7 +510,7 @@ void Scene::createObjects()
     {
         const std::string name = "a_319";
         osg::Node* p_copy = creators::applyBM(creators::loadAirplane(name),name,true);
-        //auto p_copy = creators::loadAirplane(); // А если без BM еще кадров 15-20
+        // auto p_copy = creators::loadAirplane(name); // А если без BM еще кадров 15-20 ??? Чет не вижу
         
         float rot_angle = -90.f;
         if(dynamic_cast<osg::LOD*>(p_copy))

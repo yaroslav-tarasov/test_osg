@@ -970,9 +970,9 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts(std::string name)
 {
-    osg::Node* airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae"); //".osgb"
+    osg::Node* airplane_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae"); //".osgb"
     if (!airplane_file)
-        airplane_file = osgDB::readNodeFile(name + "/" + name + ".dae");
+        airplane_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae");
 
     avLod::LOD* lod = new avLod::LOD;
     //osg::Group* Root = new osg::Group;
@@ -1121,7 +1121,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     model->accept( ft );
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile(name + "/" + name + "_n.dds") ); // "a_319_n.dds"  
+    normalTex->setImage( osgDB::readImageFile("planes/" + name + "/" + name + "_n.dds") ); // "a_319_n.dds"  
 
     auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 

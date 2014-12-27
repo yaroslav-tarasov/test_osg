@@ -132,14 +132,14 @@ void BulletInterface::createShape(osg::Node* node,int id, double density)
     btCollisionShape* cs = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( node );
     btQuaternion quat;
 
-    quat.setEuler(0,180,0);
+    quat.setEuler(cg::pi_2f,cg::pi_2f,cg::pi_2f);
 
     btTransform comTransform; 
     comTransform.setIdentity();
-    comTransform.setOrigin(btVector3(10.15, 10.15, 10.15));
+    comTransform.setOrigin(btVector3(0, 0, 1));
     comTransform.setRotation(quat);
 
-    btVector3 localInertia(0.0, 0.0, 0.0);
+    btVector3 localInertia(0.0, 0.0, -200.0);
     if ( density>0.0 )
         cs->calculateLocalInertia( density, localInertia );
 
