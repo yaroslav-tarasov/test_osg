@@ -95,6 +95,8 @@
     <None Include="shaders\tess_tri.tes" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aircraft_phys.h" />
+    <ClInclude Include="aircraft_visual.h" />
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="bi\BulletMTInterface.h" />
     <ClInclude Include="bi\RigidMTUpdater.h" />
@@ -123,6 +125,8 @@
     <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aircraft_phys.cpp" />
+    <ClCompile Include="aircraft_visual.cpp" />
     <ClCompile Include="animation_handler.cpp" />
     <ClCompile Include="bi\BulletInterface.cpp" />
     <ClCompile Include="bi\BulletMTInterface.cpp" />

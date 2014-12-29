@@ -31,6 +31,9 @@
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\aircraft">
+      <UniqueIdentifier>{1e8dee50-dcac-42b3-8d09-d3f8317b93e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -133,6 +136,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pickhandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aircraft_phys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aircraft_visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -280,6 +289,12 @@
     </ClCompile>
     <ClCompile Include="LOD.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="aircraft_phys.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="aircraft_visual.cpp">
+      <Filter>Source Files\aircraft</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
