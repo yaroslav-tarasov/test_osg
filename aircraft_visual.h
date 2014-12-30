@@ -2,5 +2,8 @@
 
 namespace vis
 {
+    class aircraft
+    {
 
+    };
 }

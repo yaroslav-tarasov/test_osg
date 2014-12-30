@@ -50,8 +50,10 @@ protected:
     void checkForCollisionEvents();
     void CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1);
 private:
+    //struct private_data;
+    //osg::ref_ptr<private_data> d;
 
-    typedef std::map<int, data>  ActorMap;
+    typedef std::map<int, data>            ActorMap;
     ActorMap                              _actors;
     btDiscreteDynamicsWorld*              _scene;
     btDefaultCollisionConfiguration*      _configuration;
