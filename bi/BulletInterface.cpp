@@ -413,7 +413,7 @@ void BulletInterface::simulate( double step )
 	for (auto it = rigid_bodies_.begin(); it != rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
 
-    _scene->stepSimulation( step, 10 );
+    _scene->stepSimulation( btScalar(step), 10, btScalar(0.01) );
     checkForCollisionEvents();
 }
 
