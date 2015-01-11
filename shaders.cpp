@@ -1727,7 +1727,7 @@ namespace shaders
                 //if (vPnt.z<0)
                 //    discard;
 
-                // simulate fogging here based on input density
+                // simulate fogging here based on input mass
                 float fFogDensity = SkyFogParams.a; 
                 float fFogHeightRamp = fFogDensity * (2.0 - fFogDensity); 
                 float fFogDensityRamp = fFogDensity; 
@@ -1795,7 +1795,7 @@ namespace shaders
             // uniforms for sundisc and sunrays
             uniform vec3  frontColor;
             uniform vec3  backColor;
-            uniform float density;
+            uniform float mass;
             
             
             )
@@ -1825,7 +1825,7 @@ namespace shaders
                 vec4 cl_color = textureLod(Clouds, vTexCoord, 0.0);
 
                 // make fogging
-                gl_FragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
+                gl_FragColor = vec4(cl_color.rgb * frontColor, cl_color.a * mass); 
 
                 //gl_FragColor = vec4( result,dif_tex_col.a);
                 //gl_FragColor = vec4(1.0,0.0,0.0,1.0);

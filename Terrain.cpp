@@ -53,11 +53,15 @@ void  Terrain::create( std::string name )
         scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.osgb";// "sheremetyevo.open.osgb";   
         mat_file_name = "sheremetyevo.open.dae"; 
     }
-    else
+    else if(name == "adler")
     {
         scene_name = "adler.osgb";  
         mat_file_name = "adler.open.dae"; 
     }
+	else
+	{
+	
+	}
 
 
     osg::Node* scene = osgDB::readNodeFile(name + "_dae/"+ scene_name);  

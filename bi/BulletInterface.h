@@ -2,8 +2,19 @@
 #define H_BULLETINTERFACE
 
 #include <btBulletDynamicsCommon.h> 
+#include <osgbCollision/CollisionShapes.h>
+#include <osgbCollision/Utils.h>
+#include "bullet_helpers.h"
+#include "phys_sys_common.h"
+#include "../phys_sys_fwd.h"
 
-class BulletInterface : public osg::Referenced
+namespace phys
+{
+
+class BulletInterface 
+	: public phys::system_impl
+	// , public osg::Referenced
+    , public std::enable_shared_from_this<BulletInterface>
 {
 public:
     typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
@@ -23,13 +34,20 @@ public:
     };
     typedef std::function<void(int id)> on_collision_f;
 public:
+	BulletInterface();
+	virtual ~BulletInterface();
+
+#if 0
     static BulletInterface*  instance();
-    btDiscreteDynamicsWorld* getScene() { return _scene; }
+#endif    
+	btDynamicsWorld* getScene() { return _scene.get(); }
     
     void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
     void createBox    ( int id, const osg::Vec3& dim, double mass );
     void createSphere ( int id, double radius, double mass );
-    void createShape  ( osg::Node* node,int id, double density);
+    void createShape  ( osg::Node* node, int id, double mass);
+	void createUFO    ( osg::Node* node, int id, double mass);
+	aircraft::info_ptr createUFO2    ( osg::Node* node, int id, double mass);
 
     void setVelocity  ( int id, const osg::Vec3& pos );
     void setMatrix    ( int id, const osg::Matrix& matrix );
@@ -42,10 +60,15 @@ public:
         if(_dd)
         _scene->setDebugDrawer(_dd);
     }
-
-protected:
-    BulletInterface();
-    virtual ~BulletInterface();
+	//
+    //  phys::system_impl
+	//
+public:
+	phys::bt_dynamics_world_ptr    dynamics_world()    const override;
+	phys::bt_vehicle_raycaster_ptr vehicle_raycaster() const override;
+	void register_rigid_body( phys::rigid_body_impl * rb )   override;
+	void unregister_rigid_body( phys::rigid_body_impl * rb ) override;
+protected:  
 
     void checkForCollisionEvents();
     void CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1);
@@ -55,7 +78,8 @@ private:
 
     typedef std::map<int, data>            ActorMap;
     ActorMap                              _actors;
-    btDiscreteDynamicsWorld*              _scene;
+    // btDiscreteDynamicsWorld*              _scene;
+    bt_dynamics_world_ptr                 _scene;   
     btDefaultCollisionConfiguration*      _configuration;
     btCollisionDispatcher*                _dispatcher;
     btBroadphaseInterface*                _overlappingPairCache;
@@ -63,6 +87,20 @@ private:
     CollisionPairs                        _pairsLastUpdate;
     on_collision_f                        _on_collision;
     btIDebugDraw*                         _dd;
+
+	bt_vehicle_raycaster_ptr              vehicle_raycaster_;
+	std::set<rigid_body_impl *>			  rigid_bodies_;
 };
 
+//inline static BulletInterface*  sys()
+//{
+//	return BulletInterface::instance();
+//}
+
+BulletInterface*  sys();
+
+
+std::shared_ptr<BulletInterface> create();
+
+} // ns phys
 #endif

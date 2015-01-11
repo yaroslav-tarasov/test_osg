@@ -33,7 +33,7 @@ void LOD::traverse(osg::NodeVisitor& nv)
     if(_dirty_copy)
     {
         osg::Group* prnt =  getParent(0);
-        for(int i =0;i<prnt->getNumChildren();++i)
+        for(unsigned i =0;i<prnt->getNumChildren();++i)
         {
             auto chld = prnt->getChild(i);
             if (!dynamic_cast<avLod::LOD*>(chld))

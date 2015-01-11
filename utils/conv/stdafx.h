@@ -8,6 +8,8 @@
 #include "targetver.h"
 #include <stdio.h>
 #include <tchar.h>
+#include <functional>
+#include <memory>
 
 #include <osg/ArgumentParser>
 #include <osg/ApplicationUsage>
@@ -58,7 +60,20 @@
 #pragma comment(lib, "LinearMath.lib")
 #pragma comment(lib, "BulletDynamics.lib")
 #else 
-#pragma comment(lib, "BulletCollision_Debug.lib")
-#pragma comment(lib, "LinearMath_Debug.lib")
-#pragma comment(lib, "BulletDynamics_Debug.lib")
+#pragma comment(lib, "osgTextd.lib")
+#pragma comment(lib, "osgShadowd.lib")
+#pragma comment(lib, "osgFXd.lib")
+#pragma comment(lib, "osgEphemerisd.lib")
+#pragma comment(lib, "OpenThreadsd.lib")
+#pragma comment(lib, "osgd.lib")
+#pragma comment(lib, "osgDBd.lib")
+#pragma comment(lib, "osgViewerd.lib")
+#pragma comment(lib, "osgAnimationd.lib")
+#pragma comment(lib, "osgGAd.lib")
+#pragma comment(lib, "osgUtild.lib")
+#pragma comment(lib, "osgSimd.lib")
+#pragma comment(lib, "osgParticled.lib")
+//#pragma comment(lib, "BulletCollision_Debug.lib")
+//#pragma comment(lib, "LinearMath_Debug.lib")
+//#pragma comment(lib, "BulletDynamics_Debug.lib")
 #endif

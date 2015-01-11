@@ -5,7 +5,7 @@
 
 namespace bi
 {
-    class RigidUpdater : public osgGA::GUIEventHandler
+    class RigidUpdater : public osgGA::GUIEventHandler 
     {
     public:
         typedef std::function<void(osg::MatrixTransform* mt)> on_collision_f;
@@ -15,11 +15,13 @@ namespace bi
             , _on_collision(on_collision)
             , _dbgDraw     (nullptr)
             , _debug       (true)
+			, _sys         (phys::create())
         {}
+
 
         void addGround( const osg::Vec3& gravity )
         {
-            BulletInterface::instance()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
+            _sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
                 [&](int id){
                     if(_on_collision)
                         _on_collision(_physicsNodes[id].get());   
@@ -38,7 +40,7 @@ namespace bi
             }
 
             if(_dbgDraw)
-                BulletInterface::instance()->setDebugDrawer(_dbgDraw);
+                _sys->setDebugDrawer(_dbgDraw);
         }
 
         void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -80,25 +82,46 @@ namespace bi
             osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
 
 #if 0
-            BulletInterface::instance()->createBox( id, half_length, mass );
+            _sys->createBox( id, half_length, mass );
             addPhysicsData( id, positioned, pos, vel, mass );
-#else
-            BulletInterface::instance()->createShape(lod3, id, mass);
+#else  
+            _sys->createShape(lod3, id, mass);
             addPhysicsData( id, rotated, pos, vel, mass );
 #endif
         }
+        
+		void addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+		{
+			osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+			int id = _physicsNodes.size();
+			_sys->createUFO( lod3,id, mass );
 
+			_sys->setMatrix( id, osg::Matrix::translate(pos) );
+			_sys->setVelocity( id, vel );
+
+		}
+
+		void addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+		{
+			osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+			int id = _physicsNodes.size();
+			_aircrafts.push_back(_sys->createUFO2( lod3,id, mass ));
+
+			_sys->setMatrix( id, osg::Matrix::translate(pos) );
+			_sys->setVelocity( id, vel );
+
+		}
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
         {
             int id = _physicsNodes.size();
-            BulletInterface::instance()->createBox( id, shape->getHalfLengths(), mass );
+            _sys->createBox( id, shape->getHalfLengths(), mass );
             addPhysicsData( id, shape, pos, vel, mass );
         }
 
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
         {
             int id = _physicsNodes.size();
-            BulletInterface::instance()->createSphere( id, shape->getRadius(), mass );
+            _sys->createSphere( id, shape->getRadius(), mass );
             addPhysicsData( id, shape, pos, vel, mass );
         }
 
@@ -123,17 +146,17 @@ namespace bi
                     double dt = _hr_timer.get_delta();
                     if( _dbgDraw)
                         _dbgDraw->BeginDraw();
-                    BulletInterface::instance()->simulate( dt );
+                    _sys->simulate( dt );
                     for ( NodeMap::iterator itr=_physicsNodes.begin();
                         itr!=_physicsNodes.end(); ++itr )
                     {
-                        osg::Matrix matrix = BulletInterface::instance()->getMatrix(itr->first);
+                        osg::Matrix matrix = _sys->getMatrix(itr->first);
                         itr->second->setMatrix( matrix );
                     }
 
                     if( _dbgDraw)
                     {
-                        BulletInterface::instance()->getScene()->debugDrawWorld();
+                        _sys->getScene()->debugDrawWorld();
                         _dbgDraw->EndDraw();
                     }
                 } 
@@ -155,8 +178,8 @@ namespace bi
             mt->addChild( geode.get() );
             _root->addChild( mt.get() );
 
-            BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-            BulletInterface::instance()->setVelocity( id, vel );
+            _sys->setMatrix( id, osg::Matrix::translate(pos) );
+            _sys->setVelocity( id, vel );
             _physicsNodes[id] = mt;
         }
 
@@ -167,18 +190,22 @@ namespace bi
             mt->addChild( node );
             _root->addChild( mt.get() );
 
-            BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-            BulletInterface::instance()->setVelocity( id, vel );
+            _sys->setMatrix( id, osg::Matrix::translate(pos) );
+            _sys->setVelocity( id, vel );
             _physicsNodes[id] = mt;
         }
+
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
-        NodeMap _physicsNodes;
-        osg::observer_ptr<osg::Group> _root;
-        high_res_timer                _hr_timer;
-        on_collision_f                _on_collision;
-        avCollision::GLDebugDrawer*   _dbgDraw;
-        bool                          _debug;
+		typedef std::vector<phys::aircraft::info_ptr>  aircrafts_t;
+        NodeMap                                _physicsNodes;
+        osg::observer_ptr<osg::Group>          _root;
+        high_res_timer                         _hr_timer;
+        on_collision_f                         _on_collision;
+        avCollision::GLDebugDrawer*            _dbgDraw;
+        bool                                   _debug;
+		aircrafts_t                            _aircrafts;
+		std::shared_ptr<phys::BulletInterface> _sys;
     };
 
     //osg::ref_ptr<osgGA::GUIEventHandler>& getUpdater()

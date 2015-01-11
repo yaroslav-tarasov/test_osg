@@ -144,6 +144,12 @@
     <ClInclude Include="aircraft_visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\str.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="aircraft.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -295,6 +301,9 @@
     </ClCompile>
     <ClCompile Include="aircraft_visual.cpp">
       <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -85,9 +85,9 @@ namespace cg
     template <> inline      double  epsilon<double> () { return 1e-10; }
     template <> inline      float   epsilon<float > () { return 1e-6f; }
 
-    template <class type>   bool eq (type const& lhs, type const& rhs) { return lhs == rhs; }
-    inline                  bool eq (float       lhs, float       rhs) { return fabs(rhs - lhs) < epsilon<double>(); }
-    inline                  bool eq (double      lhs, double      rhs) { return fabs(rhs - lhs) < epsilon<float >(); }
+    //template <class type>   bool eq (type const& lhs, type const& rhs) { return lhs == rhs; }
+    //inline                  bool eq (float       lhs, float       rhs) { return fabs(rhs - lhs) < epsilon<double>(); }
+    //inline                  bool eq (double      lhs, double      rhs) { return fabs(rhs - lhs) < epsilon<float >(); }
 
     template <class type>   bool eq_zero(type const& value) { return eq(value, type()); }
     // fuzzy equality to 0

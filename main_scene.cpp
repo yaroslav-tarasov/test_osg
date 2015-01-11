@@ -514,7 +514,7 @@ osg::Node*
 
     // Create the texture; we'll use this as our color buffer.
     // Note it has no image data; not required.
-    osg::Texture2D* tex = creators::GetTextureHolder().GetDecalTexture().get();// new osg::Texture2D;
+    osg::Texture2D* tex = creators::getTextureHolder().getDecalTexture().get();// new osg::Texture2D;
 
 
     // Attach the texture to the camera. Tell it to use multisampling.

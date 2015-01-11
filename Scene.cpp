@@ -375,7 +375,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -388,6 +388,11 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         manip->setHomePosition(c, osg::Vec3(0,1,0), osg::Z_AXIS);
         manip->home(0);
     }
+	else
+	{
+	    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
+        manip->home(0);
+	}
     
 
 
@@ -500,11 +505,29 @@ void Scene::createObjects()
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
-    
+
+
     if(_rigidUpdater.valid())
         _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
-    const bool add_planes = true;
+
+	auto obj = creators::applyBM(creators::createObject("a_319"),"a_319",true);
+
+	if(_rigidUpdater.valid())
+		_rigidUpdater->addPhysicsAirplane( obj,
+		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
+
+
+	if(_rigidUpdater.valid())
+		_rigidUpdater->addUFO( obj,
+		osg::Vec3(100,100,0), osg::Vec3(0,0,0), 165.0f );
+
+	if(_rigidUpdater.valid())
+		_rigidUpdater->addUFO2( obj,
+		osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );
+    
+	const bool add_planes = false;
+
 
     if (add_planes)
     {

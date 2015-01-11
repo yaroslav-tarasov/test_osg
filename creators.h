@@ -14,6 +14,7 @@ namespace creators
     nodes_array_t       loadAirplaneParts(std::string);
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
     osg::Node*          loadHelicopter();
+	osg::Node*          createObject(std::string name, bool fclone=true);
 
     class programsHolder_base {
     public:
@@ -25,13 +26,13 @@ namespace creators
 
     class texturesHolder_base {
         public:
-        virtual osg::ref_ptr<osg::TextureCubeMap>   GetEnvTexture() = 0;
-        virtual osg::ref_ptr<osg::Texture2D>   GetDecalTexture() =0;
+        virtual osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture() = 0;
+        virtual osg::ref_ptr<osg::Texture2D>        getDecalTexture() =0;
     };    
     
-    texturesHolder_base&             GetTextureHolder();
+    texturesHolder_base&             getTextureHolder();
 
-    programsHolder_base::program_t   CreateProgram(std::string mat_name);
+    programsHolder_base::program_t   createProgram(std::string mat_name);
     
     void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m);
     void computeAttributes(osg::Node* model,std::string mat_name);

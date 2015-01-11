@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "find_node_visitor.h"   
+#include "cpp_utils/str.h"
+
+using namespace std::placeholders;
 
 // Default constructor - initialize searchForName to "" and    
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
@@ -37,13 +40,16 @@ void findNodeVisitor::apply(osg::Node &searchNode)
     if(m_==exact)
     {
          matching = /*searchNode.getName()*/searchForName.end() != std::find(searchForName.begin(),searchForName.end(),searchNode.getName());
-    }
+		 //matching = searchForName.end() != std::find_if(
+			// searchForName.begin(),
+			// searchForName.end(),
+			// std::bind(&utils::ci_find_substr_bool<std::string>,_1,searchNode.getName()));
+	}
     else
     {
          matching = searchForName.end() != std::find_if(searchForName.begin(),searchForName.end(),[&](const std::string& nodeName)->bool {
              return searchNode.getName().find(nodeName) !=std::string::npos; }
          );
-         // matching = searchNode.getName().find(searchForName) !=std::string::npos ;
     }
     
     if (matching)   

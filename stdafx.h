@@ -19,6 +19,7 @@
 #include <functional>
 #include <array>
 
+#include <memory>
 //////////////////////////////////////
 //
 //  osg include

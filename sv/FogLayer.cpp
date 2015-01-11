@@ -96,7 +96,7 @@ void FogLayer::_buildStateSet()
     sset->setNestRenderBins(false);
 
     // create clarity shader
-    osg::ref_ptr<osg::Program> cFogLayerProg = creators::CreateProgram("sky").program; //new osg::Program();
+    osg::ref_ptr<osg::Program> cFogLayerProg = creators::createProgram("sky").program; //new osg::Program();
     cFogLayerProg->setName("FogLayerShader");
     sset->setAttribute(cFogLayerProg.get());
 

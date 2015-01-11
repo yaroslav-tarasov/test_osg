@@ -66,7 +66,7 @@ osg::Group* createPrerender(osg::Node* reflectedSubgraph, osg::NodePath reflecto
 
     osg::Group* group = new osg::Group;
 
-    osg::TextureCubeMap* texture = creators::GetTextureHolder().GetEnvTexture(); 
+    osg::TextureCubeMap* texture = creators::getTextureHolder().getEnvTexture(); 
     unsigned tex_width = texture->getTextureWidth();
     unsigned tex_height = texture->getTextureHeight();
 

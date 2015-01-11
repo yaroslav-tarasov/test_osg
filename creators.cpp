@@ -20,6 +20,8 @@
 #include "bi/BulletInterface.h"
 #include "bi/RigidUpdater.h"
 
+#include "../cpp_utils/str.h"
+
 #include "LOD.h"
 
 #define TEST_SHADOWS
@@ -284,7 +286,7 @@ namespace bi
 
         void addGround( const osg::Vec3& gravity )
         {
-            BulletInterface::instance()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
+            phys::sys()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
                 [&](int id){
                     if(_on_collision)
                         _on_collision(_physicsNodes[id].get());   
@@ -320,21 +322,21 @@ namespace bi
 
 
             osg::Vec3 half_length ( (bb.xMax() - bb.xMin())/2.0f,(bb.zMax() - bb.zMin())/2.0f,(bb.yMax() - bb.yMin()) /2.0f );
-            BulletInterface::instance()->createBox( id, half_length, mass );
+            phys::sys()->createBox( id, half_length, mass );
             addPhysicsData( id, positioned, pos, vel, mass );
         }
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
         {
             int id = _physicsNodes.size();
-            BulletInterface::instance()->createBox( id, shape->getHalfLengths(), mass );
+            phys::sys()->createBox( id, shape->getHalfLengths(), mass );
             addPhysicsData( id, shape, pos, vel, mass );
         }
 
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
         {
             int id = _physicsNodes.size();
-            BulletInterface::instance()->createSphere( id, shape->getRadius(), mass );
+            phys::sys()->createSphere( id, shape->getRadius(), mass );
             addPhysicsData( id, shape, pos, vel, mass );
         }
 
@@ -357,11 +359,11 @@ namespace bi
             case osgGA::GUIEventAdapter::FRAME:
                 {
                     double dt = _hr_timer.get_delta();
-                    BulletInterface::instance()->simulate( /*0.02*/dt );
+                    phys::sys()->simulate( /*0.02*/dt );
                     for ( NodeMap::iterator itr=_physicsNodes.begin();
                         itr!=_physicsNodes.end(); ++itr )
                     {
-                        osg::Matrix matrix = BulletInterface::instance()->getMatrix(itr->first);
+                        osg::Matrix matrix = phys::sys()->getMatrix(itr->first);
                         itr->second->setMatrix( matrix );
                     }
                 }
@@ -382,8 +384,8 @@ namespace bi
             mt->addChild( geode.get() );
             _root->addChild( mt.get() );
 
-            BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-            BulletInterface::instance()->setVelocity( id, vel );
+            phys::sys()->setMatrix( id, osg::Matrix::translate(pos) );
+            phys::sys()->setVelocity( id, vel );
             _physicsNodes[id] = mt;
         }
 
@@ -394,8 +396,8 @@ namespace bi
             mt->addChild( node/*.get()*/ );
             _root->addChild( mt.get() );
 
-            BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-            BulletInterface::instance()->setVelocity( id, vel );
+            phys::sys()->setMatrix( id, osg::Matrix::translate(pos) );
+            phys::sys()->setVelocity( id, vel );
             _physicsNodes[id] = mt;
         }
   private:
@@ -1012,7 +1014,7 @@ nodes_array_t loadAirplaneParts(std::string name)
 
     if(airplane_file)
 	{
-        airplane_file->setName("all_nodes");
+        airplane_file->setName(name);
                  
 
         auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
@@ -1104,7 +1106,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     program->addBindAttribLocation( "binormal", 7 );
     
     // create and setup the texture object
-    osg::TextureCubeMap *tcm = creators::GetTextureHolder().GetEnvTexture().get(); 
+    osg::TextureCubeMap *tcm = creators::getTextureHolder().getEnvTexture().get(); 
 
     if(set_env_tex)
     {
@@ -1151,7 +1153,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-    stateset->setTextureAttributeAndModes( 0, /*colorTex.get()*/ft.getTexture(), value );
+    stateset->setTextureAttributeAndModes( 0, ft.getTexture(), value );
     stateset->setTextureAttributeAndModes( 1, normalTex.get(), value );
     stateset->setTextureAttributeAndModes( 3, tcm, value );
 
@@ -1386,17 +1388,17 @@ public:
         return texCreator(mats,"default");
     }
 
-    osg::ref_ptr<osg::TextureCubeMap>   GetEnvTexture()
+    osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()
     {
         return   envTex;
     }
     
-    osg::ref_ptr<osg::Texture2D>   GetDecalTexture()
+    osg::ref_ptr<osg::Texture2D>   getDecalTexture()
     {
         return   decalTex;
     }
 
-    friend texturesHolder_base&   GetTextureHolder();
+    friend texturesHolder_base&   getTextureHolder();
 
 private:
     
@@ -1561,7 +1563,7 @@ private:
 
 };
  
-texturesHolder_base&   GetTextureHolder()
+texturesHolder_base&   getTextureHolder()
 {
     return texturesHolder::getTextureHolder();
 }
@@ -1739,7 +1741,7 @@ void create_specular_highlights(osg::StateSet* ss)
 }
 
 
- programsHolder_base::program_t  CreateProgram(std::string mat_name)
+ programsHolder_base::program_t  createProgram(std::string mat_name)
  {
      return programsHolder::Create(mat_name);
  }
@@ -1790,7 +1792,7 @@ void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::mate
     stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
     stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
     stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );
-    stateset->setTextureAttributeAndModes( 4, GetTextureHolder().GetDecalTexture().get()/*GetShadowMap()->getTexture()*/, value ); 
+    stateset->setTextureAttributeAndModes( 4, getTextureHolder().getDecalTexture().get()/*GetShadowMap()->getTexture()*/, value ); 
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 

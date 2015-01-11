@@ -1,25 +1,14 @@
 #pragma once
 
-#include <btBulletDynamicsCommon.h> 
-#include "rigid_body_info.h"
-#include "utils/polymorph_ptr.h"
+#include "bi/rigid_body_info.h"
+#include "cpp_utils/polymorph_ptr.h"
+#include "bi/phys_sys_common.h"
+#include "aircraft.h"
 
 namespace phys
 {
-    typedef osg::Vec3d decart_position;
-    typedef osg::Vec3d point_3;
-    typedef osg::Quat  cpr;
-
-    struct contact_info_t
-    {
-        contact_info_t() {}
-        contact_info_t( point_3 const& offset, point_3 const& vel )
-            : vel(vel), offset(offset)
-        {}
-
-        point_3 vel;
-        point_3 offset;
-    };
+	namespace aircraft
+	{
 
     struct params_t
     {
@@ -77,61 +66,41 @@ namespace phys
         double pitch_attack_derivative;
     };   
 
-    struct info
-    {
-        virtual ~info() {}
 
-        virtual decart_position get_position() const = 0;
-        virtual decart_position get_wheel_position( size_t i ) const = 0;
-        virtual double Ixx() const = 0;
-        virtual double Iyy() const = 0;
-        virtual double Izz() const = 0;
-        virtual params_t const& params() const = 0;
-        virtual double drag() const = 0;
-        virtual double lift() const = 0;
-        virtual double thrust() const = 0;
-        virtual bool has_contact() const = 0;
-        virtual std::vector<contact_info_t> get_body_contacts() const = 0;
-        virtual bool has_wheel_contact(size_t id) const = 0;
-        virtual double wheel_skid_info(size_t id) const = 0;
-    };  
 
-    struct control : info
-    {
-        virtual size_t add_wheel( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) = 0;
-        virtual void remove_wheel(size_t id) = 0;
-
-        virtual void set_control_manager(std::function<void(double)> f) = 0;
-
-        virtual void set_steer   (double steer) = 0;
-        virtual void set_brake   (double brake) = 0;
-        virtual void set_thrust  (double thrust) = 0;
-        virtual void set_elevator(double elevator) = 0;
-        virtual void set_ailerons(double ailerons) = 0;
-        virtual void set_rudder  (double rudder) = 0;
-        virtual void set_wind    (point_3 const& wind) = 0;
-        virtual void apply_force (point_3 const& f) = 0;
-        virtual void update_aerodynamics(double dt) = 0;
-        virtual void reset_suspension() = 0;
-    };
-
-   class aircraft 
+   class impl 
        : public rigid_body_user_info_t
+	   , public rigid_body_impl
        , public btActionInterface
+	   , public control
    {
    public:
-      aircraft(/*compound_sensor_t const* s,*/ params_t const& params, decart_position const& pos);
+      impl(system_impl_ptr,/*compound_sensor_t const* s,*/compound_shape_proxy& s, params_t const& params, decart_position const& pos);
+   
+   
+   public:
+	   size_t add_wheel( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) override;
 
    private:
        void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep);
        void debugDraw(btIDebugDraw* debugDrawer);
+   private:
+	   void set_steer   (double steer);
+	   void set_brake   (double brake);
+
+   // rigid_body_impl
+   private:
+	   bt_rigid_body_ptr get_body() const;
+	   void pre_update(double dt);
+	   void has_contact(rigid_body_user_info_t const* other, osg::Vec3 const& local_point, osg::Vec3 const& vel);
 
    private:
-       //compound_shape_proxy                 chassis_shape_;
-       //rigid_body_proxy                     chassis_;
-       //raycast_vehicle_proxy                raycast_veh_;
+       compound_shape_proxy                   chassis_shape_;
+       rigid_body_proxy                       chassis_;
+       raycast_vehicle_proxy                  raycast_veh_;
        polymorph_ptr<rigid_body_user_info_t>  self_;
-       btRaycastVehicle::btVehicleTuning    tuning_;
+       btRaycastVehicle::btVehicleTuning      tuning_;
+	   system_impl_ptr						  sys_;
 
        std::function<void(double)> control_manager_;
 
@@ -167,5 +136,9 @@ namespace phys
        //fixed_id_vector<contact_t> body_contacts_;
        
        //fixed_id_vector<size_t> wheels_ids_;
+	   std::vector<size_t> wheels_ids_;
    };
+
+
+}
 }

@@ -114,7 +114,7 @@ namespace bi
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
         {
             int id = _physicsNodes.size();
-            //BulletInterface::instance()->createBox( id, shape->getHalfLengths(), mass );
+            //phys::sys()->createBox( id, shape->getHalfLengths(), mass );
             addPhysicsData( id, shape, pos, vel, mass );
         }
 

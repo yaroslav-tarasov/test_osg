@@ -21,7 +21,7 @@ public:
         mt->addChild( geode.get() );
         _root->addChild( mt.get() );
         
-        BulletInterface::instance()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity );
+        phys::sys()->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity );
     }
     
     void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -41,21 +41,21 @@ public:
         positioned->addChild(node);
 
         osg::Vec3 half_length ( (bb.xMax() - bb.xMin())/2.0f,(bb.yMax() - bb.yMin()) /2.0f ,(bb.zMax() - bb.zMin())/2.0f );
-        BulletInterface::instance()->createBox( id, half_length/*shape->getHalfLengths()*/, mass );
+        phys::sys()->createBox( id, half_length/*shape->getHalfLengths()*/, mass );
         addPhysicsData( id, positioned, pos, vel, mass );
     }
 
     void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        BulletInterface::instance()->createBox( id, shape->getHalfLengths(), mass );
+        phys::sys()->createBox( id, shape->getHalfLengths(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
     
     void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        BulletInterface::instance()->createSphere( id, shape->getRadius(), mass );
+        phys::sys()->createSphere( id, shape->getRadius(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
     
@@ -78,11 +78,11 @@ public:
         case osgGA::GUIEventAdapter::FRAME:
             {
                 double dt = _hr_timer.get_delta();
-                BulletInterface::instance()->simulate( /*0.02*/dt );
+                phys::sys()->simulate( /*0.02*/dt );
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                       itr!=_physicsNodes.end(); ++itr )
                 {
-                    osg::Matrix matrix = BulletInterface::instance()->getMatrix(itr->first);
+                    osg::Matrix matrix = phys::sys()->getMatrix(itr->first);
                     itr->second->setMatrix( matrix );
                 }
             }
@@ -103,8 +103,8 @@ protected:
         mt->addChild( geode.get() );
         _root->addChild( mt.get() );
         
-        BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-        BulletInterface::instance()->setVelocity( id, vel );
+        phys::sys()->setMatrix( id, osg::Matrix::translate(pos) );
+        phys::sys()->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
     
@@ -115,8 +115,8 @@ protected:
         mt->addChild( node/*.get()*/ );
         _root->addChild( mt.get() );
 
-        BulletInterface::instance()->setMatrix( id, osg::Matrix::translate(pos) );
-        BulletInterface::instance()->setVelocity( id, vel );
+        phys::sys()->setMatrix( id, osg::Matrix::translate(pos) );
+        phys::sys()->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
 

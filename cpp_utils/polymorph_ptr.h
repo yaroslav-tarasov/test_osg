@@ -2,14 +2,13 @@
 
 template<class T> struct weak_polymorph_ptr;
 
-//! умный указатель на базе shared_ptr, вероятно для хранения полиморфных указателей
 template<class T>
 struct polymorph_ptr
 {
 public:
     typedef polymorph_ptr           this_type;
     typedef std::shared_ptr<T>    underlied_ptr;
-    
+
 public:
     polymorph_ptr(std::nullptr_t)
     {
@@ -68,7 +67,7 @@ public:
 
     ~polymorph_ptr()
     {
-        static_assert(std::has_virtual_destructor<T>::value,"Base class must have virtual destructor");
+        //static_assert(std::has_virtual_destructor<T>::value,"Base class must have virtual destructor");
     }
 
     void reset()
