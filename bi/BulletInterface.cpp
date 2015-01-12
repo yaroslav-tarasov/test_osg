@@ -69,9 +69,7 @@ inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg:
 
 namespace 
 {
-	// FIXME It's a kind of magic
-	const double shift = -6.2;
-    
+
 	struct wheel_info
 	{
 		wheel_info(double radius,bool front)
@@ -86,9 +84,21 @@ namespace
 
 	typedef std::vector<wheel_info> wheels_info_t;
 
-	btCompoundShape* fill_cs(osg::Node* node, wheels_info_t& wi)
-	{
-		auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+	btCompoundShape* fill_cs(osg::Node* node, wheels_info_t& wi,aircraft::params_t& p, double& shift )
+    {          
+        osg::ComputeBoundsVisitor cbv;
+        node->accept( cbv );
+        const osg::BoundingBox& bb = cbv.getBoundingBox();
+
+        float xm = bb.xMax() - bb.xMin();
+        float ym = bb.yMax() - bb.yMin();
+        float zm = bb.zMax() - bb.zMin();
+        
+        shift = -zm/2;
+        p.wingspan = xm;
+        p.length   = ym;
+
+        auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
 		auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",findNodeVisitor::not_exact);
 		auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",findNodeVisitor::not_exact);
 		auto sh_f   = findFirstNode(node,"animgroup_shassi_f",findNodeVisitor::not_exact);
@@ -277,8 +287,10 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	//cmt.setOrigin(btVector3(0,-10,0));	
 	
 	wheels_info_t wi;
-	
-    btCompoundShape*  s = fill_cs(node,wi);
+    aircraft::params_t p;
+    p.mass     = mass;	
+    double shift;
+    btCompoundShape*  s = fill_cs(node,wi,p,shift);
 	
 	btTransform  tr;
 	tr.setIdentity();
@@ -291,6 +303,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	btScalar m12 = btScalar((/*params_.mass*/mass) /12);
 	btVector3 localInertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
+    
 	//btVector3 localInertia(0.0, 0.0, 0.0);
 	//if ( mass>0.0 )
 	//	s->calculateLocalInertia( mass, localInertia );
@@ -333,9 +346,8 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 	wheels_info_t wi;
 	aircraft::params_t p;
 	p.mass     = mass;
-	p.wingspan = 25;
-	p.length   = 25;
-	aircraft::control_ptr ctrl = std::make_shared<aircraft::impl>(shared_from_this(),phys::compound_shape_proxy(fill_cs(node,wi)),p,decart_position());
+    double      shift;
+	aircraft::control_ptr ctrl = std::make_shared<aircraft::impl>(shared_from_this(),phys::compound_shape_proxy(fill_cs(node,wi,p,shift)),p,decart_position());
 	_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 	
 	for (auto it=wi.begin();it!=wi.end();++it)
@@ -345,6 +357,9 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 
 		ctrl->add_wheel(0,0,radius,connection_point,phys::cpr(),false,(*it).front);
 	}
+
+    _actors[id]._body->applyCentralForce(btVector3(0,500000,0));
+    ctrl->set_steer(5);
 
 	return ctrl;
 }

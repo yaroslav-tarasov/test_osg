@@ -31,13 +31,13 @@ void CloudsLayer::setCloudsColors( const osg::Vec3f & vFrontColor, const osg::Ve
     _cloudsColorBackUniform->set(osg::Vec3f(vBackColor));
 }
 
-// set mass
-bool CloudsLayer::setCloudsDensity( float mass )
+// set density
+bool CloudsLayer::setCloudsDensity( float density )
 {
 
-   if (!cg::eq(_clDensity, mass, 0.01f))
+   if (!cg::eq(_clDensity, density, 0.01f))
    {
-       _clDensity = mass;
+       _clDensity = density;
        _cloudsDensityUniform->set(_clDensity);
        return true;
    }
@@ -144,7 +144,7 @@ void CloudsLayer::_buildStateSet()
 
     _cloudsColorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
     _cloudsColorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));
-    _cloudsDensityUniform    = new osg::Uniform("mass",    _clDensity);
+    _cloudsDensityUniform    = new osg::Uniform("density",    _clDensity);
     _mvpUniform              = new osg::Uniform("MVP",        _clRotation);
 
     sset->addUniform( new osg::Uniform("Clouds", 0) );

@@ -46,8 +46,9 @@ namespace phys
 
 		//virtual void set_control_manager(std::function<void(double)> f) = 0;
 
-		//virtual void set_steer   (double steer) = 0;
-		//virtual void set_brake   (double brake) = 0;
+		virtual void set_steer   (double steer) = 0;
+        virtual double get_steer () = 0;
+		virtual void set_brake   (double brake) = 0;
 		//virtual void set_thrust  (double thrust) = 0;
 		//virtual void set_elevator(double elevator) = 0;
 		//virtual void set_ailerons(double ailerons) = 0;

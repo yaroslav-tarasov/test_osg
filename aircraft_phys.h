@@ -82,11 +82,12 @@ namespace phys
 	   size_t add_wheel( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) override;
 
    private:
-       void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep);
-       void debugDraw(btIDebugDraw* debugDrawer);
+       void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
+       void debugDraw(btIDebugDraw* debugDrawer) override;
    private:
-	   void set_steer   (double steer);
-	   void set_brake   (double brake);
+	   void set_steer   (double steer) override;
+	   void set_brake   (double brake) override;
+       double get_steer () override;
 
    // rigid_body_impl
    private:

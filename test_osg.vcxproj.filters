@@ -305,5 +305,8 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
+    <ClCompile Include="bi\RigidUpdater.cpp">
+      <Filter>Source Files\bi</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

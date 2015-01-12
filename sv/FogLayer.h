@@ -92,7 +92,7 @@ public:
     // get fog coefficient
     float getFogExp2Coef() const { return m_realExp2Density; }
 
-    // get fog mass
+    // get fog density
     float getFogDensity() const { return m_fogDensity; }
 
 private:

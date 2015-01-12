@@ -1,3 +1,6 @@
+#pragma once 
+#include <type_traits>
+
 namespace cg
 {
     // число pi
@@ -155,5 +158,68 @@ namespace cg
     __forceinline float  grad2rad(float  grad) { return grad * float( pi / 180.0f ); }
     __forceinline double grad2rad(int    grad) { return grad * pi / 180.0; }
     __forceinline double grad2rad()            { return pi / 180.0; }
+
+    // приведение произвольной величины к диапазону [0, 360)
+    template<class T, bool integer> struct norm360_impl; 
+
+    template<class T> struct norm360_impl<T, true>
+    {
+        static T f(T x)
+        {
+            if ( x > 0 )
+                return x % 360;
+            else if ( x < 0 )
+                return (360 - (-x-1) % 360) - 1;
+            return x ;
+        }
+    } ; 
+
+    template<class T> struct norm360_impl<T, false>
+    {
+        static T f(T x)
+        {
+            return x - T(360) * floor(x / T(360));
+        }
+    } ; 
+
+    template <class T> T norm360 ( T x ) 
+    {
+        return norm360_impl<T,std::is_integral<T>::value>::f(x);
+    }
+
+    // приведение произвольной величины к диапазону [-180, 180)
+    template < class T >
+    __forceinline T norm180 ( T x )
+    {
+        x = norm360(x) ;
+        if ( x >= 180 )
+            x -= 360 ;
+        return x ;
+    }
+
+    // приведение произвольной величины к диапазону [0, 2*Pi)
+    __forceinline double norm_2pi ( double x )
+    {
+        return x - 2*pi * floor(x / (2*pi));
+    }
+
+    // приведение произвольной величины к диапазону [-Pi, Pi)
+    __forceinline double norm_pi ( double x )
+    {
+        x = norm_2pi(x) ;
+        if ( x >= pi )
+            x -= 2*pi ;
+        return x ;
+    }
+
+    __forceinline double norm( double value )
+    {
+        return abs( value ) ;
+    }
+
+    __forceinline float norm( float value )
+    {
+        return abs( value ) ;
+    }
 
 };
