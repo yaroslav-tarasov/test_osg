@@ -30,6 +30,14 @@ namespace phys
             , rudder(200)
             , ailerons(200)
             , aa0(-1.)
+            , S(0.0),chord(0.0),length(0.0),mass(0.0),wingspan(0.0)
+            , Cl(0.0)
+            , Cd0(0.0)
+            , Cd2(0.0)
+            , ClAOA(0.0)
+            , Cs(0.0)
+            , thrust(0.0)
+
         {}
 
         double S;
@@ -67,8 +75,8 @@ namespace phys
     };   
 
 
-
-   class impl 
+   
+   ATTRIBUTE_ALIGNED16 (class impl) 
        : public rigid_body_user_info_t
 	   , public rigid_body_impl
        , public btActionInterface
