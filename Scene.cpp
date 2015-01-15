@@ -21,6 +21,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "ada.h"
+#include "bada_import.h"
+
 using namespace avScene;
 
 std::vector<osg::ref_ptr<osg::Node>> _lamps;
@@ -350,7 +353,10 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->addEventHandler(new PickHandler());
     _viewerPtr->realize();
 
-    
+     ada::data_t b = ada::fill_data("BADA","A319");
+     std::string m = b.manufacturer;
+     OutputDebugString(m.c_str());
+
     //
     // Initialize particle engine
     // 
@@ -527,7 +533,6 @@ void Scene::createObjects()
 		osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );
     
 	const bool add_planes = false;
-
 
     if (add_planes)
     {

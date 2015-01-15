@@ -34,6 +34,15 @@
     <Filter Include="Source Files\aircraft">
       <UniqueIdentifier>{1e8dee50-dcac-42b3-8d09-d3f8317b93e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\aircraft">
+      <UniqueIdentifier>{b7d5d9ec-80d9-42fc-92e6-4fecd9062fce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{aee982bd-2830-4184-9a57-25ddf09d060b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nfi">
+      <UniqueIdentifier>{ac4ce2b3-ce67-487c-90c5-91e58e87d521}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -69,37 +78,16 @@
     <ClInclude Include="creators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="animation_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="find_node_visitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="info_visitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SkyBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shaders.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="find_tex_visitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ct_visitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="materials_visitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sv\FogLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cg_math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hi_res_timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="light_maps.h">
@@ -109,9 +97,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="teapot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="find_animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
@@ -138,16 +123,46 @@
     <ClInclude Include="pickhandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="aircraft_phys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="aircraft_visual.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utils\str.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="aircraft.h">
+      <Filter>Header Files\aircraft</Filter>
+    </ClInclude>
+    <ClInclude Include="aircraft_phys.h">
+      <Filter>Header Files\aircraft</Filter>
+    </ClInclude>
+    <ClInclude Include="aircraft_visual.h">
+      <Filter>Header Files\aircraft</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_math.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ct_visitor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="info_visitor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="hi_res_timer.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="find_tex_visitor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="find_node_visitor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="find_animation.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="animation_handler.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="bada_import.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -307,6 +322,12 @@
     </ClCompile>
     <ClCompile Include="bi\RigidUpdater.cpp">
       <Filter>Source Files\bi</Filter>
+    </ClCompile>
+    <ClCompile Include="bada_import.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="nfi\lib_loader.cpp">
+      <Filter>Source Files\nfi</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

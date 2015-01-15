@@ -14,12 +14,13 @@
 #include <stdio.h>
 #include <tchar.h>
 
-
 #include <iostream>
 #include <functional>
 #include <array>
-
+#include <unordered_map>
 #include <memory>
+
+
 //////////////////////////////////////
 //
 //  osg include
@@ -72,7 +73,6 @@
 #include <osgParticle/PrecipitationEffect>
 
 #include <osgFX/Outline>
-                                         
 
 #include <osg/Depth>
                  
@@ -92,8 +92,6 @@
 #include <osgShadow/LightSpacePerspectiveShadowMap>
 #include <osgShadow/ShadowTexture>
 #include <osgShadow/ViewDependentShadowMap>
-
-                                   
 
 #include <osgGA/NodeTrackerManipulator>
 #include <osgUtil/LineSegmentIntersector>
@@ -145,7 +143,11 @@ int main_scene2( int argc, char** argv );
 
 #define STRINGIFY(x) #x 
 
-#ifndef _DEBUG
+#ifdef _DEBUG
+    #pragma comment(lib, "BulletCollision_Debug.lib")
+    #pragma comment(lib, "LinearMath_Debug.lib")
+    #pragma comment(lib, "BulletDynamics_Debug.lib")
+#else 
     #pragma comment(lib, "osgText.lib")
     #pragma comment(lib, "osgShadow.lib")
     #pragma comment(lib, "osgFX.lib")
@@ -162,14 +164,14 @@ int main_scene2( int argc, char** argv );
     #pragma comment(lib, "BulletCollision.lib")
     #pragma comment(lib, "LinearMath.lib")
     #pragma comment(lib, "BulletDynamics.lib")
-#else 
-    #pragma comment(lib, "BulletCollision_Debug.lib")
-    #pragma comment(lib, "LinearMath_Debug.lib")
-    #pragma comment(lib, "BulletDynamics_Debug.lib")
 #endif
 
 #include "Windows.h"
 #undef max
+
+#include "boost/shared_ptr.hpp" 
+#include "boost/make_shared.hpp"
+#include "boost/enable_shared_from_this.hpp"
 
 
 // #define DEVELOP_SHADOWS

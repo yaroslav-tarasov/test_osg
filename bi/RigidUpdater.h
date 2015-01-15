@@ -45,7 +45,7 @@ namespace bi
         avCollision::GLDebugDrawer*            _dbgDraw;
         bool                                   _debug;
 		aircrafts_t                            _aircrafts;
-		std::shared_ptr<phys::BulletInterface> _sys;
+		boost::shared_ptr<phys::BulletInterface> _sys;
     };
 
 }

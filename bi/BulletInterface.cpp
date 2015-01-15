@@ -9,6 +9,7 @@
 #include "../aircraft_phys.h"
 
 
+
 using namespace phys;
 
 struct FilterCallback : public btOverlapFilterCallback
@@ -33,13 +34,13 @@ namespace phys
 {
 	BulletInterface*  sys()
 	{
-		static std::shared_ptr<BulletInterface> inst = create();
+		static boost::shared_ptr<BulletInterface> inst = create();
 		return inst.get();
 	}
 
-	std::shared_ptr<BulletInterface> create()
+	boost::shared_ptr<BulletInterface> create()
 	{
-		return std::make_shared<BulletInterface>();
+		return boost::make_shared<BulletInterface>();
 	}
 }
 
@@ -158,7 +159,7 @@ namespace
 #if 0
 BulletInterface* BulletInterface::instance()
 {
-    static std::shared_ptr<BulletInterface> s_registry = std::make_shared<BulletInterface>();
+    static boost::shared_ptr<BulletInterface> s_registry = boost::make_shared<BulletInterface>();
     return s_registry.get();
 }
 #endif
@@ -173,8 +174,8 @@ BulletInterface::BulletInterface()
     _dispatcher = new btCollisionDispatcher( _configuration );
     _overlappingPairCache = new btDbvtBroadphase;
     _solver = new btSequentialImpulseConstraintSolver;
-
-	
+    
+    
 }
 
 BulletInterface::~BulletInterface()
@@ -204,7 +205,7 @@ BulletInterface::~BulletInterface()
 
 void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gravity, on_collision_f on_collision )
 {
-    _scene = std::make_shared<btDiscreteDynamicsWorld>(_dispatcher,_overlappingPairCache, _solver, _configuration);
+    _scene = boost::make_shared<btDiscreteDynamicsWorld>(_dispatcher,_overlappingPairCache, _solver, _configuration);
     _scene->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
     
     //static osgbDynamics::PhysicsThread pt( _scene, &tBuf );
@@ -224,7 +225,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
 
     _on_collision = on_collision;
 	
-	_scene->setInternalTickCallback(internal_tick_callback);
+	//_scene->setInternalTickCallback(internal_tick_callback);
 
 	vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*_scene));
 
@@ -345,9 +346,11 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 {
 	wheels_info_t wi;
 	aircraft::params_t p;
+    memset(&p,0,sizeof(aircraft::params_t));
 	p.mass     = mass;
     double      shift;
-	aircraft::control_ptr ctrl = std::make_shared<aircraft::impl>(shared_from_this(),phys::compound_shape_proxy(fill_cs(node,wi,p,shift)),p,decart_position());
+    phys::compound_shape_proxy s(fill_cs(node,wi,p,shift));
+	aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,decart_position());
 	_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 	
 	for (auto it=wi.begin();it!=wi.end();++it)

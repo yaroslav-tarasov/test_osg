@@ -158,6 +158,17 @@ namespace cg
     __forceinline float  grad2rad(float  grad) { return grad * float( pi / 180.0f ); }
     __forceinline double grad2rad(int    grad) { return grad * pi / 180.0; }
     __forceinline double grad2rad()            { return pi / 180.0; }
+    
+    __forceinline double feet2meter()      { return 0.3048; }
+    __forceinline double meter2feet()      { return 1. / feet2meter(); }
+    __forceinline double kt2mps()          { return 0.514444444444444; }
+    __forceinline double mps2kt()          { return 1. / kt2mps(); }
+    __forceinline double mps2kmph()        { return 3.6; }
+    __forceinline double kmph2mps()        { return 1. / mps2kmph(); }
+    __forceinline double kmph2kt()         { return kmph2mps() * mps2kt(); }
+    __forceinline double kt2kmph()         { return kt2mps() * mps2kmph(); }
+    __forceinline double ftm2mps()         { return feet2meter() / 60. ; }
+    __forceinline double mps2ftm()         { return 1. / ftm2mps() ; }
 
     // приведение произвольной величины к диапазону [0, 360)
     template<class T, bool integer> struct norm360_impl; 

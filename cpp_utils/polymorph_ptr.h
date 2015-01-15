@@ -7,7 +7,7 @@ struct polymorph_ptr
 {
 public:
     typedef polymorph_ptr           this_type;
-    typedef std::shared_ptr<T>    underlied_ptr;
+    typedef boost::shared_ptr<T>    underlied_ptr;
 
 public:
     polymorph_ptr(std::nullptr_t)
@@ -21,11 +21,11 @@ public:
 
     template<class U>
     explicit polymorph_ptr(U* p)
-        : underlied_ptr_(std::dynamic_pointer_cast<T>(std::shared_ptr<U>(p)))
+        : underlied_ptr_(boost::dynamic_pointer_cast<T>(boost::shared_ptr<U>(p)))
     {
     }
 
-    explicit polymorph_ptr(std::weak_ptr<T> const& p)
+    explicit polymorph_ptr(boost::weak_ptr<T> const& p)
         : underlied_ptr_(p)
     {
     }
@@ -36,20 +36,20 @@ public:
     }
 
     template<class U>
-    polymorph_ptr(std::shared_ptr<U> const& other)
-        : underlied_ptr_(std::dynamic_pointer_cast<T>(other))
+    polymorph_ptr(boost::shared_ptr<U> const& other)
+        : underlied_ptr_(boost::dynamic_pointer_cast<T>(other))
     {
     }
 
     template<class U>
     polymorph_ptr(polymorph_ptr<U> const& other)
-        : underlied_ptr_(std::dynamic_pointer_cast<T>(other.underlied()))
+        : underlied_ptr_(boost::dynamic_pointer_cast<T>(other.underlied()))
     {
     }
 
-    operator std::weak_ptr<T>() const
+    operator boost::weak_ptr<T>() const
     {
-        return std::weak_ptr<T>(underlied_ptr_);
+        return boost::weak_ptr<T>(underlied_ptr_);
     }
 
     polymorph_ptr& operator=(polymorph_ptr const& other)
@@ -61,13 +61,13 @@ public:
     template<class U>
     polymorph_ptr& operator=(polymorph_ptr<U> const& other)
     {
-        underlied_ptr_ = std::dynamic_pointer_cast<T>(other.underlied());
+        underlied_ptr_ = boost::dynamic_pointer_cast<T>(other.underlied());
         return *this;
     }
 
     ~polymorph_ptr()
     {
-        //static_assert(std::has_virtual_destructor<T>::value,"Base class must have virtual destructor");
+        //static_assert(boost::has_virtual_destructor<T>::value,"Base class must have virtual destructor");
     }
 
     void reset()

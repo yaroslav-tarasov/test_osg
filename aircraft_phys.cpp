@@ -22,7 +22,6 @@ namespace phys
     {
 		tuning_.m_maxSuspensionTravelCm = 500;
 
-
 		btTransform  tr;
 		tr.setIdentity();
 		btVector3 aabbMin,aabbMax;
@@ -34,8 +33,9 @@ namespace phys
 		btScalar m12 = btScalar((params_.mass) /12);
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), NULL, &*chassis_shape_.get(), inertia);
-		chassis_.reset(std::make_shared<btRigidBody>(chassis_construction_info));
+        btDefaultMotionState* motionState = new btDefaultMotionState(tr);
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), /*NULL*/motionState, &*chassis_shape_.get(), inertia);
+    	chassis_.reset(boost::make_shared<btRigidBody>(chassis_construction_info));
 
 		// FIXME TODO
 		//chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
@@ -46,7 +46,7 @@ namespace phys
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
 		chassis_->setFriction(0.3f);
 
-		raycast_veh_.reset(std::make_shared<btRaycastVehicle>(tuning_, &*chassis_.get(), &*sys->vehicle_raycaster()));
+		raycast_veh_.reset(boost::make_shared<btRaycastVehicle>(tuning_, &*chassis_.get(), &*sys->vehicle_raycaster()));
 
 		raycast_veh_->setCoordinateSystem(0,2,1);
 

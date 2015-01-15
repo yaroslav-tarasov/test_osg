@@ -14,7 +14,7 @@ namespace phys
 class BulletInterface 
 	: public phys::system_impl
 	// , public osg::Referenced
-    , public std::enable_shared_from_this<BulletInterface>
+    , public boost::enable_shared_from_this<BulletInterface>
 {
 public:
     typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
@@ -100,7 +100,7 @@ private:
 BulletInterface*  sys();
 
 
-std::shared_ptr<BulletInterface> create();
+boost::shared_ptr<BulletInterface> create();
 
 } // ns phys
 #endif
