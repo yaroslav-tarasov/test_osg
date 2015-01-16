@@ -158,6 +158,7 @@
     <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="phys_aircraft.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
     <ClCompile Include="shaders.cpp" />

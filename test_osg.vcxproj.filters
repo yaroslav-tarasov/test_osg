@@ -329,5 +329,8 @@
     <ClCompile Include="nfi\lib_loader.cpp">
       <Filter>Source Files\nfi</Filter>
     </ClCompile>
+    <ClCompile Include="phys_aircraft.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
