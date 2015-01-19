@@ -4,6 +4,8 @@
 #include "phys_sys_fwd.h"
 #include "phys_aircraft.h"
 
+using namespace cg;
+
 namespace aircraft
 {
 #if 0
@@ -50,7 +52,7 @@ namespace aircraft
     }
 #endif
 
-    phys_aircraft_ptr phys_aircraft_impl::create(geo_base_3 const& base,
+    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
                                     phys_sys::system_ptr phys_sys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
                                     //nodes_management::manager_ptr nodes_manager, 
@@ -96,10 +98,10 @@ namespace aircraft
         sync_phys(0.1);
     }
 
-    void phys_aircraft_impl::attach_tow(bool attached)
-    {
-        tow_attached_ = attached;
-    }
+    //void phys_aircraft_impl::attach_tow(bool attached)
+    //{
+    //    tow_attached_ = attached;
+    //}
 
     void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, quaternion const& orien)
     {
@@ -107,15 +109,15 @@ namespace aircraft
         desired_orien_ = orien;
     }
 
-    geo_position phys_aircraft_impl::get_position() const
-    {
-        //Assert(phys_aircraft_);
+    //geo_position phys_aircraft_impl::get_position() const
+    //{
+    //    //Assert(phys_aircraft_);
 
-        decart_position body_pos = phys_aircraft_->get_position();
-        decart_position root_pos = body_pos * body_transform_inv_;
+    //    decart_position body_pos = phys_aircraft_->get_position();
+    //    decart_position root_pos = body_pos * body_transform_inv_;
 
-        return geo_position(root_pos, base_);
-    }
+    //    return geo_position(root_pos, base_);
+    //}
 
     //void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
     //{

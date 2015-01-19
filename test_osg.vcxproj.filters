@@ -165,6 +165,9 @@
     <ClInclude Include="fms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="geo_points.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -197,7 +197,8 @@ public:
         // when ambient is low - get it's color directly (to make more realistic fog at dusk/dawn)
         // also when overcast - modulate color with ambient
         const float fFogDesatFactor = cg::bound(cFogAmb.x() * 1.5f, 0.f, 1.f);
-        auto fog_color = cg::lerp01(fFogDesatFactor,/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0) );
+        //auto fog_color = cg::lerp01(fFogDesatFactor,/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0) );
+        auto fog_color = cg::lerp01(/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0),fFogDesatFactor );
 
         // save fog
          _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());

@@ -1,11 +1,15 @@
 #pragma once
 
-#include "aircraft_common.h" 
+
 
 //#include "../common/phys_sys.h"
 //#include "meteo/meteo.h"
 
+using namespace cg;
 
+#include "geometry/primitives.h"
+#include "position.h"
+#include "aircraft_common.h" 
 
 namespace aircraft
 {
@@ -13,7 +17,7 @@ namespace aircraft
     struct phys_aircraft_impl
         : phys_aircraft
     {
-        static phys_aircraft_ptr create(geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
+        static phys_aircraft_ptr create(cg::geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
  /*                                      meteo::meteo_cursor_ptr meteo_cursor, */
                                        //nodes_management::manager_ptr nodes_manager, 
                                        geo_position const& initial_position, 
@@ -21,7 +25,7 @@ namespace aircraft
                                        //shassis_support_ptr shassis, 
                                        size_t zone);
 
-        phys_aircraft_impl(geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
+        phys_aircraft_impl(cg::geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
                            //meteo::meteo_cursor_ptr meteo_cursor, 
                            //nodes_management::manager_ptr nodes_manager, 
                            geo_position const& initial_position, 
@@ -36,7 +40,7 @@ namespace aircraft
     private:
         void update() override;
         //void attach_tow(bool attached) override;
-        void go_to_pos(geo_point_3 const& pos, quaternion const& orien) override;
+        void go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien) override;
         //geo_position get_position() const;
         //void set_air_cfg(fms::air_config_t cfg);
         //void set_prediction(double prediction);
@@ -56,23 +60,23 @@ namespace aircraft
         void calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, point_3 const& desired_accel, point_3 const& /*wind*/, bool reverse, bool low_attack);
 
     private:
-        geo_base_3 base_;
-        phys_sys::system_ptr phys_sys_;
+        cg::geo_base_3                  base_;
+        phys_sys::system_ptr            phys_sys_;
         //nodes_management::manager_ptr nodes_manager_;
-        //meteo::meteo_cursor_ptr meteo_cursor_;
-        //shassis_support_ptr shassis_;
+        //meteo::meteo_cursor_ptr       meteo_cursor_;
+        //shassis_support_ptr           shassis_;
 
         phys_sys::aircraft::control_ptr phys_aircraft_;
-        //cg::transform_4 body_transform_inv_;
-        bool on_ground_;
-        //fms::air_config_t cfg_;
-        double prediction_;
+        //cg::transform_4               body_transform_inv_;
+        bool                            on_ground_;
+        //fms::air_config_t             cfg_;
+        double                          prediction_;
 
-        geo_point_3 desired_position_;
-        quaternion  desired_orien_;
-        bool tow_attached_;
-        bool has_malfunction_;
-        size_t zone_;
+        cg::geo_point_3                 desired_position_;
+        quaternion                      desired_orien_;
+        bool                            tow_attached_;
+        bool                            has_malfunction_;
+        size_t                          zone_;
     };
 
 }

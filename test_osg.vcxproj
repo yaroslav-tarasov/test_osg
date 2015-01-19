@@ -112,6 +112,7 @@
     <ClInclude Include="find_node_visitor.h" />
     <ClInclude Include="find_tex_visitor.h" />
     <ClInclude Include="fms.h" />
+    <ClInclude Include="geo_points.h" />
     <ClInclude Include="hi_res_timer.h" />
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
@@ -158,7 +159,9 @@
     <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="phys_aircraft.cpp" />
+    <ClCompile Include="phys_aircraft.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
     <ClCompile Include="shaders.cpp" />

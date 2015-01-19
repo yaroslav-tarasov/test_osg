@@ -11,7 +11,7 @@ namespace aircraft
     {
         virtual void update() = 0;
         //virtual void attach_tow(bool attached) = 0;
-        virtual void go_to_pos(geo_point_3 const& pos, quaternion const& orien)  = 0;
+        virtual void go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien)  = 0;
         //virtual geo_position get_position() const = 0;
         //virtual void set_air_cfg(fms::air_config_t cfg) = 0;
         //virtual void set_prediction(double prediction) = 0;
