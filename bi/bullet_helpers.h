@@ -17,17 +17,17 @@ namespace phys
     typedef polymorph_ptr<btRaycastVehicle>          bt_raycast_vehicle_ptr;
 
 
-    inline btVector3 to_bullet_vector3( osg::Vec3 const& v )
+    inline btVector3 to_bullet_vector3( cg::point_3 const& v )
     {
-        return btVector3(btScalar(v.x()), btScalar(v.y()), btScalar(v.z()));
+        return btVector3(btScalar(v.x), btScalar(v.y), btScalar(v.z));
     }
 
-    inline osg::Vec3 from_bullet_vector3( btVector3 const& v )
+    inline cg::point_3 from_bullet_vector3( btVector3 const& v )
     {
-        return osg::Vec3(v.x(), v.y(), v.z());
+        return cg::point_3(v.x(), v.y(), v.z());
     }
 
-    inline btMatrix3x3 to_bullet_matrix( osg::Matrix mm )
+    inline btMatrix3x3 to_bullet_matrix( cg::matrix_3 mm )
     {                 
         btMatrix3x3 m;
         m.setValue(btScalar(mm(0, 0)), btScalar(mm(0, 1)), btScalar(mm(0, 2)), 
@@ -36,9 +36,9 @@ namespace phys
         return m;
     }
 
-    inline osg::Matrix from_bullet_matrix( btMatrix3x3 const& m )
+    inline cg::matrix_3 from_bullet_matrix( btMatrix3x3 const& m )
     {
-        osg::Matrix mm;
+        cg::matrix_3 mm;
         mm(0,0) = m.getRow(0).x(), mm(0,1) = m.getRow(0).y(), mm(0,2) = m.getRow(0).z();
         mm(1,0) = m.getRow(1).x(), mm(1,1) = m.getRow(1).y(), mm(1,2) = m.getRow(1).z();
         mm(2,0) = m.getRow(2).x(), mm(2,1) = m.getRow(2).y(), mm(2,2) = m.getRow(2).z();
@@ -46,45 +46,88 @@ namespace phys
         return mm;
     }
 
-    inline osg::Quat from_bullet_quaternion( btQuaternion const& q )
+    inline cg::quaternion from_bullet_quaternion( btQuaternion const& q )
     {                    
-        return osg::Quat(q.x(), q.y(), q.z(),q.w());
+        return cg::quaternion(q.w(), cg::point_3(q.x(), q.y(), q.z()));
     }
 
-    inline btQuaternion to_bullet_quaternion( osg::Quat const& q )
+    inline btQuaternion to_bullet_quaternion( cg::quaternion const& q )
     {                    
-        return btQuaternion((btScalar)q.x(), (btScalar)q.y(), (btScalar)q.z(), (btScalar)q.w());
+        return btQuaternion((btScalar)q.get_v().x, (btScalar)q.get_v().y, (btScalar)q.get_v().z, (btScalar)q.get_w());
     }
 
-    //inline btTransform to_bullet_transform( cg::transform_4 const& tr )
-    //{
-    //    return btTransform(to_bullet_matrix(tr.rotation().matrix()), to_bullet_vector3(tr.translation()));
-    //}
-	
-	inline btTransform to_bullet_transform( osg::Matrix const& tr )
-	{
-	    return osgbCollision::asBtTransform(tr);
-	}
+    inline btTransform to_bullet_transform( cg::transform_4 const& tr )
+    {
+        return btTransform(to_bullet_matrix(tr.rotation().matrix()), to_bullet_vector3(tr.translation()));
+    }
 
-    //inline cg::transform_4 from_bullet_transform( btTransform const& tr )
-    //{
-    //    return cg::transform_4(cg::as_translation(from_bullet_vector3(tr.getOrigin())), cg::rotation_3(from_bullet_matrix(tr.getBasis())));
-    //}
+    inline cg::transform_4 from_bullet_transform( btTransform const& tr )
+    {
+        return cg::transform_4(cg::as_translation(from_bullet_vector3(tr.getOrigin())), cg::rotation_3(from_bullet_matrix(tr.getBasis())));
+    }
 
-	inline osg::Matrix from_bullet_transform( btTransform const& tr )
-	{
-	    return osgbCollision::asOsgMatrix(tr);
-	}
+    inline btTransform to_bullet_transform( cg::point_3 const& pos, cg::cpr const& orien )
+    {
+        return btTransform(to_bullet_matrix(cg::rotation_3(orien).matrix()), to_bullet_vector3(pos));
+    }
 
-    //inline btTransform to_bullet_transform( point_3 const& pos, cpr const& orien )
-    //{
-    //    return btTransform(to_bullet_matrix(cg::rotation_3(orien).matrix()), to_bullet_vector3(pos));
-    //}
+    inline btTransform to_bullet_transform( cg::point_3 const& pos, cg::quaternion const& orien )
+    {
+        return btTransform(to_bullet_quaternion(orien), to_bullet_vector3(pos));
+    }
 
-    //inline btTransform to_bullet_transform( point_3 const& pos, quaternion const& orien )
-    //{
-    //    return btTransform(to_bullet_quaternion(orien), to_bullet_vector3(pos));
-    //}
+    namespace osg_helpers
+    {
+        inline btVector3 to_bullet_vector3( osg::Vec3 const& v )
+        {
+            return btVector3(btScalar(v.x()), btScalar(v.y()), btScalar(v.z()));
+        }
+
+        inline osg::Vec3 from_bullet_vector3( btVector3 const& v )
+        {
+            return osg::Vec3(v.x(), v.y(), v.z());
+        }
+
+        inline btMatrix3x3 to_bullet_matrix( osg::Matrix mm )
+        {                 
+            btMatrix3x3 m;
+            m.setValue(btScalar(mm(0, 0)), btScalar(mm(0, 1)), btScalar(mm(0, 2)), 
+                btScalar(mm(1, 0)), btScalar(mm(1, 1)), btScalar(mm(1, 2)),
+                btScalar(mm(2, 0)), btScalar(mm(2, 1)), btScalar(mm(2, 2)));
+            return m;
+        }
+
+        inline osg::Matrix from_bullet_matrix( btMatrix3x3 const& m )
+        {
+            osg::Matrix mm;
+            mm(0,0) = m.getRow(0).x(), mm(0,1) = m.getRow(0).y(), mm(0,2) = m.getRow(0).z();
+            mm(1,0) = m.getRow(1).x(), mm(1,1) = m.getRow(1).y(), mm(1,2) = m.getRow(1).z();
+            mm(2,0) = m.getRow(2).x(), mm(2,1) = m.getRow(2).y(), mm(2,2) = m.getRow(2).z();
+
+            return mm;
+        }
+
+        inline osg::Quat from_bullet_quaternion( btQuaternion const& q )
+        {                    
+            return osg::Quat(q.x(), q.y(), q.z(),q.w());
+        }
+
+        inline btQuaternion to_bullet_quaternion( osg::Quat const& q )
+        {                    
+            return btQuaternion((btScalar)q.x(), (btScalar)q.y(), (btScalar)q.z(), (btScalar)q.w());
+        }
+
+        inline btTransform to_bullet_transform( osg::Matrix const& tr )
+        {
+            return osgbCollision::asBtTransform(tr);
+        }
+
+	    inline osg::Matrix from_bullet_transform( btTransform const& tr )
+	    {
+	        return osgbCollision::asOsgMatrix(tr);
+	    }
+    }
+
 
     //inline bt_collision_shape_ptr get_sensor_convex( sensor_ptr s )
     //{
@@ -125,18 +168,18 @@ namespace phys
     //    return bt_collision_shape_ptr(new btBvhTriangleMeshShape(mesh, true));
     //}
 
-    //inline decart_position from_bullet_position(btRigidBody const* body)
-    //{
-    //    decart_position pos;
+    inline decart_position from_bullet_position(btRigidBody const* body)
+    {
+        decart_position pos;
 
-    //    btTransform tr = body->getCenterOfMassTransform();
-    //    pos.pos   = from_bullet_vector3(tr.getOrigin());
-    //    pos.orien = cg::rotation_3(from_bullet_matrix(tr.getBasis())).cpr();
-    //    pos.dpos = from_bullet_vector3(body->getLinearVelocity());
-    //    pos.omega = cg::rad2grad() * from_bullet_vector3(body->getAngularVelocity());
+        btTransform tr = body->getCenterOfMassTransform();
+        pos.pos   = from_bullet_vector3(tr.getOrigin());
+        pos.orien = cg::rotation_3(from_bullet_matrix(tr.getBasis())).cpr();
+        pos.dpos = from_bullet_vector3(body->getLinearVelocity());
+        pos.omega = cg::rad2grad() * from_bullet_vector3(body->getAngularVelocity());
 
-    //    return pos;
-    //}
+        return pos;
+    }
 
     struct compound_shape_proxy
     {
@@ -153,6 +196,12 @@ namespace phys
 		}
 
         void add(bt_collision_shape_ptr shape, osg::Matrix const& tr)
+        {
+            shape_->addChildShape(osg_helpers::to_bullet_transform(tr), &*shape);
+            childs_.push_back(shape);
+        }
+        
+        void add(bt_collision_shape_ptr shape, cg::transform_4 const& tr)
         {
             shape_->addChildShape(to_bullet_transform(tr), &*shape);
             childs_.push_back(shape);

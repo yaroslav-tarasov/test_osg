@@ -175,7 +175,7 @@ namespace bi
                 double dt = _hr_timer.get_delta();
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
-                _sys->simulate( dt );
+                _sys->update( dt );
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
                 {

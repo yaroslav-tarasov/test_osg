@@ -174,7 +174,6 @@ int main_scene2( int argc, char** argv );
 // typedef osg::Matrix  transform_4;
 
 
-
 #include "Windows.h"
 #undef min
 #undef max
@@ -204,12 +203,15 @@ inline T atanh (T x)
 }
 
 template<typename T>
-inline T cbrt(T)
+inline T cbrt(T n)
 {
-    if(T>0)
+    if(n>0)
         return std::pow(n, 1/3.);
     else
         return -std::pow(n, 1/3.);
 }
 
-#define Assert(x) x;
+#define Assert(x) if(x){};
+
+#include "geometry/primitives.h"
+#include "position.h"

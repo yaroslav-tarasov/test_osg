@@ -17,7 +17,7 @@ namespace aircraft
     struct phys_aircraft_impl
         : phys_aircraft
     {
-        static phys_aircraft_ptr create(cg::geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
+        static phys_aircraft_ptr create(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
  /*                                      meteo::meteo_cursor_ptr meteo_cursor, */
                                        //nodes_management::manager_ptr nodes_manager, 
                                        geo_position const& initial_position, 
@@ -25,12 +25,12 @@ namespace aircraft
                                        //shassis_support_ptr shassis, 
                                        size_t zone);
 
-        phys_aircraft_impl(cg::geo_base_3 const& base, phys_sys::system_ptr phys_sys, 
+        phys_aircraft_impl(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
                            //meteo::meteo_cursor_ptr meteo_cursor, 
                            //nodes_management::manager_ptr nodes_manager, 
                            geo_position const& initial_position, 
                            ada::data_t const& fsettings, 
-                           //shassis_support_ptr shassis, phys_sys::compound_sensor_t const& s, 
+                           //shassis_support_ptr shassis, phys::compound_sensor_t const& s, 
                            size_t zone);
 
         ~phys_aircraft_impl();
@@ -45,9 +45,9 @@ namespace aircraft
         //void set_air_cfg(fms::air_config_t cfg);
         //void set_prediction(double prediction);
         //geo_position get_wheel_position( size_t i ) const ;
-        phys_sys::rigid_body_ptr get_rigid_body() const;
+        phys::rigid_body_ptr get_rigid_body() const;
         void set_steer   (double steer);
-        //std::vector<phys_sys::aircraft::contact_info_t> get_body_contacts() const;
+        //std::vector<phys::aircraft::contact_info_t> get_body_contacts() const;
         //bool has_wheel_contact(size_t id) const;
         //double wheel_skid_info(size_t id) const;
         //void remove_wheel(size_t id);
@@ -55,19 +55,19 @@ namespace aircraft
         //void set_malfunction(bool malfunction);
 
     private:
-        void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings/*, phys_sys::compound_sensor_t const& s*/);
+        void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings/*, phys::compound_sensor_t const& s*/);
         void sync_phys(double dt);
         void calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, point_3 const& desired_accel, point_3 const& /*wind*/, bool reverse, bool low_attack);
 
     private:
         cg::geo_base_3                  base_;
-        phys_sys::system_ptr            phys_sys_;
+        phys::system_ptr                phys_sys_;
         //nodes_management::manager_ptr nodes_manager_;
         //meteo::meteo_cursor_ptr       meteo_cursor_;
         //shassis_support_ptr           shassis_;
 
-        phys_sys::aircraft::control_ptr phys_aircraft_;
-        //cg::transform_4               body_transform_inv_;
+        phys::aircraft::control_ptr     phys_aircraft_;
+        cg::transform_4                 body_transform_inv_;
         bool                            on_ground_;
         //fms::air_config_t             cfg_;
         double                          prediction_;

@@ -359,7 +359,7 @@ namespace bi
             case osgGA::GUIEventAdapter::FRAME:
                 {
                     double dt = _hr_timer.get_delta();
-                    phys::sys()->simulate( /*0.02*/dt );
+                    phys::sys()->update( /*0.02*/dt );
                     for ( NodeMap::iterator itr=_physicsNodes.begin();
                         itr!=_physicsNodes.end(); ++itr )
                     {

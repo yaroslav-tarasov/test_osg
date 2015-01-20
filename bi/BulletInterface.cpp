@@ -7,7 +7,7 @@
 #include "../find_node_visitor.h"
 #include "../high_res_timer.h"
 #include "../aircraft_phys.h"
-
+#include "../osg_helpers.h"
 
 
 using namespace phys;
@@ -42,30 +42,6 @@ namespace phys
 	{
 		return boost::make_shared<BulletInterface>();
 	}
-}
-
-inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg::Node* rel = NULL)
-{
-	osg::Matrix tr;
-	osg::Node* n = node;
-	while(/*n->position().is_local() &&*/ n != rel && 0 != n->getNumParents() && n != root)
-	{
-		tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
-		n = n->getParent(0);
-	}
-
-	if (n == rel || rel == NULL)
-		return tr;
-
-	osg::Matrix tr_rel;
-	n = rel;
-	while(/*n->position().is_local()*/0 != n->getNumParents() && n != root)
-	{                  
-		tr_rel = n->asTransform()->asMatrixTransform()->getMatrix() * tr_rel;
-		n = n->getParent(0);
-	}
-
-	return (osg::Matrix::inverse(tr_rel)) * tr;
 }
 
 namespace 
@@ -271,7 +247,7 @@ void BulletInterface::createSphere( int id, double radius, double mass )
 
 static inline void add_wheel(btRaycastVehicle* v, osg::Vec3 connection_point, const double radius, btRaycastVehicle::btVehicleTuning tuning_, const bool is_front)
 {
-	btWheelInfo& wi = v->addWheel(phys::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,!is_front);
+	btWheelInfo& wi = v->addWheel(phys::osg_helpers::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,!is_front);
 	wi.m_suspensionStiffness = 20.f;
 	wi.m_wheelsDampingRelaxation = 2.3;
 	wi.m_wheelsDampingCompression = 4.4;
@@ -426,7 +402,7 @@ osg::Matrix BulletInterface::getMatrix( int id )
     return osg::Matrix();
 }
 
-void BulletInterface::simulate( double step )
+void BulletInterface::update( double step )
 {
 	for (auto it = rigid_bodies_.begin(); it != rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
@@ -546,7 +522,9 @@ void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
 	rigid_bodies_.erase(rb);
+}
 
-
-
+phys::aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t &,const decart_position &)
+{
+      return nullptr;
 }

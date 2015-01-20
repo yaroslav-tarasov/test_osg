@@ -5,12 +5,6 @@
 namespace phys
 {
 
-	struct rigid_body
-	{
-		virtual ~rigid_body() {}
-	};
-
-
     struct rigid_body_impl : rigid_body
     {
         virtual bt_rigid_body_ptr get_body() const = 0;

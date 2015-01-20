@@ -5,14 +5,17 @@
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
 #include "bullet_helpers.h"
+ #include "../phys_sys_fwd.h"
+#include "phys_sys.h"
 #include "phys_sys_common.h"
-#include "../phys_sys_fwd.h"
+
 
 namespace phys
 {
 
 class BulletInterface 
 	: public phys::system_impl
+    , public phys::system
 	// , public osg::Referenced
     , public boost::enable_shared_from_this<BulletInterface>
 {
@@ -48,12 +51,14 @@ public:
     void createShape  ( osg::Node* node, int id, double mass);
 	void createUFO    ( osg::Node* node, int id, double mass);
 	aircraft::info_ptr createUFO2    ( osg::Node* node, int id, double mass);
+    aircraft::info_ptr create_aircraft(const phys::aircraft::params_t &,const decart_position &);
 
     void setVelocity  ( int id, const osg::Vec3& pos );
     void setMatrix    ( int id, const osg::Matrix& matrix );
     osg::Matrix getMatrix( int id );
     
-    void simulate( double step );
+    void update( double step );     // former simulate
+
     void setDebugDrawer(btIDebugDraw* dd)
     {
         _dd=dd;    

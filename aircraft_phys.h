@@ -2,78 +2,15 @@
 
 #include "bi/rigid_body_info.h"
 #include "cpp_utils/polymorph_ptr.h"
+#include "phys_sys.h"
 #include "bi/phys_sys_common.h"
 #include "aircraft.h"
+
 
 namespace phys
 {
 	namespace aircraft
 	{
-
-    struct params_t
-    {
-        params_t()
-            : min_aerodynamic_speed(50)
-            , roll_sliding(0.1)
-            , roll_omega_y(1.)
-            , roll_omega_z(1.)
-
-            , course_sliding(0.1)
-            , course_omega_z(1.)
-            , course_omega_y(1.)
-
-            , pitch_drag(1.)
-            , pitch_attack(0.1)
-            , pitch_omega_x(1.)
-            , pitch_attack_derivative(1.)
-            , elevator(200)
-            , rudder(200)
-            , ailerons(200)
-            , aa0(-1.)
-            , S(0.0),chord(0.0),length(0.0),mass(0.0),wingspan(0.0)
-            , Cl(0.0)
-            , Cd0(0.0)
-            , Cd2(0.0)
-            , ClAOA(0.0)
-            , Cs(0.0)
-            , thrust(0.0)
-
-        {}
-
-        double S;
-        double chord;
-        double length;
-        double mass;
-        double wingspan;
-
-        double min_aerodynamic_speed;
-
-        double Cl;
-        double Cd0;
-        double Cd2;
-        double ClAOA;
-        double Cs;
-        double aa0;
-
-        double thrust;
-        double elevator;
-        double rudder;
-        double ailerons;
-
-        double roll_sliding;
-        double roll_omega_y;
-        double roll_omega_z;
-
-        double course_sliding;
-        double course_omega_z;
-        double course_omega_y;
-
-        double pitch_drag;
-        double pitch_attack;
-        double pitch_omega_x;
-        double pitch_attack_derivative;
-    };   
-
 
    
    ATTRIBUTE_ALIGNED16 (class impl) 
@@ -92,10 +29,35 @@ namespace phys
    private:
        void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
        void debugDraw(btIDebugDraw* debugDrawer) override;
+   
+   //info
    private:
-	   void set_steer   (double steer) override;
-	   void set_brake   (double brake) override;
-       double get_steer () override;
+       decart_position get_position() const;
+       decart_position get_wheel_position( size_t i ) const ;
+       double Ixx() const ;
+       double Iyy() const ;
+       double Izz() const ;
+       params_t const& params() const ;
+       //double drag() const;
+       //double lift() const;
+       double thrust() const ;
+       //bool has_contact() const;
+       //std::vector<contact_info_t> get_body_contacts() const;
+       //bool has_wheel_contact(size_t id) const;
+       //double wheel_skid_info(size_t id) const;
+
+   private:
+	   void   set_steer   (double steer)  override;
+	   void   set_brake   (double brake)  override;
+       double get_steer   ()              override;
+       void   set_thrust  (double thrust) override;
+       void   set_elevator(double elevator)     override;
+       void   set_ailerons(double ailerons)     override;
+       void   set_rudder  (double rudder)       override;
+       void   set_wind    (point_3 const& wind) override;
+       void   apply_force (point_3 const& f)    override;
+
+       void   reset_suspension() override;
 
    // rigid_body_impl
    private:

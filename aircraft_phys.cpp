@@ -105,7 +105,7 @@ namespace phys
         // Source
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);
 
-		btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,is_front);
+		btWheelInfo& info = raycast_veh_->addWheel(osg_helpers::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,is_front);
 		info.m_suspensionStiffness = 20.f;
 		info.m_wheelsDampingRelaxation = 2.3f;
 		info.m_wheelsDampingCompression = 4.4f;
@@ -144,6 +144,38 @@ namespace phys
 		}
 	}
 
+    void impl::set_thrust  (double thrust)
+    {
+        thrust_ = thrust;
+        if (!cg::eq_zero(thrust))
+            chassis_->activate();
+    }
+
+    void impl::apply_force (point_3 const& f)
+    {
+        chassis_->applyCentralForce(osg_helpers::to_bullet_vector3(f));
+    }
+
+    void impl::set_elevator(double elevator)
+    {
+        elevator_ = elevator;
+    }
+
+    void impl::set_ailerons(double ailerons)
+    {
+        ailerons_ = ailerons;
+    }
+
+    void impl::set_rudder  (double rudder)
+    {
+        rudder_ = rudder;
+    }
+
+    void impl::set_wind    (point_3 const& wind)
+    {
+        wind_ = wind;
+    }
+
 	bt_rigid_body_ptr impl::get_body() const
 	{
 		return chassis_.get();
@@ -171,6 +203,55 @@ namespace phys
 		//	body_contacts_[id].count++;
 		//}
 	}
+
+    void impl::reset_suspension()
+    {
+        for (int i=0;i<raycast_veh_->getNumWheels();i++)
+        {
+            raycast_veh_->resetSuspension();
+            raycast_veh_->updateWheelTransform(i,false);
+        }
+    }
+
+    decart_position impl::get_position() const
+    {
+        return from_bullet_position(&*chassis_.get());
+    }
+
+    decart_position impl::get_wheel_position( size_t id ) const
+    {
+        auto tr  = raycast_veh_->getWheelInfo(wheels_ids_[id]).m_worldTransform;
+        decart_position pos;
+        pos.pos = from_bullet_vector3(tr.getOrigin());
+        pos.orien = from_bullet_quaternion(tr.getRotation());
+
+        return pos;
+    }
+
+    double impl::Ixx() const
+    {
+        return 1. / chassis_->getInvInertiaDiagLocal().x();
+    }
+
+    double impl::Iyy() const
+    {
+        return 1. / chassis_->getInvInertiaDiagLocal().y();
+    }
+
+    double impl::Izz() const
+    {
+        return 1. / chassis_->getInvInertiaDiagLocal().z();
+    }
+
+    params_t const& impl::params() const
+    {
+        return params_;
+    }
+
+    double impl::thrust() const
+    {
+        return thrust_;
+    }
 }
 
 }

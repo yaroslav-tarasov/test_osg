@@ -2,14 +2,20 @@
 
 #include "ada.h"
 #include "phys_sys_fwd.h"
+#include "aircraft.h"
 #include "phys_aircraft.h"
+//#include "aircraft_phys.h"
+#include "phys_sys.h"
+
 
 using namespace cg;
+using namespace std::placeholders;
+
 
 namespace aircraft
 {
 #if 0
-    bool fill_sensor(nodes_management::manager_ptr nodes_manager, phys_sys::compound_sensor_t & s)
+    bool fill_sensor(nodes_management::manager_ptr nodes_manager, phys::compound_sensor_t & s)
     {
         nm::node_info_ptr body_node = nodes_manager->find_node("body");
         nm::node_info_ptr wing_r_node = nodes_manager->find_node("wing_r");
@@ -20,7 +26,7 @@ namespace aircraft
         if (!body_node->get_collision())
             return false;
 
-        phys_sys::sensor_ptr body_s = phys_sys::get_sensor(*body_node->get_collision());
+        phys::sensor_ptr body_s = phys::get_sensor(*body_node->get_collision());
         if (body_s->chunks_count() == 0)
             return false;
 
@@ -28,12 +34,12 @@ namespace aircraft
 
         if (wing_l_node->get_collision())
         {
-            phys_sys::sensor_ptr wing_s = phys_sys::get_sensor(*wing_l_node->get_collision());
+            phys::sensor_ptr wing_s = phys::get_sensor(*wing_l_node->get_collision());
             s.add(get_relative_transform(nodes_manager, wing_l_node, body_node), wing_s);
         }
         if (wing_r_node->get_collision())
         {
-            phys_sys::sensor_ptr wing_s = phys_sys::get_sensor(*wing_r_node->get_collision());
+            phys::sensor_ptr wing_s = phys::get_sensor(*wing_r_node->get_collision());
             s.add(get_relative_transform(nodes_manager, wing_r_node, body_node), wing_s);
         }
 
@@ -42,7 +48,7 @@ namespace aircraft
             if (boost::starts_with(n->name(), "engine"))
             {
 
-                phys_sys::sensor_ptr engine_s = phys_sys::get_sensor(*n->get_collision());
+                phys::sensor_ptr engine_s = phys::get_sensor(*n->get_collision());
                 s.add(nm::get_relative_transform(nodes_manager, n, body_node), engine_s);
             }
             return true;
@@ -53,7 +59,7 @@ namespace aircraft
 #endif
 
     phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
-                                    phys_sys::system_ptr phys_sys, 
+                                    phys::system_ptr phys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
                                     //nodes_management::manager_ptr nodes_manager, 
                                     geo_position const& initial_position, 
@@ -61,17 +67,17 @@ namespace aircraft
                                     //shassis_support_ptr shassis,
                                     size_t zone)
     {
-        //phys_sys::compound_sensor_t s;
+        //phys::compound_sensor_t s;
         //if (!fill_sensor(nodes_manager, s))
         //    return phys_aircraft_ptr();
 
-        return boost::make_shared<phys_aircraft_impl>(base, phys_sys, /*meteo_cursor, nodes_manager,*/ initial_position, fsettings, /*shassis, s,*/ zone);
+        return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor, nodes_manager,*/ initial_position, fsettings, /*shassis, s,*/ zone);
     }
 
-    phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys_sys::system_ptr phys_sys, /*meteo::meteo_cursor_ptr meteo_cursor, nodes_management::manager_ptr nodes_manager,*/ geo_position const& initial_position, ada::data_t const& fsettings, /*shassis_support_ptr shassis, phys_sys::compound_sensor_t const& s,*/ size_t zone)
+    phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor, nodes_management::manager_ptr nodes_manager,*/ geo_position const& initial_position, ada::data_t const& fsettings, /*shassis_support_ptr shassis, phys::compound_sensor_t const& s,*/ size_t zone)
         : base_(base)
         , zone_(zone)
-        , phys_sys_(phys_sys)
+        , phys_sys_(phys)
         //, nodes_manager_(nodes_manager)
         , desired_position_(initial_position.pos)
         , desired_orien_(initial_position.orien)
@@ -81,7 +87,7 @@ namespace aircraft
         , has_malfunction_(false)
         , prediction_(30.)
     {
-        create_phys_aircraft(initial_position, fsettings, s);
+        create_phys_aircraft(initial_position, fsettings/*, s*/);
     }
 
     phys_aircraft_impl::~phys_aircraft_impl()
@@ -134,7 +140,7 @@ namespace aircraft
     //    return geo_position(phys_aircraft_->get_wheel_position(i), base_);
     //}
 
-    phys_sys::rigid_body_ptr phys_aircraft_impl::get_rigid_body() const
+    phys::rigid_body_ptr phys_aircraft_impl::get_rigid_body() const
     {
         return phys_aircraft_;
     }
@@ -144,9 +150,9 @@ namespace aircraft
         phys_aircraft_->set_steer(steer);
     }
 
-    //std::vector<phys_sys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
+    //std::vector<phys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
     //{
-    //    std::vector<phys_sys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
+    //    std::vector<phys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
     //    for (auto it = contacts.begin(); it != contacts.end(); ++it)
     //        it->offset = it->offset * body_transform_inv_;
 
@@ -179,15 +185,16 @@ namespace aircraft
     //    has_malfunction_ = malfunction;
     //}
 
-    void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings/*, phys_sys::compound_sensor_t const& s*/)
+    void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings/*, phys::compound_sensor_t const& s*/)
     {
         const double phys_mass_factor_ = 1000;
 
+#if 0   // TODO or not TODO
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
         body_transform_inv_ = get_relative_transform(nodes_manager_, body_node).inverted();
 
-        phys_sys::collision_ptr collision = phys_sys_;
+        phys::collision_ptr collision = phys_sys_;
 
         double height = initial_position.pos.height;
         if (cg::eq_zero(initial_position.pos.height))
@@ -197,13 +204,16 @@ namespace aircraft
             if (isection)
                 height += 10 - 20. * *isection;
         }
+#else
+        double height = 0.0;
+#endif
 
         transform_4 veh_transform = cg::transform_4(as_translation(base_(geo_point_3(initial_position.pos, height))), 
                                                     rotation_3(initial_position.orien.cpr())) * body_transform_inv_.inverted();
 
         decart_position p(veh_transform.translation(), initial_position.dpos, quaternion(veh_transform.rotation().cpr()), point_3());
 
-        phys_sys::aircraft::params_t params;
+        phys::aircraft::params_t params;
         double const mass = fsettings.max_mass / phys_mass_factor_;
         double const S = fsettings.S / phys_mass_factor_;
         double const min_speed = fsettings.v_stall_ld* fsettings.c_v_min;
@@ -225,11 +235,12 @@ namespace aircraft
         params.Cs = 0.2;
         params.thrust = (fsettings.ct_1 * (100. / fsettings.ct_2 + fsettings.ct_3 * 100. * 100.));
 
-        phys_aircraft_ = phys_sys_->create_aircraft(params, &s, p);
+        phys_aircraft_ = phys_sys_->create_aircraft(params, /*&s,*/ p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
 
         double const wheel_mass = mass / 10;
 
+#if 0  // TODO or not TODO
         shassis_->visit_chassis([this, wheel_mass, &body_node](shassis_group_t const& group, shassis_t & shassis)
         {
             auto node = shassis.wheel_node;
@@ -256,6 +267,7 @@ namespace aircraft
                 shassis.phys_wheels.push_back(wid);
             }
         });
+#endif
 
         phys_aircraft_->reset_suspension();
     }
@@ -271,11 +283,13 @@ namespace aircraft
         geo_position root_glb_pos(root_pos, base_);
 
         point_3 wind;
+#if 0
         if (meteo_cursor_)
         {
             meteo_cursor_->move_to(cur_glb_pos.pos, 0);
             wind = meteo_cursor_->wind();
         }
+#endif
 
         //LogTrace("phys height " << cur_pos.pos.z);
 
@@ -310,7 +324,7 @@ namespace aircraft
 
         point_3 vk = cur_pos.dpos - wind;
 
-        point_3 Y = !cg::   eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
+        point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
         point_3 Z = cg::normalized_safe(right_dir ^ Y);
         point_3 X = cg::normalized_safe(Y ^ Z);
         cg::rotation_3 vel_rotation(X, Y, Z);
@@ -409,7 +423,9 @@ namespace aircraft
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
 
+#if 0
             if (cfg_ == fms::CFG_GD)
+#endif
                 desired_vel.z = 0;
 
             point_3 desired_accel((desired_vel - cur_pos.dpos) / 0.3, 
@@ -421,8 +437,9 @@ namespace aircraft
 
             bool reverse = false;
             bool low_attack = false;
-
+#if 0
             if (cfg_ == fms::CFG_GD/* && root_glb_pos.pos.height < 0.5*/)
+#endif
             {
                 reverse = true;
                 if (on_ground_)
@@ -491,7 +508,7 @@ namespace aircraft
         //        send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
     }
 
-    void phys_aircraft_impl::calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, point_3 const& desired_accel, point_3 const& /*wind*/, bool reverse, bool low_attack)
+    void phys_aircraft_impl::calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, cg::point_3 const& desired_accel, cg::point_3 const& /*wind*/, bool reverse, bool low_attack)
     {
         double x[4]; //(b, t, a, c)
         x[0] = slide_angle;
@@ -499,15 +516,15 @@ namespace aircraft
         x[2] = attack_angle;
         x[3] = 0;
 
-        struct func_t
+        struct func1_t
         {
-            func_t( phys_sys::aircraft::params_t const& params, double q, point_3 const& accel )
+            func1_t( phys::aircraft::params_t const& params, double q, point_3 const& accel )
                 : params_(params)
                 , q_(q)
                 , accel_(accel)
             {}
 
-            point_3 calculate( double x[4] )
+            cg::point_3 calculate( double x[4] )
             {
                 double cos_a = cos(cg::grad2rad(x[2])), sin_a = sin(cg::grad2rad(x[2])), cos_b = cos(cg::grad2rad(x[0])), sin_b = sin(cg::grad2rad(x[0]));
                 //            double cos_c = cos(cg::grad2rad(x[3])), sin_c = sin(cg::grad2rad(x[3]));
@@ -526,9 +543,9 @@ namespace aircraft
             }
 
         private:
-            phys_sys::aircraft::params_t params_;
+            phys::aircraft::params_t params_;
             double q_;
-            point_3 accel_;
+            cg::point_3 accel_;
         };
 
         struct func2_t
@@ -558,8 +575,9 @@ namespace aircraft
         if (!reverse)
             free_forces += g_vel;
 
-        boost::function<point_3(double[4])> f = boost::bind(&func_t::calculate, func_t(phys_aircraft_->params(), q, free_forces), _1);
-        boost::function<double(point_3, double[4])> f2 = boost::bind(&func2_t::calculate, func2_t(kx, ky, kz), _1, _2);
+        func1_t fn(phys_aircraft_->params(), q, free_forces);
+        std::function<cg::point_3(double[4])> f = std::bind(&func1_t::calculate, &fn , _1);
+        std::function<double(point_3, double[4])> f2 = std::bind(&func2_t::calculate, func2_t(kx, ky, kz), _1, _2);
 
         //    double lift = phys_aircraft_->params().Cl * phys_aircraft_->params().S * q;
         double liftAOA = phys_aircraft_->params().ClAOA * phys_aircraft_->params().S * q;

@@ -168,6 +168,12 @@
     <ClInclude Include="geo_points.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="osg_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="phys_sys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

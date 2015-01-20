@@ -1,9 +1,7 @@
 #pragma once
 
 //#include "aircraft_msg.h"
-//#include "phys_sys/aircraft.h"
-
-namespace phys_sys = phys;
+//#include "phys/aircraft.h"
 
 namespace aircraft
 {
@@ -16,9 +14,9 @@ namespace aircraft
         //virtual void set_air_cfg(fms::air_config_t cfg) = 0;
         //virtual void set_prediction(double prediction) = 0;
         //virtual geo_position get_wheel_position( size_t i ) const = 0;
-        virtual phys_sys::rigid_body_ptr get_rigid_body() const = 0;
+        virtual phys::rigid_body_ptr get_rigid_body() const = 0;
         virtual void set_steer   (double steer) = 0;
-        //virtual std::vector<phys_sys::aircraft::contact_info_t> get_body_contacts() const = 0;
+        //virtual std::vector<phys::aircraft::contact_info_t> get_body_contacts() const = 0;
         //virtual bool has_wheel_contact(size_t id) const = 0;
         //virtual double wheel_skid_info(size_t id) const = 0;
         //virtual void remove_wheel(size_t id) = 0;
