@@ -19,6 +19,14 @@ namespace phys
 		, raycast_veh_(sys->dynamics_world())
         , chassis_shape_(s)
 		, params_(params)
+        , elevator_(0)
+        , ailerons_(0)
+        , rudder_(0)
+        , thrust_(0)
+        , steer_(0)
+        , prev_attack_angle_(0)
+        , has_chassis_contact_(false)
+        // TODO or not TODO , body_contact_points_(1.5)
     {
 		tuning_.m_maxSuspensionTravelCm = 500;
 
@@ -60,8 +68,104 @@ namespace phys
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
 	{
-
+        if (control_manager_)
+            control_manager_(deltaTimeStep);
+        update_aerodynamics(deltaTimeStep);
 	}
+
+    void impl::update_aerodynamics(double dt)
+    {
+        using namespace cg;
+
+        if (!chassis_->isActive())
+            return;
+
+        // special aircraft forces
+        cg::point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
+        double speed = cg::norm(vel - wind_);
+        cg::quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
+        cg::point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
+        cg::point_3 omega_loc = (!orien).rotate_vector(omega);
+        dcpr cur_dcpr = cg::rot_axis2dcpr(orien.cpr(), rot_axis(omega));
+
+        double const air_density = 1.225;
+        //            double const g = 9.8;
+        double const q = 0.5 * air_density * speed * speed; // dynamic pressure
+
+        cg::point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(cg::point_3(0, 1, 0))) ;
+        cg::point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(cg::point_3(1, 0, 0))) ;
+        cg::point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(cg::point_3(0, 0, 1))) ;
+
+        cg::point_3 vk = vel - wind_;
+        cg::point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
+
+        cg::point_3 Z = cg::normalized_safe(right_dir ^ Y);
+        cg::point_3 X = cg::normalized_safe(Y ^ Z);
+
+        cg::point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
+        double attack_angle = cg::rad2grad(cg::angle(Y_right_dir_proj, forward_dir)) * (-cg::sign(Y * up_dir));
+        double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
+
+
+        // drag - lift - slide
+        double drag = 0;
+        double lift = 0;
+        double liftAOA = 0;
+        double slide = 0;
+        if (speed > params_.min_aerodynamic_speed)
+        {
+            double Cd = params_.Cd0 + params_.Cd2 * cg::sqr(params_.Cl);
+
+            drag = Cd * params_.S * q;
+            lift = params_.Cl * params_.S * q;
+            liftAOA = params_.ClAOA * (attack_angle + params_.aa0) * params_.S * q;
+            slide = params_.Cs * slide_angle * params_.S * q;
+        }   
+
+        double M_roll = 0;
+        double M_course = 0;
+        double M_pitch = 0;
+
+        if (speed > params_.min_aerodynamic_speed)
+        {
+            M_roll += -params_.roll_sliding * slide_angle * q * params_.wingspan * params_.S;
+            M_roll += -params_.roll_omega_y * omega_loc.y * q * params_.wingspan * params_.S;
+            M_roll += params_.roll_omega_z * omega_loc.z * q * params_.wingspan * params_.S;
+
+            M_roll += params_.ailerons * ailerons_ * q * params_.wingspan * params_.S;
+
+            M_course += params_.course_sliding * slide_angle * q * params_.wingspan * params_.S;
+            M_course += -params_.course_omega_z * omega_loc.z * q * params_.wingspan * params_.S;
+            M_course += params_.course_omega_y * omega_loc.y * q * params_.wingspan * params_.S;
+            M_course += params_.rudder * rudder_ * q * params_.wingspan * params_.S;
+
+            M_pitch +=  params_.pitch_drag * q * params_.chord * params_.S;
+            M_pitch +=  params_.pitch_attack * attack_angle * q * params_.chord * params_.S;
+            M_pitch += -params_.pitch_omega_x * omega_loc.x * q * params_.chord * params_.S;
+            M_pitch += -params_.pitch_attack_derivative * (attack_angle - prev_attack_angle_) / dt * q * params_.chord * params_.S;
+
+            M_pitch += params_.elevator * elevator_ * q * params_.chord * params_.S;
+        }
+
+
+        //            double zmoment = -Izz() * cg::rad2grad() * params_.Cl * params_.S * 0.5 * air_density * speed * sin(cg::grad2rad(orien.get_roll())) / params_.mass;
+
+        cg::point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
+        //chassis_->applyTorque(to_bullet_vector3(torq*cg::grad2rad()));
+        chassis_->applyTorqueImpulse(to_bullet_vector3(torq*(cg::grad2rad()*dt)));
+
+
+        cg::point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
+
+        //LogTrace("lift " << lift << " liftAOA " << liftAOA << " drag " << drag << " thrust_ " << thrust_ );
+
+        //chassis_->applyCentralForce(to_bullet_vector3(force));
+        chassis_->applyCentralImpulse(to_bullet_vector3(force * dt));
+
+
+
+        prev_attack_angle_ = attack_angle;
+    }
 
 	void impl::debugDraw(btIDebugDraw* debugDrawer)
 	{
@@ -115,6 +219,17 @@ namespace phys
 		wheels_ids_.push_back(raycast_veh_->getNumWheels()-1);
 		return wheels_ids_.size()-1;
 	}
+    
+    void impl::remove_wheel(size_t id)
+    {
+        //size_t num = wheels_ids_[id];
+        //size_t end_num = raycast_veh_->m_wheelInfo.size()-1;
+        //auto it = std::find(wheels_ids_.begin(), wheels_ids_.end(), end_num);
+        //std::swap(wheels_ids_[id], *it);
+        //raycast_veh_->m_wheelInfo.swap(num, end_num);
+        //raycast_veh_->m_wheelInfo.pop_back();
+        //wheels_ids_.erase(id);
+    }
 
 	void impl::set_steer   (double steer)
 	{
@@ -171,7 +286,7 @@ namespace phys
         rudder_ = rudder;
     }
 
-    void impl::set_wind    (point_3 const& wind)
+    void impl::set_wind    (cg::point_3 const& wind)
     {
         wind_ = wind;
     }
@@ -252,6 +367,42 @@ namespace phys
     {
         return thrust_;
     }
+
+    double impl::drag() const
+    {
+        cg::point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
+        double speed = cg::norm(vel);
+
+        double const air_density = 1.225;
+        double const q = 0.5 * air_density * speed * speed; // dynamic pressure
+
+        double Cd = params_.Cd0 + params_.Cd2 * cg::sqr(params_.Cl);
+
+        double drag = 0;
+        if (speed > 5)
+            drag = Cd * params_.S * q;
+
+        return drag;
+    }
+
+    double impl::lift() const
+    {
+        cg::point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
+        double speed = cg::norm(vel);
+
+        double const air_density = 1.225;
+        double const q = 0.5 * air_density * speed * speed; // dynamic pressure
+
+        double lift = 0;
+        if (speed > 5)
+        {
+            lift = params_.Cl * params_.S * q;
+        }   
+
+        return lift;
+    }
+
+
 }
 
 }

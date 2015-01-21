@@ -9,6 +9,8 @@
 #include "../aircraft_phys.h"
 #include "../osg_helpers.h"
 
+#include "ada.h"
+#include "bada_import.h"
 
 using namespace phys;
 
@@ -141,7 +143,7 @@ BulletInterface* BulletInterface::instance()
 #endif
 
 BulletInterface::BulletInterface()
-    : _scene(nullptr)
+    : _dw(nullptr)
     , _on_collision(nullptr)
     , _dd (nullptr)
 {
@@ -156,20 +158,20 @@ BulletInterface::BulletInterface()
 
 BulletInterface::~BulletInterface()
 {
-    if ( _scene )
+    if ( _dw )
     {
-        for ( int i=_scene->getNumCollisionObjects()-1; i>=0; --i )
+        for ( int i=_dw->getNumCollisionObjects()-1; i>=0; --i )
         {
-            btCollisionObject* obj = _scene->getCollisionObjectArray()[i];
+            btCollisionObject* obj = _dw->getCollisionObjectArray()[i];
             btRigidBody* body = btRigidBody::upcast(obj);
             if ( body && body->getMotionState() )
                 delete body->getMotionState();
             
-            _scene->removeCollisionObject( obj );
+            _dw->removeCollisionObject( obj );
             delete obj;
         }
-        // delete _scene;
-		_scene.reset();
+        // delete _dw;
+		_dw.reset();
     }
     
     delete _solver;
@@ -181,10 +183,10 @@ BulletInterface::~BulletInterface()
 
 void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gravity, on_collision_f on_collision )
 {
-    _scene = boost::make_shared<btDiscreteDynamicsWorld>(_dispatcher,_overlappingPairCache, _solver, _configuration);
-    _scene->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
+    _dw = boost::make_shared<btDiscreteDynamicsWorld>(_dispatcher,_overlappingPairCache, _solver, _configuration);
+    _dw->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
     
-    //static osgbDynamics::PhysicsThread pt( _scene, &tBuf );
+    //static osgbDynamics::PhysicsThread pt( _dw, &tBuf );
 
     osg::Vec3 norm = plane.getNormal();
     btCollisionShape* groundShape = new btStaticPlaneShape( btVector3(norm[0], norm[1], norm[2]), plane[3] );
@@ -194,16 +196,16 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     btDefaultMotionState* motionState = new btDefaultMotionState(groundTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( 0.0, motionState, groundShape, btVector3(0.0, 0.0, 0.0) );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    _scene->addRigidBody( body );
+    _dw->addRigidBody( body );
     body->setFriction(1.3f); 
     body->setActivationState(DISABLE_SIMULATION);
     body->setRestitution(0.5f);
 
     _on_collision = on_collision;
 	
-	//_scene->setInternalTickCallback(internal_tick_callback);
+	//_dw->setInternalTickCallback(internal_tick_callback);
 
-	vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*_scene));
+	vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*_dw));
 
 }
 
@@ -220,7 +222,7 @@ void BulletInterface::createBox( int id, const osg::Vec3& dim, double mass )
     btDefaultMotionState* motionState = new btDefaultMotionState(boxTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, boxShape, localInertia );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    _scene->addRigidBody( body); 
+    _dw->addRigidBody( body); 
     _actors[id]._body = body;
     _actors[id]._type  = BOX;
 }
@@ -238,7 +240,7 @@ void BulletInterface::createSphere( int id, double radius, double mass )
     btDefaultMotionState* motionState = new btDefaultMotionState(sphereTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, sphereShape, localInertia );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    _scene->addRigidBody( body );
+    _dw->addRigidBody( body );
     body->setFriction(10.3f);
     body->setRestitution(0.1f);
     _actors[id]._body  = body;
@@ -292,7 +294,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	btRaycastVehicle::btVehicleTuning    tuning_;
 	tuning_.m_maxSuspensionTravelCm = 500;
     //chassis->applyTorque(btVector3(100,100,100));
-	btRaycastVehicle* v = new btRaycastVehicle(tuning_,chassis,new btDefaultVehicleRaycaster(_scene.get()));
+	btRaycastVehicle* v = new btRaycastVehicle(tuning_,chassis,new btDefaultVehicleRaycaster(_dw.get()));
 	v->setCoordinateSystem(0,2,1);
 
 
@@ -308,8 +310,8 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	//v->applyEngineForce(500,1);
 	//v->applyEngineForce(500,2);
 
-	_scene->addRigidBody( chassis );
-	_scene->addVehicle(v);
+	_dw->addRigidBody( chassis );
+	_dw->addVehicle(v);
 
 	chassis->applyCentralForce(btVector3(0,50000,0));
 
@@ -318,12 +320,42 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	_actors[id]._body  = chassis;
 }
 
+aircraft::params_t fill_params( ada::data_t const & fsettings)
+{
+    const double phys_mass_factor_ = 1000; 
+
+    phys::aircraft::params_t params;
+    double const mass = fsettings.max_mass / phys_mass_factor_;
+    double const S = fsettings.S / phys_mass_factor_;
+    double const min_speed = fsettings.v_stall_ld* fsettings.c_v_min;
+    double const cd_0 = 2*(fsettings.cd_0_landing + fsettings.cd_0_landing_gear);
+    double const cd_2 = fsettings.cd_2_landing;
+    double const air_density = 1.225;
+    double const g = 9.8;
+    double const Cl = fsettings.max_mass * g / (air_density * fsettings.S * min_speed * min_speed);
+
+    params.mass = fsettings.max_mass / phys_mass_factor_;
+    params.S = S;
+    params.wingspan = fsettings.span;
+    params.chord = fsettings.S / params.wingspan;
+    params.length = fsettings.length; 
+    params.Cl = Cl;
+    params.Cd0 = cd_0;
+    params.Cd2 = cd_2;
+    params.ClAOA = 0.4;
+    params.Cs = 0.2;
+    params.thrust = (fsettings.ct_1 * (100. / fsettings.ct_2 + fsettings.ct_3 * 100. * 100.));
+
+    return params;
+}
+
+
 aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double mass)
 {
 	wheels_info_t wi;
-	aircraft::params_t p;
-    memset(&p,0,sizeof(aircraft::params_t));
-	p.mass     = mass;
+
+	aircraft::params_t p = fill_params( ada::fill_data("BADA","A319"));
+
     double      shift;
     phys::compound_shape_proxy s(fill_cs(node,wi,p,shift));
 	aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,decart_position());
@@ -337,8 +369,8 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 		ctrl->add_wheel(0,0,radius,connection_point,phys::cpr(),false,(*it).front);
 	}
 
-    _actors[id]._body->applyCentralForce(btVector3(0,500000,0));
-    ctrl->set_steer(5);
+    // _actors[id]._body->applyCentralForce(btVector3(0,/*500000*/100000,0));
+    // ctrl->set_steer(5);
 
 	return ctrl;
 }
@@ -366,7 +398,7 @@ void BulletInterface::createShape(osg::Node* node,int id, double mass)
     btRigidBody* body = new btRigidBody(rigidInfo);
     
     // body->setAngularVelocity( btVector3( 0., .9, 0. ) );
-    _scene->addRigidBody( body );
+    _dw->addRigidBody( body );
     _actors[id]._body  = body;
     _actors[id]._type  = SHAPE;
 }
@@ -407,7 +439,7 @@ void BulletInterface::update( double step )
 	for (auto it = rigid_bodies_.begin(); it != rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
 
-    _scene->stepSimulation( btScalar(step), 10, btScalar(0.01) );
+    _dw->stepSimulation( btScalar(step), 10, btScalar(0.01) );
     checkForCollisionEvents();
 }
 
@@ -506,7 +538,7 @@ void BulletInterface::CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1)
 
 phys::bt_dynamics_world_ptr BulletInterface::dynamics_world() const
 {
-	return _scene;
+	return _dw;
 }
 
 phys::bt_vehicle_raycaster_ptr BulletInterface::vehicle_raycaster() const

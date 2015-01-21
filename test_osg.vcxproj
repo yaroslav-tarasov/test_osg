@@ -50,7 +50,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(OSG_DIR)\3rdparty\include;C:\Work\bullet-2.82-r2704\src;ext\pugixml-1.4\src;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR);$(BULLET_DIR)\src;$(SolutionDir)\common;$(SolutionDir)\bada;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zm300 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,6 +97,7 @@
   <ItemGroup>
     <ClInclude Include="aircraft.h" />
     <ClInclude Include="aircraft_phys.h" />
+    <ClInclude Include="aircraft_shassis_impl.h" />
     <ClInclude Include="aircraft_visual.h" />
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="bada_import.h" />
@@ -117,6 +118,9 @@
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials_visitor.h" />
+    <ClInclude Include="nodes_manager.h" />
+    <ClInclude Include="nodes_managment.h" />
+    <ClInclude Include="node_impl.h" />
     <ClInclude Include="osg_helpers.h" />
     <ClInclude Include="phys_sys.h" />
     <ClInclude Include="pickhandler.h" />
@@ -133,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aircraft_phys.cpp" />
+    <ClCompile Include="aircraft_shassis_impl.cpp" />
     <ClCompile Include="aircraft_visual.cpp" />
     <ClCompile Include="animation_handler.cpp" />
     <ClCompile Include="bada_import.cpp" />
@@ -158,6 +163,9 @@
     <ClCompile Include="main_shadows.cpp" />
     <ClCompile Include="main_shadows_2.cpp" />
     <ClCompile Include="nfi\lib_loader.cpp" />
+    <ClCompile Include="nodes_management.cpp" />
+    <ClCompile Include="nodes_manager.cpp" />
+    <ClCompile Include="node_impl.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp" />
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
     <ClCompile Include="Object.cpp" />

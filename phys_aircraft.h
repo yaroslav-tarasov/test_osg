@@ -50,7 +50,7 @@ namespace aircraft
         //std::vector<phys::aircraft::contact_info_t> get_body_contacts() const;
         //bool has_wheel_contact(size_t id) const;
         //double wheel_skid_info(size_t id) const;
-        //void remove_wheel(size_t id);
+        void remove_wheel(size_t id);
         //size_t get_zone() const;
         //void set_malfunction(bool malfunction);
 

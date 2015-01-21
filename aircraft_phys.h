@@ -24,7 +24,8 @@ namespace phys
    
    
    public:
-	   size_t add_wheel( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) override;
+	   size_t add_wheel   ( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) override;
+       void   remove_wheel( size_t id );
 
    private:
        void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
@@ -38,8 +39,8 @@ namespace phys
        double Iyy() const ;
        double Izz() const ;
        params_t const& params() const ;
-       //double drag() const;
-       //double lift() const;
+       double drag() const;
+       double lift() const;
        double thrust() const ;
        //bool has_contact() const;
        //std::vector<contact_info_t> get_body_contacts() const;
@@ -47,17 +48,18 @@ namespace phys
        //double wheel_skid_info(size_t id) const;
 
    private:
-	   void   set_steer   (double steer)  override;
-	   void   set_brake   (double brake)  override;
-       double get_steer   ()              override;
-       void   set_thrust  (double thrust) override;
-       void   set_elevator(double elevator)     override;
-       void   set_ailerons(double ailerons)     override;
-       void   set_rudder  (double rudder)       override;
-       void   set_wind    (point_3 const& wind) override;
-       void   apply_force (point_3 const& f)    override;
+	   void   set_steer   (double steer)            override;
+	   void   set_brake   (double brake)            override;
+       double get_steer   ()                        override;
+       void   set_thrust  (double thrust)           override;
+       void   set_elevator(double elevator)         override;
+       void   set_ailerons(double ailerons)         override;
+       void   set_rudder  (double rudder)           override;
+       void   set_wind    (cg::point_3 const& wind) override;
+       void   apply_force (point_3 const& f)        override;
 
-       void   reset_suspension() override;
+       void   update_aerodynamics(double dt)    override;
+       void   reset_suspension()                override;
 
    // rigid_body_impl
    private:
@@ -83,7 +85,7 @@ namespace phys
        double   rudder_;
        double   thrust_;
 
-       point_3  wind_;
+       cg::point_3  wind_;
 
        double   prev_attack_angle_;
 

@@ -43,7 +43,7 @@ public:
 #if 0
     static BulletInterface*  instance();
 #endif    
-	btDynamicsWorld* getScene() { return _scene.get(); }
+	btDynamicsWorld* getScene() { return _dw.get(); }
     
     void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
     void createBox    ( int id, const osg::Vec3& dim, double mass );
@@ -63,7 +63,7 @@ public:
     {
         _dd=dd;    
         if(_dd)
-        _scene->setDebugDrawer(_dd);
+        _dw->setDebugDrawer(_dd);
     }
 	//
     //  phys::system_impl
@@ -83,8 +83,8 @@ private:
 
     typedef std::map<int, data>            ActorMap;
     ActorMap                              _actors;
-    // btDiscreteDynamicsWorld*              _scene;
-    bt_dynamics_world_ptr                 _scene;   
+    // btDiscreteDynamicsWorld*              _dw;
+    bt_dynamics_world_ptr                 _dw;   
     btDefaultCollisionConfiguration*      _configuration;
     btCollisionDispatcher*                _dispatcher;
     btBroadphaseInterface*                _overlappingPairCache;

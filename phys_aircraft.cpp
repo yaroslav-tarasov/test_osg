@@ -109,7 +109,7 @@ namespace aircraft
     //    tow_attached_ = attached;
     //}
 
-    void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, quaternion const& orien)
+    void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
     {
         desired_position_ = pos;
         desired_orien_ = orien;
@@ -169,10 +169,10 @@ namespace aircraft
     //    return phys_aircraft_->wheel_skid_info(id);
     //}
 
-    //void phys_aircraft_impl::remove_wheel(size_t id)
-    //{
-    //    phys_aircraft_->remove_wheel(id);
-    //}
+    void phys_aircraft_impl::remove_wheel(size_t id)
+    {
+        phys_aircraft_->remove_wheel(id);
+    }
 
 
     //size_t phys_aircraft_impl::get_zone() const

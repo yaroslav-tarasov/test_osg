@@ -9,7 +9,7 @@ namespace aircraft
     {
         virtual void update() = 0;
         //virtual void attach_tow(bool attached) = 0;
-        virtual void go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien)  = 0;
+        virtual void go_to_pos(cg::geo_point_3 const& pos, cg::quaternion const& orien)  = 0;
         //virtual geo_position get_position() const = 0;
         //virtual void set_air_cfg(fms::air_config_t cfg) = 0;
         //virtual void set_prediction(double prediction) = 0;
@@ -19,7 +19,7 @@ namespace aircraft
         //virtual std::vector<phys::aircraft::contact_info_t> get_body_contacts() const = 0;
         //virtual bool has_wheel_contact(size_t id) const = 0;
         //virtual double wheel_skid_info(size_t id) const = 0;
-        //virtual void remove_wheel(size_t id) = 0;
+        virtual void remove_wheel(size_t id) = 0;
         //virtual size_t get_zone() const = 0;
         //virtual void set_malfunction(bool malfunction) = 0;
 
@@ -29,9 +29,8 @@ namespace aircraft
 
     typedef polymorph_ptr<phys_aircraft> phys_aircraft_ptr;
 
-    //! шасси
-    /// TODO
-#if 0
+    /// TODO or not TODO
+#if 1
     struct shassis_t
     {
         shassis_t(nm::node_control_ptr node, nodes_management::node_control_ptr wheel_node, double radius)
@@ -54,6 +53,7 @@ namespace aircraft
 
         void freeze()
         {
+#if 0   // TODO or not TODO
             {
                 auto pos = wheel_node->position();
                 pos.local().dpos = point_3();
@@ -66,10 +66,11 @@ namespace aircraft
                 pos.local().omega = point_3();
                 node->set_position(pos);
             }
+#endif
         }
+
     };
 
-    //! группа шасси??
     struct shassis_group_t
     {
         shassis_group_t(nm::node_control_ptr node, bool is_front)
@@ -112,6 +113,7 @@ namespace aircraft
 
             opened = true;
         }
+
         void close(bool immediate = false)
         {
             if (immediate)
@@ -130,11 +132,13 @@ namespace aircraft
             {
                 for (size_t j = 0; j < it->phys_wheels.size(); ++j)
                 {
+#if 0
                     if (aircraft_phys->has_wheel_contact(it->phys_wheels[j]))
                     {
                         has_contact = true;
                         break;
                     }
+#endif
                 }
 
             }
@@ -162,18 +166,17 @@ namespace aircraft
         }
 
     };
+#endif
 
-    //! группа шасси - перечисление
     enum shasis_group
     {
         SG_FRONT = 0, SG_REAR_LEFT, SG_REAR_RIGHT
     };
 
-    //! поддержка шасси??? (что это?) судя по всему общий интерфейс управления шасси
     struct shassis_support
     {
-        virtual void visit_groups(boost::function<void(shassis_group_t &)> out) = 0;
-        virtual void visit_chassis(boost::function<void(shassis_group_t const&, shassis_t&)> out) = 0;
+        virtual void visit_groups   (std::function<void(shassis_group_t &)> out) = 0;
+        virtual void visit_chassis  (std::function<void(shassis_group_t const&, shassis_t&)> out) = 0;
         virtual void set_malfunction(shasis_group group, bool val) = 0;
         virtual void freeze() = 0;
 
@@ -181,6 +184,6 @@ namespace aircraft
     };
 
     typedef polymorph_ptr<shassis_support> shassis_support_ptr;
-#endif
+
 
 } // aircraft

@@ -215,3 +215,7 @@ inline T cbrt(T n)
 
 #include "geometry/primitives.h"
 #include "position.h"
+
+#include "cpp_utils/polymorph_ptr.h"
+#include "nodes_management.h"
+namespace nm = nodes_management;

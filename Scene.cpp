@@ -21,9 +21,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "ada.h"
-#include "bada_import.h"
-
 using namespace avScene;
 
 std::vector<osg::ref_ptr<osg::Node>> _lamps;
@@ -353,9 +350,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->addEventHandler(new PickHandler());
     _viewerPtr->realize();
 
-     ada::data_t b = ada::fill_data("BADA","A319");
-     std::string m = b.manufacturer;
-     OutputDebugString(m.c_str());
 
     //
     // Initialize particle engine
@@ -530,8 +524,12 @@ void Scene::createObjects()
 
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addUFO2( obj,
-		osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );
-    
+		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
+
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addUFO2( obj,
+        osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
+
 	const bool add_planes = false;
 
     if (add_planes)
@@ -544,8 +542,6 @@ void Scene::createObjects()
         if(dynamic_cast<osg::LOD*>(p_copy))
             rot_angle = 0;  
 
-
-
         for ( unsigned int i=0; i<10; ++i )
         {
             for ( unsigned int j=0; j<10; ++j )
@@ -555,8 +551,6 @@ void Scene::createObjects()
                     osg::Vec3((float)i, 0.0f, (float)j+0.5f), osg::Vec3(), 1.0f );
             }
         }
-
-
 
         const unsigned inst_num = 24;
         for (unsigned i = 0; i < inst_num; ++i)

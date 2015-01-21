@@ -123,9 +123,10 @@ namespace bi
         positioned->addChild(rotated);
         rotated->addChild(node);
 
-        addPhysicsData( id, positioned, pos, vel, mass );
-
+        addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        phys::aircraft::control_ptr(_aircrafts.back())->apply_force(vel);
     }
+
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
@@ -159,14 +160,14 @@ namespace bi
             {
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/++steer),-65., 65.);
-                phys::aircraft::control_ptr(_aircrafts[0])->set_steer(steer);  
+                phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);  
 
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Left )
             {
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/--steer),-65., 65.);
-                phys::aircraft::control_ptr(_aircrafts[0])->set_steer(steer);
+                phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);
             }
 
             break;
@@ -198,7 +199,7 @@ namespace bi
 
 
     void RigidUpdater::addPhysicsData( int id, osg::Shape* shape, const osg::Vec3& pos,
-        const osg::Vec3& vel, double mass )
+        const osg::Vec3& vel, double /*mass*/ )
     {
         osg::ref_ptr<osg::Geode> geode = new osg::Geode;
         geode->addDrawable( new osg::ShapeDrawable(shape) );
@@ -213,7 +214,7 @@ namespace bi
     }
 
     void RigidUpdater::addPhysicsData( int id, osg::Node* node, const osg::Vec3& pos,
-        const osg::Vec3& vel, double mass )
+        const osg::Vec3& vel, double /*mass*/ )
     {
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->addChild( node );

@@ -3,19 +3,38 @@
 
 namespace phys
 {
-	// typedef osg::Vec3d decart_position;
-	// typedef osg::Vec3d point_3;
-	typedef osg::Quat  cpr;
+    class cpr : public osg::Vec3
+    {
+    public:
+        inline cpr():osg::Vec3() {}
+        inline cpr(osg::Vec3::value_type x,osg::Vec3::value_type y,osg::Vec3::value_type z): osg::Vec3(x,y,z) {}
+        inline cpr(const osg::Vec2f& v2,osg::Vec3::value_type zz): osg::Vec3(v2,zz) {}
+        inline cpr(osg::Vec3 const& v3 ):osg::Vec3(v3) {}
+        inline cpr(osg::Vec3 & v3):osg::Vec3(v3) {}
+        inline cpr(cg::cpr const& c3 ) { _v[0] = c3.course;_v[1] = c3.pitch;_v[3] = c3.roll;  }
+
+    };
+
+    class quaternion : public osg::Quat
+    {
+    public:
+        inline quaternion(): osg::Quat() {}
+        inline quaternion( osg::Quat::value_type x, osg::Quat::value_type y, osg::Quat::value_type z, osg::Quat::value_type w): osg::Quat( x, y, z, w ) {}
+        inline quaternion( const osg::Vec4f& v ): osg::Quat( v ) {}
+        inline quaternion( const osg::Vec4d& v ): osg::Quat( v ) {}
+        inline quaternion( const cg::quaternion q) { _v[0] = q.get_w();_v[1] = q.get_v().x;_v[3] = q.get_v().y;_v[3] = q.get_v().z;  }
+    };
+
     class point_3 : public osg::Vec3
     {
     public:
-        point_3():osg::Vec3() {}
-        point_3(osg::Vec3::value_type x,osg::Vec3::value_type y,osg::Vec3::value_type z): osg::Vec3(x,y,z) {}
-        point_3(const osg::Vec2f& v2,osg::Vec3::value_type zz): osg::Vec3(v2,zz) {}
-        point_3(osg::Vec3 const& v3 ):osg::Vec3(v3) {}
-        point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
-        point_3(cg::point_3 const& v3 ) { _v[0] = v3.x;_v[1] = v3.y;_v[3] = v3.z;  }
-//        point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
+        inline point_3():osg::Vec3() {}
+        inline point_3(osg::Vec3::value_type x,osg::Vec3::value_type y,osg::Vec3::value_type z): osg::Vec3(x,y,z) {}
+        inline point_3(const osg::Vec2f& v2,osg::Vec3::value_type zz): osg::Vec3(v2,zz) {}
+        inline point_3(osg::Vec3 const& v3 ):osg::Vec3(v3) {}
+        inline point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
+        inline point_3(cg::point_3 const& v3 ) { _v[0] = v3.x;_v[1] = v3.y;_v[3] = v3.z;  }
+//      point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
         
     };
 
@@ -108,8 +127,8 @@ namespace phys
         virtual double Iyy() const = 0;
         virtual double Izz() const = 0;
 		virtual params_t const& params() const = 0;
-		//virtual double drag() const = 0;
-		//virtual double lift() const = 0;
+		virtual double drag() const = 0;
+		virtual double lift() const = 0;
 		virtual double thrust() const = 0;
 		//virtual bool has_contact() const = 0;
 		//virtual std::vector<contact_info_t> get_body_contacts() const = 0;
@@ -120,7 +139,7 @@ namespace phys
 	struct control : info
 	{
 		virtual size_t add_wheel( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) = 0;
-		//virtual void remove_wheel(size_t id) = 0;
+		virtual void   remove_wheel(size_t id) = 0;
 
 		//virtual void set_control_manager(std::function<void(double)> f) = 0;
 
@@ -130,10 +149,10 @@ namespace phys
 		virtual void   set_thrust  (double thrust) = 0;
 		virtual void   set_elevator(double elevator) = 0;
 		virtual void   set_ailerons(double ailerons) = 0;
-		virtual void set_rudder  (double rudder) = 0;
-		virtual void set_wind    (point_3 const& wind) = 0;
-		virtual void apply_force (point_3 const& f) = 0;
-		//virtual void update_aerodynamics(double dt) = 0;
+		virtual void   set_rudder  (double rudder) = 0;
+		virtual void   set_wind    (cg::point_3 const& wind) = 0;
+		virtual void   apply_force (point_3 const& f) = 0;
+		virtual void update_aerodynamics(double dt) = 0;
 		virtual void   reset_suspension() = 0;
 	};
 
