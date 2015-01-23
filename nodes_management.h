@@ -24,6 +24,7 @@ struct node_info
     //virtual quaternion get_global_orien() const = 0;
 
     //virtual model_structure::collision_volume const* get_collision() const = 0;
+    virtual cg::sphere_3 get_bound() = 0;
 };
 
 
@@ -42,7 +43,7 @@ struct manager
 {
     virtual ~manager(){}
 
-    //virtual node_info_ptr   get_node    (uint32_t node_id)   const  = 0;
+    virtual node_info_ptr   get_node    (uint32_t node_id)   const  = 0;
     virtual node_info_ptr   find_node   (std::string const& name) const  = 0;
     
     // set_model fully reinitialize model and reset positions of all nodes and root
@@ -56,6 +57,9 @@ struct manager
     //DECLARE_EVENT(model_changed, ());
 };
 
-inline void visit_sub_tree(std::function<bool(node_info_ptr)> f);
+void visit_sub_tree(node_info_ptr root, std::function<bool(node_info_ptr)> f);
+
+cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, node_info_ptr rel = nullptr);
+
 
 } //nm namespace

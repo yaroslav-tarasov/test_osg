@@ -100,6 +100,38 @@ namespace aircraft
 
             return true;
         });
+#else
+        nm::visit_sub_tree(group_node, [this, i](nm::node_info_ptr node)->bool
+        {
+            if (boost::starts_with(node->name(), "shassi_"))
+            {
+                nm::node_info_ptr wheel_node;
+                nm::visit_sub_tree(node, [&wheel_node](nm::node_info_ptr n)->bool
+                {
+                    if (boost::starts_with(n->name(), "wheel"))
+                    {
+                        wheel_node = n;
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (wheel_node)
+                {
+                    // if (auto collision = wheel_node->get_collision())
+                    {
+                        // cg::rectangle_3 bound = model_structure::bounding(*collision);
+                        double radius =0.75 * wheel_node->get_bound().radius; // 0.75 * (bound.size().y / 2.);
+
+                        this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node, radius));
+                    }
+                }
+
+
+            }
+
+            return true;
+        });
 #endif
 
 

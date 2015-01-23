@@ -17,10 +17,6 @@
 
 #include "pickhandler.h"
 
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-
 using namespace avScene;
 
 std::vector<osg::ref_ptr<osg::Node>> _lamps;

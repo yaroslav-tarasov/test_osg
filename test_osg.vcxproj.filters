@@ -186,6 +186,9 @@
     <ClInclude Include="nodes_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="sensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

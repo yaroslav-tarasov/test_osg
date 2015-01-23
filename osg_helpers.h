@@ -24,3 +24,4 @@ inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg:
 
     return (osg::Matrix::inverse(tr_rel)) * tr;
 }
+

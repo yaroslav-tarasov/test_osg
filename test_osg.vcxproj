@@ -172,6 +172,9 @@
     <ClCompile Include="phys_aircraft.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
+    <ClInclude Include="sensor.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClCompile Include="shaders.cpp" />
     <ClCompile Include="shadow3\Tuto12.cpp" />
     <ClCompile Include="shadow_map.cpp" />

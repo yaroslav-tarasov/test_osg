@@ -121,8 +121,6 @@
 #include <osg/CullFace>
 
 
-
-
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
 int main_select( int argc, char** argv );
@@ -166,13 +164,14 @@ int main_scene2( int argc, char** argv );
 #endif
 
 // typedef osg::Quat    quaternion;
-// typedef osg::Vec3  geo_base_3;
-// typedef osg::Vec3  geo_position;
-// typedef osg::Vec3  geo_point_3;
+// typedef osg::Vec3    geo_base_3;
+// typedef osg::Vec3    geo_position;
+// typedef osg::Vec3    geo_point_3;
 // typedef osg::Vec2    point_2;
 // typedef osg::Vec3    point_3;
 // typedef osg::Matrix  transform_4;
 
+#pragma warning(disable:4996)
 
 #include "Windows.h"
 #undef min
@@ -185,6 +184,9 @@ int main_scene2( int argc, char** argv );
 #include <boost/optional.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using boost::noncopyable;
 using boost::optional;
@@ -219,3 +221,6 @@ inline T cbrt(T n)
 #include "cpp_utils/polymorph_ptr.h"
 #include "nodes_management.h"
 namespace nm = nodes_management;
+
+#include "../phys_sys_fwd.h"
+#include "../aircraft_common.h"

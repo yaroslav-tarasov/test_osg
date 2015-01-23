@@ -38,6 +38,7 @@ namespace bi
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
 		typedef std::vector<phys::aircraft::info_ptr>  aircrafts_t;
+        typedef std::vector<aircraft::phys_aircraft_ptr>  phys_aircrafts_t;
         NodeMap                                  _physicsNodes;
         osg::observer_ptr<osg::Group>            _root;
         high_res_timer                           _hr_timer;
@@ -45,6 +46,7 @@ namespace bi
         avCollision::GLDebugDrawer*              _dbgDraw;
         bool                                     _debug;
 		aircrafts_t                              _aircrafts;
+        phys_aircrafts_t                         _phys_aircrafts;
 		boost::shared_ptr<phys::BulletInterface> _sys;
     };
 

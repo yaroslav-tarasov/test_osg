@@ -25,4 +25,10 @@ std::string const&  node_impl::name() const
      return node_->getName();
 }
 
+cg::sphere_3   node_impl::get_bound()
+{
+     const osg::BoundingSphere& bs = node_->getBound();
+     return cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
+}
+
 }

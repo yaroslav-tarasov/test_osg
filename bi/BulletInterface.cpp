@@ -8,9 +8,13 @@
 #include "../high_res_timer.h"
 #include "../aircraft_phys.h"
 #include "../osg_helpers.h"
+#include "sensor.h"
 
 #include "ada.h"
 #include "bada_import.h"
+
+#include "nodes_manager.h" // TODO FIXME убрать нафиг
+#include "node_impl.h"
 
 using namespace phys;
 
@@ -63,7 +67,7 @@ namespace
 
 	typedef std::vector<wheel_info> wheels_info_t;
 
-	btCompoundShape* fill_cs(osg::Node* node, wheels_info_t& wi,aircraft::params_t& p, double& shift )
+	void fill_cs(osg::Node* node, wheels_info_t& wi,phys::aircraft::params_t& p, compound_sensor_impl& cs )
     {          
         osg::ComputeBoundsVisitor cbv;
         node->accept( cbv );
@@ -73,7 +77,7 @@ namespace
         float ym = bb.yMax() - bb.yMin();
         float zm = bb.zMax() - bb.zMin();
         
-        shift = -zm/2;
+        cs.offset_ = cg::point_3(0,-zm/2,0);
         p.wingspan = xm;
         p.length   = ym;
 
@@ -104,12 +108,12 @@ namespace
 		}
 		
 
-		btTransform cmt(btQuaternion(0,0,0),btVector3(1,0,0));
-		cmt.setIdentity();
+		//btTransform cmt(btQuaternion(0,0,0),btVector3(1,0,0));
+		//cmt.setIdentity();
 		////localTrans effectively shifts the center of mass with respect to the chassis
 		//cmt.setOrigin(btVector3(0,-10,0));	
 
-		btCompoundShape*  s = new btCompoundShape;
+		btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
 		sh_f_wheel->setNodeMask(0);
 		sh_r_r_wheel->setNodeMask(0);
@@ -124,15 +128,32 @@ namespace
 		sh_r_r_wheel->setNodeMask(0xffffffff);
 		sh_r_l_wheel->setNodeMask(0xffffffff);
 
-		s->addChildShape(btTransform(btQuaternion(0,0,0),btVector3(0,shift,0)),cs_sh_f);
-		s->addChildShape(btTransform(btQuaternion(0,0,0),btVector3(0,shift,0)),cs_sh_r_l);
-		s->addChildShape(btTransform(btQuaternion(0,0,0),btVector3(0,shift,0)),cs_sh_r_r);
-		s->addChildShape(btTransform(btQuaternion(0,0,0),btVector3(0,shift,0)),cs_body);
-
-		return s;
+		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_f);
+		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_l);
+		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_r);
+		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
+        
+         
+		// return s;
 	}
 }
 
+namespace phys
+{
+    compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+    {
+        wheels_info_t wi;
+        aircraft::params_t p;
+        compound_sensor_impl cs;
+
+        fill_cs(nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,p,cs);
+
+        return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
+    }
+
+}
+namespace phys
+{
 
 #if 0
 BulletInterface* BulletInterface::instance()
@@ -268,13 +289,15 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	wheels_info_t wi;
     aircraft::params_t p;
     p.mass     = mass;	
-    double shift;
-    btCompoundShape*  s = fill_cs(node,wi,p,shift);
+    //double shift;
+    compound_sensor_impl cs;
+
+    /*btCompoundShape*  s =*/ fill_cs(node,wi,p, cs);
 	
 	btTransform  tr;
 	tr.setIdentity();
 	btVector3 aabbMin,aabbMax;
-	s->getAabb(tr,aabbMin,aabbMax);
+	cs.cs_->getAabb(tr,aabbMin,aabbMax);
 
 	btScalar dxx = btScalar(/*params_.wingspan*/(aabbMax.x() - aabbMin.x()) / 2);
 	btScalar dyy = btScalar(/*params_.length*/(aabbMax.y() - aabbMin.y()) / 2);
@@ -282,13 +305,12 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	btScalar m12 = btScalar((/*params_.mass*/mass) /12);
 	btVector3 localInertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
-    
 	//btVector3 localInertia(0.0, 0.0, 0.0);
 	//if ( mass>0.0 )
 	//	s->calculateLocalInertia( mass, localInertia );
 
 	btDefaultMotionState* motionState = new btDefaultMotionState(cmt);
-	btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, s, localInertia );
+	btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, cs.cs_, localInertia );
 	btRigidBody* chassis = new btRigidBody(rigidInfo);
 
 	btRaycastVehicle::btVehicleTuning    tuning_;
@@ -301,7 +323,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	for (auto it=wi.begin();it!=wi.end();++it)
 	{
 		const double radius = (*it).radius*.75;
-		osg::Vec3 connection_point = (*it).trans_f_body.getTrans() + osg::Vec3(0,shift,0); 
+		osg::Vec3 connection_point = (*it).trans_f_body.getTrans() + to_osg_vector3(cs.offset_); 
 
 		add_wheel(v,connection_point,radius,tuning_,(*it).front);
 	}
@@ -353,24 +375,23 @@ aircraft::params_t fill_params( ada::data_t const & fsettings)
 aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double mass)
 {
 	wheels_info_t wi;
+	aircraft::params_t p;
+    compound_sensor_impl cs;
 
-	aircraft::params_t p = fill_params( ada::fill_data("BADA","A319"));
+    fill_cs(node,wi,p,cs);
 
-    double      shift;
-    phys::compound_shape_proxy s(fill_cs(node,wi,p,shift));
-	aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,decart_position());
+    p = fill_params( ada::fill_data("BADA","A319"));
+
+	aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_),p,decart_position());
 	_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 	
 	for (auto it=wi.begin();it!=wi.end();++it)
 	{
 		const double radius = (*it).radius*.75;
-		osg::Vec3 connection_point = (*it).trans_f_body.getTrans() + osg::Vec3(0,shift,0); 
+		osg::Vec3 connection_point = (*it).trans_f_body.getTrans() + to_osg_vector3(cs.offset_); 
 
 		ctrl->add_wheel(0,0,radius,connection_point,phys::cpr(),false,(*it).front);
 	}
-
-    // _actors[id]._body->applyCentralForce(btVector3(0,/*500000*/100000,0));
-    // ctrl->set_steer(5);
 
 	return ctrl;
 }
@@ -556,7 +577,14 @@ void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 	rigid_bodies_.erase(rb);
 }
 
-phys::aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t &,const decart_position &)
-{
-      return nullptr;
+phys::aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
+{    	
+    aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,pos);
+    // FIXME TODO
+    // _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
+
+    return ctrl;
 }
+
+} // namespace phys
+

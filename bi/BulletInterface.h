@@ -8,7 +8,7 @@
  #include "../phys_sys_fwd.h"
 #include "phys_sys.h"
 #include "phys_sys_common.h"
-
+#include "sensor.h"
 
 namespace phys
 {
@@ -51,7 +51,7 @@ public:
     void createShape  ( osg::Node* node, int id, double mass);
 	void createUFO    ( osg::Node* node, int id, double mass);
 	aircraft::info_ptr createUFO2    ( osg::Node* node, int id, double mass);
-    aircraft::info_ptr create_aircraft(const phys::aircraft::params_t &,const decart_position &);
+    aircraft::info_ptr create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
 
     void setVelocity  ( int id, const osg::Vec3& pos );
     void setMatrix    ( int id, const osg::Matrix& matrix );

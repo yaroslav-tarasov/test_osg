@@ -4,7 +4,6 @@
 #include "phys_sys_fwd.h"
 #include "aircraft.h"
 #include "phys_aircraft.h"
-//#include "aircraft_phys.h"
 #include "phys_sys.h"
 
 
@@ -61,33 +60,34 @@ namespace aircraft
     phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
                                     phys::system_ptr phys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
-                                    //nodes_management::manager_ptr nodes_manager, 
+                                    nodes_management::manager_ptr nodes_manager, 
                                     geo_position const& initial_position, 
                                     ada::data_t const& fsettings, 
-                                    //shassis_support_ptr shassis,
+                                    shassis_support_ptr shassis,
                                     size_t zone)
     {
-        //phys::compound_sensor_t s;
-        //if (!fill_sensor(nodes_manager, s))
-        //    return phys_aircraft_ptr();
+        // phys::compound_sensor_t s;
+        // if (!fill_sensor(nodes_manager, s))
+        //     return phys_aircraft_ptr();
+        phys::compound_sensor_ptr s = phys::fill_cs(nodes_manager);
 
-        return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor, nodes_manager,*/ initial_position, fsettings, /*shassis, s,*/ zone);
+        return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
     }
 
-    phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor, nodes_management::manager_ptr nodes_manager,*/ geo_position const& initial_position, ada::data_t const& fsettings, /*shassis_support_ptr shassis, phys::compound_sensor_t const& s,*/ size_t zone)
+    phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor,*/ nodes_management::manager_ptr nodes_manager, geo_position const& initial_position, ada::data_t const& fsettings, shassis_support_ptr shassis, phys::compound_sensor_ptr s, size_t zone)
         : base_(base)
         , zone_(zone)
         , phys_sys_(phys)
-        //, nodes_manager_(nodes_manager)
+        , nodes_manager_(nodes_manager)
         , desired_position_(initial_position.pos)
         , desired_orien_(initial_position.orien)
-        //, shassis_(shassis)
+        , shassis_(shassis)
         //, meteo_cursor_(meteo_cursor)
         , tow_attached_(false)
         , has_malfunction_(false)
         , prediction_(30.)
     {
-        create_phys_aircraft(initial_position, fsettings/*, s*/);
+        create_phys_aircraft(initial_position, fsettings, s);
     }
 
     phys_aircraft_impl::~phys_aircraft_impl()
@@ -135,10 +135,10 @@ namespace aircraft
     //    prediction_ = prediction;
     //}
 
-    //geo_position phys_aircraft_impl::get_wheel_position( size_t i ) const
-    //{
-    //    return geo_position(phys_aircraft_->get_wheel_position(i), base_);
-    //}
+    geo_position phys_aircraft_impl::get_wheel_position( size_t i ) const
+    {
+        return geo_position(phys_aircraft_->get_wheel_position(i), base_);
+    }
 
     phys::rigid_body_ptr phys_aircraft_impl::get_rigid_body() const
     {
@@ -185,13 +185,14 @@ namespace aircraft
     //    has_malfunction_ = malfunction;
     //}
 
-    void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings/*, phys::compound_sensor_t const& s*/)
+    void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
         const double phys_mass_factor_ = 1000;
 
-#if 0   // TODO or not TODO
+
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
+ #if 0   // TODO or not TODO
         body_transform_inv_ = get_relative_transform(nodes_manager_, body_node).inverted();
 
         phys::collision_ptr collision = phys_sys_;
@@ -235,12 +236,12 @@ namespace aircraft
         params.Cs = 0.2;
         params.thrust = (fsettings.ct_1 * (100. / fsettings.ct_2 + fsettings.ct_3 * 100. * 100.));
 
-        phys_aircraft_ = phys_sys_->create_aircraft(params, /*&s,*/ p);
+        phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
 
         double const wheel_mass = mass / 10;
 
-#if 0  // TODO or not TODO
+#if 1  // TODO or not TODO
         shassis_->visit_chassis([this, wheel_mass, &body_node](shassis_group_t const& group, shassis_t & shassis)
         {
             auto node = shassis.wheel_node;
@@ -256,17 +257,19 @@ namespace aircraft
             cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
             point_3 wheel_offset = wt.translation();
 
-            cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
+            //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
+            const double radius = 0.75 * node->get_bound().radius;
 
-            size_t wid = phys_aircraft_->add_wheel(mass, bound.size().x / 2., 0.75 * (bound.size().y / 2.), wt.translation(), wt.rotation().cpr(), true, group.is_front);
+            size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, wt.translation(), wt.rotation().cpr(), true, group.is_front);
             shassis.phys_wheels.push_back(wid);
 
             for (size_t j = 0; j < fake_count; ++j)
             {
-                size_t wid = phys_aircraft_->add_wheel(mass, bound.size().x / 2., 0.75 * (bound.size().y / 2.), wt.translation(), wt.rotation().cpr(), true, group.is_front);
+                size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, wt.translation(), wt.rotation().cpr(), true, group.is_front);
                 shassis.phys_wheels.push_back(wid);
             }
         });
+#else
 #endif
 
         phys_aircraft_->reset_suspension();

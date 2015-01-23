@@ -152,7 +152,7 @@ namespace phys
 		virtual void   set_rudder  (double rudder) = 0;
 		virtual void   set_wind    (cg::point_3 const& wind) = 0;
 		virtual void   apply_force (point_3 const& f) = 0;
-		virtual void update_aerodynamics(double dt) = 0;
+		virtual void   update_aerodynamics(double dt) = 0;
 		virtual void   reset_suspension() = 0;
 	};
 

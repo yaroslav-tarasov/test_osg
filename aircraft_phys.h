@@ -5,7 +5,7 @@
 #include "phys_sys.h"
 #include "bi/phys_sys_common.h"
 #include "aircraft.h"
-
+#include "sensor.h"
 
 namespace phys
 {
@@ -13,14 +13,15 @@ namespace phys
 	{
 
    
-   ATTRIBUTE_ALIGNED16 (class impl) 
+   // ATTRIBUTE_ALIGNED16 (class impl)
+   class impl
        : public rigid_body_user_info_t
 	   , public rigid_body_impl
        , public btActionInterface
 	   , public control
    {
    public:
-      impl(system_impl_ptr,/*compound_sensor_t const* s,*/compound_shape_proxy& s, params_t const& params, decart_position const& pos);
+      impl(system_impl_ptr,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos);
    
    
    public:

@@ -12,12 +12,12 @@ namespace phys
 	namespace aircraft
 	{
 
-    impl::impl(system_impl_ptr sys,/*compound_sensor_t const* s,*/compound_shape_proxy& s, params_t const& params, decart_position const& pos)
+    impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
         : rigid_body_user_info_t(rb_aircraft)
 		, sys_ (sys)
 		, chassis_    (sys->dynamics_world())
 		, raycast_veh_(sys->dynamics_world())
-        , chassis_shape_(s)
+        , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
 		, params_(params)
         , elevator_(0)
         , ailerons_(0)

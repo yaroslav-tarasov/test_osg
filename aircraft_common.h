@@ -76,7 +76,7 @@ namespace aircraft
         shassis_group_t(nm::node_control_ptr node, bool is_front)
             : node(node)
             , malfunction(false)
-            , opened(false)
+            , opened(true/*false*/) // FIXME TODO а у нас выпущены
             , broken(false)
             , is_front(is_front)
         {

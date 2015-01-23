@@ -3,8 +3,16 @@
 #include "../find_node_visitor.h"
 #include "../high_res_timer.h"
 #include "BulletInterface.h"
+#include "../aircraft.h"                // FIXME TODO don't need here 
+#include "../aircraft_common.h"
+#include "../aircraft_shassis_impl.h"   // And maybe this too
+#include "nodes_manager.h"
+#include "../ada.h"
+#include "../bada_import.h"
+#include "../phys_aircraft.h"
+
+
 #include "RigidUpdater.h"
-#include "../aircraft.h"
 
 namespace bi
 {
@@ -33,10 +41,12 @@ namespace bi
             _sys->setDebugDrawer(_dbgDraw);
     }
 
+
+
     void RigidUpdater::addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-
+        
         osg::ComputeBoundsVisitor cbv;
         node->accept( cbv );
         const osg::BoundingBox& bb = cbv.getBoundingBox();
@@ -91,10 +101,31 @@ namespace bi
 
     }
 
+    inline nodes_management::manager_ptr get_nodes_manager(osg::Node* node) 
+    {
+        return nodes_management::create_manager(node);
+    }
+
     void RigidUpdater::addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
         int id = _physicsNodes.size();
+
+        aircraft::shassis_support_ptr shassis_;
+        shassis_ = boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager(node));
+
+        aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
+                                                                   cg::geo_base_3(),
+                                                                               _sys,
+                                                           nm::create_manager(lod3),
+                                                                     geo_position(),
+                                                      ada::fill_data("BADA","A319"),                                                   
+        boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager(node)),
+                                                                                 0);
+
+
+        _phys_aircrafts.emplace_back(ac_);
+
         _aircrafts.emplace_back(_sys->createUFO2( lod3,id, mass ));
 
         osg::ComputeBoundsVisitor cbv;
