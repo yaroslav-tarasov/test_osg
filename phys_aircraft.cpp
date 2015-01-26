@@ -8,8 +8,8 @@
 
 
 using namespace cg;
-using namespace std::placeholders;
 
+namespace sp = std::placeholders;
 
 namespace aircraft
 {
@@ -115,25 +115,25 @@ namespace aircraft
         desired_orien_ = orien;
     }
 
-    //geo_position phys_aircraft_impl::get_position() const
-    //{
-    //    //Assert(phys_aircraft_);
+    geo_position phys_aircraft_impl::get_position() const
+    {
+        //Assert(phys_aircraft_);
 
-    //    decart_position body_pos = phys_aircraft_->get_position();
-    //    decart_position root_pos = body_pos * body_transform_inv_;
+        decart_position body_pos = phys_aircraft_->get_position();
+        decart_position root_pos = body_pos * body_transform_inv_;
 
-    //    return geo_position(root_pos, base_);
-    //}
+        return geo_position(root_pos, base_);
+    }
 
     //void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
     //{
     //    cfg_ = cfg;
     //}
 
-    //void phys_aircraft_impl::set_prediction(double prediction)
-    //{
-    //    prediction_ = prediction;
-    //}
+    void phys_aircraft_impl::set_prediction(double prediction)
+    {
+        prediction_ = prediction;
+    }
 
     geo_position phys_aircraft_impl::get_wheel_position( size_t i ) const
     {
@@ -192,8 +192,9 @@ namespace aircraft
 
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
- #if 0   // TODO or not TODO
+   
         body_transform_inv_ = get_relative_transform(nodes_manager_, body_node).inverted();
+ #if 0 // TODO or not TODO
 
         phys::collision_ptr collision = phys_sys_;
 
@@ -242,7 +243,7 @@ namespace aircraft
         double const wheel_mass = mass / 10;
 
 #if 1  // TODO or not TODO
-        shassis_->visit_chassis([this, wheel_mass, &body_node](shassis_group_t const& group, shassis_t & shassis)
+        shassis_->visit_chassis([this, wheel_mass, &body_node,&s](shassis_group_t const& group, shassis_t & shassis)
         {
             auto node = shassis.wheel_node;
 
@@ -254,18 +255,19 @@ namespace aircraft
             if (group.is_front)
                 mass = wheel_mass*10, fake_count = 2;
 
-            cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
-            point_3 wheel_offset = wt.translation();
+            //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
+            cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node);
+            point_3 wheel_offset = wt.translation() + s->get_offset();
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
             const double radius = 0.75 * node->get_bound().radius;
 
-            size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, wt.translation(), wt.rotation().cpr(), true, group.is_front);
+            size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
             shassis.phys_wheels.push_back(wid);
 
             for (size_t j = 0; j < fake_count; ++j)
             {
-                size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, wt.translation(), wt.rotation().cpr(), true, group.is_front);
+                size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
                 shassis.phys_wheels.push_back(wid);
             }
         });
@@ -579,8 +581,8 @@ namespace aircraft
             free_forces += g_vel;
 
         func1_t fn(phys_aircraft_->params(), q, free_forces);
-        std::function<cg::point_3(double[4])> f = std::bind(&func1_t::calculate, &fn , _1);
-        std::function<double(point_3, double[4])> f2 = std::bind(&func2_t::calculate, func2_t(kx, ky, kz), _1, _2);
+        std::function<cg::point_3(double[4])> f = std::bind(&func1_t::calculate, &fn , sp::_1);
+        std::function<double(point_3, double[4])> f2 = std::bind(&func2_t::calculate, func2_t(kx, ky, kz), sp::_1, sp::_2);
 
         //    double lift = phys_aircraft_->params().Cl * phys_aircraft_->params().S * q;
         double liftAOA = phys_aircraft_->params().ClAOA * phys_aircraft_->params().S * q;

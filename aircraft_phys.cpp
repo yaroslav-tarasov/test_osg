@@ -46,8 +46,8 @@ namespace phys
     	chassis_.reset(boost::make_shared<btRigidBody>(chassis_construction_info));
 
 		// FIXME TODO
-		//chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
-		//chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
+		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 
 		//chassis_->setDamping(0.05f, 0.5f);
 		chassis_->setRestitution(0.1f);
@@ -204,7 +204,7 @@ namespace phys
 	{
 		point_3 connection_point = offset;
 		// Source
-        // connection_point.z() += 1;
+        //connection_point.z() += 1;
 
         // Source
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);

@@ -41,9 +41,14 @@ cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, 
 {
     osg::Matrix tr;
     osg::Node* n = node_impl_ptr(node)->as_osg_node();
-    while(/*n->position().is_local() &&*/ 0 != n->getNumParents() && n != node_impl_ptr(manager->get_node(0))->as_osg_node() && rel.get()?n != node_impl_ptr(rel)->as_osg_node():false  )
+    auto root = node_impl_ptr(manager->get_node(0))->as_osg_node();
+
+    while(/*n->position().is_local() &&*/ 0 != n->getNumParents() && n != root && (rel.get()?n != node_impl_ptr(rel)->as_osg_node():true)  )
     {
-        tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
+        if(n->asTransform())
+        if(n->asTransform()->asMatrixTransform())
+            tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
+
         n = n->getParent(0);
     }
 
@@ -52,8 +57,10 @@ cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, 
 
     osg::Matrix tr_rel;
     n = node_impl_ptr(rel)->as_osg_node();
-    while(/*n->position().is_local()*/0 != n->getNumParents() && n !=  node_impl_ptr(manager->get_node(0))->as_osg_node())
+    while(/*n->position().is_local()*/0 != n->getNumParents() && n->getName() != root->getName())
     {                  
+        if(n->asTransform())
+        if(n->asTransform()->asMatrixTransform())
         tr_rel = n->asTransform()->asMatrixTransform()->getMatrix() * tr_rel;
         n = n->getParent(0);
     }

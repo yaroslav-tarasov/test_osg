@@ -11,6 +11,7 @@ namespace phys
     
     struct compound_sensor_t
     {
+        virtual cg::point_3 get_offset()  = 0;
         virtual ~compound_sensor_t() {}
     };
 

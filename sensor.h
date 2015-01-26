@@ -9,6 +9,7 @@ struct compound_sensor_impl  : public compound_sensor_t
         : cs_(s)
         , offset_(offset)
     {}
+    cg::point_3 get_offset(){return offset_;};
 
     btCompoundShape*        cs_;
     cg::point_3             offset_;

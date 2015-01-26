@@ -55,6 +55,8 @@ public:
                 dynamic_cast<osg::ShapeDrawable *>(geode->getDrawable(0))->setColor( osg::Vec4(1.0,0,0,0) );
                 root->addChild(geode);
                 _points.push_back(geode);
+                _route.push_back(cg::point_3(position.x(),position.y(),position.z()));
+                choosed_point_signal_(_route);
             }
             else
             { 
@@ -62,6 +64,7 @@ public:
                 {
                     root->removeChild(_points.back());
                     _points.erase(--_points.end());
+                    _route.erase(--_route.end());
                 }
 
             }
@@ -69,7 +72,10 @@ public:
         }
     }
 
+    DECLARE_EVENT(choosed_point, (std::vector<cg::point_3> const &simple_route) ) ;
+
 protected:
     virtual ~PickHandler() {}
     std::list<osg::ref_ptr<osg::Geode>> _points;
+    std::vector<cg::point_3>            _route;
 };

@@ -1,6 +1,8 @@
 #pragma once 
 
-
+//
+//  Forwards
+//
 
 namespace avSky
 {
@@ -21,6 +23,9 @@ namespace bi
 {
     class RigidUpdater;
 }
+
+class PickHandler;
+
 
 namespace avScene {
 
@@ -62,6 +67,9 @@ namespace avScene {
         osg::ref_ptr<osg::Group>                    _terrainRoot;
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
+        osg::ref_ptr<PickHandler>                   _pickHandler; 
+        
+        connection_holder                           conn_holder_;        
     };
 
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }

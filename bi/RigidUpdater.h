@@ -26,6 +26,8 @@ namespace bi
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
 
+        void handlePointEvent(std::vector<cg::point_3> const &simple_route);
+
         bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
 
     protected:
@@ -37,8 +39,8 @@ namespace bi
 
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
-		typedef std::vector<phys::aircraft::info_ptr>  aircrafts_t;
-        typedef std::vector<aircraft::phys_aircraft_ptr>  phys_aircrafts_t;
+		typedef std::vector<phys::aircraft::info_ptr>                   aircrafts_t;
+        typedef std::vector<aircraft::phys_aircraft_ptr>                phys_aircrafts_t;
         NodeMap                                  _physicsNodes;
         osg::observer_ptr<osg::Group>            _root;
         high_res_timer                           _hr_timer;

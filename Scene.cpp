@@ -1,8 +1,22 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 
 #include "high_res_timer.h"
 #include "bi/BulletInterface.h"
 #include "bi/RigidUpdater.h"
+
+//Degree precision versus length
+//
+//          decimal                                                                               N/S or E/W    E/W at    E/W at       E/W at
+//          degrees           DMS                 qualitative scale that can be identified        at equator    23N/S      45N/S	     67N/S
+//    0	    1.0	        1В° 00вЂІ 0вЂі	        country or large region	                            111.32 km	102.47 km	78.71 km	43.496 km
+//    1	    0.1	        0В° 06вЂІ 0вЂі	        large city or district	                            11.132 km	10.247 km	7.871 km	4.3496 km
+//    2 	0.01	    0В° 00вЂІ 36вЂі	        town or village	                                    1.1132 km	1.0247 km	787.1 m	    434.96 m
+//    3	    0.001	    0В° 00вЂІ 3.6вЂі	        neighbourhood, street	                            111.32 m	102.47 m	78.71 m	    43.496 m
+//    4 	0.0001	    0В° 00вЂІ 0.36вЂі	    individual street, land parcel	                    11.132 m	10.247 m	7.871 m	    4.3496 m
+//    5	    0.00001	    0В° 00вЂІ 0.036вЂі	    individual trees	                                1.1132 m	1.0247 m	787.1 mm	434.96 mm
+//    6	    0.000001	0В° 00вЂІ 0.0036вЂі	    individual humans	                                111.32 mm	102.47 mm	78.71 mm	43.496 mm
+//    7	    0.0000001	0В° 00вЂІ 0.00036вЂі	    practical limit of commercial surveying	            11.132 mm	10.247 mm	7.871 mm	4.3496 mm
+//    8	    0.00000001	0В° 00вЂІ 0.000036вЂі	specialized surveying (e.g. tectonic plate mapping)	1.1132 mm	1.0247 mm	787.1 Вµm	434.96 Вµm
 
 
 #include "Scene.h"
@@ -80,7 +94,7 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
 
 
 
-#if 0  // Перенесено см ниже
+#if 0  // РџРµСЂРµРЅРµСЃРµРЅРѕ СЃРј РЅРёР¶Рµ
     const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
     osg::StateSet* ss = light->getOrCreateStateSet();
     ss->setAttribute(new osg::Program(),value);
@@ -341,11 +355,13 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Add event handlers to the viewer
     //
+    _pickHandler = new PickHandler();
     _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
     _viewerPtr->addEventHandler(new PickHandler());
     _viewerPtr->realize();
 
+    //geo_position(root_pos, base_);
 
     //
     // Initialize particle engine
@@ -397,7 +413,9 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
 
     createObjects();
-
+    
+    conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
+    
 
     //
     // Create ephemeris
@@ -509,6 +527,7 @@ void Scene::createObjects()
 
 	auto obj = creators::applyBM(creators::createObject("a_319"),"a_319",true);
 
+#if 0
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addPhysicsAirplane( obj,
 		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
@@ -518,13 +537,19 @@ void Scene::createObjects()
 		_rigidUpdater->addUFO( obj,
 		osg::Vec3(100,100,0), osg::Vec3(0,0,0), 165.0f );
 
+#endif
+
+#if 1 
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addUFO2( obj,
 		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
+#endif
 
+#if 0 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO2( obj,
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
+#endif
 
 	const bool add_planes = false;
 
@@ -532,7 +557,7 @@ void Scene::createObjects()
     {
         const std::string name = "a_319";
         osg::Node* p_copy = creators::applyBM(creators::loadAirplane(name),name,true);
-        // auto p_copy = creators::loadAirplane(name); // А если без BM еще кадров 15-20 ??? Чет не вижу
+        // auto p_copy = creators::loadAirplane(name); // Рђ РµСЃР»Рё Р±РµР· BM РµС‰Рµ РєР°РґСЂРѕРІ 15-20 ??? Р§РµС‚ РЅРµ РІРёР¶Сѓ
         
         float rot_angle = -90.f;
         if(dynamic_cast<osg::LOD*>(p_copy))
@@ -610,7 +635,7 @@ void Scene::createObjects()
 
             }
 
-            // FIXME при копировании начинаем падать кадров на 10
+            // FIXME РїСЂРё РєРѕРїРёСЂРѕРІР°РЅРёРё РЅР°С‡РёРЅР°РµРј РїР°РґР°С‚СЊ РєР°РґСЂРѕРІ РЅР° 10
             p_copy = osg::clone(p_copy, osg::CopyOp::DEEP_COPY_ALL 
                 & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
                 & ~osg::CopyOp::DEEP_COPY_ARRAYS

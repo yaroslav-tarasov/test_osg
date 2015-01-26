@@ -438,7 +438,7 @@ void BulletInterface::setMatrix( int id, const osg::Matrix& matrix )
     {
         btTransform trans;
         trans.setFromOpenGLMatrix( osg::Matrixf(matrix).ptr() );
-        actor->/*setWorldTransform*/setCenterOfMassTransform( trans );
+        actor->/*setWorldTransform*/setCenterOfMassTransform( trans );  // И то и другое работает 
     }
 }
 

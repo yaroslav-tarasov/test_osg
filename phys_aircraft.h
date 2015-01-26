@@ -47,9 +47,9 @@ namespace aircraft
         void update() override;
         //void attach_tow(bool attached) override;
         void go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien) override;
-        //geo_position get_position() const;
+        geo_position get_position() const override;
         //void set_air_cfg(fms::air_config_t cfg);
-        //void set_prediction(double prediction);
+        void set_prediction(double prediction) override;
         geo_position get_wheel_position( size_t i ) const ;
         phys::rigid_body_ptr get_rigid_body() const;
         void set_steer   (double steer);

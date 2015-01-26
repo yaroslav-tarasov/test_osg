@@ -101,32 +101,35 @@ namespace bi
 
     }
 
-    inline nodes_management::manager_ptr get_nodes_manager(osg::Node* node) 
-    {
-        return nodes_management::create_manager(node);
-    }
+    //inline nodes_management::manager_ptr get_nodes_manager(osg::Node* node) 
+    //{
+    //    return nodes_management::create_manager(node);
+    //}
 
     void RigidUpdater::addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
         int id = _physicsNodes.size();
+        
+        nm::manager_ptr man = nm::create_manager(lod3);
+        
+        size_t pa_size = _phys_aircrafts.size();
+        //if(_phys_aircrafts.size()==0)
+        {
+            aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
+                              cg::geo_base_3(cg::geo_point_3(0.000* (pa_size+1),0.0*(pa_size+1),0)),
+                                                                                   _sys,
+                                                                                    man,
+                geo_position(cg::geo_point_3(0.000* (pa_size+1),0.005*(pa_size+1),0),cg::quaternion(cg::cpr(0, 0, 0))),
+                                                          ada::fill_data("BADA","A319"),                                                   
+                                boost::make_shared<aircraft::shassis_support_impl>(man),
+                                                                                     0);
 
-        aircraft::shassis_support_ptr shassis_;
-        shassis_ = boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager(node));
+             ac_->go_to_pos(cg::geo_point_3(0.004,0.0000,0),cg::quaternion(cg::cpr(45, 0, 0)));
+            _phys_aircrafts.push_back(ac_);
+        }
 
-        aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
-                                                                   cg::geo_base_3(),
-                                                                               _sys,
-                                                           nm::create_manager(lod3),
-                                                                     geo_position(),
-                                                      ada::fill_data("BADA","A319"),                                                   
-        boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager(node)),
-                                                                                 0);
-
-
-        _phys_aircrafts.emplace_back(ac_);
-
-        _aircrafts.emplace_back(_sys->createUFO2( lod3,id, mass ));
+        _aircrafts.push_back(_sys->createUFO2( lod3,id, mass ));
 
         osg::ComputeBoundsVisitor cbv;
         node->accept( cbv );
@@ -207,7 +210,14 @@ namespace bi
                 double dt = _hr_timer.get_delta();
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
+
+                for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
+                    (*it)->update();
+
                 _sys->update( dt );
+                
+
+
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
                 {
@@ -256,5 +266,10 @@ namespace bi
         _physicsNodes[id] = mt;
     }
 
+
+    void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
+    {
+
+    }
 
 }
