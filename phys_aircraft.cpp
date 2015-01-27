@@ -150,6 +150,10 @@ namespace aircraft
         phys_aircraft_->set_steer(steer);
     }
 
+    double  phys_aircraft_impl::get_steer()
+    {
+        return  phys_aircraft_->get_steer();
+    }
     //std::vector<phys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
     //{
     //    std::vector<phys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
@@ -252,15 +256,16 @@ namespace aircraft
 
             double mass = wheel_mass;
             size_t fake_count = 0;
-            if (group.is_front)
-                mass = wheel_mass*10, fake_count = 2;
+
+            //if (group.is_front)
+            //    mass = wheel_mass*10, fake_count = 2;
 
             //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
             cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node);
             point_3 wheel_offset = wt.translation() + s->get_offset();
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
-            const double radius = 0.75 * node->get_bound().radius;
+            const double radius = 0.75 * node->get_bound().radius ;
 
             size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
             shassis.phys_wheels.push_back(wid);
@@ -287,7 +292,7 @@ namespace aircraft
         geo_position cur_glb_pos(cur_pos, base_);
         geo_position root_glb_pos(root_pos, base_);
 
-        point_3 wind;
+        point_3 wind(0.0,0.0,0.0);
 #if 0
         if (meteo_cursor_)
         {
@@ -380,11 +385,15 @@ namespace aircraft
         double ailerons = 0;
         double brake = 0;
         double rudder = 0;
+        
+        const double  min_aerodynamic_speed = phys_aircraft_->params().min_aerodynamic_speed;
+        
+        // 
 
-        if (cur_speed < phys_aircraft_->params().min_aerodynamic_speed)
+
+        if (cur_speed < phys_aircraft_->params().min_aerodynamic_speed )
         {
             on_ground_ = true;
-
 
             //geo_base_3 steer_predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(steer_prediction*dt));
             geo_base_3 steer_predict_pos = desired_position_;
@@ -403,6 +412,8 @@ namespace aircraft
             //double max_speed_clamped = max_speed;
 
             double desired_speed_signed = (dist2target_signed - cur_speed_signed) / (1.2 * prediction_*dt);
+// FIXME TYV      А не то при рулении взлетаем хвостом вперед хо-хо   
+            desired_speed_signed = cg::bound(desired_speed_signed, -30., 30.);
             //        double desired_speed_signed = filter::BreakApproachSpeed(0., dist2target_signed, cur_speed_signed, max_speed_clamped, 500, dt, prediction);
             if (fabs(desired_speed_signed) < 0.1)
                 desired_speed_signed = 0;
@@ -424,7 +435,7 @@ namespace aircraft
 
             double desired_slide_angle = slide_angle;
             double desired_thrust = phys_aircraft_->thrust();
-            double desired_attack_angle = attack_angle;
+            double desired_attack_angle = /*attack_angle*/0;
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
 
@@ -446,7 +457,9 @@ namespace aircraft
             if (cfg_ == fms::CFG_GD/* && root_glb_pos.pos.height < 0.5*/)
 #endif
             {
+#if 1           // Реверс хм однако
                 reverse = true;
+#endif
                 if (on_ground_)
                     low_attack = true;
             }

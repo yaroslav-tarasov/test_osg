@@ -111,54 +111,83 @@ namespace bi
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
         int id = _physicsNodes.size();
         
-        nm::manager_ptr man = nm::create_manager(lod3);
-        
-        size_t pa_size = _phys_aircrafts.size();
-        //if(_phys_aircrafts.size()==0)
-        {
-            aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
-                              cg::geo_base_3(cg::geo_point_3(0.000* (pa_size+1),0.0*(pa_size+1),0)),
-                                                                                   _sys,
-                                                                                    man,
-                geo_position(cg::geo_point_3(0.000* (pa_size+1),0.005*(pa_size+1),0),cg::quaternion(cg::cpr(0, 0, 0))),
-                                                          ada::fill_data("BADA","A319"),                                                   
-                                boost::make_shared<aircraft::shassis_support_impl>(man),
-                                                                                     0);
+        //nm::manager_ptr man = nm::create_manager(lod3);
+        //
+        //size_t pa_size = _phys_aircrafts.size();
+        ////if(_phys_aircrafts.size()==0)
+        //{
+        //    aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
+        //                      cg::geo_base_3(cg::geo_point_3(0.000* (pa_size+1),0.0*(pa_size+1),0)),
+        //                                                                           _sys,
+        //                                                                            man,
+        //        geo_position(cg::geo_point_3(0.000* (pa_size+1),0.005*(pa_size+1),0),cg::quaternion(cg::cpr(0, 0, 0))),
+        //                                                  ada::fill_data("BADA","A319"),                                                   
+        //                        boost::make_shared<aircraft::shassis_support_impl>(man),
+        //                                                                             0);
 
-             ac_->go_to_pos(cg::geo_point_3(0.004,0.0000,0),cg::quaternion(cg::cpr(45, 0, 0)));
-            _phys_aircrafts.push_back(ac_);
-        }
+        //    _phys_aircrafts.push_back(ac_);
+        //}
 
         _aircrafts.push_back(_sys->createUFO2( lod3,id, mass ));
 
-        osg::ComputeBoundsVisitor cbv;
-        node->accept( cbv );
-        const osg::BoundingBox& bb = cbv.getBoundingBox();
+        //osg::ComputeBoundsVisitor cbv;
+        //node->accept( cbv );
+        //const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-        float xm = bb.xMax() - bb.xMin();
-        float ym = bb.yMax() - bb.yMin();
-        float zm = bb.zMax() - bb.zMin();
+        //float xm = bb.xMax() - bb.xMin();
+        //float ym = bb.yMax() - bb.yMin();
+        //float zm = bb.zMax() - bb.zMin();
 
-        float rot_angle = -90.f;
-        auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(ym)/2.0f,0.0));
-        if(dynamic_cast<osg::LOD*>(node))
-        {
-            rot_angle = 0;
-            tr = osg::Matrix::translate(osg::Vec3(0,0,-(zm)/2.0f));
-        }        
+        //float rot_angle = -90.f;
+        //auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(ym)/2.0f,0.0));
+        //if(dynamic_cast<osg::LOD*>(node))
+        //{
+        //    rot_angle = 0;
+        //    tr = osg::Matrix::translate(osg::Vec3(0,0,-(zm)/2.0f));
+        //}        
 
-        osg::MatrixTransform* positioned = new osg::MatrixTransform(tr);
+        //osg::MatrixTransform* positioned = new osg::MatrixTransform(tr);
 
-        const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
-            osg::inDegrees(0.f) , osg::Y_AXIS,
-            osg::inDegrees(0.f)   , osg::Z_AXIS ); 
+        //const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
+        //    osg::inDegrees(0.f) , osg::Y_AXIS,
+        //    osg::inDegrees(0.f)   , osg::Z_AXIS ); 
 
-        osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
-        positioned->addChild(rotated);
-        rotated->addChild(node);
+        //osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
+        //positioned->addChild(rotated);
+        //rotated->addChild(node);
 
-        addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        addPhysicsData( id, addGUIAircraft(node), pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         phys::aircraft::control_ptr(_aircrafts.back())->apply_force(vel);
+    }
+
+
+    void RigidUpdater::addUFO3(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+    {
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        int id = _physicsNodes.size();
+
+        nm::manager_ptr man = nm::create_manager(lod3);
+
+        auto s = boost::make_shared<aircraft::shassis_support_impl>(man);
+        size_t pa_size = _phys_aircrafts.size();
+        aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
+            cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)),
+            _sys,
+            man,
+            geo_position(cg::geo_point_3(0.000,0.005*(pa_size+1),0),cg::quaternion(cg::cpr(90, 0, 0))),
+            ada::fill_data("BADA","A319"),                                                   
+            s,
+            0);
+
+        _phys_aircrafts.emplace_back(aircraft_model(ac_,s));
+        _sys->registerUFO3(id,ac_->get_rigid_body());
+
+        //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
+        mt->addChild( addGUIAircraft(node) );
+        _root->addChild( mt.get() );
+
+        _physicsNodes[id] = mt;
     }
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -211,11 +240,16 @@ namespace bi
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
-                for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
-                    (*it)->update();
-
                 _sys->update( dt );
-                
+
+                for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
+                {
+                    (*it).aircraft->update();
+                    
+                    //_physicsNodes[_physicsID[std::distance(_phys_aircrafts.begin(),it)]].setMatrix( matrix );
+                    //_physicsNodes[id] = mt;
+                    //_physicsID[_phys_aircrafts.size()-1]=id;
+                }                
 
 
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
@@ -268,8 +302,11 @@ namespace bi
 
 
     void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
-    {
-
+    {   
+        decart_position pos;
+        pos.pos = simple_route.back();
+        geo_position gp(pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+        _phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);
     }
 
 }

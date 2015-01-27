@@ -208,12 +208,17 @@ namespace phys
 
         // Source
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);
+        //tuning_.m_suspensionStiffness = 5.f; // 20.f
+        //tuning_.m_suspensionDamping = 2.3f;
+        tuning_.m_maxSuspensionForce = 60000000;
+        //tuning_.m_suspensionCompression = 4.4f;
+        //tuning_.m_frictionSlip = 10.;
 
 		btWheelInfo& info = raycast_veh_->addWheel(osg_helpers::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,is_front);
-		info.m_suspensionStiffness = 20.f;
+        info.m_suspensionStiffness = 20.f; 
 		info.m_wheelsDampingRelaxation = 2.3f;
 		info.m_wheelsDampingCompression = 4.4f;
-		info.m_frictionSlip = 10.;
+        info.m_frictionSlip = 10.;
 		info.m_rollInfluence = 0.1f;
 
 		wheels_ids_.push_back(raycast_veh_->getNumWheels()-1);

@@ -53,6 +53,8 @@ public:
 	aircraft::info_ptr createUFO2    ( osg::Node* node, int id, double mass);
     aircraft::info_ptr create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
 
+    void               registerUFO3(int id,phys::rigid_body_ptr ctrl);
+
     void setVelocity  ( int id, const osg::Vec3& pos );
     void setMatrix    ( int id, const osg::Matrix& matrix );
     osg::Matrix getMatrix( int id );

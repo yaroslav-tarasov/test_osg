@@ -16,6 +16,7 @@ namespace aircraft
         //virtual geo_position get_wheel_position( size_t i ) const = 0;
         virtual phys::rigid_body_ptr get_rigid_body() const = 0;
         virtual void set_steer   (double steer) = 0;
+        virtual double get_steer () = 0;
         //virtual std::vector<phys::aircraft::contact_info_t> get_body_contacts() const = 0;
         //virtual bool has_wheel_contact(size_t id) const = 0;
         //virtual double wheel_skid_info(size_t id) const = 0;
@@ -42,7 +43,7 @@ namespace aircraft
 
         nodes_management::node_control_ptr node;
         nodes_management::node_control_ptr wheel_node;
-        std::vector<size_t> phys_wheels;
+        std::vector<size_t>                phys_wheels;
         double radius;
         bool landing_dust;
 

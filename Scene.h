@@ -69,7 +69,7 @@ namespace avScene {
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
         osg::ref_ptr<PickHandler>                   _pickHandler; 
         
-        connection_holder                           conn_holder_;        
+        connection_holder                           conn_holder_;  
     };
 
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }

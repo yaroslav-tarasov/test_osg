@@ -288,6 +288,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
     
     const int nAntialiasing = 8;
+    
 
     if ( cTraitsPtr.valid())
     {
@@ -358,7 +359,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _pickHandler = new PickHandler();
     _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
-    _viewerPtr->addEventHandler(new PickHandler());
+    _viewerPtr->addEventHandler(_pickHandler);
     _viewerPtr->realize();
 
     //geo_position(root_pos, base_);
@@ -387,7 +388,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -527,7 +528,7 @@ void Scene::createObjects()
 
 	auto obj = creators::applyBM(creators::createObject("a_319"),"a_319",true);
 
-#if 0
+#if 1
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addPhysicsAirplane( obj,
 		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
@@ -545,11 +546,17 @@ void Scene::createObjects()
 		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
 #endif
 
-#if 0 
+#if 1 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO2( obj,
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
 #endif
+
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addUFO3( obj,
+        osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
+
+
 
 	const bool add_planes = false;
 

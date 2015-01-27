@@ -115,22 +115,22 @@ namespace
 
 		btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
-		sh_f_wheel->setNodeMask(0);
-		sh_r_r_wheel->setNodeMask(0);
-		sh_r_l_wheel->setNodeMask(0);
+		sh_f/*_wheel*/->setNodeMask(0);
+		sh_r_r/*_wheel*/->setNodeMask(0);
+		sh_r_l/*_wheel*/->setNodeMask(0);
 
 		btCollisionShape* cs_sh_r_l = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_l );
 		btCollisionShape* cs_sh_r_r = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_r );
 		btCollisionShape* cs_sh_f   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_f );
 		btCollisionShape* cs_body   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( body );
 
-		sh_f_wheel->setNodeMask(0xffffffff);
-		sh_r_r_wheel->setNodeMask(0xffffffff);
-		sh_r_l_wheel->setNodeMask(0xffffffff);
+		sh_f/*_wheel*/->setNodeMask(0xffffffff);
+		sh_r_r/*_wheel*/->setNodeMask(0xffffffff);
+		sh_r_l/*_wheel*/->setNodeMask(0xffffffff);
 
-		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_f);
-		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_l);
-		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_r);
+		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_f);
+		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_l);
+		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_r);
 		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
         
          
@@ -394,6 +394,11 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 	}
 
 	return ctrl;
+}
+
+void BulletInterface::registerUFO3(int id,phys::rigid_body_ptr ctrl)
+{
+    _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 }
 
 void BulletInterface::createShape(osg::Node* node,int id, double mass)

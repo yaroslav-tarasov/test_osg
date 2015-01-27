@@ -72,7 +72,7 @@ public:
         }
     }
 
-    DECLARE_EVENT(choosed_point, (std::vector<cg::point_3> const &simple_route) ) ;
+    DECLARE_EVENT(choosed_point, (std::vector<cg::point_3> const &) ) ;
 
 protected:
     virtual ~PickHandler() {}
