@@ -51,12 +51,12 @@ void  Terrain::create( std::string name )
     if(name == "sheremetyevo")
     {
         scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.osgb";// "sheremetyevo.open.osgb";   
-        mat_file_name = "sheremetyevo.open.dae"; 
+        mat_file_name = "sheremetyevo.open.dae.mat.xml"; 
     }
     else if(name == "adler")
     {
         scene_name = "adler.osgb";  
-        mat_file_name = "adler.open.dae"; 
+        mat_file_name = "adler.open.dae.mat.xml"; 
     }
 	else
 	{
@@ -64,7 +64,7 @@ void  Terrain::create( std::string name )
 	}
 
 
-    osg::Node* scene = osgDB::readNodeFile(name + "_dae/"+ scene_name);  
+    osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
 
     scene->setName("scene");
 
@@ -87,7 +87,7 @@ void  Terrain::create( std::string name )
     nl.push_back("railing");
     nl.push_back("panorama");
 
-    MaterialVisitor mv ( nl, creators::createMaterial,creators::computeAttributes,mat::reader::read(name + "_dae/"+mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read("areas/" + name + "/"+mat_file_name));
     scene->accept(mv);
 
     // All solid objects

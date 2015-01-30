@@ -43,6 +43,9 @@
     <Filter Include="Source Files\nfi">
       <UniqueIdentifier>{ac4ce2b3-ce67-487c-90c5-91e58e87d521}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\vehicle">
+      <UniqueIdentifier>{4646637e-3fc3-44ef-a0f3-b6a80d22d301}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -187,6 +190,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="callbacks.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="visitors.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="materials.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -366,6 +378,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nodes_management.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ray_cast_vehicle.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="materials.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

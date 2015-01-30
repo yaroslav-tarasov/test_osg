@@ -58,8 +58,8 @@ namespace aircraft
         //bool has_wheel_contact(size_t id) const;
         //double wheel_skid_info(size_t id) const;
         void         remove_wheel(size_t id);
-        //size_t get_zone() const;
-        //void set_malfunction(bool malfunction);
+        size_t       get_zone() const override;
+        void         set_malfunction(bool malfunction)  override;
 
     private:
         void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s);

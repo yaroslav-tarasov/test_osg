@@ -53,5 +53,16 @@ namespace phys
 
     /*PHYS_SYS_API*/ system_ptr create_phys_system();
 
-    compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+    // FIXME не здесь пожалуй не место
+
+    namespace aircraft
+    {
+        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+    }
+
+    namespace ray_cast_vehicle
+    {
+        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+    }
+
 }

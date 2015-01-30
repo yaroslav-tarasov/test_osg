@@ -51,6 +51,8 @@ osg::Node* createObject(std::string name, bool fclone)
 	else
 	{
 		std::string object_file_name =  osgDB::findFileInPath(name + ".osgb", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+        std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+        
 
 		if(object_file_name.empty())
 			object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
@@ -60,16 +62,22 @@ osg::Node* createObject(std::string name, bool fclone)
 
 		object_file = osgDB::readNodeFile(object_file_name);
 
-		avLod::LOD* lod = new avLod::LOD;
+        MaterialVisitor::namesList nl;
+        nl.push_back("building");
+        nl.push_back("default");
+        nl.push_back("plane");
+
+        
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(mat_file_name));
+        object_file->accept(mv);
 
 		osg::Node* engine = nullptr; 
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 
 		osg::Node* lod3 =  findFirstNode(object_file,"Lod3"); 
 
 		osg::Group* root =  findFirstNode(object_file,"Root")->asGroup(); 
-		osg::Group* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact)->asGroup();
 
-		object_file->setName(name);
+		// object_file->setName(name);
 	
 		// И какой engine мы найдем?
 		//engine =  findFirstNode(object_file,"engine",findNodeVisitor::not_exact);
@@ -117,10 +125,37 @@ osg::Node* createObject(std::string name, bool fclone)
 		//
 		//  А здесь будет чертов некошерный лод
 		//
+        osg::Node* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact);
 
-		lod_->addChild(lod);
-		lod->addChild(lod0,0,1200);
-		lod->addChild(lod3,1200,50000);
+        if(lod_)  // Далеко не все модели имеют заданную структуру ха
+        {
+ 		    avLod::LOD* lod = new avLod::LOD;
+
+		    lod_->asGroup()->addChild(lod);
+		    lod->addChild(lod0,0,1200);
+		    lod->addChild(lod3,1200,50000);
+        }
+        else
+        {
+            osg::Node* named_node =  findFirstNode(object_file,name,findNodeVisitor::not_exact);
+
+            lod3 = osg::clone(named_node, osg::CopyOp::DEEP_COPY_ALL 
+                & ~osg::CopyOp::DEEP_COPY_IMAGES
+                & ~osg::CopyOp::DEEP_COPY_TEXTURES
+                & ~osg::CopyOp::DEEP_COPY_STATESETS  
+                & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+                & ~osg::CopyOp::DEEP_COPY_UNIFORMS
+                );
+
+
+            osgUtil::Simplifier simplifier;
+            simplifier.setSampleRatio( 0.001 );
+            lod3->accept( simplifier );
+            lod3->setName("Lod3");
+            
+            root->addChild(lod3);
+        }
+
 	}
 
 	return object_file;

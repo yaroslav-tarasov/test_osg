@@ -9,7 +9,7 @@ namespace phys
     {
         virtual bt_rigid_body_ptr get_body() const = 0;
         virtual void pre_update(double dt) = 0;
-        virtual void has_contact(rigid_body_user_info_t const* other, osg::Vec3 const& local_point, osg::Vec3 const& vel) = 0;
+        virtual void has_contact(rigid_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel) = 0;
     };
 
     struct system_impl

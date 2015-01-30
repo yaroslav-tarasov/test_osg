@@ -30,6 +30,7 @@ namespace bi
             , _dbgDraw     (nullptr)
             , _debug       (true)
 			, _sys         (phys::create())
+            , _last_frame_time(0)
         {}
 
 
@@ -38,6 +39,7 @@ namespace bi
 		void addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 		void addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
         void addUFO3(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
+        void addVehicle(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
@@ -45,6 +47,11 @@ namespace bi
         void handlePointEvent(std::vector<cg::point_3> const &simple_route);
 
         bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
+        
+        osg::Node* addGUIObject( osg::Node* node )
+        {
+            return addGUIObject_( node );
+        }
 
     protected:
         void addPhysicsData( int id, osg::Shape* shape, const osg::Vec3& pos,
@@ -53,7 +60,7 @@ namespace bi
         void addPhysicsData( int id, osg::Node* node, const osg::Vec3& pos,
             const osg::Vec3& vel, double mass );
 
-        osg::Node* addGUIAircraft( osg::Node* node ) 
+        inline static osg::Node* addGUIObject_( osg::Node* node ) 
         {
             osg::ComputeBoundsVisitor cbv;
             node->accept( cbv );
@@ -89,7 +96,8 @@ namespace bi
 		typedef std::vector<phys::aircraft::info_ptr>                   aircrafts_t;
         typedef std::vector<aircraft::phys_aircraft_ptr>                phys_aircrafts_t;
         typedef std::vector<aircraft_model>                             aircraft_models_t;
-        
+        typedef std::vector<phys::ray_cast_vehicle::info_ptr>              phys_vehicles_t;
+
         NodeMap                                  _physicsNodes;
         osg::observer_ptr<osg::Group>            _root;
         high_res_timer                           _hr_timer;
@@ -98,7 +106,13 @@ namespace bi
         bool                                     _debug;
 		aircrafts_t                              _aircrafts;
         aircraft_models_t                        _phys_aircrafts;
+        phys_vehicles_t                          _phys_vehicles;
+
+
 		boost::shared_ptr<phys::BulletInterface> _sys;
+    private:
+        double                                   _last_frame_time;
+
     };
 
 }

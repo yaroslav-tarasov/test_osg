@@ -486,7 +486,7 @@ void  Scene::createTerrainRoot()
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(_terrainRoot.get())->getShadowSettings();
 
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
-    settings->setBaseShadowTextureUnit(5);
+    settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
     settings->setMinimumShadowMapNearFarRatio(.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
@@ -525,8 +525,9 @@ void Scene::createObjects()
     if(_rigidUpdater.valid())
         _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
+    const std::string name = "a_319";
 
-	auto obj = creators::applyBM(creators::createObject("a_319"),"a_319",true);
+	auto obj = creators::applyBM(creators::createObject(name),name,true);
 
 #if 1
 	if(_rigidUpdater.valid())
@@ -557,12 +558,11 @@ void Scene::createObjects()
         osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
 
 
-
 	const bool add_planes = false;
 
     if (add_planes)
     {
-        const std::string name = "a_319";
+
         osg::Node* p_copy = creators::applyBM(creators::loadAirplane(name),name,true);
         // auto p_copy = creators::loadAirplane(name); // А если без BM еще кадров 15-20 ??? Чет не вижу
         
@@ -657,6 +657,18 @@ void Scene::createObjects()
             // p_copy = osg::clone(p_copy,(const osg::CopyOp) (osg::CopyOp::DEEP_COPY_CALLBACKS & osg::CopyOp::DEEP_COPY_DRAWABLES) );
             
         }
+    }
+
+    auto poj = creators::createObject("niva_chevrolet");
+    _rigidUpdater->addVehicle(poj,
+        osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 100.0f);
+    // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));
+
+    const bool add_vehicles = true;
+
+    if(add_vehicles)
+    {
+        
     }
 
     if(_rigidUpdater.valid())

@@ -3,6 +3,7 @@
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
 #include "bi/bullet_helpers.h"
+
 #include "aircraft_phys.h"
 #include "../find_node_visitor.h"
 
@@ -167,13 +168,7 @@ namespace phys
         prev_attack_angle_ = attack_angle;
     }
 
-	void impl::debugDraw(btIDebugDraw* debugDrawer)
-	{
-		if (raycast_veh_->getNumWheels() == 0)
-			return;
 
-		raycast_veh_->debugDraw(debugDrawer);
-	}
 
 #if 0
 	void aircraft::debugDraw(btIDebugDraw* debugDrawer)
@@ -198,6 +193,14 @@ namespace phys
 			///dynamic_cast<debug_drawer_impl *>(debugDrawer)->draw_shape(tr, &*wheel_shape, cg::color_blue(), btIDebugDraw::DBG_DrawWireframe, aabbMin, aabbMax);
 		}
 	}
+#else
+    void impl::debugDraw(btIDebugDraw* debugDrawer)
+    {
+        if (raycast_veh_->getNumWheels() == 0)
+            return;
+
+        raycast_veh_->debugDraw(debugDrawer);
+    }
 #endif
 
 	size_t impl::add_wheel( double /*mass*/, double /*width*/, double radius, point_3 const& offset, cpr const & /*orien*/, bool /*has_damper*/, bool is_front )
@@ -310,7 +313,7 @@ namespace phys
 		raycast_veh_.activate(chassis_->isActive());
 	}
 
-	void impl::has_contact(rigid_body_user_info_t const* /*other*/, osg::Vec3 const& local_point, osg::Vec3 const& vel)
+	void impl::has_contact(rigid_body_user_info_t const* /*other*/, cg::point_3 const& local_point, cg::point_3 const& vel)
 	{
 		//has_chassis_contact_ = true;
 		//size_t id = body_contact_points_.insert(local_point).first;

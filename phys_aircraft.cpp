@@ -19,6 +19,8 @@ namespace aircraft
         nm::node_info_ptr body_node = nodes_manager->find_node("body");
         nm::node_info_ptr wing_r_node = nodes_manager->find_node("wing_r");
         nm::node_info_ptr wing_l_node = nodes_manager->find_node("wing_l");
+
+
         if (!body_node || !wing_r_node || !wing_l_node)
             return false;
 
@@ -69,7 +71,7 @@ namespace aircraft
         // phys::compound_sensor_t s;
         // if (!fill_sensor(nodes_manager, s))
         //     return phys_aircraft_ptr();
-        phys::compound_sensor_ptr s = phys::fill_cs(nodes_manager);
+        phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager);
 
         return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
     }
@@ -100,7 +102,23 @@ namespace aircraft
     }
 
     void phys_aircraft_impl::update()
-    {
+    {          
+        shassis_->visit_chassis([this](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
+        {
+            if(!gr.is_front)
+                return;
+
+            auto wnode = shassis.wheel_node;
+
+            nm::node_position np = wnode->position();
+            np.local().orien = cg::quaternion(cg::cpr(this->phys_aircraft_->get_steer(),0,0));
+            wnode->set_position(np);
+
+            if (shassis.phys_wheels.empty())
+                return;
+
+        });
+
         sync_phys(0.1);
     }
 
@@ -179,26 +197,24 @@ namespace aircraft
     }
 
 
-    //size_t phys_aircraft_impl::get_zone() const
-    //{
-    //    return zone_;
-    //}
+    size_t phys_aircraft_impl::get_zone() const
+    {
+        return zone_;
+    }
 
-    //void phys_aircraft_impl::set_malfunction(bool malfunction)
-    //{
-    //    has_malfunction_ = malfunction;
-    //}
+    void phys_aircraft_impl::set_malfunction(bool malfunction)
+    {
+        has_malfunction_ = malfunction;
+    }
 
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
         const double phys_mass_factor_ = 1000;
 
-
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
-   
         body_transform_inv_ = get_relative_transform(nodes_manager_, body_node).inverted();
- #if 0 // TODO or not TODO
+#if 0 // TODO or not TODO
 
         phys::collision_ptr collision = phys_sys_;
 

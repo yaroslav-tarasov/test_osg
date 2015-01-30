@@ -1,3 +1,5 @@
+#pragma once 
+
 class InfoVisitor : public osg::NodeVisitor
 {
 public:

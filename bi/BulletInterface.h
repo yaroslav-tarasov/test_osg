@@ -43,23 +43,24 @@ public:
 #if 0
     static BulletInterface*  instance();
 #endif    
-	btDynamicsWorld* getScene() { return _dw.get(); }
+	btDynamicsWorld*            getScene() { return _dw.get(); }
     
-    void createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
-    void createBox    ( int id, const osg::Vec3& dim, double mass );
-    void createSphere ( int id, double radius, double mass );
-    void createShape  ( osg::Node* node, int id, double mass);
-	void createUFO    ( osg::Node* node, int id, double mass);
-	aircraft::info_ptr createUFO2    ( osg::Node* node, int id, double mass);
-    aircraft::info_ptr create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
+    void                        createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
+    void                        createBox    ( int id, const osg::Vec3& dim, double mass );
+    void                        createSphere ( int id, double radius, double mass );
+    void                        createShape  ( osg::Node* node, int id, double mass);
+	void                        createUFO    ( osg::Node* node, int id, double mass);
+	aircraft::info_ptr          createUFO2    ( osg::Node* node, int id, double mass);
+    aircraft::info_ptr          create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
+    ray_cast_vehicle::info_ptr  createVehicle(osg::Node* node,int id,double mass);
 
-    void               registerUFO3(int id,phys::rigid_body_ptr ctrl);
+    void                        registerBody(int id,phys::rigid_body_ptr ctrl);
 
-    void setVelocity  ( int id, const osg::Vec3& pos );
-    void setMatrix    ( int id, const osg::Matrix& matrix );
-    osg::Matrix getMatrix( int id );
+    void                        setVelocity  ( int id, const osg::Vec3& pos );
+    void                        setMatrix    ( int id, const osg::Matrix& matrix );
+    osg::Matrix                 getMatrix( int id );
     
-    void update( double step );     // former simulate
+    void                        update( double step );     // former simulate
 
     void setDebugDrawer(btIDebugDraw* dd)
     {

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "materials_visitor.h"
+#include "materials.h"
+
 
 namespace creators 
 {
@@ -16,27 +17,6 @@ namespace creators
     osg::Node*          loadHelicopter();
 	osg::Node*          createObject(std::string name, bool fclone=true);
 
-    class programsHolder_base {
-    public:
-        struct program_t
-        {
-            osg::ref_ptr<osg::Program> program;
-        };
-    };
-
-    class texturesHolder_base {
-        public:
-        virtual osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture() = 0;
-        virtual osg::ref_ptr<osg::Texture2D>        getDecalTexture() =0;
-    };    
-    
-    texturesHolder_base&             getTextureHolder();
-
-    programsHolder_base::program_t   createProgram(std::string mat_name);
-    
-    void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m);
-    void computeAttributes(osg::Node* model,std::string mat_name);
-
     const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
     const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);
     const osg::Vec4 green_color = osg::Vec4(0.0f, 100.0f, 0.0f, 100.0f);
@@ -45,22 +25,7 @@ namespace creators
     const osg::Vec4 gray_color  = osg::Vec4(0.8f,0.8f,0.8f,100.0f);
 }
 
-namespace mat
-{
 
-    struct reader
-    {
-        reader();
-
-        reader(std::string full_path);
-        static materials_t  read (std::string full_path);
-        materials_t get () {return mats_;}
-
-    private:
-        materials_t mats_;
-    };
-
-}
 
 
 namespace bi
@@ -182,99 +147,3 @@ namespace spark
     spark_pair_t create(spark_t effectType,osg::Transform* model=nullptr);
 }
 
-namespace utils
-{
-
-#if 0
-template <class T>
-class NodeCallback : public osg::NodeCallback
-{
-public:
-
-    NodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
-        : _object(object)
-        , _func(func)
-        , _isPureCallback(isPure)
-    {
-    }
-
-    NodeCallback( const NodeCallback & other, const osg::CopyOp & copyop = osg::CopyOp::SHALLOW_COPY )
-        : osg::NodeCallback(other, copyop)
-        , _object(other._object)
-        , _func(other._func)
-        , _isPureCallback(other._isPureCallback)
-    {
-    }
-
-    virtual void operator()( osg::Node * node, osg::NodeVisitor * nv )
-    {
-        (_object->*_func)(nv);
-
-        if (!_isPureCallback)
-            osg::NodeCallback::operator()(_object, nv);
-    }
-
-private:
-
-    T * _object;
-    void (T::*_func)( osg::NodeVisitor * nv );
-    bool _isPureCallback;
-};
-
-template<class T>
-inline NodeCallback<T> * makeNodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
-{
-    return new NodeCallback<T>(object, func, isPure);
-}
-#endif
-
-template <class T>
-class NodeCallback : public osg::NodeCallback
-{
-public:
-    typedef std::function<void(osg::NodeVisitor * nv)> callback_f;
-public:
-
-    NodeCallback( T * object, callback_f func, bool isPure = false )
-        : _object(object)
-        , _func(func)
-        , _isPureCallback(isPure)
-    {
-    }
-
-    NodeCallback( const NodeCallback & other, const osg::CopyOp & copyop = osg::CopyOp::SHALLOW_COPY )
-        : osg::NodeCallback(other, copyop)
-        , _object(other._object)
-        , _func(other._func)
-        , _isPureCallback(other._isPureCallback)
-    {
-    }
-
-    virtual void operator()( osg::Node * node, osg::NodeVisitor * nv )
-    {
-        _func(nv);
-
-        if (!_isPureCallback)
-            osg::NodeCallback::operator()(_object, nv);
-    }
-
-private:
-
-    T * _object;
-    callback_f _func;
-    bool _isPureCallback;
-};
-
-template<class T>
-inline NodeCallback<T> * makeNodeCallback( T * object, typename NodeCallback<T>::callback_f func, bool isPure = false )
-{
-    return new NodeCallback<T>(object, func, isPure);
-}
-
-template<class T>
-inline NodeCallback<T> * makeNodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
-{
-    return new NodeCallback<T>(object, func, isPure);
-}
-
-}

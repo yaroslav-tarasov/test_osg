@@ -8,7 +8,6 @@
 #include "shaders.h"
 #include "ct_visitor.h"
 
-#include "materials_visitor.h"
 #include "pugixml.hpp"
 #include "shadow_map.h"
 
@@ -21,6 +20,8 @@
 #include "bi/RigidUpdater.h"
 
 #include "../cpp_utils/str.h"
+
+#include "materials.h"
 
 #include "LOD.h"
 
@@ -282,53 +283,7 @@ namespace bi
 
 
 }
-
-
-
-namespace mat
-{
-
-
-        reader::reader()
-        {
-        }
-
-        reader::reader(std::string full_path)
-        {
-            mats_ = read (full_path);
-        }
-
-        materials_t  reader::read (std::string full_path)
-        {
-            pugi::xml_document doc;
-            materials_t mats_;
-
-            std::string in_file_name = /*fs::path(*/full_path/*).leaf()*/ + ".mat.xml";
-
-            bool l = doc.load_file(in_file_name.c_str());
-            if(l)
-            {
-            pugi::xml_node root = doc.child("root");
-
-            for (pugi::xml_node m = root.first_child(); m; m = m.next_sibling())
-            {
-                for (pugi::xml_node t = m.first_child(); t; t = t.next_sibling())
-                {
-                    texture_t tex;
-                    tex.path = t.attribute("path").as_string();
-                    tex.unit = t.attribute("unit").as_int();
-                    mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
-                }
-            }	
-
-            }
-            else
-                std::cerr << "File not found: " << in_file_name;
-
-            return mats_;
-        }
-
-}
+ 
 
 namespace effects 
 { 
@@ -837,9 +792,9 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts(std::string name)
 {
-    osg::Node* airplane_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae"); //".osgb"
-    if (!airplane_file)
-        airplane_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae");
+    osg::Node* model_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae"); //".osgb"
+    if (!model_file)
+        model_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae");
 
     avLod::LOD* lod = new avLod::LOD;
     //osg::Group* Root = new osg::Group;
@@ -853,9 +808,9 @@ nodes_array_t loadAirplaneParts(std::string name)
     osg::Group* lod_ = nullptr;
 
 #ifdef ANIMATION_TEST
-    if(airplane_file)
+    if(model_file)
     {
-        auto anim =  findFirstNode(airplane_file,"animgroup_shassi_r_r_lod0");
+        auto anim =  findFirstNode(model_file,"animgroup_shassi_r_r_lod0");
 
         auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( anim->getUpdateCallback() );
 
@@ -877,9 +832,9 @@ nodes_array_t loadAirplaneParts(std::string name)
     }
 #endif
 
-    if(airplane_file)
+    if(model_file)
 	{
-        airplane_file->setName(name);
+        model_file->setName(name);
                  
 
         auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
@@ -904,17 +859,17 @@ nodes_array_t loadAirplaneParts(std::string name)
         osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
         osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
         
-        lod0 =  findFirstNode(airplane_file,"Lod0");
-        lod3 =  findFirstNode(airplane_file,"Lod3");
+        lod0 =  findFirstNode(model_file,"Lod0");
+        lod3 =  findFirstNode(model_file,"Lod3");
         //      
         //if(lod3) 
         //    lod3->setNodeMask(0); // Убираем нафиг Lod3 
         
-        root =  findFirstNode(airplane_file,"Root")->asGroup();
-        lod_ =  findFirstNode(airplane_file,"lod_",findNodeVisitor::not_exact)->asGroup();
+        root =  findFirstNode(model_file,"Root")->asGroup();
+        lod_ =  findFirstNode(model_file,"lod_",findNodeVisitor::not_exact)->asGroup();
 
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
-            auto g_point =  findFirstNode(airplane_file,root.c_str());
+            auto g_point =  findFirstNode(model_file,root.c_str());
             if(g_point)  
             {
                 g_point->asGroup()->addChild(child);
@@ -930,7 +885,7 @@ nodes_array_t loadAirplaneParts(std::string name)
         auto port = addAsChild("port",green_light);
         auto star_board = addAsChild("starboard",red_light);
 
-        engine =  findFirstNode(airplane_file,"engine",findNodeVisitor::not_exact);
+        engine =  findFirstNode(model_file,"engine",findNodeVisitor::not_exact);
         if (engine) engine_geode = engine->asGroup()->getChild(0);
 	}
 
@@ -945,7 +900,7 @@ nodes_array_t loadAirplaneParts(std::string name)
     //root->removeChild(lod_);
     //bool ret = lod_->removeChild(0,2);
 
-    nodes_array_t retval = {nullptr,airplane_file,engine,engine_geode,lod0,lod3};
+    nodes_array_t retval = {nullptr,model_file,engine,engine_geode,lod0,lod3};
     return retval;
 }
 
@@ -954,6 +909,41 @@ osg::Node* loadAirplane(std::string name)
 {
     return loadAirplaneParts(name)[1];
 }
+
+osg::Node* loadVehicle(std::string name)
+{
+    osg::Node* model_file = osgDB::readNodeFile("vehicles/" + name + "/" + name + ".dae"); //".osgb"
+    if (!model_file)
+        model_file = osgDB::readNodeFile("vehicles/" + name + "/" + name + ".dae");
+
+    avLod::LOD* lod = new avLod::LOD;
+
+    osg::Node* lod0 = nullptr; 
+    osg::Node* lod3 = nullptr; 
+
+    osg::Group* root = nullptr; 
+    osg::Group* lod_ = nullptr;
+
+    if(model_file)
+    {
+        model_file->setName(name);
+
+        lod0 =  findFirstNode(model_file,"Lod0");
+        lod3 =  findFirstNode(model_file,"Lod3");
+
+        root =  findFirstNode(model_file,"Root")->asGroup();
+        lod_ =  findFirstNode(model_file,"lod_",findNodeVisitor::not_exact)->asGroup();
+
+    }
+
+    // Засада при копированиии надо думать avLod::LOD
+    lod_->addChild(lod);
+    lod->addChild(lod0,0,1200);
+    lod->addChild(lod3,1200,50000);
+
+    return model_file;
+}
+
 
 osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 {
@@ -969,7 +959,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     program->addShader( new osg::Shader(osg::Shader::FRAGMENT, shaders::plane_mat::get_shader(shaders::FS)) );
     program->addBindAttribLocation( "tangent", 6 );
     program->addBindAttribLocation( "binormal", 7 );
-    
+
     // create and setup the texture object
     osg::TextureCubeMap *tcm = creators::getTextureHolder().getEnvTexture().get(); 
 
@@ -981,14 +971,19 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
         tcm->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("day_negy.jpg"));
         tcm->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("day_posz.jpg"));
         tcm->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("day_negz.jpg"));
-    }
+    }       
+
 
 
     FindTextureVisitor ft(name); 
     model->accept( ft );
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    normalTex->setImage( osgDB::readImageFile("planes/" + name + "/" + name + "_n.dds") ); // "a_319_n.dds"  
+    auto im = osgDB::readImageFile("planes/" + name + "/" + name + "_n.dds");
+    if(im==nullptr)
+        auto im = osgDB::readImageFile("vehicles/" + name + "/" + name + "_n.dds");
+
+    normalTex->setImage( im ); // "a_319_n.dds"  
 
     auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
 
@@ -1007,7 +1002,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
         stateset->setAttributeAndModes( program.get(),osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE|osg::StateAttribute::PROTECTED );
         stateset->setTextureAttributeAndModes( 3, tcm);
     }
-    
+ 
 
     osg::StateSet* stateset = model->getOrCreateStateSet();
     stateset->addUniform( new osg::Uniform("colorTex", 0) );
@@ -1220,346 +1215,6 @@ osg::Node* loadHelicopter()
     return lod0;
 }
 
-class texturesHolder  : public texturesHolder_base
-{
-public:
-    struct textures_t
-    {
-        osg::ref_ptr<osg::Texture2D>      colorTex;
-        osg::ref_ptr<osg::Texture2D>      nightTex;
-        osg::ref_ptr<osg::Texture2D>      detailsTex;
-        osg::ref_ptr<osg::TextureCubeMap> envTex;
-        osg::ref_ptr<osg::Texture2D>      decalTex;
-    };
-    
-public:
-    static inline const textures_t& Create(const mat::materials_t&  mats, std::string mat_name)
-    {
-        if (    mat_name.find("building") !=std::string::npos 
-			 || mat_name.find("ground")   !=std::string::npos
-			 || mat_name.find("tree")     !=std::string::npos
-			 || mat_name.find("ground")   !=std::string::npos
-			 || mat_name.find("concrete") !=std::string::npos
-			 || mat_name.find("sea")      !=std::string::npos
-			 || mat_name.find("mountain") !=std::string::npos
-			 || mat_name.find("railing")  !=std::string::npos
-             || mat_name.find("panorama") !=std::string::npos
-             
-			)
-        {
-           return texCreator(mats,mat_name); 
-        }
-
-        return texCreator(mats,"default");
-    }
-
-    osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()
-    {
-        return   envTex;
-    }
-    
-    osg::ref_ptr<osg::Texture2D>   getDecalTexture()
-    {
-        return   decalTex;
-    }
-
-    friend texturesHolder_base&   getTextureHolder();
-
-private:
-    
-    osg::ref_ptr<osg::Texture2D>      detailsTex;
-    osg::ref_ptr<osg::Texture2D>      emptyTex;
-    osg::ref_ptr<osg::TextureCubeMap> envTex;
-    osg::ref_ptr<osg::Texture2D>      decalTex;
-
-    texturesHolder()
-    {          
-         detailsTex = new osg::Texture2D;
-         detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-         detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-         detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-         detailsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-         detailsTex->setMaxAnisotropy(16.0f);
-
-         emptyTex = new osg::Texture2D;
-         emptyTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-         emptyTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-         emptyTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-         emptyTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-         emptyTex->setMaxAnisotropy(16.0f);
-
-         // create and setup the texture object
-         envTex = new osg::TextureCubeMap;
-         const unsigned envSize = 256;
-         envTex->setInternalFormat(GL_RGB);
-         envTex->setTextureSize(envSize, envSize);
-         envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/); // CLAMP_TO_BORDER/*CLAMP_TO_EDGE*/
-         envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
-         envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
-         envTex->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR_MIPMAP_LINEAR/*LINEAR*/);
-         envTex->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
-         envTex->setMaxAnisotropy(16.0f);
-         envTex->setNumMipmapLevels(3);
-         envTex->setUseHardwareMipMapGeneration(true);
-         
-         decalTex = new osg::Texture2D;
-         decalTex->setTextureSize(1024, 1024);
-         decalTex->setInternalFormat( GL_RGBA );
-         decalTex->setBorderWidth( 0 );
-         decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
-         decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
-#if 0
-#if 1
-         envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
-         envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
-         envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP);
-         envTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-         envTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);    
-         // assign the six images to the texture object
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("day_posx.jpg"));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("day_negx.jpg"));
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("day_posy.jpg"));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("day_negy.jpg"));
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("day_posz.jpg"));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("day_negz.jpg"));
-         // envTex->setUseHardwareMipMapGeneration(true);
-#else
-         // generate the six highlight map images (light direction = [1, 1, -1])
-         osgUtil::HighlightMapGenerator *mapgen = new osgUtil::HighlightMapGenerator(
-             osg::Vec3(1, 1, -1),            // light direction
-             osg::Vec4(1, 0.9f, 0.8f, 1),    // light color
-             8);                             // specular exponent
-
-         mapgen->generateMap();
-
-         // assign the six images to the texture object
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_X, mapgen->getImage(osg::TextureCubeMap::POSITIVE_X));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_X));
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Y));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Y));
-         envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Z));
-         envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Z));
-#endif
-#endif
-
-    }
-    
-
-
-    static texturesHolder& getTextureHolder()
-    {
-        static texturesHolder th;
-        return th;
-    }
-
-    static inline const textures_t&  texCreator(const mat::materials_t&  mats, std::string mat_name)
-    {
-        texturesHolder& th = getTextureHolder();
-
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t; 
-            t.colorTex = new osg::Texture2D;
-            t.nightTex = new osg::Texture2D;
-            t.detailsTex = th.detailsTex;
-            //t.detailsTex = new osg::Texture2D;
-
-            //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-            //t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            //t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-            
-
-            t.envTex = th.envTex;
-
-			auto range = mats.equal_range(mat_name);
-			
-			bool night_tex = false; 
-			
-			for (auto it = range.first; it != range.second; ++it)
-			{
-				// it->first 
-				if(it->second.unit == 0) 
-				{
-					t.colorTex->setImage( osgDB::readImageFile(it->second.path) );
-					t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-					t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                    t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    t.colorTex->setMaxAnisotropy(16.0f);
-                    
-                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
-                    //t.colorTex->setInternalFormatMode(
-                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
-                    //t.colorTex->setUnRefImageDataAfterApply( true );
-				} 
-                else 	
-			    if(it->second.unit == 2)
-				{
-					t.nightTex->setImage( osgDB::readImageFile(it->second.path) );
-					t.nightTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-					t.nightTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                    t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    t.nightTex->setMaxAnisotropy(16.0f);
-                   
-                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
-                    //t.nightTex->setInternalFormatMode(
-                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
-                    //t.nightTex->setUnRefImageDataAfterApply( true );
-
-					night_tex = true;
-				}
-			}
-
-			if(!night_tex)
-				t.nightTex = th.emptyTex;// t.nightTex->setImage( osgDB::readImageFile("empty_n.dds") );  
-
-
-
-            GetTextures()[mat_name] = t;
-        }
-
-        return  GetTextures()[mat_name];
-    }
-
-    static inline std::map<std::string,textures_t>& GetTextures()
-    {
-            static std::map<std::string,textures_t>     textures;
-            return textures;
-    }
-
-};
- 
-texturesHolder_base&   getTextureHolder()
-{
-    return texturesHolder::getTextureHolder();
-}
-
-class programsHolder: public programsHolder_base
-{
-//public:
-//    struct program_t
-//    {
-//        osg::ref_ptr<osg::Program> program;
-//    };
-
-public:
-    static inline const program_t& Create(std::string mat_name)
-    {
-        if(GetPrograms().find(mat_name)==GetPrograms().end())
-        {
-            program_t p;
-            p.program = new osg::Program;
-            p.program->setName(mat_name);
-            if(GetShader(shaders::VS,mat_name))
-            {
-                auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
-                p.program->addShader( vs );
-
-            }
-            //std::string fs_shader(GetShader(shaders::FS,mat_name));
-			//fs_shader.replace('','');
-            if(GetShader(shaders::FS,mat_name))
-            {
-			    auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
-                p.program->addShader( fs );
-            }
-
-            p.program->addBindAttribLocation( "tangent" , 6 );
-            p.program->addBindAttribLocation( "binormal", 7 );
-
-            GetPrograms()[mat_name]=p;
-        }
-
-        return GetPrograms()[mat_name];
-    }
-
-private:
-
-    static inline const char* GetShader(shaders::shader_t t, std::string mat_name)
-    {
-        if (mat_name.find("building") !=std::string::npos)
-        {
-            return shaders::building_mat::get_shader(t); 
-        }
-        else
-        if (mat_name.find("tree") !=std::string::npos)
-        {
-            return shaders::tree_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("ground") !=std::string::npos || mat_name.find("sea") !=std::string::npos || mat_name.find("mountain") !=std::string::npos)
-        {
-            return shaders::ground_mat::get_shader(t);  
-        }    
-        else
-        if (mat_name.find("concrete") !=std::string::npos)
-        {
-            return shaders::concrete_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("railing") !=std::string::npos)
-        {
-            return shaders::railing_mat::get_shader(t);  
-        } 
-        else
-        if (mat_name.find("panorama") !=std::string::npos)
-        {
-            return shaders::panorama_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("sky") !=std::string::npos)
-        {
-            return shaders::sky_fog_mat::get_shader(t);  
-        }            
-        else
-        if (mat_name.find("clouds") !=std::string::npos)
-        {
-            return shaders::clouds_mat::get_shader(t);  
-        }
-
-        return nullptr;
-        
-    }
-
-
-    static inline std::map<std::string,program_t>& GetPrograms()
-    {
-        static std::map<std::string,program_t>     programs;
-        return programs;
-    }
-
-};
-
-
-void computeAttributes(osg::Node* model,std::string mat_name)
-{
-    if (   mat_name.find("ground")   !=std::string::npos   
-        || mat_name.find("sea")      !=std::string::npos     
-        || mat_name.find("mountain") !=std::string::npos 
-        || mat_name.find("concrete") !=std::string::npos 
-       )
-    {
-        ComputeTangentVisitor ctv;
-        ctv.setTraversalMode( osg::NodeVisitor::TRAVERSE_ALL_CHILDREN );
-        model->accept( ctv );
-    }
-}
-
-class FogCallback: public osg::Uniform::Callback
-{
-public:
-    virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
-    {
-        //float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
-        //float sine = sinf( angle );        // -1 -> 1
-        //float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
-        //float v10 = 1.0f - v01;                //  1 -> 0
-        
-        double  fractpart, intpart;
-        fractpart = modf (nv->getFrameStamp()->getSimulationTime() / 100.0f , &intpart);
-
-        uniform->set( osg::Vec4(/*1.505f*/1.5f, /*0.8f*v01*/1.5f, 1.5f, 100*fractpart) ); 
-    }
-};
 
 void create_specular_highlights(osg::StateSet* ss)
 {
@@ -1603,62 +1258,6 @@ void create_specular_highlights(osg::StateSet* ss)
     te->setSource1_RGB (osg::TexEnvCombine::PRIMARY_COLOR);
     te->setOperand1_RGB(osg::TexEnvCombine::SRC_COLOR);
     ss->setTextureAttributeAndModes(0, te, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON);
-}
-
-
- programsHolder_base::program_t  createProgram(std::string mat_name)
- {
-     return programsHolder::Create(mat_name);
- }
-
-
-void createMaterial(osg::StateSet* stateset,std::string mat_name,const mat::materials_t& m)
-{
-    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name);
-    programsHolder::program_t  p = programsHolder::Create(mat_name);
-    
-    const osg::StateSet::UniformList& ul = stateset->getUniformList();
-    for(osg::StateSet::UniformList::const_iterator itr = ul.begin();
-        itr != ul.end();
-        ++itr)
-    {   
-        std::string name = itr->first;
-        // pcp->apply(*(itr->second.first));
-    }    
-
-    stateset->addUniform( new osg::Uniform("colorTex"    , 0) );
-    stateset->addUniform( new osg::Uniform("nightTex"    , 1) );
-    stateset->addUniform( new osg::Uniform("detailTex"      , 2) ); 
-    stateset->addUniform( new osg::Uniform("envTex"         , 3) ); 
-    stateset->addUniform( new osg::Uniform("ViewDecalMap", 4) );
-    stateset->addUniform( new osg::Uniform("shadowTexture0", 5) );
-
-
-    stateset->setAttributeAndModes( p.program.get() );
-    
-    if ( mat_name.find("panorama") !=std::string::npos )
-    {     
-          osg::Uniform* uni_fog =  new osg::Uniform("fog_params", osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-          stateset->addUniform( uni_fog );
-          uni_fog->setUpdateCallback(new FogCallback);
-          uni_fog->setDataVariance(osg::Object::DYNAMIC);
-    }
-
-    if (   mat_name.find("panorama") !=std::string::npos
-        || mat_name.find("railing")  !=std::string::npos 
-        || mat_name.find("tree")     !=std::string::npos 
-       )
-    { 
-       stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
-    }
-
-    osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-    stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
-    stateset->setTextureAttributeAndModes( 1, t.nightTex.get(), value );
-    stateset->setTextureAttributeAndModes( 2, t.detailsTex.get(), value );
-    stateset->setTextureAttributeAndModes( 3, t.envTex.get(), value );
-    stateset->setTextureAttributeAndModes( 4, getTextureHolder().getDecalTexture().get()/*GetShadowMap()->getTexture()*/, value ); 
-    stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 
 
@@ -1789,7 +1388,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     avShadow::ShadowSettings* settings = root->getShadowSettings();
     
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
-    settings->setBaseShadowTextureUnit(5);
+    settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
     settings->setMinimumShadowMapNearFarRatio(.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     //settings->setMultipleShadowMapHint(testShadow::ShadowSettings::PARALLEL_SPLIT);
@@ -1846,11 +1445,13 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 #if 1
+    const char* name = "sheremetyevo";
     const char* scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.lod0.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
-    const char* mat_file_name = "sheremetyevo.open.dae"; //scene_name;//
+    const char* mat_file_name = "sheremetyevo.open.dae.mat.xml"; //scene_name;//
 #else
+    const char* name = "adler";
     const char* scene_name = "adler.osgb";//"sheremetyevo.lod0.dae"; //"adler.open.dae";// "sheremetyevo.open.dae"; //"adler.open.dae"  
-    const char* mat_file_name = "adler.open.dae"; //scene_name;//
+    const char* mat_file_name = "adler.open.dae.mat.xml"; //scene_name;//
 #endif
 
 
@@ -1882,7 +1483,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     nl.push_back("sea");
     nl.push_back("railing");
     nl.push_back("panorama");
-    MaterialVisitor mv ( nl, createMaterial,computeAttributes,mat::reader::read(mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),computeAttributes,mat::reader::read(mat_file_name));
     scene->accept(mv);
 
     // All solid objects

@@ -114,6 +114,7 @@
 #include <osgUtil/ReflectionMapGenerator>
 #include <osgUtil/HighlightMapGenerator>
 #include <osgUtil/HalfWayMapGenerator>
+#include <osgUtil/Simplifier>
 
 #include <osg/ComputeBoundsVisitor>
 #include <osg/CameraNode>
@@ -137,6 +138,11 @@ int main_bi( int argc, char** argv );
 int main_teapot( int argc, char** argv );
 int main_spark( int argc, char** argv );
 int main_scene2( int argc, char** argv );
+
+#define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
+#define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
+
+#define BASE_SHADOW_TEXTURE_UNIT 6
 
 #define STRINGIFY(x) #x 
 
@@ -187,9 +193,13 @@ int main_scene2( int argc, char** argv );
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/any.hpp>
 
 using boost::noncopyable;
 using boost::optional;
+
+
+
 
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
@@ -217,12 +227,18 @@ inline T cbrt(T n)
 
 #include "geometry/primitives.h"
 #include "position.h"
+#include "local_position.h"
 
 #include "cpp_utils/polymorph_ptr.h"
 #include "nodes_management.h"
+
 namespace nm = nodes_management;
+namespace sp = std::placeholders;
 
 #include "phys_sys_fwd.h"
 #include "aircraft_common.h"
 
 #include "event.h"
+
+
+#include "osg_helpers.h"

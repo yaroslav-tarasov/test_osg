@@ -379,7 +379,8 @@ namespace shaders
        const char* fs = {
        "#version 130 \n"
        "#extension GL_ARB_gpu_shader5 : enable \n "
-        INCLUDE_UNIFORMS
+        
+       INCLUDE_UNIFORMS
 
        STRINGIFY ( 
 
@@ -417,6 +418,7 @@ namespace shaders
                float shadow = 1.0; 
                if(ambient.a > 0.35)
                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+
                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -434,12 +436,12 @@ namespace shaders
                vec4  light_vec_view = vec4(lightDir,1);
 
                viewworld_matrix = gl_ModelViewMatrixInverse;
-               vec4 base = texture2D(colorTex, gl_TexCoord[0].xy);
-               vec3 bump = fma(texture2D(normalTex, gl_TexCoord[0].xy).xyz, vec3(2.0), vec3(-1.0));
-               //vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;
+               vec4 base = texture2D(colorTex, f_in.texcoord);
+               vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
+               //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
                //bump = normalize(bump * 2.0 - 1.0);
                vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
-               vec4  dif_tex_col  = texture2D(colorTex,gl_TexCoord[0].xy, -1.0);
+               vec4  dif_tex_col  = texture2D(colorTex,f_in.texcoord, -1.0);
                float glass_factor = /*1.0 - dif_tex_col.a*/0;
 
                // get dist to point and normalized to-eye vector
@@ -489,7 +491,6 @@ namespace shaders
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-               //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
            }
        )
 

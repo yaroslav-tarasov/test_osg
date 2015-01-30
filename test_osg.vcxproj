@@ -117,6 +117,7 @@
     <ClInclude Include="hi_res_timer.h" />
     <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
+    <ClInclude Include="materials.h" />
     <ClInclude Include="materials_visitor.h" />
     <ClInclude Include="nodes_manager.h" />
     <ClInclude Include="nodes_managment.h" />
@@ -134,6 +135,8 @@
     <ClInclude Include="teapot.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="utils\str.h" />
+    <ClInclude Include="callbacks.h" />
+    <ClInclude Include="visitors.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aircraft_phys.cpp" />
@@ -162,6 +165,7 @@
     <ClCompile Include="main_scene2.cpp" />
     <ClCompile Include="main_shadows.cpp" />
     <ClCompile Include="main_shadows_2.cpp" />
+    <ClCompile Include="materials.cpp" />
     <ClCompile Include="nfi\lib_loader.cpp" />
     <ClCompile Include="nodes_management.cpp" />
     <ClCompile Include="nodes_manager.cpp" />
@@ -170,6 +174,7 @@
     <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="phys_aircraft.cpp" />
+    <ClCompile Include="ray_cast_vehicle.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
     <ClInclude Include="sensor.h">

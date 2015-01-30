@@ -73,8 +73,11 @@ void findNodeVisitor::apply(osg::Node &searchNode)
 	}
     else
     {
-         matching = searchForName.end() != std::find_if(searchForName.begin(),searchForName.end(),[&](const std::string& nodeName)->bool {
-             return boost::to_lower_copy(searchNode.getName()).find(nodeName) !=std::string::npos; }
+         matching = searchForName.end() != std::find_if(searchForName.begin(),searchForName.end(),
+             [&](const std::string& nodeName)->bool {
+             std::string ls = boost::to_lower_copy(searchNode.getName());
+             return ls.find(nodeName) !=std::string::npos;
+         }
          );
     }
     
@@ -89,7 +92,7 @@ void findNodeVisitor::apply(osg::Node &searchNode)
 void findNodeVisitor::setNameToFind(const std::string &searchName)    
 {    
     searchForName.clear();
-    searchForName.push_back(searchName);    
+    searchForName.push_back(boost::to_lower_copy(searchName));    
     foundNodeList.clear();    
 }    
 
@@ -97,6 +100,7 @@ void findNodeVisitor::setNameToFind(const std::string &searchName)
 void findNodeVisitor::setNamesToFind(const std::list<std::string> &searchNames )
 {
     searchForName = searchNames;
+    std::for_each(searchForName.begin(),searchForName.end(),[=](std::string& str){str = boost::to_lower_copy(str);});
     foundNodeList.clear();
 }
 

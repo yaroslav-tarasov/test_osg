@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "shadow_map.h"
 #include "creators.h"
+#include "callbacks.h"
 
 namespace creators
 {

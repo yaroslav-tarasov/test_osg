@@ -26,6 +26,10 @@ int main_scene2( int argc, char** argv )
     pTraits->width = 1920;//rect.right - rect.left + 1;
     pTraits->height = 1200;//rect.bottom - rect.top + 1;
 #endif
+    
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\planes");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\vehicles");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\areas");
 
     avScene::Scene::Create(arguments/*,pTraits*/);
     

@@ -77,3 +77,6 @@
 //#pragma comment(lib, "LinearMath_Debug.lib")
 //#pragma comment(lib, "BulletDynamics_Debug.lib")
 #endif
+
+
+#include <boost/algorithm/string.hpp>

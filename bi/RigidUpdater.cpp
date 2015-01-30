@@ -10,7 +10,7 @@
 #include "../ada.h"
 #include "../bada_import.h"
 #include "../phys_aircraft.h"
-
+#include "../vehicle.h"
 
 #include "RigidUpdater.h"
 
@@ -101,11 +101,6 @@ namespace bi
 
     }
 
-    //inline nodes_management::manager_ptr get_nodes_manager(osg::Node* node) 
-    //{
-    //    return nodes_management::create_manager(node);
-    //}
-
     void RigidUpdater::addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
@@ -156,19 +151,24 @@ namespace bi
         //positioned->addChild(rotated);
         //rotated->addChild(node);
 
-        addPhysicsData( id, addGUIAircraft(node), pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        addPhysicsData( id, addGUIObject(node), pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         phys::aircraft::control_ptr(_aircrafts.back())->apply_force(vel);
     }
 
 
     void RigidUpdater::addUFO3(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
+        // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
+
+        //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+
         int id = _physicsNodes.size();
 
         nm::manager_ptr man = nm::create_manager(lod3);
 
-        auto s = boost::make_shared<aircraft::shassis_support_impl>(man);
+        aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
+
         size_t pa_size = _phys_aircrafts.size();
         aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
             cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)),
@@ -179,16 +179,45 @@ namespace bi
             s,
             0);
 
+
         _phys_aircrafts.emplace_back(aircraft_model(ac_,s));
-        _sys->registerUFO3(id,ac_->get_rigid_body());
+        _sys->registerBody(id,ac_->get_rigid_body());
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-        mt->addChild( addGUIAircraft(node) );
+        mt->addChild( addGUIObject(node) );
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
     }
+
+    void RigidUpdater::addVehicle(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+    {           
+        // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
+
+        //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+
+        int id = _physicsNodes.size();
+        phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(lod3?lod3:node,id,mass);
+        
+        // FIXME
+        lod3->setNodeMask(0);
+
+        //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
+        
+        _phys_vehicles.emplace_back(veh);
+
+        //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
+        mt->addChild( addGUIObject(node) );
+        _root->addChild( mt.get() );
+
+        _physicsNodes[id] = mt;
+
+        veh->set_steer(10);
+    }
+
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
@@ -204,11 +233,39 @@ namespace bi
         addPhysicsData( id, shape, pos, vel, mass );
     }
 
+    struct frame_timer
+    {
+        inline frame_timer(osgViewer::View* view,double& last_frame_time)
+            : last_frame_time(last_frame_time)
+            , current_time(0)
+        {
+           current_time = view->getFrameStamp()->getSimulationTime();
+        }
+
+        inline double diff()
+        {
+          return current_time - last_frame_time ; 
+        }
+
+        inline ~frame_timer()
+        {
+           last_frame_time  = current_time;
+        }
+
+    private:
+        double  current_time;
+        double& last_frame_time;
+    };
+
+
     bool RigidUpdater::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
     {
         osgViewer::View* view = static_cast<osgViewer::View*>( &aa );
-        if ( !view || !_root ) return false;
 
+        frame_timer ftm (view,_last_frame_time);
+
+        if ( !view || !_root ) return false;
+        
         switch ( ea.getEventType() )
         {
         case osgGA::GUIEventAdapter::KEYUP:
@@ -237,6 +294,11 @@ namespace bi
         case osgGA::GUIEventAdapter::FRAME:
             {
                 double dt = _hr_timer.get_delta();
+                double dt1 = ftm.diff();
+
+                if (abs(dt-dt1)>0.1) 
+                    OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");
+
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 

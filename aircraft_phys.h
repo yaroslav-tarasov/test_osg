@@ -66,7 +66,7 @@ namespace phys
    private:
 	   bt_rigid_body_ptr get_body() const;
 	   void pre_update(double dt);
-	   void has_contact(rigid_body_user_info_t const* other, osg::Vec3 const& local_point, osg::Vec3 const& vel);
+	   void has_contact(rigid_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel);
 
    private:
        compound_shape_proxy                   chassis_shape_;

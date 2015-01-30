@@ -3,6 +3,7 @@
 #include "OrientationConverter.h"
 #include "optimize_nodes.h"
 #include "find_node_visitor.h"
+#include "visitors.h"
 
 typedef std::vector<std::string> FileNameList;
 
@@ -790,6 +791,15 @@ int main( int argc, char **argv )
             AddMissingColoursToGeometryVisitor av;
             root->accept(av);
         }
+        
+        // all names to lower
+        utils::CommonVisitor<osg::Node> names_lower(
+            [=](osg::Node& n)->void {
+                std::string name(boost::to_lower_copy(n.getName()))
+                n.setName(name);
+        }); 
+
+        root->accept(names_lower);
 
         // optimize the scene graph, remove rendundent nodes and state etc.
         osgUtil::Optimizer optimizer;

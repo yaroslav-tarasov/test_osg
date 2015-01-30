@@ -27,30 +27,16 @@ namespace ada
     ada::data_t fill_data(std::string const& bada_path, std::string const& aircraft_kind )
     {   
         ada::data_t ac_settings;
-        OutputDebugString(bada_path.c_str());
-        OutputDebugString(aircraft_kind.c_str());
 
         create_proxy_fn_t create_proxy_fn = reinterpret_cast<create_proxy_fn_t> (lib_loader().get_symbol(BADA_DLL,"create_proxy"));
 
-        auto proxy = create_proxy_fn("BADA");
+        auto proxy = create_proxy_fn(bada_path);
         //auto proxy = bada::create_proxy(bada_path);
 
-        OutputDebugString("bada::create_proxy\n");
-        if(proxy.get())
-        {
-            OutputDebugString("proxy.get()\n");
-        }
-        else
-        {
-            OutputDebugString("not proxy.get()\n");
-        }
-#if 1
         auto syn_data        = proxy->get_synonim_data(aircraft_kind) ;
-        OutputDebugString("Get syn_data");
         auto air_data        = proxy->get_aircraft_data(syn_data->getSynonim()) ;
-        OutputDebugString("Get air_data");
         auto air_global_data = proxy->get_global_data() ;
-        OutputDebugString("Get air_global_data");
+
 
         ac_settings.base_model        = syn_data->getSynonim();
         ac_settings.manufacturer      = syn_data->getManufacturer();
@@ -176,7 +162,7 @@ namespace ada
         ac_settings.landing_length = air_data->get_LDL();
         ac_settings.max_cas = air_data->get_Vmo() * cg::kt2mps();
         ac_settings.max_mach = air_data->get_Mmo();
-#endif
+
         return ac_settings;
     }
 
