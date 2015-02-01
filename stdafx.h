@@ -138,6 +138,8 @@ int main_bi( int argc, char** argv );
 int main_teapot( int argc, char** argv );
 int main_spark( int argc, char** argv );
 int main_scene2( int argc, char** argv );
+int main_dubins( int argc, char** argv );
+
 
 #define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
 #define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
@@ -240,5 +242,12 @@ namespace sp = std::placeholders;
 
 #include "event.h"
 
-
 #include "osg_helpers.h"
+
+//
+//  refl stubs
+//
+#define REFL_INNER(x)
+#define REFL_SER_BIN(x)
+#define REFL_ENTRY(x)
+#define REFL_END()

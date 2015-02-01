@@ -156,6 +156,8 @@ osg::Node* createObject(std::string name, bool fclone)
             root->addChild(lod3);
         }
 
+		objCache[name] = object_file;
+
 	}
 
 	return object_file;

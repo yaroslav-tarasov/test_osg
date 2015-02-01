@@ -795,7 +795,7 @@ int main( int argc, char **argv )
         // all names to lower
         utils::CommonVisitor<osg::Node> names_lower(
             [=](osg::Node& n)->void {
-                std::string name(boost::to_lower_copy(n.getName()))
+                std::string name(boost::to_lower_copy(n.getName()));
                 n.setName(name);
         }); 
 

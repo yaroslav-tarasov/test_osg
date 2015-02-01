@@ -388,7 +388,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -527,7 +527,7 @@ void Scene::createObjects()
 
     const std::string name = "a_319";
 
-	auto obj = creators::applyBM(creators::createObject(name),name,true);
+	auto obj = /*creators::applyBM(*/creators::createObject(name)/*,name,true)*/;
 
 #if 1
 	if(_rigidUpdater.valid())

@@ -386,5 +386,11 @@
     <ClCompile Include="materials.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dubins.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dubins_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

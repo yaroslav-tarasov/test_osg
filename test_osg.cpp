@@ -34,6 +34,7 @@ std::function<int( int, char**)> pmain[] = {
                                              ,main_teapot           //13
                                              ,main_spark            //14
                                              ,main_scene2           //15
+											 ,main_dubins           //16
                                            };       
 
 
@@ -46,5 +47,5 @@ int main( int argc, char** argv )
     
     osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
-    return pmain[15](argc, argv);
+    return pmain[16](argc, argv);
 }

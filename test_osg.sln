@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_osg", "test_osg.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "conv", "utils\conv\conv.vcxproj", "{7680809C-6415-4374-8032-854C333EAD52}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "daeTest", "daeTest\daeTest.vcxproj", "{9904DE03-E7DC-4404-BFEC-75288C7223B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{7680809C-6415-4374-8032-854C333EAD52}.Debug|Win32.Build.0 = Debug|Win32
 		{7680809C-6415-4374-8032-854C333EAD52}.Release|Win32.ActiveCfg = Release|Win32
 		{7680809C-6415-4374-8032-854C333EAD52}.Release|Win32.Build.0 = Release|Win32
+		{9904DE03-E7DC-4404-BFEC-75288C7223B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9904DE03-E7DC-4404-BFEC-75288C7223B2}.Debug|Win32.Build.0 = Debug|Win32
+		{9904DE03-E7DC-4404-BFEC-75288C7223B2}.Release|Win32.ActiveCfg = Release|Win32
+		{9904DE03-E7DC-4404-BFEC-75288C7223B2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

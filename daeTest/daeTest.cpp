@@ -121,7 +121,7 @@ struct mat_reader
 		pugi::xml_document doc;
 		materials_t mats_;
 
-		std::string in_file_name = fs::path(full_path).leaf() + ".mat.xml";
+		std::string in_file_name = fs::path(full_path).leaf().string() + ".mat.xml";
 		
 		bool l = doc.load_file(in_file_name.c_str());
 		
@@ -150,7 +150,7 @@ struct xml_helper
 	xml_helper(std::string full_path)
 	{
 		assert(outFileName().empty());
-		outFileName(fs::path(full_path).leaf() + ".mat.xml");
+		outFileName(fs::path(full_path).leaf().string() + ".mat.xml");
 	}
 
 	static pugi::xml_node& createNewMaterial(std::string name)
@@ -219,7 +219,7 @@ domEffect* currentEffect(domEffect* de = nullptr)
 }
 
 std::string lookupFile(const std::string& fileName) {
-	return (dataPath() / fileName).native_file_string();
+	return (dataPath() / fileName).string();// native_file_string();
 }
 
 inline daeElement *getElementFromURI( daeURI &uri )
@@ -831,7 +831,7 @@ void processModel(domCOLLADA& root) {
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string file = lookupFile("sheremetyevo.open.dae");
+	std::string file = lookupFile("planes/a_319/a_319.dae");
 
 	mat_reader mt(file);
 	

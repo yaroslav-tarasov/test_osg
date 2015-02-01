@@ -42,6 +42,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -66,15 +67,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DOM_DYNAMIC;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\include;..\..\include\1.4;..\..\external-libs\boost;C:\Work\prj\test_osg\ext\pugixml-1.4\src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;..\ext\pugixml-1.4\src;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\external-libs\boost\lib\vc10;C:\Work\prj\test_osg\ext\pugixml-1.4\scripts\vs2010\x32;..\..\build\vc10-1.4</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcollada14dom22.lib;libboost_filesystem.lib;libboost_system.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;..\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcollada14dom22.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
