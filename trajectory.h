@@ -1,0 +1,48 @@
+#pragma once
+
+#include "curve2.h"
+#include "dubins.h"
+
+namespace fms
+{
+
+struct trajectory
+{   
+    typedef cg::curve2_t<double> keypoints_t;
+
+    trajectory(const decart_position& begin_pos,decart_position const& end_pos,double radius, double step = 1)
+        :  curr_pos_(0)
+    {
+        double q0[] = { begin_pos.pos.x,begin_pos.pos.y,cg::grad2rad()*(90 - begin_pos.orien.get_course()) };
+        double q1[] = { end_pos.pos.x,end_pos.pos.y,cg::grad2rad()*(90 - end_pos.orien.get_course() )};
+
+        dubins_init( q0, q1, radius, &path_);
+        dubins_path_sample_many( &path_,std::bind(fill,std::ref(kpts_),sp::_1,sp::_2,sp::_3), step, nullptr);
+    }
+    
+    const keypoints_t& get() const {return kpts_;};
+    keypoints_t get()  {return kpts_;};
+
+    virtual ~trajectory() {}
+            
+    double& get_current_position()
+    {
+        return curr_pos_;
+    }
+
+private:
+    static int fill(keypoints_t& kp,double q[3], double x, void* user_data)
+    {
+        auto p = cg::point_2(q[0],q[1]);
+        kp.points().insert(std::make_pair(x,p));
+        return 0;
+    }        
+
+    DubinsPath    path_;
+    keypoints_t   kpts_;
+    double    curr_pos_;
+};
+
+ typedef polymorph_ptr<trajectory> trajectory_ptr;
+
+}

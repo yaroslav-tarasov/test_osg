@@ -201,6 +201,15 @@
     <ClInclude Include="materials.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="curve2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trajectory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trajectory_drawer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

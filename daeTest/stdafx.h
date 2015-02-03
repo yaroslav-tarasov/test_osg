@@ -35,13 +35,19 @@
 #include "pugixml.hpp"
 
 
+//#ifdef _DEBUG
+//	#pragma comment(lib, "libboost_filesystem-vc100-mt-gd-1_50.lib")
+//	#pragma comment(lib, "libboost_system-vc100-mt-gd-1_50.lib")
+//#else
+//	#pragma comment(lib, "libboost_filesystem-vc100-mt-1_50.lib")
+//	#pragma comment(lib, "libboost_system-vc100-mt-1_50.lib")
+//#endif
+
 #ifdef _DEBUG
-	#pragma comment(lib, "libboost_filesystem-vc100-mt-gd-1_50.lib")
-	#pragma comment(lib, "libboost_system-vc100-mt-gd-1_50.lib")
+#pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-gd-1_50.lib")
 #else
-	#pragma comment(lib, "libboost_filesystem-vc100-mt-1_50.lib")
-	#pragma comment(lib, "libboost_system-vc100-mt-1_50.lib")
+#pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
 #endif
-
-
 

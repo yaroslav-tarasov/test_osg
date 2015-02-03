@@ -163,9 +163,14 @@ namespace phys
         //chassis_->applyCentralForce(to_bullet_vector3(force));
         chassis_->applyCentralImpulse(to_bullet_vector3(force * dt));
 
-
-
         prev_attack_angle_ = attack_angle;
+
+        //std::stringstream cstr;
+
+        //cstr << "Linear velocity : " << get_body()->getLinearVelocity().norm()  <<"\n" ;
+
+        //OutputDebugString(cstr.str().c_str());
+
     }
 
 

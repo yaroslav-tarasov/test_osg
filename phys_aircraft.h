@@ -48,6 +48,7 @@ namespace aircraft
         //void attach_tow(bool attached) override;
         void         go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien) override;
         geo_position get_position() const override;
+        decart_position get_local_position() const override;
         //void       set_air_cfg(fms::air_config_t cfg);
         void         set_prediction(double prediction) override;
         geo_position get_wheel_position( size_t i ) const ;
@@ -60,6 +61,7 @@ namespace aircraft
         void         remove_wheel(size_t id);
         size_t       get_zone() const override;
         void         set_malfunction(bool malfunction)  override;
+        void         freeze(bool freeze) override;
 
     private:
         void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s);
@@ -78,6 +80,7 @@ namespace aircraft
         bool                            on_ground_;
         //fms::air_config_t             cfg_;
         double                          prediction_;
+        bool                            freeze_;
 
         cg::geo_point_3                 desired_position_;
         quaternion                      desired_orien_;

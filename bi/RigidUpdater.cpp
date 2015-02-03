@@ -305,12 +305,56 @@ namespace bi
                 _sys->update( dt );
 
                 for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
-                {
+                {   
+#if 1
+                    if((*it).traj.get())
+                    {
+                         if ((*it).traj->get_current_position() < (*it).traj->get().length())
+                         {
+                             (*it).aircraft->freeze(false);
+                             (*it).traj->get_current_position() += dt*5;
+                             decart_position target_pos;
+                                                                          
+                             target_pos.pos = cg::point_3((*it).traj->get().value((*it).traj->get_current_position() + 0),0);
+
+                             geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+                             (*it).aircraft->go_to_pos(gp.pos ,gp.orien);
+                            
+                             decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
+                            
+                             std::stringstream cstr;
+
+                             cstr << "curr_pods_len:  " << (*it).traj->get_current_position() << ";   cur_pos x= " << cur_pos.pos.x << " y= "  << cur_pos.pos.y  <<
+                                     "    target_pos x= " << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
+
+                             OutputDebugString(cstr.str().c_str());
+                        }
+                        else
+                        {
+                                                     
+                           cg::point_3 cur_pos = _phys_aircrafts[0].aircraft->get_local_position().pos;
+                           cg::point_3 d_pos = _phys_aircrafts[0].aircraft->get_local_position().dpos;
+                           cg::point_3 trg_p((*it).traj->get().value((*it).traj->get().length()),0);
+                           d_pos.z = 0;
+                           if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
+                           {   
+                               decart_position target_pos;
+                               target_pos.pos = trg_p;
+                               geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+                               (*it).aircraft->go_to_pos(gp.pos ,gp.orien);
+                           }
+                           else
+                           {
+                               (*it).traj.reset();
+                               (*it).aircraft->freeze(true);
+                           }
+                        }
+
+                    }
+#endif
+
                     (*it).aircraft->update();
-                    
-                    //_physicsNodes[_physicsID[std::distance(_phys_aircrafts.begin(),it)]].setMatrix( matrix );
-                    //_physicsNodes[id] = mt;
-                    //_physicsID[_phys_aircrafts.size()-1]=id;
+
                 }                
 
 
@@ -365,10 +409,24 @@ namespace bi
 
     void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
     {   
-        decart_position pos;
-        pos.pos = simple_route.back();
-        geo_position gp(pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-        _phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);
+        decart_position target_pos;
+        target_pos.pos = simple_route.back();
+        //geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+        decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
+        target_pos.orien = cur_pos.orien;
+        
+        double cc = cur_pos.orien.get_course();
+        double tc = target_pos.orien.get_course();
+        _phys_aircrafts[0].traj = boost::make_shared<fms::trajectory>(cur_pos,target_pos,18.5,2);
+       
+        _trajectory_drawer->set(_phys_aircrafts[0].traj->get());
+        //_phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);
+        
+        std::stringstream cstr;
+
+        cstr << "Target course : " << cc  <<"\n" ;
+
+        OutputDebugString(cstr.str().c_str());
     }
 
 }

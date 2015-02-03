@@ -1,7 +1,7 @@
 #pragma once 
 
 #include "GLDebugDrawer.h"
-
+#include "trajectory_drawer.h"
 
 namespace bi
 {
@@ -10,11 +10,12 @@ namespace bi
         aircraft_model( aircraft::phys_aircraft_ptr          aircraft,
                         aircraft::shassis_support_ptr          shassis)
               : aircraft(aircraft)
-              , shassis (shassis) 
+              , shassis (shassis)
         {}
 
         aircraft::phys_aircraft_ptr            aircraft;
         aircraft::shassis_support_ptr          shassis;
+        fms::trajectory_ptr                    traj;
     };
 
 
@@ -51,6 +52,11 @@ namespace bi
         osg::Node* addGUIObject( osg::Node* node )
         {
             return addGUIObject_( node );
+        }
+
+        void setTrajectoryDrawer(TrajectoryDrawer * drawer)
+        {
+           _trajectory_drawer =  drawer;
         }
 
     protected:
@@ -96,7 +102,7 @@ namespace bi
 		typedef std::vector<phys::aircraft::info_ptr>                   aircrafts_t;
         typedef std::vector<aircraft::phys_aircraft_ptr>                phys_aircrafts_t;
         typedef std::vector<aircraft_model>                             aircraft_models_t;
-        typedef std::vector<phys::ray_cast_vehicle::info_ptr>              phys_vehicles_t;
+        typedef std::vector<phys::ray_cast_vehicle::info_ptr>           phys_vehicles_t;
 
         NodeMap                                  _physicsNodes;
         osg::observer_ptr<osg::Group>            _root;
@@ -107,7 +113,7 @@ namespace bi
 		aircrafts_t                              _aircrafts;
         aircraft_models_t                        _phys_aircrafts;
         phys_vehicles_t                          _phys_vehicles;
-
+        osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
 
 		boost::shared_ptr<phys::BulletInterface> _sys;
     private:

@@ -11,6 +11,7 @@ namespace aircraft
         //virtual void               attach_tow(bool attached) = 0;
         virtual void                 go_to_pos(cg::geo_point_3 const& pos, cg::quaternion const& orien)  = 0;
         virtual geo_position         get_position() const = 0;
+        virtual decart_position      get_local_position() const = 0;
         //virtual void               set_air_cfg(fms::air_config_t cfg) = 0;
         virtual void                 set_prediction(double prediction) = 0;
         //virtual geo_position       get_wheel_position( size_t i ) const = 0;
@@ -23,7 +24,7 @@ namespace aircraft
         virtual void                 remove_wheel(size_t id) = 0;
         virtual size_t               get_zone() const = 0;
         virtual void                 set_malfunction(bool malfunction) = 0;
-
+        virtual void                 freeze(bool freeze) = 0;
         virtual ~phys_aircraft() {}
     };
 

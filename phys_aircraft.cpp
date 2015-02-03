@@ -91,6 +91,7 @@ namespace aircraft
         , tow_attached_(false)
         , has_malfunction_(false)
         , prediction_(30.)
+        , freeze_(true)
     {
         create_phys_aircraft(initial_position, fsettings, s);
     }
@@ -105,22 +106,25 @@ namespace aircraft
     }
 
     void phys_aircraft_impl::update()
-    {          
-        shassis_->visit_chassis([this](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
+    {     
+        if (!freeze_)
         {
-            if(!gr.is_front)
-                return;
+            shassis_->visit_chassis([this](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
+            {
+                if(!gr.is_front)
+                    return;
 
-            auto wnode = shassis.wheel_node;
+                auto wnode = shassis.wheel_node;
 
-            nm::node_position np = wnode->position();
-            np.local().orien = cg::quaternion(cg::cpr(this->phys_aircraft_->get_steer(),0,0));
-            wnode->set_position(np);
+                nm::node_position np = wnode->position();
+                np.local().orien = cg::quaternion(cg::cpr(this->phys_aircraft_->get_steer(),0,0));
+                wnode->set_position(np);
 
-            if (shassis.phys_wheels.empty())
-                return;
+                if (shassis.phys_wheels.empty())
+                    return;
 
-        });
+            });
+        }
 
         sync_phys(0.1);
     }
@@ -129,6 +133,17 @@ namespace aircraft
     //{
     //    tow_attached_ = attached;
     //}
+
+    void phys_aircraft_impl::freeze(bool freeze)
+    {
+        freeze_ = freeze; 
+        if(freeze)
+        {
+            phys_aircraft_->set_thrust(0);
+            phys_aircraft_->set_brake(100000); 
+            phys_aircraft_->set_steer(0);
+        }
+    }
 
     void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
     {
@@ -144,6 +159,16 @@ namespace aircraft
         decart_position root_pos = body_pos * body_transform_inv_;
 
         return geo_position(root_pos, base_);
+    }
+
+    decart_position phys_aircraft_impl::get_local_position() const
+    {
+        //Assert(phys_aircraft_);
+
+        decart_position body_pos = phys_aircraft_->get_position();
+        decart_position root_pos = body_pos * body_transform_inv_;
+
+        return root_pos;
     }
 
     //void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
@@ -322,7 +347,7 @@ namespace aircraft
 
         //LogTrace("phys height " << cur_pos.pos.z);
 
-        if (tow_attached_)
+        if (tow_attached_ )
         {
             //phys_aircraft_->set_steer(steer);
             phys_aircraft_->set_thrust(0);
@@ -541,7 +566,8 @@ namespace aircraft
         phys_aircraft_->set_rudder(rudder);
         phys_aircraft_->set_wind(wind);
 
-        // TODO
+
+       // TODO
         //        send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
     }
 

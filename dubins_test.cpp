@@ -3,16 +3,24 @@
 #include "dubins.h"
 #include <stdio.h>
 using namespace std;
-#include "geometry/curve.h"
-
-
+//#include "geometry/curve.h"
+#include "curve2.h"
 
 int printConfiguration(double q[3], double x, void* user_data) {
 	printf("%f, %f, %f, %f\n", q[0], q[1], q[2], x);
 	return 0;
 }
 
-typedef cg::curve_t<double> keypoints_t;
+
+typedef cg::curve2_t<double> keypoints_t;
+
+static int fill(keypoints_t& kp,double q[3], double x, void* user_data)
+{
+    auto p = cg::point_2(q[0],q[1]);
+    kp.points().insert(std::make_pair(x,p));
+    return 0;
+}
+
 
 int main_dubins(int argc, char** argv )
 {
@@ -25,22 +33,24 @@ int main_dubins(int argc, char** argv )
 	dubins_init( q0, q1, turning_radius, &path);
 	dubins_path_sample_many( &path, printConfiguration, 0.1, NULL);
 	
-	std::function<int (double q[3], double t, void* user_data)> fn;
-	//= ([=](double q[3], double x, void* user_data)->int{
-	//	// q[0], q[1], q[2], x
-	//	// sample_points.points().insert(std::make_pair(q[0],q[1]));	
-	//	return 0;
-	//});
+    // We need work around for MSVC 2010 internal error
+    auto fn = [&sample_points](double q[3], double x, void* user_data)->int {
+        auto p = cg::point_2(q[0],q[1]);
+        sample_points.points().insert(std::make_pair(x,p));	
+        return 0;
+    };
 
-	dubins_path_sample_many( &path,lambda_cast<DubinsPathSamplingCallback>::Cast([=](double q[3], double x, void* user_data)->int{
-	    // q[0], q[1], q[2], x
-		// sample_points.points().insert(std::make_pair(q[0],q[1]));	
-		return 0;
-	}) , 0.1, NULL);
-	
-
-	//for (auto it = traj_->points().begin(), end = traj_->points().end(); it != end; ++it)
-	//	pnts.insert(std::make_pair(it->dist, it->dyn_state.pos.height));
+	dubins_path_sample_many( &path,std::bind(fill,std::ref(sample_points),sp::_1,sp::_2,sp::_3), 0.1, NULL);
+    
+    keypoints_t::value_type val = sample_points.value(3.55);
+    
+    double dist = 0;
+    auto p_prev = sample_points.points().begin()->second;
+    BOOST_FOREACH(const auto &p, sample_points.points())
+    {
+        dist +=cg::distance(p.second,p_prev);
+        p_prev = p.second;
+    }
 
 	return 0;
 }

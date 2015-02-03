@@ -196,11 +196,18 @@ int main_dubins( int argc, char** argv );
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
+#include <boost/foreach.hpp>
 
 using boost::noncopyable;
 using boost::optional;
 
-
+//
+//  refl stubs
+//
+#define REFL_INNER(x)
+#define REFL_SER_BIN(x)
+#define REFL_ENTRY(x)
+#define REFL_END()
 
 
 // #define DEVELOP_SHADOWS
@@ -244,10 +251,4 @@ namespace sp = std::placeholders;
 
 #include "osg_helpers.h"
 
-//
-//  refl stubs
-//
-#define REFL_INNER(x)
-#define REFL_SER_BIN(x)
-#define REFL_ENTRY(x)
-#define REFL_END()
+#include "trajectory.h"

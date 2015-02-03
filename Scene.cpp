@@ -388,7 +388,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -417,6 +417,11 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     
     conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
     
+    auto td = new TrajectoryDrawer;
+    
+    addChild(td);
+
+    _rigidUpdater->setTrajectoryDrawer(td);
 
     //
     // Create ephemeris
@@ -516,7 +521,8 @@ void Scene::createObjects()
             }
     }
     );
-
+    
+    
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);

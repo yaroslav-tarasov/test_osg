@@ -74,7 +74,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;..\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;..\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4;C:\simex\ext\lib\boost</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcollada14dom22.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
