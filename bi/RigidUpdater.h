@@ -101,8 +101,37 @@ namespace bi
             positioned->addChild(rotated);
             rotated->addChild(node);
             return positioned;
-        }
+        }     
 
+        inline static osg::Node* addGUIObject_v( osg::Node* node ) 
+        {
+            osg::ComputeBoundsVisitor cbv;
+            node->accept( cbv );
+            const osg::BoundingBox& bb = cbv.getBoundingBox();
+
+            float xm = bb.xMax() - bb.xMin();
+            float ym = bb.yMax() - bb.yMin();
+            float zm = bb.zMax() - bb.zMin();
+
+            float rot_angle = -90.f;
+            auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(zm)/2.0f,0.0));
+            if(dynamic_cast<osg::LOD*>(node))
+            {
+                rot_angle = 0;
+                tr = osg::Matrix::translate(osg::Vec3(0,0,-(zm)/2.0f));
+            }        
+
+            osg::MatrixTransform* positioned = new osg::MatrixTransform(tr);
+
+            const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
+                osg::inDegrees(0.f)   , osg::Y_AXIS,
+                osg::inDegrees(0.f)   , osg::Z_AXIS ); 
+
+            osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
+            positioned->addChild(rotated);
+            rotated->addChild(node);
+            return positioned;
+        }
 
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;

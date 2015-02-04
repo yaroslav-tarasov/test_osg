@@ -665,9 +665,31 @@ void Scene::createObjects()
         }
     }
 
-    auto poj = creators::createObject("niva_chevrolet");
-    _rigidUpdater->addVehicle(poj,
-        osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 100.0f);
+    auto trap = creators::createObject("trap");
+    _rigidUpdater->addVehicle(trap,
+        osg::Vec3(250,150,00), osg::Vec3(0,30000,0), 10.0f);
+
+    auto buksir = creators::createObject("buksir");
+    _rigidUpdater->addVehicle(buksir,
+        osg::Vec3(270,150,00), osg::Vec3(0,30000,0), 10.0f);
+
+
+    auto cleaner = creators::createObject("cleaner");
+    _rigidUpdater->addVehicle(cleaner,
+        osg::Vec3(290,150,00), osg::Vec3(0,30000,0), 10.0f);
+
+
+    auto niva_cevrolet = creators::createObject("niva_chevrolet");
+    _rigidUpdater->addVehicle(niva_cevrolet,
+        osg::Vec3(310,150,00), osg::Vec3(0,30000,0), 10.0f);
+
+
+    auto pojarka = creators::createObject("pojarka");
+    _rigidUpdater->addVehicle(pojarka,
+        osg::Vec3(330,150,00), osg::Vec3(0,30000,0), 10.0f);
+
+
+
     // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));
 
     const bool add_vehicles = true;

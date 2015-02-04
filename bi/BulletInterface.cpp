@@ -482,7 +482,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
         info->add_wheel(30,0,radius,connection_point,cg::cpr(),false/*,(*it).front*/);
     }   
     
-    _actors[id]._body->applyCentralForce(btVector3(0,20000,0));
+    //_actors[id]._body->applyCentralForce(btVector3(0,20000,0));
 
     return info;
 }

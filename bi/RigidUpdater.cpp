@@ -202,7 +202,7 @@ namespace bi
         phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(lod3?lod3:node,id,mass);
         
         // FIXME
-        lod3->setNodeMask(0);
+        if(lod3) lod3->setNodeMask(0);
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
@@ -210,10 +210,12 @@ namespace bi
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-        mt->addChild( addGUIObject(node) );
+        mt->addChild( addGUIObject_v(node) );
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
+
+        _sys->setMatrix( id, osg::Matrix::translate(pos) );
 
         veh->set_steer(10);
     }

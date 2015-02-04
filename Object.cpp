@@ -137,6 +137,7 @@ osg::Node* createObject(std::string name, bool fclone)
         }
         else
         {
+#if 0
             osg::Node* named_node =  findFirstNode(object_file,name,findNodeVisitor::not_exact);
 
             lod3 = osg::clone(named_node, osg::CopyOp::DEEP_COPY_ALL 
@@ -154,6 +155,7 @@ osg::Node* createObject(std::string name, bool fclone)
             lod3->setName("Lod3");
             
             root->addChild(lod3);
+#endif     
         }
 
 		objCache[name] = object_file;
