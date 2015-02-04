@@ -11,11 +11,18 @@ namespace bi
                         aircraft::shassis_support_ptr          shassis)
               : aircraft(aircraft)
               , shassis (shassis)
+              , desired_velocity(min_desired_velocity)
         {}
 
         aircraft::phys_aircraft_ptr            aircraft;
         aircraft::shassis_support_ptr          shassis;
         fms::trajectory_ptr                    traj;
+        double                                 desired_velocity;
+
+        static const   int                     max_desired_velocity = 20;
+        static const   int                     min_desired_velocity = 5;
+        inline static  double                  min_radius() {return 18.75;} 
+        inline static  double                  step()       {return 2.0;} 
     };
 
 

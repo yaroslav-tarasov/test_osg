@@ -6,7 +6,7 @@
 
 namespace cg
 {
-    namespace details
+    namespace details2
     {
         template<class points_t>
         struct curve_traits
@@ -43,7 +43,7 @@ namespace cg
     }
 
     template<typename T>
-    struct default_curve_lerp
+    struct default_curve_lerp2
     {   
         typedef T  value_type;
         value_type operator()(const value_type &a, const value_type &b, double t) const
@@ -53,7 +53,7 @@ namespace cg
     };
 
 
-    template<typename T, typename L = default_curve_lerp<cg::point_t<T,2>> >
+    template<typename T, typename L = default_curve_lerp2<cg::point_t<T,2>> >
     class curve2_t
     {
     public:
@@ -152,7 +152,7 @@ namespace cg
         {
             Assert(cg::ge(start_dist, length()));
             BOOST_FOREACH(const auto &p, other.points())
-                points().insert(points().end(), make_pair(start_dist + p.first, p.second));
+                points().insert(points().end(), std::make_pair(start_dist + p.first, p.second));
         }
 
         void remove_equal_points(double tolerance = cg::epsilon<double>())

@@ -156,7 +156,7 @@ namespace aircraft
         //Assert(phys_aircraft_);
 
         decart_position body_pos = phys_aircraft_->get_position();
-        decart_position root_pos = body_pos * body_transform_inv_;
+        decart_position root_pos = body_pos * body_transform_inv_; // Скорее всего здесь единица
 
         return geo_position(root_pos, base_);
     }
@@ -165,9 +165,9 @@ namespace aircraft
     {
         //Assert(phys_aircraft_);
 
-        decart_position body_pos = phys_aircraft_->get_position();
-        decart_position root_pos = body_pos * body_transform_inv_;
-
+        decart_position body_pos = phys_aircraft_->get_position();  
+        decart_position root_pos = body_pos * body_transform_inv_; // Скорее всего здесь единица 
+        
         return root_pos;
     }
 
@@ -241,7 +241,11 @@ namespace aircraft
 
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
-        body_transform_inv_ = get_relative_transform(nodes_manager_, body_node).inverted();
+        body_transform_inv_ = cg::transform_4(); 
+        // FIXME TYV  сдается мне нефига не нужный код 
+        // В модели симекса съедается трансформ на геометрии, и Body оказывается востребованным
+        // get_relative_transform(nodes_manager_, body_node).inverted();
+
 #if 0 // TODO or not TODO
 
         phys::collision_ptr collision = phys_sys_;

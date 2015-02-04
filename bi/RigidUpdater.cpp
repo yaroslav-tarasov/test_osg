@@ -309,25 +309,40 @@ namespace bi
 #if 1
                     if((*it).traj.get())
                     {
-                         if ((*it).traj->get_current_position() < (*it).traj->get().length())
+                         if ((*it).traj->cur_len() < (*it).traj->get().length())
                          {
+                             
+                             (*it).aircraft->set_prediction(15.); 
                              (*it).aircraft->freeze(false);
-                             (*it).traj->get_current_position() += dt*5;
+                             const double  cur_len = (*it).traj->cur_len();
+                             (*it).traj->des_len((*it).traj->cur_len() + dt*(*it).desired_velocity);
+                             const double  tar_len = (*it).traj->cur_len();
                              decart_position target_pos;
                                                                           
-                             target_pos.pos = cg::point_3((*it).traj->get().value((*it).traj->get_current_position() + 0),0);
-
-                             geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-                             (*it).aircraft->go_to_pos(gp.pos ,gp.orien);
+                             target_pos.pos = cg::point_3((*it).traj->get().value(tar_len),0);
+                             geo_position gtp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+                             (*it).aircraft->go_to_pos(gtp.pos ,gtp.orien);
                             
-                             decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
+                             
+                             const double curs_change = (*it).traj->get_curses().value(tar_len) - (*it).traj->get_curses().value(cur_len);
+
+                             if(cg::eq(curs_change,0.0))
+                                 (*it).desired_velocity = aircraft_model::max_desired_velocity;
+                             else
+                                 (*it).desired_velocity = aircraft_model::min_desired_velocity;
+
+                             const decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
                             
-                             std::stringstream cstr;
+                             //std::stringstream cstr;
 
-                             cstr << "curr_pods_len:  " << (*it).traj->get_current_position() << ";   cur_pos x= " << cur_pos.pos.x << " y= "  << cur_pos.pos.y  <<
-                                     "    target_pos x= " << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
+                             //cstr << std::setprecision(8) 
+                             //     << "curr_pods_len:  "             << (*it).traj->cur_len() 
+                             //     << "    desired_velocity :  "     << (*it).desired_velocity   
+                             //     << "    delta curs :  "  << curs_change
+                             //     << ";   cur_pos x= "     << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+                             //     << "    target_pos x= "  << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
 
-                             OutputDebugString(cstr.str().c_str());
+                             //OutputDebugString(cstr.str().c_str());
                         }
                         else
                         {
@@ -345,7 +360,7 @@ namespace bi
                            }
                            else
                            {
-                               (*it).traj.reset();
+                               // (*it).traj.reset();
                                (*it).aircraft->freeze(true);
                            }
                         }
@@ -413,20 +428,47 @@ namespace bi
         target_pos.pos = simple_route.back();
         //geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
         decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
-        target_pos.orien = cur_pos.orien;
+        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
         
-        double cc = cur_pos.orien.get_course();
-        double tc = target_pos.orien.get_course();
-        _phys_aircrafts[0].traj = boost::make_shared<fms::trajectory>(cur_pos,target_pos,18.5,2);
+        
+
+        if (!_phys_aircrafts[0].traj)
+        {
+             _phys_aircrafts[0].traj = boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft_model::min_radius(),aircraft_model::step());
+        }
+        else
+        {  
+            fms::trajectory_ptr main_ = _phys_aircrafts[0].traj;
+
+            decart_position begin_pos(cg::point_3(main_->get().value(main_->get().length()),0)
+                                     ,cg::cpr(main_->get_curses().value(main_->get().length()),0,0) );
+            
+            std::stringstream cstr;
+
+            cstr << std::setprecision(8) 
+                << "x:  "         << main_->get().value(main_->get().length()).x
+                << "    y: "      << main_->get().value(main_->get().length()).y
+                << "    curs :  " << main_->get_curses().value(main_->get().length()) 
+                << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
+                << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
+                << "\n" ;
+
+            OutputDebugString(cstr.str().c_str());
+
+            target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course,0,0);
+            
+            fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
+                                                                            target_pos,
+                                                                            aircraft_model::min_radius(),
+                                                                            aircraft_model::step());
+
+            main_->append(*traj.get());
+        }
        
         _trajectory_drawer->set(_phys_aircrafts[0].traj->get());
+        
         //_phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);
         
-        std::stringstream cstr;
-
-        cstr << "Target course : " << cc  <<"\n" ;
-
-        OutputDebugString(cstr.str().c_str());
     }
 
 }
