@@ -49,7 +49,7 @@ public:
             || mat_name.find("railing")  !=std::string::npos
             || mat_name.find("panorama") !=std::string::npos
             || mat_name.find("plane") !=std::string::npos
-
+            || mat_name.find("default") !=std::string::npos
             )
         {
             return texCreator(mats,mat_name,model_name); 

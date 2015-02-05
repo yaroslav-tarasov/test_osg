@@ -3,8 +3,8 @@
 #include "dubins.h"
 #include <stdio.h>
 using namespace std;
-//#include "geometry/curve.h"
-#include "curve2.h"
+#include "geometry/curve.h"
+// #include "curve2.h"
 
 int printConfiguration(double q[3], double x, void* user_data) {
 	printf("%f, %f, %f, %f\n", q[0], q[1], q[2], x);
@@ -12,7 +12,7 @@ int printConfiguration(double q[3], double x, void* user_data) {
 }
 
 
-typedef cg::curve2_t<double> keypoints_t;
+typedef cg::curve_t<cg::point_2> keypoints_t;
 
 static int fill(keypoints_t& kp,double q[3], double x, void* user_data)
 {

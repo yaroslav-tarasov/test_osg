@@ -146,17 +146,19 @@ namespace ray_cast_vehicle
 {
     void fill_cs(osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
     {          
+        osg::Node* lod3 =  findFirstNode(node,"Lod3");
+
         osg::ComputeBoundsVisitor cbv;
-        node->accept( cbv );
+        (lod3?lod3:node)->accept( cbv );
         const osg::BoundingBox& bb = cbv.getBoundingBox();
 
         float xm = bb.xMax() - bb.xMin();
         float ym = bb.yMax() - bb.yMin();
         float zm = bb.zMax() - bb.zMin();
 
-        cs.offset_ = cg::point_3(0,-zm/2,0);
+        cs.offset_ = cg::point_3(0,/*lod3?-zm/2:*/0,0);
 
-        auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+        auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
 
         auto wheels = findAllNodes(node,"wheel",findNodeVisitor::not_exact);
 
@@ -173,7 +175,6 @@ namespace ray_cast_vehicle
 
         btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
-        //btCollisionShape* cs_r_r_1_wheel = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( r_r_1_wheel );
         btCollisionShape* cs_body   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( body );
         
         for (auto it = wheels.begin();it != wheels.end();++it)

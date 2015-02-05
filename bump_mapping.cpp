@@ -2,7 +2,6 @@
 #include "creators.h"
 #include "shaders.h"
 
-//#include "CommonFunctions"
 #include "find_node_visitor.h"  
 #include "find_tex_visitor.h"
 #include "animation_handler.h"

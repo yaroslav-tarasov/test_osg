@@ -2,6 +2,7 @@
 
 #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
+#include "find_node_visitor.h"  
 
 namespace bi
 {
@@ -105,6 +106,8 @@ namespace bi
 
         inline static osg::Node* addGUIObject_v( osg::Node* node ) 
         {
+            osg::Node* lod3 =  findFirstNode(node,"Lod3");
+
             osg::ComputeBoundsVisitor cbv;
             node->accept( cbv );
             const osg::BoundingBox& bb = cbv.getBoundingBox();
@@ -114,7 +117,7 @@ namespace bi
             float zm = bb.zMax() - bb.zMin();
 
             float rot_angle = -90.f;
-            auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(zm)/2.0f,0.0));
+            auto tr = osg::Matrix::translate(osg::Vec3(0.0,lod3?-(ym)/2.0f:0.0,0.0));
             if(dynamic_cast<osg::LOD*>(node))
             {
                 rot_angle = 0;
@@ -150,6 +153,7 @@ namespace bi
         aircraft_models_t                        _phys_aircrafts;
         phys_vehicles_t                          _phys_vehicles;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
+
 
 		boost::shared_ptr<phys::BulletInterface> _sys;
     private:

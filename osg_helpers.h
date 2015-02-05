@@ -44,6 +44,8 @@ inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg:
     osg::Node* n = node;
     while(/*n->position().is_local() &&*/ n != rel && 0 != n->getNumParents() && n != root)
     {
+        if(n->asTransform())
+        if(n->asTransform()->asMatrixTransform())
         tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
         n = n->getParent(0);
     }
@@ -54,7 +56,9 @@ inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg:
     osg::Matrix tr_rel;
     n = rel;
     while(/*n->position().is_local()*/0 != n->getNumParents() && n != root)
-    {                  
+    {
+        if(n->asTransform())
+        if(n->asTransform()->asMatrixTransform())
         tr_rel = n->asTransform()->asMatrixTransform()->getMatrix() * tr_rel;
         n = n->getParent(0);
     }

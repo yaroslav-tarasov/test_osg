@@ -831,7 +831,7 @@ void processModel(domCOLLADA& root) {
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string file = lookupFile("planes/mi_8/mi_8.dae");
+	std::string file = lookupFile("vehicles/pojarka/pojarka.dae");
 
 	mat_reader mt(file);
 	

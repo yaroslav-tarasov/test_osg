@@ -1,16 +1,17 @@
 #pragma once
 
-#include "curve2.h"
+
 #include "dubins.h"
 #include "geometry/curve.h"
+#include "curve2.h"
 
 namespace fms
 {
 
 struct trajectory
 {   
-    typedef cg::curve2_t<double> keypoints_t;
-    typedef cg::curve_t<double>  curses_t;
+    typedef cg::curve_t<cg::point_2>           keypoints_t;
+    typedef cg::curve_t<double>                curses_t;
 
     trajectory(const decart_position& begin_pos,decart_position const& end_pos,double radius, double step = 1)
         :  curr_pos_(0)
@@ -37,7 +38,7 @@ struct trajectory
     virtual ~trajectory() {}
             
     inline double cur_len() const { return curr_pos_ ;}
-    void   des_len(double curr_len = 0.0) { curr_pos_ = curr_len;}
+    void   set_cur_len(double curr_len = 0.0) { curr_pos_ = curr_len;}
 
 private:
     static int fill(keypoints_t& kp,curses_t& cr,double q[3], double x, void* user_data)

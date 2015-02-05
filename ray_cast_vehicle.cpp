@@ -114,9 +114,11 @@ namespace ray_cast_vehicle
         bool isFrontWheel = offset.y > 0;
 
         cg::point_3 connection_point = offset;
-        connection_point.z += 1;
+        //connection_point.z += 1;
 
-        btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0),1.1f,btScalar(radius),tuning_,isFrontWheel);
+        tuning_.m_maxSuspensionForce = 60000000;
+
+        btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0),0/*1.1f*/,btScalar(radius),tuning_,isFrontWheel);
         info.m_suspensionStiffness = 20.f;
         info.m_wheelsDampingRelaxation = 2.3f;
         info.m_wheelsDampingCompression = 4.4f;

@@ -197,12 +197,14 @@ namespace bi
 
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        
 
         int id = _physicsNodes.size();
         phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(lod3?lod3:node,id,mass);
         
         // FIXME
-        if(lod3) lod3->setNodeMask(0);
+        if(lod3) 
+            lod3->setNodeMask(0);
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
@@ -306,18 +308,19 @@ namespace bi
 
                 _sys->update( dt );
 
+
                 for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
                 {   
-#if 1
+                     high_res_timer        _hr_timer2;
+#if 1   // Модель
                     if((*it).traj.get())
                     {
                          if ((*it).traj->cur_len() < (*it).traj->get().length())
                          {
-                             
                              (*it).aircraft->set_prediction(15.); 
                              (*it).aircraft->freeze(false);
                              const double  cur_len = (*it).traj->cur_len();
-                             (*it).traj->des_len((*it).traj->cur_len() + dt*(*it).desired_velocity);
+                             (*it).traj->set_cur_len ((*it).traj->cur_len() + dt*(*it).desired_velocity);
                              const double  tar_len = (*it).traj->cur_len();
                              decart_position target_pos;
                                                                           
@@ -369,10 +372,19 @@ namespace bi
 
                     }
 #endif
+                    double dt2 = _hr_timer2.get_delta();
+
+                    std::stringstream cstr;
+
+                    cstr << std::setprecision(8) 
+                        << "dt2:  "     << dt2 
+                        <<"\n" ;
 
                     (*it).aircraft->update();
 
-                }                
+                    OutputDebugString(cstr.str().c_str());
+
+                }   
 
 
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
@@ -467,8 +479,11 @@ namespace bi
             main_->append(*traj.get());
         }
        
+        // Подробная отрисовка
         _trajectory_drawer->set(_phys_aircrafts[0].traj->get());
         
+        // _trajectory_drawer->set(simple_route);
+
         //_phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);
         
     }
