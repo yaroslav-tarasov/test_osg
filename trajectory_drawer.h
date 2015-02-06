@@ -28,18 +28,18 @@ public:
             parent->addChild(this);        
     }
 
-    void set(const fms::trajectory::keypoints_t& kp)
+    void set(const fms::trajectory& traj)
     {
-       kp_ =  kp;
+
        vert_->clear();
        //traj_lines_->clear();
 
        traj_lines_ = new osg::DrawElementsUInt(osg::PrimitiveSet::POINTS, 0);
 
        int i=0;
-       BOOST_FOREACH(const auto &p, kp.points())
+       BOOST_FOREACH(const auto &p, traj.extract_values())
        {
-           vert_->push_back( osg::Vec3( p.second.x, p.second.y, 0.8) );
+           vert_->push_back( osg::Vec3( p.x, p.y, 0.8) );
            traj_lines_->push_back(i++);
        } 
        
@@ -55,7 +55,6 @@ public:
 
     void set(const std::vector<cg::point_3>& kp)
     {
-       // kp_ =  kp;
         vert_->clear();
         //traj_lines_->clear();
 
@@ -94,7 +93,6 @@ public:
     const char * libraryName ()                        const { return "avScene"; }
 
 private:
-    fms::trajectory::keypoints_t                         kp_;
     osg::ref_ptr<osg::Vec3Array>                       vert_; 
     osg::ref_ptr<osg::Geometry>                    geometry_;
     osg::ref_ptr<osg::DrawElementsUInt>          traj_lines_;

@@ -315,7 +315,7 @@ namespace bi
 #if 1   // Модель
                     if((*it).traj.get())
                     {
-                         if ((*it).traj->cur_len() < (*it).traj->get().length())
+                         if ((*it).traj->cur_len() < (*it).traj->length())
                          {
                              (*it).aircraft->set_prediction(15.); 
                              (*it).aircraft->freeze(false);
@@ -324,12 +324,12 @@ namespace bi
                              const double  tar_len = (*it).traj->cur_len();
                              decart_position target_pos;
                                                                           
-                             target_pos.pos = cg::point_3((*it).traj->get().value(tar_len),0);
+                             target_pos.pos = cg::point_3((*it).traj->kp_value(tar_len),0);
                              geo_position gtp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
                              (*it).aircraft->go_to_pos(gtp.pos ,gtp.orien);
                             
                              
-                             const double curs_change = (*it).traj->get_curses().value(tar_len) - (*it).traj->get_curses().value(cur_len);
+                             const double curs_change = (*it).traj->curs_value(tar_len) - (*it).traj->curs_value(cur_len);
 
                              if(cg::eq(curs_change,0.0))
                                  (*it).desired_velocity = aircraft_model::max_desired_velocity;
@@ -354,7 +354,7 @@ namespace bi
                                                      
                            cg::point_3 cur_pos = _phys_aircrafts[0].aircraft->get_local_position().pos;
                            cg::point_3 d_pos = _phys_aircrafts[0].aircraft->get_local_position().dpos;
-                           cg::point_3 trg_p((*it).traj->get().value((*it).traj->get().length()),0);
+                           cg::point_3 trg_p((*it).traj->kp_value((*it).traj->length()),0);
                            d_pos.z = 0;
                            if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
                            {   
@@ -454,15 +454,15 @@ namespace bi
         {  
             fms::trajectory_ptr main_ = _phys_aircrafts[0].traj;
 
-            decart_position begin_pos(cg::point_3(main_->get().value(main_->get().length()),0)
-                                     ,cg::cpr(main_->get_curses().value(main_->get().length()),0,0) );
+            decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+                                     ,cg::cpr(main_->curs_value(main_->length()),0,0) );
             
             std::stringstream cstr;
 
             cstr << std::setprecision(8) 
-                << "x:  "         << main_->get().value(main_->get().length()).x
-                << "    y: "      << main_->get().value(main_->get().length()).y
-                << "    curs :  " << main_->get_curses().value(main_->get().length()) 
+                << "x:  "         << main_->kp_value(main_->length()).x
+                << "    y: "      << main_->kp_value(main_->length()).y
+                << "    curs :  " << main_->curs_value(main_->length()) 
                 << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
                 << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
                 << "\n" ;
@@ -480,7 +480,7 @@ namespace bi
         }
        
         // Подробная отрисовка
-        _trajectory_drawer->set(_phys_aircrafts[0].traj->get());
+        _trajectory_drawer->set(*(_phys_aircrafts[0].traj.get()));
         
         // _trajectory_drawer->set(simple_route);
 

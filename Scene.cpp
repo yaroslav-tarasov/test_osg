@@ -530,7 +530,7 @@ void Scene::createObjects()
 
 	auto obj = /*creators::applyBM(*/creators::createObject(name)/*,name,true)*/;
 
-#if 1
+#if 0
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addPhysicsAirplane( obj,
 		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
@@ -542,13 +542,13 @@ void Scene::createObjects()
 
 #endif
 
-#if 1 
+#if 0 
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addUFO2( obj,
 		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
 #endif
 
-#if 1 
+#if 0 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO2( obj,
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
@@ -660,7 +660,7 @@ void Scene::createObjects()
         }
     }
 
-#if 1
+#if 0
     auto trap = creators::createObject("trap");
     _rigidUpdater->addVehicle(trap,
         osg::Vec3(250,750,00), osg::Vec3(0,30000,0), 1500.0f);
