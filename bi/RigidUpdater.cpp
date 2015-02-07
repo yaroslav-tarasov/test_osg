@@ -311,7 +311,7 @@ namespace bi
 
                 for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
                 {   
-                     high_res_timer        _hr_timer2;
+                     //high_res_timer        _hr_timer2;
 #if 1   // Модель
                     if((*it).traj.get())
                     {
@@ -372,17 +372,19 @@ namespace bi
 
                     }
 #endif
-                    double dt2 = _hr_timer2.get_delta();
+     //               double dt2 = _hr_timer2.get_delta();
 
-                    std::stringstream cstr;
+     //               std::stringstream cstr;
 
-                    cstr << std::setprecision(8) 
-                        << "dt2:  "     << dt2 
-                        <<"\n" ;
+     //               cstr << std::setprecision(8) 
+     //                   << "dt2:  "     << dt2 
+     //                   <<"\n" ;
 
-                    (*it).aircraft->update();
+					//OutputDebugString(cstr.str().c_str());
+                    
+					(*it).aircraft->update();
 
-                    OutputDebugString(cstr.str().c_str());
+                    
 
                 }   
 

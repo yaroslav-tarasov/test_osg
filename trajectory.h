@@ -41,17 +41,28 @@ struct trajectory
         {                         
             auto seg = (*it).apply_offset(length_); 
             kp_seg_.push_back(seg);
-        }
+	    }
+
+		for(auto it = other.curs_seg_.begin();it!=other.curs_seg_.end();++it)
+		{                         
+			auto seg = (*it).apply_offset(length_); 
+			curs_seg_.push_back(seg);
+		}
 
         // kp_seg_.insert(kp_seg_.end(),other.kp_seg_.begin(), other.kp_seg_.end());
-        curs_seg_.insert(curs_seg_.end(),other.curs_seg_.begin(),other.curs_seg_.end());
-        
-        length_ = 0;
-        for(auto it = kp_seg_.begin();it!=kp_seg_.end();++it)
+        // curs_seg_.insert(curs_seg_.end(),other.curs_seg_.begin(),other.curs_seg_.end());
+
         {    
-            length_ += (*it).length();
+            length_ = kp_seg_.back().length();
         }
 
+		std::stringstream cstr;
+
+		cstr << std::setprecision(8) 
+			<< "length_:  "         << length_
+			<< "\n" ;
+
+		OutputDebugString(cstr.str().c_str());
     }
     
     inline double length() const
@@ -103,11 +114,9 @@ private:
     
     size_t current_segment(double curr_len)
     {
-        double len = 0;
         for(auto it = kp_seg_.begin();it!=kp_seg_.end();++it)
         {
-             len += (*it).length();
-             if(curr_len <= len)
+             if(curr_len <= (*it).length())
                  return  std::distance(kp_seg_.begin(),it);
         }
         return 0;
