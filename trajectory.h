@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "dubins.h"
 #include "geometry/curve.h"
 #include "curve2.h"
@@ -9,6 +8,16 @@ class TrajectoryDrawer;
 
 namespace fms
 {
+
+inline double to_dubin(const cg::quaternion& orien)
+{
+	return cg::grad2rad()*(90 - orien.get_course());
+}
+
+inline cg::quaternion from_dubin(double course)
+{
+	return cg::cpr(90 - cg::rad2grad()*course);
+}
 
 struct trajectory
 {   
@@ -21,7 +30,6 @@ struct trajectory
 
     trajectory(const decart_position& begin_pos,decart_position const& end_pos,double radius, double step = 1)
         :  curr_pos_(0)
-        ,  length_  (0)
     {
         double q0[] = { begin_pos.pos.x,begin_pos.pos.y,cg::grad2rad()*(90 - begin_pos.orien.get_course()) };
         double q1[] = { end_pos.pos.x,end_pos.pos.y,cg::grad2rad()*(90 - end_pos.orien.get_course() )};
@@ -31,12 +39,13 @@ struct trajectory
         dubins_path_sample_many( &path_,std::bind(fill,std::ref(kpts_),std::ref(crs_),sp::_1,sp::_2,sp::_3), step, nullptr);
         kp_seg_.push_back(kpts_);
         curs_seg_.push_back(crs_);
-        length_ = kpts_.length();
     }
     
     void append(const trajectory &other) 
     {
         size_t size = 0;
+		const auto length_ = kp_seg_.back().length();
+
         for(auto it = other.kp_seg_.begin();it!=other.kp_seg_.end();++it)
         {                         
             auto seg = (*it).apply_offset(length_); 
@@ -51,23 +60,11 @@ struct trajectory
 
         // kp_seg_.insert(kp_seg_.end(),other.kp_seg_.begin(), other.kp_seg_.end());
         // curs_seg_.insert(curs_seg_.end(),other.curs_seg_.begin(),other.curs_seg_.end());
-
-        {    
-            length_ = kp_seg_.back().length();
-        }
-
-		std::stringstream cstr;
-
-		cstr << std::setprecision(8) 
-			<< "length_:  "         << length_
-			<< "\n" ;
-
-		OutputDebugString(cstr.str().c_str());
     }
     
     inline double length() const
     {
-        return length_;
+        return kp_seg_.back().length();
     }
     
     inline const keypoints_t::value_type kp_value(double arg) /*const*/
@@ -137,7 +134,6 @@ private:
     kp_segments_t     kp_seg_;
     cr_segments_t   curs_seg_;
     double          curr_pos_;
-    double            length_;
 };
 
  typedef polymorph_ptr<trajectory> trajectory_ptr;

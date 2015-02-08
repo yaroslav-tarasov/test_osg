@@ -459,7 +459,9 @@ namespace bi
             decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
                                      ,cg::cpr(main_->curs_value(main_->length()),0,0) );
             
-            std::stringstream cstr;
+            target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+			
+			std::stringstream cstr;
 
             cstr << std::setprecision(8) 
                 << "x:  "         << main_->kp_value(main_->length()).x
@@ -467,12 +469,13 @@ namespace bi
                 << "    curs :  " << main_->curs_value(main_->length()) 
                 << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
                 << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
-                << "\n" ;
+                << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
+				<< "\n" ;
 
             OutputDebugString(cstr.str().c_str());
+       
 
-            target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course,0,0);
-            
+
             fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
                                                                             target_pos,
                                                                             aircraft_model::min_radius(),
