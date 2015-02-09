@@ -23,6 +23,7 @@ public:
     node_info_ptr           root_node       () const override;
     cg::geo_point_3         get_global_pos  () const override;
     cg::quaternion          get_global_orien() const override;
+    cg::transform_4         get_root_transform() const override;
 
 //  node_impl
     osg::Node*          as_osg_node() {return node_.get();}

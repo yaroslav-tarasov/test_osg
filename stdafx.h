@@ -198,6 +198,13 @@ int main_dubins( int argc, char** argv );
 #include <boost/any.hpp>
 #include <boost/foreach.hpp>
 
+#include <boost/graph/astar_search.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/random.hpp>
+#include <boost/random.hpp>
+#include <boost/graph/graphviz.hpp>
+
+
 using boost::noncopyable;
 using boost::optional;
 
@@ -208,7 +215,8 @@ using boost::optional;
 #define REFL_SER_BIN(x)
 #define REFL_ENTRY(x)
 #define REFL_END()
-
+#define REFL_STRUCT(x)
+#define REFL_NUM(x1,x2,x3,x4)
 
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
@@ -248,6 +256,8 @@ namespace sp = std::placeholders;
 #include "aircraft_common.h"
 
 #include "event.h"
+#include "mod_system.h"
+
 
 #include "osg_helpers.h"
 

@@ -1,5 +1,7 @@
 #pragma once
 
+class btCompoundShape;
+
 namespace phys
 {
 struct compound_sensor_impl  : public compound_sensor_t

@@ -69,5 +69,4 @@ cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, 
 }
 
 
-
 }

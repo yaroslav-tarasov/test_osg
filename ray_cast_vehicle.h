@@ -52,7 +52,7 @@ namespace ray_cast_vehicle
         void reset_suspension();
 
     private:
-        system_impl_ptr sys_;
+        system_impl_ptr                      sys_;
 
         bt_collision_shape_ptr               chassis_shape_;
         rigid_body_proxy                     chassis_;

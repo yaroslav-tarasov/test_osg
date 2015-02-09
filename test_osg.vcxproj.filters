@@ -210,6 +210,15 @@
     <ClInclude Include="trajectory_drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="vehicle_model_states.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicle_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vehicle_model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -399,6 +408,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dubins_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vehicle_model_states.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vehicle_model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

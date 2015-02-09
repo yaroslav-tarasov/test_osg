@@ -675,9 +675,18 @@ void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 	rigid_bodies_.erase(rb);
 }
 
-phys::aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
+aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
     aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,pos);
+    // FIXME TODO
+    // _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
+
+    return ctrl;
+}
+
+ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,phys::compound_sensor_ptr s,const decart_position & pos)
+{    	
+    ray_cast_vehicle::control_ptr ctrl = boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,s,pos);
     // FIXME TODO
     // _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 

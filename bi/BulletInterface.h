@@ -52,6 +52,8 @@ public:
 	void                        createUFO    ( osg::Node* node, int id, double mass);
 	aircraft::info_ptr          createUFO2    ( osg::Node* node, int id, double mass);
     aircraft::info_ptr          create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
+    ray_cast_vehicle::info_ptr  create_ray_cast_vehicle(double,phys::compound_sensor_ptr,const decart_position & pos);
+    
     ray_cast_vehicle::info_ptr  createVehicle(osg::Node* node,int id,double mass);
 
     void                        registerBody(int id,phys::rigid_body_ptr ctrl);

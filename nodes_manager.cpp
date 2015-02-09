@@ -47,4 +47,5 @@ namespace nodes_management
 
           return node_info_ptr();
     }
+
 }

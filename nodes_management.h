@@ -43,7 +43,7 @@ struct node_info
     //virtual node_info_ptr                rel_node() const = 0;
     virtual node_info_ptr                root_node() const = 0;
 
-    //virtual transform_4                  get_root_transform() const = 0;
+    virtual cg::transform_4              get_root_transform() const = 0;
     virtual cg::geo_point_3              get_global_pos() const = 0;
     virtual cg::quaternion               get_global_orien() const = 0;
 

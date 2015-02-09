@@ -141,6 +141,9 @@
     <ClInclude Include="trajectory_drawer.h" />
     <ClInclude Include="utils\str.h" />
     <ClInclude Include="callbacks.h" />
+    <ClInclude Include="vehicle_common.h" />
+    <ClInclude Include="vehicle_model.h" />
+    <ClInclude Include="vehicle_model_states.h" />
     <ClInclude Include="visitors.h" />
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +187,8 @@
     <ClCompile Include="ray_cast_vehicle.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="select_geometry.cpp" />
+    <ClCompile Include="vehicle_model.cpp" />
+    <ClCompile Include="vehicle_model_states.cpp" />
     <ClInclude Include="sensor.h">
       <FileType>CppCode</FileType>
     </ClInclude>

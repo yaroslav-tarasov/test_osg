@@ -84,4 +84,10 @@ node_position /*const&*/ node_impl::position() /*const*/
     return /*extrapolated_position_*//*position_*/local_position(0,0,from_osg_vector3(mat.getTrans()),from_osg_quat(mat.getRotate()));
 }
 
+// FIXME just stub
+cg::transform_4  node_impl::get_root_transform() const 
+{
+    return cg::transform_4();
+}
+
 }
