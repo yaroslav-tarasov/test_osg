@@ -129,10 +129,10 @@ namespace aircraft
         sync_phys(0.1);
     }
 
-    //void phys_aircraft_impl::attach_tow(bool attached)
-    //{
-    //    tow_attached_ = attached;
-    //}
+    void phys_aircraft_impl::attach_tow(bool attached)
+    {
+        tow_attached_ = attached;
+    }
 
     void phys_aircraft_impl::freeze(bool freeze)
     {
@@ -200,24 +200,25 @@ namespace aircraft
     {
         return  phys_aircraft_->get_steer();
     }
-    //std::vector<phys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
-    //{
-    //    std::vector<phys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
-    //    for (auto it = contacts.begin(); it != contacts.end(); ++it)
-    //        it->offset = it->offset * body_transform_inv_;
 
-    //    return contacts;
-    //}
+    std::vector<phys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
+    {
+        std::vector<phys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
+        for (auto it = contacts.begin(); it != contacts.end(); ++it)
+            it->offset = it->offset * body_transform_inv_;
 
-    //bool phys_aircraft_impl::has_wheel_contact(size_t id) const
-    //{
-    //    return phys_aircraft_->has_wheel_contact(id);
-    //}
+        return contacts;
+    }
 
-    //double phys_aircraft_impl::wheel_skid_info(size_t id) const
-    //{
-    //    return phys_aircraft_->wheel_skid_info(id);
-    //}
+    bool phys_aircraft_impl::has_wheel_contact(size_t id) const
+    {
+        return phys_aircraft_->has_wheel_contact(id);
+    }
+
+    double phys_aircraft_impl::wheel_skid_info(size_t id) const
+    {
+        return phys_aircraft_->wheel_skid_info(id);
+    }
 
     void phys_aircraft_impl::remove_wheel(size_t id)
     {

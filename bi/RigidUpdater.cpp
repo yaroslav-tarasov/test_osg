@@ -182,6 +182,16 @@ namespace bi
 
         _phys_aircrafts.emplace_back(aircraft_model(ac_,s));
         _sys->registerBody(id,ac_->get_rigid_body());
+        
+
+        //_phys_aircrafts.back().shassis->visit_groups([=](aircraft::shassis_group_t & shassis_group)
+        //{
+        //    //if (to_be_opened)
+        //    //    shassis_group.open(true);
+        //    //else 
+        //        if (!shassis_group.is_front)
+        //                shassis_group.close(false);
+        //});
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -293,6 +303,32 @@ namespace bi
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/--steer),-65., 65.);
                 phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);
             }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
+            {
+                _phys_aircrafts.back().get_chassis()->visit_groups([=](aircraft::shassis_group_t & shassis_group)
+                {
+                    //if (to_be_opened)
+                    if (!shassis_group.is_front)
+                        shassis_group.open(false);
+                    //else
+                    //  shassis_group.close(true);
+                });
+            }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_L )
+            {
+                _phys_aircrafts.back().get_chassis()->visit_groups([=](aircraft::shassis_group_t & shassis_group)
+                {
+                    //if (to_be_opened)
+                    //    shassis_group.open(true);
+                    //else
+                    if (!shassis_group.is_front)
+                        shassis_group.close(false);
+                });
+            }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
+            {
+                _phys_aircrafts[0].check_wheel_brake();
+            }
 
             break;
         case osgGA::GUIEventAdapter::FRAME:
@@ -312,80 +348,14 @@ namespace bi
                 for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
                 {   
                      //high_res_timer        _hr_timer2;
-#if 1   // Модель
-                    if((*it).traj.get())
-                    {
-                         if ((*it).traj->cur_len() < (*it).traj->length())
-                         {
-                             (*it).aircraft->set_prediction(15.); 
-                             (*it).aircraft->freeze(false);
-                             const double  cur_len = (*it).traj->cur_len();
-                             (*it).traj->set_cur_len ((*it).traj->cur_len() + dt*(*it).desired_velocity);
-                             const double  tar_len = (*it).traj->cur_len();
-                             decart_position target_pos;
-                                                                          
-                             target_pos.pos = cg::point_3((*it).traj->kp_value(tar_len),0);
-                             geo_position gtp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-                             (*it).aircraft->go_to_pos(gtp.pos ,gtp.orien);
-                            
-                             
-                             const double curs_change = (*it).traj->curs_value(tar_len) - (*it).traj->curs_value(cur_len);
-
-                             if(cg::eq(curs_change,0.0))
-                                 (*it).desired_velocity = aircraft_model::max_desired_velocity;
-                             else
-                                 (*it).desired_velocity = aircraft_model::min_desired_velocity;
-
-                             const decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
-                            
-                             //std::stringstream cstr;
-
-                             //cstr << std::setprecision(8) 
-                             //     << "curr_pods_len:  "             << (*it).traj->cur_len() 
-                             //     << "    desired_velocity :  "     << (*it).desired_velocity   
-                             //     << "    delta curs :  "  << curs_change
-                             //     << ";   cur_pos x= "     << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-                             //     << "    target_pos x= "  << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
-
-                             //OutputDebugString(cstr.str().c_str());
-                        }
-                        else
-                        {
-                                                     
-                           cg::point_3 cur_pos = _phys_aircrafts[0].aircraft->get_local_position().pos;
-                           cg::point_3 d_pos = _phys_aircrafts[0].aircraft->get_local_position().dpos;
-                           cg::point_3 trg_p((*it).traj->kp_value((*it).traj->length()),0);
-                           d_pos.z = 0;
-                           if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
-                           {   
-                               decart_position target_pos;
-                               target_pos.pos = trg_p;
-                               geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-                               (*it).aircraft->go_to_pos(gp.pos ,gp.orien);
-                           }
-                           else
-                           {
-                               // (*it).traj.reset();
-                               (*it).aircraft->freeze(true);
-                           }
-                        }
-
-                    }
-#endif
      //               double dt2 = _hr_timer2.get_delta();
-
      //               std::stringstream cstr;
-
      //               cstr << std::setprecision(8) 
      //                   << "dt2:  "     << dt2 
      //                   <<"\n" ;
-
 					//OutputDebugString(cstr.str().c_str());
                     
-					(*it).aircraft->update();
-
-                    
-
+                    it->update( dt );
                 }   
 
 
@@ -443,7 +413,7 @@ namespace bi
         decart_position target_pos;
         target_pos.pos = simple_route.back();
         //geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-        decart_position cur_pos = _phys_aircrafts[0].aircraft->get_local_position();
+        decart_position cur_pos = _phys_aircrafts[0].get_local_position();
         target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
         
         

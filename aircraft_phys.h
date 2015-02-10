@@ -7,6 +7,7 @@
 #include "aircraft.h"
 #include "sensor.h"
 
+
 namespace phys
 {
 	namespace aircraft
@@ -43,10 +44,10 @@ namespace phys
        double drag() const;
        double lift() const;
        double thrust() const ;
-       //bool has_contact() const;
-       //std::vector<contact_info_t> get_body_contacts() const;
-       //bool has_wheel_contact(size_t id) const;
-       //double wheel_skid_info(size_t id) const;
+       bool has_contact() const;
+       std::vector<contact_info_t> get_body_contacts() const;
+       bool has_wheel_contact(size_t id) const;
+       double wheel_skid_info(size_t id) const;
 
    private:
 	   void   set_steer   (double steer)            override;
@@ -92,25 +93,24 @@ namespace phys
 
        bool     has_chassis_contact_;
 
-       //typedef cg::duplicate_points_fixed_id<point_3> dup_points_t;
-       //dup_points_t  body_contact_points_;
+       typedef cg::duplicate_points_fixed_id<cg::point_3> dup_points_t;
+       dup_points_t  body_contact_points_;
 
        struct contact_t
        {
            contact_t() {}
-           contact_t(point_3 const& vel)
+           contact_t(cg::point_3 const& vel)
                : sum_vel(vel)
                , count(1)
            {}
 
-           point_3 sum_vel;
+           cg::point_3 sum_vel;
            size_t count;
        };
 
-       //fixed_id_vector<contact_t> body_contacts_;
-       
-       //fixed_id_vector<size_t> wheels_ids_;
-	   std::vector<size_t> wheels_ids_;
+       fixed_id_vector<contact_t> body_contacts_;
+
+       fixed_id_vector<size_t> wheels_ids_;
    };
 
 

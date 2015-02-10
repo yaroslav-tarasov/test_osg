@@ -27,7 +27,7 @@ namespace phys
         , steer_(0)
         , prev_attack_angle_(0)
         , has_chassis_contact_(false)
-        // TODO or not TODO , body_contact_points_(1.5)
+        , body_contact_points_(1.5)
     {
 		tuning_.m_maxSuspensionTravelCm = 500;
 
@@ -208,6 +208,21 @@ namespace phys
     }
 #endif
 
+    bool impl::has_contact() const
+    {
+        for (int i=0;i<raycast_veh_->getNumWheels();i++)
+        {
+            btWheelInfo const& info = raycast_veh_->getWheelInfo(i);
+            if (info.m_raycastInfo.m_isInContact)
+                return true;
+        }
+
+        if (has_chassis_contact_)
+            return true;
+
+        return false;
+    }
+
 	size_t impl::add_wheel( double /*mass*/, double /*width*/, double radius, point_3 const& offset, cpr const & /*orien*/, bool /*has_damper*/, bool is_front )
 	{
 		point_3 connection_point = offset;
@@ -229,19 +244,18 @@ namespace phys
         info.m_frictionSlip = 10.;
 		info.m_rollInfluence = 0.1f;
 
-		wheels_ids_.push_back(raycast_veh_->getNumWheels()-1);
-		return wheels_ids_.size()-1;
+        return wheels_ids_.insert(raycast_veh_->getNumWheels()-1);
 	}
     
     void impl::remove_wheel(size_t id)
     {
-        //size_t num = wheels_ids_[id];
-        //size_t end_num = raycast_veh_->m_wheelInfo.size()-1;
-        //auto it = std::find(wheels_ids_.begin(), wheels_ids_.end(), end_num);
-        //std::swap(wheels_ids_[id], *it);
-        //raycast_veh_->m_wheelInfo.swap(num, end_num);
-        //raycast_veh_->m_wheelInfo.pop_back();
-        //wheels_ids_.erase(id);
+        size_t num = wheels_ids_[id];
+        size_t end_num = raycast_veh_->m_wheelInfo.size()-1;
+        auto it = std::find(wheels_ids_.begin(), wheels_ids_.end(), end_num);
+        std::swap(wheels_ids_[id], *it);
+        raycast_veh_->m_wheelInfo.swap(num, end_num);
+        raycast_veh_->m_wheelInfo.pop_back();
+        wheels_ids_.erase(id);
     }
 
 	void impl::set_steer   (double steer)
@@ -311,26 +325,50 @@ namespace phys
 
 	void impl::pre_update(double /*dt*/)
 	{
-		//has_chassis_contact_ = false;
-		//body_contact_points_.clear();
-		//body_contacts_.clear();
+		has_chassis_contact_ = false;
+		body_contact_points_.clear();
+		body_contacts_.clear();
 
 		raycast_veh_.activate(chassis_->isActive());
 	}
 
-	void impl::has_contact(rigid_body_user_info_t const* /*other*/, cg::point_3 const& local_point, cg::point_3 const& vel)
-	{
-		//has_chassis_contact_ = true;
-		//size_t id = body_contact_points_.insert(local_point).first;
+    void impl::has_contact(rigid_body_user_info_t const* /*other*/, cg::point_3 const& local_point, cg::point_3 const& vel)
+    {
+        has_chassis_contact_ = true;
+        size_t id = body_contact_points_.insert(local_point).first;
 
-		//if (!body_contacts_.valid(id))
-		//	body_contacts_.insert(id, contact_t(vel));
-		//else
-		//{
-		//	body_contacts_[id].sum_vel += vel;
-		//	body_contacts_[id].count++;
-		//}
-	}
+        if (!body_contacts_.valid(id))
+            body_contacts_.insert(id, contact_t(vel));
+        else
+        {
+            body_contacts_[id].sum_vel += vel;
+            body_contacts_[id].count++;
+        }
+    }
+
+    std::vector<contact_info_t> impl::get_body_contacts() const
+    {
+        std::vector<contact_info_t> res;
+        for (auto it = body_contact_points_.begin(); it != body_contact_points_.end(); ++it)
+        {
+            cg::point_3 vel = body_contacts_[it.id()].sum_vel / body_contacts_[it.id()].count;
+            res.push_back(contact_info_t(*it, vel));
+        }
+
+        return res;
+    }
+
+    bool impl::has_wheel_contact(size_t id) const
+    {
+        btWheelInfo const& info = raycast_veh_->getWheelInfo(wheels_ids_[id]);
+        return info.m_raycastInfo.m_isInContact;
+    }
+
+    double impl::wheel_skid_info(size_t id) const
+    {
+        btWheelInfo const& info = raycast_veh_->getWheelInfo(wheels_ids_[id]);
+        return info.m_skidInfo;
+    }
 
     void impl::reset_suspension()
     {

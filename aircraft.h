@@ -109,12 +109,12 @@ namespace phys
 	struct contact_info_t
 	{
 		contact_info_t() {}
-		contact_info_t( point_3 const& offset, point_3 const& vel )
+		contact_info_t( cg::point_3 const& offset, cg::point_3 const& vel )
 			: vel(vel), offset(offset)
 		{}
 
-		point_3 vel;
-		point_3 offset;
+		cg::point_3 vel;
+		cg::point_3 offset;
 	};
 
 	struct info
@@ -130,10 +130,10 @@ namespace phys
 		virtual double drag() const = 0;
 		virtual double lift() const = 0;
 		virtual double thrust() const = 0;
-		//virtual bool has_contact() const = 0;
-		//virtual std::vector<contact_info_t> get_body_contacts() const = 0;
-		//virtual bool has_wheel_contact(size_t id) const = 0;
-		//virtual double wheel_skid_info(size_t id) const = 0;
+		virtual bool has_contact() const = 0;
+		virtual std::vector<contact_info_t> get_body_contacts() const = 0;
+		virtual bool has_wheel_contact(size_t id) const = 0;
+		virtual double wheel_skid_info(size_t id) const = 0;
 	};  
 
 	struct control : info

@@ -246,6 +246,14 @@ inline T cbrt(T n)
 #include "position.h"
 #include "local_position.h"
 
+namespace binary
+{
+    // size
+    typedef uint32_t size_type;
+}
+
+#include "geometry/dup_points.h"
+
 #include "cpp_utils/polymorph_ptr.h"
 #include "nodes_management.h"
 

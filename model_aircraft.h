@@ -155,7 +155,6 @@ struct info
     //DECLARE_EVENT(responder_changed, (fpl::info*));
 };
 
-//! интерфейс, управление ВС (общее?)
 struct control
 {
     virtual ~control(){}
