@@ -46,6 +46,9 @@
     <Filter Include="Source Files\vehicle">
       <UniqueIdentifier>{4646637e-3fc3-44ef-a0f3-b6a80d22d301}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests">
+      <UniqueIdentifier>{baec0567-4405-4fd5-a2ed-21305b2b44e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -239,34 +242,7 @@
     <ClCompile Include="SkyBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleHUD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main_scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="select_geometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main_shadows.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main_shadows_2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shadow3\Tuto12.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tess_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tex_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="bump_mapping.cpp">
@@ -281,9 +257,6 @@
     <ClCompile Include="exp_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bi\osgbullet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bi\BulletInterface.cpp">
       <Filter>Source Files\bi</Filter>
     </ClCompile>
@@ -294,9 +267,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shadow_map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="teapot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowedScene.cpp">
@@ -407,14 +377,47 @@
     <ClCompile Include="dubins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dubins_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vehicle_model_states.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vehicle_model.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tex_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tess_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="shadow3\Tuto12.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="main_shadows_2.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="main_shadows.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="select_geometry.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="bi\osgbullet.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleHUD.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="dubins_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="teapot.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp">
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

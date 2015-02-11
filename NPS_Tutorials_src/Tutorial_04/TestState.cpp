@@ -1,18 +1,4 @@
 #include "stdafx.h"
-//#include <osg/Node>
-//#include <osg/Group>
-//#include <osg/Geode>
-//#include <osg/Geometry>
-//#include <osg/Texture2D>
-//#include <osgDB/ReadFile> 
-//#include <osgViewer/Viewer>
-//#include <osg/PositionAttitudeTransform>
-//#include <osgGA/TrackballManipulator>
-//#include <osg/StateSet>
-//#include <osg/Texture2D>
-//#include <osg/TexEnv>
-//#include <osg/TexGen>
-//#include <osg/ShapeDrawable>
 #include <iostream>
 
 namespace {
