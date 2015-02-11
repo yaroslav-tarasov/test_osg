@@ -263,9 +263,15 @@ namespace sp = std::placeholders;
 #include "phys_sys_fwd.h"
 #include "aircraft_common.h"
 
+#include "aircraft_model_inf.h"
+
 #include "event.h"
 #include "mod_system.h"
 
+inline cg::geo_base_3 get_base()
+{
+    return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
+}
 
 #include "osg_helpers.h"
 

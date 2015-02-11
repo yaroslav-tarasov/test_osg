@@ -134,8 +134,14 @@ void node_impl::set_position(node_position const& pos)
 
 node_position /*const&*/ node_impl::position() /*const*/
 {
-    auto mat = node_->asTransform()->asMatrixTransform()->getMatrix();
-    return /*extrapolated_position_*//*position_*/local_position(0,0,from_osg_vector3(mat.getTrans()),from_osg_quat(mat.getRotate()));
+    // auto mat = node_->get asTransform()->asMatrixTransform()->getMatrix();
+    auto pat = node_->asTransform()->asPositionAttitudeTransform();
+    auto mat = node_->asTransform()->asMatrixTransform();
+
+    osg::Vec3 trans = pat?pat->getPosition():mat->getMatrix().getTrans();  
+    osg::Quat rot = pat?pat->getAttitude():mat->getMatrix().getRotate();  
+
+    return /*extrapolated_position_*//*position_*/local_position(0,0,from_osg_vector3(trans),from_osg_quat(rot));
 }
 
 // FIXME just stub

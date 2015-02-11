@@ -660,7 +660,7 @@ void Scene::createObjects()
         }
     }
 
-#if 0
+#if 1
     auto trap = creators::createObject("trap");
     _rigidUpdater->addVehicle(trap,
         osg::Vec3(250,750,00), osg::Vec3(0,30000,0), 1500.0f);
@@ -683,6 +683,10 @@ void Scene::createObjects()
     auto pojarka = creators::createObject("pojarka");
     _rigidUpdater->addVehicle(pojarka,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
+
+    auto niva_cevrolet2 = creators::createObject("niva_chevrolet");
+    _rigidUpdater->addVehicle2(niva_cevrolet2,
+        osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 1860.0f);    
     
     //pojarka->setNodeMask(0);
     //cleaner->setNodeMask(0);

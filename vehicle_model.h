@@ -17,17 +17,20 @@ struct model_base
       virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
 };
 
-//! физическая модель подвижного объекта
+typedef polymorph_ptr<model_base> model_base_ptr;
+
+
 struct model
     : model_base
-    //: model_presentation        //! 
-    //, view                      //! 
-    //, phys_object_model_base    //! 
+    //: model_presentation        
+    //, view                      
+    //, phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-
+      static model_base_ptr create(nodes_management::manager_ptr nodes_manager,
+                                   phys::control_ptr        phys);
 private:
-    model(/*kernel::object_create_t const& oc, dict_copt dict*/);
+    model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys/*kernel::object_create_t const& oc, dict_copt dict*/);
 
     // base_presentation
 private:

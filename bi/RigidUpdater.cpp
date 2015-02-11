@@ -171,7 +171,7 @@ namespace bi
 
         size_t pa_size = _phys_aircrafts.size();
         aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
-            cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)),
+            get_base(),
             _sys,
             man,
             geo_position(cg::geo_point_3(0.000,0.005*(pa_size+1),0),cg::quaternion(cg::cpr(90, 0, 0))),
@@ -180,7 +180,7 @@ namespace bi
             0);
 
 
-        _phys_aircrafts.emplace_back(aircraft_model(ac_,s));
+        _phys_aircrafts.emplace_back(aircraft::model(ac_,s));
         _sys->registerBody(id,ac_->get_rigid_body());
         
 
@@ -218,7 +218,7 @@ namespace bi
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
-        _phys_vehicles.emplace_back(veh);
+        _vehicles.emplace_back(veh);
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -232,6 +232,17 @@ namespace bi
         veh->set_steer(10);
     }
 
+    void RigidUpdater::addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+    {           
+
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+         
+        nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
+
+        _phys_vehicles.emplace_back(vehicle::model::create(man,_sys));
+
+
+    }
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
@@ -356,8 +367,13 @@ namespace bi
 					//OutputDebugString(cstr.str().c_str());
                     
                     it->update( dt );
-                }   
+                } 
 
+                for(auto it = _phys_vehicles.begin();it!=_phys_vehicles.end();++it)
+                {   
+                          (*it)->update( dt );
+                }   
+                 
 
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
@@ -418,13 +434,13 @@ namespace bi
         
         
 
-        if (!_phys_aircrafts[0].traj)
+        if (!_phys_aircrafts[0].get_trajectory())
         {
-             _phys_aircrafts[0].traj = boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft_model::min_radius(),aircraft_model::step());
+             _phys_aircrafts[0].set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::model::min_radius(),aircraft::model::step()));
         }
         else
         {  
-            fms::trajectory_ptr main_ = _phys_aircrafts[0].traj;
+            fms::trajectory_ptr main_ = _phys_aircrafts[0].get_trajectory();
 
             decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
                                      ,cg::cpr(main_->curs_value(main_->length()),0,0) );
@@ -448,14 +464,14 @@ namespace bi
 
             fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
                                                                             target_pos,
-                                                                            aircraft_model::min_radius(),
-                                                                            aircraft_model::step());
+                                                                            aircraft::model::min_radius(),
+                                                                            aircraft::model::step());
 
             main_->append(*traj.get());
         }
        
         // Подробная отрисовка
-        _trajectory_drawer->set(*(_phys_aircrafts[0].traj.get()));
+        _trajectory_drawer->set(*(_phys_aircrafts[0].get_trajectory().get()));
         
         // _trajectory_drawer->set(simple_route);
 

@@ -5,7 +5,7 @@
 #include "bada_glb_data.h"
 
 //#include "fms/fms.h"
-
+#undef  BADA_API
 #define BADA_API
 
 namespace bada

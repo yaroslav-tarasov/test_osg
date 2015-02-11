@@ -5,6 +5,11 @@
 #include "sensor.h"
 #include "vehicle.h"
 
+struct stub_msys : kernel::model_system
+{
+    double calc_step() const { return 0.1; }
+};
+
 namespace vehicle
 {
 
@@ -13,9 +18,14 @@ namespace vehicle
 //    return object_info_ptr(new model(oc, dict));
 //}
 
+model_base_ptr model::create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+{
+    return model_base_ptr(new model(nodes_manager,phys));
+}
+
 //AUTO_REG_NAME(vehicle_model, model::create);
 
-model::model(/*kernel::object_create_t const& oc, dict_copt dict*/)
+model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys/*kernel::object_create_t const& oc, dict_copt dict*/)
     : /*view(oc, dict)*/
     //, phys_object_model_base(collection_)
     //, sys_(dynamic_cast<model_system *>(oc.sys))
@@ -23,9 +33,23 @@ model::model(/*kernel::object_create_t const& oc, dict_copt dict*/)
     //, airport_(ani_->navigation_info()->find_airport(pos()))
     /*,*/ manual_controls_(false)
     , max_speed_(0)
+    , nodes_manager_(nodes_manager)
+    , phys_(phys)
+    , sys_ (new stub_msys)
 {
-    root_next_pos_   = root_->position().global().pos;
-    root_next_orien_ = root_->position().global().orien;
+#pragma region view    
+    //nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
+    if (nodes_manager_)
+    {
+        root_ = nodes_manager_->get_node(0);
+        //conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
+        tow_point_node_ = nodes_manager_->find_node("tow_point");
+    }
+#pragma endregion
+                       
+                          
+    root_next_pos_   =  geo_position(root_->position()./*global*/local(),get_base()).pos;
+    root_next_orien_ = root_->position()./*global*/local().orien;
 
     body_node_ = nodes_manager_->find_node("body");
 
@@ -443,11 +467,12 @@ void model::create_phys_vehicle()
 
     phys::collision_ptr collision(phys_->get_system(*phys_zone_));
 
-    auto isection = collision->intersect_first(base(cg::geo_point_3(pos(), 10.)), base(cg::geo_point_3(pos(), -10.)));
+    // TODO OR NOT
+    //auto isection = collision->intersect_first(base(cg::geo_point_3(pos(), 10.)), base(cg::geo_point_3(pos(), -10.)));
 
     double height = 0;
-    if (isection)
-        height += 10 - 20. * *isection;
+    //if (isection)   // TODO OR NOT
+    //    height += 10 - 20. * *isection;
 
     cg::transform_4 veh_transform = cg::transform_4(as_translation(base(cg::geo_point_3(pos(), height))), cg::rotation_3(cg::cpr(course(), 0,0))) * body_transform_inv_.inverted();
 

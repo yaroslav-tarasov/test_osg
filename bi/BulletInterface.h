@@ -10,6 +10,8 @@
 #include "phys_sys_common.h"
 #include "sensor.h"
 
+
+
 namespace phys
 {
 
@@ -18,6 +20,7 @@ class BulletInterface
     , public phys::system
 	// , public osg::Referenced
     , public boost::enable_shared_from_this<BulletInterface>
+    , public control
 {
 public:
     typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
@@ -78,6 +81,17 @@ public:
 	phys::bt_vehicle_raycaster_ptr vehicle_raycaster() const override;
 	void register_rigid_body( phys::rigid_body_impl * rb )   override;
 	void unregister_rigid_body( phys::rigid_body_impl * rb ) override;
+
+    // control
+public:
+
+    system_ptr        get_system(size_t zone) override;
+
+    optional<size_t>  get_zone(cg::geo_point_3 const & pos) const override;
+    optional<size_t>  get_zone(std::string const& airport) const override;
+    cg::geo_base_3 const& get_base(size_t zone) const override;
+    std::string zone_name(size_t id) const override;
+
 protected:  
 
     void checkForCollisionEvents();

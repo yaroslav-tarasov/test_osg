@@ -693,5 +693,35 @@ ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,
     return ctrl;
 }
 
+system_ptr   BulletInterface::get_system(size_t zone)
+{
+       return shared_from_this();
+}
+
+optional<size_t>  BulletInterface::get_zone(cg::geo_point_3 const & pos) const
+{
+     return 1;
+}
+
+optional<size_t>  BulletInterface::get_zone(std::string const& airport) const
+{
+      return 1;
+}
+
+cg::geo_base_3 const& BulletInterface::get_base(size_t zone) const
+{
+    return ::get_base();
+}
+
+std::string BulletInterface::zone_name(size_t id) const
+{
+    return "name";
+}
+
+
+
+
+
+
 } // namespace phys
 

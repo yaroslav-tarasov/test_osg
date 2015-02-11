@@ -147,6 +147,7 @@
     <ClInclude Include="visitors.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aircraft_model.cpp" />
     <ClCompile Include="aircraft_phys.cpp" />
     <ClCompile Include="aircraft_shassis_impl.cpp" />
     <ClCompile Include="aircraft_visual.cpp" />

@@ -419,5 +419,8 @@
     <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="aircraft_model.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
