@@ -15,6 +15,7 @@ struct model_base
 {
       virtual void update( double /*time*/ ) =0;
       virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
+      virtual void go_to_pos(  cg::geo_point_2 pos, double course ) =0;
 };
 
 typedef polymorph_ptr<model_base> model_base_ptr;
@@ -57,6 +58,9 @@ private:
     //void on_follow_route(uint32_t route_id);
     //void on_debug_controls(msg::debug_controls_data const&);
     //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
+
+public:
+    void go_to_pos(  cg::geo_point_2 pos, double course );
 
 private:
     void follow_route(std::string const& route);

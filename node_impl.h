@@ -34,6 +34,7 @@ private:
     node_position                                 position_;
     node_position                                 extrapolated_position_;
     std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
+    mutable std::string                           name_;
 };
 
 typedef polymorph_ptr<node_impl> node_impl_ptr;

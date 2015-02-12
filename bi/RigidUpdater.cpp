@@ -234,14 +234,24 @@ namespace bi
 
     void RigidUpdater::addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {           
-
+        int id = _physicsNodes.size();
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
          
         nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
 
         _phys_vehicles.emplace_back(vehicle::model::create(man,_sys));
+        _sys->registerBody(id);  // FIXME Перевести внуть модели 
 
+        osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
+        mt->addChild( addGUIObject_v(node) );
+        _root->addChild( mt.get() );
 
+        _physicsNodes[id] = mt;
+
+        _sys->setMatrix( id, osg::Matrix::translate(pos) );
+
+        //veh->set_steer(10);
+        _phys_vehicles.back()->go_to_pos(cg::geo_point_2(0.000,0.005),90);
     }
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )

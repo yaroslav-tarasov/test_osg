@@ -76,7 +76,8 @@ void node_impl::set_visibility  (bool visible)
 
 std::string const&  node_impl::name() const
 {
-     return node_->getName();
+    name_ = boost::to_lower_copy(node_->getName()); 
+    return name_;
 }
 
 cg::sphere_3   node_impl::get_bound()
@@ -126,10 +127,18 @@ void node_impl::set_position(node_position const& pos)
 {   
     //time_                   = m.time;
     //position_               = m.pos.get_pos(position_, m.components);
-    //extrapolated_position_  = position_;
-    auto mat = node_->asTransform()->asMatrixTransform()->getMatrix();
-    mat.setRotate(to_osg_quat(pos.local().orien));
-    node_->asTransform()->asMatrixTransform()->setMatrix(mat);
+    //extrapolated_position_  = position_;   ]
+    if(node_->asTransform()->asMatrixTransform())
+    {
+        auto mat = node_->asTransform()->asMatrixTransform()->getMatrix();
+        mat.setRotate(to_osg_quat(pos.local().orien));
+        node_->asTransform()->asMatrixTransform()->setMatrix(mat);
+    }
+    else if(node_->asTransform()->asPositionAttitudeTransform())
+    {
+        auto pat = node_->asTransform()->asPositionAttitudeTransform();
+        node_->asTransform()->asPositionAttitudeTransform()->setAttitude(to_osg_quat(pos.local().orien));
+    }
 }
 
 node_position /*const&*/ node_impl::position() /*const*/

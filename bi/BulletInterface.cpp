@@ -494,6 +494,11 @@ void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
     _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 }
 
+void BulletInterface::registerBody(int id)
+{
+    _actors[id]._body  = rigid_bodies_.back()->get_body().get();
+}
+
 void BulletInterface::createShape(osg::Node* node,int id, double mass)
 {
     btCollisionShape* cs = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( node );
@@ -667,12 +672,14 @@ phys::bt_vehicle_raycaster_ptr BulletInterface::vehicle_raycaster() const
 
 void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 {
-	rigid_bodies_.insert(rb);
+	// rigid_bodies_.insert(rb);
+    rigid_bodies_.push_back(rb);
 }
 
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
-	rigid_bodies_.erase(rb);
+	// rigid_bodies_.erase(rb);
+    // FIXME  пока не удаляем
 }
 
 aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)

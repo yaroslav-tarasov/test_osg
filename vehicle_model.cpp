@@ -64,6 +64,8 @@ model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr      
     //    .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
     //    .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
     //    ;
+
+    create_phys_vehicle();
 }
 
 void model::update( double time )
@@ -193,6 +195,11 @@ void model::on_go_to_pos(msg::go_to_pos_data const& data)
         
     state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, !!aerotow_);
 }
+#else
+void model::go_to_pos(  cg::geo_point_2 pos, double course )
+{
+    model_state_ = boost::make_shared<go_to_pos_state>(pos, course, !!aerotow_);
+}
 #endif 
 
 //void model::on_debug_controls(msg::debug_controls_data const& d)
@@ -320,7 +327,7 @@ void model::sync_phys()
     double brake = 0;
 
     double max_thrust = aerotow_ ? 100 : 10;
-    double thrust = cg::bound(0.1 * (desired_speed_signed - cur_speed_signed) / (5 * sys_->calc_step()), -max_thrust, max_thrust);
+    double thrust = cg::bound(/*0.1 **/ (desired_speed_signed - cur_speed_signed) / (5 * sys_->calc_step()), -max_thrust, max_thrust);
 
     if (fabs(cur_speed_signed) > fabs(desired_speed_signed))
     {
@@ -340,26 +347,30 @@ void model::sync_phys()
 
 void model::sync_nodes_manager( double /*dt*/ )
 {
+    
     if (phys_vehicle_ && root_)
     {
         cg::geo_base_3 base = phys_->get_base(*phys_zone_);
         decart_position bodypos = phys_vehicle_->get_position();
         decart_position root_pos = bodypos * body_transform_inv_;
 
+#if 0 
         geo_position pos(root_pos, base);
 
-        nodes_management::node_position root_node_pos = root_->position();
+        // FIXME √лобальные локальные преобразовани€ 
+        nodes_management::node_position root_node_pos = geo_position(root_->position().local(),get_base()); // root_->position();
         root_node_pos.global().pos = root_next_pos_;
         root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
 
         root_node_pos.global().orien = root_next_orien_;
         root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
 
-        root_->set_position(root_node_pos);
+        nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
+        root_->set_position(/*root_node_pos*/rnp);
 
         root_next_pos_ = pos.pos;
         root_next_orien_ = pos.orien;
-
+#endif
 
         geo_position body_pos(phys_vehicle_->get_position() * body_transform_inv_, base);
 
@@ -372,7 +383,7 @@ void model::sync_nodes_manager( double /*dt*/ )
 
 // FIXME TODO
 //            nodes_management::node_info_ptr rel_node = wheels_[i].node->rel_node();
-            nodes_management::node_info_ptr rel_node;
+            nodes_management::node_info_ptr rel_node = wheels_[i].node;
 
             cg::geo_base_3 global_pos = wheels_[i].node->get_global_pos();
             cg::quaternion global_orien = wheels_[i].node->get_global_orien();
@@ -419,8 +430,10 @@ void model::update_model( double dt )
         geo_position glb_phys_pos(phys_pos, base);
 
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
-        if (dist > 10)
-            return;
+        // FIXME state устанавливетс€ через чарт
+        // у мен€ координаты отличаютс€ надо думать
+        //if (dist > 10)
+        //    return;
     }
 
     if (model_state_)
@@ -463,7 +476,10 @@ void model::create_phys_vehicle()
     //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
     phys::compound_sensor_ptr s = phys::ray_cast_vehicle::fill_cs(nodes_manager_);
 
-    body_transform_inv_ = get_relative_transform(nodes_manager_, body_node_).inverted();
+    body_transform_inv_ =  cg::transform_4(); 
+    // FIXME TYV  сдаетс€ мне нефига не нужный код 
+    // ¬ модели симекса съедаетс€ трансформ на геометрии, и Body оказываетс€ востребованным
+    // get_relative_transform(nodes_manager_, body_node_).inverted();
 
     phys::collision_ptr collision(phys_->get_system(*phys_zone_));
 
@@ -479,28 +495,32 @@ void model::create_phys_vehicle()
     //phys::box_sensor_t box(cg::rectangle_3(point_3(-2, -2, -1), point_3(2, 2, 1)));
     decart_position p(veh_transform.translation(), cg::quaternion(veh_transform.rotation().cpr()));
     //p.pos.z -= 0.2;
+    p.pos.z = 0;
+    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(2000, s, p);
 
-    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(200, s, p);
-
-#if 0   // implementation
-    nm::visit_sub_tree(nodes_manager_->get_node_tree_iterator(0), [this](nm::node_info_ptr wheel_node)->bool
+    // implementation
+    nm::visit_sub_tree(nodes_manager_->get_node(0), [this](nm::node_info_ptr wheel_node)->bool
     {
+        std::string name = wheel_node->name();
         if (boost::starts_with(wheel_node->name(), "wheel"))
         {
-            cg::transform_4 wt = nm::get_relative_transform(nodes_manager_, wheel_node, this->body_node_);
+            // ѕоиск имени симекса нам не походит
+            // cg::transform_4 wt = nm::get_relative_transform(nodes_manager_, wheel_node, this->body_node_);
+            cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, wheel_node);
             cg::point_3 wheel_offset = wt.translation();
 
-            auto const *wnc = wheel_node->get_collision() ;
-            Assert(wnc) ;
-            cg::rectangle_3 bound = model_structure::bounding(*wnc);
+            //auto const *wnc = wheel_node->get_collision() ;
+            //Assert(wnc) ;
+            //cg::rectangle_3 bound = model_structure::bounding(*wnc);
+            double radius =0.75 * wheel_node->get_bound().radius;
 
-            this->phys_vehicle_->add_wheel(30, bound.size().x / 2, bound.size().y/ 2, wt.translation(), wt.rotation().cpr(), true);
+            this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wt.translation(), wt.rotation().cpr(), true);
 
             this->wheels_.push_back(model::wheel_t(wheel_node));
         }
         return true;
     });
-#endif
+
 
     phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->reset_suspension();
 }

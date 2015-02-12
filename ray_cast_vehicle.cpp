@@ -9,6 +9,8 @@
 //#include "debug_drawer.h"
 #include "bi/phys_sys_common.h"
 
+
+
 namespace phys
 {
 namespace ray_cast_vehicle
@@ -21,7 +23,7 @@ namespace ray_cast_vehicle
         , chassis_(sys->dynamics_world())
         , raycast_veh_(sys->dynamics_world())
         , steer_(0)
-        ,chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
+        , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
     {
         tuning_.m_maxSuspensionTravelCm = 50;
 
@@ -35,9 +37,21 @@ namespace ray_cast_vehicle
 #else
         btVector3 inertia;
         chassis_shape_->calculateLocalInertia(btScalar(mass), inertia);
+       
+        btTransform  tr;
+        tr.setIdentity();
+        btVector3 aabbMin,aabbMax;
+        chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
+
+        btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);
+        btScalar dyy = btScalar((aabbMax.y() - aabbMin.y()) / 2);
+        btScalar dzz = btScalar((aabbMax.z() - aabbMin.z()) / 2);
+        btScalar m12 = btScalar((mass) /12);
+        inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
+
 #endif
 
-        btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(mass), NULL, &*chassis_shape_, inertia);
+        btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(mass), new custom_ms, &*chassis_shape_, inertia);
         chassis_.reset(boost::make_shared<btRigidBody>(chassis_construction_info));
 
         chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));

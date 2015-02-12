@@ -392,4 +392,17 @@ namespace phys
         bool active_;
     };
 
+    struct	custom_ms : public btMotionState
+    {
+        void	getWorldTransform(btTransform& worldTrans ) const override
+        {}
+
+        //Bullet only calls the update of worldtransform for active objects
+        void	setWorldTransform(const btTransform& worldTrans) override
+        {
+              int i = 0;
+        }
+    };
+
+
 }

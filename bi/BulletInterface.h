@@ -60,6 +60,7 @@ public:
     ray_cast_vehicle::info_ptr  createVehicle(osg::Node* node,int id,double mass);
 
     void                        registerBody(int id,phys::rigid_body_ptr ctrl);
+    void                        registerBody(int id);
 
     void                        setVelocity  ( int id, const osg::Vec3& pos );
     void                        setMatrix    ( int id, const osg::Matrix& matrix );
@@ -113,7 +114,7 @@ private:
     btIDebugDraw*                         _dd;
 
 	bt_vehicle_raycaster_ptr              vehicle_raycaster_;
-	std::set<rigid_body_impl *>			  rigid_bodies_;
+	std::vector<rigid_body_impl *>	      rigid_bodies_;
 };
 
 //inline static BulletInterface*  sys()
