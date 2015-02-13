@@ -361,6 +361,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
     _viewerPtr->addEventHandler(_pickHandler);
     _viewerPtr->realize();
+    addChild(_pickHandler->getOrCreateSelectionBox()); 
 
     //geo_position(root_pos, base_);
 
@@ -416,7 +417,8 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     createObjects();
     
     conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
-    
+    conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
+
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
 
     //

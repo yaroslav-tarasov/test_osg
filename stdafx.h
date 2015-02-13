@@ -121,6 +121,7 @@
 #include <osg/FrontFace>
 #include <osg/CullFace>
 
+#include <osg/ValueObject>
 
 int main_scene( int argc, char** argv );
 int main_hud( int argc, char** argv );
@@ -260,6 +261,8 @@ namespace binary
 namespace nm = nodes_management;
 namespace sp = std::placeholders;
 
+#include "trajectory.h"
+
 #include "phys_sys_fwd.h"
 #include "aircraft_common.h"
 
@@ -275,4 +278,3 @@ inline cg::geo_base_3 get_base()
 
 #include "osg_helpers.h"
 
-#include "trajectory.h"

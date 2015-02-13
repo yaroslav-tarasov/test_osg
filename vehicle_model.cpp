@@ -68,6 +68,11 @@ model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr      
     create_phys_vehicle();
 }
 
+nodes_management::node_info_ptr model::get_root()
+{
+       return nodes_manager_->find_node("root");
+}
+
 void model::update( double time )
 {   
     // view::update(time);
@@ -88,7 +93,7 @@ void model::update( double time )
             sync_phys();
         else
         {
-            cg::geo_base_3 base;  // = phys_->get_base(*phys_zone_); // TODODODOODO FIXME  
+            cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
             decart_position cur_pos = phys_vehicle_->get_position();
             geo_position cur_glb_pos(cur_pos, base);
             // set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); // FIXME оповешаем всех остальных а оно мине надо?
@@ -327,7 +332,7 @@ void model::sync_phys()
     double brake = 0;
 
     double max_thrust = aerotow_ ? 100 : 10;
-    double thrust = cg::bound(/*0.1 **/ (desired_speed_signed - cur_speed_signed) / (5 * sys_->calc_step()), -max_thrust, max_thrust);
+    double thrust = cg::bound(0.1 * (desired_speed_signed - cur_speed_signed) / (5 * sys_->calc_step()), -max_thrust, max_thrust);
 
     if (fabs(cur_speed_signed) > fabs(desired_speed_signed))
     {
@@ -339,6 +344,16 @@ void model::sync_phys()
     phys_vehicle_->set_steer(steer);
     phys_vehicle_->set_thrust(thrust);
     phys_vehicle_->set_brake(brake);
+
+    //std::stringstream cstr;
+
+    //cstr << std::setprecision(8) 
+    //    << "steer:  "         << steer
+    //    << "    thrust: "      << thrust
+    //    << "    brake :  " << brake 
+    //    << "\n" ;
+
+    //OutputDebugString(cstr.str().c_str());
 
     //if (settings_.debug_draw)
     //    send_cmd(msg::phys_pos_msg(cur_glb_pos.pos, cur_course));
@@ -400,9 +415,27 @@ void model::sync_nodes_manager( double /*dt*/ )
             cg::point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (sys_->calc_step());
 
             node_pos.local().omega = omega_rel;
+            
+            // FIXME отсутствие промежуточной логики приводит к странным решениям
+            node_pos.local().orien = desired_orien_in_rel;
+
+            std::stringstream cstr;
+
+            cstr << std::setprecision(8) 
+                << "node_pos.local().get_course:  "   << node_pos.local().orien.get_course()
+                << "   node_pos.local().get_pitch: "  << node_pos.local().orien.get_pitch()
+                << "   node_pos.local().get_roll :  " << node_pos.local().orien.get_roll() 
+                << "   desired_orien_in_rel.get_course:  "  << desired_orien_in_rel.get_course()
+                << "   desired_orien_in_rel.get_pitch: "    << desired_orien_in_rel.get_pitch()
+                << "   desired_orien_in_rel.get_roll :  "   << desired_orien_in_rel.get_roll() 
+                << "\n" ;
+
+            OutputDebugString(cstr.str().c_str());
 
             wheels_[i].node->set_position(node_pos);
         }
+
+
     }
 }
 
@@ -432,8 +465,8 @@ void model::update_model( double dt )
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
         // FIXME state устанавливется через чарт
         // у меня координаты отличаются надо думать
-        //if (dist > 10)
-        //    return;
+        if (dist > 10)
+            return;
     }
 
     if (model_state_)
@@ -442,7 +475,7 @@ void model::update_model( double dt )
         if (model_state_->end())
         {
             model_state_.reset();
-            //set_state(state_t(pos(), course(), 0));
+            set_state(state_t(pos(), course(), 0));
         }
     }
 }

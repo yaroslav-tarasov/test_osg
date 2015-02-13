@@ -77,6 +77,7 @@ osg::Node* createObject(std::string name, bool fclone)
 
 		osg::Group* root =  findFirstNode(object_file,"Root")->asGroup(); 
 
+        root->setUserValue("id",reinterpret_cast<uint32_t>(&*root));
 		// object_file->setName(name);
 	
 		// И какой engine мы найдем?

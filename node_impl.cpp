@@ -5,6 +5,41 @@
 namespace nodes_management
 {
     
+void node_impl::pre_update(double time)
+{
+    if (!time_)
+        return;
+
+    double dt = time - *time_;
+
+    if (dt <= 0)
+        return;
+
+    if (!position_.is_static())
+    {
+        if (position_.is_local())
+        {                                                                                                                                       
+            extrapolated_position_.local().pos   = position_.local().pos + position_.local().dpos * dt;
+            extrapolated_position_.local().orien = cg::quaternion(cg::rot_axis(position_.local().omega * dt)) * position_.local().orien;
+            extrapolated_position_reseted();
+        }
+        else
+        {
+            extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos * dt);
+            extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
+            extrapolated_position_reseted();
+        }
+    }
+}
+
+void node_impl::post_update(double /*time*/)
+{
+}
+
+void node_impl::extrapolated_position_reseted() 
+{
+}
+
 void node_impl::play_animation  (std::string const& seq, double len, double from, double size) 
 {
     // FIXME  Заглушка для анимации
@@ -78,6 +113,11 @@ std::string const&  node_impl::name() const
 {
     name_ = boost::to_lower_copy(node_->getName()); 
     return name_;
+}
+
+uint32_t node_impl::node_id() const
+{
+    return node_id_;
 }
 
 cg::sphere_3   node_impl::get_bound()

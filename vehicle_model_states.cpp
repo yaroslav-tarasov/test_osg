@@ -23,8 +23,8 @@ void follow_route_state::update(model * self, double dt)
     double const model_calc_step = 0.1;
 
     cg::geo_base_2  cur_pos     = self->pos();
-    double      cur_course  = self->course();
-    double      cur_speed   = self->speed();
+    double          cur_course  = self->course();
+    double          cur_speed   = self->speed();
 
     size_t steps = cg::floor(dt / model_calc_step + 0.01);
 
@@ -75,7 +75,7 @@ void follow_curve_state::update(model * self, double dt)
     cg::geo_base_2 cur_pos = self->pos();
     double cur_course = self->course();
     double cur_speed = self->speed();
-
+    
     size_t steps = cg::floor(dt / model_calc_step + 0.01);
 
     double max_speed = 0;
@@ -121,8 +121,8 @@ void follow_curve_state::update(model * self, double dt)
         }
     }
 
-    // FIXME TODO OR NOT TODO
-    // self->set_state(state_t(cur_pos, cur_course, cur_speed));
+
+    self->set_state(state_t(cur_pos, cur_course, cur_speed));
     self->set_max_speed(max_speed);
 }
 
@@ -140,8 +140,19 @@ void go_to_pos_state::update(model * self, double dt)
     const double nominal_speed = with_airtow_ ? 3. : 10;
 
     cg::geo_base_2 cur_pos = self->pos();
-    double cur_course = self->course();
-    double cur_speed = self->speed();
+    double         cur_course = self->course();
+    double         cur_speed = self->speed();
+    
+    //std::stringstream cstr;
+
+    //cstr << std::setprecision(8) 
+    //    << "x:  "         << cur_pos.lat
+    //    << "    y: "      << cur_pos.lon
+    //    << "    curs :  " << cur_course 
+    //    << "    cur_speed:  " << cur_speed 
+    //    << "\n" ;
+
+    //OutputDebugString(cstr.str().c_str());
 
     double max_speed = 0;
 

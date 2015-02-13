@@ -180,7 +180,7 @@ namespace bi
             0);
 
 
-        _phys_aircrafts.emplace_back(aircraft::model(ac_,s));
+        _phys_aircrafts.emplace_back(boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s));
         _sys->registerBody(id,ac_->get_rigid_body());
         
 
@@ -240,7 +240,7 @@ namespace bi
         nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
 
         _phys_vehicles.emplace_back(vehicle::model::create(man,_sys));
-        _sys->registerBody(id);  // FIXME Перевести внуть модели 
+        _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->addChild( addGUIObject_v(node) );
@@ -249,9 +249,11 @@ namespace bi
         _physicsNodes[id] = mt;
 
         _sys->setMatrix( id, osg::Matrix::translate(pos) );
+        osg::Matrix mmm = _sys->getMatrix(id);
+        _phys_vehicles.back()->set_state(vehicle::state_t(cg::geo_base_2()(from_osg_vector3(pos)), from_osg_quat(mmm.getRotate()).get_course(), 0.0f));
 
         //veh->set_steer(10);
-        _phys_vehicles.back()->go_to_pos(cg::geo_point_2(0.000,0.005),90);
+
     }
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
@@ -326,6 +328,8 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
+// FIXME перенести в модель
+#if 0
                 _phys_aircrafts.back().get_chassis()->visit_groups([=](aircraft::shassis_group_t & shassis_group)
                 {
                     //if (to_be_opened)
@@ -334,9 +338,12 @@ namespace bi
                     //else
                     //  shassis_group.close(true);
                 });
+#endif
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_L )
             {
+ // FIXME перенести в модель
+#if 0
                 _phys_aircrafts.back().get_chassis()->visit_groups([=](aircraft::shassis_group_t & shassis_group)
                 {
                     //if (to_be_opened)
@@ -345,10 +352,16 @@ namespace bi
                     if (!shassis_group.is_front)
                         shassis_group.close(false);
                 });
+#endif
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
-                _phys_aircrafts[0].check_wheel_brake();
+ // FIXME перенести в модель
+#if 0
+                {
+                   _phys_aircrafts[0].check_wheel_brake();
+                }
+#endif                
             }
 
             break;
@@ -376,12 +389,12 @@ namespace bi
      //                   <<"\n" ;
 					//OutputDebugString(cstr.str().c_str());
                     
-                    it->update( dt );
+                    aircraft::int_control_ptr(*it)->update( dt );
                 } 
 
                 for(auto it = _phys_vehicles.begin();it!=_phys_vehicles.end();++it)
                 {   
-                          (*it)->update( dt );
+                          (*it)->update( view->getFrameStamp()->getSimulationTime()/*dt*/ );
                 }   
                  
 
@@ -432,57 +445,94 @@ namespace bi
         _sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
-
+    
+    void RigidUpdater::handleSelectObjectEvent(uint32_t id )
+    {
+         selected_obj_id_ = id;
+    }
 
     void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
     {   
         decart_position target_pos;
         target_pos.pos = simple_route.back();
-        //geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
-        decart_position cur_pos = _phys_aircrafts[0].get_local_position();
-        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+        geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
         
-        
-
-        if (!_phys_aircrafts[0].get_trajectory())
+        if(selected_obj_id_)
         {
-             _phys_aircrafts[0].set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::model::min_radius(),aircraft::model::step()));
-        }
-        else
-        {  
-            fms::trajectory_ptr main_ = _phys_aircrafts[0].get_trajectory();
+             
+            auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
+            {
+                if(amp->root()->node_id()==this->selected_obj_id_)
+                    return true;
 
-            decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
-                                     ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+                return false;
+            });
             
-            target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+            if(it_am!=_phys_aircrafts.end())
+            {
+                aircraft::info_ptr am=*it_am;
+                decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
+                target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+
+                if (!aircraft::int_control_ptr(am)->get_trajectory())
+                {
+                     aircraft::int_control_ptr(am)->set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::model::min_radius(),aircraft::model::step()));
+                }
+                else
+                {  
+                    fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
+
+                    decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+                                             ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+            
+                    target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 			
-			std::stringstream cstr;
+			        std::stringstream cstr;
 
-            cstr << std::setprecision(8) 
-                << "x:  "         << main_->kp_value(main_->length()).x
-                << "    y: "      << main_->kp_value(main_->length()).y
-                << "    curs :  " << main_->curs_value(main_->length()) 
-                << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
-                << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
-                << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
-				<< "\n" ;
+                    cstr << std::setprecision(8) 
+                        << "x:  "         << main_->kp_value(main_->length()).x
+                        << "    y: "      << main_->kp_value(main_->length()).y
+                        << "    curs :  " << main_->curs_value(main_->length()) 
+                        << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
+                        << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
+                        << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
+				        << "\n" ;
 
-            OutputDebugString(cstr.str().c_str());
+                    OutputDebugString(cstr.str().c_str());
        
 
 
-            fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
-                                                                            target_pos,
-                                                                            aircraft::model::min_radius(),
-                                                                            aircraft::model::step());
+                    fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
+                                                                                    target_pos,
+                                                                                    aircraft::model::min_radius(),
+                                                                                    aircraft::model::step());
 
-            main_->append(*traj.get());
+                    main_->append(*traj.get());
+                }
+       
+                // Подробная отрисовка
+                _trajectory_drawer->set(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
+            
+            }
+            else
+            {
+                auto it_vh = std::find_if(_phys_vehicles.begin(),_phys_vehicles.end(),[this](vehicle::model_base_ptr vh)->bool
+                {
+                    if(vh->get_root()->node_id()==this->selected_obj_id_)
+                        return true;
+
+                    return false;
+                });
+
+                if(it_vh!=_phys_vehicles.end())
+                    (*it_vh)->go_to_pos(gp.pos,90);
+            }
+            
+            
+            
+            
         }
-       
-        // Подробная отрисовка
-        _trajectory_drawer->set(*(_phys_aircrafts[0].get_trajectory().get()));
-        
+
         // _trajectory_drawer->set(simple_route);
 
         //_phys_aircrafts[0].aircraft->go_to_pos(gp.pos ,gp.orien);

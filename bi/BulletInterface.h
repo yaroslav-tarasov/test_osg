@@ -115,6 +115,9 @@ private:
 
 	bt_vehicle_raycaster_ptr              vehicle_raycaster_;
 	std::vector<rigid_body_impl *>	      rigid_bodies_;
+
+    cg::geo_base_3                        base_;
+
 };
 
 //inline static BulletInterface*  sys()

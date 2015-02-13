@@ -6,6 +6,7 @@ namespace aircraft
     struct model
         : info
         , control
+        , int_control
     {
 
     public:
@@ -16,11 +17,13 @@ namespace aircraft
 
 
 
-        model( aircraft::phys_aircraft_ptr          aircraft,
-               aircraft::shassis_support_ptr          shassis)
+        model( nodes_management::manager_ptr        nodes_manager,
+               aircraft::phys_aircraft_ptr          aircraft,
+               aircraft::shassis_support_ptr        shassis       )
             : phys_aircraft_(aircraft)
             , shassis_ (shassis)
             , desired_velocity_(min_desired_velocity)
+            , nodes_manager_(nodes_manager)
         {
             // from view
  #pragma region view
@@ -186,8 +189,9 @@ protected:
 
    public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};
-        inline decart_position get_local_position() {return phys_aircraft_->get_local_position();};
-        inline void set_trajectory(fms::trajectory_ptr  traj){traj_ = traj;}
+        decart_position get_local_position() {return phys_aircraft_->get_local_position();};
+        
+        void set_trajectory(fms::trajectory_ptr  traj){traj_ = traj;}
         fms::trajectory_ptr  get_trajectory(){return traj_;}               
 
     private:

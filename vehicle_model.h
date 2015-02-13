@@ -16,6 +16,8 @@ struct model_base
       virtual void update( double /*time*/ ) =0;
       virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
       virtual void go_to_pos(  cg::geo_point_2 pos, double course ) =0;
+      virtual void set_state(state_t const& state) =0 ;
+      virtual nodes_management::node_info_ptr get_root()=0;
 };
 
 typedef polymorph_ptr<model_base> model_base_ptr;
@@ -50,6 +52,8 @@ public:
     void set_max_speed(double max_speed);
     void set_course_hard(double course);
     cg::geo_point_2 phys_pos() const;
+
+    nodes_management::node_info_ptr get_root();
 
 private:
     //void on_attach_tow( uint32_t tow_id ); 

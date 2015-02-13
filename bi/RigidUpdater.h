@@ -17,9 +17,10 @@ namespace bi
             : _root        (root)
             , _on_collision(on_collision)
             , _dbgDraw     (nullptr)
-            , _debug       (true)
+            , _debug       (false)
 			, _sys         (phys::create())
             , _last_frame_time(0)
+            , selected_obj_id_(0)
         {}
 
 
@@ -35,6 +36,7 @@ namespace bi
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
 
         void handlePointEvent(std::vector<cg::point_3> const &simple_route);
+        void handleSelectObjectEvent(uint32_t id );
 
         bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
         
@@ -121,7 +123,7 @@ namespace bi
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
 		typedef std::vector<phys::aircraft::info_ptr>                   aircrafts_t;
         typedef std::vector<aircraft::phys_aircraft_ptr>                phys_aircrafts_t;
-        typedef std::vector<aircraft::model>                            aircraft_models_t;
+        typedef std::vector<aircraft::info_ptr>                         aircraft_models_t;
         typedef std::vector<phys::ray_cast_vehicle::info_ptr>           phys_vehicles_t;
         typedef std::vector<vehicle::model_base_ptr>                    vehicles_t;
 
@@ -141,6 +143,7 @@ namespace bi
     private:
         double                                   _last_frame_time;
 
+        uint32_t                                 selected_obj_id_;
     };
 
 }

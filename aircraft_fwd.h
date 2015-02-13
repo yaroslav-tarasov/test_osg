@@ -7,6 +7,7 @@ namespace aircraft
     struct tp_provider;
     struct info;
     struct control;
+    struct int_control;   // FIXME все внуть ибо нефиг
     struct fms_container;
     struct aircraft_ipo_control;
     struct aircraft_atc_control;
@@ -15,6 +16,7 @@ namespace aircraft
     typedef polymorph_ptr<info>                 info_ptr;
     typedef std::weak_ptr<info>                 info_wptr;
     typedef polymorph_ptr<control>              control_ptr;
+    typedef polymorph_ptr<int_control>          int_control_ptr;
     typedef polymorph_ptr<fms_container>        fms_container_ptr;
     typedef polymorph_ptr<aircraft_ipo_control> aircraft_ipo_control_ptr;
     typedef polymorph_ptr<aircraft_atc_control> aircraft_atc_control_ptr;

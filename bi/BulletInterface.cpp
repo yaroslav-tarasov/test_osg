@@ -236,6 +236,7 @@ BulletInterface::BulletInterface()
     : _dw(nullptr)
     , _on_collision(nullptr)
     , _dd (nullptr)
+    , base_(::get_base())
 {
 
     _configuration = new btDefaultCollisionConfiguration;
@@ -717,7 +718,7 @@ optional<size_t>  BulletInterface::get_zone(std::string const& airport) const
 
 cg::geo_base_3 const& BulletInterface::get_base(size_t zone) const
 {
-    return ::get_base();
+    return base_;
 }
 
 std::string BulletInterface::zone_name(size_t id) const

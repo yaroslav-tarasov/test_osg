@@ -13,7 +13,8 @@ cg::transform_4 const&  model::tow_point_transform() const
 
 nodes_management::node_info_ptr model::root() const
 {
-    return nodes_manager_->get_node(0);
+    //return nodes_manager_->get_node(0);  // FIXME отступаем от исходной модели
+    return nodes_manager_->find_node("root");
 }
 
 bool model::malfunction(malfunction_kind_t kind) const
@@ -23,7 +24,8 @@ bool model::malfunction(malfunction_kind_t kind) const
 
 cg::geo_point_3 const& model::pos() const
 {
-    return cg::geo_point_3();//fms_info_->get_state().dyn_state.pos;
+    static cg::geo_point_3 pp;
+    return pp;//fms_info_->get_state().dyn_state.pos;
 }
 
 cg::point_3 model::dpos() const
