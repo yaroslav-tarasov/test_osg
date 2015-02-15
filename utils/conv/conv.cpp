@@ -792,11 +792,12 @@ int main( int argc, char **argv )
             root->accept(av);
         }
         
+		auto ff = std::bind(&boost::to_lower_copy<std::string>,std::placeholders::_1,std::locale());
+
         // all names to lower
         utils::CommonVisitor<osg::Node> names_lower(
             [=](osg::Node& n)->void {
-                std::string name(boost::to_lower_copy(n.getName()));
-                n.setName(name);
+                n.setName(ff(n.getName()));
         }); 
 
         root->accept(names_lower);
@@ -880,3 +881,5 @@ int main( int argc, char **argv )
 
     return 0;
 }
+
+

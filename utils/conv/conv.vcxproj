@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\find_node_visitor.cpp" />
+    <ClCompile Include="bullet_exporter.cpp" />
     <ClCompile Include="conv.cpp" />
     <ClCompile Include="OrientationConverter.cpp" />
     <ClCompile Include="stdafx.cpp">
