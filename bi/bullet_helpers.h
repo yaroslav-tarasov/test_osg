@@ -151,11 +151,11 @@ namespace phys
     }    
 
     // TODO FIXME хочется путей по прямее
-    inline cg::transform_4 from_osg_transform( const osg::Matrix& m )
-    {
-        btTransform tr = asBtTransform( m );
-        return cg::transform_4(cg::as_translation(from_bullet_vector3(tr.getOrigin())), cg::rotation_3(from_bullet_matrix(tr.getBasis())));
-    }
+  //  inline cg::transform_4 from_osg_transform( const osg::Matrix& m )
+  //  {
+		//btTransform tr = asBtTransform( m );
+  //      return cg::transform_4(cg::as_translation(from_bullet_vector3(tr.getOrigin())), cg::rotation_3(from_bullet_matrix(tr.getBasis())));
+  //  }
 
     //inline bt_collision_shape_ptr get_sensor_convex( sensor_ptr s )
     //{

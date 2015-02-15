@@ -422,5 +422,8 @@
     <ClCompile Include="aircraft_model.cpp">
       <Filter>Source Files\aircraft</Filter>
     </ClCompile>
+    <ClCompile Include="bvh_static_mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

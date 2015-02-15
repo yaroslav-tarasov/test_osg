@@ -36,6 +36,8 @@ namespace phys
 
     struct compound_sensor_t;
     typedef polymorph_ptr<compound_sensor_t> compound_sensor_ptr;
+	struct sensor_t;
+	typedef polymorph_ptr<sensor_t> sensor_ptr;
 }
 
 

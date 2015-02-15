@@ -38,6 +38,12 @@ inline cg::matrix_3 from_osg_matrix( osg::Matrix3 const& m )
     return mm;
 }
 
+inline cg::transform_4 from_osg_transform( const osg::Matrix& m )
+{
+	// FIXME  Мать, мать, мать, ну чего все так не прямо
+	return cg::transform_4(cg::as_translation(from_osg_vector3(m.getTrans())), cg::rotation_3(from_osg_quat(m.getRotate()).cpr()));
+}
+
 inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg::Node* rel = NULL)
 {
     osg::Matrix tr;

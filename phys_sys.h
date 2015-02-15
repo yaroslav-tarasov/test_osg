@@ -15,6 +15,11 @@ namespace phys
         virtual ~compound_sensor_t() {}
     };
 
+	struct sensor_t
+	{
+		virtual ~sensor_t() {}
+	};
+
     struct rigid_body
     {
         virtual ~rigid_body() {}

@@ -93,6 +93,10 @@ public:
     cg::geo_base_3 const& get_base(size_t zone) const override;
     std::string zone_name(size_t id) const override;
 
+	// collision
+private:
+	boost::optional<double> intersect_first(cg::point_3 const& p, cg::point_3 const& q) const;
+
 protected:  
 
     void checkForCollisionEvents();
@@ -109,6 +113,13 @@ private:
     btCollisionDispatcher*                _dispatcher;
     btBroadphaseInterface*                _overlappingPairCache;
     btSequentialImpulseConstraintSolver*  _solver;
+
+	boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
+	boost::scoped_ptr<btCollisionDispatcher>           dispatcher_;
+	boost::scoped_ptr<btConstraintSolver>              solver_;
+	boost::scoped_ptr<btDefaultCollisionConfiguration> collision_configuration_;
+
+
     CollisionPairs                        _pairsLastUpdate;
     on_collision_f                        _on_collision;
     btIDebugDraw*                         _dd;

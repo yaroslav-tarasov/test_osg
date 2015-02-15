@@ -3,11 +3,6 @@
 #include "nodes_management.h"
 #include "node_impl.h"
 
-// TODO FIXME  не ну это тоже бред
-#include <btBulletDynamicsCommon.h>
-#include <osgbCollision/CollisionShapes.h>
-#include <osgbCollision/Utils.h>
-#include "bi/bullet_helpers.h"
 
 namespace nodes_management
 {
@@ -53,7 +48,7 @@ cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, 
     }
 
     if (rel.get() == NULL || n == node_impl_ptr(rel)->as_osg_node()  )
-        return phys::from_osg_transform(tr);
+        return from_osg_transform(tr);
 
     osg::Matrix tr_rel;
     n = node_impl_ptr(rel)->as_osg_node();
@@ -65,7 +60,7 @@ cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, 
         n = n->getParent(0);
     }
 
-    return phys::from_osg_transform((osg::Matrix::inverse(tr_rel)) * tr);
+    return from_osg_transform((osg::Matrix::inverse(tr_rel)) * tr);
 }
 
 

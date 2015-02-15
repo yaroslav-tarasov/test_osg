@@ -32,10 +32,7 @@ struct FilterCallback : public btOverlapFilterCallback
     }
 };                 
 
-static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/)
-{
 
-}
 
 namespace phys
 {
@@ -223,6 +220,7 @@ namespace phys
 
 namespace phys
 {
+	static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/);
 
 #if 0
 BulletInterface* BulletInterface::instance()
@@ -261,7 +259,7 @@ BulletInterface::~BulletInterface()
             _dw->removeCollisionObject( obj );
             delete obj;
         }
-        // delete _dw;
+
 		_dw.reset();
     }
     
@@ -276,8 +274,13 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
 {
     _dw = boost::make_shared<btDiscreteDynamicsWorld>(_dispatcher,_overlappingPairCache, _solver, _configuration);
     _dw->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
-    
-    //static osgbDynamics::PhysicsThread pt( _dw, &tBuf );
+
+	_dw->getSolverInfo().m_numIterations = 20;
+	_dw->getSolverInfo().m_damping = 1.;
+	_dw->getSolverInfo().m_splitImpulse = false;
+	_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
+	
+	_dw->setInternalTickCallback(internal_tick_callback);
 
     osg::Vec3 norm = plane.getNormal();
     btCollisionShape* groundShape = new btStaticPlaneShape( btVector3(norm[0], norm[1], norm[2]), plane[3] );
@@ -294,7 +297,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
 
     _on_collision = on_collision;
 	
-	//_dw->setInternalTickCallback(internal_tick_callback);
+
 
 	vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*_dw));
 
@@ -701,6 +704,20 @@ ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,
     return ctrl;
 }
 
+boost::optional<double> BulletInterface::intersect_first(cg::point_3 const& p, cg::point_3 const& q) const
+{
+	_dw->updateAabbs();
+	_dw->computeOverlappingPairs();
+
+	btCollisionWorld::ClosestRayResultCallback callback(to_bullet_vector3(p), to_bullet_vector3(q));
+	_dw->rayTest(to_bullet_vector3(p), to_bullet_vector3(q), callback);
+
+	if (!callback.hasHit())
+		return boost::none;
+
+	return callback.m_closestHitFraction;
+}
+
 system_ptr   BulletInterface::get_system(size_t zone)
 {
        return shared_from_this();
@@ -726,7 +743,50 @@ std::string BulletInterface::zone_name(size_t id) const
     return "name";
 }
 
+static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/)
+{
+	int numManifolds = world->getDispatcher()->getNumManifolds();
+	for (int i=0;i<numManifolds;i++)
+	{
+		btPersistentManifold* contactManifold =  world->getDispatcher()->getManifoldByIndexInternal(i);
+		btCollisionObject const* obA = static_cast<btCollisionObject const*>(contactManifold->getBody0());
+		btCollisionObject const* obB = static_cast<btCollisionObject const*>(contactManifold->getBody1());
 
+		if (obA->getUserPointer() && obB->getUserPointer())
+		{
+			rigid_body_user_info_t * rbA = (rigid_body_user_info_t *)(obA->getUserPointer());
+			rigid_body_user_info_t * rbB = (rigid_body_user_info_t *)(obB->getUserPointer());
+
+			size_t numContacts = (size_t)contactManifold->getNumContacts();
+			if (numContacts)
+			{
+				if (rbA->rigid_body_kind() == rb_aircraft)
+				{
+					for (size_t i = 0; i < numContacts; ++i)
+					{
+						btManifoldPoint const& pnt = contactManifold->getContactPoint(i);
+						btVector3 rel_vel = obA->getInterpolationLinearVelocity() - obB->getInterpolationLinearVelocity();
+						// TODO : use angular speed
+
+						dynamic_cast<rigid_body_impl*>(rbA)->has_contact(rbB, from_bullet_vector3(pnt.m_localPointA), from_bullet_vector3(rel_vel));
+					}
+				}
+
+				if (rbB->rigid_body_kind() == rb_aircraft)
+				{
+					for (size_t i = 0; i < numContacts; ++i)
+					{
+						btManifoldPoint const& pnt = contactManifold->getContactPoint(i);
+						btVector3 rel_vel = obB->getInterpolationLinearVelocity() - obA->getInterpolationLinearVelocity();
+						// TODO : use angular speed
+
+						dynamic_cast<rigid_body_impl*>(rbB)->has_contact(rbA, from_bullet_vector3(pnt.m_localPointB), from_bullet_vector3(rel_vel));
+					}
+				}
+			}
+		}
+	}  
+}
 
 
 

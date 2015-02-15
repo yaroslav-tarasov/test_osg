@@ -159,6 +159,7 @@
     <ClCompile Include="bi\osgbullet.cpp" />
     <ClCompile Include="bi\RigidUpdater.cpp" />
     <ClCompile Include="bump_mapping.cpp" />
+    <ClCompile Include="bvh_static_mesh.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="dubins.cpp" />
