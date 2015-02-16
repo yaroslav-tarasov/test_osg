@@ -11,7 +11,7 @@ namespace aircraft
         MF_SMOKE_ON_BOARD,
         MF_FUEL_LEAKING,
         MF_ONE_ENGINE,
-        MF_ALL_ENGINES,
+        MF_ALL_ENGINES, 
 
         MF_SIZE
     };

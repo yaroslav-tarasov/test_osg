@@ -32,8 +32,13 @@ public:
     {
 
        vert_->clear();
-       //traj_lines_->clear();
+       if(traj_lines_.get())
+           traj_lines_->clear();
 
+       if(int s = geometry_->getNumPrimitiveSets()>0)
+               geometry_->removePrimitiveSet(0,s);
+
+       
        traj_lines_ = new osg::DrawElementsUInt(osg::PrimitiveSet::POINTS, 0);
 
        int i=0;
@@ -56,7 +61,11 @@ public:
     void set(const std::vector<cg::point_3>& kp)
     {
         vert_->clear();
-        //traj_lines_->clear();
+        if(traj_lines_.get())
+            traj_lines_->clear();
+
+        if(int s = geometry_->getNumPrimitiveSets()>0)
+            geometry_->removePrimitiveSet(0,s);
 
         auto traj_lines_ = new osg::DrawElementsUInt(osg::PrimitiveSet::LINES, 0);
 

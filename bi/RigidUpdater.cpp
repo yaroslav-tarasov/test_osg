@@ -174,7 +174,7 @@ namespace bi
             get_base(),
             _sys,
             man,
-            geo_position(cg::geo_point_3(0.000,0.005*(pa_size+1),0),cg::quaternion(cg::cpr(90, 0, 0))),
+            geo_position(cg::geo_point_3(0.000,0.002*((double)pa_size+.1),0),cg::quaternion(cg::cpr(90, 0, 0))),
             ada::fill_data("BADA","A319"),                                                   
             s,
             0);
@@ -195,7 +195,9 @@ namespace bi
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-        mt->addChild( addGUIObject(node) );
+        mt->setName("phys_ctrl");
+        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->addChild( node );
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -222,7 +224,9 @@ namespace bi
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-        mt->addChild( addGUIObject_v(node) );
+        mt->setName("phys_ctrl");
+        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->addChild( /*addGUIObject_v(node)*/node );
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -243,7 +247,9 @@ namespace bi
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
-        mt->addChild( addGUIObject_v(node) );
+        mt->setName("phys_ctrl");
+        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->addChild( /*addGUIObject_v(node)*/node );
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -449,6 +455,20 @@ namespace bi
     void RigidUpdater::handleSelectObjectEvent(uint32_t id )
     {
          selected_obj_id_ = id;
+
+         auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
+         {
+             if(amp->root()->object_id()==this->selected_obj_id_)
+                 return true;
+
+             return false;
+         });
+
+         if(it_am!=_phys_aircrafts.end())
+         {
+            auto traj = aircraft::int_control_ptr(*it_am)->get_trajectory().get();
+            if (traj) _trajectory_drawer->set(*(traj));
+         }
     }
 
     void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
@@ -462,7 +482,7 @@ namespace bi
              
             auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
             {
-                if(amp->root()->node_id()==this->selected_obj_id_)
+                if(amp->root()->object_id()==this->selected_obj_id_)
                     return true;
 
                 return false;
@@ -512,13 +532,14 @@ namespace bi
        
                 // Подробная отрисовка
                 _trajectory_drawer->set(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
-            
+
+                auto vgp2 = fms::to_geo_points(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
             }
             else
             {
                 auto it_vh = std::find_if(_phys_vehicles.begin(),_phys_vehicles.end(),[this](vehicle::model_base_ptr vh)->bool
                 {
-                    if(vh->get_root()->node_id()==this->selected_obj_id_)
+                    if(vh->get_root()->object_id()==this->selected_obj_id_)
                         return true;
 
                     return false;
@@ -527,9 +548,6 @@ namespace bi
                 if(it_vh!=_phys_vehicles.end())
                     (*it_vh)->go_to_pos(gp.pos,90);
             }
-            
-            
-            
             
         }
 

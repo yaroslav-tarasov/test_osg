@@ -107,16 +107,28 @@ public:
             }
             else if(act==SELECT_OBJECT) 
             {
-                auto parent = hit.drawable->getParent(0);
-                bool not_root=true;
-                while (parent && (not_root=boost::to_lower_copy(parent->getName())!="root") && parent->getNumParents()>0)
+                //auto parent = hit.drawable->getParent(0);
+                bool is_root=false;
+                //while (parent && (not_root=boost::to_lower_copy(parent->getName())!="phys_ctrl") && parent->getNumParents()>0)
+                //{
+                //     parent = parent->getParent(0);
+                //};
+                
+                osg::Node* parent = nullptr;
+                for(auto it = hit.nodePath.begin();it!=hit.nodePath.end() ;++it)
                 {
-                     parent = parent->getParent(0);
-                };
-
-                if(parent && !not_root)
+                    if(boost::to_lower_copy((*it)->getName())=="phys_ctrl")
+                    {
+                        is_root = true;
+                        parent = *it;
+                        break;
+                    };
+                }
+                
+                if(parent && is_root)
                 {
                     // Устанавливается в CreateObject
+                    // object_id при создании физического объекта
                     uint32_t id = 0;
                     parent->getUserValue("id",id);
                     //if(id)
@@ -127,7 +139,7 @@ public:
                         parent->accept( cbv );
                         const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-                        osg::Vec3 worldCenter = bb.center() * osg::computeLocalToWorld(hit.nodePath);
+                        osg::Vec3 worldCenter = bb.center() /** osg::computeLocalToWorld(hit.nodePath)*/;
                         _selectionBox->setMatrix(
                             osg::Matrix::scale(bb.xMax()-bb.xMin(), bb.yMax()-bb.yMin(), bb.zMax()-bb.zMin()) *
                             osg::Matrix::translate(worldCenter) );

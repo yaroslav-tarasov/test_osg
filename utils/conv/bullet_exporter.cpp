@@ -5,14 +5,8 @@
 #include <osgbCollision/Utils.h>
 
 #ifndef _DEBUG
-//#pragma comment(lib, "osgwTools.lib")
-//#pragma comment(lib, "osgbDynamics.lib")
-//#pragma comment(lib, "osgbInteraction.lib")
 #pragma comment(lib, "osgbCollision.lib")
 #else 
-// #pragma comment(lib, "osgwToolsd.lib")
-//#pragma comment(lib, "osgbDynamicsd.lib")
-//#pragma comment(lib, "osgbInteractiond.lib")
 #pragma comment(lib, "osgbCollisiond.lib")
 #endif
 
@@ -30,7 +24,7 @@ bool generateBulletFile(std::string name, osg::Node* body)
 	trimeshShape->serializeSingleShape(serializer);
 	serializer->finishSerialization();
 
-	FILE* file = fopen((name + ".bullet").c_str(),"wb");
+	FILE* file = fopen(name.c_str(),"wb");
 	fwrite(serializer->getBufferPointer(),serializer->getCurrentBufferSize(),1, file);
 	fclose(file);
 

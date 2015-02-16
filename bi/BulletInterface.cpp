@@ -79,7 +79,7 @@ namespace aircraft
         float zm = bb.zMax() - bb.zMin();
         
         cs.offset_ = cg::point_3(0,-zm/2,0);
-        p.wingspan = xm;
+        //p.wingspan = xm;
         p.length   = ym;
 
         auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);

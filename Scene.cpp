@@ -389,7 +389,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -530,7 +530,7 @@ void Scene::createObjects()
 
     const std::string name = "a_319";
 
-	auto obj = creators::createObject(name);
+	auto obj = creators::createObject(name,true);
 
 #if 0
 	if(_rigidUpdater.valid())
@@ -558,10 +558,22 @@ void Scene::createObjects()
 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO3( obj,
-        osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
+        osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );   // force 
 
 
-	const bool add_planes = false;
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addUFO3( creators::createObject(name,true),
+        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
+ 	
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addUFO3( creators::createObject(name,true),
+        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
+    
+    if(_rigidUpdater.valid())
+        _rigidUpdater->addUFO3( creators::createObject(name,true),
+        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
+
+    const bool add_planes = false;
 
     if (add_planes)
     {
@@ -663,26 +675,26 @@ void Scene::createObjects()
     }
 
 #if 0
-    auto trap = creators::createObject("trap");
+    auto trap = creators::createObject("trap",false);
     _rigidUpdater->addVehicle(trap,
         osg::Vec3(250,750,00), osg::Vec3(0,30000,0), 1500.0f);
 
-    auto buksir = creators::createObject("buksir");
+    auto buksir = creators::createObject("buksir",false);
     _rigidUpdater->addVehicle(buksir,
         osg::Vec3(270,750,00), osg::Vec3(0,30000,0), 6000.0f);
 
 
-    auto cleaner = creators::createObject("cleaner");
+    auto cleaner = creators::createObject("cleaner",false);
     _rigidUpdater->addVehicle(cleaner,
         osg::Vec3(290,750,00), osg::Vec3(0,30000,0), 10000.0f);
 
 
-    auto niva_cevrolet = creators::createObject("niva_chevrolet");
+    auto niva_cevrolet = creators::createObject("niva_chevrolet",false);
     _rigidUpdater->addVehicle(niva_cevrolet,
         osg::Vec3(310,750,00), osg::Vec3(0,30000,0), 1860.0f);
 
 
-    auto pojarka = creators::createObject("pojarka");
+    auto pojarka = creators::createObject("pojarka",false);
     _rigidUpdater->addVehicle(pojarka,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
@@ -694,12 +706,12 @@ void Scene::createObjects()
     //buksir->setNodeMask(0);
 #endif
 
-    auto pojarka = creators::createObject("pojarka");
-    _rigidUpdater->addVehicle(pojarka,
+    auto pojarka2 = creators::createObject("pojarka",false);
+    _rigidUpdater->addVehicle(pojarka2,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
-    auto niva_cevrolet2 = creators::createObject("pojarka");
-    _rigidUpdater->addVehicle2(niva_cevrolet2,
+    auto pojarka_ctrl = creators::createObject("pojarka",false);
+    _rigidUpdater->addVehicle2(pojarka_ctrl,
         osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  
 
     // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));

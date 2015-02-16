@@ -1,5 +1,7 @@
 #pragma once
 
+#include "msg_dispatcher.h"
+
 namespace nodes_management
 {
 
@@ -33,6 +35,7 @@ private:
 //  node_info
     node_position /*const&*/    position        () /*const*/ override;
     uint32_t                    node_id         () const;
+    uint32_t                    object_id       () const;
     cg::sphere_3                get_bound       ()         override;
     std::string const&          name            ()   const override;
     node_info_ptr               root_node       ()   const override;
@@ -40,13 +43,16 @@ private:
     cg::quaternion              get_global_orien()   const override;
     cg::transform_4             get_root_transform() const override;
 
+protected:
+    network::msg_dispatcher<>& msg_disp();
+
 public:
 //  node_impl
     osg::Node*                  as_osg_node() {return node_.get();}
 private:
-    uint32_t    node_id_;
+    uint32_t                    node_id_;
 
-    optional<double>                               time_;
+    optional<double>                              time_;
 
     osg::ref_ptr<osg::Node>                       node_;
     node_position                                 position_;

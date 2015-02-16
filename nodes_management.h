@@ -61,7 +61,7 @@ namespace nodes_management
         virtual node_position /*const&*/     position   () /*const*/ = 0;
         //virtual transform_4                  transform  () const = 0;
         virtual uint32_t                     node_id    () const = 0;
-        //virtual uint32_t                     object_id  () const = 0;
+        virtual uint32_t                     object_id  () const = 0;
         virtual std::string const&           name       () const = 0;
                                                                                     
         //virtual node_info_ptr                rel_node() const = 0;

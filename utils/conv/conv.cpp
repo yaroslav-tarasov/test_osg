@@ -791,13 +791,15 @@ int main( int argc, char **argv )
             AddMissingColoursToGeometryVisitor av;
             root->accept(av);
         }
+       
         
-		auto ff = std::bind(&boost::to_lower_copy<std::string>,std::placeholders::_1,std::locale());
+		
+        auto to_lower = std::bind(&boost::to_lower_copy<std::string>,std::placeholders::_1,std::locale());
 
         // all names to lower
         utils::CommonVisitor<osg::Node> names_lower(
             [=](osg::Node& n)->void {
-                n.setName(ff(n.getName()));
+                n.setName(to_lower(n.getName()));
         }); 
 
         root->accept(names_lower);
@@ -872,6 +874,22 @@ int main( int argc, char **argv )
         {
             osg::notify(osg::NOTICE)<<result.message()<< std::endl;
         }
+
+        auto lod3 =  findFirstNode(root,"lod3");
+
+        bool res = generateBulletFile(fileNameOut + ".bullet", lod3?lod3:root);
+
+        if (res)
+        {
+            osg::notify(osg::NOTICE)<<"Data written to '"<<fileNameOut + ".bullet"<<"'."<< std::endl;
+        }
+        else
+        {
+            osg::notify(osg::NOTICE)<< "Error Occurred While Writing to "<< fileNameOut + ".bullet"<< std::endl;
+        }
+
+
+
     }
     else
     {

@@ -15,7 +15,7 @@ namespace creators
     nodes_array_t       loadAirplaneParts(std::string);
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
     osg::Node*          loadHelicopter();
-	osg::Node*          createObject(std::string name, bool fclone=true);
+	osg::Node*          createObject(std::string name,bool airplane, bool fclone=true);
 
     const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
     const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);

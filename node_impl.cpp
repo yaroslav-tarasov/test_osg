@@ -120,6 +120,25 @@ uint32_t node_impl::node_id() const
     return node_id_;
 }
 
+uint32_t node_impl::object_id() const
+{
+    auto n = node_;
+    uint32_t id=0;
+    bool got_phys_node=false;
+    while(0 != n->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(n->getName())))
+    {                  
+        n = n->getParent(0);
+    }
+
+    if(!got_phys_node)
+    {
+        n->getUserValue("id",id);
+    }
+
+    return id;
+}
+
+
 cg::sphere_3   node_impl::get_bound()
 {
      const osg::BoundingSphere& bs = node_->getBound();

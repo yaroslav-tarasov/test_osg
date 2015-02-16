@@ -197,6 +197,7 @@ int main_dubins( int argc, char** argv );
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
+#include <boost/variant.hpp>
 #include <boost/foreach.hpp>
 
 #include <boost/graph/astar_search.hpp>
@@ -205,6 +206,14 @@ int main_dubins( int argc, char** argv );
 #include <boost/random.hpp>
 #include <boost/graph/graphviz.hpp>
 
+#ifdef _DEBUG
+#pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-gd-1_50.lib")
+#else
+#pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
+#endif
+
 
 using boost::noncopyable;
 using boost::optional;
@@ -212,17 +221,18 @@ using boost::optional;
 //
 //  refl stubs
 //
-#define REFL_INNER(x)
-#define REFL_SER_BIN(x)
-#define REFL_ENTRY(x)
-#define REFL_END()
-#define REFL_STRUCT(x)
-#define REFL_NUM(x1,x2,x3,x4)
+
+//#define REFL_INNER(x)
+//#define REFL_SER_BIN(x)
+//#define REFL_ENTRY(x)
+//#define REFL_END()
+//#define REFL_STRUCT(x)
+//#define REFL_NUM(x1,x2,x3,x4)
 
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
 
-#include "meta.h"
+#include "common/meta.h"
 #include "cg_math.h"
 #include "geometry/xmath.h"
 
@@ -261,6 +271,11 @@ namespace binary
 namespace nm = nodes_management;
 namespace sp = std::placeholders;
 
+inline cg::geo_base_3 get_base()
+{
+    return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
+}
+
 #include "trajectory.h"
 
 #include "phys_sys_fwd.h"
@@ -271,10 +286,7 @@ namespace sp = std::placeholders;
 #include "event.h"
 #include "mod_system.h"
 
-inline cg::geo_base_3 get_base()
-{
-    return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
-}
+
 
 #include "osg_helpers.h"
 

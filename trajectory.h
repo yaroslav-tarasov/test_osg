@@ -21,8 +21,6 @@ inline cg::quaternion from_dubin(double course)
 
 struct trajectory
 {   
-    friend  class TrajectoryDrawer;
-
     typedef cg::curve_t<cg::point_2>           keypoints_t;
     typedef cg::curve_t<double>                   curses_t;
     typedef std::vector<keypoints_t>         kp_segments_t;
@@ -57,9 +55,6 @@ struct trajectory
 			auto seg = (*it).apply_offset(length_); 
 			curs_seg_.push_back(seg);
 		}
-
-        // kp_seg_.insert(kp_seg_.end(),other.kp_seg_.begin(), other.kp_seg_.end());
-        // curs_seg_.insert(curs_seg_.end(),other.curs_seg_.begin(),other.curs_seg_.end());
     }
     
     inline double length() const
@@ -93,7 +88,6 @@ struct trajectory
         values.reserve(size);
         for(auto it = kp_seg_.begin();it!=kp_seg_.end();++it)
         {    
-            // values.insert(values.end(),(*it).extract_values().begin(), (*it).extract_values().end());
             auto kp_s = (*it).extract_values();
             for(auto it2 = kp_s.begin();it2!=kp_s.end();++it2)
                 values.push_back(*it2);
@@ -129,12 +123,22 @@ private:
     }        
 
     DubinsPath          path_;
-    //keypoints_t         kpts_;
-    //curses_t             crs_;
     kp_segments_t     kp_seg_;
     cr_segments_t   curs_seg_;
     double          curr_pos_;
 };
+
+inline std::vector<cg::geo_point_2> to_geo_points(const trajectory& traj)
+{
+    const auto vals =  traj.extract_values();
+    std::vector<cg::geo_point_2> vgp2;
+    for (auto it=vals.begin();it!=vals.end();++it)
+    {
+         vgp2.push_back(::get_base()(*it));
+    }
+    
+    return vgp2;
+}
 
  typedef polymorph_ptr<trajectory> trajectory_ptr;
 

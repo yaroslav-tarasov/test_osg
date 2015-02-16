@@ -80,3 +80,6 @@
 
 
 #include <boost/algorithm/string.hpp>
+
+
+bool generateBulletFile(std::string name, osg::Node* body);

@@ -42,7 +42,9 @@ namespace bi
         
         osg::Node* addGUIObject( osg::Node* node )
         {
-            return addGUIObject_( node );
+            assert(false);
+            // return addGUIObject_( node );
+            return nullptr;
         }
 
         void setTrajectoryDrawer(TrajectoryDrawer * drawer)
@@ -57,6 +59,7 @@ namespace bi
         void addPhysicsData( int id, osg::Node* node, const osg::Vec3& pos,
             const osg::Vec3& vel, double mass );
 
+#if 0
         inline static osg::Node* addGUIObject_( osg::Node* node ) 
         {
             osg::ComputeBoundsVisitor cbv;
@@ -67,24 +70,28 @@ namespace bi
             float ym = bb.yMax() - bb.yMin();
             float zm = bb.zMax() - bb.zMin();
 
-            float rot_angle = -90.f;
+/*            float rot_angle = -90.f;
             auto tr = osg::Matrix::translate(osg::Vec3(0.0,-(ym)/2.0f,0.0));
             if(dynamic_cast<osg::LOD*>(node))
             {
                 rot_angle = 0;
                 tr = osg::Matrix::translate(osg::Vec3(0,0,-(zm)/2.0f));
-            }        
+            }  */      
 
-            osg::MatrixTransform* positioned = new osg::MatrixTransform(tr);
+            //osg::MatrixTransform* positioned = new osg::MatrixTransform(tr);
 
-            const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
-                osg::inDegrees(0.f) , osg::Y_AXIS,
-                osg::inDegrees(0.f)   , osg::Z_AXIS ); 
+            //const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
+            //    osg::inDegrees(0.f) , osg::Y_AXIS,
+            //    osg::inDegrees(0.f)   , osg::Z_AXIS ); 
 
-            osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
-            positioned->addChild(rotated);
-            rotated->addChild(node);
-            return positioned;
+            //osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
+            //positioned->addChild(rotated);
+            //rotated->addChild(node);
+            
+            auto pat = node->asTransform()->asPositionAttitudeTransform();
+            pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+            pat->setPosition(osg::Vec3(0,-(zm)/2.0f,0));
+            return node/*positioned*/;
         }     
 
         inline static osg::Node* addGUIObject_v( osg::Node* node ) 
@@ -118,6 +125,7 @@ namespace bi
             rotated->addChild(node);
             return positioned;
         }
+#endif
 
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
