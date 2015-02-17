@@ -22,6 +22,7 @@ static int fill(keypoints_t& kp,double q[3], double x, void* user_data)
 }
 
 
+
 int main_dubins(int argc, char** argv )
 {
 	keypoints_t  sample_points;
@@ -54,3 +55,5 @@ int main_dubins(int argc, char** argv )
 
 	return 0;
 }
+
+AUTO_REG(main_dubins)

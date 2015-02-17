@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-using namespace std;
-using namespace boost;
+//using namespace std;
+//using namespace boost;
 
 #include "ada.h"
 #include "phys_sys_fwd.h"

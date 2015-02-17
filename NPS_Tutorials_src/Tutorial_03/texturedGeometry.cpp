@@ -100,6 +100,8 @@ osg::Geode* createPyramid()
 }
 }
 
+
+
 int main_texturedGeometry(int argc, char** argv)
 {
    osgViewer::Viewer viewer;
@@ -151,3 +153,5 @@ int main_texturedGeometry(int argc, char** argv)
    } 
    return 0;
 }
+
+   AUTO_REG(main_texturedGeometry)

@@ -7,6 +7,33 @@
 
 #include "targetver.h"
 
+#define  BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE
+#include "boost/asio.hpp"
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp> 
+#include <boost/make_shared.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/optional.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/math/constants/constants.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/any.hpp>
+#include <boost/variant.hpp>
+#include <boost/foreach.hpp>
+
+#include <boost/graph/astar_search.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/random.hpp>
+#include <boost/random.hpp>
+#include <boost/graph/graphviz.hpp>
+                             
+#include <boost/property_tree/ptree.hpp>
+
+
+
+
 //////////////////////////////////////
 //
 //  std include
@@ -123,24 +150,24 @@
 
 #include <osg/ValueObject>
 
-int main_scene( int argc, char** argv );
-int main_hud( int argc, char** argv );
-int main_select( int argc, char** argv );
-int main_shadows(int argc, char *argv[]);
-int main_shadows_2( int argc, char** argv );
-int main_shadows_3(int argc, char** argv);
-int main_texturedGeometry(int argc, char** argv);
-int main_TestState(int argc, char** argv);
-int main_tess_test( int argc, char** argv );
-int main_tex_test( int argc, char** argv );
-int main_bump_map( int argc, char** argv );
-int main_exp_test( int argc, char** argv );
-int main_bi( int argc, char** argv );
-int main_teapot( int argc, char** argv );
-int main_spark( int argc, char** argv );
-int main_scene2( int argc, char** argv );
-int main_dubins( int argc, char** argv );
-
+//int main_scene( int argc, char** argv );
+//int main_hud( int argc, char** argv );
+//int main_select( int argc, char** argv );
+//int main_shadows(int argc, char *argv[]);
+//int main_shadows_2( int argc, char** argv );
+//int main_shadows_3(int argc, char** argv);
+//int main_texturedGeometry(int argc, char** argv);
+//int main_TestState(int argc, char** argv);
+//int main_tess_test( int argc, char** argv );
+//int main_tex_test( int argc, char** argv );
+//int main_bump_map( int argc, char** argv );
+//int main_exp_test( int argc, char** argv );
+//int main_bi( int argc, char** argv );
+//int main_teapot( int argc, char** argv );
+//int main_spark( int argc, char** argv );
+//int main_scene2( int argc, char** argv );
+//int main_dubins( int argc, char** argv );
+//int main_net(int argc, char** argv);
 
 #define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
 #define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
@@ -172,13 +199,6 @@ int main_dubins( int argc, char** argv );
     #pragma comment(lib, "BulletDynamics.lib")
 #endif
 
-// typedef osg::Quat    quaternion;
-// typedef osg::Vec3    geo_base_3;
-// typedef osg::Vec3    geo_position;
-// typedef osg::Vec3    geo_point_3;
-// typedef osg::Vec2    point_2;
-// typedef osg::Vec3    point_3;
-// typedef osg::Matrix  transform_4;
 
 #pragma warning(disable:4996)
 
@@ -186,34 +206,18 @@ int main_dubins( int argc, char** argv );
 #undef min
 #undef max
 
-#include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp> 
-#include <boost/make_shared.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/optional.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/math/constants/constants.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/any.hpp>
-#include <boost/variant.hpp>
-#include <boost/foreach.hpp>
 
-#include <boost/graph/astar_search.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/random.hpp>
-#include <boost/random.hpp>
-#include <boost/graph/graphviz.hpp>
 
 #ifdef _DEBUG
+#pragma comment(lib, "boost_thread-vc100-mt-gd-1_50.lib")
 #pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_50.lib")
 #pragma comment(lib, "boost_system-vc100-mt-gd-1_50.lib")
 #else
+#pragma comment(lib, "boost_thread-vc100-mt-1_50.lib")
 #pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
 #pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
 #endif
-
+  
 
 using boost::noncopyable;
 using boost::optional;
@@ -286,7 +290,87 @@ inline cg::geo_base_3 get_base()
 #include "event.h"
 #include "mod_system.h"
 
-
-
 #include "osg_helpers.h"
+
+#include "cpp_utils/func_pointer.h"
+
+namespace fn_reg
+{
+
+typedef
+    boost::unordered_map<std::string, boost::any>
+    func_collection_t;
+
+inline func_collection_t& func_collection()
+{
+    static func_collection_t collection;
+    return collection;
+}
+
+//! получение указателя на синглтон коллекции функций
+inline func_collection_t const* extract_collection()
+{
+    return &(func_collection());
+}
+
+//! глобальный регистратор; в конструкторе обращение к синглтону в котором регистрируем объект
+struct func_registrator
+{
+    template<typename function_type>
+    func_registrator(const char* name, function_type func)
+    {
+        func_collection()[name] = func;
+    }
+};
+
+
+inline  boost::any extract_function(std::string const& function_name)
+{
+   func_collection_t const& col = func_collection();
+    auto it = col.find(function_name);
+
+    if (it == col.end())
+        return boost::any();
+
+    return it->second;
+}
+
+template<typename signature>
+typename cpp_utils::func_pointer<signature>::type
+    function( std::string const& function_name)
+{
+    // FIXME TODO
+    // DECL_LOGGER("nfi");
+
+    boost::any func = extract_function( function_name);
+
+    if (func.empty())
+    {
+        return nullptr;
+    }
+
+    try
+    {
+        return boost::any_cast<typename cpp_utils::func_pointer<signature>::type>(func);
+    }
+    catch(boost::bad_any_cast const&)
+    {
+        // FIXME TODO
+        // LogError("function type mismatch: " << function_name << " in " << lib_name);
+    }
+
+    return nullptr;
+}
+
+}
+
+#define AUTO_REG_NAME_IMPL(name, func)          \
+    namespace                                       \
+{                                               \
+    fn_reg::func_registrator              \
+    __registrator__##name(#name, &func);    \
+}
+
+#define AUTO_REG_NAME(name, func)   AUTO_REG_NAME_IMPL(name, func)
+#define AUTO_REG(func)              AUTO_REG_NAME_IMPL(func, func)
 

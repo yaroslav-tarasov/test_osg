@@ -126,6 +126,7 @@ protected:
     high_res_timer                _hr_timer;
 };
 
+
 int main_bi( int argc, char** argv )
 {
     osg::ArgumentParser arguments( &argc, argv );
@@ -174,3 +175,6 @@ int main_bi( int argc, char** argv )
     viewer.setSceneData( root.get() );
     return viewer.run();
 }
+
+
+AUTO_REG(main_bi)

@@ -75,6 +75,8 @@ class ManipResetter : public osgGA::GUIEventHandler
         osgGA::TrackballManipulator *mManip;
 };
 
+
+
 int main_shadows(int argc, char *argv[])
 {
     //osg::setNotifyLevel(osg::INFO);
@@ -178,3 +180,6 @@ int main_shadows(int argc, char *argv[])
     printManip(manip.get());
     return r;
 }
+
+
+   AUTO_REG(main_shadows)

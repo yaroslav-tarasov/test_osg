@@ -111,6 +111,8 @@ creators::nodes_array_t createModel(bool overlay, osgSim::OverlayNode::OverlayTe
 
 }
 
+
+
 int main_shadows_2( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -197,3 +199,5 @@ int main_shadows_2( int argc, char** argv )
 
     return 1;
 }
+
+AUTO_REG(main_shadows_2)

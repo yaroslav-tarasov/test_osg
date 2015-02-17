@@ -73,7 +73,6 @@ public:
 };
 
 
-
 int main_tex_test( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -249,3 +248,5 @@ int main_tex_test( int argc, char** argv )
     viewer.setSceneData( root.get() );
     return viewer.run();
 }
+
+AUTO_REG(main_tex_test)

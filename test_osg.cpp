@@ -17,25 +17,26 @@ class LogFileHandler : public osg::NotifyHandler
 };
 
 
-std::function<int( int, char**)> pmain[] = {
-                                              main_scene            //0
-                                             ,main_select           //1
-                                             ,main_shadows          //2
-                                             ,main_shadows_2        //3
-                                             ,main_shadows_3        //4
-                                             ,main_hud              //5
-											 ,main_texturedGeometry //6
-											 ,main_TestState        //7
-                                             ,main_tess_test        //8 
-                                             ,main_tex_test         //9
-                                             ,main_bump_map         //10
-                                             ,main_exp_test         //11
-                                             ,main_bi               //12
-                                             ,main_teapot           //13
-                                             ,main_spark            //14
-                                             ,main_scene2           //15
-											 ,main_dubins           //16
-                                           };       
+//std::function<int( int, char**)> pmain[] = {
+//                                              main_scene            //0
+//                                             ,main_select           //1
+//                                             ,main_shadows          //2
+//                                             ,main_shadows_2        //3
+//                                             ,main_shadows_3        //4
+//                                             ,main_hud              //5
+//											   ,main_texturedGeometry //6
+//											   ,main_TestState        //7
+//                                             ,main_tess_test        //8 
+//                                             ,main_tex_test         //9
+//                                             ,main_bump_map         //10
+//                                             ,main_exp_test         //11
+//                                             ,main_bi               //12
+//                                             ,main_teapot           //13
+//                                             ,main_spark            //14
+//                                             ,main_scene2           //15
+//											   ,main_dubins           //16
+//                                             ,main_net              //17
+//                                           };       
 
 
 int main( int argc, char** argv )
@@ -47,5 +48,10 @@ int main( int argc, char** argv )
     
     osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
-    return pmain[15](argc, argv);
+    auto fp = fn_reg::function<int( int argc, char** argv )>("main_scene2");
+
+    if(fp)
+        return fp(argc, argv);
+
+    return 0;
 }

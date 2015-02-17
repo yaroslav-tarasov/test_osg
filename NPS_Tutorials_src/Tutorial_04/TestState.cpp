@@ -97,6 +97,7 @@ osg::Geode* createPyramid()
 
 }
 
+
 int main_TestState(int argc, char** argv)
 {
 
@@ -194,3 +195,5 @@ int main_TestState(int argc, char** argv)
    } 
    return 0;
 }
+
+   AUTO_REG(main_TestState)

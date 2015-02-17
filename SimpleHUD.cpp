@@ -8,6 +8,8 @@
 #include <osg/ShapeDrawable>
 #include <osg/Geometry>
 
+
+
 int main_hud( int argc, char** argv )
 {
    osg::Group* root = NULL; 
@@ -131,3 +133,5 @@ int main_hud( int argc, char** argv )
 
    return 0;
 }
+
+ AUTO_REG(main_hud)

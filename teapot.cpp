@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "teapot.h"
 
+
+
 int main_teapot( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -12,3 +14,5 @@ int main_teapot( int argc, char** argv )
     viewer.setSceneData( root.get() );
     return viewer.run();
 }
+
+ AUTO_REG(main_teapot)

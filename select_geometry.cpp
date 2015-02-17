@@ -58,6 +58,9 @@ protected:
     osg::ref_ptr<osg::MatrixTransform> _selectionBox;
 };
 
+
+
+
 int main_select( int argc, char** argv )
 {
     osg::ref_ptr<osg::Node> model1 = osgDB::readNodeFile( "cessna.osg" );
@@ -75,3 +78,5 @@ int main_select( int argc, char** argv )
     viewer.addEventHandler( picker.get() );
     return viewer.run();
 }
+
+AUTO_REG(main_select)

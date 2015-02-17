@@ -143,6 +143,8 @@ public:
     osg::ref_ptr<osg::LightSource> ls_;
 };
 
+
+
 int main_bump_map( int argc, char** argv )
 {
     osg::ArgumentParser arguments( &argc, argv );
@@ -292,3 +294,5 @@ int main_bump_map( int argc, char** argv )
 
     return viewer.run();
 }
+
+AUTO_REG(main_bump_map)

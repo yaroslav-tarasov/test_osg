@@ -3,6 +3,8 @@
 #include "creators.h"
 #include "Terrain.h"
 
+
+
 int main_scene2( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -38,3 +40,5 @@ int main_scene2( int argc, char** argv )
     return scene->GetViewer()->run();
 
 }
+
+AUTO_REG(main_scene2)

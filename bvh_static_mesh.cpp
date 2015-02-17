@@ -34,7 +34,7 @@ namespace phys
         //shape_ = shared_ptr<btCollisionShape>(new btStaticPlaneShape(btVector3(0, 0, 1), 0));
 
 
-        body_  = boost::make_shared<btRigidBody>(0, nullptr, &*shape_);
+        body_  = boost::make_shared<btRigidBody>(btScalar(0), nullptr, &*shape_);
         body_->setRestitution(0.1f);
         body_->setCenterOfMassTransform(btTransform(m, to_bullet_vector3(cg::point_3())));
         body_->setFriction(0.99f);

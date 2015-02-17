@@ -556,6 +556,7 @@ osg::Node*
 }
 
 
+
 int main_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -1106,3 +1107,5 @@ int main_scene( int argc, char** argv )
 
     return 1;
 }
+
+AUTO_REG(main_scene)

@@ -268,6 +268,10 @@ namespace exp_mat
 
 }  // ns exp_mat
 
+
+
+
+
 int main_exp_test( int argc, char** argv )
 {
 
@@ -346,3 +350,5 @@ int main_exp_test( int argc, char** argv )
     viewer.setSceneData( root.get() );
     return viewer.run();
 }
+
+AUTO_REG(main_exp_test)

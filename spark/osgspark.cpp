@@ -198,3 +198,6 @@ int main_spark( int argc, char** argv )
     viewer.addEventHandler( handler.get() );
     return viewer.run();
 }
+
+
+AUTO_REG(main_spark)

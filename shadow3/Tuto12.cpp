@@ -4,6 +4,7 @@
 
 using namespace osg;
 
+
 int main_shadows_3(int argc, char** argv)
 {
 	//Declaration of the objects that will form our scene
@@ -96,3 +97,4 @@ int main_shadows_3(int argc, char** argv)
 }
 
 
+ AUTO_REG(main_shadows_3)
