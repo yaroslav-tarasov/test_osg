@@ -3,10 +3,16 @@
 #include "async_services/async_services.h"
 #include "async_services/async_timer.h"
 #include "cpp_utils/thread_aware_obj.h"
-#include "msg_dispatcher.h"
+#include "network/msg_dispatcher.h"
+#include "client.h"
+
+#include <QApplication>
+
+
+client_interface_ptr create_client();
 
 using namespace boost;
-using namespace cg;
+// using namespace cg;
 using std::string;
 using std::vector;
 using boost::property_tree::ptree;
@@ -27,21 +33,7 @@ namespace  aa
     };
 }
 
-struct client_interface
-{
 
-    virtual ~client_interface() {}
-    //virtual atc::airport::data_t get_airport_data(const string &name) = 0;
-    virtual bool is_ready() const = 0;
-
-    enum place_t
-    {
-        CITY = 0,
-        VILLAGE
-    };
-
-    virtual vector<cg::geo_point_2> get_places(const string &name, place_t type) = 0;
-};
 
 struct data_response
     : network::msg_id<id_data_responce>
@@ -280,7 +272,7 @@ void client_impl::finalize()
 //    return std::move(res);
 //}
 
-vector<geo_point_2> client_impl::get_places(const string &name, place_t type)
+vector<cg::geo_point_2> client_impl::get_places(const string &name, place_t type)
 {
     const places_request request(name, type);
     auto res = places_getter_->get(wrapper_, request, timeout_);
@@ -342,26 +334,48 @@ bool client_impl::is_ready() const
     return wrapper_ != NULL;
 }
 
-AUTO_REG(main_net)
+client::client(const ptree &config)
+    : impl_(client_impl::create(config))
+{
+
+}
+
+client::~client()
+{
+    impl_->finalize();
+    impl_.reset();
+}
+
+//atc::airport::data_t get_airport_data(const string &name)
+//{
+//    return impl_->get_airport_data(name);
+//}
+
+bool client::is_ready() const
+{
+    return impl_->is_ready();
+}
+
+vector<cg::geo_point_2> client::get_places(const string &name, place_t type)
+{
+    return impl_->get_places(name, type);
+}
+
 
 int main_net(int argc, char** argv)
 {
-	async_services_initializer asi(false);
+    QApplication application(argc, argv);
+    application.setQuitOnLastWindowClosed(false);
 
-    asi.get_service().run();
-	return 0;
+    async_services_initializer asi(true);
+
+    client_interface_ptr db = create_client();
+
+
+    // asi.get_service().run();
+    return application.exec();
 }
 
+AUTO_REG(main_net)
 
-bool sync_wait_for_qt(const boost::function<bool()> &fn, pt::time_duration timeout)
-{
-    time_counter time;
-    while (!fn())
-    {
-        if (time.time() > timeout)
-            return false;
 
-        QCoreApplication::instance()->processEvents(QEventLoop::WaitForMoreEvents);
-    }
-    return true;
-}

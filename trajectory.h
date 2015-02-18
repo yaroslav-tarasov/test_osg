@@ -41,7 +41,6 @@ struct trajectory
     
     void append(const trajectory &other) 
     {
-        size_t size = 0;
 		const auto length_ = kp_seg_.back().length();
 
         for(auto it = other.kp_seg_.begin();it!=other.kp_seg_.end();++it)
@@ -113,7 +112,7 @@ private:
         return 0;
     }
 
-    static int fill(keypoints_t& kp,curses_t& cr,double q[3], double x, void* user_data)
+    static int fill(keypoints_t& kp,curses_t& cr,double q[3], double x, void* /*user_data*/)
     {
         auto p = cg::point_2(q[0],q[1]);
         cr.insert(std::make_pair(x,(90 - cg::rad2grad()*q[2])));

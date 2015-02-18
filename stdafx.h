@@ -4,6 +4,7 @@
 //
 
 #pragma once
+#ifndef  precompile_header
 
 #include "targetver.h"
 
@@ -30,7 +31,7 @@
 #include <boost/graph/graphviz.hpp>
                              
 #include <boost/property_tree/ptree.hpp>
-
+#include <boost/property_tree/info_parser.hpp>
 
 
 
@@ -150,24 +151,6 @@
 
 #include <osg/ValueObject>
 
-//int main_scene( int argc, char** argv );
-//int main_hud( int argc, char** argv );
-//int main_select( int argc, char** argv );
-//int main_shadows(int argc, char *argv[]);
-//int main_shadows_2( int argc, char** argv );
-//int main_shadows_3(int argc, char** argv);
-//int main_texturedGeometry(int argc, char** argv);
-//int main_TestState(int argc, char** argv);
-//int main_tess_test( int argc, char** argv );
-//int main_tex_test( int argc, char** argv );
-//int main_bump_map( int argc, char** argv );
-//int main_exp_test( int argc, char** argv );
-//int main_bi( int argc, char** argv );
-//int main_teapot( int argc, char** argv );
-//int main_spark( int argc, char** argv );
-//int main_scene2( int argc, char** argv );
-//int main_dubins( int argc, char** argv );
-//int main_net(int argc, char** argv);
 
 #define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
 #define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
@@ -177,6 +160,19 @@
 #define STRINGIFY(x) #x 
 
 #ifdef _DEBUG
+    #pragma comment(lib, "osgTextd.lib")
+    #pragma comment(lib, "osgShadowd.lib")
+    #pragma comment(lib, "osgFXd.lib")
+    #pragma comment(lib, "osgEphemerisd.lib")
+    #pragma comment(lib, "OpenThreadsd.lib")
+    #pragma comment(lib, "osgd.lib")
+    #pragma comment(lib, "osgDBd.lib")
+    #pragma comment(lib, "osgViewerd.lib")
+    #pragma comment(lib, "osgAnimationd.lib")
+    #pragma comment(lib, "osgGAd.lib")
+    #pragma comment(lib, "osgUtild.lib")
+    #pragma comment(lib, "osgSimd.lib")
+    #pragma comment(lib, "osgParticled.lib")
     #pragma comment(lib, "BulletCollision_Debug.lib")
     #pragma comment(lib, "LinearMath_Debug.lib")
     #pragma comment(lib, "BulletDynamics_Debug.lib")
@@ -199,12 +195,31 @@
     #pragma comment(lib, "BulletDynamics.lib")
 #endif
 
+#ifndef _DEBUG
+#pragma comment(lib, "SPARK_GL.lib")
+#pragma comment(lib, "SPARK.lib")
+#else 
+#pragma comment(lib, "SPARK_GL_debug.lib")
+#pragma comment(lib, "SPARK_debug.lib")
+#endif
+
+#ifndef _DEBUG
+#pragma comment(lib, "osgwTools.lib")
+#pragma comment(lib, "osgbDynamics.lib")
+#pragma comment(lib, "osgbInteraction.lib")
+#pragma comment(lib, "osgbCollision.lib")
+#else 
+#pragma comment(lib, "osgwToolsd.lib")
+#pragma comment(lib, "osgbDynamicsd.lib")
+#pragma comment(lib, "osgbInteractiond.lib")
+#pragma comment(lib, "osgbCollisiond.lib")
+#endif
 
 #pragma warning(disable:4996)
 
-#include "Windows.h"
-#undef min
-#undef max
+//#include "Windows.h"
+//#undef min
+//#undef max
 
 
 
@@ -217,24 +232,14 @@
 #pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
 #pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
 #endif
-  
+
+// #define DEVELOP_SHADOWS
+#define TEST_SHADOWS_FROM_OSG
 
 using boost::noncopyable;
 using boost::optional;
 
-//
-//  refl stubs
-//
-
-//#define REFL_INNER(x)
-//#define REFL_SER_BIN(x)
-//#define REFL_ENTRY(x)
-//#define REFL_END()
-//#define REFL_STRUCT(x)
-//#define REFL_NUM(x1,x2,x3,x4)
-
-// #define DEVELOP_SHADOWS
-#define TEST_SHADOWS_FROM_OSG
+#include "fn_reg.h"
 
 #include "common/meta.h"
 #include "cg_math.h"
@@ -292,85 +297,6 @@ inline cg::geo_base_3 get_base()
 
 #include "osg_helpers.h"
 
-#include "cpp_utils/func_pointer.h"
-
-namespace fn_reg
-{
-
-typedef
-    boost::unordered_map<std::string, boost::any>
-    func_collection_t;
-
-inline func_collection_t& func_collection()
-{
-    static func_collection_t collection;
-    return collection;
-}
-
-//! получение указателя на синглтон коллекции функций
-inline func_collection_t const* extract_collection()
-{
-    return &(func_collection());
-}
-
-//! глобальный регистратор; в конструкторе обращение к синглтону в котором регистрируем объект
-struct func_registrator
-{
-    template<typename function_type>
-    func_registrator(const char* name, function_type func)
-    {
-        func_collection()[name] = func;
-    }
-};
 
 
-inline  boost::any extract_function(std::string const& function_name)
-{
-   func_collection_t const& col = func_collection();
-    auto it = col.find(function_name);
-
-    if (it == col.end())
-        return boost::any();
-
-    return it->second;
-}
-
-template<typename signature>
-typename cpp_utils::func_pointer<signature>::type
-    function( std::string const& function_name)
-{
-    // FIXME TODO
-    // DECL_LOGGER("nfi");
-
-    boost::any func = extract_function( function_name);
-
-    if (func.empty())
-    {
-        return nullptr;
-    }
-
-    try
-    {
-        return boost::any_cast<typename cpp_utils::func_pointer<signature>::type>(func);
-    }
-    catch(boost::bad_any_cast const&)
-    {
-        // FIXME TODO
-        // LogError("function type mismatch: " << function_name << " in " << lib_name);
-    }
-
-    return nullptr;
-}
-
-}
-
-#define AUTO_REG_NAME_IMPL(name, func)          \
-    namespace                                       \
-{                                               \
-    fn_reg::func_registrator              \
-    __registrator__##name(#name, &func);    \
-}
-
-#define AUTO_REG_NAME(name, func)   AUTO_REG_NAME_IMPL(name, func)
-#define AUTO_REG(func)              AUTO_REG_NAME_IMPL(func, func)
-
+#endif // precompile_header

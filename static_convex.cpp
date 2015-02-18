@@ -1,5 +1,5 @@
 #include "static_convex.h"
-#include "impl/rigid_body_info.h"
+#include "rigid_body_info.h"
 
 namespace phys
 {

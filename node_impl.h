@@ -1,6 +1,6 @@
 #pragma once
 
-#include "msg_dispatcher.h"
+#include "network/msg_dispatcher.h"
 
 namespace nodes_management
 {

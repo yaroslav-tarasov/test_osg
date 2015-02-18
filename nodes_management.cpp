@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "nodes_management.h"
 #include "node_impl.h"
 

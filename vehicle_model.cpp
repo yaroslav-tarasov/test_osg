@@ -419,18 +419,18 @@ void model::sync_nodes_manager( double /*dt*/ )
             // FIXME отсутствие промежуточной логики приводит к странным решениям
             node_pos.local().orien = desired_orien_in_rel;
 
-            std::stringstream cstr;
+            //std::stringstream cstr;
 
-            cstr << std::setprecision(8) 
-                << "node_pos.local().get_course:  "   << node_pos.local().orien.get_course()
-                << "   node_pos.local().get_pitch: "  << node_pos.local().orien.get_pitch()
-                << "   node_pos.local().get_roll :  " << node_pos.local().orien.get_roll() 
-                << "   desired_orien_in_rel.get_course:  "  << desired_orien_in_rel.get_course()
-                << "   desired_orien_in_rel.get_pitch: "    << desired_orien_in_rel.get_pitch()
-                << "   desired_orien_in_rel.get_roll :  "   << desired_orien_in_rel.get_roll() 
-                << "\n" ;
+            //cstr << std::setprecision(8) 
+            //    << "node_pos.local().get_course:  "   << node_pos.local().orien.get_course()
+            //    << "   node_pos.local().get_pitch: "  << node_pos.local().orien.get_pitch()
+            //    << "   node_pos.local().get_roll :  " << node_pos.local().orien.get_roll() 
+            //    << "   desired_orien_in_rel.get_course:  "  << desired_orien_in_rel.get_course()
+            //    << "   desired_orien_in_rel.get_pitch: "    << desired_orien_in_rel.get_pitch()
+            //    << "   desired_orien_in_rel.get_roll :  "   << desired_orien_in_rel.get_roll() 
+            //    << "\n" ;
 
-            OutputDebugString(cstr.str().c_str());
+            //OutputDebugString(cstr.str().c_str());
 
             wheels_[i].node->set_position(node_pos);
         }

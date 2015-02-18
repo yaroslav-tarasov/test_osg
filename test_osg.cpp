@@ -11,7 +11,21 @@ class LogFileHandler : public osg::NotifyHandler
         virtual ~LogFileHandler() { _log.close(); }
         virtual void notify(osg::NotifySeverity severity,
             const char* msg)
-        { _log << msg; }
+        { 
+            static std::string str_severity[] =
+            {
+                "ALWAYS",
+                "FATAL",
+                "WARN",
+                "NOTICE",
+                "INFO",
+                "DEBUG_INFO",
+                "DEBUG_FP"
+            };
+      
+            _log << str_severity[severity] << ":" << msg;
+        
+        }
     protected:
         std::ofstream _log;
 };
@@ -48,7 +62,7 @@ int main( int argc, char** argv )
     
     osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
-    auto fp = fn_reg::function<int( int argc, char** argv )>("main_scene2");
+    auto fp = fn_reg::function<int( int argc, char** argv )>("main_net");
 
     if(fp)
         return fp(argc, argv);

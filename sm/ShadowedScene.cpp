@@ -12,12 +12,7 @@
 */
 
 #include "stdafx.h"
-//#include <osg/Texture2D>
-//#include <osg/CoordinateSystemNode>
-//#include <osg/TexEnv>
-//#include <osg/io_utils>
-//
-//#include <osgUtil/CullVisitor>
+
 #include "ShadowedScene.h"
 
 using namespace avShadow;

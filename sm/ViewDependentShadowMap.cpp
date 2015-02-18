@@ -12,6 +12,7 @@
 */
 
 #include "stdafx.h"
+
 #include "ShadowSettings.h"
 #include "ViewDependentShadowMap.h"
 #include "ShadowedScene.h"

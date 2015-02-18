@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "aircraft_model.h"
 
 namespace aircraft

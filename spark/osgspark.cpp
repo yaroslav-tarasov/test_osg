@@ -1,11 +1,6 @@
 #include "stdafx.h"
-#ifndef _DEBUG
-#pragma comment(lib, "SPARK_GL.lib")
-#pragma comment(lib, "SPARK.lib")
-#else 
-#pragma comment(lib, "SPARK_GL_debug.lib")
-#pragma comment(lib, "SPARK_debug.lib")
-#endif
+
+#include <GL/glut.h>
 
 #include "../creators.h"
 #include "SparkDrawable.h"
