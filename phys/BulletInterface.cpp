@@ -6,7 +6,7 @@
 #include <osgbCollision/Utils.h>
 #include "../find_node_visitor.h"
 #include "../high_res_timer.h"
-#include "../aircraft_phys.h"
+#include "aircraft_phys.h"
 #include "sensor.h"
 
 #include "ray_cast_vehicle.h"

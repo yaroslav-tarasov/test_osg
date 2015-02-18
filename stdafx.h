@@ -287,7 +287,7 @@ inline cg::geo_base_3 get_base()
 
 #include "trajectory.h"
 
-#include "phys_sys_fwd.h"
+#include "phys/phys_sys_fwd.h"
 #include "aircraft_common.h"
 
 #include "aircraft_model_inf.h"

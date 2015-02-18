@@ -2,7 +2,7 @@
 #include <btBulletDynamicsCommon.h>
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
-#include "bi/bullet_helpers.h"
+#include "bullet_helpers.h"
 
 #include "aircraft_phys.h"
 #include "../find_node_visitor.h"

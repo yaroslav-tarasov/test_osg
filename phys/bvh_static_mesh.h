@@ -1,7 +1,7 @@
 #pragma once
 
 #include "phys_sys.h"
-#include "bi/phys_sys_common.h"
+#include "phys_sys_common.h"
 
 namespace phys
 {

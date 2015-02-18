@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-#include "Scene.h"
+#include "av/Scene.h"
 #include "creators.h"
-#include "Terrain.h"
+#include "av/Terrain.h"
 
 
 

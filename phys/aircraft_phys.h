@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bi/rigid_body_info.h"
+#include "rigid_body_info.h"
 #include "cpp_utils/polymorph_ptr.h"
 #include "phys_sys.h"
-#include "bi/phys_sys_common.h"
+#include "phys_sys_common.h"
 #include "aircraft.h"
 #include "sensor.h"
 

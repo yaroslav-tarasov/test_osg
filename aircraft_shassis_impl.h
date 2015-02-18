@@ -1,6 +1,6 @@
 #pragma once
 
-#include "phys_sys.h"
+#include "phys/phys_sys.h"
 #include "aircraft_common.h"
 
 namespace aircraft

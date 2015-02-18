@@ -3,11 +3,11 @@
 #include <btBulletDynamicsCommon.h>
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
-#include "bi/bullet_helpers.h"
+#include "phys/bullet_helpers.h"
 
 #include "ray_cast_vehicle.h"
 //#include "debug_drawer.h"
-#include "bi/phys_sys_common.h"
+#include "phys/phys_sys_common.h"
 
 
 

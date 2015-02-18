@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 
 #include "high_res_timer.h"
-#include "bi/BulletInterface.h"
-#include "bi/RigidUpdater.h"
+#include "phys/BulletInterface.h"
+#include "phys/RigidUpdater.h"
 
 //Degree precision versus length
 //

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Ephemeris.h"
-#include "sv/FogLayer.h"
-#include "sv/CloudLayer.h"
+#include "av/FogLayer.h"
+#include "av/CloudLayer.h"
 
 #include "EnvRenderer.h"
 

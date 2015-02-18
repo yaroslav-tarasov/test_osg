@@ -3,7 +3,7 @@
 //#include "common/collect_collision.h"
 #include "geometry/filter.h"
 #include "sensor.h"
-#include "vehicle.h"
+#include "phys/vehicle.h"
 
 struct stub_msys : kernel::model_system
 {

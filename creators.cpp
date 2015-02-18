@@ -16,14 +16,14 @@
 #include "sm/ViewDependentShadowMap.h"
 
 #include "high_res_timer.h"
-#include "bi/BulletInterface.h"
-#include "bi/RigidUpdater.h"
+#include "phys/BulletInterface.h"
+#include "phys/RigidUpdater.h"
 
 #include "../cpp_utils/str.h"
 
 #include "materials.h"
 
-#include "LOD.h"
+#include "av/LOD.h"
 
 #define TEST_SHADOWS
 // #define TEST_TEXTURE

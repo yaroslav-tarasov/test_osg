@@ -5,7 +5,7 @@
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
 #include "bullet_helpers.h"
- #include "../phys_sys_fwd.h"
+#include "phys_sys_fwd.h"
 #include "phys_sys.h"
 #include "phys_sys_common.h"
 #include "sensor.h"

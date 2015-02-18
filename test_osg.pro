@@ -183,16 +183,16 @@ QT += core gui
 
 HEADERS += \
     stdafx.h \
-    bi/RigidUpdater.h \
-    bi/rigid_body_info.h \
-    bi/phys_sys_common.h \
-    bi/GLDebugDrawer.h \
-    bi/BulletInterface.h \
-    bi/bullet_helpers.h \
-    Terrain.h \
+    phys/RigidUpdater.h \
+    phys/rigid_body_info.h \
+    phys/phys_sys_common.h \
+    phys/GLDebugDrawer.h \
+    phys/BulletInterface.h \
+    phys/bullet_helpers.h \
+    av/Terrain.h \
     find_node_visitor.h \
     creators.h \
-    client.h
+    tests/client.h
 
 SOURCES += \
     test_osg.cpp \
@@ -200,37 +200,38 @@ SOURCES += \
     vehicle_model.cpp \
     #static_convex.cpp \
     shaders.cpp \
-    Scene.cpp \
-    ray_cast_vehicle.cpp \
-    phys_aircraft.cpp \
-    Object.cpp \
     nodes_manager.cpp \
     nodes_management.cpp \
     node_impl.cpp \
     materials.cpp \
-    LOD.cpp \
-    Ephemeris.cpp \
-    EnvRenderer.cpp \
     dubins.cpp \
-    bvh_static_mesh.cpp \
     bada_import.cpp \
     animation_handler.cpp \
     aircraft_visual.cpp \
     aircraft_shassis_impl.cpp \
-    aircraft_phys.cpp \
+    phys/aircraft_phys.cpp \
     aircraft_model.cpp \
-    bi/RigidUpdater.cpp \
-    bi/GLDebugDrawer.cpp \
-    bi/BulletInterface.cpp \
-    sv/FogLayer.cpp \
-    sv/CloudLayer.cpp \
+    phys/RigidUpdater.cpp \
+    phys/GLDebugDrawer.cpp \
+    phys/BulletInterface.cpp \
+    phys/ray_cast_vehicle.cpp \
+    phys/phys_aircraft.cpp \
+    phys/bvh_static_mesh.cpp \
     nfi/lib_loader.cpp \
     sm/ViewDependentShadowMap.cpp \
     sm/ShadowTechnique.cpp \
     sm/ShadowSettings.cpp \
     sm/ShadowMap.cpp \
     sm/ShadowedScene.cpp \
-    Terrain.cpp \
+    av/Terrain.cpp \
+    av/Scene.cpp \
+    av/PreRender.cpp \
+    av/Object.cpp \
+    av/LOD.cpp \
+    av/FogLayer.cpp \
+    av/Ephemeris.cpp \
+    av/EnvRenderer.cpp \
+    av/CloudLayer.cpp \
     find_node_visitor.cpp \
     creators.cpp \
     spark/SparkUpdatingHandler.cpp \
@@ -241,5 +242,5 @@ SOURCES += \
     spark/explosion_effect.cpp \
     spark/osgspark.cpp \
     main_scene2.cpp \
-    test_network.cpp \
-    sync_qt.cpp
+    tests/test_network.cpp \
+    tests/sync_qt.cpp

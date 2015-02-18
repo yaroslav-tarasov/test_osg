@@ -9,8 +9,8 @@
 #include "nodes_manager.h"
 #include "../ada.h"
 #include "../bada_import.h"
-#include "../phys_aircraft.h"
-#include "../vehicle.h"
+#include "phys_aircraft.h"
+#include "vehicle.h"
 
 #include "RigidUpdater.h"
 

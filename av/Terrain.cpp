@@ -15,9 +15,9 @@
 #include "high_res_timer.h"
 
 #include <osgwTools/AbsoluteModelTransform.h>
-#include "bi/BulletInterface.h"
-#include "bi/BulletMTInterface.h"
-#include "bi/RigidMTUpdater.h"
+#include "phys/BulletInterface.h"
+#include "phys/BulletMTInterface.h"
+#include "phys/RigidMTUpdater.h"
 
 
 
