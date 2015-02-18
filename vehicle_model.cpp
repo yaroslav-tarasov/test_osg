@@ -5,6 +5,8 @@
 #include "sensor.h"
 #include "phys/vehicle.h"
 
+
+
 struct stub_msys : kernel::model_system
 {
     double calc_step() const { return 0.1; }
@@ -12,6 +14,24 @@ struct stub_msys : kernel::model_system
 
 namespace vehicle
 {
+
+
+
+void base_view_presentation::send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd)
+{
+    send_msg_(bytes, sure, just_cmd);
+}
+
+void base_view_presentation::on_msg(binary::bytes_cref bytes)
+{
+    msg_disp().dispatch_bytes(bytes);
+}
+
+
+network::msg_dispatcher<>& base_view_presentation::msg_disp()
+{
+    return msg_disp_;
+}
 
 //object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 //{
@@ -56,14 +76,14 @@ model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr      
     if (!settings_.route.empty())
         follow_route(settings_.route);
 
-    //msg_disp()
-    //    .add<msg::attach_tow_msg_t          >(boost::bind(&model::on_attach_tow             , this, _1))
-    //    .add<msg::detach_tow_msg_t          >(boost::bind(&model::on_detach_tow             , this))
-    //    .add<msg::go_to_pos_data            >(boost::bind(&model::on_go_to_pos              , this, _1))
-    //    .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
-    //    .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
-    //    .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
-    //    ;
+    msg_disp()
+        .add<msg::attach_tow_msg_t          >(boost::bind(&model::on_attach_tow             , this, _1))
+        .add<msg::detach_tow_msg_t          >(boost::bind(&model::on_detach_tow             , this))
+        .add<msg::go_to_pos_data            >(boost::bind(&model::on_go_to_pos              , this, _1))
+        .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
+//        .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
+//        .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
+        ;
 
     create_phys_vehicle();
 }
@@ -165,47 +185,47 @@ void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
     //}
 }
 
-//void model::on_attach_tow( uint32_t tow_id )
-//{
-//    if (!aerotow_)
-//        set_tow(tow_id);
-//}
-//
-//void model::on_detach_tow()
-//{
-//    if (aerotow_)
-//        set_tow(boost::none);
-//}
+void model::on_attach_tow( uint32_t tow_id )
+{
+    if (!aerotow_)
+        set_tow(tow_id);
+}
 
-//void model::on_follow_route(uint32_t route_id)
-//{
+void model::on_detach_tow()
+{
+    if (aerotow_)
+        set_tow(boost::none);
+}
+
+void model::on_follow_route(uint32_t route_id)
+{
 //    simple_route::info_ptr routeptr = collection_->get_object(route_id);
 //    if (routeptr)
 //        state_ = boost::make_shared<follow_route_state>(routeptr);
-//}
+}
 
-#if 0 // we need it badly but maybe another form
+
 void model::on_go_to_pos(msg::go_to_pos_data const& data)
 {
-    if (airport_)
-    {
-        auto path = airport_->find_shortest_path(pos(), data.pos, aerotow_ ? (1 << ani::TAXI) : (1 << ani::SERVICE));
-        if (!path.empty())
-        {
-            cg::geo_curve_2 curve(path);
-            state_ = boost::make_shared<follow_curve_state>(curve, data.course, !!aerotow_);
-            return;
-        }
-    }
+//    if (airport_)
+//    {
+//        auto path = airport_->find_shortest_path(pos(), data.pos, aerotow_ ? (1 << ani::TAXI) : (1 << ani::SERVICE));
+//        if (!path.empty())
+//        {
+//            cg::geo_curve_2 curve(path);
+//            state_ = boost::make_shared<follow_curve_state>(curve, data.course, !!aerotow_);
+//            return;
+//        }
+//    }
         
-    state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, !!aerotow_);
+    model_state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, !!aerotow_);
 }
-#else
+
+// FIXME это лишнее работаем через см выше
 void model::go_to_pos(  cg::geo_point_2 pos, double course )
 {
     model_state_ = boost::make_shared<go_to_pos_state>(pos, course, !!aerotow_);
 }
-#endif 
 
 //void model::on_debug_controls(msg::debug_controls_data const& d)
 //{

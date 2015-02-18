@@ -7,6 +7,24 @@
 #include "phys/phys_sys.h"
 //#include "common/phys_object_model_base.h"
 //#include "objects/ani.h"
+#include "network/msg_dispatcher.h"
+
+using network::gen_msg;
+
+#include "vehicle_msg.h"
+
+namespace kernel
+{
+// used by any presentation to send message through its system,
+typedef
+    boost::function<void(binary::bytes_cref/*msg*/, bool /*sure*/, bool /*just_cmd*/)>
+    send_msg_f;
+
+typedef
+    boost::function<void(bool /*block*/)>
+    block_obj_msgs_f;
+}
+
 
 namespace vehicle
 {
@@ -20,13 +38,89 @@ struct model_base
       virtual nodes_management::node_info_ptr get_root()=0;
 };
 
+
+
+struct  base_view_presentation
+{
+    // base_presentation
+    protected:
+//        void pre_update (double time) override;
+//        void update     (double time) override;
+//        void post_update(double time) override;
+//        void update_atc (double time) override;
+        virtual void on_msg     (binary::bytes_cref   bytes )  /*override*/;
+//        void reset_parent (kernel::object_info_wptr parent)  override;
+public:
+    DECLARE_EVENT(state_modified, ());
+
+protected:
+    template<class msg_t>
+    void set(msg_t const& msg, bool sure = true)
+    {
+//     Information about obj_2 changing on presentation_1 should spread to obj_1 presentation_2
+//     only by way (3) -> (4), not by way (1) -> (2). But notification (1) should work as well.
+//
+//     So we block ability to send messages (2) while obj_2 invokes 'set' function to renew its state
+
+//       -----------   event  -----------
+//      [ obj1 prs1 ] <-(1)- [ obj2 prs1 ]
+//       -----------       /  -----------
+//           |            /       |
+//           |           /        |
+//         msg (2)     (?)       msg (3)
+//           |         /          |
+//           |        /           |
+//           V       /            V
+//      ------------L  event  -----------
+//      [ obj1 prs2 ] <-(4)- [ obj2 prs2 ]
+//       -----------          -----------
+
+        block_msgs_(true);
+        {
+            // most notification are fired from this handler
+            msg_disp().on_msg(msg);
+            state_modified_signal_();
+        }
+        block_msgs_(false);
+
+        send(msg, sure);
+    }
+
+protected:
+    void send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd);
+
+private:
+    template<class msg_t>
+    void send(msg_t const& msg, bool sure = true, bool just_cmd = false)
+    {
+        auto data = network::wrap_msg(msg);
+        send_msg(data, sure, just_cmd);
+    }
+protected:
+    network::msg_dispatcher<>& msg_disp();
+
+private:
+    network::msg_dispatcher<>   msg_disp_;
+
+private:
+    size_t              object_id_;
+    std::string              name_;
+//    kernel::object_info_wptr    parent_;
+//    kernel::object_info_vector  objects_;
+
+    kernel::send_msg_f          send_msg_;
+    kernel::block_obj_msgs_f    block_msgs_;
+};
+
+
 typedef polymorph_ptr<model_base> model_base_ptr;
 
 
 struct model
     : model_base
     //: model_presentation        
-    //, view                      
+    //, view
+      , base_view_presentation
     //, phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
@@ -56,10 +150,10 @@ public:
     nodes_management::node_info_ptr get_root();
 
 private:
-    //void on_attach_tow( uint32_t tow_id ); 
-    //void on_detach_tow(); 
-    //void on_go_to_pos(msg::go_to_pos_data const& data);
-    //void on_follow_route(uint32_t route_id);
+    void on_attach_tow( uint32_t tow_id );
+    void on_detach_tow();
+    void on_go_to_pos(msg::go_to_pos_data const& data);
+    void on_follow_route(uint32_t route_id);
     //void on_debug_controls(msg::debug_controls_data const&);
     //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
 
@@ -143,12 +237,19 @@ public:
     double course() const {return state_.course;}
     double speed() const {return state_.speed;}
     cg::point_2 dpos() const {return cg::point_2(cg::polar_point_2(1., state_.course)) * state_.speed;}
+    // FIXME преносим обратно
     void set_state(state_t const& state)
     {
-        //set(msg::state_msg_t(state), false);
+        // » здесь тоже чегото надо сделать
+        // set(msg::state_msg_t(state), false);
         state_ = state;
     }
-    
+
+    void set_tow(optional<uint32_t> tow_id)
+    {
+        set(msg::tow_msg_t(tow_id), true);
+    }
+
 protected: 
     settings_t settings_;
     state_t    state_;
