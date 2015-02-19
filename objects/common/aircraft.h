@@ -3,7 +3,7 @@
 #include "aircraft_fwd.h"
 
 #include "phys/phys_sys_fwd.h"
-#include "position.h"
+#include "atc/position.h"
 
 
 //! самолет

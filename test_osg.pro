@@ -99,19 +99,26 @@ RCC_DIR     = $$MISC_PATH
 # include paths
 
 INCLUDEPATH += ./
+INCLUDEPATH += \
+               $$PWD/utils                                    \
+               $$PWD/_include                                 \
+               $$PWD/_include/objects                         \
+               $$PWD/objects                                  \
+               C:/simex/src/_Include                          \
+               C:/simex/src/_Include/network                  \
+               $$PWD/ext/pugixml-1.4/src                      \
+               $$(OSG_DIR)/3rdparty/include                   \
+               $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
+               $$(OSG_DIR)/OpenSceneGraph-3.2.1/include       \
+               $$(BULLET_DIR)/src                             \
+               $$(OSG_DIR)/SPARK-1.5.5/include                \
+               $$PWD/common                                   \
+               $$PWD/bada
 INCLUDEPATH += $$INCLUDE_PATH
 INCLUDEPATH += $$EXT_INCLUDE
 INCLUDEPATH += $$EXT_INCLUDE/gmp
 INCLUDEPATH += $$_PRO_FILE_PWD_
-INCLUDEPATH += \
-               $$PWD/ext/pugixml-1.4/src \
-               $$(OSG_DIR)/3rdparty/include \
-               $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
-               $$(OSG_DIR)/OpenSceneGraph-3.2.1/include \
-               $$(BULLET_DIR)/src \
-               $$(OSG_DIR)/SPARK-1.5.5/include \
-               $$PWD/common \
-               $$PWD/bada
+
 
 #############
 # lib paths
@@ -190,33 +197,33 @@ HEADERS += \
     phys/BulletInterface.h \
     phys/bullet_helpers.h \
     av/Terrain.h \
-    find_node_visitor.h \
+    utils/visitors/find_node_visitor.h \
     creators.h \
     tests/client.h
 
 SOURCES += \
     test_osg.cpp \
-    vehicle_model_states.cpp \
-    vehicle_model.cpp \
+    objects/vehicle/vehicle_model_states.cpp \
+    objects/vehicle/vehicle_model.cpp \
     #static_convex.cpp \
     shaders.cpp \
-    nodes_manager.cpp \
-    nodes_management.cpp \
-    node_impl.cpp \
+    objects/nodes_manager/nodes_manager.cpp \
+    objects/nodes_manager/nodes_management.cpp \
+    objects/nodes_manager/node_impl.cpp \
     materials.cpp \
     dubins.cpp \
-    bada_import.cpp \
+    bada/bada_import.cpp \
     animation_handler.cpp \
-    aircraft_visual.cpp \
-    aircraft_shassis_impl.cpp \
-    phys/aircraft_phys.cpp \
-    aircraft_model.cpp \
+    objects/aircraft/aircraft_visual.cpp \
+    objects/aircraft/aircraft_shassis_impl.cpp \
+    objects/aircraft/aircraft_model.cpp \
     phys/RigidUpdater.cpp \
     phys/GLDebugDrawer.cpp \
     phys/BulletInterface.cpp \
     phys/ray_cast_vehicle.cpp \
     phys/phys_aircraft.cpp \
     phys/bvh_static_mesh.cpp \
+    phys/aircraft_phys.cpp \
     nfi/lib_loader.cpp \
     sm/ViewDependentShadowMap.cpp \
     sm/ShadowTechnique.cpp \
@@ -232,7 +239,7 @@ SOURCES += \
     av/Ephemeris.cpp \
     av/EnvRenderer.cpp \
     av/CloudLayer.cpp \
-    find_node_visitor.cpp \
+    utils/visitors/find_node_visitor.cpp \
     creators.cpp \
     spark/SparkUpdatingHandler.cpp \
     spark/SparkDrawable.cpp \

@@ -62,6 +62,7 @@ using boost::any_cast;
 using boost::bad_any_cast;
 
 using boost::circular_buffer;
+#endif // Q_MOC_RUN
 //////////////////////////////////////
 //
 //  std include
@@ -74,7 +75,7 @@ using boost::circular_buffer;
 #include <array>
 #include <unordered_map>
 #include <memory>
-
+#include <queue>
 
 ////////////////////////////////////////////////
 
@@ -82,7 +83,7 @@ using std::deque;
 using std::list;
 using std::map;
 using std::multimap;
-//using std::queue;
+using std::queue;
 using std::set;
 using std::multiset;
 using std::stack;
@@ -105,7 +106,7 @@ using std::move;
 using std::forward;
 
 
-#endif // Q_MOC_RUN
+
 
 //////////////////////////////////////
 //
@@ -328,11 +329,13 @@ using cg::point_2;
 using cg::point_2f;
 using cg::point_3;
 using cg::point_3f;
+using cg::point_3i;
 using cg::cpr;
 using cg::quaternion;
-using cg::transform_4;
+using cg::transform_4;             
+using cg::geo_base_3;
 
-#include "position.h"
+#include "atc/position.h"
 #include "local_position.h"
 
 #include "geometry/dup_points.h"
