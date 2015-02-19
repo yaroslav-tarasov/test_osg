@@ -2,8 +2,7 @@
 
 #include "OrientationConverter.h"
 #include "optimize_nodes.h"
-#include "find_node_visitor.h"
-#include "visitors.h"
+#include "visitors/visitors.h"
 
 typedef std::vector<std::string> FileNameList;
 

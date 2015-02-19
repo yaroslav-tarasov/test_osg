@@ -16,17 +16,11 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\bi">
-      <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\sm">
       <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\sv">
-      <UniqueIdentifier>{ccef160f-0d6b-4c67-91c4-2c60a2b1f36c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
@@ -48,6 +42,18 @@
     </Filter>
     <Filter Include="Source Files\tests">
       <UniqueIdentifier>{baec0567-4405-4fd5-a2ed-21305b2b44e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\phys">
+      <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bada">
+      <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nm">
+      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -239,37 +245,13 @@
     <ClCompile Include="animation_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="find_node_visitor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SkyBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main_scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="bump_mapping.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="common\CommonFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="exp_test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="bi\BulletInterface.cpp">
-      <Filter>Source Files\bi</Filter>
-    </ClCompile>
     <ClCompile Include="light_maps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sv\PreRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shadow_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowedScene.cpp">
@@ -308,71 +290,11 @@
     <ClCompile Include="spark\SparkUpdatingHandler.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
-    <ClCompile Include="sv\CloudLayer.cpp">
-      <Filter>Source Files\sv</Filter>
-    </ClCompile>
-    <ClCompile Include="sv\FogLayer.cpp">
-      <Filter>Source Files\sv</Filter>
-    </ClCompile>
-    <ClCompile Include="Ephemeris.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="EnvRenderer.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="main_scene2.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="Terrain.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="bi\BulletMTInterface.cpp">
-      <Filter>Source Files\bi</Filter>
-    </ClCompile>
-    <ClCompile Include="bi\GLDebugDrawer.cpp">
-      <Filter>Source Files\bi</Filter>
-    </ClCompile>
-    <ClCompile Include="LOD.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="aircraft_phys.cpp">
-      <Filter>Source Files\aircraft</Filter>
-    </ClCompile>
-    <ClCompile Include="aircraft_visual.cpp">
-      <Filter>Source Files\aircraft</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="bi\RigidUpdater.cpp">
-      <Filter>Source Files\bi</Filter>
-    </ClCompile>
-    <ClCompile Include="bada_import.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="nfi\lib_loader.cpp">
       <Filter>Source Files\nfi</Filter>
-    </ClCompile>
-    <ClCompile Include="phys_aircraft.cpp">
-      <Filter>Source Files\aircraft</Filter>
-    </ClCompile>
-    <ClCompile Include="node_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="aircraft_shassis_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nodes_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="nodes_management.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ray_cast_vehicle.cpp">
-      <Filter>Source Files\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="materials.cpp">
       <Filter>Source Files</Filter>
@@ -380,56 +302,128 @@
     <ClCompile Include="dubins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vehicle_model_states.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vehicle_model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tex_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tess_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="shadow3\Tuto12.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="main_shadows_2.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="main_shadows.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="select_geometry.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="bi\osgbullet.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleHUD.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="dubins_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="teapot.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="aircraft_model.cpp">
+    <ClCompile Include="objects\aircraft\aircraft_visual.cpp">
       <Filter>Source Files\aircraft</Filter>
     </ClCompile>
-    <ClCompile Include="bvh_static_mesh.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp">
+      <Filter>Source Files\aircraft</Filter>
     </ClCompile>
-    <ClCompile Include="test_network.cpp">
+    <ClCompile Include="objects\aircraft\aircraft_model.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\aircraft_phys.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\phys_aircraft.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="av\CloudLayer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\EnvRenderer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Ephemeris.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\FogLayer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\LOD.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Object.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\PreRender.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Scene.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Terrain.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\BulletInterface.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\BulletMTInterface.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\bvh_static_mesh.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\GLDebugDrawer.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\RigidUpdater.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\static_convex.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\bump_mapping.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\dubins_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\exp_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\main_scene.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\main_shadows.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\main_shadows_2.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\select_geometry.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\shadow_map.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\SimpleHUD.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\SkyBox.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\teapot.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\tess_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\tex_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\vehicle\vehicle_model.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\vehicle\vehicle_model_states.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="phys\ray_cast_vehicle.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="bada\bada_import.cpp">
+      <Filter>Source Files\bada</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\node_impl.cpp">
+      <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\nodes_management.cpp">
+      <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\nodes_manager.cpp">
+      <Filter>Source Files\nm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

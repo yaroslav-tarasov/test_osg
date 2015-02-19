@@ -27,8 +27,6 @@
 #include "sm/ViewDependentShadowMap.h"
 #include "Terrain.h"
 
-#include "find_node_visitor.h" 
-
 #include "pickhandler.h"
 
 using namespace avScene;

@@ -2,8 +2,11 @@
 
 class btCompoundShape;
 
+
 namespace phys
 {
+
+struct compound_sensor_t;
 
 struct compound_sensor_impl  : public compound_sensor_t
 {

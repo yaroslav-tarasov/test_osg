@@ -1,14 +1,13 @@
 #include "stdafx.h"
 
-#include "../find_node_visitor.h"
 #include "../high_res_timer.h"
 #include "BulletInterface.h"
-#include "../aircraft.h"                // FIXME TODO don't need here 
-#include "../aircraft_common.h"
-#include "../aircraft_shassis_impl.h"   // And maybe this too
-#include "nodes_manager.h"
-#include "../ada.h"
-#include "../bada_import.h"
+#include "aircraft.h"                // FIXME TODO don't need here 
+#include "aircraft/aircraft_common.h"
+#include "aircraft/aircraft_shassis_impl.h"   // And maybe this too
+#include "nodes_manager/nodes_manager.h"
+#include "ada/ada.h"
+#include "bada/bada_import.h"
 #include "phys_aircraft.h"
 #include "vehicle.h"
 

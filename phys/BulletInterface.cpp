@@ -1,21 +1,21 @@
 #include "stdafx.h"
 
 
-#include "BulletInterface.h"
+#include <btBulletDynamicsCommon.h> 
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
-#include "../find_node_visitor.h"
 #include "../high_res_timer.h"
 #include "aircraft_phys.h"
 #include "sensor.h"
+#include "BulletInterface.h"
 
 #include "ray_cast_vehicle.h"
 
-#include "ada.h"
+#include "ada/ada.h"
 #include "bada_import.h"
 
-#include "nodes_manager.h" // TODO FIXME убрать нафиг
-#include "node_impl.h"
+#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
+#include "nodes_manager/node_impl.h"
 
 using namespace phys;
 

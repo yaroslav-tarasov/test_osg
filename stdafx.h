@@ -8,6 +8,7 @@
 
 #include "targetver.h"
 
+#ifndef Q_MOC_RUN
 #define  BOOST_MOVE_USE_STANDARD_LIBRARY_MOVE
 #include "boost/asio.hpp"
 #include <boost/cstdint.hpp>
@@ -24,6 +25,8 @@
 #include <boost/variant.hpp>
 #include <boost/foreach.hpp>
 
+#include <boost/circular_buffer.hpp>
+
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp>
@@ -32,9 +35,33 @@
                              
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
+////////////////////////////////////////////////
 
+using boost::none;
 
+using boost::scoped_ptr;
+using boost::scoped_array;
+using boost::intrusive_ptr;
+using boost::shared_ptr;
+using boost::shared_array;
+using boost::weak_ptr;
+using boost::make_shared;
+using boost::enable_shared_from_this;
 
+using boost::optional;
+using boost::in_place;
+
+using boost::format;
+using boost::wformat;
+
+using boost::bind;
+using boost::function;
+
+using boost::any;
+using boost::any_cast;
+using boost::bad_any_cast;
+
+using boost::circular_buffer;
 //////////////////////////////////////
 //
 //  std include
@@ -47,6 +74,38 @@
 #include <array>
 #include <unordered_map>
 #include <memory>
+
+
+////////////////////////////////////////////////
+
+using std::deque;
+using std::list;
+using std::map;
+using std::multimap;
+//using std::queue;
+using std::set;
+using std::multiset;
+using std::stack;
+using std::string;
+using std::wstring;
+using std::vector;
+using std::array;
+using std::unique_ptr;
+
+using std::ofstream;
+using std::ifstream;
+
+using std::exception;
+using std::runtime_error;
+
+using std::pair;
+using std::make_pair;
+
+using std::move;
+using std::forward;
+
+
+#endif // Q_MOC_RUN
 
 //////////////////////////////////////
 //
@@ -217,11 +276,6 @@
 
 #pragma warning(disable:4996)
 
-//#include "Windows.h"
-//#undef min
-//#undef max
-
-
 
 #ifdef _DEBUG
 #pragma comment(lib, "boost_thread-vc100-mt-gd-1_50.lib")
@@ -239,11 +293,11 @@
 using boost::noncopyable;
 using boost::optional;
 
-#include "fn_reg.h"
+#include "nfi/fn_reg.h"
 
 #include "common/meta.h"
 #include "cg_math.h"
-#include "geometry/xmath.h"
+
 
 template<typename T>
 inline T atanh (T x)
@@ -262,23 +316,34 @@ inline T cbrt(T n)
 
 #define Assert(x) if(x){};
 
+#include "geometry/xmath.h"
 #include "geometry/primitives.h"
+////////////////////////////////
+//
+//
+
+using cg::geo_point_3;
+using cg::geo_point_2;
+using cg::point_2;
+using cg::point_2f;
+using cg::point_3;
+using cg::point_3f;
+using cg::cpr;
+using cg::quaternion;
+using cg::transform_4;
+
 #include "position.h"
 #include "local_position.h"
-
-namespace binary
-{
-    // size
-    typedef uint32_t size_type;
-}
 
 #include "geometry/dup_points.h"
 
 #include "cpp_utils/polymorph_ptr.h"
-#include "nodes_management.h"
+#include "objects/nodes_management.h"
 
 namespace nm = nodes_management;
 namespace sp = std::placeholders;
+
+
 
 inline cg::geo_base_3 get_base()
 {
@@ -288,15 +353,15 @@ inline cg::geo_base_3 get_base()
 #include "trajectory.h"
 
 #include "phys/phys_sys_fwd.h"
-#include "aircraft_common.h"
+#include "aircraft/aircraft_common.h"  // FIXME объекты надо прятать 
 
-#include "aircraft_model_inf.h"
+#include "objects/aircraft_model_inf.h"
 
 #include "event.h"
 #include "mod_system.h"
 
 #include "osg_helpers.h"
-
+#include "visitors/find_node_visitor.h"
 
 
 #endif // precompile_header

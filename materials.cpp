@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "materials.h"
 #include "shaders.h"
-#include "ct_visitor.h"
+#include "visitors/ct_visitor.h"
 #include "pugixml.hpp"
 
 namespace creators 

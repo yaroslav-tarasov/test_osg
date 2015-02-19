@@ -2,9 +2,8 @@
 
 #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
-#include "find_node_visitor.h"  
-#include "aircraft_model.h"
-#include "vehicle_model.h"
+#include "aircraft/aircraft_model.h"
+#include "vehicle/vehicle_model.h"
 
 namespace bi
 {

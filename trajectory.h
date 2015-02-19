@@ -2,7 +2,6 @@
 
 #include "dubins.h"
 #include "geometry/curve.h"
-#include "curve2.h"
 
 class TrajectoryDrawer;
 

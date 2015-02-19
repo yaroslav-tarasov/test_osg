@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "find_node_visitor.h"
 #include "creators.h"
 #include "LOD.h"
 

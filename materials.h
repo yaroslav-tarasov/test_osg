@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "materials_visitor.h"
+#include "visitors/materials_visitor.h"
 
 namespace mat
 {

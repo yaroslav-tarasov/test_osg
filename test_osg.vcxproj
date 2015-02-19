@@ -70,7 +70,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\simex\src\_Include;C:\simex\src\_Include\network;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\common;$(SolutionDir)\bada;$(SolutionDir);..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\objects;$(SolutionDir)\objects;C:\simex\src\_Include;C:\simex\src\_Include\network;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -149,61 +149,68 @@
     <ClInclude Include="visitors.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="aircraft_model.cpp" />
-    <ClCompile Include="aircraft_phys.cpp" />
-    <ClCompile Include="aircraft_shassis_impl.cpp" />
-    <ClCompile Include="aircraft_visual.cpp" />
     <ClCompile Include="animation_handler.cpp" />
-    <ClCompile Include="bada_import.cpp" />
-    <ClCompile Include="bi\BulletInterface.cpp" />
-    <ClCompile Include="bi\BulletMTInterface.cpp" />
-    <ClCompile Include="bi\GLDebugDrawer.cpp" />
-    <ClCompile Include="bi\osgbullet.cpp" />
-    <ClCompile Include="bi\RigidUpdater.cpp" />
-    <ClCompile Include="bump_mapping.cpp" />
-    <ClCompile Include="bvh_static_mesh.cpp" />
+    <ClCompile Include="av\CloudLayer.cpp" />
+    <ClCompile Include="av\EnvRenderer.cpp" />
+    <ClCompile Include="av\Ephemeris.cpp" />
+    <ClCompile Include="av\FogLayer.cpp" />
+    <ClCompile Include="av\LOD.cpp" />
+    <ClCompile Include="av\Object.cpp" />
+    <ClCompile Include="av\PreRender.cpp" />
+    <ClCompile Include="av\Scene.cpp" />
+    <ClCompile Include="av\Terrain.cpp" />
+    <ClCompile Include="bada\bada_import.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="dubins.cpp" />
-    <ClCompile Include="dubins_test.cpp" />
-    <ClCompile Include="EnvRenderer.cpp" />
-    <ClCompile Include="Ephemeris.cpp" />
-    <ClCompile Include="exp_test.cpp" />
-    <ClCompile Include="find_node_visitor.cpp" />
     <ClCompile Include="light_maps.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="LOD.cpp" />
-    <ClCompile Include="main_scene.cpp" />
     <ClCompile Include="main_scene2.cpp" />
-    <ClCompile Include="main_shadows.cpp" />
-    <ClCompile Include="main_shadows_2.cpp" />
     <ClCompile Include="materials.cpp" />
     <ClCompile Include="nfi\lib_loader.cpp" />
-    <ClCompile Include="nodes_management.cpp" />
-    <ClCompile Include="nodes_manager.cpp" />
-    <ClCompile Include="node_impl.cpp" />
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_03\texturedGeometry.cpp" />
-    <ClCompile Include="NPS_Tutorials_src\Tutorial_04\TestState.cpp" />
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="phys_aircraft.cpp" />
-    <ClCompile Include="ray_cast_vehicle.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="select_geometry.cpp" />
-    <ClCompile Include="test_network.cpp">
+    <ClCompile Include="objects\aircraft\aircraft_model.cpp" />
+    <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp" />
+    <ClCompile Include="objects\aircraft\aircraft_visual.cpp" />
+    <ClCompile Include="objects\nodes_manager\nodes_management.cpp" />
+    <ClCompile Include="objects\nodes_manager\nodes_manager.cpp" />
+    <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
+    <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
+    <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
+    <ClCompile Include="phys\aircraft_phys.cpp" />
+    <ClCompile Include="phys\BulletInterface.cpp" />
+    <ClCompile Include="phys\BulletMTInterface.cpp" />
+    <ClCompile Include="phys\bvh_static_mesh.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="vehicle_model.cpp" />
-    <ClCompile Include="vehicle_model_states.cpp" />
+    <ClCompile Include="phys\GLDebugDrawer.cpp" />
+    <ClCompile Include="phys\phys_aircraft.cpp" />
+    <ClCompile Include="phys\ray_cast_vehicle.cpp" />
+    <ClCompile Include="phys\RigidUpdater.cpp" />
+    <ClCompile Include="phys\static_convex.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\bump_mapping.cpp" />
+    <ClCompile Include="tests\dubins_test.cpp" />
+    <ClCompile Include="tests\exp_test.cpp" />
+    <ClCompile Include="tests\main_scene.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\main_shadows.cpp" />
+    <ClCompile Include="tests\main_shadows_2.cpp" />
+    <ClCompile Include="tests\select_geometry.cpp" />
+    <ClCompile Include="tests\shadow_map.cpp" />
+    <ClCompile Include="tests\SimpleHUD.cpp" />
+    <ClCompile Include="tests\SkyBox.cpp" />
+    <ClCompile Include="tests\teapot.cpp" />
+    <ClCompile Include="tests\tess_test.cpp" />
+    <ClCompile Include="tests\tex_test.cpp" />
+    <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClInclude Include="sensor.h">
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClCompile Include="shaders.cpp" />
-    <ClCompile Include="shadow3\Tuto12.cpp" />
-    <ClCompile Include="shadow_map.cpp" />
-    <ClCompile Include="SimpleHUD.cpp" />
-    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="sm\ShadowedScene.cpp" />
     <ClCompile Include="sm\ShadowMap.cpp" />
     <ClCompile Include="sm\ShadowSettings.cpp" />
@@ -220,14 +227,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="sv\CloudLayer.cpp" />
-    <ClCompile Include="sv\FogLayer.cpp" />
-    <ClCompile Include="sv\PreRender.cpp" />
-    <ClCompile Include="teapot.cpp" />
-    <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="tess_test.cpp" />
     <ClCompile Include="test_osg.cpp" />
-    <ClCompile Include="tex_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

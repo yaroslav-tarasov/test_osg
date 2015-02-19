@@ -9,7 +9,7 @@ using namespace cg;
 
 #include "geometry/primitives.h"
 #include "position.h"
-#include "aircraft_common.h" 
+#include "aircraft/aircraft_common.h" 
 
 namespace phys
 {

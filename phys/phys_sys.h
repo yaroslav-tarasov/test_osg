@@ -1,8 +1,8 @@
 #pragma once
 
-#include "phys_sys_fwd.h"
+#include "phys/phys_sys_fwd.h"
 //#include "sensor.h"
-#include "aircraft.h"
+#include "objects/aircraft.h"
 #include "position.h"
 
 

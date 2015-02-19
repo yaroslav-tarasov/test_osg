@@ -1,16 +1,15 @@
 #include "stdafx.h"
 #include "Terrain.h"
 
-#include "find_node_visitor.h" 
-#include "find_tex_visitor.h"
-#include "find_animation.h"
+#include "visitors/find_tex_visitor.h"
+#include "visitors/find_animation.h"
 
 #include "creators.h"
-#include <windows.h>
+//#include <windows.h>
 #include "shaders.h"
-#include "ct_visitor.h"
+#include "visitors/ct_visitor.h"
 
-#include "materials_visitor.h"
+#include "visitors/materials_visitor.h"
 #include "pugixml.hpp"
 #include "high_res_timer.h"
 

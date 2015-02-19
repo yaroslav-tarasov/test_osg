@@ -4,10 +4,11 @@
 #include <btBulletDynamicsCommon.h> 
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
+
 #include "bullet_helpers.h"
 #include "phys_sys_fwd.h"
 #include "phys_sys.h"
-#include "phys_sys_common.h"
+#include "phys_sys_common.h" //FIXME  Â stdafx phys_sys
 #include "sensor.h"
 
 
@@ -18,7 +19,6 @@ namespace phys
 class BulletInterface 
 	: public phys::system_impl
     , public phys::system
-	// , public osg::Referenced
     , public boost::enable_shared_from_this<BulletInterface>
     , public control
 {

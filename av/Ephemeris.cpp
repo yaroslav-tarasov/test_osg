@@ -1,13 +1,12 @@
 #include "stdafx.h"
-#include "Ephemeris.h"
+#include "Ephemeris.h" 
+
 #include "av/FogLayer.h"
 #include "av/CloudLayer.h"
+#include "av/EnvRenderer.h"
 
-#include "EnvRenderer.h"
+#include <osgEphemeris/EphemerisModel.h>  
 
-#include <osgEphemeris/EphemerisModel.h>
-
-#include "find_node_visitor.h" 
 #include "creators.h"
 
 namespace avSky

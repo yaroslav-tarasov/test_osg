@@ -4,23 +4,24 @@
 #include "stdafx.h"
 #include "creators.h"
 #include "animation_handler.h"
-#include "find_node_visitor.h"
+#include "visitors/info_visitor.h"
 
-#include "info_visitor.h"
 #include "SkyBox.h"
-#include "sv/FogLayer.h"
-#include "sv/CloudLayer.h"
-#include "sv/PreRender.h"
-#include "EnvRenderer.h"
+#include "av/FogLayer.h"
+#include "av/CloudLayer.h"
+#include "av/PreRender.h"
+#include "av/EnvRenderer.h"
+
+
+#include "high_res_timer.h"
+#include "phys/BulletInterface.h"
+#include "phys/RigidUpdater.h"
+
+#include <osgEphemeris/EphemerisModel.h>
+
 
 #include "shadow_map.h"
 #include "teapot.h"
-
-#include "high_res_timer.h"
-#include "bi/BulletInterface.h"
-#include "bi/RigidUpdater.h"
-
-#include <osgEphemeris/EphemerisModel.h>
 
 #if defined (DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
 #if !defined(TEST_SHADOWS_FROM_OSG)

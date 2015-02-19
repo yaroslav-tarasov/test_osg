@@ -2,10 +2,10 @@
 #include "creators.h"
 #include "shaders.h"
 
-#include "find_node_visitor.h"  
-#include "find_tex_visitor.h"
+
+#include "visitors/find_tex_visitor.h"
 #include "animation_handler.h"
-#include "ct_visitor.h"
+#include "visitors/ct_visitor.h"
 
 static const std::string animationName("Default");
 

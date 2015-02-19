@@ -2,10 +2,10 @@
 #include <btBulletDynamicsCommon.h>
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
-#include "phys/bullet_helpers.h"
+#include "bullet_helpers.h"
 
 #include "bvh_static_mesh.h"
-#include "phys/rigid_body_info.h"
+#include "rigid_body_info.h"
 
 namespace phys
 {

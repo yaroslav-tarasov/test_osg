@@ -1,5 +1,8 @@
 #pragma once
 
+#include <btBulletDynamicsCommon.h> 
+#include "bullet_helpers.h"
+
 namespace phys
 {
     enum rigid_body_kind_t
