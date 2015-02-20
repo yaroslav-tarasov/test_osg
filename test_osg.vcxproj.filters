@@ -269,27 +269,6 @@
     <ClCompile Include="sm\ShadowSettings.cpp">
       <Filter>Source Files\sm</Filter>
     </ClCompile>
-    <ClCompile Include="spark\explosion_effect.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\fire_effect.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\osgspark.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\rain_effect.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\simple_effect.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\SparkDrawable.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
-    <ClCompile Include="spark\SparkUpdatingHandler.cpp">
-      <Filter>Source Files\spark</Filter>
-    </ClCompile>
     <ClCompile Include="main_scene2.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
@@ -424,6 +403,30 @@
     </ClCompile>
     <ClCompile Include="objects\nodes_manager\nodes_manager.cpp">
       <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\explosion_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\fire_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\rain_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\simple_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\SparkDrawable.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\osgspark.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\vehicle\vehicle_view.cpp">
+      <Filter>Source Files\vehicle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

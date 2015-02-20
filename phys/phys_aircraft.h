@@ -51,7 +51,7 @@ namespace aircraft
         decart_position get_local_position() const override;
         //void       set_air_cfg(fms::air_config_t cfg);
         void         set_prediction(double prediction) override;
-        geo_position get_wheel_position( size_t i ) const ;
+        geo_position get_wheel_position( size_t i ) const override;
         phys::rigid_body_ptr get_rigid_body() const;
         void         set_steer   (double steer);
         double       get_steer() override;

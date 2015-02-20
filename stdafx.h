@@ -322,7 +322,6 @@ inline T cbrt(T n)
 ////////////////////////////////
 //
 //
-
 using cg::geo_point_3;
 using cg::geo_point_2;
 using cg::point_2;
@@ -334,6 +333,9 @@ using cg::cpr;
 using cg::quaternion;
 using cg::transform_4;             
 using cg::geo_base_3;
+//////////////////////////////////
+
+#include "common/event.h"
 
 #include "atc/position.h"
 #include "local_position.h"
@@ -359,8 +361,6 @@ inline cg::geo_base_3 get_base()
 #include "aircraft/aircraft_common.h"  // FIXME объекты надо прятать 
 
 #include "objects/aircraft_model_inf.h"
-
-#include "event.h"
 #include "mod_system.h"
 
 #include "osg_helpers.h"

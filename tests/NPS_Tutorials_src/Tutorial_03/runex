@@ -1,0 +1,3 @@
+make
+export LD_LIBRARY_PATH="/usr/local/lib:/usr/local/OSG/OSG2.0/OpenSceneGraph/lib"
+./osex

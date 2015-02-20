@@ -23,7 +23,7 @@ class LogFileHandler : public osg::NotifyHandler
                 "DEBUG_FP"
             };
       
-            _log << str_severity[severity] << ":" << msg;
+            _log << str_severity[severity] << ": " << msg;
         
         }
     protected:

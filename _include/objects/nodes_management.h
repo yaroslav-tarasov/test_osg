@@ -96,13 +96,13 @@ namespace nodes_management
     
         // set_model fully reinitialize model and reset positions of all nodes and root
     
-        //virtual void            set_model   (string const& model, bool save_root_pos = true)  = 0;
-        //virtual string const&   get_model   () const                    = 0;
+        virtual void            set_model   (string const& model, bool save_root_pos = true)  = 0;
+        virtual string const&   get_model   () const                    = 0;
         //virtual void            visit_nodes (boost::function<void(node_info_ptr)> const& f) const = 0;
 
         //virtual node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const = 0;
 
-        //DECLARE_EVENT(model_changed, ());
+        DECLARE_EVENT(model_changed, ());
     };
 
     void visit_sub_tree(node_info_ptr root, std::function<bool(node_info_ptr)> f);

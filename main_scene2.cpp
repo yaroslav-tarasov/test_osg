@@ -5,7 +5,6 @@
 #include "av/Terrain.h"
 
 
-
 int main_scene2( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);

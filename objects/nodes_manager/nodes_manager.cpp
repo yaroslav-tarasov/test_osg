@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "precompiled_objects.h"
+
 #include "objects/nodes_management.h"
 #include "nodes_manager.h"
 #include "node_impl.h"
@@ -22,8 +24,12 @@ namespace nodes_management
 
         node_info_ptr find_node(std::string const& name) const override;
         node_info_ptr get_node    (uint32_t node_id)   const  override;
+        void          set_model   (string const& model, bool save_root_pos = true) override;
+        string const&   get_model   () const override;
+
     private: 
         osg::ref_ptr<osg::Node> base_;
+        std::string       model_name_;
     };
 
     node_info_ptr manager_impl::find_node(std::string const& name) const
@@ -47,4 +53,14 @@ namespace nodes_management
           return node_info_ptr();
     }
 
+    void  manager_impl::set_model   (string const& model, bool save_root_pos) 
+    {
+        // FIXME TODO а мудельку поменять?   
+        model_name_ =  model;
+    }
+
+    string const&   manager_impl::get_model   () const 
+    {
+          return model_name_;
+    }
 }

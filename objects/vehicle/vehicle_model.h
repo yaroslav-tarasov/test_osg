@@ -9,7 +9,7 @@
 //#include "objects/ani.h"
 #include "network/msg_dispatcher.h"
 
-using network::gen_msg;
+using network::gen_msg;  // FIXME
 
 #include "vehicle_msg.h"
 

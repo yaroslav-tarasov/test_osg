@@ -163,6 +163,13 @@
     <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="dubins.cpp" />
+    <ClCompile Include="ext\spark\explosion_effect.cpp" />
+    <ClCompile Include="ext\spark\fire_effect.cpp" />
+    <ClCompile Include="ext\spark\osgspark.cpp" />
+    <ClCompile Include="ext\spark\rain_effect.cpp" />
+    <ClCompile Include="ext\spark\simple_effect.cpp" />
+    <ClCompile Include="ext\spark\SparkDrawable.cpp" />
+    <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
     <ClCompile Include="light_maps.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -178,6 +185,7 @@
     <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
+    <ClCompile Include="objects\vehicle\vehicle_view.cpp" />
     <ClCompile Include="phys\aircraft_phys.cpp" />
     <ClCompile Include="phys\BulletInterface.cpp" />
     <ClCompile Include="phys\BulletMTInterface.cpp" />
@@ -216,13 +224,6 @@
     <ClCompile Include="sm\ShadowSettings.cpp" />
     <ClCompile Include="sm\ShadowTechnique.cpp" />
     <ClCompile Include="sm\ViewDependentShadowMap.cpp" />
-    <ClCompile Include="spark\explosion_effect.cpp" />
-    <ClCompile Include="spark\fire_effect.cpp" />
-    <ClCompile Include="spark\osgspark.cpp" />
-    <ClCompile Include="spark\rain_effect.cpp" />
-    <ClCompile Include="spark\simple_effect.cpp" />
-    <ClCompile Include="spark\SparkDrawable.cpp" />
-    <ClCompile Include="spark\SparkUpdatingHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

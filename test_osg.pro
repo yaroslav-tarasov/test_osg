@@ -199,7 +199,21 @@ HEADERS += \
     av/Terrain.h \
     utils/visitors/find_node_visitor.h \
     creators.h \
-    tests/client.h
+    tests/client.h \
+    utils/visitors/visitors.h \
+    utils/visitors/materials_visitor.h \
+    utils/visitors/info_visitor.h \
+    utils/visitors/find_tex_visitor.h \
+    utils/visitors/find_node_visitor.h \
+    utils/visitors/find_animation.h \
+    utils/visitors/ct_visitor.h \
+    av/Scene.h \
+    av/PreRender.h \
+    av/LOD.h \
+    av/FogLayer.h \
+    av/Ephemeris.h \
+    av/EnvRenderer.h \
+    av/CloudLayer.h
 
 SOURCES += \
     test_osg.cpp \
@@ -241,13 +255,14 @@ SOURCES += \
     av/CloudLayer.cpp \
     utils/visitors/find_node_visitor.cpp \
     creators.cpp \
-    spark/SparkUpdatingHandler.cpp \
-    spark/SparkDrawable.cpp \
-    spark/simple_effect.cpp \
-    spark/rain_effect.cpp \
-    spark/fire_effect.cpp \
-    spark/explosion_effect.cpp \
-    spark/osgspark.cpp \
+    ext/spark/SparkUpdatingHandler.cpp \
+    ext/spark/SparkDrawable.cpp \
+    ext/spark/simple_effect.cpp \
+    ext/spark/rain_effect.cpp \
+    ext/spark/fire_effect.cpp \
+    ext/spark/explosion_effect.cpp \
+    ext/spark/osgspark.cpp \
     main_scene2.cpp \
     tests/test_network.cpp \
-    tests/sync_qt.cpp
+    tests/sync_qt.cpp \
+    utils/visitors/find_node_visitor.cpp

@@ -40,7 +40,7 @@ public:
 public:
     static inline const textures_t& Create(const mat::materials_t&  mats, std::string mat_name,std::string model_name)
     {
-        if (    mat_name.find("building") !=std::string::npos 
+        if (   mat_name.find("building") !=std::string::npos
             || mat_name.find("ground")   !=std::string::npos
             || mat_name.find("tree")     !=std::string::npos
             || mat_name.find("concrete") !=std::string::npos
