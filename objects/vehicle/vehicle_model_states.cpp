@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include "precompiled_objects.h"
+
 #include "vehicle_model_states.h"
 #include "vehicle_model.h"
 

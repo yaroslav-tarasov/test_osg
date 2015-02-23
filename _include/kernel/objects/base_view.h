@@ -106,7 +106,7 @@ struct /*SYSTEMS_API*/ base_view_presentation
     : kernel::base_presentation // базовый интерфейс представления
     //, kernel::history_prs       // что-то связанное с историей // now history is generic for all objects
 {
-    base_view_presentation(/*kernel::object_create_t const& oc*/);
+    base_view_presentation(kernel::object_create_t const& oc);
 
 // object_info
 public:

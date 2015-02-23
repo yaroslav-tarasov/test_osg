@@ -55,7 +55,7 @@ class LogFileHandler : public osg::NotifyHandler
 
 int main( int argc, char** argv )
 {  
-    osg::setNotifyLevel( osg::WARN );
+    osg::setNotifyLevel( osg::INFO/*WARN*/ );
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
     osg::notify(osg::INFO) << "Start this program \n";
@@ -67,5 +67,6 @@ int main( int argc, char** argv )
     if(fp)
         return fp(argc, argv);
 
+	BOOST_TYPEOF(fp) func;
     return 0;
 }

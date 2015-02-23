@@ -4,7 +4,6 @@
 
 namespace simple_route
 {
-//! некая точка (???)
 //struct anchor_point_t
 //{
 //    anchor_point_t(ani::point_pos const &pos, double speed)
@@ -26,7 +25,6 @@ namespace simple_route
 //    double speed;
 //};
 
-//! настройки простого маршрута (???)
 struct settings_t
 {
     settings_t()
@@ -38,7 +36,6 @@ struct settings_t
     double speed;
 };
 
-//! интерфейс информации о простом маршруте
 struct info
 {
     virtual ~info(){}

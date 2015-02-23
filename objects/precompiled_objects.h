@@ -1,5 +1,9 @@
 #pragma once
+#undef SYSTEMS_API
 
+#include "kernel/kernel.h"
+
+#include "kernel/object_class.h"
 #include "kernel/object_info.h"
 using namespace kernel;
 using namespace binary;

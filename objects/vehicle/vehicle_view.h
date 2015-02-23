@@ -1,7 +1,6 @@
 #pragma once
 
 #include "vehicle_common.h"
-using network::gen_msg;  // FIXME
 #include "vehicle_msg.h"
 // #include "common/radar.h"
 #include "objects/nodes_management.h"
@@ -41,10 +40,10 @@ struct view
     , vehicle_data
     //, obj_data_holder<vehicle_data>     //! сериализуемые данные из упражнения
 {
-    static object_info_ptr create(/*kernel::object_create_t const& oc, dict_copt dict*/);
+    static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
 
 protected:
-    view( /*kernel::object_create_t const& oc, dict_copt dict*/);
+    view( kernel::object_create_t const& oc/*, dict_copt dict*/);
 
     // base_view_presentation
 protected:

@@ -1,46 +1,31 @@
 #pragma once
 
-//#include "vehicle_view.h"
-#include "vehicle_common.h"
-#include "vehicle_model_states.h"
-#include "common/aircraft.h"
+#include "vehicle_view.h"
 #include "phys/phys_sys.h"
 //#include "common/phys_object_model_base.h"
 //#include "objects/ani.h"
 #include "network/msg_dispatcher.h"
 
-using network::gen_msg;  // FIXME
+#include "vehicle_common.h"
+#include "vehicle_model_states.h"
+#include "common/aircraft.h"
 
-#include "vehicle_msg.h"
-
-namespace kernel
-{
-// used by any presentation to send message through its system,
-typedef
-    boost::function<void(binary::bytes_cref/*msg*/, bool /*sure*/, bool /*just_cmd*/)>
-    send_msg_f;
-
-typedef
-    boost::function<void(bool /*block*/)>
-    block_obj_msgs_f;
-}
-
+//namespace kernel
+//{
+//// used by any presentation to send message through its system,
+//typedef
+//    boost::function<void(binary::bytes_cref/*msg*/, bool /*sure*/, bool /*just_cmd*/)>
+//    send_msg_f;
+//
+//typedef
+//    boost::function<void(bool /*block*/)>
+//    block_obj_msgs_f;
+//}
 
 namespace vehicle
 {
-// FIXME just stub
-struct model_base
-{
-      virtual ~model_base() {};
-      virtual void update( double /*time*/ ) =0;
-      virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
-      virtual void go_to_pos(  cg::geo_point_2 pos, double course ) =0;
-      virtual void set_state(state_t const& state) =0 ;
-      virtual nodes_management::node_info_ptr get_root()=0;
-};
 
-
-
+/*
 struct  base_view_presentation
 {
     // base_presentation
@@ -49,7 +34,7 @@ struct  base_view_presentation
 //        void update     (double time) override;
 //        void post_update(double time) override;
 //        void update_atc (double time) override;
-        virtual void on_msg     (binary::bytes_cref   bytes )  /*override*/;
+        virtual void on_msg     (binary::bytes_cref   bytes )  override;
 //        void reset_parent (kernel::object_info_wptr parent)  override;
 public:
     DECLARE_EVENT(state_modified, ());
@@ -112,23 +97,21 @@ private:
     kernel::send_msg_f          send_msg_;
     kernel::block_obj_msgs_f    block_msgs_;
 };
-
-
-typedef polymorph_ptr<model_base> model_base_ptr;
-
+*/
 
 struct model
-    : model_base
+      : model_base
     //: model_presentation        
-    //, view
-      , base_view_presentation
+      , view
+    //, base_view_presentation
     //, phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-      static model_base_ptr create(nodes_management::manager_ptr nodes_manager,
-                                   phys::control_ptr        phys);
+      static model_base_ptr create(nodes_management::manager_ptr nodes_manager
+                                   ,phys::control_ptr        phys
+								   ,kernel::object_create_t const& oc);
 private:
-    model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys/*kernel::object_create_t const& oc, dict_copt dict*/);
+    model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
 
     // base_presentation
 private:
@@ -136,8 +119,8 @@ private:
 
     // base_view_presentation
 private:
-    //void on_object_created(object_info_ptr object) override;
-    //void on_object_destroying(object_info_ptr object) override;
+    void on_object_created(object_info_ptr object) override;
+    void on_object_destroying(object_info_ptr object) override;
 
     // view
 private:
@@ -186,6 +169,11 @@ private:
     //        .def("attach_tow", &model::on_attach_tow)
     //        .def("detach_tow", &model::on_detach_tow);
     //}
+	// FIXME stub
+	boost::python::object py_ptr() const
+	{                                   
+	return boost::python::object(boost::python::ptr(this));
+	}
 
 private:
     //model_system *    sys_;
@@ -239,17 +227,13 @@ public:
     double speed() const {return state_.speed;}
     cg::point_2 dpos() const {return cg::point_2(cg::polar_point_2(1., state_.course)) * state_.speed;}
     // FIXME преносим обратно
-    void set_state(state_t const& state)
+    void set_state_debug(state_t const& state)
     {
         // » здесь тоже чегото надо сделать
         // set(msg::state_msg_t(state), false);
         state_ = state;
     }
 
-    void set_tow(optional<uint32_t> tow_id)
-    {
-        set(msg::tow_msg_t(tow_id), true);
-    }
 
 protected: 
     settings_t settings_;

@@ -3,27 +3,19 @@
 #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
 #include "aircraft/aircraft_model.h"
-#include "vehicle/vehicle_model.h"
+//#include "vehicle/vehicle_model.h"
 
 namespace bi
 {
     class RigidUpdater : public osgGA::GUIEventHandler 
     {
+	    friend struct RigidUpdater_private;
     public:
         typedef std::function<void(osg::MatrixTransform* mt)> on_collision_f;
     public:
-        RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ) 
-            : _root        (root)
-            , _on_collision(on_collision)
-            , _dbgDraw     (nullptr)
-            , _debug       (false)
-			, _sys         (phys::create())
-            , _last_frame_time(0)
-            , selected_obj_id_(0)
-        {}
+        RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ); 
 
-
-        void addGround( const osg::Vec3& gravity );
+		void addGround( const osg::Vec3& gravity );
         void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
 		void addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 		void addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
@@ -142,15 +134,16 @@ namespace bi
         bool                                     _debug;
 		aircrafts_t                              _aircrafts;
         aircraft_models_t                        _phys_aircrafts;
-        phys_vehicles_t                          _vehicles;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         vehicles_t                               _phys_vehicles;
 
 		boost::shared_ptr<phys::BulletInterface> _sys;
-    private:
+		struct RigidUpdater_private;
+	    boost::shared_ptr<RigidUpdater_private>   _d;
+private:
         double                                   _last_frame_time;
 
-        uint32_t                                 selected_obj_id_;
+        uint32_t                                selected_obj_id_;
     };
 
 }

@@ -338,7 +338,7 @@ using cg::geo_base_3;
 #include "common/event.h"
 
 #include "atc/position.h"
-#include "local_position.h"
+#include "impl/local_position.h" // FIXME объекты надо прятать 
 
 #include "geometry/dup_points.h"
 
@@ -366,5 +366,39 @@ inline cg::geo_base_3 get_base()
 #include "osg_helpers.h"
 #include "visitors/find_node_visitor.h"
 
+namespace boost {
+namespace python {
+
+	class object  
+	{
+	};
+	
+	inline static object ptr(const void*)
+	{
+		return object();
+	}
+
+}
+
+}
+
+#include "vehicle/vehicle_common.h"
+
+namespace vehicle
+{
+	// FIXME just stub
+	struct model_base
+	{
+		virtual ~model_base() {};
+		virtual void update( double /*time*/ ) =0;
+		virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
+		virtual void go_to_pos(  cg::geo_point_2 pos, double course ) =0;
+		virtual void set_state_debug(state_t const& state) =0 ;
+		virtual nodes_management::node_info_ptr get_root()=0;
+	};
+
+	typedef polymorph_ptr<model_base> model_base_ptr;
+	
+}
 
 #endif // precompile_header

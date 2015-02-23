@@ -387,7 +387,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -554,9 +554,9 @@ void Scene::createObjects()
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
 #endif
 
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addUFO3( obj,
-        osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );   // force 
+    //if(_rigidUpdater.valid())
+    //    _rigidUpdater->addUFO3( obj,
+    //    osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );   // force 
 
 
     if(_rigidUpdater.valid())
@@ -705,11 +705,13 @@ void Scene::createObjects()
 #endif
 
     auto pojarka2 = creators::createObject("pojarka",false);
-    _rigidUpdater->addVehicle(pojarka2,
+    if(pojarka2)
+	_rigidUpdater->addVehicle(pojarka2,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
     auto pojarka_ctrl = creators::createObject("pojarka",false);
-    _rigidUpdater->addVehicle2(pojarka_ctrl,
+    if(pojarka_ctrl)
+	_rigidUpdater->addVehicle2(pojarka_ctrl,
         osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  
 
     // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));

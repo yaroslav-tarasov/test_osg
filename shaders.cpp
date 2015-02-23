@@ -144,6 +144,7 @@ namespace shaders
     {
 
     const char* vs = {
+		"#version 130 \n"
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
         INCLUDE_VS
@@ -334,7 +335,8 @@ namespace shaders
 
     namespace default_mat 
     {
-       const char* vs = {       
+       const char* vs = {  
+		   "#version 130 \n"
            "#extension GL_ARB_gpu_shader5 : enable \n"
 
            INCLUDE_VS
@@ -511,6 +513,7 @@ namespace shaders
     namespace building_mat 
     {
         const char* vs = {  
+			"#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS
@@ -693,6 +696,7 @@ namespace shaders
     namespace tree_mat 
     {
         const char* vs = {  
+			"#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -817,7 +821,8 @@ namespace shaders
 
     namespace ground_mat 
     {
-        const char* vs = {  
+        const char* vs = {
+			 "#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS

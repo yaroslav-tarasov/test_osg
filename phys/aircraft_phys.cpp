@@ -42,8 +42,8 @@ namespace phys
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
         btDefaultMotionState* motionState = new btDefaultMotionState(tr);
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), /*NULL*/new custom_ms, &*chassis_shape_.get(), inertia);
-    	chassis_.reset(boost::make_shared<btRigidBody>(chassis_construction_info));
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), /*NULL*//*new custom_ms*/motionState, &*chassis_shape_.get(), inertia);
+		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
 
 		// FIXME TODO
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));

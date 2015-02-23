@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "precompiled_objects.h"
+
 #include "vehicle_model.h"
 //#include "common/collect_collision.h"
 #include "geometry/filter.h"
@@ -15,43 +17,55 @@ struct stub_msys : kernel::model_system
 namespace vehicle
 {
 
+//void base_view_presentation::send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd)
+//{
+//    send_msg_(bytes, sure, just_cmd);
+//}
+//
+//void base_view_presentation::on_msg(binary::bytes_cref bytes)
+//{
+//    msg_disp().dispatch_bytes(bytes);
+//}
 
 
-void base_view_presentation::send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd)
-{
-    send_msg_(bytes, sure, just_cmd);
-}
-
-void base_view_presentation::on_msg(binary::bytes_cref bytes)
-{
-    msg_disp().dispatch_bytes(bytes);
-}
-
-
-network::msg_dispatcher<>& base_view_presentation::msg_disp()
-{
-    return msg_disp_;
-}
+//network::msg_dispatcher<>& base_view_presentation::msg_disp()
+//{
+//    return msg_disp_;
+//}
 
 //object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 //{
 //    return object_info_ptr(new model(oc, dict));
 //}
 
-model_base_ptr model::create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
 {
-    return model_base_ptr(new model(nodes_manager,phys));
+	kernel::object_create_t  oc(
+		nullptr, 
+		nullptr, //kernel::system*                 sys             , 
+		0,//size_t                          object_id       , 
+		"name", //string const&                   name            , 
+		vector<object_info_ptr>(),//vector<object_info_ptr> const&  objects         , 
+		kernel::send_msg_f(),//kernel::send_msg_f const&       send_msg        , 
+		kernel::block_obj_msgs_f()//kernel::block_obj_msgs_f        block_msgs
+		);
+	return model::create(nodes_manager,phys,oc);
+}
+
+model_base_ptr model::create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc)
+{
+    return model_base_ptr(new model(nodes_manager,phys,oc));
 }
 
 //AUTO_REG_NAME(vehicle_model, model::create);
 
-model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys/*kernel::object_create_t const& oc, dict_copt dict*/)
-    : /*view(oc, dict)*/
+model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+    : view(oc)/*, dict)*/
     //, phys_object_model_base(collection_)
     //, sys_(dynamic_cast<model_system *>(oc.sys))
     //, ani_(find_first_object<ani_object::info_ptr>(collection_))
     //, airport_(ani_->navigation_info()->find_airport(pos()))
-    /*,*/ manual_controls_(false)
+    , manual_controls_(false)
     , max_speed_(0)
     , nodes_manager_(nodes_manager)
     , phys_(phys)
@@ -143,25 +157,25 @@ void model::update( double time )
     }
 }
 
-//void model::on_object_created(object_info_ptr object)
-//{
-//    view::on_object_created(object);
-//    if (simple_route::info_ptr is_route = object)
-//    {
-//        if (object->name() == settings_.route)
-//            follow_route(settings_.route);
-//    }
-//}
-//
-//void model::on_object_destroying(object_info_ptr object)
-//{
-//    view::on_object_destroying(object);
-//    if (simple_route::info_ptr is_route = object)
-//    {
-//        if (object->name() == settings_.route)
-//            detach_cur_route();
-//    }
-//}
+void model::on_object_created(object_info_ptr object)
+{
+    view::on_object_created(object);
+    if (simple_route::info_ptr is_route = object)
+    {
+        if (object->name() == settings_.route)
+            follow_route(settings_.route);
+    }
+}
+
+void model::on_object_destroying(object_info_ptr object)
+{
+    view::on_object_destroying(object);
+    if (simple_route::info_ptr is_route = object)
+    {
+        if (object->name() == settings_.route)
+            detach_cur_route();
+    }
+}
 
 void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
 {   
@@ -459,18 +473,18 @@ void model::sync_nodes_manager( double /*dt*/ )
     }
 }
 
-//void model::settings_changed()
-//{
-//    view::settings_changed();
-//
-//    if (!aerotow_ || (object_info_ptr(aerotow_)->name() != settings_.aerotow))
-//    {            
-//        aircraft::model_info_ptr new_aerotow = find_object<aircraft::model_info_ptr>(collection_, settings_.aerotow);
-//
-//        if (new_aerotow)
-//            set_tow(kernel::object_info_ptr(new_aerotow)->object_id()) ;
-//    }
-//}
+void model::settings_changed()
+{
+    view::settings_changed();
+
+    if (!aerotow_ || (object_info_ptr(aerotow_)->name() != settings_.aerotow))
+    {            
+        aircraft::model_info_ptr new_aerotow = find_object<aircraft::model_info_ptr>(collection_, settings_.aerotow);
+
+        if (new_aerotow)
+            set_tow(kernel::object_info_ptr(new_aerotow)->object_id()) ;
+    }
+}
 
 void model::update_model( double dt )
 {

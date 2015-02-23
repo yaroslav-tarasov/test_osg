@@ -2,7 +2,7 @@
 
 #include "../high_res_timer.h"
 #include "BulletInterface.h"
-#include "aircraft.h"                // FIXME TODO don't need here 
+#include "aircraft.h"                         // FIXME TODO don't need here 
 #include "aircraft/aircraft_common.h"
 #include "aircraft/aircraft_shassis_impl.h"   // And maybe this too
 #include "nodes_manager/nodes_manager.h"
@@ -13,8 +13,30 @@
 
 #include "RigidUpdater.h"
 
+// FIXME
+namespace vehicle
+{
+	model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
+};
+
+
 namespace bi
 {
+	struct RigidUpdater::RigidUpdater_private
+	{
+		        RigidUpdater::phys_vehicles_t                          _vehicles;
+	};
+
+	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
+		: _root        (root)
+		, _on_collision(on_collision)
+		, _dbgDraw     (nullptr)
+		, _debug       (true)
+		, _sys         (phys::create())
+		, _last_frame_time(0)
+		, selected_obj_id_(0)
+		, _d(boost::make_shared<RigidUpdater_private>())
+	{}
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
     {
@@ -219,7 +241,7 @@ namespace bi
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
-        _vehicles.emplace_back(veh);
+        _d->_vehicles.emplace_back(veh);
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -232,7 +254,7 @@ namespace bi
 
         _sys->setMatrix( id, osg::Matrix::translate(pos) );
 
-        veh->set_steer(10);
+        //veh->set_steer(10);
     }
 
     void RigidUpdater::addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
@@ -242,7 +264,7 @@ namespace bi
          
         nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
 
-        _phys_vehicles.emplace_back(vehicle::model::create(man,_sys));
+        _phys_vehicles.emplace_back(vehicle::create(man,_sys));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -255,7 +277,7 @@ namespace bi
 
         _sys->setMatrix( id, osg::Matrix::translate(pos) );
         osg::Matrix mmm = _sys->getMatrix(id);
-        _phys_vehicles.back()->set_state(vehicle::state_t(cg::geo_base_2()(from_osg_vector3(pos)), from_osg_quat(mmm.getRotate()).get_course(), 0.0f));
+        _phys_vehicles.back()->set_state_debug(vehicle::state_t(cg::geo_base_2()(from_osg_vector3(pos)), from_osg_quat(mmm.getRotate()).get_course(), 0.0f));
 
         //veh->set_steer(10);
 

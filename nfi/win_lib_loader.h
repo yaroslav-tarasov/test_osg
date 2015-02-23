@@ -1,4 +1,5 @@
 #pragma once
+#undef  VerifyMsg
 #define VerifyMsg(x,y) if(x){};
 
 inline std::string formated_error_msg(DWORD err_code = GetLastError())

@@ -19,7 +19,7 @@ namespace aircraft
 #if 0
     bool fill_sensor(nodes_management::manager_ptr nodes_manager, phys::compound_sensor_t & s)
     {
-        nm::node_info_ptr body_node = nodes_manager->find_node("body");
+        nm::node_info_ptr body_node   = nodes_manager->find_node("body");
         nm::node_info_ptr wing_r_node = nodes_manager->find_node("wing_r");
         nm::node_info_ptr wing_l_node = nodes_manager->find_node("wing_l");
 
