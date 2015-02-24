@@ -73,11 +73,15 @@ struct view
     : kernel::base_view_presentation
     , craft_data// obj_data_holder<craft_data>
     , info
-    //, ani_info
+#if 0
+    , ani_info
+#endif
     , control
     , aircraft_ipo_control
     , aircraft_atc_control
+#if 0
     , fms_container
+#endif
     , atc_info
 {
     static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
@@ -154,7 +158,9 @@ protected:
 
     // control
 protected:
+#if 0
     void assign_fpl         (fpl::info_ptr fpl_obj);
+#endif
     void unassign_fpl       ();
     void set_kind           (std::string const& kind) override;
     void set_turbulence     (unsigned turb) override;
@@ -189,8 +195,9 @@ private:
 
     // fms_container
 protected:
+#if 0
     aircraft_fms::info_ptr get_fms() const override;
-
+#endif
     // atc_info
 protected:
     atc_state_t get_atc_state() const override;
@@ -237,8 +244,8 @@ protected:
     void update_atc_state();
     
     nodes_management::manager_ptr  get_nodes_manager() const { return nodes_manager_; }
+#if 0   
     aircraft_fms::info_ptr         get_fms_info() const { return fms_info_; }
-#if 0    
     conflicts_manager::control_ptr get_conflicts_manager() const { return conflicts_manager_; }
 #endif
 
@@ -250,10 +257,14 @@ private:
     conflicts_manager::control_ptr conflicts_manager_;
 #endif
     nodes_management::manager_ptr  nodes_manager_;
+#if 0
     aircraft_fms::info_ptr         fms_info_;
+#endif
 
 private:
+#if 0
     aircraft_gui::control_ptr      gui_;
+#endif
 
 private:
     scoped_connection fms_changed_connection_ ;
@@ -264,8 +275,10 @@ protected:
     transform_4 tow_point_transform_;
 
 protected:
+#if 0
     fpl::info_ptr       fpl_ ;
-    optional<double>    proc_len_;
+#endif    
+	optional<double>    proc_len_;
     optional<double>    prediction_len_;
 
     void update_len(double time);

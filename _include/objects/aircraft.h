@@ -206,8 +206,8 @@ struct info
     virtual optional<double> get_prediction_length() const = 0;
     virtual optional<double> get_proc_length() const = 0;
 
-    DECLARE_EVENT(assigned_fpl_changed, (fpl::info_ptr));
-    DECLARE_EVENT(responder_changed, (fpl::info*));
+    //DECLARE_EVENT(assigned_fpl_changed, (fpl::info_ptr));
+    //DECLARE_EVENT(responder_changed, (fpl::info*));
 };
 
 //! интерфейс, управление ВС (общее?)
@@ -215,7 +215,7 @@ struct control
 {
     virtual ~control(){}
 
-    virtual void assign_fpl  (fpl::info_ptr fpl_obj) = 0;
+//    virtual void assign_fpl  (fpl::info_ptr fpl_obj) = 0;
     virtual void unassign_fpl() = 0;
 //
     virtual void set_kind(std::string const& kind) = 0;

@@ -66,8 +66,10 @@ view::view(kernel::object_create_t const& oc/*, dict_copt dict*/)
     , conflicts_manager_        (find_first_object<conflicts_manager::control_ptr>(collection_))
 #endif    
     , nodes_manager_            (find_first_child<nodes_management::manager_ptr>(this))
+#if 0  
     , fms_info_                 (find_first_child<aircraft_fms::info_ptr       >(this))
     , gui_                      (find_first_child<aircraft_gui::control_ptr    >(this))
+#endif
 #if 0    
     , ani_                      (find_first_object<ani_object::info_ptr>(collection_))
     , met_proxy_obj_            (find_first_object<meteo_proxy::info_ptr>(collection_))
@@ -496,12 +498,12 @@ std::vector<uint32_t>  view::sectors_sequence() const
     return std::vector<uint32_t>();
 }
 #endif
+#if 0 
 void view::assign_fpl(fpl::info_ptr fpl_obj)
 { 
-#if 0  
     set(msg::fpl_msg(object_info_ptr(fpl_obj)->object_id()));
-#endif
 }
+#endif
 
 void view::unassign_fpl()
 {
@@ -529,10 +531,12 @@ void view::activate ()
     set_atc_state(AS_ACTIVATED);
 }
 
+#if 0
 aircraft_fms::info_ptr view::get_fms() const
 {
     return fms_info_;
 }
+#endif
 
 atc_state_t view::get_atc_state() const
 {
@@ -783,8 +787,8 @@ void view::restore_responder_code()
 void view::set_parking_initial_position(std::string const &airport_name, std::string const &parking_name)
 {
     Assert(nodes_manager_);
-    Assert(fms_info_);
 #if 0
+    Assert(fms_info_);
     if (ani_ && !airport_name.empty() && !parking_name.empty())
     {
         ani::airport_info_ptr airp = ani_->navigation_info()->get_airport(airport_name);

@@ -229,6 +229,21 @@ void model::update(double dt)
 
 }
 
+void model::sync_fms(bool force)
+{
+	if (!phys_aircraft_)
+		return ;
+#if 0
+	geo_position fmspos = fms_pos();
+	geo_position physpos = phys_aircraft_->get_position();
+
+	double prediction = 300;
+
+	if (force || tow_attached_ || (cg::distance2d(fmspos.pos, physpos.pos) > cg::norm(physpos.dpos) * prediction * sys_->calc_step() * 2))
+		aircraft_fms::model_control_ptr(get_fms_info())->reset_pos(physpos.pos, physpos.orien.cpr().course);
+#endif
+}
+
 phys::rigid_body_ptr model::get_rigid_body() const
 {
     return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
