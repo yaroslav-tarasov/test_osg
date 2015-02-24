@@ -431,5 +431,8 @@
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="objects\aircraft\aircraft_view.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

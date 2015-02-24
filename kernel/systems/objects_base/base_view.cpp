@@ -20,6 +20,7 @@ base_view_presentation::base_view_presentation(kernel::object_create_t const& oc
 {
     typedef base_view_presentation this_t;
 
+    if(oc.sys) // FIXME а мы пока без системы 
     conn_holder() 
         <<  collection_->subscribe_object_created   (boost::bind(&this_t::object_created   , this, _1))
         <<  collection_->subscribe_object_destroying(boost::bind(&this_t::object_destroying, this, _1));

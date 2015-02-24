@@ -10,108 +10,20 @@
 #include "vehicle_model_states.h"
 #include "common/aircraft.h"
 
-//namespace kernel
-//{
-//// used by any presentation to send message through its system,
-//typedef
-//    boost::function<void(binary::bytes_cref/*msg*/, bool /*sure*/, bool /*just_cmd*/)>
-//    send_msg_f;
-//
-//typedef
-//    boost::function<void(bool /*block*/)>
-//    block_obj_msgs_f;
-//}
-
 namespace vehicle
 {
 
-/*
-struct  base_view_presentation
-{
-    // base_presentation
-    protected:
-//        void pre_update (double time) override;
-//        void update     (double time) override;
-//        void post_update(double time) override;
-//        void update_atc (double time) override;
-        virtual void on_msg     (binary::bytes_cref   bytes )  override;
-//        void reset_parent (kernel::object_info_wptr parent)  override;
-public:
-    DECLARE_EVENT(state_modified, ());
-
-protected:
-    template<class msg_t>
-    void set(msg_t const& msg, bool sure = true)
-    {
-//     Information about obj_2 changing on presentation_1 should spread to obj_1 presentation_2
-//     only by way (3) -> (4), not by way (1) -> (2). But notification (1) should work as well.
-//
-//     So we block ability to send messages (2) while obj_2 invokes 'set' function to renew its state
-
-//       -----------   event  -----------
-//      [ obj1 prs1 ] <-(1)- [ obj2 prs1 ]
-//       -----------       /  -----------
-//           |            /       |
-//           |           /        |
-//         msg (2)     (?)       msg (3)
-//           |         /          |
-//           |        /           |
-//           V       /            V
-//      ------------L  event  -----------
-//      [ obj1 prs2 ] <-(4)- [ obj2 prs2 ]
-//       -----------          -----------
-
-        block_msgs_(true);
-        {
-            // most notification are fired from this handler
-            msg_disp().on_msg(msg);
-            state_modified_signal_();
-        }
-        block_msgs_(false);
-
-        send(msg, sure);
-    }
-
-protected:
-    void send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd);
-
-private:
-    template<class msg_t>
-    void send(msg_t const& msg, bool sure = true, bool just_cmd = false)
-    {
-        auto data = network::wrap_msg(msg);
-        send_msg(data, sure, just_cmd);
-    }
-protected:
-    network::msg_dispatcher<>& msg_disp();
-
-private:
-    network::msg_dispatcher<>   msg_disp_;
-
-private:
-    size_t              object_id_;
-    std::string              name_;
-//    kernel::object_info_wptr    parent_;
-//    kernel::object_info_vector  objects_;
-
-    kernel::send_msg_f          send_msg_;
-    kernel::block_obj_msgs_f    block_msgs_;
-};
-*/
-
 struct model
       : model_base
-    //: model_presentation        
       , view
     //, base_view_presentation
     //, phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-      static model_base_ptr create(nodes_management::manager_ptr nodes_manager
-                                   ,phys::control_ptr        phys
-								   ,kernel::object_create_t const& oc);
+      static model_base_ptr create( phys::control_ptr               phys
+								  , kernel::object_create_t  const& oc);
 private:
-    model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
+    model(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
 
     // base_presentation
 private:
@@ -204,40 +116,24 @@ private:
 
     std::vector<wheel_t> wheels_;
 
-    model_state_ptr model_state_;
+    model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
 
-    bool manual_controls_;
+    bool                manual_controls_;
 
 private:
     double rod_course ;
     double air_course ;
     double steer_course ;
 
-// from view
-protected:
-    nodes_management::manager_ptr       nodes_manager_;
-    nodes_management::node_control_ptr  root_;
-    nodes_management::node_info_ptr     tow_point_node_;
-    aircraft::info_ptr                  aerotow_;
-
 // from view / data
 public:
-    cg::geo_point_2 const& pos() const {return state_.pos;}
-    double course() const {return state_.course;}
-    double speed() const {return state_.speed;}
-    cg::point_2 dpos() const {return cg::point_2(cg::polar_point_2(1., state_.course)) * state_.speed;}
     // FIXME преносим обратно
     void set_state_debug(state_t const& state)
     {
-        // И здесь тоже чегото надо сделать
-        // set(msg::state_msg_t(state), false);
-        state_ = state;
+        // И здесь тоже чего-то надо сделать
+        set(msg::state_msg_t(state), false);
+        // view::state_ = state;
     }
-
-
-protected: 
-    settings_t settings_;
-    state_t    state_;
 
 protected:
     phys::control_ptr        phys_;

@@ -1,43 +1,77 @@
 #include "stdafx.h"
 
+#include "precompiled_objects.h"
+
 #include "aircraft_model.h"
+#include "aircraft_common.h"
 
 namespace aircraft
 {
 
+// FIXME Само собой чушь
+void /*system_base::*/block_obj_msgs(bool block)
+{ }
+
+void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
+{}
+
+info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+{
+    size_t id  = 0x666;
+    std::vector<object_info_ptr>  objects;
+    objects.push_back(nodes_manager);
+    auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
+    auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
+    kernel::object_create_t  oc(
+        nullptr, 
+        nullptr,                    // kernel::system*                 sys             , 
+        id,                         // size_t                          object_id       , 
+        "name",                     // string const&                   name            , 
+        objects,  // vector<object_info_ptr> const&  objects         , 
+        msg_service,                // kernel::send_msg_f const&       send_msg        , 
+        block_msgs                  // kernel::block_obj_msgs_f        block_msgs
+        );
+
+    return model::create(phys,oc);
+}
+
+// FIXME в оригинале создаем object
+info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+{
+    return info_ptr(new model(phys,oc/*, dict*/));
+}
+
+model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
+    : view(oc)
+    , desired_velocity_(min_desired_velocity())
+    , phys_(phys)
+{
+
+    if (get_nodes_manager())
+    {
+        root_               = get_nodes_manager()->get_node(0);
+        elev_rudder_node_   = get_nodes_manager()->find_node("elevrudr");
+        rudder_node_        = get_nodes_manager()->find_node("rudder");
+        tow_point_node_     = get_nodes_manager()->find_node("tow_point");
+        body_node_          = get_nodes_manager()->find_node("body");
+    }
+
+    shassis_ = boost::make_shared<shassis_support_impl>(get_nodes_manager());
+    // sync_state_.reset(new sync_fsm::none_state(*this));
+
+    conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
+
+}
+
 // from view
 #pragma region view
-cg::transform_4 const&  model::tow_point_transform() const
-{
-    return tow_point_transform_;
-}
 
 nodes_management::node_info_ptr model::root() const
 {
     //return nodes_manager_->get_node(0);  // FIXME отступаем от исходной модели
-    return nodes_manager_->find_node("root");
+    return get_nodes_manager()->find_node("root");
 }
 
-bool model::malfunction(malfunction_kind_t kind) const
-{
-    return malfunctions_[kind];
-}
-
-cg::geo_point_3 const& model::pos() const
-{
-    static cg::geo_point_3 pp;
-    return pp;//fms_info_->get_state().dyn_state.pos;
-}
-
-cg::point_3 model::dpos() const
-{
-    return cg::point_3();// cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
-}
-
-cg::cpr model::orien() const
-{
-    return cg::cpr();//fms_info_->get_state().orien();
-}
 
 #pragma  endregion
 
@@ -151,9 +185,9 @@ void model::update(double dt)
             const double curs_change = (*it).traj_->curs_value(tar_len) - (*it).traj_->curs_value(cur_len);
 
             if(cg::eq(curs_change,0.0))
-                (*it).desired_velocity_ = aircraft::model::max_desired_velocity;
+                (*it).desired_velocity_ = aircraft::max_desired_velocity();
             else
-                (*it).desired_velocity_ = aircraft::model::min_desired_velocity;
+                (*it).desired_velocity_ = aircraft::min_desired_velocity();
 
             // const decart_position cur_pos = _phys_aircrafts[0].phys_aircraft_->get_local_position();
 
@@ -193,6 +227,90 @@ void model::update(double dt)
 
     phys_aircraft_->update();
 
+}
+
+phys::rigid_body_ptr model::get_rigid_body() const
+{
+    return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
+}
+
+point_3 model::tow_offset() const
+{
+    return tow_point_node_ ? get_relative_transform(get_nodes_manager(), tow_point_node_, body_node_).translation() : point_3();
+}
+
+bool model::tow_attached() const
+{
+    return tow_attached_;
+}
+geo_position model::get_phys_pos() const
+{
+    // TODO
+    return phys_aircraft_->get_position();
+}
+
+void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback)
+{
+    if (tow_attached_ == attached)
+        return ;
+
+    tow_attached_ = attached;
+    tow_invalid_callback_ = tow_invalid_callback;
+    if (phys_aircraft_)
+        phys_aircraft_->attach_tow(attached);
+
+    if (!tow_attached_)
+        sync_fms(true);
+}
+
+void model::set_steer( double steer )
+{   
+    Assert(tow_attached_);
+
+    if (phys_aircraft_)
+        phys_aircraft_->set_steer(steer);
+}
+
+void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
+{
+    if (!phys_aircraft)
+    {
+        if (tow_attached_ && tow_invalid_callback_)
+            tow_invalid_callback_();
+    }
+    phys_aircraft_ = phys_aircraft;
+}
+
+void model::check_wheel_brake()
+{
+    if (!phys_aircraft_)
+        return;
+
+    shassis_->visit_groups([this](shassis_group_t & shassis_group)
+    {
+        if (shassis_group.opened && shassis_group.malfunction && !shassis_group.broken)
+        {
+            bool has_contact = shassis_group.check_contact(this->phys_aircraft_);
+            if (has_contact)
+                shassis_group.broke(this->phys_aircraft_);
+        }
+    });
+}
+
+void model::on_time_factor_changed(double /*time*/, double factor)
+{
+    //bool fast = factor > 1 ? true : false;
+
+    //if (fast_session_ != fast)
+    //{
+
+    //    if (sync_state_)
+    //    {
+    //        sync_fsm::state_ptr prev_state = sync_state_;
+    //        sync_state_->on_fast_session(fast);
+    //    }
+    //    fast_session_ = fast;
+    //}
 }
 
 

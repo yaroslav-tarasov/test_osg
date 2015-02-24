@@ -17,49 +17,62 @@ struct stub_msys : kernel::model_system
 namespace vehicle
 {
 
-//void base_view_presentation::send_msg(binary::bytes_cref bytes, bool sure, bool just_cmd)
-//{
-//    send_msg_(bytes, sure, just_cmd);
-//}
-//
-//void base_view_presentation::on_msg(binary::bytes_cref bytes)
-//{
-//    msg_disp().dispatch_bytes(bytes);
-//}
-
-
-//network::msg_dispatcher<>& base_view_presentation::msg_disp()
-//{
-//    return msg_disp_;
-//}
-
 //object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 //{
 //    return object_info_ptr(new model(oc, dict));
 //}
 
-model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+
+// FIXME Само собой чушь
+void /*system_base::*/block_obj_msgs(bool block)
 {
-	kernel::object_create_t  oc(
-		nullptr, 
-		nullptr, //kernel::system*                 sys             , 
-		0,//size_t                          object_id       , 
-		"name", //string const&                   name            , 
-		vector<object_info_ptr>(),//vector<object_info_ptr> const&  objects         , 
-		kernel::send_msg_f(),//kernel::send_msg_f const&       send_msg        , 
-		kernel::block_obj_msgs_f()//kernel::block_obj_msgs_f        block_msgs
-		);
-	return model::create(nodes_manager,phys,oc);
+    //if (block)
+    //{
+    //    if (block_obj_msgs_counter_ == 0)
+    //        // this could happen via sending message, or via handling incoming one
+    //        msg_protocol_ = in_place();
+
+    //    ++block_obj_msgs_counter_;
+    //}
+    //else 
+    //{
+    //    Assert(block_obj_msgs_counter_ > 0);
+    //    --block_obj_msgs_counter_;
+    //}
 }
 
-model_base_ptr model::create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc)
+void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
+{}
+
+model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
 {
-    return model_base_ptr(new model(nodes_manager,phys,oc));
+	size_t id  = 0x666;
+    std::vector<object_info_ptr>  objects;
+    objects.push_back(nodes_manager);
+    auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
+    auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
+    kernel::object_create_t  oc(
+		nullptr, 
+		nullptr,                    // kernel::system*                 sys             , 
+		id,                         // size_t                          object_id       , 
+		"name",                     // string const&                   name            , 
+		objects,  // vector<object_info_ptr> const&  objects         , 
+		msg_service,                // kernel::send_msg_f const&       send_msg        , 
+		block_msgs                  // kernel::block_obj_msgs_f        block_msgs
+		);
+
+	return model::create(phys,oc);
+}
+
+// FIXME в оригинале создаем object
+model_base_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc)
+{
+    return model_base_ptr(new model(phys,oc));
 }
 
 //AUTO_REG_NAME(vehicle_model, model::create);
 
-model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+model::model(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
     : view(oc)/*, dict)*/
     //, phys_object_model_base(collection_)
     //, sys_(dynamic_cast<model_system *>(oc.sys))
@@ -67,21 +80,10 @@ model::model(nodes_management::manager_ptr nodes_manager,phys::control_ptr      
     //, airport_(ani_->navigation_info()->find_airport(pos()))
     , manual_controls_(false)
     , max_speed_(0)
-    , nodes_manager_(nodes_manager)
     , phys_(phys)
     , sys_ (new stub_msys)
 {
-#pragma region view    
-    //nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
-    if (nodes_manager_)
-    {
-        root_ = nodes_manager_->get_node(0);
-        //conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
-        tow_point_node_ = nodes_manager_->find_node("tow_point");
-    }
-#pragma endregion
-                       
-                          
+                      
     root_next_pos_   =  geo_position(root_->position()./*global*/local(),get_base()).pos;
     root_next_orien_ = root_->position()./*global*/local().orien;
 
@@ -109,7 +111,7 @@ nodes_management::node_info_ptr model::get_root()
 
 void model::update( double time )
 {   
-    // view::update(time);
+    view::update(time);
 
     if (!phys_vehicle_)
     {
@@ -130,12 +132,12 @@ void model::update( double time )
             cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
             decart_position cur_pos = phys_vehicle_->get_position();
             geo_position cur_glb_pos(cur_pos, base);
-            // set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); // FIXME оповешаем всех остальных а оно мине надо?
+            set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); // FIXME оповешаем всех остальных а оно мине надо?
         }
 
         sync_nodes_manager(dt);
 
-#if 0 // FIXME we need it badly
+#if 1 // FIXME we need it badly
         if (aerotow_)
         {
             if (aircraft::model_info_ptr(aerotow_)->get_rigid_body() && phys_vehicle_ && aircraft::model_info_ptr(aerotow_)->tow_attached())
@@ -179,24 +181,24 @@ void model::on_object_destroying(object_info_ptr object)
 
 void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
 {   
-    //if (!phys_vehicle_)
-    //    return;
+    if (!phys_vehicle_)
+        return;
 
-    //if (aerotow_ && aircraft::model_info_ptr(aerotow_)->get_rigid_body())
-    //{
-    //    cg::point_3 tow_offset = tow_point_node_ ? nm::get_relative_transform(nodes_manager_, tow_point_node_, body_node_).translation() : cg::point_3();
+    if (aerotow_ && aircraft::model_info_ptr(aerotow_)->get_rigid_body())
+    {
+        cg::point_3 tow_offset = tow_point_node_ ? nm::get_relative_transform(nodes_manager_, tow_point_node_, body_node_).translation() : cg::point_3();
 
-    //    phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->set_tow(aircraft::model_info_ptr(aerotow_)->get_rigid_body(), tow_offset, aircraft::model_info_ptr(aerotow_)->tow_offset());
+        phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->set_tow(aircraft::model_info_ptr(aerotow_)->get_rigid_body(), tow_offset, aircraft::model_info_ptr(aerotow_)->tow_offset());
 
-    //    aircraft::model_control_ptr(aerotow_)->set_tow_attached(object_id(), boost::bind(&model::on_detach_tow, this));
-    //}
-    //else
-    //{
-    //    if (old_aerotow)
-    //        aircraft::model_control_ptr(old_aerotow)->set_tow_attached(boost::none, boost::function<void()>());
+        aircraft::model_control_ptr(aerotow_)->set_tow_attached(object_id(), boost::bind(&model::on_detach_tow, this));
+    }
+    else
+    {
+        if (old_aerotow)
+            aircraft::model_control_ptr(old_aerotow)->set_tow_attached(boost::none, boost::function<void()>());
 
-    //    phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->reset_tow();
-    //}
+        phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->reset_tow();
+    }
 }
 
 void model::on_attach_tow( uint32_t tow_id )

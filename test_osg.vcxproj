@@ -180,6 +180,7 @@
     <ClCompile Include="nfi\lib_loader.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_model.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp" />
+    <ClCompile Include="objects\aircraft\aircraft_view.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_visual.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_management.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager.cpp" />

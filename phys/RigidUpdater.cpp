@@ -19,6 +19,11 @@ namespace vehicle
 	model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
 };
 
+namespace aircraft
+{
+    info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
+};
+
 
 namespace bi
 {
@@ -31,7 +36,7 @@ namespace bi
 		: _root        (root)
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
-		, _debug       (true)
+		, _debug       (false)
 		, _sys         (phys::create())
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
@@ -180,7 +185,7 @@ namespace bi
     void RigidUpdater::addUFO3(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
         // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
-
+#if  0  // Under construction
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
 
@@ -204,6 +209,54 @@ namespace bi
         _phys_aircrafts.emplace_back(boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s));
         _sys->registerBody(id,ac_->get_rigid_body());
         
+
+        //_phys_aircrafts.back().shassis->visit_groups([=](aircraft::shassis_group_t & shassis_group)
+        //{
+        //    //if (to_be_opened)
+        //    //    shassis_group.open(true);
+        //    //else 
+        //        if (!shassis_group.is_front)
+        //                shassis_group.close(false);
+        //});
+
+        //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
+        osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
+        mt->setName("phys_ctrl");
+        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->addChild( node );
+        _root->addChild( mt.get() );
+
+        _physicsNodes[id] = mt;
+#endif
+    }
+
+    void RigidUpdater::addUFO4(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+    {
+        // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
+
+        //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+
+        int id = _physicsNodes.size();
+
+        nm::manager_ptr man = nm::create_manager(lod3);
+
+        aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
+
+        size_t pa_size = _phys_aircrafts.size();
+        aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
+            get_base(),
+            _sys,
+            man,
+            geo_position(cg::geo_point_3(0.000,0.002*((double)pa_size+.1),0),cg::quaternion(cg::cpr(90, 0, 0))),
+            ada::fill_data("BADA","A319"),                                                   
+            s,
+            0);
+
+
+        _phys_aircrafts.emplace_back(vehicle::create(man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
+        _sys->registerBody(id);  // FIXME Перевести внутрь модели //_sys->registerBody(id,ac_->get_rigid_body());
+
 
         //_phys_aircrafts.back().shassis->visit_groups([=](aircraft::shassis_group_t & shassis_group)
         //{
@@ -517,7 +570,7 @@ namespace bi
 
                 if (!aircraft::int_control_ptr(am)->get_trajectory())
                 {
-                     aircraft::int_control_ptr(am)->set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::model::min_radius(),aircraft::model::step()));
+                     aircraft::int_control_ptr(am)->set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
                 }
                 else
                 {  
@@ -545,8 +598,8 @@ namespace bi
 
                     fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
                                                                                     target_pos,
-                                                                                    aircraft::model::min_radius(),
-                                                                                    aircraft::model::step());
+                                                                                    aircraft::min_radius(),
+                                                                                    aircraft::step());
 
                     main_->append(*traj.get());
                 }

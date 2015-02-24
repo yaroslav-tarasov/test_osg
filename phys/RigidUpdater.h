@@ -2,7 +2,7 @@
 
 #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
-#include "aircraft/aircraft_model.h"
+//#include "aircraft/aircraft_model.h"
 //#include "vehicle/vehicle_model.h"
 
 namespace bi
@@ -20,6 +20,8 @@ namespace bi
 		void addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 		void addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
         void addUFO3(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
+        void addUFO4(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
+
         void addVehicle(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
         void addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 

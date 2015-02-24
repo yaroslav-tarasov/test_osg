@@ -58,7 +58,7 @@ void view::on_child_removing(object_info_ptr child)
 void view::on_state(state_t const& state)
 {                                              
     state_ = state;
-    on_state_changed();
+    on_state_changed();     // Задействован только в чарте
 }
 
 void view::on_settings(settings_t const& settings)

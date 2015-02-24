@@ -35,6 +35,8 @@
                              
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
+
+#include <boost/signals2.hpp>
 ////////////////////////////////////////////////
 
 using boost::none;
@@ -62,6 +64,7 @@ using boost::any_cast;
 using boost::bad_any_cast;
 
 using boost::circular_buffer;
+using boost::signals2::scoped_connection;
 #endif // Q_MOC_RUN
 //////////////////////////////////////
 //
@@ -399,6 +402,14 @@ namespace vehicle
 
 	typedef polymorph_ptr<model_base> model_base_ptr;
 	
+}
+
+namespace aircraft
+{
+    inline static   int                    max_desired_velocity() {return 20;};
+    inline static   int                    min_desired_velocity() {return 5;};
+    inline static   double                 min_radius() {return 18.75;}; 
+    inline static   double                 step()       {return 2.0;}; 
 }
 
 #endif // precompile_header

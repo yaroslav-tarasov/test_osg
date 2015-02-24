@@ -63,7 +63,7 @@ public:
     point_2 dpos() const {return point_2(cg::polar_point_2(1., state_.course)) * state_.speed;}
 
 protected:
-    virtual void on_state_changed() {}
+    virtual void on_state_changed() {}    // Задействован только в чарте
     virtual void settings_changed() {}
     virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) {}
 
