@@ -684,6 +684,7 @@ void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
 	// rigid_bodies_.erase(rb);
     // FIXME  пока не удаляем
+    FIXME("Нету удаления, а надо бы особенно для сомолей")
 }
 
 aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)

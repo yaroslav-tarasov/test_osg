@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include <btBulletDynamicsCommon.h>
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>

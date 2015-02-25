@@ -64,6 +64,7 @@ model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_
 	return model::create(phys,oc);
 }
 
+FIXME(А чего не объект?)
 // FIXME в оригинале создаем object
 model_base_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc)
 {

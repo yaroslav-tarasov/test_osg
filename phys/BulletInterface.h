@@ -7,6 +7,7 @@
 
 #include "bullet_helpers.h"
 #include "phys_sys_fwd.h"
+#include "common/phys_sys.h" 
 #include "phys_sys.h"
 #include "phys_sys_common.h" //FIXME  Â stdafx phys_sys
 #include "sensor.h"

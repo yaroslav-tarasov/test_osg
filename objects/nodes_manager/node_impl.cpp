@@ -43,6 +43,7 @@ void node_impl::extrapolated_position_reseted()
 void node_impl::play_animation  (std::string const& seq, double len, double from, double size) 
 {
     // FIXME  Заглушка для анимации
+    FIXME(Анимация на коленке)
     osgAnimation::Animation::PlayMode pm = from > 0?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
     auto god_node = node_impl_ptr(root_node())->as_osg_node()->getParent(0);
@@ -186,7 +187,9 @@ void node_impl::set_position(node_position const& pos)
 {   
     //time_                   = m.time;
     //position_               = m.pos.get_pos(position_, m.components);
-    //extrapolated_position_  = position_;   ]
+    //extrapolated_position_  = position_;   
+    FIXME(Больное место локальные/глобальные координаты)
+    if(pos.is_local())
     if(node_->asTransform()->asMatrixTransform())
     {
         auto mat = node_->asTransform()->asMatrixTransform()->getMatrix();
@@ -209,12 +212,14 @@ node_position /*const&*/ node_impl::position() /*const*/
     osg::Vec3 trans = pat?pat->getPosition():mat->getMatrix().getTrans();  
     osg::Quat rot = pat?pat->getAttitude():mat->getMatrix().getRotate();  
 
+    FIXME(Больное место локальные/глобальные координаты)
     return /*extrapolated_position_*//*position_*/local_position(0,0,from_osg_vector3(trans),from_osg_quat(rot));
 }
 
 // FIXME just stub
 cg::transform_4  node_impl::get_root_transform() const 
 {
+    FIXME(Пустой трансформ хм)
     return cg::transform_4();
 }
 

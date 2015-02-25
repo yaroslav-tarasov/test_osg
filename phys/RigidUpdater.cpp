@@ -8,7 +8,7 @@
 #include "nodes_manager/nodes_manager.h"
 #include "ada/ada.h"
 #include "bada/bada_import.h"
-#include "phys_aircraft.h"
+#include "aircraft/phys_aircraft.h"
 #include "vehicle.h"
 
 #include "RigidUpdater.h"
@@ -241,33 +241,14 @@ namespace bi
 
         nm::manager_ptr man = nm::create_manager(lod3);
 
-        aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
+        FIXME("А вот и засада с лодами")
+        //aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
 
         size_t pa_size = _phys_aircrafts.size();
-        aircraft::phys_aircraft_ptr ac_ = aircraft::phys_aircraft_impl::create(
-            get_base(),
-            _sys,
-            man,
-            geo_position(cg::geo_point_3(0.000,0.002*((double)pa_size+.1),0),cg::quaternion(cg::cpr(90, 0, 0))),
-            ada::fill_data("BADA","A319"),                                                   
-            s,
-            0);
 
-
-        _phys_aircrafts.emplace_back(vehicle::create(man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
+        _phys_aircrafts.emplace_back(aircraft::create(man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
         _sys->registerBody(id);  // FIXME Перевести внутрь модели //_sys->registerBody(id,ac_->get_rigid_body());
 
-
-        //_phys_aircrafts.back().shassis->visit_groups([=](aircraft::shassis_group_t & shassis_group)
-        //{
-        //    //if (to_be_opened)
-        //    //    shassis_group.open(true);
-        //    //else 
-        //        if (!shassis_group.is_front)
-        //                shassis_group.close(false);
-        //});
-
-        //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
         mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));

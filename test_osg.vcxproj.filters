@@ -55,6 +55,12 @@
     <Filter Include="Source Files\nm">
       <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\aircraft\sync_fms">
+      <UniqueIdentifier>{ee4fda0b-563d-4762-ae9b-f55d9224a6eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\aircraft_fms">
+      <UniqueIdentifier>{90453dd4-b788-4821-8e97-a1903a771500}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -293,9 +299,6 @@
     <ClCompile Include="phys\aircraft_phys.cpp">
       <Filter>Source Files\aircraft</Filter>
     </ClCompile>
-    <ClCompile Include="phys\phys_aircraft.cpp">
-      <Filter>Source Files\aircraft</Filter>
-    </ClCompile>
     <ClCompile Include="av\CloudLayer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
@@ -433,6 +436,30 @@
     </ClCompile>
     <ClCompile Include="objects\aircraft\aircraft_view.cpp">
       <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\phys_aircraft.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_none_state.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_phys_state.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_fsm.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp">
+      <Filter>Source Files\aircraft_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_fms_state.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp">
+      <Filter>Source Files\aircraft\sync_fms</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

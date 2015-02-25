@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "precompiled_objects.h"
 
 #include "aircraft_view.h"
@@ -59,6 +58,8 @@ object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict
 
 //AUTO_REG_NAME(aircraft_view, view::create);
 
+
+
 view::view(kernel::object_create_t const& oc/*, dict_copt dict*/)
     : base_view_presentation    (oc)
     //, obj_data_base             (dict)
@@ -66,8 +67,8 @@ view::view(kernel::object_create_t const& oc/*, dict_copt dict*/)
     , conflicts_manager_        (find_first_object<conflicts_manager::control_ptr>(collection_))
 #endif    
     , nodes_manager_            (find_first_child<nodes_management::manager_ptr>(this))
-#if 0  
     , fms_info_                 (find_first_child<aircraft_fms::info_ptr       >(this))
+#if 0
     , gui_                      (find_first_child<aircraft_gui::control_ptr    >(this))
 #endif
 #if 0    
@@ -186,20 +187,23 @@ void view::on_child_removing(object_info_ptr child)
 
 geo_point_3 const& view::pos() const
 {
-    // FIXME
+    // FIXME  
+    FIXME(Здесь должен быть позицион)
     return geo_point_3();// return fms_info_->get_state().dyn_state.pos;
 }
 
 point_3 view::dpos() const
 {
     // FIXME
+    FIXME(Здесь должен быть позицион)
     return point_3();
     // return cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
 }
 
 cpr view::orien() const
 {   
-    // FIXME
+    // FIXME  
+    FIXME(Здесь должена быть ориентация)
     return cpr();
     // return fms_info_->get_state().orien();
 }
@@ -208,7 +212,7 @@ settings_t const & view::settings() const
 {
     return settings_;
 }
-#if 0
+#if 1
 fpl::info_ptr view::get_fpl() const
 {
     return fpl_;
@@ -531,7 +535,7 @@ void view::activate ()
     set_atc_state(AS_ACTIVATED);
 }
 
-#if 0
+#if 1
 aircraft_fms::info_ptr view::get_fms() const
 {
     return fms_info_;
@@ -957,6 +961,7 @@ void view::on_wheel_contact_effect(msg::wheel_contact_effect const& eff)
 
 void view::set_fpl_initial_position()
 {
+    FIXME(Начальная позиция из fpl)
 #if 0  // FIXME  а тут начальная позиция?
 
     Assert(fpl_) ;

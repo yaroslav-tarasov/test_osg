@@ -1,7 +1,8 @@
 #pragma once
 
 #include "vehicle_view.h"
-#include "phys/phys_sys.h"
+// #include "phys/phys_sys.h"
+#include "common/phys_sys.h"
 //#include "common/phys_object_model_base.h"
 //#include "objects/ani.h"
 #include "network/msg_dispatcher.h"

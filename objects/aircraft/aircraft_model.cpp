@@ -1,9 +1,12 @@
 #include "stdafx.h"
-
 #include "precompiled_objects.h"
 
 #include "aircraft_model.h"
 #include "aircraft_common.h"
+
+#include "sync_fsm/sync_phys_state.h"
+#include "sync_fsm/sync_none_state.h"
+#include "sync_fsm/sync_fms_state.h"
 
 namespace aircraft
 {
@@ -45,6 +48,8 @@ model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
     : view(oc)
     , desired_velocity_(min_desired_velocity())
     , phys_(phys)
+    , fast_session_(false)
+    , nm_ang_smooth_(2)
 {
 
     if (get_nodes_manager())
@@ -57,10 +62,57 @@ model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
     }
 
     shassis_ = boost::make_shared<shassis_support_impl>(get_nodes_manager());
-    // sync_state_.reset(new sync_fsm::none_state(*this));
+    sync_state_.reset(new sync_fsm::none_state(*this));
 
-    conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
+     FIXME(Нужна реализация системы)
+    //conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
 
+}
+
+airports_manager::info_ptr model::get_airports_manager() const
+{
+    return airports_manager_;
+}
+
+phys::control_ptr model::phys_control() const
+{
+    return phys_;
+}
+
+nodes_management::manager_ptr model::get_nodes_manager() const
+{
+    return view::get_nodes_manager();
+}
+
+aircraft_fms::info_ptr model::get_fms_info() const
+{
+    return view::get_fms_info();
+}
+
+shassis_support_ptr model::get_shassis() const
+{
+    return shassis_;
+}
+
+geo_position model::get_root_pos() const
+{
+    FIXME("Позиция рута в глобальных координатах ооооочень больной вопрос")
+    return geo_position();//root_->position().global();
+}
+
+bool model::is_fast_session() const
+{
+    return fast_session_;
+}
+
+void model::set_desired_nm_pos  (geo_point_3 const& pos)
+{
+    desired_nm_pos_ = pos;
+}
+
+void model::set_desired_nm_orien(quaternion const& orien)
+{
+    desired_nm_orien_ = orien;
 }
 
 // from view
@@ -141,13 +193,13 @@ void model::update_contact_effects(double time)
             {
                 geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
                 geo_position body_pos = this->phys_aircraft_->get_position();
-                point_3 loc_omega = (!body_pos.orien).rotate_vector(wpos.omega);
-                point_3 vel = body_pos.dpos - body_pos.orien.rotate_vector(point_3(loc_omega.x,0,0) * cg::grad2rad()) * shassis.radius;
+                cg::point_3 loc_omega = (!body_pos.orien).rotate_vector(wpos.omega);
+                cg::point_3 vel = body_pos.dpos - body_pos.orien.rotate_vector(cg::point_3(loc_omega.x,0,0) * cg::grad2rad()) * shassis.radius;
 
                 if (cg::norm(vel) > 50)
                 {
                     point_3 loc_offset = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
-                    loc_offset += point_3(0,0,shassis.radius);
+                    loc_offset += cg::point_3(0,0,shassis.radius);
                     this->set(msg::wheel_contact_effect(time, loc_offset, vel), false);
 
                     shassis.landing_dust = true;
@@ -286,6 +338,28 @@ void model::set_steer( double steer )
         phys_aircraft_->set_steer(steer);
 }
 
+geo_position model::fms_pos() const
+{
+    // FIXME  
+    //point_3 dir = cg::polar_point_3(1., get_fms_info()->get_state().orien().course, get_fms_info()->get_state().orien().pitch);
+    //return geo_position(get_fms_info()->get_state().dyn_state.pos, get_fms_info()->get_state().dyn_state.TAS * dir, get_fms_info()->get_state().orien(), point_3());
+    return geo_position();
+}
+
+void model::switch_sync_state(sync_fsm::state_ptr state)
+{
+    if (sync_state_)
+        sync_state_->deinit();
+    sync_state_ = state;
+}
+
+void model::freeze_position()
+{
+    auto  fmspos = fms_pos();
+    nodes_management::node_position root_node_pos(geo_position(fmspos.pos, fmspos.orien));
+    root_->set_position(root_node_pos);
+}
+
 void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
 {
     if (!phys_aircraft)
@@ -295,6 +369,13 @@ void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
     }
     phys_aircraft_ = phys_aircraft;
 }
+
+void model::set_nm_angular_smooth(double val)
+{
+    nm_ang_smooth_ = val;
+}
+
+
 
 void model::check_wheel_brake()
 {

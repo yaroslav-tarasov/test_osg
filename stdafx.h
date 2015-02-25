@@ -65,6 +65,7 @@ using boost::bad_any_cast;
 
 using boost::circular_buffer;
 using boost::signals2::scoped_connection;
+using boost::signals2::connection;
 #endif // Q_MOC_RUN
 //////////////////////////////////////
 //
@@ -320,22 +321,26 @@ inline T cbrt(T n)
 
 #define Assert(x) if(x){};
 
+#include "common/points.h"
+
+#include "common/util.h"
+
 #include "geometry/xmath.h"
-#include "geometry/primitives.h"
+//#include "geometry/primitives.h"
 ////////////////////////////////
 //
 //
-using cg::geo_point_3;
-using cg::geo_point_2;
-using cg::point_2;
-using cg::point_2f;
-using cg::point_3;
-using cg::point_3f;
-using cg::point_3i;
-using cg::cpr;
-using cg::quaternion;
-using cg::transform_4;             
-using cg::geo_base_3;
+//using cg::geo_point_3;
+//using cg::geo_point_2;
+//using cg::point_2;
+//using cg::point_2f;
+//using cg::point_3;
+//using cg::point_3f;
+//using cg::point_3i;
+//using cg::cpr;
+//using cg::quaternion;
+//using cg::transform_4;             
+//using cg::geo_base_3;
 //////////////////////////////////
 
 #include "common/event.h"
@@ -412,4 +417,10 @@ namespace aircraft
     inline static   double                 step()       {return 2.0;}; 
 }
 
+#define STR(x) STRINGIFY(x)
+#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))
+
 #endif // precompile_header
+
+
+

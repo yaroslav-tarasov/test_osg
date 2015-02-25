@@ -4,6 +4,7 @@
 #include "phys/phys_sys.h"
 #include "phys_sys/aircraft.h"
 #include "aircraft_shassis_impl.h"
+#include "sync_fsm/sync_fsm.h"
 
 #include "network/msg_dispatcher.h"
 
@@ -19,6 +20,7 @@ namespace aircraft
         , model_info                // интерфейс информации о модели
         , model_control             // интерфейс управления моделью
         , int_control
+        , sync_fsm::self_t
     {
         static /*object_info_ptr*/info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
 
@@ -45,21 +47,21 @@ namespace aircraft
 
         // sync_fsm::self_t
     private:
-        //geo_position fms_pos() const;
-        //airports_manager::info_ptr get_airports_manager() const;
-        //phys_sys::control_ptr phys_control() const;
-        //nodes_management::manager_ptr get_nodes_manager() const;
-        //aircraft_fms::info_ptr get_fms_info() const;
+        geo_position fms_pos() const;
+        airports_manager::info_ptr get_airports_manager() const;
+        phys::control_ptr phys_control() const;
+        nodes_management::manager_ptr get_nodes_manager() const;
+        aircraft_fms::info_ptr get_fms_info() const;
         //meteo::meteo_cursor_ptr get_meteo_cursor() const;
-        //shassis_support_ptr get_shassis() const;
-        //geo_position get_root_pos() const;
-        //bool is_fast_session() const;
-        //void set_desired_nm_pos  (geo_point_3 const& pos);
-        //void set_desired_nm_orien(quaternion const& orien);
-        //void switch_sync_state(sync_fsm::state_ptr state);
-        //void freeze_position();
+        shassis_support_ptr get_shassis() const;
+        geo_position get_root_pos() const;
+        bool is_fast_session() const;
+        void set_desired_nm_pos  (geo_point_3 const& pos);
+        void set_desired_nm_orien(quaternion const& orien);
+        void switch_sync_state(sync_fsm::state_ptr state);
+        void freeze_position();
         void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
-        //void set_nm_angular_smooth(double val);
+        void set_nm_angular_smooth(double val);
     private:
         void on_zone_destroyed( size_t id );
         void update_model();
@@ -89,7 +91,7 @@ namespace aircraft
         model_system *    sys_;
         optional<double> last_update_;
 
-
+        airports_manager::info_ptr airports_manager_;
         
         nodes_management::node_control_ptr     root_;
         nodes_management::node_control_ptr     elev_rudder_node_;
@@ -101,6 +103,10 @@ namespace aircraft
 
         aircraft::phys_aircraft_ptr            phys_aircraft_;
 
+        optional<geo_point_3>                  desired_nm_pos_;
+        optional<quaternion>                   desired_nm_orien_;
+        double                                 nm_ang_smooth_;
+        
         boost::function<void()>                tow_invalid_callback_;
         optional<uint32_t>                     tow_attached_;
 
@@ -110,7 +116,14 @@ namespace aircraft
         /////////////////////////////////////
 
     private:
+        bool fast_session_;
+
+    private:
+        sync_fsm::state_ptr sync_state_;
+
+    private:
         // FIXME stub
+        FIXME(Питонная заглушка)
         boost::python::object py_ptr() const
         {                                   
             return boost::python::object(boost::python::ptr(this));

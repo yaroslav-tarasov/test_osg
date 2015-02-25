@@ -1,13 +1,11 @@
 #include "stdafx.h"
 
-//using namespace std;
-//using namespace boost;
 
 #include "ada/ada.h"
-#include "phys_sys_fwd.h"
+#include "phys/phys_sys_fwd.h"
 #include "aircraft.h"
 #include "phys_aircraft.h"
-#include "phys_sys.h"
+#include "phys/phys_sys.h"
 
 
 using namespace cg;
@@ -171,10 +169,10 @@ namespace aircraft
         return root_pos;
     }
 
-    //void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
-    //{
-    //    cfg_ = cfg;
-    //}
+    void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
+    {
+        cfg_ = cfg;
+    }
 
     void phys_aircraft_impl::set_prediction(double prediction)
     {

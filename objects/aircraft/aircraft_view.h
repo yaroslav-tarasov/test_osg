@@ -3,7 +3,7 @@
 #include "objects/ani_fwd.h"
 
 #include "common/aircraft.h"
-//#include "common/aircraft_fms.h"
+#include "common/aircraft_fms.h"
 //#include "common/tp_sys.h"
 //#include "common/meteo_proxy.h"
 //#include "common/conflicts_manager.h"
@@ -79,7 +79,7 @@ struct view
     , control
     , aircraft_ipo_control
     , aircraft_atc_control
-#if 0
+#if 1
     , fms_container
 #endif
     , atc_info
@@ -114,7 +114,7 @@ protected:
     point_3             dpos               () const override;
     cpr                 orien              () const override;
     settings_t const &  settings           () const override;
-#if 0
+#if 1
     fpl::info_ptr       get_fpl            () const override;
 #endif
     bool                has_assigned_fpl   () const override;
@@ -195,7 +195,7 @@ private:
 
     // fms_container
 protected:
-#if 0
+#if 1
     aircraft_fms::info_ptr get_fms() const override;
 #endif
     // atc_info
@@ -244,8 +244,9 @@ protected:
     void update_atc_state();
     
     nodes_management::manager_ptr  get_nodes_manager() const { return nodes_manager_; }
-#if 0   
+   
     aircraft_fms::info_ptr         get_fms_info() const { return fms_info_; }
+#if 0
     conflicts_manager::control_ptr get_conflicts_manager() const { return conflicts_manager_; }
 #endif
 
@@ -257,7 +258,7 @@ private:
     conflicts_manager::control_ptr conflicts_manager_;
 #endif
     nodes_management::manager_ptr  nodes_manager_;
-#if 0
+#if 1
     aircraft_fms::info_ptr         fms_info_;
 #endif
 
@@ -275,7 +276,7 @@ protected:
     transform_4 tow_point_transform_;
 
 protected:
-#if 0
+#if 1
     fpl::info_ptr       fpl_ ;
 #endif    
 	optional<double>    proc_len_;
@@ -313,6 +314,7 @@ private:
 
 private:
     // FIXME stub
+    FIXME(Питонная заглушка)
     boost::python::object py_ptr() const
     {                                   
         return boost::python::object(boost::python::ptr(this));
