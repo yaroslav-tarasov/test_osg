@@ -18,7 +18,7 @@ void /*system_base::*/block_obj_msgs(bool block)
 void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {}
 
-info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
 {
     size_t id  = 0x666;
     std::vector<object_info_ptr>  objects;
@@ -27,7 +27,7 @@ info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr   
     auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
     kernel::object_create_t  oc(
         nullptr, 
-        nullptr,                    // kernel::system*                 sys             , 
+        sys.get(),                  // kernel::system*                 sys             , 
         id,                         // size_t                          object_id       , 
         "name",                     // string const&                   name            , 
         objects,  // vector<object_info_ptr> const&  objects         , 
@@ -38,18 +38,19 @@ info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr   
     return model::create(phys,oc);
 }
 
-// FIXME в оригинале создаем object
-info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+
+object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
 {
-    return info_ptr(new model(phys,oc/*, dict*/));
+    return object_info_ptr(new model(phys,oc/*, dict*/));
 }
 
 model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
     : view(oc)
     , desired_velocity_(min_desired_velocity())
-    , phys_(phys)
-    , fast_session_(false)
-    , nm_ang_smooth_(2)
+    , phys_            (phys)
+    , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
+    , fast_session_    (false)
+    , nm_ang_smooth_   (2)
 {
 
     if (get_nodes_manager())
@@ -68,6 +69,122 @@ model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
     //conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
 
 }
+
+void model::update( double time )
+{   
+    view::update(time);
+    update_len(time);
+
+    //if (!fpl_ || fpl_->active())
+    //    aircraft_fms::model_control_ptr(get_fms_info())->activate();
+        
+    FIXME(init_shassi_anim)
+    //init_shassi_anim();
+
+    double dt = time - (last_update_ ? *last_update_ : 0);
+    if (cg::eq_zero(dt))
+        return;
+
+    desired_nm_pos_.reset();
+    desired_nm_orien_.reset();
+
+    sync_fsm::state_ptr prev_state = sync_state_;
+    sync_state_->update(time, dt);
+
+    FIXME(синхронизация рута)
+
+    //sync_nm_root(dt);
+
+    update_contact_effects(time);
+    check_wheel_brake();
+    FIXME(update_shassi_anim)
+    //update_shassi_anim(time);
+    update_atc_state();
+    sync_fms();
+
+    if (phys_aircraft_)
+    {
+        bool has_malfunction = false;
+        if (malfunction(MF_CHASSIS_FRONT) || malfunction(MF_CHASSIS_REAR_LEFT) || malfunction(MF_CHASSIS_REAR_RIGHT))
+            has_malfunction = true;
+
+        phys_aircraft_->set_malfunction(has_malfunction);
+    }
+
+    last_update_ = time;
+}
+
+#if 0
+
+void model::update(double dt)
+{
+    auto it = this;
+
+    if((*it).traj_.get())
+    {
+        if ((*it).traj_->cur_len() < (*it).traj_->length())
+        {
+            (*it).phys_aircraft_->set_prediction(15.); 
+            (*it).phys_aircraft_->freeze(false);
+            const double  cur_len = (*it).traj_->cur_len();
+            (*it).traj_->set_cur_len ((*it).traj_->cur_len() + dt*(*it).desired_velocity_);
+            const double  tar_len = (*it).traj_->cur_len();
+            decart_position target_pos;
+
+            target_pos.pos = cg::point_3((*it).traj_->kp_value(tar_len),0);
+            geo_position gtp(target_pos, get_base());
+            (*it).phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+
+
+            const double curs_change = (*it).traj_->curs_value(tar_len) - (*it).traj_->curs_value(cur_len);
+
+            if(cg::eq(curs_change,0.0))
+                (*it).desired_velocity_ = aircraft::max_desired_velocity();
+            else
+                (*it).desired_velocity_ = aircraft::min_desired_velocity();
+
+            // const decart_position cur_pos = _phys_aircrafts[0].phys_aircraft_->get_local_position();
+
+            //std::stringstream cstr;
+
+            //cstr << std::setprecision(8) 
+            //     << "curr_pods_len:  "             << (*it).traj->cur_len() 
+            //     << "    desired_velocity :  "     << (*it).desired_velocity_   
+            //     << "    delta curs :  "  << curs_change
+            //     << ";   cur_pos x= "     << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+            //     << "    target_pos x= "  << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
+
+            //OutputDebugString(cstr.str().c_str());
+        }
+        else
+        {
+
+            cg::point_3 cur_pos = phys_aircraft_->get_local_position().pos;
+            cg::point_3 d_pos = phys_aircraft_->get_local_position().dpos;
+            cg::point_3 trg_p((*it).traj_->kp_value((*it).traj_->length()),0);
+            d_pos.z = 0;
+            if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
+            {   
+                decart_position target_pos;
+                target_pos.pos = trg_p;
+                geo_position gp(target_pos, get_base());
+                (*it).phys_aircraft_->go_to_pos(gp.pos ,gp.orien);
+            }
+            else
+            {
+                // (*it).traj.reset();
+                (*it).phys_aircraft_->freeze(true);
+            }
+        }
+
+    }
+
+    if(phys_aircraft_)
+        phys_aircraft_->update();
+
+}
+
+#endif
 
 airports_manager::info_ptr model::get_airports_manager() const
 {
@@ -214,72 +331,7 @@ void model::update_contact_effects(double time)
     });
 }
 
-void model::update(double dt)
-{
-    auto it = this;
 
-    if((*it).traj_.get())
-    {
-        if ((*it).traj_->cur_len() < (*it).traj_->length())
-        {
-            (*it).phys_aircraft_->set_prediction(15.); 
-            (*it).phys_aircraft_->freeze(false);
-            const double  cur_len = (*it).traj_->cur_len();
-            (*it).traj_->set_cur_len ((*it).traj_->cur_len() + dt*(*it).desired_velocity_);
-            const double  tar_len = (*it).traj_->cur_len();
-            decart_position target_pos;
-
-            target_pos.pos = cg::point_3((*it).traj_->kp_value(tar_len),0);
-            geo_position gtp(target_pos, get_base());
-            (*it).phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
-
-
-            const double curs_change = (*it).traj_->curs_value(tar_len) - (*it).traj_->curs_value(cur_len);
-
-            if(cg::eq(curs_change,0.0))
-                (*it).desired_velocity_ = aircraft::max_desired_velocity();
-            else
-                (*it).desired_velocity_ = aircraft::min_desired_velocity();
-
-            // const decart_position cur_pos = _phys_aircrafts[0].phys_aircraft_->get_local_position();
-
-            //std::stringstream cstr;
-
-            //cstr << std::setprecision(8) 
-            //     << "curr_pods_len:  "             << (*it).traj->cur_len() 
-            //     << "    desired_velocity :  "     << (*it).desired_velocity_   
-            //     << "    delta curs :  "  << curs_change
-            //     << ";   cur_pos x= "     << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-            //     << "    target_pos x= "  << target_pos.pos.x << " y= "  << target_pos.pos.y <<"\n" ;
-
-            //OutputDebugString(cstr.str().c_str());
-        }
-        else
-        {
-
-            cg::point_3 cur_pos = phys_aircraft_->get_local_position().pos;
-            cg::point_3 d_pos = phys_aircraft_->get_local_position().dpos;
-            cg::point_3 trg_p((*it).traj_->kp_value((*it).traj_->length()),0);
-            d_pos.z = 0;
-            if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
-            {   
-                decart_position target_pos;
-                target_pos.pos = trg_p;
-                geo_position gp(target_pos, get_base());
-                (*it).phys_aircraft_->go_to_pos(gp.pos ,gp.orien);
-            }
-            else
-            {
-                // (*it).traj.reset();
-                (*it).phys_aircraft_->freeze(true);
-            }
-        }
-
-    }
-
-    phys_aircraft_->update();
-
-}
 
 void model::sync_fms(bool force)
 {

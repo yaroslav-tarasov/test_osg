@@ -13,15 +13,19 @@
 
 #include "RigidUpdater.h"
 
+#include "kernel/systems/systems_base.h"
+#include "fake_system.h"
+
 // FIXME
+FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
 namespace vehicle
 {
-	model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
+	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
 };
 
 namespace aircraft
 {
-    info_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
+    kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
 };
 
 
@@ -30,18 +34,40 @@ namespace bi
 	struct RigidUpdater::RigidUpdater_private
 	{
 		        RigidUpdater::phys_vehicles_t                          _vehicles;
+                kernel::system_ptr                                     _msys; 
 	};
 
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
 		: _root        (root)
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
-		, _debug       (false)
-		, _sys         (phys::create())
+		, _debug       (true)
+		, _sys         (/*phys::create()*/phys::create_phys_system())
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
-	{}
+	{
+
+        using namespace kernel;
+        _d->_msys = kernel::create_model_system("script should  be placed here");
+
+        kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
+        
+        
+        //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
+        auto class_name = "phys_sys_model";
+        std::vector<object_class_ptr> const &classes = objects_factory_ptr(_d->_msys)->object_classes() ;
+        
+        auto obj2 = objects_factory_ptr(_d->_msys)->create_object(classes, class_name);
+        /*        kernel::object_class_ptr class_ptr ;
+
+        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
+        if (class_name == (*it)->name())
+        class_ptr = *it ;
+
+
+        auto obj = objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name);  */ 
+    }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
     {
@@ -246,7 +272,7 @@ namespace bi
 
         size_t pa_size = _phys_aircrafts.size();
 
-        _phys_aircrafts.emplace_back(aircraft::create(man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
+        _phys_aircrafts.emplace_back(aircraft::create(_d->_msys,man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
         _sys->registerBody(id);  // FIXME Перевести внутрь модели //_sys->registerBody(id,ac_->get_rigid_body());
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -298,7 +324,7 @@ namespace bi
          
         nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
 
-        _phys_vehicles.emplace_back(vehicle::create(man,_sys));
+        _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man,_sys));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -450,7 +476,7 @@ namespace bi
      //                   <<"\n" ;
 					//OutputDebugString(cstr.str().c_str());
                     
-                    aircraft::int_control_ptr(*it)->update( dt );
+                    aircraft::int_control_ptr(*it)->update( view->getFrameStamp()->getSimulationTime()/*dt*/ );
                 } 
 
                 for(auto it = _phys_vehicles.begin();it!=_phys_vehicles.end();++it)
@@ -513,7 +539,7 @@ namespace bi
 
          auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
          {
-             if(amp->root()->object_id()==this->selected_obj_id_)
+             if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
                  return true;
 
              return false;
@@ -537,7 +563,7 @@ namespace bi
              
             auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
             {
-                if(amp->root()->object_id()==this->selected_obj_id_)
+                if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
                     return true;
 
                 return false;
@@ -594,7 +620,7 @@ namespace bi
             {
                 auto it_vh = std::find_if(_phys_vehicles.begin(),_phys_vehicles.end(),[this](vehicle::model_base_ptr vh)->bool
                 {
-                    if(vh->get_root()->object_id()==this->selected_obj_id_)
+                    if(vh->get_root() && vh->get_root()->object_id()==this->selected_obj_id_)
                         return true;
 
                     return false;

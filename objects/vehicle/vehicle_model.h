@@ -21,8 +21,8 @@ struct model
     //, phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-      static model_base_ptr create( phys::control_ptr               phys
-								  , kernel::object_create_t  const& oc);
+      static object_info_ptr create( phys::control_ptr               phys
+								     , kernel::object_create_t  const& oc);
 private:
     model(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
 
@@ -82,11 +82,13 @@ private:
     //        .def("attach_tow", &model::on_attach_tow)
     //        .def("detach_tow", &model::on_detach_tow);
     //}
-	// FIXME stub
-	boost::python::object py_ptr() const
-	{                                   
-	return boost::python::object(boost::python::ptr(this));
-	}
+private:
+    // FIXME stub
+    FIXME(Питонная заглушка)
+        boost::python::object py_ptr() const
+    {                                   
+        return boost::python::object(boost::python::ptr(this));
+    }
 
 private:
     //model_system *    sys_;

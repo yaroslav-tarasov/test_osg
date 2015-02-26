@@ -230,6 +230,12 @@ private:
     //        .def("name", &base_view_presentation::name, py::return_value_policy<copy_const_reference>())
     //        .def("id",   &base_view_presentation::object_id);
     //}
+    // FIXME stub
+    // FIXME(Питонная заглушка)
+        boost::python::object py_ptr() const
+    {                                   
+        return boost::python::object(boost::python::ptr(this));
+    }
 
 private:
     size_t              object_id_;

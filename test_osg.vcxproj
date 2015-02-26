@@ -81,8 +81,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fms.lib;logger.lib;async_services.lib;alloc.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;C:\simex\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;C:\simex\bin\release;C:\Work_Terminal\simex\bin\release;ext\bada;ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;C:\simex\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;C:\simex/ext/lib/tinyxml2/release\;C:\simex\bin\release;C:\Work_Terminal\simex\bin\release;ext\bada;ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
@@ -171,6 +171,8 @@
     <ClCompile Include="ext\spark\simple_effect.cpp" />
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
+    <ClCompile Include="fake_system.cpp" />
+    <ClCompile Include="kernel\systems\common\object_class_impl.cpp" />
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
     <ClCompile Include="light_maps.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -191,9 +193,14 @@
     <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
     <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
     <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp" />
+    <ClCompile Include="objects\airports_manager\airports_manager_view.cpp" />
+    <ClCompile Include="objects\airport\airport_model.cpp" />
+    <ClCompile Include="objects\airport\airport_view.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_management.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager.cpp" />
     <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
+    <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp" />
+    <ClCompile Include="objects\phys_sys_object\phys_sys_object_view.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_view.cpp" />

@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "precompiled_objects.h"
+
 #include "airports_manager_view.h"
 
 namespace airports_manager
@@ -7,8 +10,9 @@ object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
     return object_info_ptr(new view(oc, dict));
 }
 
-AUTO_REG_NAME(airports_manager_view, view::create);
-AUTO_REG_NAME(airports_manager_chart, base_chart_presentation<view>::create);
+FIXME("Авторегистрация, что тоже интересно")
+//AUTO_REG_NAME(airports_manager_view, view::create);
+//AUTO_REG_NAME(airports_manager_chart, base_chart_presentation<view>::create);
 
 view::view( kernel::object_create_t const& oc, dict_copt)
     : base_view_presentation(oc)

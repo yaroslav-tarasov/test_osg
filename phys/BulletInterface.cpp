@@ -36,13 +36,19 @@ struct FilterCallback : public btOverlapFilterCallback
 
 namespace phys
 {
-	BulletInterface*  sys()
-	{
-		static boost::shared_ptr<BulletInterface> inst = create();
-		return inst.get();
-	}
-
-	boost::shared_ptr<BulletInterface> create()
+    BulletInterface*  sys()
+    {
+        static boost::shared_ptr<BulletInterface> inst = create();
+        return inst.get();
+    }
+    
+    system_ptr create_phys_system()
+    {
+       static boost::shared_ptr<BulletInterface> inst = create();
+       return  inst;
+    }
+	
+    boost::shared_ptr<BulletInterface> create()
 	{
 		return boost::make_shared<BulletInterface>();
 	}
@@ -500,6 +506,8 @@ void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
 
 void BulletInterface::registerBody(int id)
 {
+    FIXME(Больной вопрос меняем способ передачи информации)
+    if(rigid_bodies_.size() > 0) 
     _actors[id]._body  = rigid_bodies_.back()->get_body().get();
 }
 

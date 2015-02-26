@@ -61,6 +61,15 @@
     <Filter Include="Source Files\aircraft_fms">
       <UniqueIdentifier>{90453dd4-b788-4821-8e97-a1903a771500}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\airport">
+      <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\phys_sys_obj">
+      <UniqueIdentifier>{84d8ac5f-3c1a-4a06-b37b-7cd4da0ba62e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\systems">
+      <UniqueIdentifier>{9debcb17-2ead-4d63-8cae-1087f2ec1b5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -460,6 +469,27 @@
     </ClCompile>
     <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp">
       <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\airports_manager\airports_manager_view.cpp">
+      <Filter>Source Files\airport</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\airport\airport_view.cpp">
+      <Filter>Source Files\airport</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\airport\airport_model.cpp">
+      <Filter>Source Files\airport</Filter>
+    </ClCompile>
+    <ClCompile Include="fake_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp">
+      <Filter>Source Files\phys_sys_obj</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\phys_sys_object\phys_sys_object_view.cpp">
+      <Filter>Source Files\phys_sys_obj</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ namespace aircraft
 namespace sync_fsm
 {
     void none_state::update(double /*time*/, double /*dt*/) 
-    {
+    {                                                                   
         if (self_.get_airports_manager())
         {
             auto fms_pos = self_.fms_pos();

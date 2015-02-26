@@ -24,6 +24,7 @@ protected:
 
 private:
     std::set<airport::info_ptr> airports_;
+
 };
 
 }

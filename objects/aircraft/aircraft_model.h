@@ -22,7 +22,7 @@ namespace aircraft
         , int_control
         , sync_fsm::self_t
     {
-        static /*object_info_ptr*/info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
+        static object_info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
 
     private:
 
@@ -120,14 +120,6 @@ namespace aircraft
 
     private:
         sync_fsm::state_ptr sync_state_;
-
-    private:
-        // FIXME stub
-        FIXME(Питонная заглушка)
-        boost::python::object py_ptr() const
-        {                                   
-            return boost::python::object(boost::python::ptr(this));
-        }
 
     protected: // FIXME тоже заглушка в отсутствии возможности найти физ системы как объект
         phys::control_ptr        phys_;

@@ -6,6 +6,9 @@
 #pragma once
 #ifndef  precompile_header
 
+// time to undef now
+#undef SYSTEMS_API
+
 #include "targetver.h"
 
 #ifndef Q_MOC_RUN
@@ -62,6 +65,7 @@ using boost::function;
 using boost::any;
 using boost::any_cast;
 using boost::bad_any_cast;
+using boost::static_pointer_cast;
 
 using boost::circular_buffer;
 using boost::signals2::scoped_connection;
@@ -419,6 +423,9 @@ namespace aircraft
 
 #define STR(x) STRINGIFY(x)
 #define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))
+
+#include <tinyxml2/tinyxml2.h>
+#include "xml/tixml_xinclude.h"
 
 #endif // precompile_header
 

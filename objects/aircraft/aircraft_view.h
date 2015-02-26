@@ -312,14 +312,6 @@ private:
 private:
     std::vector< std::pair<double, std::string> > oldi_sequence_ ;
 
-private:
-    // FIXME stub
-    FIXME(Питонная заглушка)
-    boost::python::object py_ptr() const
-    {                                   
-        return boost::python::object(boost::python::ptr(this));
-    }
-
 };
 
 } // aircraft

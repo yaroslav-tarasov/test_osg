@@ -4,6 +4,7 @@
 #include "trajectory_drawer.h"
 //#include "aircraft/aircraft_model.h"
 //#include "vehicle/vehicle_model.h"
+// #include "kernel/msg_proxy.h"
 
 namespace bi
 {
@@ -139,9 +140,13 @@ namespace bi
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         vehicles_t                               _phys_vehicles;
 
-		boost::shared_ptr<phys::BulletInterface> _sys;
+		/*boost::shared_ptr*/
+        polymorph_ptr<phys::BulletInterface>      _sys;
 		struct RigidUpdater_private;
-	    boost::shared_ptr<RigidUpdater_private>   _d;
+	    boost::shared_ptr<RigidUpdater_private>  _d;
+
+        //kernel::msg_service                      msg_service_;
+
 private:
         double                                   _last_frame_time;
 

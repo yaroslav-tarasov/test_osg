@@ -58,13 +58,6 @@ namespace nodes_management
         void          set_model   (string const& model, bool save_root_pos = true) override;
         string const&   get_model   () const override;
    
-    private:
-        // FIXME stub
-        boost::python::object py_ptr() const
-        {                                   
-            return boost::python::object(boost::python::ptr(this));
-        }
-
     private: 
         osg::ref_ptr<osg::Node> base_;
         std::string       model_name_;

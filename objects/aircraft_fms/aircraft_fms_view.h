@@ -170,12 +170,6 @@ private:
 protected:
     ani_object::info_ptr ani_;
 
-private:
-    // FIXME stub
-    boost::python::object py_ptr() const
-    {                                   
-        return boost::python::object(boost::python::ptr(this));
-    }
 };
 
 }

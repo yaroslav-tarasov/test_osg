@@ -4,7 +4,7 @@
 #include "vehicle_model.h"
 //#include "common/collect_collision.h"
 #include "geometry/filter.h"
-#include "sensor.h"
+#include "phys/sensor.h"
 #include "phys/vehicle.h"
 
 
@@ -44,7 +44,7 @@ void /*system_base::*/block_obj_msgs(bool block)
 void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {}
 
-model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
+object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager, phys::control_ptr        phys)
 {
 	size_t id  = 0x666;
     std::vector<object_info_ptr>  objects;
@@ -53,7 +53,7 @@ model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_
     auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
     kernel::object_create_t  oc(
 		nullptr, 
-		nullptr,                    // kernel::system*                 sys             , 
+		sys.get(),                    // kernel::system*                 sys             , 
 		id,                         // size_t                          object_id       , 
 		"name",                     // string const&                   name            , 
 		objects,  // vector<object_info_ptr> const&  objects         , 
@@ -66,9 +66,9 @@ model_base_ptr create(nodes_management::manager_ptr nodes_manager,phys::control_
 
 FIXME(А чего не объект?)
 // FIXME в оригинале создаем object
-model_base_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc)
+object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc)
 {
-    return model_base_ptr(new model(phys,oc));
+    return object_info_ptr(new model(phys,oc));
 }
 
 //AUTO_REG_NAME(vehicle_model, model::create);
