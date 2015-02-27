@@ -3,7 +3,7 @@
 #include "vehicle_view.h"
 // #include "phys/phys_sys.h"
 #include "common/phys_sys.h"
-//#include "common/phys_object_model_base.h"
+#include "common/phys_object_model_base.h"
 //#include "objects/ani.h"
 #include "network/msg_dispatcher.h"
 
@@ -18,13 +18,13 @@ struct model
       : model_base
       , view
     //, base_view_presentation
-    //, phys_object_model_base    
+      , phys_object_model_base    
 {
     //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-      static object_info_ptr create( phys::control_ptr               phys
-								     , kernel::object_create_t  const& oc);
+    static object_info_ptr create( /*phys::control_ptr               phys
+                                   ,*/ kernel::object_create_t  const& oc);
 private:
-    model(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
+    model(/*phys::control_ptr        phys,*/kernel::object_create_t const& oc/*, dict_copt dict*/);
 
     // base_presentation
 private:
@@ -82,16 +82,10 @@ private:
     //        .def("attach_tow", &model::on_attach_tow)
     //        .def("detach_tow", &model::on_detach_tow);
     //}
-private:
-    // FIXME stub
-    FIXME(Питонная заглушка)
-        boost::python::object py_ptr() const
-    {                                   
-        return boost::python::object(boost::python::ptr(this));
-    }
+
 
 private:
-    //model_system *    sys_;
+    model_system *    sys_;
     optional<double> last_update_;
     double max_speed_;
 
@@ -138,9 +132,6 @@ public:
         // view::state_ = state;
     }
 
-protected:
-    phys::control_ptr        phys_;
-    kernel::model_system *    sys_;                
 };
 
 } // vehicle

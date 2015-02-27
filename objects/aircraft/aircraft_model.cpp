@@ -44,6 +44,8 @@ object_info_ptr model::create(phys::control_ptr        phys,kernel::object_creat
     return object_info_ptr(new model(phys,oc/*, dict*/));
 }
 
+AUTO_REG_NAME(aircraft_model, model::create);
+
 model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
     : view(oc)
     , desired_velocity_(min_desired_velocity())

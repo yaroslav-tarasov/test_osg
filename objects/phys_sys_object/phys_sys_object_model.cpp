@@ -17,6 +17,8 @@ model::model(kernel::object_create_t const& oc/*, dict_copt dict*/)
     , last_time_(0)
     , exercise_loaded_connection_(oc.sys->subscribe_exercise_loaded(boost::bind(&model::on_exercise_loaded, this)))
 { 
+    FIXME(Тоже магия)
+    zones_.insert(0, zone_t(create_phys_system(), cg::geo_point_3(), "noname"));
 }
 
 model::~model()
@@ -96,12 +98,18 @@ void model::on_object_destroying(object_info_ptr object)
 
 system_ptr model::get_system(size_t zone)
 {
+    FIXME(Тоже магия)
+    zone = 0;
+    
     return zones_[zone].sys;
 }
 
 optional<size_t> model::get_zone(geo_point_3 const & pos) const
 {
     optional<size_t> zone;
+    
+    FIXME(Магическое число)  
+        return 1;
 
     for (auto it = zones_.begin(); it != zones_.end(); ++it)
     {
@@ -117,12 +125,19 @@ optional<size_t> model::get_zone(geo_point_3 const & pos) const
 
 optional<size_t> model::get_zone(std::string const& airport) const
 {
+    FIXME(Магическое число)  
+        return 1;
+
     auto it = std::find_if(zones_.begin(), zones_.end(), airport_zone_predicate(airport));
     return it != zones_.end() ? optional<size_t>(std::distance(zones_.begin(), it)) : boost::none;
 }
 
 geo_base_3 const& model::get_base(size_t zone) const
 {
+    static auto _base = ::get_base();
+    FIXME(Магическое число)  
+        return _base;
+
     return zones_[zone].base;
 }
 

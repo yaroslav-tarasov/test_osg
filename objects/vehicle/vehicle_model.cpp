@@ -44,7 +44,7 @@ void /*system_base::*/block_obj_msgs(bool block)
 void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {}
 
-object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager, phys::control_ptr        phys)
+object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager)
 {
 	size_t id  = 0x666;
     std::vector<object_info_ptr>  objects;
@@ -53,35 +53,33 @@ object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nod
     auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
     kernel::object_create_t  oc(
 		nullptr, 
-		sys.get(),                    // kernel::system*                 sys             , 
+		sys.get(),                  // kernel::system*                 sys             , 
 		id,                         // size_t                          object_id       , 
 		"name",                     // string const&                   name            , 
-		objects,  // vector<object_info_ptr> const&  objects         , 
+		objects,                    // vector<object_info_ptr> const&  objects         , 
 		msg_service,                // kernel::send_msg_f const&       send_msg        , 
 		block_msgs                  // kernel::block_obj_msgs_f        block_msgs
 		);
 
-	return model::create(phys,oc);
+	return model::create(oc);
 }
 
-FIXME(А чего не объект?)
-// FIXME в оригинале создаем object
-object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc)
+object_info_ptr model::create(kernel::object_create_t const& oc)
 {
-    return object_info_ptr(new model(phys,oc));
+    return object_info_ptr(new model(oc));
 }
 
-//AUTO_REG_NAME(vehicle_model, model::create);
+AUTO_REG_NAME(vehicle_model, model::create);
 
-model::model(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+model::model(kernel::object_create_t const& oc/*, dict_copt dict*/)
     : view(oc)/*, dict)*/
-    //, phys_object_model_base(collection_)
+    , phys_object_model_base(collection_)
     //, sys_(dynamic_cast<model_system *>(oc.sys))
     //, ani_(find_first_object<ani_object::info_ptr>(collection_))
     //, airport_(ani_->navigation_info()->find_airport(pos()))
     , manual_controls_(false)
     , max_speed_(0)
-    , phys_(phys)
+    FIXME (Подлежит удалению)
     , sys_ (new stub_msys)
 {
                       

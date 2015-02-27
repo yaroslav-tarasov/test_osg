@@ -37,6 +37,13 @@ namespace kernel
     //        id_range() = new_range;
     //}
 
+    void update_id_range(/*msg_service& srv*/)
+    {
+        id_range_t new_range = make_id_range(1000,10000);
+
+        if (id_range() != new_range)
+            id_range() = new_range;
+    }
 struct model_system_impl;
 
 system_ptr create_model_system(/*msg_service& service,*/ std::string const& script) 
@@ -157,6 +164,7 @@ fake_system_base::fake_system_base(system_kind kind/*, msg_service& service*/, s
     //    .add<msg::container_msg >(boost::bind(&system_base::on_container_msg , this, _1));
 
     //update_id_range(service);
+    update_id_range();
 }
 
 fake_system_base::~fake_system_base()
@@ -258,7 +266,7 @@ object_info_ptr   fake_system_base::create_object  (std::string const& name)
 
     kernel::object_create_t oc(/*hierarchy_class*/nullptr, this, id, name, std::vector<object_info_ptr>(), msg_service, block_msgs);
 
-    auto fp = fn_reg::function<object_info_ptr(object_create_t)>(name);
+    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(name);
     
     if(fp)
         fp(oc);
@@ -308,7 +316,7 @@ inline object_info_ptr create_object(kernel::object_create_t oc)
         function_name = class_name + "_" + sys_name(oc.sys->kind());
     }
 
-    auto fp = fn_reg::function<object_info_ptr(object_create_t)>(function_name);
+    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(function_name);
 
     if(fp)
         return fp(oc);

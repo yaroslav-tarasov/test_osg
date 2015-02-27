@@ -15,12 +15,13 @@
 
 #include "kernel/systems/systems_base.h"
 #include "fake_system.h"
+#include "kernel/object_class.h"
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
 namespace vehicle
 {
-	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
+	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager);
 };
 
 namespace aircraft
@@ -51,22 +52,25 @@ namespace bi
         using namespace kernel;
         _d->_msys = kernel::create_model_system("script should  be placed here");
 
-        kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
+        // kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
         
         
         //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
-        auto class_name = "phys_sys_model";
-        std::vector<object_class_ptr> const &classes = objects_factory_ptr(_d->_msys)->object_classes() ;
+        std::string class_name = "phys_sys";
+        std::string unique_name = "phys_sys";
+        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
         
-        auto obj2 = objects_factory_ptr(_d->_msys)->create_object(classes, class_name);
-        /*        kernel::object_class_ptr class_ptr ;
+        kernel::object_class_ptr class_ptr ;
 
         for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
-        if (class_name == (*it)->name())
-        class_ptr = *it ;
+        {
+            if (class_name == (*it)->name())
+            class_ptr = *it ;
+            std::string n = (*it)->name();
+        }
 
 
-        auto obj = objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name);  */ 
+        auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name);   
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
@@ -324,7 +328,7 @@ namespace bi
          
         nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
 
-        _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man,_sys));
+        _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;

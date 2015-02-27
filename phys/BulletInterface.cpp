@@ -734,12 +734,14 @@ system_ptr   BulletInterface::get_system(size_t zone)
 
 optional<size_t>  BulletInterface::get_zone(cg::geo_point_3 const & pos) const
 {
+     FIXME(Магическое число)
      return 1;
 }
 
 optional<size_t>  BulletInterface::get_zone(std::string const& airport) const
 {
-      return 1;
+    FIXME(Магическое число)  
+    return 1;
 }
 
 cg::geo_base_3 const& BulletInterface::get_base(size_t zone) const
