@@ -14,8 +14,10 @@
 #include "ada/ada.h"
 #include "bada_import.h"
 
-#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
-#include "nodes_manager/node_impl.h"
+//#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
+//#include "nodes_manager/node_impl.h"
+#include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
+#include "nm/node_impl.h"
 
 using namespace phys;
 

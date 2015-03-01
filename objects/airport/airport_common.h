@@ -4,6 +4,7 @@
 
 namespace airport
 {
+#if 0
     namespace lighting
     {
 
@@ -276,7 +277,7 @@ namespace airport
 
 
     } // namespace lighting
-
+#endif
 struct settings_t
 {
     settings_t()
@@ -285,8 +286,11 @@ struct settings_t
 
     string   icao_code;
     point_3  lights_offset;
+#if 0
     lighting::navi_lights_control_t  navi_lights_control ;
     //lighting::navi_lights_t          navi_lights ;
+#endif
+
 };
 
 
@@ -357,7 +361,9 @@ inline point_3f lights_offset(string icao_code)
 REFL_STRUCT(settings_t)
     REFL_ENTRY(icao_code)
     REFL_SER(lights_offset)
+#if 0
     REFL_ENTRY(navi_lights_control)
+#endif
 REFL_END()
 
 } // namespace airport

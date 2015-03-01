@@ -3,8 +3,25 @@
 #include "nodes_management_fwd.h"
 #include "cpp_utils/polymorph_ptr.h"
 
-namespace nodes_management
-{
+	namespace nodes_management
+	{
+	struct settings_t
+	{
+		settings_t()
+			: model("checker")
+		{}
+		settings_t(std::string const& model)
+			: model(model)
+		{}
+
+		std::string model;
+	};
+
+	REFL_STRUCT(settings_t)
+		REFL_ENTRY(model)
+	REFL_END()
+
+
     struct node_position
     {
         node_position() : pos_(geo_position()) { }
@@ -87,6 +104,32 @@ namespace nodes_management
         virtual void set_visibility  (bool visible) = 0;
     };
 
+	struct node_tree_iterator
+	{
+		virtual ~node_tree_iterator(){}
+
+		virtual std::vector<node_tree_iterator_ptr> const& children() const = 0 ;
+		virtual node_info_ptr node() const = 0 ;
+	};
+
+	struct vis_node_control
+	{
+		typedef 
+			std::vector</*victory::node_ptr*/osg::ref_ptr<osg::Node>> 
+			vis_nodes_t;
+
+		virtual ~vis_node_control(){}
+		virtual vis_nodes_t const& vis_nodes() const = 0;
+		virtual bool is_visible() const = 0;
+	};
+
+	struct vis_node_info
+	{
+		virtual ~vis_node_info() {}
+
+		virtual bool is_visible() const = 0 ;
+	};
+
     struct manager
     {
         virtual ~manager(){}
@@ -98,12 +141,13 @@ namespace nodes_management
     
         virtual void            set_model   (string const& model, bool save_root_pos = true)  = 0;
         virtual string const&   get_model   () const                    = 0;
-        //virtual void            visit_nodes (boost::function<void(node_info_ptr)> const& f) const = 0;
+        virtual void            visit_nodes (boost::function<void(node_info_ptr)> const& f) const = 0;
 
-        //virtual node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const = 0;
+        virtual node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const = 0;
 
         DECLARE_EVENT(model_changed, ());
     };
+
 
     void visit_sub_tree(node_info_ptr root, std::function<bool(node_info_ptr)> f);
 

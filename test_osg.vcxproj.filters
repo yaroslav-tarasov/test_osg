@@ -70,6 +70,9 @@
     <Filter Include="Source Files\systems">
       <UniqueIdentifier>{9debcb17-2ead-4d63-8cae-1087f2ec1b5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\nodes_manager">
+      <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -246,6 +249,36 @@
     <ClInclude Include="fn_reg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="objects\nm\node_impl.h">
+      <Filter>Source Files\nm</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nm\nodes_manager.h">
+      <Filter>Source Files\nm</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\mod_node_impl.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\node_impl.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\node_tree_iterator.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\nodes_factory.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\nodes_manager_common.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\nodes_manager_view.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\nodes_manager_visual.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\nodes_manager\vis_node_impl.h">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -407,15 +440,6 @@
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="objects\nodes_manager\node_impl.cpp">
-      <Filter>Source Files\nm</Filter>
-    </ClCompile>
-    <ClCompile Include="objects\nodes_manager\nodes_management.cpp">
-      <Filter>Source Files\nm</Filter>
-    </ClCompile>
-    <ClCompile Include="objects\nodes_manager\nodes_manager.cpp">
-      <Filter>Source Files\nm</Filter>
-    </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
@@ -490,6 +514,33 @@
     </ClCompile>
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nm\node_impl.cpp">
+      <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nm\nodes_management.cpp">
+      <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nm\nodes_manager.cpp">
+      <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\mod_node_impl.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\node_impl.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\node_tree_iterator.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\nodes_manager_view.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\nodes_manager_visual.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp">
+      <Filter>Source Files\nodes_manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

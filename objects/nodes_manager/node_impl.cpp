@@ -1,10 +1,61 @@
 #include "stdafx.h"
+#include "precompiled_objects.h"
 
 #include "node_impl.h"
+#include "nodes_manager_common.h"
+#include "nodes_manager_view.h"
+#include "reflection/proc/prop_attr.h"
 
 namespace nodes_management
 {
+
+node_impl::node_impl( view * manager, node_impl const& parent, model_structure::node_data const& data, uint32_t id )
+    : manager_(manager)
+    , data_   (data)
+    , node_id_(id)
+{
+    position_.set_local(local_position(manager->object_id(), parent.node_id(), data.pos, data.orien));
+    extrapolated_position_ = position_;
+
+    init_disp();
+}
+
+node_impl::node_impl( view * manager, geo_position const& pos, model_structure::node_data const& data, uint32_t id )
+    : manager_(manager)
+    , data_   (data)
+    , node_id_(id)
+{
+    position_.set_global(pos);
+    extrapolated_position_ = position_;
+
+    init_disp();
+}
+
+node_impl::node_impl( view * manager, binary::input_stream & stream )
+    : manager_(manager)
+{
+    using namespace binary;
+
+    read(stream, node_id_); 
+    read(stream, data_); 
+    read(stream, position_); 
+    read(stream, texture_);
+
+    extrapolated_position_ = position_;
     
+    init_disp();
+}
+
+void node_impl::save( binary::output_stream& stream ) const
+{
+    using namespace binary;
+
+    write(stream, node_id_); 
+    write(stream, data_); 
+    write(stream, position_); 
+    write(stream, texture_);
+}
+
 void node_impl::pre_update(double time)
 {
     if (!time_)
@@ -36,84 +87,15 @@ void node_impl::post_update(double /*time*/)
 {
 }
 
-void node_impl::extrapolated_position_reseted() 
+node_position const& node_impl::position() const
 {
+    return extrapolated_position_;
 }
 
-void node_impl::play_animation  (std::string const& seq, double len, double from, double size) 
+transform_4 node_impl::transform  () const
 {
-    // FIXME  Заглушка для анимации
-    FIXME(Анимация на коленке)
-    osgAnimation::Animation::PlayMode pm = from > 0?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
-    
-    auto god_node = node_impl_ptr(root_node())->as_osg_node()->getParent(0);
-                                           
-    auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( god_node->getUpdateCallback() );
-    
-    if ( manager_ )
-    {   
-
-        const osgAnimation::AnimationList& animations =
-            manager_->getAnimationList();
-        
-        //std::vector<std::string>  childs_names;
-        
-        if(childs_callbacks_.size()==0)
-            for (int i =0; i < node_->asGroup()->getNumChildren();++i)
-            {
-               auto child_node = node_->asGroup()->getChild(i); 
-               childs_callbacks_.push_back(child_node->getUpdateCallback());
-               // child_node->setUpdateCallback(nullptr);
-            }
-        
-        //osgAnimation::ChannelList& channels = animations[0]->getChannels();
-        //std::list<std::string>  chan_names;  
-        //std::for_each(channels.begin(),channels.end(),[&chan_names,&childs_names](osg::ref_ptr<osgAnimation::Channel> chan)
-        //                                              {
-        //                                                  chan_names.push_back(chan->getTargetName());
-        //                                                  if(std::find(childs_names.begin(), childs_names.end(), chan->getTargetName())!=childs_names.end())
-        //                                                  {
-        //                                                      chan->setTargetName("hhhhhh");
-        //                                                  }
-        //                                              }
-        //);
-
-        for ( unsigned int i=0; i<animations.size(); ++i )
-        {
-            const std::string& name = animations[i]->getName();
-            // if ( name==animationName_ )
-            {
-                animations[i]->setPlayMode(pm);                   
-                manager_->playAnimation( animations[i].get(),2,2.0 );
-
-            }
-        }
-
-        //for( auto it = chan_names.begin();it!=chan_names.end();++it)
-        //    channels[std::distance(chan_names.begin(),it)]->setTargetName(*it);
-
-        //for (int i =0; i < node_->asGroup()->getNumChildren();++i)
-        //{
-        //    auto child_node = node_->asGroup()->getChild(i); 
-        //    child_node->setUpdateCallback(childs_callbacks_[i]);
-        //}
-    }
-}
-
-void node_impl::set_texture     (std::string const& texture) 
-{
-
-}
-
-void node_impl::set_visibility  (bool visible) 
-{
-      node_->setNodeMask(visible?0xfffffffff:0);
-}
-
-std::string const&  node_impl::name() const
-{
-    name_ = boost::to_lower_copy(node_->getName()); 
-    return name_;
+    Assert(extrapolated_position_.is_local());
+    return transform_4(cg::as_translation(extrapolated_position_.local().pos), cg::rotation_3(extrapolated_position_.local().orien.cpr()));
 }
 
 uint32_t node_impl::node_id() const
@@ -123,104 +105,203 @@ uint32_t node_impl::node_id() const
 
 uint32_t node_impl::object_id() const
 {
-    auto n = node_;
-    uint32_t id=0;
-    bool got_phys_node=false;
-    while(0 != n->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(n->getName())))
-    {                  
-        n = n->getParent(0);
-    }
+    return manager_->object_id();
+}
 
-    if(!got_phys_node)
+string const& node_impl::name() const
+{
+    return data_.name;
+}
+
+node_info_ptr node_impl::rel_node() const
+{
+    Assert(position_.is_local());
+
+    if (rel_node_)
+        return *rel_node_;
+
+    manager * rel_object ;
+    if (position_.local().relative_obj == manager_->object_id())
+        rel_object = manager_;
+    else
+        rel_object = manager_ptr(manager_->collection()->get_object(position_.local().relative_obj)).get();
+
+    rel_node_ = rel_object ? rel_object->get_node(position_.local().relative_node) : node_info_ptr();
+
+    return *rel_node_;
+}
+
+node_info_ptr node_impl::root_node() const
+{
+    Assert(position_.is_local());
+
+    node_info_ptr n = rel_node();
+
+    while(n->position().is_local())
+        n = n->rel_node();
+
+    return n;
+}
+
+transform_4 node_impl::get_root_transform() const
+{
+    //TODO: cache
+
+    if (extrapolated_position_.is_local())
+    {                         
+        transform_4 rel_tr = rel_node()->get_root_transform();
+        return rel_tr * transform();
+    }
+    else
+        return transform_4();
+}
+
+
+geo_point_3 node_impl::get_global_pos() const
+{
+    if (extrapolated_position_.is_local())
     {
-        n->getUserValue("id",id);
+        transform_4 tr = get_root_transform();
+        node_info_ptr root = root_node();
+        return root->position().global().pos(root->position().global().orien.rotate_vector(tr.translation()));
+    }
+    else
+        return extrapolated_position_.global().pos;
+}
+
+quaternion node_impl::get_global_orien() const
+{
+    if (extrapolated_position_.is_local())
+    {
+        transform_4 tr = get_root_transform();
+        node_info_ptr root = root_node();
+        return root->position().global().orien * quaternion(tr.rotation().cpr());
+    }
+    else
+        return extrapolated_position_.global().orien;
+}
+
+model_structure::collision_volume const* node_impl::get_collision() const
+{
+    if (!collision_ && manager_->get_collision_structure())
+    {
+        auto const& volumes = manager_->get_collision_structure()->collision_volumes;
+        auto it = volumes.find(data_.name);
+        collision_.reset(it != volumes.end() ? &*(it->second) : NULL);
     }
 
-    return id;
+    return collision_ ? *collision_ : NULL;
 }
 
-
-cg::sphere_3   node_impl::get_bound()
-{
-     const osg::BoundingSphere& bs = node_->getBound();
-     return cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
+void node_impl::on_msg(binary::bytes_cref data)
+{               
+    msg_disp().dispatch_bytes(data);
 }
 
-node_info_ptr  node_impl::root_node() const
+void node_impl::on_position(msg::node_pos_descr const& m)
 {
-    auto n = node_;
-    while(0 != n->getNumParents() && "root" != boost::to_lower_copy(n->getName()))
-    {                  
-        n = n->getParent(0);
+    time_                   = m.time;
+    position_               = m.pos.get_pos(position_, m.components);
+    extrapolated_position_  = position_;
+
+    if (position_.is_local())
+    {
+        if (rel_node_ && *rel_node_)
+        {
+            if ((*rel_node_)->object_id() != position_.local().relative_obj || (*rel_node_)->node_id() != position_.local().relative_node)
+                rel_node_.reset();
+        }
     }
+    else
+        rel_node_.reset();
 
-    return boost::make_shared<node_impl>(n.get()); // FIXME хо-хо
+    extrapolated_position_reseted();
 }
 
-cg::geo_point_3 node_impl::get_global_pos() const
+void node_impl::on_texture(msg::node_texture_msg const& m)
 {
-    //if (extrapolated_position_.is_local())
-    //{
-    //    transform_4 tr = get_root_transform();
-    //    node_info_ptr root = root_node();
-    //    return root->position().global().pos(root->position().global().orien.rotate_vector(tr.translation()));
-    //}
-    //else
-    //    return extrapolated_position_.global().pos;
-    return cg::geo_point_3();
-}
-
-cg::quaternion node_impl::get_global_orien() const
-{
-    //if (extrapolated_position_.is_local())
-    //{
-    //    transform_4 tr = get_root_transform();
-    //    node_info_ptr root = root_node();
-    //    return root->position().global().orien * quaternion(tr.rotation().cpr());
-    //}
-    //else
-    //    return extrapolated_position_.global().orien;
-    return cg::quaternion();
+    texture_ = m.tex;
 }
 
 void node_impl::set_position(node_position const& pos)
 {   
-    //time_                   = m.time;
-    //position_               = m.pos.get_pos(position_, m.components);
-    //extrapolated_position_  = position_;   
-    FIXME(Больное место локальные/глобальные координаты)
-    if(pos.is_local())
-    if(node_->asTransform()->asMatrixTransform())
-    {
-        auto mat = node_->asTransform()->asMatrixTransform()->getMatrix();
-        mat.setRotate(to_osg_quat(pos.local().orien));
-        node_->asTransform()->asMatrixTransform()->setMatrix(mat);
-    }
-    else if(node_->asTransform()->asPositionAttitudeTransform())
-    {
-        auto pat = node_->asTransform()->asPositionAttitudeTransform();
-        node_->asTransform()->asPositionAttitudeTransform()->setAttitude(to_osg_quat(pos.local().orien));
+    manager_->set_node_msg(node_id_, 
+        network::wrap_msg(msg::node_pos_msg(
+            manager_->update_time(), 
+            ct_all, 
+            node_pos(pos))));
+}
+
+void node_impl::play_animation(string const& seq, double len, double from, double size)
+{
+    manager_->send_node_msg(
+        node_id_,
+        network::wrap_msg(msg::node_animation(
+            *manager_->update_time(), 
+            seq, 
+            (float)len, 
+            (float)from, 
+            (float)size)));
+}
+
+void node_impl::set_texture(string const& texture)
+{
+    if (!texture_ || *texture_ != texture)
+        manager_->set_node_msg(
+            node_id_, 
+            network::wrap_msg(msg::node_texture_msg(texture)));
+}
+
+void node_impl::set_visibility  (bool visible)
+{
+    manager_->send_node_msg(
+        node_id_, 
+        network::wrap_msg(msg::visibility_msg(visible)));
+}
+
+void node_impl::on_object_created(object_info_ptr object)
+{
+    if ((!rel_node_ || !*rel_node_) && position_.is_local())
+    {               
+        if (position_.local().relative_obj == object->object_id())
+        {
+            manager_ptr rel_object = object;
+            rel_node_ = rel_object->get_node(position_.local().relative_node);
+        }
     }
 }
 
-node_position /*const&*/ node_impl::position() /*const*/
-{
-    // auto mat = node_->get asTransform()->asMatrixTransform()->getMatrix();
-    auto pat = node_->asTransform()->asPositionAttitudeTransform();
-    auto mat = node_->asTransform()->asMatrixTransform();
-
-    osg::Vec3 trans = pat?pat->getPosition():mat->getMatrix().getTrans();  
-    osg::Quat rot = pat?pat->getAttitude():mat->getMatrix().getRotate();  
-
-    FIXME(Больное место локальные/глобальные координаты)
-    return /*extrapolated_position_*//*position_*/local_position(0,0,from_osg_vector3(trans),from_osg_quat(rot));
+void node_impl::on_object_destroying(object_info_ptr object)
+{           
+    if (rel_node_ && *rel_node_)
+    {
+        if ((*rel_node_)->object_id() == object->object_id())
+            rel_node_.reset();
+    }
 }
 
-// FIXME just stub
-cg::transform_4  node_impl::get_root_transform() const 
+model_structure::node_data const& node_impl::data() const 
+{ 
+    return data_; 
+}
+
+void node_impl::extrapolated_position_reseted() 
 {
-    FIXME(Пустой трансформ хм)
-    return cg::transform_4();
+}
+
+network::msg_dispatcher<>& node_impl::msg_disp()
+{
+    return msg_disp_;
+}
+
+void node_impl::init_disp()
+{   
+    msg_disp()
+        .add<msg::freeze_state_msg  >(boost::bind(&node_impl::on_position , this, _1))
+        .add<msg::node_pos_msg      >(boost::bind(&node_impl::on_position , this, _1))
+        .add<msg::node_texture_msg  >(boost::bind(&node_impl::on_texture  , this, _1))
+        .track<msg::node_animation  >()
+        .track<msg::visibility_msg  >();
 }
 
 }
