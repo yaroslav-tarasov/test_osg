@@ -46,12 +46,13 @@ void vis_node_impl::fill_victory_nodes()
     if (vis_manager->visual_object())
     {
         for (auto jt = data_.victory_nodes.begin(); jt != data_.victory_nodes.end(); ++jt)
-            if (auto visnode = victory::find_name(vis_manager->visual_object()->node().get(), *jt))
+            FIXME(fill_victory_nodes Need to be realized)
+            //if (auto visnode = victory::find_name(vis_manager->visual_object()->node().get(), *jt))
             {
-                victory_nodes_.push_back(visnode);
-
-                if (texture_ && visnode->as_root())
-                    visnode->as_root()->set_base_texture(*texture_);
+                //victory_nodes_.push_back(visnode);
+                FIXME(fill_victory_nodes Need to be realized)
+                //if (texture_ && visnode->as_root())
+                //    visnode->as_root()->set_base_texture(*texture_);
             }
     }
 }
@@ -76,11 +77,12 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
         return true;
     });
 
-    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-    {
-        if (auto v_node = (*(it))->as_animgroup())
-            v_node->play_sequence(victory::animation_player::sequence_play_info(anim.name, anim.len, float(anim.time), anim.from, anim.size));
-    }
+    FIXME(Animation Need to be realized)
+    //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+    //{
+    //    if (auto v_node = (*(it))->as_animgroup())
+    //        v_node->play_sequence(victory::animation_player::sequence_play_info(anim.name, anim.len, float(anim.time), anim.from, anim.size));
+    //}
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)
@@ -92,14 +94,15 @@ void vis_node_impl::on_visibility(msg::visibility_msg const& m)
 void vis_node_impl::on_texture(msg::node_texture_msg const& m)
 {
     node_impl::on_texture(m.tex);
-
-    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-    {
-        if (auto v_node = (*(it))->as_root())
-        {
-            v_node->set_base_texture(*texture_);
-        }
-    }
+    
+    FIXME(on_texture Need to be realized)
+    //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+    //{
+    //    if (auto v_node = (*(it))->as_root())
+    //    {
+    //        v_node->set_base_texture(*texture_);
+    //    }
+    //}
 }
 
 bool vis_node_impl::is_visible() const
@@ -145,18 +148,19 @@ void vis_node_impl::sync_position()
 
     bool visible = is_visible();
 
-
-    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-        (*(it))->set_process_flag(visible);
+    FIXME(sync_position Need to be realized)
+    //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+    //    (*(it))->set_process_flag(visible);
 
     if (visible)
     {
         if (position_.is_local())
         {
             cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f(extrapolated_position_.local().orien.rotation()));
-            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-                if ((*(it))->as_transform())
-                    (*(it))->as_transform()->set_transform(tr);
+            FIXME(sync_position Need to be realized)
+            //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+            //    if ((*(it))->as_transform())
+            //        (*(it))->as_transform()->set_transform(tr);
         }
         else
         {
@@ -164,8 +168,9 @@ void vis_node_impl::sync_position()
             point_3f offset = base(extrapolated_position_.global().pos);
 
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f(extrapolated_position_.global().orien.rotation()));
-            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-                (*(it))->as_transform()->set_transform(tr);
+            FIXME(sync_position need to)
+            //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+            //    (*(it))->as_transform()->set_transform(tr);
         }
     }
 

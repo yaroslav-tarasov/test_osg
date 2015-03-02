@@ -542,5 +542,8 @@
     <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp">
       <Filter>Source Files\nodes_manager</Filter>
     </ClCompile>
+    <ClCompile Include="config\config.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

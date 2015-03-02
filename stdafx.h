@@ -427,6 +427,8 @@ namespace aircraft
 #include <tinyxml2/tinyxml2.h>
 #include "xml/tixml_xinclude.h"
 
+#include "config/config.h"
+
 #endif // precompile_header
 
 

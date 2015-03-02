@@ -193,6 +193,12 @@ model_structure::collision_volume const* node_impl::get_collision() const
     return collision_ ? *collision_ : NULL;
 }
 
+cg::sphere_3    node_impl::get_bound() const
+{
+   FIXME(Need to be realized)
+   return cg::sphere_3();
+}
+
 void node_impl::on_msg(binary::bytes_cref data)
 {               
     msg_disp().dispatch_bytes(data);

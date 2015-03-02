@@ -1,6 +1,6 @@
 #pragma once
 
-#include "node_impl.h"
+#include "nm/node_impl.h"
 #include "vis_node_impl.h"
 #include "mod_node_impl.h"
 

@@ -5,6 +5,7 @@
 #include "objects/nodes_management.h"
 #include "nodes_manager.h"
 #include "node_impl.h"
+#include "nodes_manager/node_tree_iterator.h"
 
 namespace nodes_management
 {   
@@ -53,11 +54,12 @@ namespace nodes_management
         object_info_ptr manager_impl::create(osg::Node* base,kernel::object_create_t const& oc/*, dict_copt dict*/);
         void init();
 
-        node_info_ptr find_node(std::string const& name) const override;
-        node_info_ptr get_node    (uint32_t node_id)   const  override;
-        void          set_model   (string const& model, bool save_root_pos = true) override;
-        string const&   get_model   () const override;
-   
+        node_info_ptr   find_node  (std::string const& name)                         const override;
+        node_info_ptr   get_node   (uint32_t node_id)                                const  override;
+        void            set_model  (string const& model, bool save_root_pos = true)  override;
+        string const&   get_model  ()                                                const override;
+        void            visit_nodes( boost::function<void(node_info_ptr)> const& f ) const override;
+        node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const override;
     private: 
         osg::ref_ptr<osg::Node> base_;
         std::string       model_name_;
@@ -68,7 +70,8 @@ namespace nodes_management
         //for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
         //    if ((*it)->data().name == name)
         //        return (*it);
-        auto n = findFirstNode(base_,name,findNodeVisitor::not_exact);
+        auto n = findFirstNode(base_,name
+            ,findNodeVisitor::not_exact);
         if(n)
             return boost::make_shared<node_impl>(n);
 
@@ -125,4 +128,16 @@ namespace nodes_management
         //    contains_model_ = true;
         //}
     }
+
+    void manager_impl::visit_nodes( boost::function<void(node_info_ptr)> const& f ) const
+    {
+        FIXME(И по узлам пройтись не плохо бы)
+        //for_each(nodes_.begin(), nodes_.end(), f);
+    }
+
+    node_tree_iterator_ptr manager_impl::get_node_tree_iterator(uint32_t node_id) const
+    {
+        return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), this);
+    }
+
 }

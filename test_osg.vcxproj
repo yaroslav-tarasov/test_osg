@@ -173,6 +173,7 @@
     <ClCompile Include="av\Terrain.cpp" />
     <ClCompile Include="bada\bada_import.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
+    <ClCompile Include="config\config.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="dubins.cpp" />
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
@@ -213,7 +214,9 @@
     <ClCompile Include="objects\nodes_manager\mod_node_impl.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager_view.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager_visual.cpp" />
-    <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
+    <ClCompile Include="objects\nodes_manager\node_impl.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="objects\nodes_manager\node_tree_iterator.cpp" />
     <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp" />
     <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp" />

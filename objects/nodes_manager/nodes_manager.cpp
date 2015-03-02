@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "precompiled_objects.h"
 
 #include "objects/nodes_management.h"

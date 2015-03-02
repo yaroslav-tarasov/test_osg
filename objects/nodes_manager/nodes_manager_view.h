@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nodes_manager_common.h"
-#include "node_impl.h"
+#include "nm/node_impl.h"
 
 #include "objects/nodes_management.h"
 

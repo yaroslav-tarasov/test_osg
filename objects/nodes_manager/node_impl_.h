@@ -35,7 +35,7 @@ public:
     geo_point_3             get_global_pos      () const;
     quaternion              get_global_orien    () const;
     model_structure::collision_volume const* get_collision       () const;
-
+    cg::sphere_3            get_bound()            const;
 public:
     void on_msg(binary::bytes_cref data);
 

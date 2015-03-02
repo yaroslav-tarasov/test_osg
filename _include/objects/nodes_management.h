@@ -41,11 +41,23 @@
 
         bool is_static() const;
         void set_static();
-
+           
+        template<class processor> friend void reflect(processor&, node_position const&);
 
     private:
         boost::any pos_;
     };
+
+REFL_STRUCT(node_position)
+    
+    bool __local__ = obj.is_local();
+    REFL_SER_RAW(__local__)
+
+    if (__local__)
+        REFL_SER_AS_TYPE(pos_, local_position)
+    else 
+        REFL_SER_AS_TYPE(pos_, geo_position)
+REFL_END()
 
     //! вероятно некая проверка на начлаьные значения полей 'dpos' и 'omega'
     inline bool node_position::is_static() const
@@ -75,21 +87,21 @@
     {
         virtual ~node_info(){}
 
-        virtual node_position /*const&*/     position   () /*const*/ = 0;
-        //virtual transform_4                  transform  () const = 0;
+        virtual node_position const&         position   () const = 0;
+        virtual transform_4                  transform  () const = 0;
         virtual uint32_t                     node_id    () const = 0;
         virtual uint32_t                     object_id  () const = 0;
         virtual std::string const&           name       () const = 0;
                                                                                     
-        //virtual node_info_ptr                rel_node() const = 0;
-        virtual node_info_ptr                root_node() const = 0;   // FIXME не всякий рут можно найти
+        virtual node_info_ptr                rel_node()    const = 0;
+        virtual node_info_ptr                root_node()   const = 0;   // FIXME не всякий рут можно найти
 
         virtual cg::transform_4              get_root_transform() const = 0;
-        virtual cg::geo_point_3              get_global_pos() const = 0;
-        virtual cg::quaternion               get_global_orien() const = 0;
+        virtual cg::geo_point_3              get_global_pos()     const = 0;
+        virtual cg::quaternion               get_global_orien()   const = 0;
 
         //virtual model_structure::collision_volume const* get_collision() const = 0;
-        virtual cg::sphere_3                 get_bound() = 0;
+        virtual cg::sphere_3                 get_bound() const = 0;
     };
 
 

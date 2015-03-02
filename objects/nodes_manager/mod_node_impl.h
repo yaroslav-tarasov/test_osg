@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "node_impl.h"
+#include "nm/node_impl.h"
 
 namespace nodes_management
 {
