@@ -1,5 +1,10 @@
 #include "stdafx.h"
 
+#include "kernel/systems/systems_base.h"
+#include "fake_system.h"
+#include "kernel/object_class.h"
+#include "kernel/msg_proxy.h"
+
 #include "../high_res_timer.h"
 #include "BulletInterface.h"
 #include "aircraft.h"                         // FIXME TODO don't need here 
@@ -12,11 +17,11 @@
 #include "aircraft/phys_aircraft.h"
 #include "vehicle.h"
 
+
+
 #include "RigidUpdater.h"
 
-#include "kernel/systems/systems_base.h"
-#include "fake_system.h"
-#include "kernel/object_class.h"
+
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -36,7 +41,8 @@ namespace bi
 	struct RigidUpdater::RigidUpdater_private
 	{
 		        RigidUpdater::phys_vehicles_t                          _vehicles;
-                kernel::system_ptr                                     _msys; 
+                kernel::system_ptr                                     _msys;
+                kernel::msg_service msg_service_; 
 	};
 
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
@@ -51,7 +57,7 @@ namespace bi
 	{
 
         using namespace kernel;
-        _d->_msys = kernel::create_model_system("script should  be placed here");
+        _d->_msys = kernel::create_model_system(_d->msg_service_,"script should  be placed here");
 
         // kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
         
@@ -270,7 +276,7 @@ namespace bi
 
         int id = _physicsNodes.size();
 
-        nm::manager_ptr man = nm::create_manager(lod3);
+        nm::manager_ptr man = nm::create_manager(_d->_msys,lod3);
 
         FIXME("А вот и засада с лодами")
         //aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
@@ -327,7 +333,7 @@ namespace bi
         int id = _physicsNodes.size();
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
          
-        nm::manager_ptr man = nm::create_manager(lod3?lod3:node);
+        nm::manager_ptr man = nm::create_manager(_d->_msys,lod3?lod3:node);
 
         _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 

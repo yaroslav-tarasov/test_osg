@@ -245,7 +245,7 @@ node_info_ptr  node_impl::root_node() const
         n = n->getParent(0);
     }
 
-    return boost::make_shared<node_impl>(n.get()); // FIXME хо-хо
+    return boost::make_shared<node_impl>(n.get(),manager_); // FIXME хо-хо
 }
 
 cg::geo_point_3 node_impl::get_global_pos() const
@@ -258,6 +258,7 @@ cg::geo_point_3 node_impl::get_global_pos() const
     //}
     //else
     //    return extrapolated_position_.global().pos;
+    FIXME(get_global_pos())
     return cg::geo_point_3();
 }
 
@@ -271,6 +272,7 @@ cg::quaternion node_impl::get_global_orien() const
     //}
     //else
     //    return extrapolated_position_.global().orien;
+    FIXME(get_global_orien())
     return cg::quaternion();
 }
 
@@ -278,7 +280,8 @@ void node_impl::set_position(node_position const& pos)
 {   
     //time_                   = m.time;
     //position_               = m.pos.get_pos(position_, m.components);
-    //extrapolated_position_  = position_;   
+    //extrapolated_position_  = position_; 
+
     FIXME(Больное место локальные/глобальные координаты)
     if(pos.is_local())
     if(node_->asTransform()->asMatrixTransform())
@@ -292,6 +295,19 @@ void node_impl::set_position(node_position const& pos)
         auto pat = node_->asTransform()->asPositionAttitudeTransform();
         node_->asTransform()->asPositionAttitudeTransform()->setAttitude(to_osg_quat(pos.local().orien));
     }
+}
+
+model_structure::collision_volume const* node_impl::get_collision() const
+{
+    //if (!collision_ && manager_->get_collision_structure())
+    //{
+    //    auto const& volumes = manager_->get_collision_structure()->collision_volumes;
+    //    auto it = volumes.find(data_.name);
+    //    collision_.reset(it != volumes.end() ? &*(it->second) : NULL);
+    //}
+
+    //return collision_ ? *collision_ : NULL;
+    return nullptr;
 }
 
 node_position const& node_impl::position() const
@@ -330,7 +346,7 @@ node_info_ptr node_impl::rel_node() const
 
     //rel_node_ = rel_object ? rel_object->get_node(position_.local().relative_node) : node_info_ptr();
     
-    rel_node_ = boost::make_shared<node_impl>(node_->getParent(0));
+    rel_node_ = boost::make_shared<node_impl>(node_->getParent(0), manager_);
 
     return *rel_node_;
 }

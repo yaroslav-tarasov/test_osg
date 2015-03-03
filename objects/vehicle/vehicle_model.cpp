@@ -82,9 +82,17 @@ model::model(kernel::object_create_t const& oc/*, dict_copt dict*/)
     FIXME (Подлежит удалению)
     , sys_ (new stub_msys)
 {
-                      
-    root_next_pos_   =  geo_position(root_->position()./*global*/local(),get_base()).pos;
-    root_next_orien_ = root_->position()./*global*/local().orien;
+    FIXME(local global)
+    if(root_->position().is_local())    
+    {
+        root_next_pos_   = geo_position(root_->position()./*global*/local(),get_base()).pos;
+        root_next_orien_ = root_->position()./*global*/local().orien;
+    }
+    else
+    {
+        root_next_pos_   =  root_->position().global().pos;
+        root_next_orien_ =  root_->position().global().orien;
+    }
 
     body_node_ = nodes_manager_->find_node("body");
 

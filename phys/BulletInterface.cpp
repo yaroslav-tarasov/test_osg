@@ -17,6 +17,10 @@
 //#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
 //#include "nodes_manager/node_impl.h"
 
+#include "kernel/systems/systems_base.h"
+#include "fake_system.h"
+#include "kernel/object_class.h"
+
 #include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
 FIXME(Неправильное использование node_impl)
 #include "nm/node_impl.h"

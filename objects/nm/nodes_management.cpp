@@ -17,7 +17,8 @@ public:
 
     virtual void apply(osg::Node &searchNode)
     {   
-        if(func_(boost::make_shared<nm::node_impl>(&searchNode)))
+        FIXME (Nodes manager надо реализовывать нормально)
+        if(func_(boost::make_shared<nm::node_impl>(&searchNode,nullptr)))
             traverse(searchNode);    
     }
 

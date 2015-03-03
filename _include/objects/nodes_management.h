@@ -2,6 +2,7 @@
 
 #include "nodes_management_fwd.h"
 #include "cpp_utils/polymorph_ptr.h"
+#include "atc/model_structure.h"
 
 	namespace nodes_management
 	{
@@ -100,7 +101,7 @@ REFL_END()
         virtual cg::geo_point_3              get_global_pos()     const = 0;
         virtual cg::quaternion               get_global_orien()   const = 0;
 
-        //virtual model_structure::collision_volume const* get_collision() const = 0;
+        virtual model_structure::collision_volume const* get_collision() const = 0;
         virtual cg::sphere_3                 get_bound() const = 0;
     };
 

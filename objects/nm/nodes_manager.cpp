@@ -5,6 +5,7 @@
 #include "objects/nodes_management.h"
 #include "nodes_manager.h"
 #include "node_impl.h"
+#include "nodes_manager/nodes_manager_view.h"
 #include "nodes_manager/node_tree_iterator.h"
 
 namespace nodes_management
@@ -22,14 +23,14 @@ namespace nodes_management
 
     } 
 
-    manager_ptr create_manager(osg::Node* node) 
+    manager_ptr create_manager(kernel::system_ptr sys,osg::Node* node) 
     {
         size_t id  = 0x666;
         auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
         auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
         kernel::object_create_t  oc(
             nullptr, 
-            nullptr,                    // kernel::system*                 sys             , 
+            sys.get(),                    // kernel::system*                 sys             , 
             id,                         // size_t                          object_id       , 
             "name",                     // string const&                   name            , 
             std::vector<object_info_ptr>(),  // vector<object_info_ptr> const&  objects         , 
@@ -41,13 +42,14 @@ namespace nodes_management
     }
 
     class manager_impl 
-        :  public base_view_presentation
-        ,  public manager
+        :  public view //base_view_presentation
+        // ,  public manager
     {
     public: 
         manager_impl( osg::Node* base, kernel::object_create_t const& oc) 
-            : base_view_presentation(oc)
+            : /*base_view_presentation*/view(oc)
             , base_(base)
+            , self (this)
             
         {}
 
@@ -63,6 +65,7 @@ namespace nodes_management
     private: 
         osg::ref_ptr<osg::Node> base_;
         std::string       model_name_;
+        manager_impl* const    self;
     };
 
     node_info_ptr manager_impl::find_node(std::string const& name) const
@@ -73,7 +76,7 @@ namespace nodes_management
         auto n = findFirstNode(base_,name
             ,findNodeVisitor::not_exact);
         if(n)
-            return boost::make_shared<node_impl>(n);
+            return boost::make_shared<node_impl>(n,self);
 
         return node_info_ptr();
     }
@@ -82,7 +85,7 @@ namespace nodes_management
     {
           
           if(node_id==0)
-                  return boost::make_shared<node_impl>(base_);   // FIXME ну бред же
+                  return boost::make_shared<node_impl>(base_, self);   // FIXME ну бред же
 
           return node_info_ptr();
     }
@@ -137,7 +140,7 @@ namespace nodes_management
 
     node_tree_iterator_ptr manager_impl::get_node_tree_iterator(uint32_t node_id) const
     {
-        return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), this);
+        return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), self);
     }
 
 }

@@ -19,8 +19,9 @@ struct view;
 struct node_impl : public node_control
 {
 public:
-    node_impl( osg::Node* n )
+    node_impl( osg::Node* n,  view  * manager )
         : node_(n)
+        , manager_(manager)
     {
         node_->getUserValue("id",node_id_);
     }
@@ -47,6 +48,7 @@ private:
     void set_texture     (std::string const& texture) override;
     void set_visibility  (bool visible) override;
     void set_position    (node_position const& pos) override;
+    virtual model_structure::collision_volume const* get_collision() const override;
 
 public:
     virtual void on_object_created   (object_info_ptr object);
@@ -96,6 +98,9 @@ protected:
     mutable optional<node_info_ptr>               rel_node_;
     std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
     mutable std::string                           name_;
+
+protected:
+    mutable optional<model_structure::collision_volume const*> collision_;
 
 private:
     network::msg_dispatcher<> msg_disp_;
