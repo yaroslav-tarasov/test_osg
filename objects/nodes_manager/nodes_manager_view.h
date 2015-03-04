@@ -30,10 +30,10 @@ protected:
 
 struct view
     : base_view_presentation
-    , /*obj_data_holder<*/nodes_data/*>*/
+    , obj_data_holder<nodes_data>
     , manager
 {
-    static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
 public:
     object_collection const*    collection () const;
@@ -52,7 +52,7 @@ protected:
     virtual void apply_model(string const& model);
 
 protected:
-    view(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    view(kernel::object_create_t const& oc, dict_copt dict);
 
 private:
     void save(dict_ref  dict, bool safe_key) const override;

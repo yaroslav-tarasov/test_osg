@@ -51,18 +51,18 @@ std::string make_OLDI_msg(aircraft::atc_state_t atc_state)
 #endif
 } // end of anonymous namespace
 
-object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
-{
-    return object_info_ptr(new view(oc/*, dict*/));
+object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
+{   
+    return object_info_ptr(new view(oc, dict));
 }
 
 AUTO_REG_NAME(aircraft_view, view::create);
 
 
 
-view::view(kernel::object_create_t const& oc/*, dict_copt dict*/)
+view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation    (oc)
-    //, obj_data_base             (dict)
+    , obj_data_base             (dict)
 #if 0
     , conflicts_manager_        (find_first_object<conflicts_manager::control_ptr>(collection_))
 #endif    

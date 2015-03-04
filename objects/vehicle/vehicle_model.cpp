@@ -42,7 +42,10 @@ void /*system_base::*/block_obj_msgs(bool block)
 }
 
 void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
-{}
+{
+       int i =0;
+
+}
 
 object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager)
 {
@@ -61,18 +64,21 @@ object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nod
 		block_msgs                  // kernel::block_obj_msgs_f        block_msgs
 		);
 
-	return model::create(oc);
+    vehicle::settings_t settings;
+    dict_t d = dict::wrap(vehicle_data(settings,state_t()));
+
+	return model::create(oc,d);
 }
 
-object_info_ptr model::create(kernel::object_create_t const& oc)
+object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 {
-    return object_info_ptr(new model(oc));
+    return object_info_ptr(new model(oc, dict));
 }
 
 AUTO_REG_NAME(vehicle_model, model::create);
 
-model::model(kernel::object_create_t const& oc/*, dict_copt dict*/)
-    : view(oc)/*, dict)*/
+model::model(kernel::object_create_t const& oc, dict_copt dict)
+    : view(oc, dict)
     , phys_object_model_base(collection_)
     //, sys_(dynamic_cast<model_system *>(oc.sys))
     //, ani_(find_first_object<ani_object::info_ptr>(collection_))

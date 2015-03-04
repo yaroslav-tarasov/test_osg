@@ -71,7 +71,7 @@ protected:
 
 struct view
     : kernel::base_view_presentation
-    , craft_data// obj_data_holder<craft_data>
+    , obj_data_holder<craft_data>
     , info
 #if 0
     , ani_info
@@ -84,7 +84,7 @@ struct view
 #endif
     , atc_info
 {
-    static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
 protected:
     typedef 
@@ -92,7 +92,7 @@ protected:
         contact_t;
 
 protected:
-    view( kernel::object_create_t const& oc/*, dict_copt dict*/ );
+    view( kernel::object_create_t const& oc, dict_copt dict );
 
 public:
     ~view();

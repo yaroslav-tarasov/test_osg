@@ -9,9 +9,9 @@
 namespace nodes_management
 {
 
-object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
 {
-    view *obj = new view(oc/*, dict*/);
+    view *obj = new view(oc, dict);
     object_info_ptr info(obj);
     obj->init();
     return info;
@@ -90,9 +90,9 @@ void view::apply_model(string const& model)
     init_logic_tree();
 }
 
-view::view(kernel::object_create_t const& oc/*, dict_copt dict*/)
+view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
-    //, obj_data_base         (dict)
+    , obj_data_base         (dict)
 {
     msg_disp()
         .add<msg::model_msg>(boost::bind(&view::on_model    , this, _1))

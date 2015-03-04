@@ -34,11 +34,17 @@ void model::update( double time )
     size_t count = cg::max(1, cg::floor(dt / calc_step));
     double real_calc_step = dt / count;
 
+FIXME(Ну очень интересная физика)
+#if 0
     for (size_t i = 0; i < count; ++i)
     {
         for (auto it = zones_.begin(); it != zones_.end(); ++it)
             (*it).sys->update(real_calc_step);
     }
+#else
+    for (auto it = zones_.begin(); it != zones_.end(); ++it)
+        (*it).sys->update(dt);
+#endif
 
     last_time_ = time;
 }

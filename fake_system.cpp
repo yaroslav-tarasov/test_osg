@@ -81,8 +81,9 @@ protected:
     // objects_factory
 protected:
     object_info_ptr create_object           (object_class_ptr hierarchy_class, std::string const &name)     override;
-    object_info_ptr create_object           (std::string const &object_name)                                override;
+    //object_info_ptr create_object           (std::string const &object_name)                                override;
     object_info_ptr load_object_hierarchy   (dict_cref dict)                                                override;
+    void            save_object_hierarchy   (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
     object_class_vector const& object_classes() const                                                   override;
     object_class_ptr get_object_class(std::string const& name) const                                    override;
 
@@ -214,7 +215,7 @@ fake_system_base::fake_system_base(system_kind kind, msg_service& service, std::
     //, id_randgen_           (randgen_seed_tag())
     , udp_messages_size_    (0)
     , udp_msg_threshold_    (1300 ) // limit for Win32
-    //, block_obj_msgs_counter_(0)
+    , block_obj_msgs_counter_(0)
 {
     // загружаем файл objects.xml - в нем дерево подсистем и объектов, в том числе ссылки на внешние файлы ani, fpl, bada
     tinyxml2::XMLDocument units_doc;
@@ -351,41 +352,41 @@ auto fake_system_base::generate_object_id() -> obj_id_t
     return id;
 }
 
-object_info_ptr   fake_system_base::create_object  (std::string const& name)
-{   
-    object_info_ptr obj;
-    //msgs_blocker    mb(*this);
-
-    //{
-    //    locks::bool_lock l(create_object_lock_);
-    //    obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
-    //}
-
-    uint32_t id       = generate_object_id();
-
-    auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
-    auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
-
-    kernel::object_create_t oc(/*hierarchy_class*/nullptr, this, id, name, std::vector<object_info_ptr>(), msg_service, block_msgs);
-
-    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(name);
-    
-    if(fp)
-        fp(oc);
-
-    if (obj)
-        fire_object_created(obj);
-    
-    if (obj == nullptr)
-    {
-        LogError("Unable to load object " << name);
-        return obj;
-    }
-
-    register_obj_id(id);
-
-    return obj;
-}
+//object_info_ptr   fake_system_base::create_object  (std::string const& name)
+//{   
+//    object_info_ptr obj;
+//    //msgs_blocker    mb(*this);
+//
+//    //{
+//    //    locks::bool_lock l(create_object_lock_);
+//    //    obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
+//    //}
+//
+//    uint32_t id       = generate_object_id();
+//
+//    auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
+//    auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
+//
+//    kernel::object_create_t oc(/*hierarchy_class*/nullptr, this, id, name, std::vector<object_info_ptr>(), msg_service, block_msgs);
+//
+//    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(name);
+//    
+//    if(fp)
+//        fp(oc);
+//
+//    if (obj)
+//        fire_object_created(obj);
+//    
+//    if (obj == nullptr)
+//    {
+//        LogError("Unable to load object " << name);
+//        return obj;
+//    }
+//
+//    register_obj_id(id);
+//
+//    return obj;
+//}
 
 object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std::string const &obj_name)
 {
@@ -420,9 +421,31 @@ object_info_ptr fake_system_base::load_object_hierarchy(dict_t const& dict)
     return obj;
 }
 
+void fake_system_base::save_object_hierarchy(object_info_ptr objinfo, dict_t& dict, bool safe_key) const
+{
+    //     optional<time_counter> tc;
+    //     if (objinfo->parent().expired())
+    //         tc = in_place();
+
+    write(dict, objinfo->hierarchy_class()->name(), "hierarchy_class_name");
+    write(dict, objinfo->name()     , "name");
+    write(dict, objinfo->object_id(), "id"  );
+
+    dict_t& children = dict.add_child("children");
+
+    size_t count = 0;
+    for (object_info_vector::const_iterator it = objinfo->objects().begin(); it != objinfo->objects().end(); ++it)
+        save_object_hierarchy(*it, children.add_child("child_" + lexical_cast<string>(count++)), safe_key);
+
+    objinfo->save(dict.add_child("own_data"), safe_key);
+
+    //     if (tc)
+    //         LogInfo("Saving " << objinfo->name() << "; time: " << tc->to_double(tc->time()));
+}
+
 FIXME(А это должно быть в отдельном файле)
 
-inline object_info_ptr create_object(kernel::object_create_t oc)
+inline object_info_ptr create_object(kernel::object_create_t oc, dict_copt dict = boost::none)
 {   
     string lib_name   = *oc.hierarchy_class->find_attribute("lib");
     string class_name = *oc.hierarchy_class->find_attribute("cpp_class");
@@ -436,9 +459,15 @@ inline object_info_ptr create_object(kernel::object_create_t oc)
     }
 
     auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(function_name);
+    auto fp_d = fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt dict)>(function_name);
 
     if(fp)
         return fp(oc);
+    else if(fp_d)
+        return fp_d(oc,dict);
+    else
+        return fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt)>(/*lib_name,*/ class_name+"_view")(boost::cref(oc), dict);
+
 
     return object_info_ptr();
 }
@@ -551,8 +580,7 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
 
     auto ownd_data = dict.find("own_data");
 
-    FIXME(Ну да здесь должен быть словарь)
-    object_info_ptr object = kernel::create_object(oc/*, dict_copt(ownd_data, *ownd_data)*/);
+    object_info_ptr object = kernel::create_object(oc , dict_copt(ownd_data, *ownd_data));
 
     if (object == nullptr)
     {
@@ -596,10 +624,10 @@ object_class_ptr fake_system_base::get_object_class(std::string const& name) con
 void fake_system_base::fire_object_created(object_info_ptr obj)
 {
     //send to other systems
-    //dict_t dic;
-    //save_object_hierarchy(obj, dic, false);
+    dict_t dic;
+    save_object_hierarchy(obj, dic, false);
 
-    //msg_service_((system_kind)kind_, network::wrap_msg(msg::object_created(binary::wrap(std::move(dic)))), true);
+    msg_service_((system_kind)kind_, network::wrap_msg(msg::object_created(binary::wrap(std::move(dic)))), true);
 
     //fire on my system
     object_created_signal_(obj);
@@ -717,25 +745,76 @@ network::msg_dispatcher<>& fake_system_base::msg_disp()
 
 void fake_system_base::block_obj_msgs(bool block)
 {
-    //if (block)
-    //{
-    //    if (block_obj_msgs_counter_ == 0)
-    //        // this could happen via sending message, or via handling incoming one
-    //        msg_protocol_ = in_place();
+    if (block)
+    {
+        if (block_obj_msgs_counter_ == 0)
+            // this could happen via sending message, or via handling incoming one
+            msg_protocol_ = in_place();
 
-    //    ++block_obj_msgs_counter_;
-    //}
-    //else 
-    //{
-    //    Assert(block_obj_msgs_counter_ > 0);
-    //    --block_obj_msgs_counter_;
-    //}
+        ++block_obj_msgs_counter_;
+    }
+    else 
+    {
+        Assert(block_obj_msgs_counter_ > 0);
+        --block_obj_msgs_counter_;
+    }
 
 }
 
 void fake_system_base::send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {
-    FIXME ( Need to be realized)
+    if (obj_msgs_blocked())
+    {
+        if (msg_protocol_ && !just_cmd)
+        {
+            binary::input_stream is(bytes);
+            uint32_t msg_id = network::read_id(is);
+
+            auto res = msg_protocol_->insert(msg::details::make_msg_obj_id(object_id, msg_id));
+
+            // doesn't work because of nodes_manager  
+            //             if (!res.second)
+            //             {
+            //                 auto obj = get_object(object_id);
+            //                 VerifyMsg(res.second, "Object " << obj->name() << " tries to send msg with id " << msg_id << " several times from " << sys_name(kind_));
+            //             }
+        }
+
+        return;
+    }
+
+    // prevent from sending messaged to destroying objects
+    if (obj_ids_to_destroy_.count(object_id) != 0)
+        return;
+
+    binary::bytes_t msg = network::wrap_msg(msg::object_msg(object_id, bytes, just_cmd, msg_protocol_ ? move(*msg_protocol_) : msg_protocol_t()));
+    msg_protocol_.reset();
+
+    if (update_time())
+    {
+        if (sure)
+            tcp_messages_.push_back(move(msg));
+        else 
+        {
+            if (udp_messages_size_ + binary::size(msg) > udp_msg_threshold_)
+            {                                           
+                if (!udp_messages_.empty())
+                {
+                    msg_service_((system_kind)kind_, network::wrap_msg(msg::container_msg(move(udp_messages_))), false);
+                    udp_messages_size_ = 0;
+                }
+
+                Assert(udp_messages_.empty());
+            }
+
+            udp_messages_size_ += binary::size(msg);
+            udp_messages_.push_back(move(msg));
+        }
+    }
+    else 
+    {   
+        msg_service_((system_kind)kind_, msg, sure);
+    }
 }
 
 void fake_system_base::process_destroy_object( size_t object_id )

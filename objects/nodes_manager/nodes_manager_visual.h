@@ -9,10 +9,10 @@ struct visual
     : kernel::visual_presentation
     , view
 {
-    static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
 private:
-    visual(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    visual(kernel::object_create_t const& oc, dict_copt dict);
 
 public:
     void init() override;

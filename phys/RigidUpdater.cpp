@@ -42,7 +42,7 @@ namespace bi
 	{
 		        RigidUpdater::phys_vehicles_t                          _vehicles;
                 kernel::system_ptr                                     _msys;
-                kernel::msg_service msg_service_; 
+                kernel::msg_service                             msg_service_; 
 	};
 
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
@@ -61,23 +61,42 @@ namespace bi
 
         // kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
         
-        
+        FIXME(Уникальное имя наверное хорошая вещь)
+        // void editor_document_impl::create_clicked(std::string const &class_name)
         //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
-        std::string class_name = "phys_sys";
-        std::string unique_name = "phys_sys";
-        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
         
-        kernel::object_class_ptr class_ptr ;
-
-        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
         {
-            if (class_name == (*it)->name())
-            class_ptr = *it ;
-            std::string n = (*it)->name();
+            std::string class_name = "phys_sys";
+            std::string unique_name = "phys_sys";
+            std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
+        
+            kernel::object_class_ptr class_ptr ;
+
+            for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
+            {
+                if (class_name == (*it)->name())
+                class_ptr = *it ;
+                std::string n = (*it)->name();
+            }
+
+            auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
         }
+        {
+            std::string class_name = "aircraft";
+            std::string unique_name = "aircraft_0";
+            std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
 
+            kernel::object_class_ptr class_ptr ;
 
-        auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name);   
+            for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
+            {
+                if (class_name == (*it)->name())
+                    class_ptr = *it ;
+                std::string n = (*it)->name();
+            }
+
+            auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
+        }
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
@@ -474,8 +493,9 @@ namespace bi
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
-                _sys->update( dt );
-
+                //_sys->update( dt );
+                // Физику обновляем через моделирующую
+                _d->_msys->update(view->getFrameStamp()->getSimulationTime());
 
                 for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
                 {   

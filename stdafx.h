@@ -59,6 +59,8 @@ using boost::in_place;
 using boost::format;
 using boost::wformat;
 
+using boost::lexical_cast;
+
 using boost::bind;
 using boost::function;
 

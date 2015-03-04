@@ -22,11 +22,11 @@ namespace aircraft
         , int_control
         , sync_fsm::self_t
     {
-        static object_info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/);
+        static object_info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict);
 
     private:
 
-        model( phys::control_ptr        phys,kernel::object_create_t const& oc);
+        model( phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict);
 
     public:
         void on_malfunction_changed( malfunction_kind_t kind ); 

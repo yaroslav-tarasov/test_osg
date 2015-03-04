@@ -36,14 +36,13 @@ protected:
 
 //! вид
 struct view
-    : base_view_presentation            //! базовый вид
-    , vehicle_data
-    //, obj_data_holder<vehicle_data>     //! сериализуемые данные из упражнения
+    : base_view_presentation            
+    , obj_data_holder<vehicle_data>     
 {
-    static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
+    static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
 protected:
-    view( kernel::object_create_t const& oc/*, dict_copt dict*/);
+    view( kernel::object_create_t const& oc, dict_copt dict);
 
     // base_view_presentation
 protected:

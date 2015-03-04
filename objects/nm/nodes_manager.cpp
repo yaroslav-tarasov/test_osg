@@ -42,14 +42,13 @@ namespace nodes_management
     }
 
     class manager_impl 
-        :  public view //base_view_presentation
-        // ,  public manager
+        :  public view 
     {
     public: 
         manager_impl( osg::Node* base, kernel::object_create_t const& oc) 
-            : /*base_view_presentation*/view(oc)
+            : view(oc,dict_copt())  FIXME(Словарик охота)
             , base_(base)
-            , self (this)
+            , self_ (this)
             
         {}
 
@@ -65,7 +64,7 @@ namespace nodes_management
     private: 
         osg::ref_ptr<osg::Node> base_;
         std::string       model_name_;
-        manager_impl* const    self;
+        manager_impl* const     self_;
     };
 
     node_info_ptr manager_impl::find_node(std::string const& name) const
@@ -76,7 +75,7 @@ namespace nodes_management
         auto n = findFirstNode(base_,name
             ,findNodeVisitor::not_exact);
         if(n)
-            return boost::make_shared<node_impl>(n,self);
+            return boost::make_shared<node_impl>(n,self_);
 
         return node_info_ptr();
     }
@@ -85,7 +84,7 @@ namespace nodes_management
     {
           
           if(node_id==0)
-                  return boost::make_shared<node_impl>(base_, self);   // FIXME ну бред же
+                  return boost::make_shared<node_impl>(base_, self_);   // FIXME ну бред же
 
           return node_info_ptr();
     }
@@ -140,7 +139,7 @@ namespace nodes_management
 
     node_tree_iterator_ptr manager_impl::get_node_tree_iterator(uint32_t node_id) const
     {
-        return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), self);
+        return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), self_);
     }
 
 }

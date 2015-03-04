@@ -35,19 +35,22 @@ object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr node
         block_msgs                  // kernel::block_obj_msgs_f        block_msgs
         );
 
-    return model::create(phys,oc);
+    aircraft::settings_t air_settings;
+    dict_t d = dict::wrap(craft_data(air_settings));
+
+    return model::create(phys,oc,d);
 }
 
 
-object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc/*, dict_copt dict*/)
+object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict)
 {
-    return object_info_ptr(new model(phys,oc/*, dict*/));
+    return object_info_ptr(new model(phys, oc, dict));
 }
 
 AUTO_REG_NAME(aircraft_model, model::create);
 
-model::model( phys::control_ptr        phys, kernel::object_create_t const& oc )
-    : view(oc)
+model::model( phys::control_ptr        phys, kernel::object_create_t const& oc, dict_copt dict )
+    : view(oc,dict)
     , desired_velocity_(min_desired_velocity())
     , phys_            (phys)
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))

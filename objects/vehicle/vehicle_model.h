@@ -20,11 +20,10 @@ struct model
     //, base_view_presentation
       , phys_object_model_base    
 {
-    //static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
-    static object_info_ptr create( /*phys::control_ptr               phys
-                                   ,*/ kernel::object_create_t  const& oc);
+    static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
+
 private:
-    model(/*phys::control_ptr        phys,*/kernel::object_create_t const& oc/*, dict_copt dict*/);
+    model(kernel::object_create_t const& oc, dict_copt dict);
 
     // base_presentation
 private:
@@ -129,7 +128,6 @@ public:
     {
         // И здесь тоже чего-то надо сделать
         set(msg::state_msg_t(state), false);
-        // view::state_ = state;
     }
 
 };

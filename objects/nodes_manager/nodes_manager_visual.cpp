@@ -8,9 +8,9 @@
 namespace nodes_management
 {
 
-object_info_ptr visual::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+object_info_ptr visual::create(kernel::object_create_t const& oc, dict_copt dict)
 {
-    visual * obj = new visual(oc/*, dict*/);
+    visual * obj = new visual(oc, dict);
     object_info_ptr info(obj);
     obj->init();
     return info;
@@ -18,8 +18,8 @@ object_info_ptr visual::create(kernel::object_create_t const& oc/*, dict_copt di
 
 AUTO_REG_NAME(nodes_manager_visual, visual::create);
 
-visual::visual( kernel::object_create_t const& oc/*, dict_copt dict*/)
-    : view(oc/*, dict*/)
+visual::visual( kernel::object_create_t const& oc, dict_copt dict)
+    : view(oc, dict)
     , sys_(dynamic_cast<visual_system *>(oc.sys))
 {
 }

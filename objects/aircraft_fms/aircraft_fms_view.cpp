@@ -26,7 +26,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     //, meteo_cursor_(meteo_proxy_->create_cursor())
 {
     //LogDebug("aircraft_fms::view created");
-    instruments_env_.navi = ani_->navigation_info();
+    if(ani_)
+        instruments_env_.navi = ani_->navigation_info();
 
     msg_disp()
         .add<msg::state_msg>   (boost::bind(&view::on_state, this, _1))

@@ -6,12 +6,12 @@
 
 namespace vehicle
 {
-view::view( kernel::object_create_t const& oc/*, dict_copt dict*/)
+view::view( kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
-    //, obj_data_base         (dict)
+    , obj_data_base         (dict)
 {
-    //if (dict)
-    //    set_name(oc.name);
+    if (dict)
+        set_name(oc.name);
 
     nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
     if (nodes_manager_)
@@ -28,9 +28,9 @@ view::view( kernel::object_create_t const& oc/*, dict_copt dict*/)
         ;
 }
     
-object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
 {
-    return object_info_ptr(new view(oc/*, dict*/));
+    return object_info_ptr(new view(oc, dict));
 }
 
 AUTO_REG_NAME(vehicle_view, view::create);
