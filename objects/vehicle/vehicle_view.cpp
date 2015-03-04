@@ -28,12 +28,12 @@ view::view( kernel::object_create_t const& oc/*, dict_copt dict*/)
         ;
 }
     
-//object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
-//{
-//    return object_info_ptr(new view(oc, dict));
-//}
+object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+{
+    return object_info_ptr(new view(oc/*, dict*/));
+}
 
-//AUTO_REG_NAME(vehicle_view, view::create);
+AUTO_REG_NAME(vehicle_view, view::create);
 
 void view::on_object_destroying(object_info_ptr object)
 {

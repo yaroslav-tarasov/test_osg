@@ -81,4 +81,3 @@ namespace fn_reg
 
 #define AUTO_REG_NAME(name, func)   AUTO_REG_NAME_IMPL(name, func)
 #define AUTO_REG(func)              AUTO_REG_NAME_IMPL(func, func)
-
