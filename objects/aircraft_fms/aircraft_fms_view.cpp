@@ -42,7 +42,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
 void view::update(double time)
 {
     base_view_presentation::update(time);
-    closest_airport_ = ani_->navigation_info()->find_airport(state_.dyn_state.pos, 70000);
+    if(ani_)
+        closest_airport_ = ani_->navigation_info()->find_airport(state_.dyn_state.pos, 70000);
 }
 
 void view::on_object_created( object_info_ptr object )

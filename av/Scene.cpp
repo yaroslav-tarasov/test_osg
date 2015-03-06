@@ -516,7 +516,7 @@ void Scene::createObjects()
             }
     }
     );
-
+    
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
 
@@ -561,6 +561,8 @@ void Scene::createObjects()
         _rigidUpdater->addUFO4( creators::createObject(name,true),
         osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
  	
+    _rigidUpdater->createNodeHierarchy(obj);
+
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO4( creators::createObject(name,true),
         osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
@@ -723,5 +725,7 @@ void Scene::createObjects()
 
     if(_rigidUpdater.valid())
         _viewerPtr->addEventHandler( _rigidUpdater/*avTerrain::bi::getUpdater().get()*/ );
+
+
 
 }

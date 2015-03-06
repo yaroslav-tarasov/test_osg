@@ -9,47 +9,26 @@
 
 
 
-struct stub_msys : kernel::model_system
-{
-    double calc_step() const { return 0.1; }
-};
-
 namespace vehicle
 {
 
-//object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
-//{
-//    return object_info_ptr(new model(oc, dict));
-//}
+object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
+{
+    return object_info_ptr(new model(oc, dict));
+}
 
 
 // FIXME Само собой чушь
-void /*system_base::*/block_obj_msgs(bool block)
-{
-    //if (block)
-    //{
-    //    if (block_obj_msgs_counter_ == 0)
-    //        // this could happen via sending message, or via handling incoming one
-    //        msg_protocol_ = in_place();
+void block_obj_msgs(bool block)
+{}
 
-    //    ++block_obj_msgs_counter_;
-    //}
-    //else 
-    //{
-    //    Assert(block_obj_msgs_counter_ > 0);
-    //    --block_obj_msgs_counter_;
-    //}
-}
-
-void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
-{
-       int i =0;
-
-}
+void send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
+{}
 
 object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager)
 {
-	size_t id  = 0x666;
+    FIXME(Разврат)
+	size_t id  = nodes_manager->get_node(0)->object_id();
     std::vector<object_info_ptr>  objects;
     objects.push_back(nodes_manager);
     auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
@@ -70,23 +49,17 @@ object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nod
 	return model::create(oc,d);
 }
 
-object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
-{
-    return object_info_ptr(new model(oc, dict));
-}
 
 AUTO_REG_NAME(vehicle_model, model::create);
 
 model::model(kernel::object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
     , phys_object_model_base(collection_)
-    //, sys_(dynamic_cast<model_system *>(oc.sys))
+    , sys_(dynamic_cast<model_system *>(oc.sys))
     //, ani_(find_first_object<ani_object::info_ptr>(collection_))
     //, airport_(ani_->navigation_info()->find_airport(pos()))
     , manual_controls_(false)
     , max_speed_(0)
-    FIXME (Подлежит удалению)
-    , sys_ (new stub_msys)
 {
     FIXME(local global)
     if(root_->position().is_local())    
@@ -342,6 +315,21 @@ void model::sync_phys()
     geo_position cur_glb_pos(cur_pos, base);
     double cur_speed = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
+
+    {
+        //std::stringstream cstr;
+
+        //cstr << std::setprecision(8) 
+        //    << "physics x:  "         << cur_pos.pos.x
+        //    << "    y: "              << cur_pos.pos.y
+        //    << "    curs :  "         << cur_course 
+        //    << "    cur_speed:  "     << cur_speed 
+        //    << "\n" ;
+
+        //OutputDebugString(cstr.str().c_str());
+    }
+
+
 
     cg::point_2 loc_cur_dpos = cg::point_2(cur_pos.dpos) * cg::rotation_2(cur_pos.orien.get_course());
     double cur_speed_signed = loc_cur_dpos.y < 0 ? -cur_speed : cur_speed;

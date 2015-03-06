@@ -11,6 +11,7 @@
 
 #include "fake_system.h"
 
+#include "kernel/systems/vis_system.h"
 
 namespace kernel
 {
@@ -48,12 +49,20 @@ namespace kernel
         if (id_range() != new_range)
             id_range() = new_range;
     }
+
 struct model_system_impl;
+struct visual_system_impl;
 
 system_ptr create_model_system(msg_service& service, std::string const& script) 
 {
     LogInfo("Creating MODEL system");
     return kernel::system_ptr(boost::make_shared<model_system_impl>(boost::ref(service), boost::ref(script)));
+}
+
+system_ptr create_visual_system(msg_service& service, vis_sys_props const& vsp ) 
+{
+    LogInfo("Creating VISUAL system");
+    return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service), boost::ref(vsp)));
 }
 
 struct  fake_system_base
@@ -1067,4 +1076,100 @@ double model_system_impl::calc_step() const
     return calc_step_ * (cg::eq_zero(time_factor_) ? 1. : time_factor_);
 }
 
+
+struct visual_system_impl
+    : visual_system
+    , visual_system_props
+    , fake_system_base
+    //, victory::widget_control
+{
+
+    visual_system_impl(msg_service& service,/* victory::IVictory *vis,*/ vis_sys_props const& props);
+
+private:
+    void update       (double time) override;
+    void load_exercise(dict_cref dict) override;
+
+    // visual_system
+private:
+    visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 );
+
+
+    // visual_system_props
+private:
+
+    vis_sys_props const&    vis_props   () const;
+    void                    update_props(vis_sys_props const&);
+
+
+    void            object_destroying(object_info_ptr object);
+
+private:
+    //DECL_LOGGER("vis_sys");
+
+private:
+    vis_sys_props           props_;
+
+    //victory::IVictoryPtr    victory_;
+    //victory::IScenePtr      scene_;
+    //victory::IViewportPtr   viewport_;
+
+    scoped_connection object_destroying_connection_;
+
+
+
+};
+
+
+visual_system_impl::visual_system_impl(msg_service& service, /*victory::IVictory *vis,*/ vis_sys_props const& props)
+    : fake_system_base(sys_visual, service, "objects.xml")
+    //, victory_   (vis)
+
+    //, scene_    (vis->create_scene())
+    //, viewport_ (vis->create_viewport())
+
+    , props_(props)
+    , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&visual_system_impl::object_destroying, this, _1)))
+{
+    LogInfo("Create Visual Subsystem");
 }
+
+void visual_system_impl::update(double time)
+{
+    fake_system_base::update(time);
+
+    //scene_->update(time);
+    //update_eye();
+}
+
+vis_sys_props const& visual_system_impl::vis_props() const
+{
+    return props_;
+}
+
+void visual_system_impl::update_props(vis_sys_props const& props)
+{
+    props_ = props;
+    //init_eye();
+}
+
+void visual_system_impl::load_exercise(dict_cref dict)
+{
+    fake_system_base::load_exercise(dict);
+    //init_eye();
+}
+
+visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/ )
+{
+    return visual_object_ptr();//boost::make_shared<visual_object_impl>(victory_, scene_, res, seed);
+}
+
+void visual_system_impl::object_destroying(object_info_ptr object)
+{
+    //if (eye_ == object)
+    //    eye_.reset();
+    //else if (debug_eye_ && debug_eye_->track_object == object)
+    //    debug_eye_.reset();
+}
+
+} // kernel

@@ -13,29 +13,31 @@ namespace nodes_management
     class manager_impl;
 
     // FIXME Само собой чушь
-    void /*system_base::*/block_obj_msgs(bool block)
-    {
+    void block_obj_msgs(bool block)
+    {}
 
-    }
-
-    void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
-    {
-
-    } 
+    void send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
+    {} 
 
     manager_ptr create_manager(kernel::system_ptr sys,osg::Node* node) 
     {
         size_t id  = 0x666;
+        //node_info_ptr nn = boost::make_shared<node_impl>(node,nullptr);
+        //size_t id  = nn->root_node()->object_id();
+        osg::Node* root =  findFirstNode(node,"Root");
+        if(root) 
+            root->getUserValue("id",id);
+
         auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
         auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
         kernel::object_create_t  oc(
             nullptr, 
-            sys.get(),                    // kernel::system*                 sys             , 
-            id,                         // size_t                          object_id       , 
-            "name",                     // string const&                   name            , 
+            sys.get(),                       // kernel::system*                 sys             , 
+            id,                              // size_t                          object_id       , 
+            "name",                          // string const&                   name            , 
             std::vector<object_info_ptr>(),  // vector<object_info_ptr> const&  objects         , 
-            msg_service,                // kernel::send_msg_f const&       send_msg        , 
-            block_msgs                  // kernel::block_obj_msgs_f        block_msgs
+            msg_service,                     // kernel::send_msg_f const&       send_msg        , 
+            block_msgs                       // kernel::block_obj_msgs_f        block_msgs
             );
 
         return boost::make_shared<manager_impl>(node,oc);

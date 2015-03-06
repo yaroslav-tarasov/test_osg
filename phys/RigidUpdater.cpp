@@ -17,8 +17,6 @@
 #include "aircraft/phys_aircraft.h"
 #include "vehicle.h"
 
-
-
 #include "RigidUpdater.h"
 
 
@@ -95,7 +93,7 @@ namespace bi
                 std::string n = (*it)->name();
             }
 
-            auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
+            //auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
         }
     }
 
@@ -244,6 +242,9 @@ namespace bi
 #if  0  // Under construction
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact);
+        size_t object_id = 0;
+        root->getUserValue("id",object_id);
 
         int id = _physicsNodes.size();
 
@@ -278,8 +279,9 @@ namespace bi
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
-        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->setUserValue("id",object_id);
         mt->addChild( node );
+
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -292,6 +294,9 @@ namespace bi
 
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact);
+        size_t object_id = 0;
+        root->getUserValue("id",object_id);
 
         int id = _physicsNodes.size();
 
@@ -307,8 +312,10 @@ namespace bi
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
-        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->setUserValue("id",object_id);
+
         mt->addChild( node );
+
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -320,7 +327,9 @@ namespace bi
 
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
-        
+        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact);
+        size_t object_id = 0;
+        root->getUserValue("id",object_id);
 
         int id = _physicsNodes.size();
         phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(lod3?lod3:node,id,mass);
@@ -336,7 +345,7 @@ namespace bi
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
-        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->setUserValue("id",object_id);
         mt->addChild( /*addGUIObject_v(node)*/node );
         _root->addChild( mt.get() );
 
@@ -351,7 +360,10 @@ namespace bi
     {           
         int id = _physicsNodes.size();
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
-         
+        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact); 
+        size_t object_id = 0;
+        root->getUserValue("id",object_id);
+
         nm::manager_ptr man = nm::create_manager(_d->_msys,lod3?lod3:node);
 
         _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man));
@@ -359,8 +371,11 @@ namespace bi
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
-        mt->setUserValue("id",reinterpret_cast<uint32_t>(&*mt));
+        mt->setUserValue("id",object_id);
+        
         mt->addChild( /*addGUIObject_v(node)*/node );
+
+
         _root->addChild( mt.get() );
 
         _physicsNodes[id] = mt;
@@ -563,7 +578,203 @@ namespace bi
         _sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
-    
+
+    class heilVisitor : public osg::NodeVisitor
+    {  
+
+    public:
+        heilVisitor(std::ofstream& filelogic)  
+            :_level(0)
+            , osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+            , root_visited(false)
+            , lod_visited (false)
+            , ostream_nodes(filelogic)
+        {
+             using namespace binary;
+            // fill default
+            //write(ostream_nodes, 1);
+            auto d = wrap(binary::size_type(1));
+            ostream_nodes.write(raw_ptr(d), size(d));//1 transform before root
+        }
+
+        std::string spaces()
+        { return std::string(_level*2, ' '); }
+        
+        size_t num_children(osg::Group& node)
+        {
+            size_t num = 0;
+
+            for (unsigned i = 0; i < node.getNumChildren(); i++) //lod level
+            {
+                if (node.getChild(i)->asTransform() || node.getChild(i)->asGroup())
+                    ++num;
+            }
+            return num;
+        }
+
+        void apply( osg::Node& node )
+        {   
+            using namespace binary;
+            std::cout << spaces() << node.libraryName() << "::" << node.className() << " : " << node.getName() << std::endl;
+            std::string node_name = boost::to_lower_copy(node.getName());
+            std::string name_cut = node_name.substr(0, node_name.find("_lod"));
+            std::string name_first_part = name_cut.substr(0, name_cut.find("_")); 
+
+            if(node_name == "root")
+               root_visited = true;
+            
+            FIXME("Ёротика")
+            
+            //if(boost::starts_with(node_name,"lod") && name_cut == name_first_part && name_first_part != "lod0")
+            //   return;
+            
+            if(boost::starts_with(node_name,"lod") && lod_visited)
+                return;
+            else
+                if(boost::starts_with(node_name,"lod0"))
+                {
+                    lod_visited = true;
+                }
+
+            if (root_visited && (node.asTransform() || node.asGroup() ))
+            {
+
+                model_structure::node_data new_node;
+            
+                const binary::size_type  children_count = node.asGroup()?num_children(*node.asGroup()):0;
+            
+                new_node.pos = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans());
+                new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
+            
+           
+
+                new_node.name = name_cut; // логическое им€. ќбщее дл€ все лодов
+
+                {
+                    auto d = wrap(new_node);
+                    ostream_nodes.write(raw_ptr(d), size(d));
+                }
+
+                {
+                    auto d = wrap(children_count);// print root
+                    ostream_nodes.write(raw_ptr(d), size(d));
+                }
+
+                std::stringstream cstr;
+
+                cstr << std::setprecision(8) 
+                    << "--------------------------------------- \n"
+                    << spaces() << "   Node /Name=   "          << new_node.name << "\n"
+                    << spaces() << "   Translate =   ("         << new_node.pos.x  << " ," << new_node.pos.y << " ,"  << new_node.pos.z << " )" << "\n"
+                    << spaces() << "   Rotate    =   ("         << new_node.orien.get_course()  << " ," << new_node.orien.get_pitch() << " ,"  << new_node.orien.get_roll() << " )" << "\n"
+                    << spaces() << "   Logic children number: " << children_count << "\n";
+
+                OutputDebugString(cstr.str().c_str());
+
+            }
+
+            _level++;
+            traverse( node );
+            _level--;
+        }
+
+        void apply( osg::Geode& geode )
+        {
+            std::cout << spaces() << geode.libraryName() << "::" << geode.className() << " : " << geode.getName() << std::endl;
+            
+            std::stringstream cstr;
+
+            //cstr << std::setprecision(8) 
+            //    << "physics x:  "         << cur_pos.pos.x
+            //    << "\n" ;
+
+            //OutputDebugString(cstr.str().c_str());
+
+            _level++;
+            for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
+            {
+                osg::Drawable* drawable = geode.getDrawable(i);
+                std::cout << spaces() << drawable->libraryName() << "::" << drawable->className() << " : " << geode.getName() << std::endl;
+            }
+
+            traverse( geode );
+            _level--;
+        }
+
+        //vector<char> get_model_data()
+        //{
+        //     return ostream_nodes.detach();
+        //}
+
+    protected:
+        unsigned int _level;
+        /*binary::output_stream*/std::ofstream& ostream_nodes;
+        bool root_visited;
+        bool lod_visited;
+    };
+
+    void RigidUpdater::createNodeHierarchy(osg::Node* node)
+    {
+//        vector<char> model_data;
+//
+//        if (model_data.empty())
+//        {
+//            using namespace binary;
+//
+//            // fill default
+//            output_stream stream;
+//            write(stream, 1);
+//            model_structure::node_data ndata;
+//            ndata.name = "root";
+//            write(stream, ndata);
+//            write(stream, 0);
+////////////////////////////////////////////////////////
+//
+//            const binary::size_type  children_count = (binary::size_type)num_children();
+//
+//            {
+//
+//                auto d = binary::wrap(children_count); // print root
+//                stream.write(raw_ptr(d), size(d));
+//            }
+//
+//            model_structure::node_data new_node;
+//            
+//            //new_node.pos = translationCur;
+//            //new_node.orien = cg::quaternion(eulerAnglesCur);
+//            //new_node.name = m_logic_name;
+//            
+//            {
+//                auto d = wrap(new_node);
+//                stream.write(raw_ptr(d), size(d));
+//            }
+//
+//            {
+//                auto d = wrap(children_count);// print root
+//                stream.write(raw_ptr(d), size(d));
+//            }
+//
+//            model_data = stream.detach();
+//        }
+//
+//        binary::input_stream model_stream(model_data.data(), model_data.size());
+          std::ofstream filelogic(std::string("test") + ".stbin", std::ios_base::binary);
+          
+          heilVisitor  hv(filelogic);
+          hv.apply(*node);
+
+          //binary::input_stream model_stream(hv.get_model_data().data(), hv.get_model_data().size());
+          
+
+          //if(filelogic)
+          //{   
+          //     filelogic << hv.get_output_stream();
+          //}
+
+          
+    }
+
+
     void RigidUpdater::handleSelectObjectEvent(uint32_t id )
     {
          selected_obj_id_ = id;
@@ -619,18 +830,18 @@ namespace bi
             
                     target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 			
-			        std::stringstream cstr;
+			        //std::stringstream cstr;
 
-                    cstr << std::setprecision(8) 
-                        << "x:  "         << main_->kp_value(main_->length()).x
-                        << "    y: "      << main_->kp_value(main_->length()).y
-                        << "    curs :  " << main_->curs_value(main_->length()) 
-                        << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
-                        << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
-                        << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
-				        << "\n" ;
+           //         cstr << std::setprecision(8) 
+           //             << "x:  "         << main_->kp_value(main_->length()).x
+           //             << "    y: "      << main_->kp_value(main_->length()).y
+           //             << "    curs :  " << main_->curs_value(main_->length()) 
+           //             << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
+           //             << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
+           //             << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
+				       // << "\n" ;
 
-                    OutputDebugString(cstr.str().c_str());
+           //         OutputDebugString(cstr.str().c_str());
        
 
 
