@@ -30,6 +30,12 @@
     <ClInclude Include="optimize_nodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\boost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\stl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -41,10 +47,10 @@
     <ClCompile Include="OrientationConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\find_node_visitor.cpp">
+    <ClCompile Include="bullet_exporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bullet_exporter.cpp">
+    <ClCompile Include="..\visitors\find_node_visitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

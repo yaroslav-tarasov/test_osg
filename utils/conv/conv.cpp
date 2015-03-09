@@ -3,6 +3,15 @@
 #include "OrientationConverter.h"
 #include "optimize_nodes.h"
 #include "visitors/visitors.h"
+#include "visitors/find_node_visitor.h"
+
+#include "alloc/pool_stl.h"
+#include "reflection/proc/binary.h"
+#include "atc/model_structure.h"
+#include "osg_helpers.h"
+#include "visitors/heil_visitor.h"
+
+
 
 typedef std::vector<std::string> FileNameList;
 
@@ -790,9 +799,7 @@ int main( int argc, char **argv )
             AddMissingColoursToGeometryVisitor av;
             root->accept(av);
         }
-       
-        
-		
+ 		
         auto to_lower = std::bind(&boost::to_lower_copy<std::string>,std::placeholders::_1,std::locale());
 
         // all names to lower
@@ -825,6 +832,12 @@ int main( int argc, char **argv )
         }
 
         optimizer.optimize(root.get());
+
+        std::ofstream filelogic(fileNameOut + ".stbin", std::ios_base::binary);
+          
+        heilVisitor  hv(filelogic);
+        hv.apply(*root.get());
+
 
         if( do_convert )
             root = oc.convert( root.get() );

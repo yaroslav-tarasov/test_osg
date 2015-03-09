@@ -6,7 +6,7 @@ struct cfg_t
     struct path_t
     {
         path_t()
-            : data("../data")
+            : data("data") //data("../data")
         {}
 
         std::string data;

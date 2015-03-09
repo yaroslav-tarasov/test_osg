@@ -6,10 +6,11 @@
 #pragma once
 
 #include "targetver.h"
-#include <stdio.h>
-#include <tchar.h>
-#include <functional>
-#include <memory>
+
+#define BOOST_ALL_NO_LIB
+
+#include "boost.h"
+#include "stl.h"
 
 #include <osg/ArgumentParser>
 #include <osg/ApplicationUsage>
@@ -79,7 +80,32 @@
 #endif
 
 
+#ifdef _DEBUG
+#pragma comment(lib, "boost_thread-vc100-mt-gd-1_50.lib")
+#pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-gd-1_50.lib")
+#else
+#pragma comment(lib, "boost_thread-vc100-mt-1_50.lib")
+#pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
+#pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
+#endif
+
 #include <boost/algorithm/string.hpp>
 
 
 bool generateBulletFile(std::string name, osg::Node* body);
+
+#include "cg_math.h"
+
+#define Assert(x) if(x){};
+
+#include "common/points.h"
+
+#include "common/util.h"
+
+#include "geometry/xmath.h"
+
+#define STRINGIFY(x) #x 
+
+#define STR(x) STRINGIFY(x)
+#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))

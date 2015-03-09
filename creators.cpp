@@ -791,9 +791,9 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
 
 nodes_array_t loadAirplaneParts(std::string name)
 {
-    osg::Node* model_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae"); //".osgb"
+    osg::Node* model_file = osgDB::readNodeFile("data/models/" + name + "/" + name + ".dae"); //".osgb"
     if (!model_file)
-        model_file = osgDB::readNodeFile("planes/" + name + "/" + name + ".dae");
+        model_file = osgDB::readNodeFile("data/models/" + name + "/" + name + ".dae");
 
     avLod::LOD* lod = new avLod::LOD;
     //osg::Group* Root = new osg::Group;
@@ -978,9 +978,9 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
     model->accept( ft );
 
     osg::ref_ptr<osg::Texture2D> normalTex = new osg::Texture2D;
-    auto im = osgDB::readImageFile("planes/" + name + "/" + name + "_n.dds");
+    auto im = osgDB::readImageFile("data/models/" + name + "/" + name + "_n.dds");
     if(im==nullptr)
-        auto im = osgDB::readImageFile("vehicles/" + name + "/" + name + "_n.dds");
+        auto im = osgDB::readImageFile("data/models/" + name + "/" + name + "_n.dds");
 
     normalTex->setImage( im ); // "a_319_n.dds"  
 

@@ -22,9 +22,6 @@
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\av">
-      <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\aircraft">
       <UniqueIdentifier>{1e8dee50-dcac-42b3-8d09-d3f8317b93e1}</UniqueIdentifier>
     </Filter>
@@ -72,6 +69,9 @@
     </Filter>
     <Filter Include="Source Files\nodes_manager">
       <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\phys\av">
+      <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +279,9 @@
     <ClInclude Include="objects\nodes_manager\vis_node_impl.h">
       <Filter>Source Files\nodes_manager</Filter>
     </ClInclude>
+    <ClInclude Include="heil_visitor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -318,7 +321,7 @@
       <Filter>Source Files\sm</Filter>
     </ClCompile>
     <ClCompile Include="main_scene2.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="nfi\lib_loader.cpp">
       <Filter>Source Files\nfi</Filter>
@@ -342,31 +345,31 @@
       <Filter>Source Files\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="av\CloudLayer.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\EnvRenderer.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Ephemeris.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\FogLayer.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\LOD.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Object.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\PreRender.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Scene.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Terrain.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\phys\av</Filter>
     </ClCompile>
     <ClCompile Include="phys\BulletInterface.cpp">
       <Filter>Source Files\phys</Filter>

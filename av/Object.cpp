@@ -8,8 +8,7 @@ struct fpl_wrap
 {
 	fpl_wrap(const std::string& name)
 	{
-		fpl_.push_back("planes/" + name + "/");
-		fpl_.push_back("vehicles/" + name + "/");
+		fpl_.push_back("data/models/" + name + "/");
 		fpl_.push_back("areas/" + name + "/");
 	};
 

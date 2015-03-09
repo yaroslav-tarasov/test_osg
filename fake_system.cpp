@@ -90,6 +90,7 @@ protected:
     // objects_factory
 protected:
     object_info_ptr create_object           (object_class_ptr hierarchy_class, std::string const &name)     override;
+    //object_info_ptr create_object           (obj_create_data const& descr)                                  override;
     //object_info_ptr create_object           (std::string const &object_name)                                override;
     object_info_ptr load_object_hierarchy   (dict_cref dict)                                                override;
     void            save_object_hierarchy   (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
@@ -393,6 +394,22 @@ auto fake_system_base::generate_object_id() -> obj_id_t
 //    }
 //
 //    register_obj_id(id);
+//
+//    return obj;
+//}
+
+//object_info_ptr fake_system_base::create_object(obj_create_data const& data)
+//{
+//    object_info_ptr obj;
+//    msgs_blocker    mb(*this);
+//    
+//    {
+//        locks::bool_lock l(create_object_lock_);
+//        obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
+//    }
+//
+//    if (obj)
+//        fire_object_created(obj);
 //
 //    return obj;
 //}

@@ -42,13 +42,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SIMEX_DIR)\bin\release\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR);</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -65,8 +66,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;C:\Work\prj\SeaViewR6\svCore;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR);</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..;..\..;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;common;C:\Work\prj\SeaViewR6;$(SolutionDir)..\Externals\pugixml\1.0\Include;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SolutionDir)..\Include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -74,7 +75,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(TargetPath) $(OSG_DIR)\OpenSceneGraph-3.2.1\build\bin</Command>
@@ -85,13 +86,15 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\boost.h" />
+    <ClInclude Include="..\..\stl.h" />
     <ClInclude Include="optimize_nodes.h" />
     <ClInclude Include="OrientationConverter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\find_node_visitor.cpp" />
+    <ClCompile Include="..\visitors\find_node_visitor.cpp" />
     <ClCompile Include="bullet_exporter.cpp" />
     <ClCompile Include="conv.cpp" />
     <ClCompile Include="OrientationConverter.cpp" />
