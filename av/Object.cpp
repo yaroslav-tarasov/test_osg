@@ -8,8 +8,8 @@ struct fpl_wrap
 {
 	fpl_wrap(const std::string& name)
 	{
-		fpl_.push_back("data/models/" + name + "/");
-		fpl_.push_back("areas/" + name + "/");
+		fpl_.push_back(cfg().path.data + "/models/" + name + "/");
+		fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
 	};
 
 	osgDB::FilePathList fpl_;

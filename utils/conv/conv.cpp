@@ -815,9 +815,9 @@ int main( int argc, char **argv )
 
         findNodeVisitor::nodeNamesList list_name;
         
-        for(int i=0; i<sizeof(optimize::names)/sizeof(optimize::names[0]);++i)
+        for(int i=0; i<sizeof(do_not_optimize::names)/sizeof(do_not_optimize::names[0]);++i)
         {
-            list_name.push_back(optimize::names[i]);
+            list_name.push_back(do_not_optimize::names[i]);
         }
         
 

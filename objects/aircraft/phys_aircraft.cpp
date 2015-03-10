@@ -37,12 +37,12 @@ namespace aircraft
         if (wing_l_node->get_collision())
         {
             phys::sensor_ptr wing_s = phys::get_sensor(*wing_l_node->get_collision());
-            s.add(get_relative_transform(nodes_manager, wing_l_node, body_node), wing_s);
+            s.add(nodes_manager->get_relative_transform(/*nodes_manager,*/ wing_l_node, body_node), wing_s);
         }
         if (wing_r_node->get_collision())
         {
             phys::sensor_ptr wing_s = phys::get_sensor(*wing_r_node->get_collision());
-            s.add(get_relative_transform(nodes_manager, wing_r_node, body_node), wing_s);
+            s.add(nodes_manager_->get_relative_transform(/*nodes_manager,*/ wing_r_node, body_node), wing_s);
         }
 
         nm::visit_sub_tree(nodes_manager->get_node_tree_iterator(body_node->node_id()), [&s, nodes_manager, body_node](nm::node_info_ptr n)->bool
@@ -51,7 +51,7 @@ namespace aircraft
             {
 
                 phys::sensor_ptr engine_s = phys::get_sensor(*n->get_collision());
-                s.add(nm::get_relative_transform(nodes_manager, n, body_node), engine_s);
+                s.add(nodes_manager->get_relative_transform(/*nodes_manager,*/ n, body_node), engine_s);
             }
             return true;
         });
@@ -308,7 +308,7 @@ namespace aircraft
             //    mass = wheel_mass*10, fake_count = 2;
 
             //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
-            cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node);
+            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node);
             point_3 wheel_offset = wt.translation() + s->get_offset();
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());

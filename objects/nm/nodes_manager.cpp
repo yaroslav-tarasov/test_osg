@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "precompiled_objects.h"
 
 #include "objects/nodes_management.h"
@@ -63,6 +62,7 @@ namespace nodes_management
         string const&   get_model  ()                                                const override;
         void            visit_nodes( boost::function<void(node_info_ptr)> const& f ) const override;
         node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const override;
+        cg::transform_4 get_relative_transform(/*manager_ptr manager,*/ node_info_ptr node, node_info_ptr rel ) override;
     private: 
         osg::ref_ptr<osg::Node> base_;
         std::string       model_name_;
@@ -142,6 +142,37 @@ namespace nodes_management
     node_tree_iterator_ptr manager_impl::get_node_tree_iterator(uint32_t node_id) const
     {
         return boost::make_shared<node_tree_iterator_impl>(get_node(node_id), self_);
+    }
+
+    cg::transform_4 manager_impl::get_relative_transform(/*manager_ptr manager,*/ node_info_ptr node, node_info_ptr rel )
+    {
+        osg::Matrix tr;
+        osg::Node* n = node_impl_ptr(node)->as_osg_node();
+        auto root = node_impl_ptr(/*manager*/this->get_node(0))->as_osg_node();
+
+        while(/*n->position().is_local() &&*/ 0 != n->getNumParents() && n != root && (rel.get()?n != node_impl_ptr(rel)->as_osg_node():true)  )
+        {
+            if(n->asTransform())
+                if(n->asTransform()->asMatrixTransform())
+                    tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
+
+            n = n->getParent(0);
+        }
+
+        if (rel.get() == NULL || n == node_impl_ptr(rel)->as_osg_node()  )
+            return from_osg_transform(tr);
+
+        osg::Matrix tr_rel;
+        n = node_impl_ptr(rel)->as_osg_node();
+        while(/*n->position().is_local()*/0 != n->getNumParents() && n->getName() != root->getName())
+        {                  
+            if(n->asTransform())
+                if(n->asTransform()->asMatrixTransform())
+                    tr_rel = n->asTransform()->asMatrixTransform()->getMatrix() * tr_rel;
+            n = n->getParent(0);
+        }
+
+        return from_osg_transform((osg::Matrix::inverse(tr_rel)) * tr);
     }
 
 }

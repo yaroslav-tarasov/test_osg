@@ -40,6 +40,7 @@ public:
     kernel::system const*       system     () const;
     optional<double>            update_time() const;
     collision_structure const*  get_collision_structure() const;
+    /*inline */cg::transform_4  get_relative_transform(/*manager_ptr manager,*/ node_info_ptr node, node_info_ptr rel );
 
 public:
     void set_node_msg (uint16_t node_id, binary::bytes_t&& data, bool sure = true);

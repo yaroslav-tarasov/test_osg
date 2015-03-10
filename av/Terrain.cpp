@@ -86,7 +86,7 @@ void  Terrain::create( std::string name )
     nl.push_back("railing");
     nl.push_back("panorama");
 
-    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read("areas/" + name + "/"+mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);
 
     // All solid objects

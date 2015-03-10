@@ -30,7 +30,7 @@ object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr node
         sys.get(),                  // kernel::system*                 sys             , 
         id,                         // size_t                          object_id       , 
         "name",                     // string const&                   name            , 
-        objects,  // vector<object_info_ptr> const&  objects         , 
+        objects,                    // vector<object_info_ptr> const&  objects         , 
         msg_service,                // kernel::send_msg_f const&       send_msg        , 
         block_msgs                  // kernel::block_obj_msgs_f        block_msgs
         );
@@ -38,21 +38,20 @@ object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr node
     aircraft::settings_t air_settings;
     dict_t d = dict::wrap(craft_data(air_settings));
 
-    return model::create(phys,oc,d);
+    return model::create(oc,d);
 }
 
-
-object_info_ptr model::create(phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict)
+object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 {
-    return object_info_ptr(new model(phys, oc, dict));
+    return object_info_ptr(new model(oc, dict));
 }
 
 AUTO_REG_NAME(aircraft_model, model::create);
 
-model::model( phys::control_ptr        phys, kernel::object_create_t const& oc, dict_copt dict )
+model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view(oc,dict)
+    , phys_object_model_base    (collection_)
     , desired_velocity_(min_desired_velocity())
-    , phys_            (phys)
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
@@ -336,6 +335,14 @@ void model::update_contact_effects(double time)
     });
 }
 
+void model::on_zone_destroyed( size_t id )
+{
+    if (sync_state_)
+    {
+        sync_fsm::state_ptr prev_state = sync_state_;
+        sync_state_->on_zone_destroyed(id);
+    }
+}
 
 
 void model::sync_fms(bool force)
@@ -360,7 +367,7 @@ phys::rigid_body_ptr model::get_rigid_body() const
 
 point_3 model::tow_offset() const
 {
-    return tow_point_node_ ? get_relative_transform(get_nodes_manager(), tow_point_node_, body_node_).translation() : point_3();
+    return tow_point_node_ ? get_nodes_manager()->get_relative_transform(/*get_nodes_manager(),*/ tow_point_node_, body_node_).translation() : point_3();
 }
 
 bool model::tow_attached() const

@@ -2,6 +2,7 @@
 
 #include "aircraft_view.h"
 #include "phys/phys_sys.h"
+ #include "common/phys_object_model_base.h"
 #include "phys_sys/aircraft.h"
 #include "aircraft_shassis_impl.h"
 #include "sync_fsm/sync_fsm.h"
@@ -21,12 +22,13 @@ namespace aircraft
         , model_control             // интерфейс управления моделью
         , int_control
         , sync_fsm::self_t
+        , phys_object_model_base 
     {
-        static object_info_ptr create(phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict);
+        static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
     private:
 
-        model( phys::control_ptr        phys,kernel::object_create_t const& oc, dict_copt dict);
+        model( kernel::object_create_t const& oc, dict_copt dict);
 
     public:
         void on_malfunction_changed( malfunction_kind_t kind ); 
@@ -121,8 +123,6 @@ namespace aircraft
     private:
         sync_fsm::state_ptr sync_state_;
 
-    protected: // FIXME тоже заглушка в отсутствии возможности найти физ системы как объект
-        phys::control_ptr        phys_;
 
     };
 

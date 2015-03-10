@@ -21,6 +21,10 @@
 
 #include "visitors/heil_visitor.h"
 
+#include "object_creators.h"
+
+FIXME(Test)        
+bool loadBulletFile(std::string name, btBvhTriangleMeshShape* trimeshShape);
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -81,6 +85,7 @@ namespace bi
             auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
 
         }
+        if(false)
         {
             std::string class_name = "aircraft";
             std::string unique_name = "aircraft_0";
@@ -100,20 +105,10 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
-		//{
-  //          std::string class_name = "aircraft";
-  //          std::string unique_name = "aircraft_0";
-		//	aircraft::settings_t sett;
-		//	sett.kind = "A319";
-		//	obj_create_data ocd("aircraft", /*name*/unique_name, dict::wrap(aircraft::craft_data(sett, /*fpl_id*/0)));
+        aircraft::settings_t s;
+        s.kind = "A319";
+        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
 
-		//	ocd
-		//	   .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
-		//	   .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
-		//	   ;//.add_child(obj_create_data("gui"          , "gui"          , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
-
-		//	kernel::fake_objects_factory_ptr(_d->_msys)->create_object(ocd);	
-		//}
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )

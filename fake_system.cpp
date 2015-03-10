@@ -50,6 +50,38 @@ namespace kernel
             id_range() = new_range;
     }
 
+
+    //////////////////////////////////////////////////////////////////////////
+    obj_create_data::obj_create_data(std::string const& hier_class, std::string const& name, dict_t&& own_data)
+        : children_(data_.add_child("children"))
+    {
+        write(data_, hier_class, "hierarchy_class_name");
+        write(data_, name      , "name");
+
+        data_.add_child("own_data") = move(own_data);
+    }
+
+    obj_create_data::obj_create_data(std::string const& hier_class, std::string const& name)
+        : children_(data_.add_child("children"))
+    {
+        write(data_, hier_class, "hierarchy_class_name");
+        write(data_, name      , "name");
+    }
+
+    obj_create_data& obj_create_data::add_child(obj_create_data const& data)
+    {
+        children_.add_child("child_" + lexical_cast<string>(children_.children().size())) = data.dict();
+        return *this;
+    }
+
+    dict_t const& obj_create_data::dict() const
+    {
+        return data_;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+
 struct model_system_impl;
 struct visual_system_impl;
 
@@ -90,7 +122,7 @@ protected:
     // objects_factory
 protected:
     object_info_ptr create_object           (object_class_ptr hierarchy_class, std::string const &name)     override;
-    //object_info_ptr create_object           (obj_create_data const& descr)                                  override;
+    object_info_ptr create_object           (obj_create_data const& descr)                                  override;
     //object_info_ptr create_object           (std::string const &object_name)                                override;
     object_info_ptr load_object_hierarchy   (dict_cref dict)                                                override;
     void            save_object_hierarchy   (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
@@ -422,6 +454,22 @@ object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std
     {
         locks::bool_lock l(create_object_lock_);
         obj = create_object_hierarchy_impl(hier_class, obj_name, true);
+    }
+
+    if (obj)
+        fire_object_created(obj);
+
+    return obj;
+}
+
+object_info_ptr fake_system_base::create_object(obj_create_data const& data)
+{
+    object_info_ptr obj;
+    msgs_blocker    mb(*this);
+
+    {
+        locks::bool_lock l(create_object_lock_);
+        obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
     }
 
     if (obj)

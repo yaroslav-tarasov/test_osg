@@ -315,6 +315,30 @@ uint32_t view::msg_sub_id(size_t id, binary::bytes_cref data) const
     return msgid + (node_id << 16);
 }
 
+cg::transform_4 view::get_relative_transform(/*manager_ptr manager,*/ node_info_ptr node, node_info_ptr rel)
+{
+    cg::transform_4 tr;
+    node_info_ptr n = node;
+    while(n->position().is_local() && n != rel)
+    {
+        tr = n->transform() * tr;
+        n = /*manager*/this->get_node(n->position().local().relative_node);
+    }
+
+    if (n == rel || rel == NULL)
+        return tr;
+
+    cg::transform_4 tr_rel;
+    n = rel;
+    while(n->position().is_local())
+    {                  
+        tr_rel = n->transform() * tr_rel;
+        n = /*manager*/this->get_node(n->position().local().relative_node);
+    }
+
+    return (tr_rel.inverted()) * tr;
+}
+
 AUTO_REG_NAME(nodes_manager_view , view ::create);
 //AUTO_REG_NAME(nodes_manager_chart, chart::create);
 

@@ -97,7 +97,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         }
 
         if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
-            tow_point_transform_ = get_relative_transform(nodes_manager_, tow_point_node);
+            tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node);
     }
 
 #if 0 
@@ -212,6 +212,7 @@ settings_t const & view::settings() const
 {
     return settings_;
 }
+
 #if 1
 fpl::info_ptr view::get_fpl() const
 {
@@ -858,7 +859,7 @@ void view::on_settings(settings_t const& s)
             nodes_manager_->set_model(get_model(s.kind));
 
             if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
-                tow_point_transform_ = get_relative_transform(nodes_manager_, tow_point_node);
+                tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node);
 
             model_changed = true;
         }

@@ -157,6 +157,8 @@ REFL_END()
         virtual void            visit_nodes (boost::function<void(node_info_ptr)> const& f) const = 0;
 
         virtual node_tree_iterator_ptr get_node_tree_iterator(uint32_t node_id) const = 0;
+        virtual  cg::transform_4       get_relative_transform( node_info_ptr node, node_info_ptr rel = nullptr) = 0;
+
 
         DECLARE_EVENT(model_changed, ());
     };

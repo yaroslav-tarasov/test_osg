@@ -172,7 +172,7 @@ void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
 
     if (aerotow_ && aircraft::model_info_ptr(aerotow_)->get_rigid_body())
     {
-        cg::point_3 tow_offset = tow_point_node_ ? nm::get_relative_transform(nodes_manager_, tow_point_node_, body_node_).translation() : cg::point_3();
+        cg::point_3 tow_offset = tow_point_node_ ? nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node_, body_node_).translation() : cg::point_3();
 
         phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->set_tow(aircraft::model_info_ptr(aerotow_)->get_rigid_body(), tow_offset, aircraft::model_info_ptr(aerotow_)->tow_offset());
 
@@ -576,7 +576,7 @@ void model::create_phys_vehicle()
         {
             // Поиск имени симекса нам не походит
             // cg::transform_4 wt = nm::get_relative_transform(nodes_manager_, wheel_node, this->body_node_);
-            cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, wheel_node);
+            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ wheel_node);
             cg::point_3 wheel_offset = wt.translation();
 
             //auto const *wnc = wheel_node->get_collision() ;

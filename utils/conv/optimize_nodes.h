@@ -1,6 +1,6 @@
 #pragma once
 
-namespace optimize
+namespace do_not_optimize
 {
     const char* names[] =
     {
@@ -13,7 +13,9 @@ namespace optimize
         "camera_tower",
         "masts",
         "lightmast",
-        "navaid_"
+        "navaid_",
+        "tow_point",
+        "back_tail"
     };
 
 }
