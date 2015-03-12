@@ -24,7 +24,7 @@
 #include "object_creators.h"
 
 FIXME(Test)        
-bool loadBulletFile(std::string name, btBvhTriangleMeshShape* trimeshShape);
+bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -59,7 +59,7 @@ namespace bi
 		, _d(boost::make_shared<RigidUpdater_private>())
 	{
         
-        btBvhTriangleMeshShape* trimeshShape = nullptr;
+        btCompoundShape* trimeshShape = nullptr;
         bool r = loadBulletFile(cfg().path.data + "/models/a_319/a_319.osgb.bullet",  trimeshShape);
         
         using namespace kernel;
@@ -374,7 +374,7 @@ namespace bi
         //veh->set_steer(10);
     }
 
-    void RigidUpdater::addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
+    void RigidUpdater::addVehicle2(const string& model_name,osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {           
         int id = _physicsNodes.size();
         osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
@@ -383,7 +383,9 @@ namespace bi
         root->getUserValue("id",object_id);
 
         nm::manager_ptr man = nm::create_manager(_d->_msys,node/*lod3?lod3:node*/);
-        
+        FIXME("Костыль")
+        man->set_model(model_name);
+
         _phys_vehicles.push_back(vehicle::create(_d->_msys,man));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 

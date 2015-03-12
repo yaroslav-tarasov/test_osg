@@ -74,7 +74,6 @@ bool generateBulletFile(std::string name, osg::Node* node)
 	/*Convex*/btTriangleMeshShape* trimeshShape = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( node );
     
     btCompoundShape * cs =  fill_cs(node);
-;
 
     static const char* nodeName = node->getName().c_str();
     serializer->registerNameForPointer(cs, nodeName);   

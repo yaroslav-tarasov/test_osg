@@ -3,7 +3,7 @@
 #include "btBulletWorldImporter.h"
 #include "BulletCollision/CollisionShapes/btTriangleMeshShape.h"
 
-bool loadBulletFile(std::string name, btBvhTriangleMeshShape* trimeshShape)
+bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape)
 {
     btBulletWorldImporter import(0);//don't store info into the world
     import.setVerboseMode(0xFF);
@@ -30,7 +30,7 @@ bool loadBulletFile(std::string name, btBvhTriangleMeshShape* trimeshShape)
             //const char* meshName = import.getNameForPointer(trimeshShape);
             //if (meshName)
             //    trimeshShape = (btBvhTriangleMeshShape*)import.getCollisionShapeByName(meshName);
-            cs = (btCompoundShape*)import.getCollisionShapeByName("lod3");
+            trimeshShape = (btCompoundShape*)import.getCollisionShapeByName("lod3");
 
         }
 

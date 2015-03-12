@@ -528,7 +528,7 @@ void Scene::createObjects()
 
 	auto obj = creators::createObject(name,true);
 
-#if 0
+#if 1
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addPhysicsAirplane( obj,
 		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
@@ -540,13 +540,13 @@ void Scene::createObjects()
 
 #endif
 
-#if 0 
+#if 1 
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addUFO2( obj,
 		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
 #endif
 
-#if 0 
+#if 1 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO2( obj,
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
@@ -702,14 +702,16 @@ void Scene::createObjects()
     //buksir->setNodeMask(0);
 #endif
 
-    auto pojarka2 = creators::createObject("niva_chevrolet",false);
+    const std::string v_name = "niva_chevrolet";
+
+    auto pojarka2 = creators::createObject(v_name,false);
     if(pojarka2)
 	_rigidUpdater->addVehicle(pojarka2,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
-    auto pojarka_ctrl = creators::createObject("niva_chevrolet",false);
+    auto pojarka_ctrl = creators::createObject(v_name,false);
     if(pojarka_ctrl)
-	_rigidUpdater->addVehicle2(pojarka_ctrl,
+	_rigidUpdater->addVehicle2(v_name,pojarka_ctrl,
         osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  
 
     // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));

@@ -21,6 +21,8 @@
 //#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
 //#include "nodes_manager/node_impl.h"
 
+bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
+
 #include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
 FIXME(Неправильное использование node_impl)
 #include "nm/node_impl.h"
@@ -88,11 +90,15 @@ namespace aircraft
         node->accept( cbv );
         const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-        float xm = bb.xMax() - bb.xMin();
-        float ym = bb.yMax() - bb.yMin();
-        float zm = bb.zMax() - bb.zMin();
+        float xm = abs(bb.xMax() - bb.xMin());
+        float ym = abs(bb.yMax() - bb.yMin());
+        float zm = abs(bb.zMax() - bb.zMin());
         
-        cs.offset_ = cg::point_3(0,-zm/2,0);
+        float dx = abs(bb.xMax()) - xm / 2.f;
+        float dy = abs(bb.yMax()) - ym / 2.f;
+        float dz = abs(bb.zMax()) - zm / 2.f;
+
+        cs.offset_ = cg::point_3(0,/*-zm/2*/-dz,0);
         //p.wingspan = xm;
         p.length   = ym;
 
@@ -155,44 +161,56 @@ namespace aircraft
 
 namespace ray_cast_vehicle
 {
-    void fill_cs(osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
+    void fill_cs(const std::string& model_name,osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
     {          
-        osg::Node* lod3 =  findFirstNode(node,"Lod3");
+        if(model_name.empty())
+        {
+            osg::Node* lod3 =  findFirstNode(node,"Lod3");
 
-        osg::ComputeBoundsVisitor cbv;
-        (lod3?lod3:node)->accept( cbv );
-        const osg::BoundingBox& bb = cbv.getBoundingBox();
+            osg::ComputeBoundsVisitor cbv;
+            (lod3?lod3:node)->accept( cbv );
+            const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-        float xm = bb.xMax() - bb.xMin();
-        float ym = bb.yMax() - bb.yMin();
-        float zm = bb.zMax() - bb.zMin();
+            float xm = bb.xMax() - bb.xMin();
+            float ym = bb.yMax() - bb.yMin();
+            float zm = bb.zMax() - bb.zMin();
 
-        cs.offset_ = cg::point_3(0,/*lod3?-zm/2:*/0,0);
+            float dx = abs(bb.xMax()) - xm / 2.f;
+            float dy = abs(bb.yMax()) - ym / 2.f;
+            float dz = abs(bb.zMax()) - zm / 2.f;
 
-        auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
+            cs.offset_ = cg::point_3(0,/*lod3?-zm/2:*/0,0);
 
-        auto wheels = findAllNodes(node,"wheel",findNodeVisitor::not_exact);
+            auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
 
-        for (auto it = wheels.begin();it != wheels.end();++it)
-        {   
-            if((*it)->asTransform()) // А потом они взяли и поименовали геометрию как трансформы, убил бы
-            {
-                wheel_info wii((*it)->getBound().radius(),/*is_front*/false);
-                wii.trans_f_body = get_relative_transform(node,(*it)/*,body*/);
-                wi.push_back(wii);
-                (*it)->setNodeMask(0);
+            auto wheels = findAllNodes(node,"wheel",findNodeVisitor::not_exact);
+
+            for (auto it = wheels.begin();it != wheels.end();++it)
+            {   
+                if((*it)->asTransform()) // А потом они взяли и поименовали геометрию как трансформы, убил бы
+                {
+                    wheel_info wii((*it)->getBound().radius(),/*is_front*/false);
+                    wii.trans_f_body = get_relative_transform(node,(*it)/*,body*/);
+                    wi.push_back(wii);
+                    (*it)->setNodeMask(0);
+                }
             }
-        }
 
-        btCompoundShape*  s = cs.cs_ = new btCompoundShape;
+            btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
-        btCollisionShape* cs_body   = osgbCollision::/*btConvexHullCollisionShapeFromOSG*//*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
+            btCollisionShape* cs_body   = osgbCollision::/*btConvexHullCollisionShapeFromOSG*//*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
         
-        for (auto it = wheels.begin();it != wheels.end();++it)
-            (*it)->setNodeMask(0xffffffff);
+            for (auto it = wheels.begin();it != wheels.end();++it)
+                (*it)->setNodeMask(0xffffffff);
 
 
-        cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
+            cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
+        }
+        else
+        {
+            bool r = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".osgb.bullet",  cs.cs_);
+             
+        }
 
     }
 
@@ -223,8 +241,9 @@ namespace phys
         {
             wheels_info_t wi;
             compound_sensor_impl cs;
+            const std::string model_name = manager->get_model();
 
-            ::ray_cast_vehicle::fill_cs(nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,cs);
+            ::ray_cast_vehicle::fill_cs(model_name, nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -488,7 +507,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
     wheels_info_t wi;
     compound_sensor_impl cs;
 
-    ::ray_cast_vehicle::fill_cs(node,wi,cs);
+    ::ray_cast_vehicle::fill_cs("",node,wi,cs);
 
     ray_cast_vehicle::info_ptr info = boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_),decart_position());
     _actors[id]._body  = rigid_body_impl_ptr(info)->get_body().get();

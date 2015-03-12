@@ -512,9 +512,6 @@
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="objects\nm\node_impl.cpp">
-      <Filter>Source Files\nm</Filter>
-    </ClCompile>
     <ClCompile Include="objects\nm\nodes_management.cpp">
       <Filter>Source Files\nm</Filter>
     </ClCompile>
@@ -553,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp">
       <Filter>Source Files\aircraft\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\nm\node_osg_impl.cpp">
+      <Filter>Source Files\nm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

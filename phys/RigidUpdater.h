@@ -24,7 +24,7 @@ namespace bi
         void addUFO4(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 
         void addVehicle(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
-        void addVehicle2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
+        void addVehicle2(const string& model_name,osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
@@ -37,7 +37,7 @@ namespace bi
         
         osg::Node* addGUIObject( osg::Node* node )
         {
-            assert(false);
+            // assert(false);
             // return addGUIObject_( node );
             return nullptr;
         }
