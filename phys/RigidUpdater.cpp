@@ -23,8 +23,6 @@
 
 #include "object_creators.h"
 
-FIXME(Test)        
-bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -59,9 +57,7 @@ namespace bi
 		, _d(boost::make_shared<RigidUpdater_private>())
 	{
         
-        btCompoundShape* trimeshShape = nullptr;
-        bool r = loadBulletFile(cfg().path.data + "/models/a_319/a_319.osgb.bullet",  trimeshShape);
-        
+
         using namespace kernel;
         _d->_msys = kernel::create_model_system(_d->msg_service_,"script should  be placed here");
 

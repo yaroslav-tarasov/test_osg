@@ -110,7 +110,7 @@ namespace nodes_management
         return info;
     }
 
-    void /*view*/manager_impl::init()
+    void manager_impl::init()
     {
         //init_collision_volume();
 

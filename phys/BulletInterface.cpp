@@ -84,76 +84,76 @@ namespace
 
 namespace aircraft
 {
-	void fill_cs(osg::Node* node, wheels_info_t& wi,phys::aircraft::params_t& p, compound_sensor_impl& cs )
-    {          
-        osg::ComputeBoundsVisitor cbv;
-        node->accept( cbv );
-        const osg::BoundingBox& bb = cbv.getBoundingBox();
+	void fill_cs(const std::string& model_name, osg::Node* node, wheels_info_t& wi,phys::aircraft::params_t& p, compound_sensor_impl& cs )
+    {  
+        if(model_name.empty())
+        {
+			osg::ComputeBoundsVisitor cbv;
+			node->accept( cbv );
+			const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-        float xm = abs(bb.xMax() - bb.xMin());
-        float ym = abs(bb.yMax() - bb.yMin());
-        float zm = abs(bb.zMax() - bb.zMin());
+			float xm = abs(bb.xMax() - bb.xMin());
+			float ym = abs(bb.yMax() - bb.yMin());
+			float zm = abs(bb.zMax() - bb.zMin());
         
-        float dx = abs(bb.xMax()) - xm / 2.f;
-        float dy = abs(bb.yMax()) - ym / 2.f;
-        float dz = abs(bb.zMax()) - zm / 2.f;
+			float dx = abs(bb.xMax()) - xm / 2.f;
+			float dy = abs(bb.yMax()) - ym / 2.f;
+			float dz = abs(bb.zMax()) - zm / 2.f;
 
-        cs.offset_ = cg::point_3(0,/*-zm/2*/-dz,0);
-        //p.wingspan = xm;
-        p.length   = ym;
+			cs.offset_ = cg::point_3(0,/*-zm/2*/-dz,0);
+			//p.wingspan = xm;
+			p.length   = ym;
 
-        auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
-		auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",findNodeVisitor::not_exact);
-		auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",findNodeVisitor::not_exact);
-		auto sh_f   = findFirstNode(node,"animgroup_shassi_f",findNodeVisitor::not_exact);
+			auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+			auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",findNodeVisitor::not_exact);
+			auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",findNodeVisitor::not_exact);
+			auto sh_f   = findFirstNode(node,"animgroup_shassi_f",findNodeVisitor::not_exact);
 
-		auto sh_r_l_wheel = findFirstNode(sh_r_l,"wheel",findNodeVisitor::not_exact);
-		auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",findNodeVisitor::not_exact);
-		auto sh_f_wheel   = findFirstNode(sh_f,"wheel",findNodeVisitor::not_exact);
+			auto sh_r_l_wheel = findFirstNode(sh_r_l,"wheel",findNodeVisitor::not_exact);
+			auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",findNodeVisitor::not_exact);
+			auto sh_f_wheel   = findFirstNode(sh_f,"wheel",findNodeVisitor::not_exact);
 		
-		const bool is_front = true;
-		{
-			wheel_info wii(sh_f_wheel->getBound().radius(),is_front);
-			wii.trans_f_body = get_relative_transform(node,sh_f_wheel/*,body*/);
-			wi.push_back(wii);
-		}
-	    {
-			wheel_info wii(sh_r_r_wheel->getBound().radius(),!is_front);
-			wii.trans_f_body = get_relative_transform(node,sh_r_r_wheel/*,body*/);
-			wi.push_back(wii);
-		}
-		{
-			wheel_info wii(sh_r_l_wheel->getBound().radius(),!is_front);
-			wii.trans_f_body = get_relative_transform(node,sh_r_l_wheel/*,body*/);
-			wi.push_back(wii);
-		}
+			const bool is_front = true;
+			{
+				wheel_info wii(sh_f_wheel->getBound().radius(),is_front);
+				wii.trans_f_body = get_relative_transform(node,sh_f_wheel/*,body*/);
+				wi.push_back(wii);
+			}
+			{
+				wheel_info wii(sh_r_r_wheel->getBound().radius(),!is_front);
+				wii.trans_f_body = get_relative_transform(node,sh_r_r_wheel/*,body*/);
+				wi.push_back(wii);
+			}
+			{
+				wheel_info wii(sh_r_l_wheel->getBound().radius(),!is_front);
+				wii.trans_f_body = get_relative_transform(node,sh_r_l_wheel/*,body*/);
+				wi.push_back(wii);
+			}
 		
 
-		//btTransform cmt(btQuaternion(0,0,0),btVector3(1,0,0));
-		//cmt.setIdentity();
-		////localTrans effectively shifts the center of mass with respect to the chassis
-		//cmt.setOrigin(btVector3(0,-10,0));	
+			//btTransform cmt(btQuaternion(0,0,0),btVector3(1,0,0));
+			//cmt.setIdentity();
+			////localTrans effectively shifts the center of mass with respect to the chassis
+			//cmt.setOrigin(btVector3(0,-10,0));	
 
-		btCompoundShape*  s = cs.cs_ = new btCompoundShape;
+			btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
-		sh_f/*_wheel*/->setNodeMask(0);
-		sh_r_r/*_wheel*/->setNodeMask(0);
-		sh_r_l/*_wheel*/->setNodeMask(0);
+			sh_f->setNodeMask(0);
+			sh_r_r->setNodeMask(0);
+			sh_r_l->setNodeMask(0);
 
-		//btCollisionShape* cs_sh_r_l = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_l );
-		//btCollisionShape* cs_sh_r_r = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_r );
-		//btCollisionShape* cs_sh_f   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_f );
-		btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
+			btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
 
-		sh_f/*_wheel*/->setNodeMask(0xffffffff);
-		sh_r_r/*_wheel*/->setNodeMask(0xffffffff);
-		sh_r_l/*_wheel*/->setNodeMask(0xffffffff);
+			sh_f->setNodeMask(0xffffffff);
+			sh_r_r->setNodeMask(0xffffffff);
+			sh_r_l->setNodeMask(0xffffffff);
 
-		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_f);
-		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_l);
-		//cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_sh_r_r);
-		cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
-        
+			cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
+		}
+		else
+		{
+		   bool r = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".osgb.bullet",  cs.cs_);
+		}
          
 		// return s;
 	}
@@ -161,7 +161,7 @@ namespace aircraft
 
 namespace ray_cast_vehicle
 {
-    void fill_cs(const std::string& model_name,osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
+    void fill_cs(const std::string& model_name, osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
     {          
         if(model_name.empty())
         {
@@ -227,8 +227,9 @@ namespace phys
             wheels_info_t wi;
             aircraft::params_t p;
             compound_sensor_impl cs;
+			const std::string model_name = manager->get_model();
 
-            ::aircraft::fill_cs(nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,p,cs);
+            ::aircraft::fill_cs(model_name, nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,p,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -398,7 +399,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
     //double shift;
     compound_sensor_impl cs;
 
-    /*btCompoundShape*  s =*/ ::aircraft::fill_cs(node,wi,p, cs);
+    /*btCompoundShape*  s =*/ ::aircraft::fill_cs("",node,wi,p, cs);
 	
 	btTransform  tr;
 	tr.setIdentity();
@@ -484,7 +485,7 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 	aircraft::params_t p;
     compound_sensor_impl cs;
 
-    ::aircraft::fill_cs(node,wi,p,cs);
+    ::aircraft::fill_cs("",node,wi,p,cs);
 
     p = fill_params( ada::fill_data("BADA","A319"));
 

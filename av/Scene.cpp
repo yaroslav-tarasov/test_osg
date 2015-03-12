@@ -387,7 +387,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -540,13 +540,13 @@ void Scene::createObjects()
 
 #endif
 
-#if 1 
+#if 0 
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addUFO2( obj,
 		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
 #endif
 
-#if 1 
+#if 0 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO2( obj,
         osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
