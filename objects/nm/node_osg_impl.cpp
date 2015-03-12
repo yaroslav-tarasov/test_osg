@@ -5,6 +5,7 @@
 #include "nodes_manager/nodes_manager_common.h"
 #include "nodes_manager/nodes_manager_view.h"
 
+#ifdef OSG_NODE_IMPL
 namespace nodes_management
 {
 
@@ -388,3 +389,5 @@ void node_impl::on_texture(msg::node_texture_msg const& m)
 }
 
 }
+
+#endif

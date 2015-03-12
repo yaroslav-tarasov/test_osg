@@ -6,6 +6,7 @@
 #include "nodes_manager_view.h"
 #include "reflection/proc/prop_attr.h"
 
+#ifndef OSG_NODE_IMPL
 namespace nodes_management
 {
 
@@ -311,3 +312,5 @@ void node_impl::init_disp()
 }
 
 }
+
+#endif

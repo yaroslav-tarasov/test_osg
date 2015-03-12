@@ -216,10 +216,7 @@
     <ClCompile Include="objects\nodes_manager\mod_node_impl.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager_view.cpp" />
     <ClCompile Include="objects\nodes_manager\nodes_manager_visual.cpp" />
-    <ClCompile Include="objects\nodes_manager\node_impl.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
     <ClCompile Include="objects\nodes_manager\node_tree_iterator.cpp" />
     <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp" />
     <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp" />

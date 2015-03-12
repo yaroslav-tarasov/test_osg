@@ -109,3 +109,5 @@ private:
 typedef polymorph_ptr<node_impl> node_impl_ptr;
 
 }
+
+#define OSG_NODE_IMPL
