@@ -86,7 +86,7 @@ namespace nodes_management
     {
           
           if(node_id==0)
-                  return boost::make_shared<node_impl>(base_, self_);   // FIXME ну бред же
+                  return boost::make_shared<node_impl>(base_.get(), self_);   // FIXME ну бред же
 
           return node_info_ptr();
     }

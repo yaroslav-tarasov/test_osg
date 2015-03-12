@@ -582,7 +582,7 @@ void model::create_phys_vehicle()
             //auto const *wnc = wheel_node->get_collision() ;
             //Assert(wnc) ;
             //cg::rectangle_3 bound = model_structure::bounding(*wnc);
-            double radius =0.75 * wheel_node->get_bound().radius;
+            double radius = 0.75 * wheel_node->get_bound().radius;
 
             this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wt.translation(), wt.rotation().cpr(), true);
 

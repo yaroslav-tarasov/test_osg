@@ -58,7 +58,10 @@ namespace bi
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
 	{
-
+        
+        btBvhTriangleMeshShape* trimeshShape = nullptr;
+        bool r = loadBulletFile(cfg().path.data + "/models/a_319/a_319.osgb.bullet",  trimeshShape);
+        
         using namespace kernel;
         _d->_msys = kernel::create_model_system(_d->msg_service_,"script should  be placed here");
 
@@ -105,9 +108,9 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
-        aircraft::settings_t s;
-        s.kind = "A319";
-        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
+        //aircraft::settings_t s;
+        //s.kind = "A319";
+        //auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
 
     }
 
@@ -346,11 +349,12 @@ namespace bi
         root->getUserValue("id",object_id);
 
         int id = _physicsNodes.size();
-        phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(lod3?lod3:node,id,mass);
+        phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(node/*lod3?lod3:node*/,id,mass);
         
+        FIXME(Сначала вырубаем lod3 потом копируем модель, цирк ей богу)
         // FIXME
-        if(lod3) 
-            lod3->setNodeMask(0);
+        //if(lod3) 
+        //    lod3->setNodeMask(0);
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
@@ -378,9 +382,9 @@ namespace bi
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 
-        nm::manager_ptr man = nm::create_manager(_d->_msys,lod3?lod3:node);
-
-        _phys_vehicles.emplace_back(vehicle::create(_d->_msys,man));
+        nm::manager_ptr man = nm::create_manager(_d->_msys,node/*lod3?lod3:node*/);
+        
+        _phys_vehicles.push_back(vehicle::create(_d->_msys,man));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;

@@ -40,6 +40,8 @@
 #include <osg/MatrixTransform>
 #include <osgUtil/Optimizer>
 
+#include <osg/ComputeBoundsVisitor>
+
 #include <iostream>
 
 
@@ -74,9 +76,9 @@
 #pragma comment(lib, "osgUtild.lib")
 #pragma comment(lib, "osgSimd.lib")
 #pragma comment(lib, "osgParticled.lib")
-//#pragma comment(lib, "BulletCollision_Debug.lib")
-//#pragma comment(lib, "LinearMath_Debug.lib")
-//#pragma comment(lib, "BulletDynamics_Debug.lib")
+#pragma comment(lib, "BulletCollision_Debug.lib")
+#pragma comment(lib, "LinearMath_Debug.lib")
+#pragma comment(lib, "BulletDynamics_Debug.lib")
 #endif
 
 

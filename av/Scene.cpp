@@ -560,8 +560,6 @@ void Scene::createObjects()
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO4( creators::createObject(name,true),
         osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
- 	
-    _rigidUpdater->createNodeHierarchy(obj);
 
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO4( creators::createObject(name,true),
@@ -704,12 +702,12 @@ void Scene::createObjects()
     //buksir->setNodeMask(0);
 #endif
 
-    auto pojarka2 = creators::createObject("pojarka",false);
+    auto pojarka2 = creators::createObject("niva_chevrolet",false);
     if(pojarka2)
 	_rigidUpdater->addVehicle(pojarka2,
         osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
-    auto pojarka_ctrl = creators::createObject("pojarka",false);
+    auto pojarka_ctrl = creators::createObject("niva_chevrolet",false);
     if(pojarka_ctrl)
 	_rigidUpdater->addVehicle2(pojarka_ctrl,
         osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  

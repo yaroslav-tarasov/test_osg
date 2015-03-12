@@ -166,7 +166,27 @@ REFL_END()
 
     void visit_sub_tree(node_info_ptr root, std::function<bool(node_info_ptr)> f);
 
-    cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, node_info_ptr rel = nullptr);
+    inline void visit_sub_tree(node_tree_iterator_ptr node, boost::function<bool(node_info_ptr)> f)
+    {
+        std::queue<node_tree_iterator_ptr> q;
+        q.push(node);
+
+        while(!q.empty())
+        {
+            node_tree_iterator_ptr n = q.front();
+            q.pop();
+
+            if (!f(n->node()))
+                return;
+
+            for(auto it = n->children().begin(); it != n->children().end(); ++it)
+                q.push(*it);
+        }
+    }
+
+
+    // Перенесено в менеджер
+    //cg::transform_4 get_relative_transform(manager_ptr manager, node_info_ptr node, node_info_ptr rel = nullptr);
 
 
 } //nm namespace

@@ -14,12 +14,12 @@
 #include "ada/ada.h"
 #include "bada_import.h"
 
-//#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
-//#include "nodes_manager/node_impl.h"
-
 #include "kernel/systems/systems_base.h"
 #include "fake_system.h"
 #include "kernel/object_class.h"
+
+//#include "nodes_manager/nodes_manager.h" // TODO FIXME убрать нафиг
+//#include "nodes_manager/node_impl.h"
 
 #include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
 FIXME(Неправильное использование node_impl)
@@ -137,7 +137,7 @@ namespace aircraft
 		//btCollisionShape* cs_sh_r_l = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_l );
 		//btCollisionShape* cs_sh_r_r = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_r_r );
 		//btCollisionShape* cs_sh_f   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( sh_f );
-		btCollisionShape* cs_body   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( body );
+		btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
 
 		sh_f/*_wheel*/->setNodeMask(0xffffffff);
 		sh_r_r/*_wheel*/->setNodeMask(0xffffffff);
@@ -186,7 +186,7 @@ namespace ray_cast_vehicle
 
         btCompoundShape*  s = cs.cs_ = new btCompoundShape;
 
-        btCollisionShape* cs_body   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG( body );
+        btCollisionShape* cs_body   = osgbCollision::/*btConvexHullCollisionShapeFromOSG*//*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
         
         for (auto it = wheels.begin();it != wheels.end();++it)
             (*it)->setNodeMask(0xffffffff);

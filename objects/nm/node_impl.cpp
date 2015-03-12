@@ -214,7 +214,7 @@ uint32_t node_impl::node_id() const
 
 uint32_t node_impl::object_id() const
 {
-    auto n = node_;
+    osg::Node* n = node_.get();
     uint32_t id=0;
     bool got_phys_node=false;
     while(0 != n->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(n->getName())))
