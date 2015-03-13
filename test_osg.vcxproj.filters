@@ -73,6 +73,9 @@
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ada">
+      <UniqueIdentifier>{b8984683-8efa-40f4-ad2e-1f255c5052f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -553,6 +556,9 @@
     </ClCompile>
     <ClCompile Include="objects\nm\node_osg_impl.cpp">
       <Filter>Source Files\nm</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\ada\ada_view.cpp">
+      <Filter>Source Files\ada</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

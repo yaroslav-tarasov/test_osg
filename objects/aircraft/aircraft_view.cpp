@@ -175,11 +175,12 @@ void view::on_child_appended(object_info_ptr child)
 void view::on_child_removing(object_info_ptr child)
 {
     base_view_presentation::on_child_removing(child) ;
-#if 0  
+ 
     if (fms_info_ == child)
         fms_info_.reset() ;
     else if (nodes_manager_ == child)
         nodes_manager_.reset() ;
+#if 0 
     else if (gui_ == child)
         gui_.reset() ;
 #endif
@@ -189,23 +190,23 @@ geo_point_3 const& view::pos() const
 {
     // FIXME  
     FIXME(Здесь должен быть позицион)
-    return geo_point_3();// return fms_info_->get_state().dyn_state.pos;
+    return fms_info_->get_state().dyn_state.pos;
 }
 
 point_3 view::dpos() const
 {
     // FIXME
     FIXME(Здесь должен быть позицион)
-    return point_3();
-    // return cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
+    //return point_3();
+    return cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
 }
 
 cpr view::orien() const
 {   
     // FIXME  
     FIXME(Здесь должена быть ориентация)
-    return cpr();
-    // return fms_info_->get_state().orien();
+    //return cpr();
+    return fms_info_->get_state().orien();
 }
 
 settings_t const & view::settings() const
@@ -589,7 +590,7 @@ void view::on_fms_changed()
 
 void view::on_fms_state_changed()
 {
-#if 0
+#if 1
     if (fms_info_->get_state().version == 0)
         update_atc_state() ;
 #endif
@@ -792,8 +793,8 @@ void view::restore_responder_code()
 void view::set_parking_initial_position(std::string const &airport_name, std::string const &parking_name)
 {
     Assert(nodes_manager_);
-#if 0
     Assert(fms_info_);
+#if 0
     if (ani_ && !airport_name.empty() && !parking_name.empty())
     {
         ani::airport_info_ptr airp = ani_->navigation_info()->get_airport(airport_name);
@@ -838,7 +839,7 @@ void view::set_parking_initial_position(std::string const &airport_name, std::st
 
         aircraft_fms::control_ptr(fms_info_)->set_state(st);
     }
-    #endif
+#endif
 }
 
 double view::len_for_cmd() const
@@ -863,12 +864,14 @@ void view::on_settings(settings_t const& s)
 
             model_changed = true;
         }
-#if 0
+#if 1
         if (fms_info_)
             aircraft_fms::control_ptr(fms_info_)->set_aircraft_kind(s.kind);
-        #endif
+#endif
+
     }
-#if 0
+
+#if 1
     if (s.payload != settings_.payload && fms_info_)
             aircraft_fms::control_ptr(fms_info_)->set_payload(s.payload);
 #endif

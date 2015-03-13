@@ -105,6 +105,7 @@ namespace aircraft
 			p.length   = ym;
 
 			auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+
 			auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",findNodeVisitor::not_exact);
 			auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",findNodeVisitor::not_exact);
 			auto sh_f   = findFirstNode(node,"animgroup_shassi_f",findNodeVisitor::not_exact);
@@ -130,32 +131,30 @@ namespace aircraft
 				wi.push_back(wii);
 			}
 		
-
-			//btTransform cmt(btQuaternion(0,0,0),btVector3(1,0,0));
-			//cmt.setIdentity();
-			////localTrans effectively shifts the center of mass with respect to the chassis
-			//cmt.setOrigin(btVector3(0,-10,0));	
-
-			btCompoundShape*  s = cs.cs_ = new btCompoundShape;
+			btCollisionShape* cs_body = nullptr;
+			cs.cs_ = new btCompoundShape;
 
 			sh_f->setNodeMask(0);
 			sh_r_r->setNodeMask(0);
 			sh_r_l->setNodeMask(0);
-
-			btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
-
+#if 0
+            FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
+            cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
+#else
+            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::AXIS::Y,3 );
+#endif
 			sh_f->setNodeMask(0xffffffff);
 			sh_r_r->setNodeMask(0xffffffff);
 			sh_r_l->setNodeMask(0xffffffff);
 
-			cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
+            if(cs_body)
+			    cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
 		}
 		else
 		{
 		   bool r = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".osgb.bullet",  cs.cs_);
 		}
          
-		// return s;
 	}
 }
 
@@ -183,7 +182,7 @@ namespace ray_cast_vehicle
 
             auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
 
-            auto wheels = findAllNodes(node,"wheel",findNodeVisitor::not_exact);
+            auto wheels = findNodes(node,"wheel",findNodeVisitor::not_exact);
 
             for (auto it = wheels.begin();it != wheels.end();++it)
             {   

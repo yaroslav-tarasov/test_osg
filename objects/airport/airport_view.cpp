@@ -32,7 +32,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 
 geo_point_3 view::pos() const
 {
-    return *atc::airport::kta_position(settings_.icao_code);
+    FIXME(fake position)  
+    return ::get_base();//*atc::airport::kta_position(settings_.icao_code);
 }
 
 std::string const& view::name() const

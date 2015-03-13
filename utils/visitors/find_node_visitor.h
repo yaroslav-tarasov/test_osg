@@ -113,7 +113,7 @@ inline static osg::Node * findFirstNode(osg::Node* root,const std::string &searc
     return findVis.getFirst();
 }
 
-inline static findNodeVisitor::nodeListType findAllNodes(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact)
+inline static findNodeVisitor::nodeListType findNodes(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact)
 {
     findNodeVisitor findVis(searchName,m); 
     root->accept(findVis);

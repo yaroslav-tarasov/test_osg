@@ -137,7 +137,7 @@ namespace bi
         avCollision::GLDebugDrawer*              _dbgDraw;
         bool                                     _debug;
 		aircrafts_t                              _aircrafts;
-        aircraft_models_t                        _phys_aircrafts;
+        aircraft_models_t                        _model_aircrafts;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         vehicles_t                               _phys_vehicles;
 

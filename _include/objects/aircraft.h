@@ -195,7 +195,7 @@ struct info
 // FIXME not relized yet 
     //virtual tp_provider_ptr  get_tp_provider(double duration_sec) = 0;
 
-    //virtual aircraft_fms::info_ptr get_fms() const = 0;
+    virtual aircraft_fms::info_ptr get_fms() const = 0;
 
 
     //virtual atc_controls_t const& get_atc_controls() const = 0;

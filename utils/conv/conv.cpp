@@ -887,9 +887,7 @@ int main( int argc, char **argv )
             osg::notify(osg::NOTICE)<<result.message()<< std::endl;
         }
 
-        auto lod3 =  findFirstNode(root,"lod3");
-
-        bool res = generateBulletFile(fileNameOut + ".bullet", lod3?lod3:root);
+        bool res = generateBulletFile(fileNameOut + ".bullet", root);
 
         if (res)
         {

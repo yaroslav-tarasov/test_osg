@@ -46,6 +46,26 @@ namespace bi
                 kernel::msg_service                             msg_service_; 
 	};
 
+    void create_auto_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
+    {
+        using namespace kernel;
+
+        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(sys)->object_classes() ;
+
+        kernel::object_class_ptr class_ptr ;
+
+        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
+        {
+            if (class_name == (*it)->name())
+                class_ptr = *it ;
+            std::string n = (*it)->name();
+        }
+
+        auto obj = kernel::fake_objects_factory_ptr(sys)->create_object(class_ptr, unique_name); 
+
+    }
+
+
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
 		: _root        (root)
 		, _on_collision(on_collision)
@@ -57,33 +77,18 @@ namespace bi
 		, _d(boost::make_shared<RigidUpdater_private>())
 	{
         
-
         using namespace kernel;
         _d->_msys = kernel::create_model_system(_d->msg_service_,"script should  be placed here");
 
-        // kernel::object_info_ptr obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object("phys_sys_model");
-        
         FIXME(Уникальное имя наверное хорошая вещь)
         // void editor_document_impl::create_clicked(std::string const &class_name)
         //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
         
-        {
-            std::string class_name = "phys_sys";
-            std::string unique_name = "phys_sys";
-            std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
-        
-            kernel::object_class_ptr class_ptr ;
+        create_auto_object(_d->_msys,"phys_sys","phys_sys");
+        create_auto_object(_d->_msys,"airports_manager","aiports_manager");
+        create_auto_object(_d->_msys,"ada","ada");
+        create_auto_object(_d->_msys,"airport","aiport_0");
 
-            for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
-            {
-                if (class_name == (*it)->name())
-                class_ptr = *it ;
-                std::string n = (*it)->name();
-            }
-
-            auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
-
-        }
         if(false)
         {
             std::string class_name = "aircraft";
@@ -104,9 +109,9 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
-        //aircraft::settings_t s;
-        //s.kind = "A319";
-        //auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
+        aircraft::settings_t s;
+        s.kind = "A319";
+        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
 
     }
 
@@ -318,9 +323,9 @@ namespace bi
         FIXME("А вот и засада с лодами")
         //aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
 
-        size_t pa_size = _phys_aircrafts.size();
+        size_t pa_size = _model_aircrafts.size();
 
-        _phys_aircrafts.emplace_back(aircraft::create(_d->_msys,man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
+        _model_aircrafts.emplace_back(aircraft::create(_d->_msys,man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
         _sys->registerBody(id);  // FIXME Перевести внутрь модели //_sys->registerBody(id,ac_->get_rigid_body());
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -528,7 +533,7 @@ namespace bi
                 // Физику обновляем через моделирующую
                 _d->_msys->update(view->getFrameStamp()->getSimulationTime());
 
-                for(auto it = _phys_aircrafts.begin();it!=_phys_aircrafts.end();++it)
+                for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   
                      //high_res_timer        _hr_timer2;
      //               double dt2 = _hr_timer2.get_delta();
@@ -665,7 +670,7 @@ namespace bi
     {
          selected_obj_id_ = id;
 
-         auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
+         auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
          {
              if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
                  return true;
@@ -673,7 +678,7 @@ namespace bi
              return false;
          });
 
-         if(it_am!=_phys_aircrafts.end())
+         if(it_am!=_model_aircrafts.end())
          {
             auto traj = aircraft::int_control_ptr(*it_am)->get_trajectory().get();
             if (traj) _trajectory_drawer->set(*(traj));
@@ -689,7 +694,7 @@ namespace bi
         if(selected_obj_id_)
         {
              
-            auto it_am = std::find_if(_phys_aircrafts.begin(),_phys_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
+            auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
             {
                 if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
                     return true;
@@ -697,7 +702,7 @@ namespace bi
                 return false;
             });
             
-            if(it_am!=_phys_aircrafts.end())
+            if(it_am!=_model_aircrafts.end())
             {
                 aircraft::info_ptr am=*it_am;
                 decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();

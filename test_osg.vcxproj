@@ -194,6 +194,7 @@
     <ClCompile Include="main_scene2.cpp" />
     <ClCompile Include="materials.cpp" />
     <ClCompile Include="nfi\lib_loader.cpp" />
+    <ClCompile Include="objects\ada\ada_view.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_model.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_view.cpp" />
