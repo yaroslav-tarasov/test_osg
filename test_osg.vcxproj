@@ -60,7 +60,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;pugixmld.lib;osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixmld.lib;osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -82,7 +82,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;ext\bada;ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
@@ -130,6 +130,7 @@
     <ClInclude Include="nodes_manager.h" />
     <ClInclude Include="nodes_managment.h" />
     <ClInclude Include="node_impl.h" />
+    <ClInclude Include="objects\conditions\meteo_proxy_view.h" />
     <ClInclude Include="objects\nm\nodes_manager.h" />
     <ClInclude Include="objects\nm\node_impl.h" />
     <ClInclude Include="objects\nodes_manager\mod_node_impl.h" />
@@ -206,11 +207,13 @@
     <ClCompile Include="objects\aircraft\sync_fsm\sync_phys_state.cpp" />
     <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
     <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
+    <ClCompile Include="objects\aircraft_fms\aircraft_fms_model.cpp" />
     <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp" />
     <ClCompile Include="objects\airports_manager\airports_manager_view.cpp" />
     <ClCompile Include="objects\airport\airport_model.cpp" />
     <ClCompile Include="objects\airport\airport_view.cpp" />
     <ClCompile Include="objects\common\object_creators.cpp" />
+    <ClCompile Include="objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="objects\nm\nodes_management.cpp" />
     <ClCompile Include="objects\nm\nodes_manager.cpp" />
     <ClCompile Include="objects\nm\node_osg_impl.cpp" />

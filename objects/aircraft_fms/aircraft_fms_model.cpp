@@ -1,8 +1,11 @@
+#include "stdafx.h"
+#include "precompiled_objects.h"
+
 #include "aircraft_fms_model.h"
 
 #include "fms/traj_calc.h"
 
-#include "common/fpl.h"
+//#include "common/fpl.h"
 
 namespace aircraft
 {
@@ -164,6 +167,7 @@ void model::on_plan_changed()
 
 void model::init_fms()
 {
+    FIXME(Meteo)
     if (!fsettings() || !get_meteo_proxy())
         return ;
 
@@ -171,7 +175,8 @@ void model::init_fms()
 
     ada::data_t const& fsetttings = *fsettings();
     fms::aircraft_data_t adata(fsetttings, payload_ * fsetttings.max_payload_mass);
-    pilot_impl_ = fms::create_aircraft_pilot(get_meteo_proxy(), fmsst, adata);
+
+    pilot_impl_ = fms::create_aircraft_pilot(get_meteo_proxy(), fmsst, adata);      
 
     fms::pilot_control_ptr(pilot_impl_)->set_instrument(!get_plan().empty() ? get_plan().front() : fms::instrument_ptr());
 }

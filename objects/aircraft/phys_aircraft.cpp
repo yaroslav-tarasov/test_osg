@@ -310,7 +310,7 @@ namespace aircraft
             //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
             cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node);
             point_3 wheel_offset = wt.translation() + s->get_offset();
-
+            
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
             const double radius = 0.75 * node->get_bound().radius ;
 
@@ -358,7 +358,7 @@ namespace aircraft
             phys_aircraft_->set_elevator(0);
             phys_aircraft_->set_ailerons(0);
 
-            // TODO
+            // TODO  // by simex 
             //send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
 
             return;

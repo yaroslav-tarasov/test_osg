@@ -17,9 +17,6 @@ namespace sync_fsm
 
         fms::procedure_model_ptr pm =  self_.get_fms_info()->procedure_model();
         double prediction = cg::clamp(pm->taxi_TAS(), pm->takeoff_TAS(), 15., 30.)(self_.get_fms_info()->get_state().dyn_state.TAS);
-        
-        aircraft_fms::info_ptr info = self_.get_fms_info();
-        aircraft_fms::model_info_ptr p = aircraft_fms::model_info_ptr(self_.get_fms_info());
         geo_base_3 predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(prediction*0.1));
         phys_aircraft_->go_to_pos(predict_pos, self_.get_fms_info()->get_state().orien());
         phys_aircraft_->set_air_cfg(self_.get_fms_info()->get_state().dyn_state.cfg);

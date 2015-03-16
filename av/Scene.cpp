@@ -528,7 +528,7 @@ void Scene::createObjects()
 
 	auto obj = creators::createObject(name,true);
 
-#if 1
+#if 0
 	if(_rigidUpdater.valid())
 		_rigidUpdater->addPhysicsAirplane( obj,
 		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );

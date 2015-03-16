@@ -76,6 +76,9 @@
     <Filter Include="Source Files\ada">
       <UniqueIdentifier>{b8984683-8efa-40f4-ad2e-1f255c5052f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\meteo">
+      <UniqueIdentifier>{a11a04c7-6b70-4e15-90d5-8b1f61ee4ac1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -284,6 +287,9 @@
     </ClInclude>
     <ClInclude Include="_include\objects\object_creators.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objects\conditions\meteo_proxy_view.h">
+      <Filter>Source Files\meteo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -551,14 +557,20 @@
     <ClCompile Include="objects\aircraft\aircraft_visual.cpp">
       <Filter>Source Files\aircraft_fms</Filter>
     </ClCompile>
-    <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
-    </ClCompile>
     <ClCompile Include="objects\nm\node_osg_impl.cpp">
       <Filter>Source Files\nm</Filter>
     </ClCompile>
     <ClCompile Include="objects\ada\ada_view.cpp">
       <Filter>Source Files\ada</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp">
+      <Filter>Source Files\aircraft_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft_fms\aircraft_fms_model.cpp">
+      <Filter>Source Files\aircraft_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\conditions\meteo_proxy_view.cpp">
+      <Filter>Source Files\meteo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

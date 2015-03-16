@@ -26,7 +26,7 @@ inline btVector3 to_bullet_vector3( osg::Vec3 const& v  )
 
 namespace vehicle
 {
-    btCompoundShape*  fill_cs(osg::Node* node )
+    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
     {          
         osg::Node* lod3 =  findFirstNode(node,"Lod3");
 
@@ -39,6 +39,7 @@ namespace vehicle
         float zm = bb.zMax() - bb.zMin();
 
         btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/0,0);
+        offset = cg::point_3(0,0,0);
 
         auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
 
@@ -78,7 +79,7 @@ namespace vehicle
 namespace airplane
 {
 
-    btCompoundShape*  fill_cs(osg::Node* node)
+    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset)
     {  
             osg::ComputeBoundsVisitor cbv;
             node->accept( cbv );
@@ -93,7 +94,7 @@ namespace airplane
             float dz = abs(bb.zMax()) - zm / 2.f;
 
             btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
-
+            offset = cg::point_3(0,-dz,0);
 
             auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
 
@@ -149,7 +150,7 @@ namespace airplane
 namespace heli
 {
 
-    btCompoundShape*  fill_cs(osg::Node* node)
+    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset)
     {  
         osg::ComputeBoundsVisitor cbv;
         node->accept( cbv );
@@ -164,6 +165,7 @@ namespace heli
         float dz = abs(bb.zMax()) - zm / 2.f;
 
         btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
+        offset = cg::point_3(0,-dz,0);
 
         auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
 
@@ -213,7 +215,7 @@ namespace heli
 
 }
 
-btCompoundShape* fill_cs(osg::Node* node)
+btCompoundShape* fill_cs(osg::Node* node, cg::point_3& offset)
 {
     auto lod3 =  findFirstNode(node,"lod3");
 
@@ -223,27 +225,27 @@ btCompoundShape* fill_cs(osg::Node* node)
     bool heli     = findFirstNode(node ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
 
     if(airplane)
-        return airplane::fill_cs(lod3?lod3:node);
+        return airplane::fill_cs(lod3?lod3:node,offset);
     else if(vehicle)
-        return vehicle::fill_cs(lod3?lod3:node);
+        return vehicle::fill_cs(lod3?lod3:node,offset);
     else if(vehicle)
-        return  airplane::fill_cs(lod3?lod3:node);
+        return  airplane::fill_cs(lod3?lod3:node,offset);
 
     return nullptr;
 }
 
-bool generateBulletFile(std::string name, osg::Node* node)
+bool generateBulletFile(std::string name, osg::Node* node, cg::point_3& offset)
 {
 	btDefaultSerializer*	serializer = new btDefaultSerializer();
 	
 	// /*Convex*/btTriangleMeshShape* trimeshShape = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( node );
     
-    btCompoundShape * cs =  fill_cs(node);
+    btCompoundShape * cs =  fill_cs(node,offset);
 
     static const char* nodeName = node->getName().c_str();
     FIXME(ћожет надо дл€ всех узлов проставить имена)
     serializer->registerNameForPointer(cs, /*nodeName*/"lod3");   
-	
+
     serializer->startSerialization();
 	cs->serializeSingleShape(serializer);
 	serializer->finishSerialization();

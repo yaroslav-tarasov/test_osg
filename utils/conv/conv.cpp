@@ -833,7 +833,23 @@ int main( int argc, char **argv )
 
         optimizer.optimize(root.get());
 
-        std::ofstream filelogic(fileNameOut + ".stbin", std::ios_base::binary);
+        boost::filesystem::path pathFileOut(fileNameOut); 
+        std::string base_file_name = pathFileOut.parent_path().string() + "/" + pathFileOut.stem().string();
+
+        cg::point_3 offset;
+
+        bool res = generateBulletFile(base_file_name + ".bullet", root, offset);
+
+        if (res)
+        {
+            osg::notify(osg::NOTICE)<<"Data written to '"<< base_file_name + ".bullet"<<"'."<< std::endl;
+        }
+        else
+        {
+            osg::notify(osg::NOTICE)<< "Error Occurred While Writing to "<< base_file_name + ".bullet"<< std::endl;
+        }
+
+        std::ofstream filelogic(base_file_name + ".stbin", std::ios_base::binary);
           
         heilVisitor  hv(filelogic);
         hv.apply(*root.get());
@@ -887,16 +903,7 @@ int main( int argc, char **argv )
             osg::notify(osg::NOTICE)<<result.message()<< std::endl;
         }
 
-        bool res = generateBulletFile(fileNameOut + ".bullet", root);
 
-        if (res)
-        {
-            osg::notify(osg::NOTICE)<<"Data written to '"<<fileNameOut + ".bullet"<<"'."<< std::endl;
-        }
-        else
-        {
-            osg::notify(osg::NOTICE)<< "Error Occurred While Writing to "<< fileNameOut + ".bullet"<< std::endl;
-        }
 
 
 

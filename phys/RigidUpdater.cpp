@@ -87,6 +87,7 @@ namespace bi
         create_auto_object(_d->_msys,"phys_sys","phys_sys");
         create_auto_object(_d->_msys,"airports_manager","aiports_manager");
         create_auto_object(_d->_msys,"ada","ada");
+        create_auto_object(_d->_msys,"meteo_proxy","meteo_proxy");
         create_auto_object(_d->_msys,"airport","aiport_0");
 
         if(false)

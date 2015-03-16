@@ -2,7 +2,7 @@
 
 #include "common/aircraft.h"
 #include "common/aircraft_fms.h"
-//#include "common/meteo_proxy.h"
+#include "common/meteo_proxy.h"
 #include "objects/ada.h"
 #include "objects/ani.h"
 #include "objects/fpl.h"
@@ -116,7 +116,7 @@ protected:
 
 protected:
     void set_auto_transition(fms::transition_t i, bool isauto);
-#if 0    
+#if 1    
     meteo::meteo_proxy_ptr get_meteo_proxy() const;
 #endif
 
@@ -147,7 +147,7 @@ private:
     //! характеристики ВС
     ada::info_ptr               ada_;
     fms::procedure_model_ptr    procedure_model_;
-    //meteo::meteo_proxy_ptr      meteo_proxy_;
+    meteo::meteo_proxy_ptr      meteo_proxy_;
     //meteo::meteo_cursor_ptr     meteo_cursor_;
 
     //! 

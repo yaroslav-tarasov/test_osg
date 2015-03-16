@@ -94,9 +94,6 @@
 
 #include <boost/algorithm/string.hpp>
 
-
-bool generateBulletFile(std::string name, osg::Node* body);
-
 #include "cg_math.h"
 
 #define Assert(x) if(x){};
@@ -111,3 +108,5 @@ bool generateBulletFile(std::string name, osg::Node* body);
 
 #define STR(x) STRINGIFY(x)
 #define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))
+
+bool generateBulletFile(std::string name, osg::Node* body, cg::point_3& offset);

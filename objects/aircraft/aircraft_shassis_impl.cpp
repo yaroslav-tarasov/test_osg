@@ -68,11 +68,13 @@ namespace aircraft
     void shassis_support_impl::find_shassis( shasis_group i, nm::node_info_ptr group_node )
     {
 
- #if 0
+ #if !defined(OSG_NODE_IMPL)
+
         auto it = nodes_manager_->get_node_tree_iterator(group_node->node_id());
 
         nm::visit_sub_tree(it, [this, i](nm::node_info_ptr node)->bool
         {
+            std::string name = node->name();
             if (boost::starts_with(node->name(), "shassi_"))
             {
                 nm::node_info_ptr wheel_node;
@@ -88,6 +90,8 @@ namespace aircraft
 
                 if (wheel_node)
                 {
+                    FIXME ("We don't have collision volumes")
+
                     if (auto collision = wheel_node->get_collision())
                     {
                         cg::rectangle_3 bound = model_structure::bounding(*collision);
@@ -95,6 +99,11 @@ namespace aircraft
 
                         this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node, radius));
                     }
+                    else
+                    {
+                        this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node,  0.75 * node->get_bound().radius));
+                    }
+
                 }
             }
 

@@ -22,7 +22,7 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     , obj_data_base(dict)
     , ada_         (find_first_object<ada::info_ptr>(collection_))
     , ani_         (find_first_object<ani_object::info_ptr>(collection_))
-    //, meteo_proxy_ (find_first_object<meteo_proxy::info_ptr>(collection_)->get_general_proxy())
+    , meteo_proxy_ (find_first_object<meteo_proxy::info_ptr>(collection_)->get_general_proxy())
     //, meteo_cursor_(meteo_proxy_->create_cursor())
 {
     //LogDebug("aircraft_fms::view created");
@@ -746,7 +746,7 @@ void view::set_auto_transition(fms::transition_t i, bool isauto)
     set(msg::settings_msg(new_settings));
 }
 
-#if 0
+#if 1
 meteo::meteo_proxy_ptr view::get_meteo_proxy() const
 {
     return meteo_proxy_;

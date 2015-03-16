@@ -45,7 +45,7 @@ class heilVisitor : public osg::NodeVisitor
             if(node_name == "root")
                root_visited = true;
             
-            FIXME("Ёротика")
+            FIXME("XXX")
             
             //if(boost::starts_with(node_name,"lod") && name_cut == name_first_part && name_first_part != "lod0")
             //   return;
@@ -69,9 +69,10 @@ class heilVisitor : public osg::NodeVisitor
                 
 				if(got_lod) got_lod=false;
                 
-				new_node.pos = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans());
+				new_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans());
                 new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
-            
+                const osg::BoundingSphere& bs = node.getBound();
+                new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
            
 
                 new_node.name = name_cut; // логическое им€. ќбщее дл€ все лодов
