@@ -23,6 +23,8 @@
 
 #include "object_creators.h"
 
+FIXME("kernel/systems.h")
+#include "kernel/systems.h"
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -43,6 +45,7 @@ namespace bi
 	{
 		        RigidUpdater::phys_vehicles_t                          _vehicles;
                 kernel::system_ptr                                     _msys;
+				kernel::system_ptr                                     _vsys;
                 kernel::msg_service                             msg_service_; 
 	};
 
@@ -107,9 +110,11 @@ namespace bi
 	{
         
         using namespace kernel;
-        _d->_msys = kernel::create_model_system(_d->msg_service_,"script should  be placed here");
-
-        FIXME(Уникальное имя наверное хорошая вещь)
+        _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
+		
+		_d->_vsys = create_visual_system(_d->msg_service_, vis_sys_props());
+        
+	    FIXME(Уникальное имя наверное хорошая вещь)
         // void editor_document_impl::create_clicked(std::string const &class_name)
         //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
         

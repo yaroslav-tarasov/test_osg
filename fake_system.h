@@ -2,8 +2,10 @@
 
 namespace kernel
 {
+struct vis_sys_props;
 
 system_ptr create_model_system(msg_service& service, std::string const& script);
+system_ptr create_visual_system(msg_service& service, vis_sys_props const& vsp );
 
 struct fake_objects_factory
 {

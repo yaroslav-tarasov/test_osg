@@ -6,13 +6,13 @@
 
 namespace phys
 {
-object_info_ptr model::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+object_info_ptr model::create(kernel::object_create_t const& oc , dict_copt dict)
 {
-    return object_info_ptr(new model(oc/*,dict*/));
+    return object_info_ptr(new model(oc,dict));
 }
 
-model::model(kernel::object_create_t const& oc/*, dict_copt dict*/)
-    : view(oc/*, dict*/)
+model::model(kernel::object_create_t const& oc, dict_copt dict)
+    : view(oc, dict)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     , last_time_(0)
     , exercise_loaded_connection_(oc.sys->subscribe_exercise_loaded(boost::bind(&model::on_exercise_loaded, this)))

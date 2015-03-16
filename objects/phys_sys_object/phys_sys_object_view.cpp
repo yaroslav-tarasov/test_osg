@@ -5,13 +5,13 @@
 
 namespace phys
 {
-    object_info_ptr view::create(kernel::object_create_t const& oc/*, dict_copt dict*/)
+    object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
     {
-        return object_info_ptr(new view(oc/*, dict*/));
+        return object_info_ptr(new view(oc, dict));
     }
 
 
-    view::view( kernel::object_create_t const& oc/*, dict_copt dict*/ )
+    view::view( kernel::object_create_t const& oc, dict_copt dict )
         : base_view_presentation(oc)
     {
     }

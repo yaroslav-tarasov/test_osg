@@ -14,12 +14,12 @@ namespace phys
         , view
         , control
     {
-        static object_info_ptr create(kernel::object_create_t const& oc/*, dict_copt dict*/);
+        static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
         ~model();
 
     private:
-        model(kernel::object_create_t const& oc/*, dict_copt dict*/);
+        model(kernel::object_create_t const& oc, dict_copt dict);
 
         // base_presentation
     private:
