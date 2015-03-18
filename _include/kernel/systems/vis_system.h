@@ -1,6 +1,6 @@
 #pragma once
 
-#include "victory/vtVictoryFwd.h"
+//#include "victory/vtVictoryFwd.h"
 #include "common/event.h"
 #include "kernel/systems.h"
 
@@ -11,7 +11,7 @@ struct visual_object
 {
     virtual ~visual_object(){}
 
-    virtual victory::node_ptr node() const = 0;
+    virtual osg::ref_ptr<osg::Node> node() const = 0;
     virtual void set_visible(bool visible) = 0;
 };
 

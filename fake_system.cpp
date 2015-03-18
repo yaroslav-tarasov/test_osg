@@ -12,6 +12,9 @@
 #include "fake_system.h"
 
 #include "kernel/systems/vis_system.h"
+#include "kernel/systems/ctrl_system.h"
+
+#include "kernel/systems/visual_system/visual_object_impl.h"
 
 namespace kernel
 {
@@ -84,6 +87,7 @@ namespace kernel
 
 struct model_system_impl;
 struct visual_system_impl;
+struct ctrl_system_impl;
 
 system_ptr create_model_system(msg_service& service, std::string const& script) 
 {
@@ -95,6 +99,12 @@ system_ptr create_visual_system(msg_service& service, vis_sys_props const& vsp )
 {
     LogInfo("Creating VISUAL system");
     return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service), boost::ref(vsp)));
+}
+
+system_ptr create_ctrl_system( msg_service& service ) 
+{
+    LogInfo("Creating CTRL system");
+    return kernel::system_ptr(boost::make_shared<ctrl_system_impl>(boost::ref(service)));
 }
 
 struct  fake_system_base
@@ -1142,6 +1152,9 @@ double model_system_impl::calc_step() const
 }
 
 
+#pragma region visual system define
+
+
 struct visual_system_impl
     : visual_system
     , visual_system_props
@@ -1226,7 +1239,7 @@ void visual_system_impl::load_exercise(dict_cref dict)
 
 visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/ )
 {
-    return visual_object_ptr();//boost::make_shared<visual_object_impl>(victory_, scene_, res, seed);
+    return boost::make_shared<visual_object_impl>( res, seed);
 }
 
 void visual_system_impl::object_destroying(object_info_ptr object)
@@ -1236,5 +1249,44 @@ void visual_system_impl::object_destroying(object_info_ptr object)
     //else if (debug_eye_ && debug_eye_->track_object == object)
     //    debug_eye_.reset();
 }
+#pragma  endregion
+
+
+#pragma region control system define
+
+struct ctrl_system_impl
+    : ctrl_system
+    , fake_system_base
+
+{
+
+    ctrl_system_impl(msg_service& service);
+
+private:
+    void update       (double time) override;
+
+private:
+
+
+    scoped_connection object_destroying_connection_;
+
+
+
+};
+
+
+ctrl_system_impl::ctrl_system_impl(msg_service& service)
+    : fake_system_base(sys_ext_ctrl, service, "objects.xml")
+    //, object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&ctrl_system_impl::object_destroying, this, _1)))
+{
+    LogInfo("Create Visual Subsystem");
+}
+
+void ctrl_system_impl::update(double time)
+{
+    fake_system_base::update(time);
+}
+
+#pragma  endregion
 
 } // kernel

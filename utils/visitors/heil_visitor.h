@@ -1,5 +1,24 @@
 #pragma once    
 
+template<typename T>
+std::ostream &operator <<(std::ostream &os, const std::vector<T> &v) {
+    using namespace std;
+    copy(v.begin(), v.end(), ostream_iterator<T>(os, " "));
+    return os;
+}
+
+template<typename T>
+std::ostream &operator <<(std::ostream &os, const std::vector<std::vector<T>> &v) {
+    using namespace std;
+
+    //NOTE: for some reason std::copy doesn't work here, so I use manual loop
+    //copy(v.begin(), v.end(), ostream_iterator<std::vector<T>>(os, "\n"));
+
+    for(size_t i = 0 ; i < v.size(); ++i)
+        os << v[i] << "  ";
+    return os;
+}
+
 class heilVisitor : public osg::NodeVisitor
     {  
 
@@ -58,7 +77,17 @@ class heilVisitor : public osg::NodeVisitor
                     lod_visited = true;
                 }
 				else if(boost::starts_with(node_name,"lod"))
-					got_lod = true;
+                {
+                    got_lod = true;
+                    if(node.asGroup())
+                    {
+                        for(unsigned i = 0; i<node.asGroup()->getNumChildren();++i)
+                        {
+                            lods_.push_back(node.asGroup()->getChild(i)->getName());
+                        }
+                    }
+                }
+
 
             if (root_visited && (node.asTransform() || node.asGroup() ))
             {
@@ -73,7 +102,11 @@ class heilVisitor : public osg::NodeVisitor
                 new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
                 const osg::BoundingSphere& bs = node.getBound();
                 new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
-           
+                
+                if (lod_visited && node_name.find("_lod")!= std::string::npos)
+                    std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut](const std::string name){new_node.victory_nodes.push_back(name_cut + "_" + name);});
+                else
+                    new_node.victory_nodes.push_back(name_cut);
 
                 new_node.name = name_cut; // логическое имя. Общее для все лодов
 
@@ -94,7 +127,8 @@ class heilVisitor : public osg::NodeVisitor
                     << spaces() << "   Node /Name=   "          << new_node.name << "\n"
                     << spaces() << "   Translate =   ("         << new_node.pos.x  << " ," << new_node.pos.y << " ,"  << new_node.pos.z << " )" << "\n"
                     << spaces() << "   Rotate    =   ("         << new_node.orien.get_course()  << " ," << new_node.orien.get_pitch() << " ,"  << new_node.orien.get_roll() << " )" << "\n"
-                    << spaces() << "   Logic children number: " << children_count << "\n";
+                    << spaces() << "   Logic children number: " << children_count  
+                    << spaces() << "   visual nodes: " << new_node.victory_nodes  << "\n";
 
                 OutputDebugStringA(cstr.str().c_str());
 
@@ -129,15 +163,11 @@ class heilVisitor : public osg::NodeVisitor
             _level--;
         }
 
-        //vector<char> get_model_data()
-        //{
-        //     return ostream_nodes.detach();
-        //}
-
     protected:
-        unsigned int _level;
-        /*binary::output_stream*/std::ofstream& ostream_nodes;
-        bool root_visited;
-        bool lod_visited;
-		bool got_lod;
+        unsigned int             _level;
+        std::ofstream&           ostream_nodes;
+        bool                     root_visited;
+        bool                     lod_visited;
+		bool                     got_lod;
+        std::vector<std::string> lods_;
     };

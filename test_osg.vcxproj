@@ -188,6 +188,7 @@
     <ClCompile Include="fake_system.cpp" />
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp" />
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
+    <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
     <ClCompile Include="light_maps.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -196,6 +197,7 @@
     <ClCompile Include="materials.cpp" />
     <ClCompile Include="nfi\lib_loader.cpp" />
     <ClCompile Include="objects\ada\ada_view.cpp" />
+    <ClCompile Include="objects\aircraft\aircraft_ctrl.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_model.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp" />
     <ClCompile Include="objects\aircraft\aircraft_view.cpp" />

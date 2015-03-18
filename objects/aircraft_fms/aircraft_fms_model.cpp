@@ -167,7 +167,6 @@ void model::on_plan_changed()
 
 void model::init_fms()
 {
-    FIXME(Meteo)
     if (!fsettings() || !get_meteo_proxy())
         return ;
 

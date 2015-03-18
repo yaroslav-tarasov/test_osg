@@ -4,18 +4,19 @@
 
 namespace aircraft
 {
-	struct visual
+	struct ctrl
 			: view
 	{
 		static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
     private:
-        visual(object_create_t const& oc, dict_copt dict);
+        ctrl(object_create_t const& oc, dict_copt dict, optional<cg::geo_point_3> const &initial_pos = boost::none, optional<double> const &initial_course = boost::none);
 
     protected:
         void update(double time);
 
     private:
-        nm::node_info_ptr engine_node_;
+        void set_initial_position(cg::geo_point_3 const &p, double c);
+
 	};
 }

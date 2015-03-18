@@ -25,7 +25,7 @@ void block_obj_msgs(bool block)
 void send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {}
 
-object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager)
+object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager,const std::string& model_name)
 {
     FIXME(Разврат)
 	size_t id  = nodes_manager->get_node(0)->object_id();
@@ -44,6 +44,7 @@ object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nod
 		);
 
     vehicle::settings_t settings;
+    settings.model = model_name;
     dict_t d = dict::wrap(vehicle_data(settings,state_t()));
 
 	return model::create(oc,d);
@@ -58,6 +59,8 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     //, ani_(find_first_object<ani_object::info_ptr>(collection_))
     //, airport_(ani_->navigation_info()->find_airport(pos()))
+    , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
+    , airport_(airports_manager_->find_closest_airport(pos()))
     , manual_controls_(false)
     , max_speed_(0)
 {
@@ -118,7 +121,7 @@ void model::update( double time )
             cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
             decart_position cur_pos = phys_vehicle_->get_position();
             geo_position cur_glb_pos(cur_pos, base);
-            set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); // FIXME оповешаем всех остальных а оно мине надо?
+            set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); 
         }
 
         sync_nodes_manager(dt);
@@ -209,8 +212,8 @@ void model::on_follow_route(uint32_t route_id)
 
 void model::on_go_to_pos(msg::go_to_pos_data const& data)
 {
-//    if (airport_)
-//    {
+    if (airport_)
+    {
 //        auto path = airport_->find_shortest_path(pos(), data.pos, aerotow_ ? (1 << ani::TAXI) : (1 << ani::SERVICE));
 //        if (!path.empty())
 //        {
@@ -218,7 +221,7 @@ void model::on_go_to_pos(msg::go_to_pos_data const& data)
 //            state_ = boost::make_shared<follow_curve_state>(curve, data.course, !!aerotow_);
 //            return;
 //        }
-//    }
+    }
         
     model_state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, !!aerotow_);
 }
@@ -316,18 +319,18 @@ void model::sync_phys()
     double cur_speed = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
 
-    {
-        //std::stringstream cstr;
+    //{
+    //    std::stringstream cstr;
 
-        //cstr << std::setprecision(8) 
-        //    << "physics x:  "         << cur_pos.pos.x
-        //    << "    y: "              << cur_pos.pos.y
-        //    << "    curs :  "         << cur_course 
-        //    << "    cur_speed:  "     << cur_speed 
-        //    << "\n" ;
+    //    cstr << std::setprecision(8) 
+    //        << "physics x:  "         << cur_pos.pos.x
+    //        << "    y: "              << cur_pos.pos.y
+    //        << "    curs :  "         << cur_course 
+    //        << "    cur_speed:  "     << cur_speed 
+    //        << "\n" ;
 
-        //OutputDebugString(cstr.str().c_str());
-    }
+    //    OutputDebugString(cstr.str().c_str());
+    //}
 
 
 
@@ -569,6 +572,7 @@ void model::create_phys_vehicle()
     phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(2000, s, p);
 
     // implementation
+#ifdef OSG_NODE_IMPL 
     nm::visit_sub_tree(nodes_manager_->get_node(0), [this](nm::node_info_ptr wheel_node)->bool
     {
         std::string name = wheel_node->name();
@@ -576,20 +580,46 @@ void model::create_phys_vehicle()
         {
             // Поиск имени симекса нам не походит
             // cg::transform_4 wt = nm::get_relative_transform(nodes_manager_, wheel_node, this->body_node_);
-            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ wheel_node);
+            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ wheel_node,this->body_node_);
             cg::point_3 wheel_offset = wt.translation();
+            wheel_offset.z = -wheel_offset.z; 
 
             //auto const *wnc = wheel_node->get_collision() ;
             //Assert(wnc) ;
             //cg::rectangle_3 bound = model_structure::bounding(*wnc);
             double radius = 0.75 * wheel_node->get_bound().radius;
 
-            this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wt.translation(), wt.rotation().cpr(), true);
+            this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wheel_offset, wt.rotation().cpr(), true);
 
             this->wheels_.push_back(model::wheel_t(wheel_node));
         }
         return true;
     });
+#else
+    nm::visit_sub_tree(nodes_manager_->get_node_tree_iterator(0), [this](nm::node_info_ptr wheel_node)->bool
+    {
+        std::string name = wheel_node->name();
+        if (boost::starts_with(wheel_node->name(), "wheel"))
+        {
+            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*nodes_manager_,*/ wheel_node, this->body_node_);
+            point_3 wheel_offset = wt.translation();
+            FIXME(One more dirty trick)
+            // Что тут за хрень с колесами прибавили, отняли нафига? 
+            // Трансформ относительно body считается правильно, да он будет отрицательный по z
+            // А вот дальше непонятный цирк 
+            wheel_offset.z = -wheel_offset.z; 
+            //auto const *wnc = wheel_node->get_collision() ;
+            //Assert(wnc) ;
+            //cg::rectangle_3 bound = model_structure::bounding(*wnc);
+            double radius = 0.75 * wheel_node->get_bound().radius;
+
+            this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wheel_offset, wt.rotation().cpr(), true);
+
+            this->wheels_.push_back(model::wheel_t(wheel_node));
+        }
+        return true;
+    });
+#endif
 
 
     phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->reset_suspension();

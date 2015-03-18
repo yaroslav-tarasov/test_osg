@@ -746,12 +746,10 @@ void view::set_auto_transition(fms::transition_t i, bool isauto)
     set(msg::settings_msg(new_settings));
 }
 
-#if 1
 meteo::meteo_proxy_ptr view::get_meteo_proxy() const
 {
     return meteo_proxy_;
 }
-#endif
 
 void view::on_fms_settings_changed()
 {

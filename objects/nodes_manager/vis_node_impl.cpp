@@ -46,14 +46,26 @@ void vis_node_impl::fill_victory_nodes()
     if (vis_manager->visual_object())
     {
         for (auto jt = data_.victory_nodes.begin(); jt != data_.victory_nodes.end(); ++jt)
+        {
             FIXME(fill_victory_nodes Need to be realized)
-            //if (auto visnode = victory::find_name(vis_manager->visual_object()->node().get(), *jt))
+            if (*jt=="root")
             {
-                //victory_nodes_.push_back(visnode);
+                 victory_nodes_.push_back(vis_manager->visual_object()->node().get());
+                 continue;
+            }
+
+            if (auto visnode = findFirstNode(vis_manager->visual_object()->node().get(), *jt))
+            {
+                victory_nodes_.push_back(visnode);
                 FIXME(fill_victory_nodes Need to be realized)
                 //if (texture_ && visnode->as_root())
                 //    visnode->as_root()->set_base_texture(*texture_);
             }
+        }
+        
+         //if(vis_manager->visual_object()->node().get()) 
+        //    victory_nodes_.push_back(vis_manager->visual_object()->node().get());
+
     }
 }
 
@@ -148,19 +160,22 @@ void vis_node_impl::sync_position()
 
     bool visible = is_visible();
 
-    FIXME(sync_position Need to be realized)
-    //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-    //    (*(it))->set_process_flag(visible);
+    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+        (*(it))->setNodeMask(visible?0xffffffff:0);   // set_process_flag(visible);
 
     if (visible)
     {
         if (position_.is_local())
         {
+#if 1
             cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f(extrapolated_position_.local().orien.rotation()));
             FIXME(sync_position Need to be realized)
-            //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-            //    if ((*(it))->as_transform())
-            //        (*(it))->as_transform()->set_transform(tr);
+            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+                if ((*(it))->asTransform()/*as_transform()*/)
+                if((*(it))->asTransform()->asMatrixTransform())
+                    (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr))/*as_transform()->set_transform(tr)*/;
+#endif
+
         }
         else
         {
@@ -169,8 +184,10 @@ void vis_node_impl::sync_position()
 
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f(extrapolated_position_.global().orien.rotation()));
             FIXME(sync_position need to)
-            //for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-            //    (*(it))->as_transform()->set_transform(tr);
+            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+                if ((*(it))->asTransform())
+                if((*(it))->asTransform()->asMatrixTransform())
+                (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
         }
     }
 

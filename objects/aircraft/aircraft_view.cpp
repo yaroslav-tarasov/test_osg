@@ -73,16 +73,16 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 #endif
 #if 0    
     , ani_                      (find_first_object<ani_object::info_ptr>(collection_))
+#endif
     , met_proxy_obj_            (find_first_object<meteo_proxy::info_ptr>(collection_))
     , meteo_proxy_              (met_proxy_obj_->get_general_proxy())
+#if 0 
     , tp_sys_                   (find_first_object<tp_sys::control_ptr >(collection_))
 #endif
     , max_pred_len_             (120.)
-#if 0 
     , fms_changed_connection_   (fms_info_->subscribe_fms_changed  (boost::bind(&view::on_fms_changed      , this)))
     , plan_changed_connection_  (fms_info_->subscribe_plan_changed (boost::bind(&view::on_plan_changed      , this)))
     , state_changed_connection_ (fms_info_->subscribe_state_changed(boost::bind(&view::on_fms_state_changed, this)))
-#endif
     , providers_count_          (0)
 
     , atc_state_                (AS_NOT_CONCERNED)
@@ -197,7 +197,6 @@ point_3 view::dpos() const
 {
     // FIXME
     FIXME(Здесь должен быть позицион)
-    //return point_3();
     return cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
 }
 
@@ -537,12 +536,10 @@ void view::activate ()
     set_atc_state(AS_ACTIVATED);
 }
 
-#if 1
 aircraft_fms::info_ptr view::get_fms() const
 {
     return fms_info_;
 }
-#endif
 
 atc_state_t view::get_atc_state() const
 {
@@ -590,12 +587,10 @@ void view::on_fms_changed()
 
 void view::on_fms_state_changed()
 {
-#if 1
     if (fms_info_->get_state().version == 0)
         update_atc_state() ;
-#endif
 
-    // TODO
+// TODO
 //     if (prev_flight_state_ != fms_info_->get_state().flight_state)
 //     {
 //         if (fms::FS_INACTIVE == prev_flight_state_ || fms::FS_ENDED == prev_flight_state_)
@@ -864,17 +859,15 @@ void view::on_settings(settings_t const& s)
 
             model_changed = true;
         }
-#if 1
+
         if (fms_info_)
             aircraft_fms::control_ptr(fms_info_)->set_aircraft_kind(s.kind);
-#endif
 
     }
 
-#if 1
     if (s.payload != settings_.payload && fms_info_)
             aircraft_fms::control_ptr(fms_info_)->set_payload(s.payload);
-#endif
+
     if (s.company_name != settings_.company_name || model_changed)
         if (nodes_manager_)
             nodes_management::node_control_ptr(nodes_manager_->get_node(0))->set_texture(get_texture(s.kind, s.company_name));

@@ -24,11 +24,13 @@ typedef std::map< std::string, osg::ref_ptr<osg::Node> > nodesMap;
 
 nodesMap objCache;
 
-osg::Node* createObject(std::string name, bool airplane,bool fclone)
+osg::Node* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
 	nodesMap::iterator it;
+    
+
 
 	if(( it = objCache.find(name))!=objCache.end())
 	{
@@ -59,6 +61,12 @@ osg::Node* createObject(std::string name, bool airplane,bool fclone)
 			return nullptr;
 
 		object_file = osgDB::readNodeFile(object_file_name);
+
+        bool airplane = findFirstNode(object_file ,"shassi_",findNodeVisitor::not_exact)!=nullptr;
+        bool vehicle  = findFirstNode(object_file ,"wheel",findNodeVisitor::not_exact)!=nullptr;
+        FIXME(Палец пол и потолок при определении модели)
+        bool heli     = findFirstNode(object_file ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
+
 
         MaterialVisitor::namesList nl;
         nl.push_back("building");

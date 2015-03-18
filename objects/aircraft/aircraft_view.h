@@ -5,7 +5,7 @@
 #include "common/aircraft.h"
 #include "common/aircraft_fms.h"
 //#include "common/tp_sys.h"
-//#include "common/meteo_proxy.h"
+#include "common/meteo_proxy.h"
 //#include "common/conflicts_manager.h"
 //#include "common/fpl_manager.h"
 
@@ -79,9 +79,7 @@ struct view
     , control
     , aircraft_ipo_control
     , aircraft_atc_control
-#if 1
     , fms_container
-#endif
     , atc_info
 {
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
@@ -195,9 +193,8 @@ private:
 
     // fms_container
 protected:
-#if 1
     aircraft_fms::info_ptr get_fms() const override;
-#endif
+
     // atc_info
 protected:
     atc_state_t get_atc_state() const override;
@@ -258,9 +255,8 @@ private:
     conflicts_manager::control_ptr conflicts_manager_;
 #endif
     nodes_management::manager_ptr  nodes_manager_;
-#if 1
     aircraft_fms::info_ptr         fms_info_;
-#endif
+
 
 private:
 #if 0
@@ -276,9 +272,8 @@ protected:
     transform_4 tow_point_transform_;
 
 protected:
-#if 1
     fpl::info_ptr       fpl_ ;
-#endif    
+ 
 	optional<double>    proc_len_;
     optional<double>    prediction_len_;
 
@@ -287,15 +282,16 @@ protected:
 protected:
 #if 0 
     ani_object::info_ptr    ani_;
+#endif
     meteo_proxy::info_ptr   met_proxy_obj_;
     meteo::meteo_proxy_ptr  meteo_proxy_;
-#endif
 
 private:
 #if 0 
     tp_sys::control_ptr    tp_sys_;
     fms::tp::aircraft_ptr  airc_tp_;
 #endif
+
     size_t                 providers_count_;
     double                 max_pred_len_;
 

@@ -51,10 +51,11 @@ AUTO_REG_NAME(aircraft_model, model::create);
 model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view(oc,dict)
     , phys_object_model_base    (collection_)
-    , desired_velocity_(min_desired_velocity())
+    , sys_(dynamic_cast<model_system *>(oc.sys))
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
+    , desired_velocity_(min_desired_velocity())
 {
 
     if (get_nodes_manager())
@@ -97,7 +98,7 @@ void model::update( double time )
 
     FIXME(синхронизация рута)
 
-    //sync_nm_root(dt);
+    sync_nm_root(dt);
 
     update_contact_effects(time);
     check_wheel_brake();
@@ -116,6 +117,23 @@ void model::update( double time )
     }
 
     last_update_ = time;
+}
+
+void model::sync_nm_root(double /*dt*/)
+{
+    Assert(root_);
+
+    if (!desired_nm_pos_ || !desired_nm_orien_)
+        return;
+
+    geo_point_3 const desired_pos   = *desired_nm_pos_;
+    quaternion  const desired_orien = *desired_nm_orien_;
+
+    nodes_management::node_position root_node_pos = root_->position();
+    root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
+    root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
+
+    root_->set_position(root_node_pos);
 }
 
 #if 0
@@ -218,7 +236,10 @@ shassis_support_ptr model::get_shassis() const
 geo_position model::get_root_pos() const
 {
     FIXME("Позиция рута в глобальных координатах ооооочень больной вопрос")
-    return geo_position();//root_->position().global();
+    if(root_->position().is_local())
+     root_->position().local();
+
+    return root_->position().global();
 }
 
 bool model::is_fast_session() const
@@ -229,6 +250,14 @@ bool model::is_fast_session() const
 void model::set_desired_nm_pos  (geo_point_3 const& pos)
 {
     desired_nm_pos_ = pos;
+    std::stringstream cstr;
+
+    cstr << std::setprecision(8) 
+        << "set_desired_nm_pos:  x:  "         << pos.lat
+        << "    y: "      << pos.lon
+        << "\n" ;
+
+    OutputDebugString(cstr.str().c_str());
 }
 
 void model::set_desired_nm_orien(quaternion const& orien)
@@ -237,16 +266,16 @@ void model::set_desired_nm_orien(quaternion const& orien)
 }
 
 // from view
-#pragma region view
-
-nodes_management::node_info_ptr model::root() const
-{
-    //return nodes_manager_->get_node(0);  // FIXME отступаем от исходной модели
-    return get_nodes_manager()->find_node("root");
-}
-
-
-#pragma  endregion
+//#pragma region view
+//
+//nodes_management::node_info_ptr model::root() const
+//{
+//    //return nodes_manager_->get_node(0);  // FIXME отступаем от исходной модели
+//    return get_nodes_manager()->find_node("root");
+//}
+//
+//
+//#pragma  endregion
 
 void model::on_malfunction_changed( malfunction_kind_t kind ) 
 {
@@ -349,7 +378,7 @@ void model::sync_fms(bool force)
 {
 	if (!phys_aircraft_)
 		return ;
-#if 0
+#if 1
 	geo_position fmspos = fms_pos();
 	geo_position physpos = phys_aircraft_->get_position();
 
@@ -404,10 +433,9 @@ void model::set_steer( double steer )
 
 geo_position model::fms_pos() const
 {
-    // FIXME  
-    //point_3 dir = cg::polar_point_3(1., get_fms_info()->get_state().orien().course, get_fms_info()->get_state().orien().pitch);
-    //return geo_position(get_fms_info()->get_state().dyn_state.pos, get_fms_info()->get_state().dyn_state.TAS * dir, get_fms_info()->get_state().orien(), point_3());
-    return geo_position();
+ 
+    point_3 dir = cg::polar_point_3(1., get_fms_info()->get_state().orien().course, get_fms_info()->get_state().orien().pitch);
+    return geo_position(get_fms_info()->get_state().dyn_state.pos, get_fms_info()->get_state().dyn_state.TAS * dir, get_fms_info()->get_state().orien(), point_3());
 }
 
 void model::switch_sync_state(sync_fsm::state_ptr state)

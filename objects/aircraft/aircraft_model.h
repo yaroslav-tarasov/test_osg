@@ -2,7 +2,7 @@
 
 #include "aircraft_view.h"
 #include "phys/phys_sys.h"
- #include "common/phys_object_model_base.h"
+#include "common/phys_object_model_base.h"
 #include "phys_sys/aircraft.h"
 #include "aircraft_shassis_impl.h"
 #include "sync_fsm/sync_fsm.h"
@@ -76,11 +76,12 @@ namespace aircraft
         void update_contact_effects(double time);
         void check_wheel_brake();
         void on_time_factor_changed(double time, double factor);
-
+            
+        void sync_nm_root(double dt);
 
         // FIX система узлов
-   public:
-        nodes_management::node_info_ptr root() const override;
+   //public:
+   //     nodes_management::node_info_ptr root() const override;
 
    public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};

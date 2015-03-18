@@ -554,9 +554,6 @@
     <ClCompile Include="_include\objects\bullet_importer.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
-    <ClCompile Include="objects\aircraft\aircraft_visual.cpp">
-      <Filter>Source Files\aircraft_fms</Filter>
-    </ClCompile>
     <ClCompile Include="objects\nm\node_osg_impl.cpp">
       <Filter>Source Files\nm</Filter>
     </ClCompile>
@@ -571,6 +568,15 @@
     </ClCompile>
     <ClCompile Include="objects\conditions\meteo_proxy_view.cpp">
       <Filter>Source Files\meteo</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\aircraft_visual.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="objects\aircraft\aircraft_ctrl.cpp">
+      <Filter>Source Files\aircraft</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

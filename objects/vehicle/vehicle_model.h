@@ -10,6 +10,7 @@
 #include "vehicle_common.h"
 #include "vehicle_model_states.h"
 #include "common/aircraft.h"
+#include "common/airports_manager.h"
 
 namespace vehicle
 {
@@ -87,7 +88,9 @@ private:
     model_system *    sys_;
     optional<double> last_update_;
     double max_speed_;
-
+    
+    airports_manager::info_ptr airports_manager_;
+    airport::info_ptr          airport_;
     //ani_object::info_ptr    ani_ ;
     //ani::airport_info_ptr  airport_;
 

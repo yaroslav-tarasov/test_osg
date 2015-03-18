@@ -12,3 +12,4 @@ using network::gen_msg;
 #include "kernel/objects/base_view.h"
 
 #include "kernel/systems/vis_system.h"
+#include "kernel/systems/ctrl_system.h"

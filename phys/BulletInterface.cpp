@@ -210,9 +210,14 @@ namespace ray_cast_vehicle
         }
         else
         {
-            bool r = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
-            const btTransform ct0 = cs.cs_->getChildTransform(0);
-            cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+            bool loaded = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
+            if(loaded)
+            {
+                const btTransform ct0 = cs.cs_->getChildTransform(0);
+                cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+            }
+            else
+                cs.cs_ = nullptr;
         }
 
     }

@@ -44,6 +44,16 @@ inline cg::transform_4 from_osg_transform( const osg::Matrix& m )
 	return cg::transform_4(cg::as_translation(from_osg_vector3(m.getTrans())), cg::rotation_3(from_osg_quat(m.getRotate()).cpr()));
 }
 
+inline osg::Matrix to_osg_transform( const cg::transform_4& tr )
+{
+    osg::Matrix m;
+    cg::transform_4::translation_t t = tr.translation();
+    cg::rotation_3 r = tr.rotation();
+    m.setTrans(to_osg_vector3(t));
+    m.setRotate(to_osg_quat(r.cpr()));
+    return m;
+}
+
 inline osg::Matrix get_relative_transform(osg::Node* root, osg::Node* node, osg::Node* rel = NULL)
 {
     osg::Matrix tr;

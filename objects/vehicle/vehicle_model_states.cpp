@@ -142,9 +142,9 @@ void go_to_pos_state::update(model * self, double dt)
 {
     const double nominal_speed = with_airtow_ ? 3. : 10;
 
-    cg::geo_base_2 cur_pos = self->pos();
+    cg::geo_base_2 cur_pos    = self->pos();
     double         cur_course = self->course();
-    double         cur_speed = self->speed();
+    double         cur_speed  = self->speed();
     
     //std::stringstream cstr;
 

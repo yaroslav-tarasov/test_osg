@@ -30,7 +30,7 @@ FIXME("kernel/systems.h")
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
 namespace vehicle
 {
-	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager);
+	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,const std::string& model_name);
 };
 
 namespace aircraft
@@ -46,6 +46,7 @@ namespace bi
 		        RigidUpdater::phys_vehicles_t                          _vehicles;
                 kernel::system_ptr                                     _msys;
 				kernel::system_ptr                                     _vsys;
+                kernel::system_ptr                                     _csys;
                 kernel::msg_service                             msg_service_; 
 	};
 
@@ -68,42 +69,12 @@ namespace bi
 
     }
 
-
-    FIXME(Надо реализовать)
-#if 0 
-    void /*chart::*/set_initial_position(aircraft::fms_container_ptr m, cg::geo_point_3 const &p, double c)
-    {
-        nodes_management::node_control_ptr root(get_nodes_manager()->get_node(0));
-        root->set_position(geo_position(p, quaternion(cpr(c, 0, 0))));
-
-        aircraft_fms::state_t st = m->get_fms_info()->get_state();
-        st.dyn_state.pos = p;
-        st.dyn_state.course = c;
-
-        if (ada::info_ptr ada_obj = find_first_object<ada::info_ptr>(collection_))
-        {
-            if (auto adata = ada_obj->get_data(settings().kind))
-            {
-                fms::procedure_model_ptr proc_model = fms::create_bada_procedure_model(*adata) ;
-
-                st.dyn_state.TAS = proc_model->nominal_cruise_TAS(p.height) ;
-                st.dyn_state.fuel_mass = fms::calc_fuel_mass(settings().fuelload, *adata) ;
-            }
-        }
-
-        if (cg::eq_zero(p.height))
-            st.dyn_state.cfg = fms::CFG_GD;
-
-        aircraft_fms::control_ptr(get_fms_info())->set_state(st);
-    }
-#endif
-
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
 		: _root        (root)
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
 		, _debug       (true)
-		, _sys         (/*phys::create()*/phys::create_phys_system())
+		, _sys         (phys::create_phys_system())
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
@@ -111,9 +82,14 @@ namespace bi
         
         using namespace kernel;
         _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
-		
-		_d->_vsys = create_visual_system(_d->msg_service_, vis_sys_props());
         
+        vis_sys_props props_;
+        props_.base_point = ::get_base();
+
+		_d->_vsys = create_visual_system(_d->msg_service_, props_);
+
+        _d->_csys = create_ctrl_system(_d->msg_service_);
+
 	    FIXME(Уникальное имя наверное хорошая вещь)
         // void editor_document_impl::create_clicked(std::string const &class_name)
         //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
@@ -146,7 +122,7 @@ namespace bi
 
         aircraft::settings_t s;
         s.kind = "A319";
-        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_msys).get()),s);
+        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),s);
 
     }
 
@@ -353,7 +329,7 @@ namespace bi
 
         int id = _physicsNodes.size();
 
-        nm::manager_ptr man = nm::create_manager(_d->_msys,lod3);
+        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),lod3);
 
         FIXME("А вот и засада с лодами")
         //aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
@@ -418,12 +394,21 @@ namespace bi
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 
-        nm::manager_ptr man = nm::create_manager(_d->_msys,node/*lod3?lod3:node*/);
+#ifdef  OSG_NODE_IMPL
+        lod3?lod3->setNodeMask(0):0;
+        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),node);
+        //lod3?lod3->setNodeMask(0xffffffff):0;
+#else
+        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),nullptr/*lod3?lod3:node*/);
+        object_id  = man->get_node(0)->object_id();
+#endif
+
         FIXME("Костыль")
         man->set_model(model_name);
 
-        _phys_vehicles.push_back(vehicle::create(_d->_msys,man));
+        _phys_vehicles.push_back(vehicle::create(_d->_msys,man,model_name));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
+        //man->set_model(model_name);
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
@@ -567,6 +552,8 @@ namespace bi
                 //_sys->update( dt );
                 // Физику обновляем через моделирующую
                 _d->_msys->update(view->getFrameStamp()->getSimulationTime());
+                _d->_csys->update(view->getFrameStamp()->getSimulationTime());
+                _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
 
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   

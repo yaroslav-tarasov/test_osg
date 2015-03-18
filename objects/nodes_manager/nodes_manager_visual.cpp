@@ -39,7 +39,7 @@ void visual::apply_model(string const& model)
 void visual::apply_vis_model()
 {
     if (!settings_.model.empty())
-        visual_object_ = sys_->create_visual_object(settings_.model + "//" + settings_.model + ".scg", object_id()) ;
+        visual_object_ = sys_->create_visual_object(settings_.model /*+ "//" + settings_.model + ".scg"*/, object_id()) ;
     else 
         visual_object_.reset();
 

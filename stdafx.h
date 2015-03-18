@@ -322,4 +322,6 @@ namespace aircraft
 #endif // precompile_header
 
 
+//#define OSG_NODE_IMPL
+
 
