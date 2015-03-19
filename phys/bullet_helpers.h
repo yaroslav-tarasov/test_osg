@@ -203,8 +203,10 @@ namespace phys
         btTransform tr = body->getCenterOfMassTransform();
         pos.pos   = from_bullet_vector3(tr.getOrigin());
         pos.orien = cg::rotation_3(from_bullet_matrix(tr.getBasis())).cpr();
-        pos.dpos = from_bullet_vector3(body->getLinearVelocity());
-        pos.omega = cg::rad2grad() * from_bullet_vector3(body->getAngularVelocity());
+        btVector3 vel = body->getLinearVelocity();
+        pos.dpos = from_bullet_vector3(vel.length() < 1e-1?btVector3(0,0,0):vel);
+        btVector3 avel = body->getAngularVelocity();
+        pos.omega = cg::rad2grad() * from_bullet_vector3(avel.length() < 1e-1?btVector3(0,0,0):avel);
 
         return pos;
     }

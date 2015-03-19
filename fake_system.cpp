@@ -137,10 +137,10 @@ protected:
 
     // objects_factory
 protected:
-    object_info_ptr create_object           (object_class_ptr hierarchy_class, std::string const &name)     override;
-    object_info_ptr create_object           (obj_create_data const& descr)                                  override;
-    object_info_ptr load_object_hierarchy   (dict_cref dict)                                                override;
-    void            save_object_hierarchy   (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
+    object_info_ptr create_object            (object_class_ptr hierarchy_class, std::string const &name)     override;
+    object_info_ptr create_object            (obj_create_data const& descr)                                  override;
+    object_info_ptr load_object_hierarchy    (dict_cref dict)                                                override;
+    void            save_object_hierarchy    (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
     object_class_vector const& object_classes() const                                                   override;
     object_class_ptr get_object_class(std::string const& name) const                                    override;
 
@@ -386,8 +386,8 @@ object_info_ptr fake_system_base::get_object( obj_id_t object_id ) const
 void fake_system_base::destroy_object( obj_id_t object_id )
 { 
     // destroy self
-    //msg_service_((system_kind)kind_, network::wrap_msg(msg::destroy_object(object_id)), true);
-    //process_destroy_object(object_id);
+    msg_service_((system_kind)kind_, network::wrap_msg(msg::destroy_object(object_id)), true);
+    process_destroy_object(object_id);
 }
 
 void fake_system_base::register_obj_id(obj_id_t id)

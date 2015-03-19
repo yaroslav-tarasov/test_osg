@@ -88,8 +88,11 @@ namespace sync_fsm
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
 // FIXME TODO
-            //nodes_management::node_info_ptr rel_node = wnode->rel_node();
+#ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wnode;
+#else
+            nodes_management::node_info_ptr rel_node = wnode->rel_node();
+#endif            
 
             geo_base_3 global_pos = wnode->get_global_pos();
             quaternion global_orien = wnode->get_global_orien();

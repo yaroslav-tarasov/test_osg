@@ -503,6 +503,8 @@ std::vector<uint32_t>  view::sectors_sequence() const
     return std::vector<uint32_t>();
 }
 #endif
+
+FIXME(¬ оригинале похоже совсем не используетс€)
 #if 0 
 void view::assign_fpl(fpl::info_ptr fpl_obj)
 { 
@@ -510,6 +512,7 @@ void view::assign_fpl(fpl::info_ptr fpl_obj)
 }
 #endif
 
+FIXME(¬ оригинале похоже совсем не используетс€)
 void view::unassign_fpl()
 {
     set(msg::fpl_msg(boost::none));
