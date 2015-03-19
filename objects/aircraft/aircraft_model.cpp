@@ -71,7 +71,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     sync_state_.reset(new sync_fsm::none_state(*this));
 
      FIXME(Нужна реализация системы)
-    //conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
+     conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
 
 }
 
@@ -487,18 +487,18 @@ void model::check_wheel_brake()
 
 void model::on_time_factor_changed(double /*time*/, double factor)
 {
-    //bool fast = factor > 1 ? true : false;
+    bool fast = factor > 1 ? true : false;
 
-    //if (fast_session_ != fast)
-    //{
+    if (fast_session_ != fast)
+    {
 
-    //    if (sync_state_)
-    //    {
-    //        sync_fsm::state_ptr prev_state = sync_state_;
-    //        sync_state_->on_fast_session(fast);
-    //    }
-    //    fast_session_ = fast;
-    //}
+        if (sync_state_)
+        {
+            sync_fsm::state_ptr prev_state = sync_state_;
+            sync_state_->on_fast_session(fast);
+        }
+        fast_session_ = fast;
+    }
 }
 
 
