@@ -265,18 +265,6 @@ void model::set_desired_nm_orien(quaternion const& orien)
     desired_nm_orien_ = orien;
 }
 
-// from view
-//#pragma region view
-//
-//nodes_management::node_info_ptr model::root() const
-//{
-//    //return nodes_manager_->get_node(0);  // FIXME отступаем от исходной модели
-//    return get_nodes_manager()->find_node("root");
-//}
-//
-//
-//#pragma  endregion
-
 void model::on_malfunction_changed( malfunction_kind_t kind ) 
 {
     if (kind == MF_CHASSIS_FRONT)

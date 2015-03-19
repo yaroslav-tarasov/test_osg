@@ -108,11 +108,11 @@ system_ptr create_ctrl_system( msg_service& service )
 }
 
 struct  fake_system_base
-    : system            // интерфейс
-    //, system_session    // интерфейс
-    //, objects_factory   // интерфейс
+    : system            
+    , system_session    
+    //, objects_factory  
     , fake_objects_factory
-    , object_collection // интерфейс
+    , object_collection 
     , boost::enable_shared_from_this<fake_system_base>
 {
     fake_system_base(system_kind kind, msg_service& service, std::string const &objects_file_name);
@@ -129,11 +129,16 @@ protected:
     optional<double>    last_update_time    () const                    override;
     double              atc_update_period   () const                    override;
 
+    // system_session
+protected:
+    void on_session_loaded      ();
+    void on_session_stopped     ();
+    void on_time_factor_changed (double time, double factor);
+
     // objects_factory
 protected:
     object_info_ptr create_object           (object_class_ptr hierarchy_class, std::string const &name)     override;
     object_info_ptr create_object           (obj_create_data const& descr)                                  override;
-    //object_info_ptr create_object           (std::string const &object_name)                                override;
     object_info_ptr load_object_hierarchy   (dict_cref dict)                                                override;
     void            save_object_hierarchy   (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
     object_class_vector const& object_classes() const                                                   override;
@@ -264,7 +269,7 @@ fake_system_base::fake_system_base(system_kind kind, msg_service& service, std::
     : kind_                 (kind)
     , msg_service_          (service, this)
     , create_object_lock_   (false)
-    //, id_randgen_           (randgen_seed_tag())
+    , id_randgen_           (randgen_seed_tag())
     , udp_messages_size_    (0)
     , udp_msg_threshold_    (1300 ) // limit for Win32
     , block_obj_msgs_counter_(0)
@@ -456,10 +461,35 @@ auto fake_system_base::generate_object_id() -> obj_id_t
 //    return obj;
 //}
 
+void fake_system_base::on_session_loaded() 
+{
+    session_loaded_signal_() ;
+}
+
+void fake_system_base::on_session_stopped()
+{
+    session_stopped_signal_() ;
+
+    vector<obj_id_t> roots = remove_roots_order();
+
+    for (auto it = roots.begin(); it != roots.end(); ++it)
+        if (objects_.count(*it) != 0) // e.g. fpl_manager removes corresponding aircraft on fpl destroying 
+            process_destroy_object(*it);
+
+    Assert(root_objects_.empty());
+}
+
+void fake_system_base::on_time_factor_changed (double time, double factor)
+{
+    // it allows to restart atc_update after time changing (e.g. while moving slider in history)
+    last_update_atc_ = size_t(time / atc_update_period()) * atc_update_period(); 
+    time_factor_changed_signal_(time, factor);
+}
+
 object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std::string const &obj_name)
 {
     object_info_ptr obj;
-    //msgs_blocker    mb(*this);
+    msgs_blocker    mb(*this);
     FIXME(Доп функционал)
     {
         locks::bool_lock l(create_object_lock_);

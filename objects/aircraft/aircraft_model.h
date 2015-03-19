@@ -79,10 +79,6 @@ namespace aircraft
             
         void sync_nm_root(double dt);
 
-        // FIX система узлов
-   //public:
-   //     nodes_management::node_info_ptr root() const override;
-
    public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};
         decart_position get_local_position() {return phys_aircraft_->get_local_position();};

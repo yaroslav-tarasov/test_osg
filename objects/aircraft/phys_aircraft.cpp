@@ -533,9 +533,7 @@ namespace aircraft
             if (cfg_ == fms::CFG_GD/* && root_glb_pos.pos.height < 0.5*/)
 #endif
             {
-#if 1           // Реверс хм однако
                 reverse = true;
-#endif
                 if (on_ground_)
                     low_attack = true;
             }
