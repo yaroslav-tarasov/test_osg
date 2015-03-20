@@ -9,7 +9,7 @@ namespace aircraft
 namespace sync_fsm
 {
     const double none_state::sync_none_dist = 30100;
-    const double phys_state::phys_height = 80;
+    //const double phys_state::phys_height = 80;
 }
 }
 

@@ -38,7 +38,7 @@ namespace sync_fsm
 
 
         // transitions
-        if (!self_.is_fast_session() && !phys_aircraft_failed_ && fms_pos.pos.height < phys_state::phys_height - 1 && self_.phys_control()->get_zone(fms_pos.pos))
+        if (!self_.is_fast_session() && !phys_aircraft_failed_ && fms_pos.pos.height < /*phys_state::*/phys_height() - 1 && self_.phys_control()->get_zone(fms_pos.pos))
         {
             optional<size_t> phys_zone = self_.phys_control()->get_zone(fms_pos.pos);
             if (phys_zone)
@@ -55,7 +55,7 @@ namespace sync_fsm
                     if (!cg::eq_zero(fms_pos.pos.height))
                         self_.switch_sync_state(boost::make_shared<transition_fms_phys_state>(self_, phys_aircraft, base, time));
                     else
-                        self_.switch_sync_state(boost::make_shared<phys_state>(self_, phys_aircraft, base));
+                        self_.switch_sync_state(/*boost::make_shared<phys_state>*/create_sync_phys_state(self_, phys_aircraft, base));
 
                 }
             }

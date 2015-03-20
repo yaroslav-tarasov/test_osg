@@ -319,6 +319,14 @@ namespace aircraft
 
 #include "config/config.h"
 
+#define LOG_OSD_MSG( msg )                                                                \
+    do {                                                                                  \
+    std::stringstream logger__str;                                                        \
+    logger__str << std::setprecision(8) << msg ; /* don't use brackets here! */           \
+    OutputDebugString(logger__str.str().c_str());                                          \
+    } while(0)
+
+
 #endif // precompile_header
 
 

@@ -188,6 +188,8 @@ void vis_node_impl::sync_position()
                 if ((*(it))->asTransform())
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
+
+            LOG_OSD_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
         }
     }
 

@@ -543,6 +543,8 @@ namespace bi
                 double dt = _hr_timer.get_delta();
                 double dt1 = ftm.diff();
 
+                OutputDebugString("Update-----------------------------------------------------------------\n");
+
                 if (abs(dt-dt1)>0.1) 
                     OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");
 

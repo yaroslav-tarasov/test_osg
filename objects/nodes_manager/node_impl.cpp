@@ -79,6 +79,7 @@ void node_impl::pre_update(double time)
         {
             extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos * dt);
             extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
+            LOG_OSD_MSG( "node_impl::pre_update(double time):   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
             extrapolated_position_reseted();
         }
     }

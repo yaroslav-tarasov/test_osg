@@ -42,7 +42,7 @@ void transition_fms_phys_state::update(double time, double /*dt*/)
 
     if (time >= start_transition_time_ + transition_time)
     {
-        self_.switch_sync_state(boost::make_shared<phys_state>(self_, phys_aircraft_, base_));
+        self_.switch_sync_state(/*boost::make_shared<phys_state>*/create_sync_phys_state(self_, phys_aircraft_, base_));
     }
 }
 
