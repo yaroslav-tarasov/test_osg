@@ -127,7 +127,7 @@ namespace bi
 
         aircraft::settings_t as;
         as.kind = "A319";
-        auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as);
+        //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as);
 
         vehicle::settings_t vs;
         vs.model = "niva_chevrolet";
@@ -136,7 +136,9 @@ namespace bi
 
         const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
         auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
-
+		auto nm = find_first_child<nodes_management::manager_ptr>(vvv);
+		uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+		uint32_t vv_id = kernel::object_info_ptr(vvv)->object_id();
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
@@ -745,8 +747,10 @@ namespace bi
             const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
             kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
             {
-                uint32_t id = kernel::object_info_ptr(a)->object_id();
-                if( kernel::object_info_ptr(a)->object_id() == this->selected_obj_id_)
+				auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+				uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                if( nm_id == this->selected_obj_id_)
                 {
                      a->goto_pos(gp.pos,90);
                      return false;
