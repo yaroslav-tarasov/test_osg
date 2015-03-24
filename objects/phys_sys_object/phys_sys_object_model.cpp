@@ -35,7 +35,7 @@ void model::update( double time )
     double real_calc_step = dt / count;
 
 FIXME(Ну очень интересная физика)
-#if 0
+#if 1
     for (size_t i = 0; i < count; ++i)
     {
         for (auto it = zones_.begin(); it != zones_.end(); ++it)

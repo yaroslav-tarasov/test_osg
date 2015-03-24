@@ -123,7 +123,6 @@ namespace aircraft
 
             });
         }
-
         sync_phys(0.1);
     }
 

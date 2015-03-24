@@ -47,7 +47,6 @@ void vis_node_impl::fill_victory_nodes()
     {
         for (auto jt = data_.victory_nodes.begin(); jt != data_.victory_nodes.end(); ++jt)
         {
-            FIXME(fill_victory_nodes Need to be realized)
             if (*jt=="root")
             {
                  victory_nodes_.push_back(vis_manager->visual_object()->node().get());
@@ -63,9 +62,6 @@ void vis_node_impl::fill_victory_nodes()
             }
         }
         
-         //if(vis_manager->visual_object()->node().get()) 
-        //    victory_nodes_.push_back(vis_manager->visual_object()->node().get());
-
     }
 }
 
@@ -167,15 +163,11 @@ void vis_node_impl::sync_position()
     {
         if (position_.is_local())
         {
-#if 1
             cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f(extrapolated_position_.local().orien.rotation()));
-            FIXME(sync_position Need to be realized)
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
                 if ((*(it))->asTransform()/*as_transform()*/)
                 if((*(it))->asTransform()->asMatrixTransform())
                     (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr))/*as_transform()->set_transform(tr)*/;
-#endif
-
         }
         else
         {
@@ -183,13 +175,12 @@ void vis_node_impl::sync_position()
             point_3f offset = base(extrapolated_position_.global().pos);
 
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f(extrapolated_position_.global().orien.rotation()));
-            FIXME(sync_position need to)
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
                 if ((*(it))->asTransform())
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
 
-            LOG_OSD_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
+            LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
         }
     }
 

@@ -188,23 +188,16 @@ void view::on_child_removing(object_info_ptr child)
 
 geo_point_3 const& view::pos() const
 {
-    // FIXME  
-    FIXME(Здесь должен быть позицион)
     return fms_info_->get_state().dyn_state.pos;
 }
 
 point_3 view::dpos() const
 {
-    // FIXME
-    FIXME(Здесь должен быть позицион)
     return cg::polar_point_3(fms_info_->get_state().dyn_state.TAS, fms_info_->get_state().orien().course, fms_info_->get_state().orien().pitch);
 }
 
 cpr view::orien() const
 {   
-    // FIXME  
-    FIXME(Здесь должена быть ориентация)
-    //return cpr();
     return fms_info_->get_state().orien();
 }
 

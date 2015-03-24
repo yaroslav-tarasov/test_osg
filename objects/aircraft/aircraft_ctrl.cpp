@@ -46,7 +46,7 @@ namespace aircraft
                 fms::procedure_model_ptr proc_model = fms::create_bada_procedure_model(*adata) ;
                 FIXME(Для наземки другой способ создания?) 
                 // а то уедет ведь черт знает куда
-                st.dyn_state.TAS = 0;// proc_model->nominal_cruise_TAS(p.height) ;
+                st.dyn_state.TAS = proc_model->taxi_TAS() ;// proc_model->nominal_cruise_TAS(p.height) ;
                 st.dyn_state.fuel_mass = fms::calc_fuel_mass(settings().fuelload, *adata) ;
             }
         }

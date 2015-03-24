@@ -90,7 +90,7 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
 //        .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
         ;
 
-    create_phys_vehicle();
+    //create_phys_vehicle();
 }
 
 nodes_management::node_info_ptr model::get_root()
@@ -126,7 +126,6 @@ void model::update( double time )
 
         sync_nodes_manager(dt);
 
-#if 1 // FIXME we need it badly
         if (aerotow_)
         {
             if (aircraft::model_info_ptr(aerotow_)->get_rigid_body() && phys_vehicle_ && aircraft::model_info_ptr(aerotow_)->tow_attached())
@@ -142,7 +141,7 @@ void model::update( double time )
                 on_detach_tow();
             }
         }
-#endif
+
 
         last_update_ = time;
     }
@@ -409,19 +408,19 @@ void model::sync_nodes_manager( double /*dt*/ )
         decart_position bodypos = phys_vehicle_->get_position();
         decart_position root_pos = bodypos * body_transform_inv_;
 
-#if 0 
+#if !defined(OSG_NODE_IMPL) 
         geo_position pos(root_pos, base);
 
         // FIXME Глобальные локальные преобразования 
-        nodes_management::node_position root_node_pos = geo_position(root_->position().local(),get_base()); // root_->position();
+        nodes_management::node_position root_node_pos = root_->position();
         root_node_pos.global().pos = root_next_pos_;
         root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
 
         root_node_pos.global().orien = root_next_orien_;
         root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
 
-        nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
-        root_->set_position(/*root_node_pos*/rnp);
+        // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
+        root_->set_position(root_node_pos);
 
         root_next_pos_ = pos.pos;
         root_next_orien_ = pos.orien;
@@ -436,9 +435,11 @@ void model::sync_nodes_manager( double /*dt*/ )
             cg::quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             cg::point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
 
-// FIXME TODO
-//            nodes_management::node_info_ptr rel_node = wheels_[i].node->rel_node();
+#ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wheels_[i].node;
+#else
+            nodes_management::node_info_ptr rel_node = wheels_[i].node->rel_node();
+#endif  
 
             cg::geo_base_3 global_pos = wheels_[i].node->get_global_pos();
             cg::quaternion global_orien = wheels_[i].node->get_global_orien();
@@ -455,22 +456,11 @@ void model::sync_nodes_manager( double /*dt*/ )
             cg::point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (sys_->calc_step());
 
             node_pos.local().omega = omega_rel;
-            
+
+#ifdef OSG_NODE_IMPL
             // FIXME отсутствие промежуточной логики приводит к странным решениям
             node_pos.local().orien = desired_orien_in_rel;
-
-            //std::stringstream cstr;
-
-            //cstr << std::setprecision(8) 
-            //    << "node_pos.local().get_course:  "   << node_pos.local().orien.get_course()
-            //    << "   node_pos.local().get_pitch: "  << node_pos.local().orien.get_pitch()
-            //    << "   node_pos.local().get_roll :  " << node_pos.local().orien.get_roll() 
-            //    << "   desired_orien_in_rel.get_course:  "  << desired_orien_in_rel.get_course()
-            //    << "   desired_orien_in_rel.get_pitch: "    << desired_orien_in_rel.get_pitch()
-            //    << "   desired_orien_in_rel.get_roll :  "   << desired_orien_in_rel.get_roll() 
-            //    << "\n" ;
-
-            //OutputDebugString(cstr.str().c_str());
+#endif
 
             wheels_[i].node->set_position(node_pos);
         }

@@ -578,5 +578,8 @@
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
+    <ClCompile Include="objects\vehicle\vehicle_ctrl.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

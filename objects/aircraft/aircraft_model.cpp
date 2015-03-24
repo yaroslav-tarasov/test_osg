@@ -79,7 +79,7 @@ void model::update( double time )
 {   
     view::update(time);
     update_len(time);
-
+    
     //if (!fpl_ || fpl_->active())
     //    aircraft_fms::model_control_ptr(get_fms_info())->activate();
         
@@ -129,18 +129,18 @@ void model::sync_nm_root(double /*dt*/)
     geo_point_3 const desired_pos   = *desired_nm_pos_;
     quaternion  const desired_orien = *desired_nm_orien_;
     
-    LOG_OSD_MSG( "sync_nm_root:  desired_pos:  x:  "  << desired_pos.lat << "    y: " << desired_pos.lon << "\n" );
+    LOG_ODS_MSG( "sync_nm_root:  desired_pos:  x:  "  << desired_pos.lat << "    y: " << desired_pos.lon << "\n" );
 
     nodes_management::node_position root_node_pos = root_->position();
     // 
     FIXME(Если расскоментарить отлично синхронизируемся)
-    // root_node_pos.global().pos = desired_pos;
+    //root_node_pos.global().pos = desired_pos;
     
     root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
     root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
     
-    LOG_OSD_MSG( "sync_nm_root:   root_node_pos.global().pos :   x:  "  <<  root_node_pos.global().pos.lat << "    y: " << root_node_pos.global().pos.lon << "\n" );
-    LOG_OSD_MSG( "sync_nm_root:   root_node_pos.global().dpos :  x:  "  <<  root_node_pos.global().dpos.x << "    y: " << root_node_pos.global().dpos.y << "\n" );
+    LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().pos :   x:  "  <<  root_node_pos.global().pos.lat << "    y: " << root_node_pos.global().pos.lon <<  "  calc_step=" << sys_->calc_step() << "\n" );
+    LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().dpos :  x:  "  <<  root_node_pos.global().dpos.x << "    y: " << root_node_pos.global().dpos.y << "\n" );
 
     root_->set_position(root_node_pos);
 }
@@ -259,7 +259,7 @@ void model::set_desired_nm_pos  (geo_point_3 const& pos)
 {
     desired_nm_pos_ = pos;
     
-    LOG_OSD_MSG( "set_desired_nm_pos:  x:  "  << pos.lat << "    y: " << pos.lon << "\n" );
+    LOG_ODS_MSG( "set_desired_nm_pos:  x:  "  << pos.lat << "    y: " << pos.lon << "\n" );
 
 }
 

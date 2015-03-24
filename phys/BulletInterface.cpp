@@ -613,7 +613,9 @@ void BulletInterface::update( double step )
     
     if (!cg::eq_zero(step))
     {
-        _dw->stepSimulation( btScalar(step), 10, btScalar(0.01) );
+        FIXME("stepSimulation  (0.001)")
+
+        _dw->stepSimulation( btScalar(step), 10, btScalar(0.001) ); 
     }
 
     checkForCollisionEvents();

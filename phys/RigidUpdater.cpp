@@ -23,6 +23,11 @@
 
 #include "object_creators.h"
 
+
+#include "objects/vehicle_fwd.h"
+#include "objects/vehicle.h"
+
+
 FIXME("kernel/systems.h")
 #include "kernel/systems.h"
 
@@ -120,9 +125,17 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
-        aircraft::settings_t s;
-        s.kind = "A319";
-        auto obj = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),s);
+        aircraft::settings_t as;
+        as.kind = "A319";
+        auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as);
+
+        vehicle::settings_t vs;
+        vs.model = "niva_chevrolet";
+
+        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs);
+
+        const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+        auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
 
     }
 
@@ -529,12 +542,7 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
- // FIXME перенести в модель
-#if 0
-                {
-                   _phys_aircrafts[0].check_wheel_brake();
-                }
-#endif                
+               
             }
 
             break;
@@ -543,19 +551,20 @@ namespace bi
                 double dt = _hr_timer.get_delta();
                 double dt1 = ftm.diff();
 
-                OutputDebugString("Update-----------------------------------------------------------------\n");
+                LOG_ODS_MSG("Update-----------------------------------------------------------------\n" << "dt=" << dt << "\n");
 
                 if (abs(dt-dt1)>0.1) 
-                    OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");
+                    OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");     
 
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
                 //_sys->update( dt );
-                // Физику обновляем через моделирующую
+                // Физику обновляем через моделирующую 
+
                 _d->_msys->update(view->getFrameStamp()->getSimulationTime());
                 _d->_csys->update(view->getFrameStamp()->getSimulationTime());
-                _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
+                _d->_vsys->update(view->getFrameStamp()->getSimulationTime());                
 
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   
@@ -629,64 +638,10 @@ namespace bi
 
     void RigidUpdater::createNodeHierarchy(osg::Node* node)
     {
-//        vector<char> model_data;
-//
-//        if (model_data.empty())
-//        {
-//            using namespace binary;
-//
-//            // fill default
-//            output_stream stream;
-//            write(stream, 1);
-//            model_structure::node_data ndata;
-//            ndata.name = "root";
-//            write(stream, ndata);
-//            write(stream, 0);
-////////////////////////////////////////////////////////
-//
-//            const binary::size_type  children_count = (binary::size_type)num_children();
-//
-//            {
-//
-//                auto d = binary::wrap(children_count); // print root
-//                stream.write(raw_ptr(d), size(d));
-//            }
-//
-//            model_structure::node_data new_node;
-//            
-//            //new_node.pos = translationCur;
-//            //new_node.orien = cg::quaternion(eulerAnglesCur);
-//            //new_node.name = m_logic_name;
-//            
-//            {
-//                auto d = wrap(new_node);
-//                stream.write(raw_ptr(d), size(d));
-//            }
-//
-//            {
-//                auto d = wrap(children_count);// print root
-//                stream.write(raw_ptr(d), size(d));
-//            }
-//
-//            model_data = stream.detach();
-//        }
-//
-//        binary::input_stream model_stream(model_data.data(), model_data.size());
-
           std::ofstream filelogic(std::string("test") + ".stbin", std::ios_base::binary);
           
           heilVisitor  hv(filelogic);
           hv.apply(*node);
-
-          //binary::input_stream model_stream(hv.get_model_data().data(), hv.get_model_data().size());
-          
-
-          //if(filelogic)
-          //{   
-          //     filelogic << hv.get_output_stream();
-          //}
-
-          
     }
 
 
@@ -787,6 +742,17 @@ namespace bi
                     (*it_vh)->go_to_pos(gp.pos,90);
             }
             
+            const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+            kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
+            {
+                uint32_t id = kernel::object_info_ptr(a)->object_id();
+                if( kernel::object_info_ptr(a)->object_id() == this->selected_obj_id_)
+                {
+                     a->goto_pos(gp.pos,90);
+                     return false;
+                }
+                return true;
+            });
         }
 
         // _trajectory_drawer->set(simple_route);

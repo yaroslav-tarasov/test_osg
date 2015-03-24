@@ -227,6 +227,7 @@
     <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp" />
     <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp" />
     <ClCompile Include="objects\phys_sys_object\phys_sys_object_view.cpp" />
+    <ClCompile Include="objects\vehicle\vehicle_ctrl.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_view.cpp" />

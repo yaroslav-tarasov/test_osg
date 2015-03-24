@@ -133,6 +133,8 @@ namespace sync_fsm
         double prediction = cg::clamp(pm->taxi_TAS(), pm->takeoff_TAS(), 15., 30.)(self_.get_fms_info()->get_state().dyn_state.TAS);
         //geo_base_3 predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(prediction*0.1));
         
+        //LOG_ODS_MSG( "TAS:  "  << self_.get_fms_info()->get_state().dyn_state.TAS << "\n" );
+        
         geo_position physpos = phys_aircraft_->get_position();
         physpos.pos += point_3(20.1,20.1,0);
         geo_base_3 predict_pos  = physpos.pos;
@@ -188,7 +190,6 @@ namespace sync_fsm
 
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
-// FIXME TODO
 #ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wnode;
 #else

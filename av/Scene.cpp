@@ -705,15 +705,17 @@ void Scene::createObjects()
 
     const std::string v_name = "niva_chevrolet";
 
- //   auto pojarka2 = creators::createObject(v_name);
- //   if(pojarka2)
-	//_rigidUpdater->addVehicle(pojarka2,
- //       osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
+#if 0
+    auto pojarka2 = creators::createObject(v_name);
+    if(pojarka2)
+	_rigidUpdater->addVehicle(pojarka2,
+        osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
 
     auto pojarka_ctrl = creators::createObject(v_name);
     if(pojarka_ctrl)
 	_rigidUpdater->addVehicle2(v_name,pojarka_ctrl,
         osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  
+#endif
 
     // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));
 
