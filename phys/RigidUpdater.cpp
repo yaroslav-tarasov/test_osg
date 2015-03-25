@@ -17,15 +17,18 @@
 #include "aircraft/phys_aircraft.h"
 #include "vehicle.h"
 
+#include "common/simple_route.h"
+
 #include "RigidUpdater.h"
 
 #include "visitors/heil_visitor.h"
 
 #include "object_creators.h"
 
-
+// Моя фантазия
 #include "objects/vehicle_fwd.h"
 #include "objects/vehicle.h"
+
 
 
 FIXME("kernel/systems.h")
@@ -73,6 +76,24 @@ namespace bi
         auto obj = kernel::fake_objects_factory_ptr(sys)->create_object(class_ptr, unique_name); 
 
     }
+    
+    kernel::object_info_ptr create_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
+    {
+        using namespace kernel;
+
+        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(sys)->object_classes() ;
+
+        kernel::object_class_ptr class_ptr ;
+
+        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
+        {
+            if (class_name == (*it)->name())
+                class_ptr = *it ;
+            std::string n = (*it)->name();
+        }
+
+        return kernel::fake_objects_factory_ptr(sys)->create_object(class_ptr, unique_name); 
+    }
 
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
 		: _root        (root)
@@ -83,6 +104,7 @@ namespace bi
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
+        , _time_delta(0)
 	{
         
         using namespace kernel;
@@ -132,13 +154,21 @@ namespace bi
         vehicle::settings_t vs;
         vs.model = "niva_chevrolet";
 
-        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs);
+        cg::geo_point_3 vpos(0.0,0.0005,0.0);
+        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,vpos);
 
-        const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
-        auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
-		auto nm = find_first_child<nodes_management::manager_ptr>(vvv);
-		uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
-		uint32_t vv_id = kernel::object_info_ptr(vvv)->object_id();
+        //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+        //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
+		//auto nm = find_first_child<nodes_management::manager_ptr>(vvv);
+		//uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+		//uint32_t vv_id = kernel::object_info_ptr(vvv)->object_id();
+
+        // auto sr_obj = create_object(_d->_csys,"simple_route","simple_route_0");
+        
+        simple_route::settings_t srs;
+        srs.speed = 20;
+        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vpos);
+        
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
@@ -544,7 +574,8 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
-               
+                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
+                 vvv->follow_route("simple_route_0");
             }
 
             break;
@@ -563,10 +594,16 @@ namespace bi
 
                 //_sys->update( dt );
                 // Физику обновляем через моделирующую 
-
-                _d->_msys->update(view->getFrameStamp()->getSimulationTime());
-                _d->_csys->update(view->getFrameStamp()->getSimulationTime());
-                _d->_vsys->update(view->getFrameStamp()->getSimulationTime());                
+                if(_time_delta >= 0.1)
+                {
+                    _d->_msys->update(view->getFrameStamp()->getSimulationTime());
+                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
+                    _d->_vsys->update(view->getFrameStamp()->getSimulationTime()); 
+                    _time_delta = dt;
+                }
+                else
+                    _time_delta += dt;
+               
 
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   
@@ -670,7 +707,7 @@ namespace bi
     {   
         decart_position target_pos;
         target_pos.pos = simple_route.back();
-        geo_position gp(target_pos, cg::geo_base_3(cg::geo_point_3(0.0,0.0,0)));
+        geo_position gp(target_pos, ::get_base() /*cg::geo_base_3(cg::geo_point_3(0.0,0.0,0))*/);
         
         if(selected_obj_id_)
         {
@@ -702,21 +739,6 @@ namespace bi
             
                     target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 			
-			        //std::stringstream cstr;
-
-           //         cstr << std::setprecision(8) 
-           //             << "x:  "         << main_->kp_value(main_->length()).x
-           //             << "    y: "      << main_->kp_value(main_->length()).y
-           //             << "    curs :  " << main_->curs_value(main_->length()) 
-           //             << "    angle:  " << cg::angle(target_pos.pos,begin_pos.pos) 
-           //             << "    angle:  " << cg::polar_point_2(target_pos.pos - begin_pos.pos).course 
-           //             << "    delta curses: " << cg::norm360(target_pos.orien.get_course()) - cg::norm360(begin_pos.orien.get_course())
-				       // << "\n" ;
-
-           //         OutputDebugString(cstr.str().c_str());
-       
-
-
                     fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
                                                                                     target_pos,
                                                                                     aircraft::min_radius(),
@@ -745,6 +767,7 @@ namespace bi
             }
             
             const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+#if 0  // Рабочий код ездим           
             kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
             {
 				auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
@@ -757,6 +780,11 @@ namespace bi
                 }
                 return true;
             });
+#endif
+            auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get());
+            // simple_route::control_ptr(sr_obj)->add_point();
+            sr_obj->add_point(gp.pos);
+
         }
 
         // _trajectory_drawer->set(simple_route);

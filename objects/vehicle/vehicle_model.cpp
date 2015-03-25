@@ -203,9 +203,9 @@ void model::on_detach_tow()
 
 void model::on_follow_route(uint32_t route_id)
 {
-//    simple_route::info_ptr routeptr = collection_->get_object(route_id);
-//    if (routeptr)
-//        state_ = boost::make_shared<follow_route_state>(routeptr);
+    simple_route::info_ptr routeptr = collection_->get_object(route_id);
+    if (routeptr)
+        /*state_*/model_state_ = boost::make_shared<follow_route_state>(routeptr);
 }
 
 
@@ -260,15 +260,13 @@ void model::go_to_pos(  cg::geo_point_2 pos, double course )
 //    }
 //}
 
-
-// FIXME TODOTODOTODO
 void model::follow_route(std::string const& route)
 {
-    //object_info_ptr routeptr = find_object<object_info_ptr>(collection_, route);
-    //if (routeptr)
-    //{
-    //    on_follow_route(routeptr->object_id());
-    //}
+    object_info_ptr routeptr = find_object<object_info_ptr>(collection_, route);
+    if (routeptr)
+    {
+        on_follow_route(routeptr->object_id());
+    }
 }
 
 void model::detach_cur_route()
@@ -317,20 +315,6 @@ void model::sync_phys()
     geo_position cur_glb_pos(cur_pos, base);
     double cur_speed = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
-
-    //{
-    //    std::stringstream cstr;
-
-    //    cstr << std::setprecision(8) 
-    //        << "physics x:  "         << cur_pos.pos.x
-    //        << "    y: "              << cur_pos.pos.y
-    //        << "    curs :  "         << cur_course 
-    //        << "    cur_speed:  "     << cur_speed 
-    //        << "\n" ;
-
-    //    OutputDebugString(cstr.str().c_str());
-    //}
-
 
 
     cg::point_2 loc_cur_dpos = cg::point_2(cur_pos.dpos) * cg::rotation_2(cur_pos.orien.get_course());
@@ -384,15 +368,6 @@ void model::sync_phys()
     phys_vehicle_->set_thrust(thrust);
     phys_vehicle_->set_brake(brake);
 
-    //std::stringstream cstr;
-
-    //cstr << std::setprecision(8) 
-    //    << "steer:  "         << steer
-    //    << "    thrust: "      << thrust
-    //    << "    brake :  " << brake 
-    //    << "\n" ;
-
-    //OutputDebugString(cstr.str().c_str());
 
     //if (settings_.debug_draw)
     //    send_cmd(msg::phys_pos_msg(cur_glb_pos.pos, cur_course));

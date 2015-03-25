@@ -1153,7 +1153,7 @@ FIXME("calc_step_  (.01)")
 model_system_impl::model_system_impl(msg_service& service, string const& script)
     : fake_system_base( sys_model, service, "objects.xml" )
     , time_factor_( 0)
-    , calc_step_  (.01)
+    , calc_step_  (.1)
     //, py_engine_  (this)
     , ex_script_  (script)
 

@@ -141,7 +141,7 @@ namespace bi
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         vehicles_t                               _phys_vehicles;
 
-		/*boost::shared_ptr*/
+
         polymorph_ptr<phys::BulletInterface>      _sys;
 		struct RigidUpdater_private;
 	    boost::shared_ptr<RigidUpdater_private>  _d;
@@ -150,6 +150,7 @@ namespace bi
 
 private:
         double                                   _last_frame_time;
+        double                                   _time_delta;
 
         uint32_t                                selected_obj_id_;
     };

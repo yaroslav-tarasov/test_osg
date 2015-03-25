@@ -70,6 +70,15 @@ namespace vehicle
     {
         send_cmd(msg::go_to_pos_data(pos,course));
     }
+
+    void ctrl::follow_route(std::string const& route)
+    {
+        object_info_ptr routeptr = find_object<object_info_ptr>(collection_, route);
+        if (routeptr)
+        {
+            send_cmd(msg::follow_route_msg_t(routeptr->object_id()));
+        }
+    }
 }
 
 
