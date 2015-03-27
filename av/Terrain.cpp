@@ -113,15 +113,15 @@ void  Terrain::create( std::string name )
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
 
-    auto ret_array  = creators::createMovingModel(center,radius*0.8f);
-
-    osg::Node* movingModel = ret_array[0];
-
     addChild(baseModel);
     baseModel->setName("baseModel");
-    
+
+#if 0
+    auto ret_array  = creators::createMovingModel(center,radius*0.8f);
+    osg::Node* movingModel = ret_array[0];
     addChild(movingModel);
     movingModel->setName("movingModel");
+#endif
 
     OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.get_delta() << "\n";
 

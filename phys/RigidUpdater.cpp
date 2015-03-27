@@ -173,7 +173,7 @@ namespace bi
         // auto sr_obj = create_object(_d->_csys,"simple_route","simple_route_0");
         
         simple_route::settings_t srs;
-        srs.speed = 15;
+        srs.speed = 6;
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,gp.pos);
         
     }
