@@ -55,7 +55,7 @@ class LogFileHandler : public osg::NotifyHandler
 
 int main( int argc, char** argv )
 {  
-    osg::setNotifyLevel( osg::INFO/*WARN*/ );
+    osg::setNotifyLevel( osg::WARN );
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
     osg::notify(osg::INFO) << "Start this program \n";

@@ -63,7 +63,6 @@ void node_impl::pre_update(double time)
         return;
 
     double dt = time - *time_;
-
     if (dt <= 0)
         return;
 

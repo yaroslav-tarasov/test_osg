@@ -8,6 +8,8 @@
 int main_scene2( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
+    
+    logger::need_to_log(/*true*/);
 
 #if 0
     // OSG graphics context

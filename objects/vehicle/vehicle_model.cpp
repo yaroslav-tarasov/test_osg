@@ -534,7 +534,8 @@ void model::create_phys_vehicle()
     decart_position p(veh_transform.translation(), cg::quaternion(veh_transform.rotation().cpr()));
     //p.pos.z -= 0.2;
     p.pos.z = 0;
-    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(2000, s, p);
+    FIXME(Масса тел: 2000 или 200 вот вопрос )
+    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(200, s, p);
 
     // implementation
 #ifdef OSG_NODE_IMPL 
@@ -566,13 +567,13 @@ void model::create_phys_vehicle()
         std::string name = wheel_node->name();
         if (boost::starts_with(wheel_node->name(), "wheel"))
         {
-            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*nodes_manager_,*/ wheel_node, this->body_node_);
+            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*nodes_manager_,*/ wheel_node/*, this->body_node_*/);
             point_3 wheel_offset = wt.translation();
             FIXME(One more dirty trick)
             // Что тут за хрень с колесами прибавили, отняли нафига? 
             // Трансформ относительно body считается правильно, да он будет отрицательный по z
             // А вот дальше непонятный цирк 
-            wheel_offset.z = -wheel_offset.z; 
+            wheel_offset.z = abs(wheel_offset.z); 
             //auto const *wnc = wheel_node->get_collision() ;
             //Assert(wnc) ;
             //cg::rectangle_3 bound = model_structure::bounding(*wnc);

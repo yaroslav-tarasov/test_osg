@@ -55,6 +55,11 @@ void   ctrl::add_point( cg::geo_point_3 const& p )
       point_added_signal_(idx,ani::point_pos(ani::LAYER_GROUND,p));
 }
 
+void   ctrl::set_speed( double  speed )
+{
+      set(msg::settings_msg_t(speed));
+}
+
 void ctrl::init()
 {
     conn_point_changed_ = subscribe_point_changed(boost::bind(&ctrl::point_dragged, this, _1, _2));
@@ -71,9 +76,11 @@ void ctrl::point_dragged(size_t idx, ani::point_pos const& new_pos)
 
 void ctrl::point_added(size_t idx, ani::point_pos const& new_pos)
 {
-    extra_route_chart_->point_added(idx, new_pos);
-    points_changed();
-    reset_points();
+    //extra_route_chart_->point_added(idx, new_pos);
+    //points_changed();
+    //reset_points();
+
+    set(msg::add_point_msg(idx,new_pos));
 }
 
 void ctrl::point_removed(size_t idx)

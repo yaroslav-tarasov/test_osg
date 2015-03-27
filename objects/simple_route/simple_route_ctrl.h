@@ -24,6 +24,7 @@ struct ctrl
     // control
 public:
     void add_point(cg::geo_point_3 const& p) override;
+    void set_speed( double  speed ) override;
     // own
 private:
     void init           ();

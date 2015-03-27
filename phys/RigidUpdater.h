@@ -150,7 +150,9 @@ namespace bi
 
 private:
         double                                   _last_frame_time;
-        double                                   _time_delta;
+        double                                   _time_delta_mod_sys;
+        double                                   _time_delta_vis_sys;
+        double                                   _time_delta_ctrl_sys;
 
         uint32_t                                selected_obj_id_;
     };

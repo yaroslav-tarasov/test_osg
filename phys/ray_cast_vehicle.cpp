@@ -126,13 +126,15 @@ namespace ray_cast_vehicle
     void impl::add_wheel( double /*mass*/, double /*width*/, double radius, cg::point_3 const& offset, cg::cpr const & /*orien*/, bool /*has_damper*/ )
     {
         bool isFrontWheel = offset.y > 0;
-
+        btScalar suspensionRestLength = 0.0f;
         cg::point_3 connection_point = offset;
-        //connection_point.z += 1;
-
+#if defined(SIMEX_MOD)
+        connection_point.z += 1;
+        suspensionRestLength = 1.1f;
+#endif
         tuning_.m_maxSuspensionForce = 60000000;
 
-        btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0),0/*1.1f*/,btScalar(radius),tuning_,isFrontWheel);
+        btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0),suspensionRestLength,btScalar(radius),tuning_,isFrontWheel);
         info.m_suspensionStiffness = 20.f;
         info.m_wheelsDampingRelaxation = 2.3f;
         info.m_wheelsDampingCompression = 4.4f;

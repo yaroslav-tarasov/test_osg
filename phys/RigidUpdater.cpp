@@ -104,7 +104,9 @@ namespace bi
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
-        , _time_delta(0)
+        , _time_delta_mod_sys(0)
+        , _time_delta_vis_sys(0)
+        , _time_delta_ctrl_sys(0)
 	{
         
         using namespace kernel;
@@ -152,10 +154,15 @@ namespace bi
         //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as);
 
         vehicle::settings_t vs;
-        vs.model = "niva_chevrolet";
+        vs.model = "niva_chevrolet";//"buksir";//
+        
+        cg::point_3 vpos(330,750,00);
+        decart_position target_pos(vpos,cg::quaternion());
+        geo_position gp(target_pos, ::get_base());
 
-        cg::geo_point_3 vpos(0.0,0.0005,0.0);
-        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,vpos);
+        // cg::geo_point_3 vpos(0.0,0.0005,0.0);
+        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,gp.pos);
+
 
         //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
         //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
@@ -166,8 +173,8 @@ namespace bi
         // auto sr_obj = create_object(_d->_csys,"simple_route","simple_route_0");
         
         simple_route::settings_t srs;
-        srs.speed = 20;
-        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vpos);
+        srs.speed = 15;
+        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,gp.pos);
         
     }
 
@@ -408,7 +415,7 @@ namespace bi
         int id = _physicsNodes.size();
         phys::ray_cast_vehicle::info_ptr veh = _sys->createVehicle(node/*lod3?lod3:node*/,id,mass);
         
-        FIXME(—начала вырубаем lod3 потом копируем модель, цирк ей богу)
+        FIXME("— начала вырубаем lod3 потом копируем модель, цирк ей богу")
         // FIXME
         //if(lod3) 
         //    lod3->setNodeMask(0);
@@ -575,7 +582,13 @@ namespace bi
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
                  auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
-                 vvv->follow_route("simple_route_0");
+                 auto sr_obj = kernel::find_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"simple_route_0");
+                 if(sr_obj)
+                 {
+                    sr_obj->set_speed(5);
+                    vvv->follow_route("simple_route_0");
+                 }
+                 
             }
 
             break;
@@ -584,26 +597,44 @@ namespace bi
                 double dt = _hr_timer.get_delta();
                 double dt1 = ftm.diff();
 
-                LOG_ODS_MSG("Update-----------------------------------------------------------------\n" << "dt=" << dt << "\n");
-
-                if (abs(dt-dt1)>0.1) 
+               if (abs(dt-dt1)>0.1) 
                     OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");     
 
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
                 //_sys->update( dt );
+
+                const double dt_sys = dt; 
                 // ‘изику обновл€ем через моделирующую 
-                if(_time_delta >= 0.1)
+                if(_time_delta_mod_sys >= cfg().model_params.msys_step)
                 {
                     _d->_msys->update(view->getFrameStamp()->getSimulationTime());
-                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
-                    _d->_vsys->update(view->getFrameStamp()->getSimulationTime()); 
-                    _time_delta = dt;
+                    _time_delta_mod_sys = dt_sys;
                 }
                 else
-                    _time_delta += dt;
-               
+                    _time_delta_mod_sys += dt_sys;
+
+                LOG_ODS_MSG("Update-------------------------" << "  dt=  " << dt << "--------------------------------\n");
+                
+                if(_time_delta_ctrl_sys >= cfg().model_params.csys_step)
+                {
+                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
+                    _time_delta_ctrl_sys = dt_sys;
+                }
+                else
+                    _time_delta_ctrl_sys += dt_sys;
+
+                //if(_time_delta_vis_sys >= cfg().model_params.vsys_step)
+                {
+                    _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
+                    _time_delta_vis_sys = dt_sys;
+                }
+                //else
+                //    _time_delta_vis_sys += dt_sys;
+                
+                
+                
 
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   

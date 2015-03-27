@@ -22,12 +22,12 @@ struct add_point_msg
     add_point_msg() {}
 
 
-    add_point_msg( size_t          idx,cg::geo_point_3 pos)
+    add_point_msg( size_t          idx,ani::point_pos pos)
         : idx(idx), pos(pos)
     {}
 
     size_t          idx;
-    cg::geo_point_3 pos;
+    ani::point_pos pos;
 
 };
 

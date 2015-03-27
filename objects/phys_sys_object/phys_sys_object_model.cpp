@@ -30,7 +30,7 @@ void model::update( double time )
 {
     double dt = time - last_time_;
 
-    double const calc_step = 0.1;
+    double const calc_step = /*0.1*/0.01;
     size_t count = cg::max(1, cg::floor(dt / calc_step));
     double real_calc_step = dt / count;
 

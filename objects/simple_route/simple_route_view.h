@@ -78,6 +78,7 @@ namespace simple_route
         void point_removed  (size_t pnt_id) ;
 
         void on_point_added    (msg::add_point_msg const& msg);
+        void on_settings       (msg::settings_msg_t const& settings);
 
     protected:
         void set_point(size_t pnt_id, cg::geo_point_3 const& new_pos);

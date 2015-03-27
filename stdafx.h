@@ -319,11 +319,34 @@ namespace aircraft
 
 #include "config/config.h"
 
+class logger:
+    public boost::noncopyable
+{
+public:
+    //logger& get()
+    //{
+    //    static logger l;
+    //    return l;
+    //}
+
+    static bool need_to_log(boost::optional<bool> ntl = boost::none)
+    {
+        static bool blog(false);
+        if(ntl)
+            blog=*ntl;
+        return blog;
+    };
+private:
+    logger() {}
+};
+
 #define LOG_ODS_MSG( msg )                                                                \
     do {                                                                                  \
+    if(logger::need_to_log()) {                                                     \
     std::stringstream logger__str;                                                        \
-    logger__str << std::setprecision(8) << msg ; /* don't use brackets here! */           \
-    OutputDebugString(logger__str.str().c_str());                                          \
+    logger__str << std::setprecision(8) << msg ;                                          \
+    OutputDebugString(logger__str.str().c_str());                                         \
+    }                                                                                     \
     } while(0)
 
 // #define LOG_ODS_MSG( msg ) #msg ;

@@ -29,7 +29,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     points_changed();
     msg_disp()
         .add<msg::add_point_msg   >(boost::bind(&view::on_point_added   , this, _1))
-        //.add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
+        .add<msg::settings_msg_t>  (boost::bind(&view::on_settings, this, _1))
         ;
 }
 
@@ -41,7 +41,7 @@ view::view(kernel::object_create_t const& oc, std::vector<geo_point_2> const& po
     points_changed();
     msg_disp()
         .add<msg::add_point_msg   >(boost::bind(&view::on_point_added   , this, _1))
-        //.add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
+        .add<msg::settings_msg_t>  (boost::bind(&view::on_settings, this, _1))
         ;
 }
 
@@ -118,6 +118,17 @@ void view::point_dragged(size_t idx, ani::point_pos const& new_pos)
 void view::on_point_added(msg::add_point_msg const& pnt)
 {
      point_added(pnt.idx,ani::point_pos(0,pnt.pos));
+     LOG_ODS_MSG("on_point_added -------\n" 
+                << "pnt.idx=" << pnt.idx 
+                << " pnt.pos.x= " << pnt.pos.lat 
+                << " pnt.pos.y= " << pnt.pos.lon 
+                << " anchor_points().size()= " << anchor_points().size()
+                << "\n");
+}
+
+void view::on_settings(msg::settings_msg_t const& settings)
+{
+      settings_ = settings;
 }
 
 void view::point_added(size_t idx, ani::point_pos const& new_pos)

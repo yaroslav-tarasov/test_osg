@@ -43,16 +43,16 @@ void follow_route_state::update(model * self, double dt)
 
         double len = route_->closest(cg::geo_point_3(cur_pos, 0));
 
-       
-
         double nominal_speed = route_->interpolate_speed(len);
         double desired_len = cg::bound(len + nominal_speed * prediction, 0., route_->length());
          
-        LOG_ODS_MSG( "follow_route_state::update:  len:  "  << len << "  desired_len:  "  << desired_len << "\n" );
 
         cg::geo_point_2 desired = route_->interpolate(desired_len);
         
-        LOG_ODS_MSG( "follow_route_state::update:  desired:  x:  "  << desired.lat << "    y: " << desired.lon << "\n" );
+        LOG_ODS_MSG( "follow_route_state::update:  desired:  x:  "  << desired.lat << "    y: " << desired.lon << "\n"
+                     << "len:  "  << len << "  desired_len:  "  << desired_len << "\n"
+                     << "nominal_speed:  "  << nominal_speed << "  desired_len:  "  << desired_len << "\n"
+            );
         
         cg::point_2 dir = cur_pos(desired);
 

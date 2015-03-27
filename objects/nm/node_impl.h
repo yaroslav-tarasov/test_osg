@@ -95,6 +95,7 @@ protected:
     node_position                                 position_;
     optional<std::string>                         texture_;
     mutable node_position                         extrapolated_position_;
+    mutable node_position                         prev_extrapolated_position_;
     mutable optional<node_info_ptr>               rel_node_;
     std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
     mutable std::string                           name_;

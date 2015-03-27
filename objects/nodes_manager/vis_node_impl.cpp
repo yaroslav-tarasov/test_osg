@@ -74,7 +74,13 @@ void vis_node_impl::extrapolated_position_reseted()
 void vis_node_impl::pre_update(double time)
 {
     node_impl::pre_update(time);
-    sync_position();
+    double dt = time - *time_;
+    if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
+    {
+        
+        LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt << "   node type: " << (extrapolated_position_.is_local()?"local":"global") << "\n" );
+    }
+    sync_position(dt);
 }
 
 void vis_node_impl::on_animation(msg::node_animation const& anim)
@@ -144,7 +150,7 @@ void vis_node_impl::init_disp()
         .add<msg::visibility_msg>(boost::bind(&vis_node_impl::on_visibility, this, _1));
 }
 
-void vis_node_impl::sync_position()
+void vis_node_impl::sync_position(double dt)
 {
     if (!need_update_)
         return;
@@ -181,6 +187,14 @@ void vis_node_impl::sync_position()
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
 
             LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
+            LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   dx:  "
+                <<  extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat
+                << "    dy: "  << extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon
+                << "    dvx: " << (extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat) / (dt?dt:1.0) / 0.00001
+                << "    dvy: " << (extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon) / (dt?dt:1.0) / 0.00001
+                << "\n" );
+            
+            prev_extrapolated_position_  = extrapolated_position_;
         }
     }
 

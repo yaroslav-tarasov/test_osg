@@ -31,12 +31,12 @@ typedef
 
 struct settings_t
 {
-    settings_t()
-        : speed(0)
+    settings_t(double speed=0)
+        : speed(speed)
     {
 
     }
-
+    
     double speed;
 };
 
@@ -57,6 +57,7 @@ struct control
     virtual ~control(){}
 
     virtual void      add_point( cg::geo_point_3 const& p )  = 0;
+    virtual void      set_speed( double  speed )  = 0;
 };
 
 typedef polymorph_ptr<control> control_ptr;
@@ -64,7 +65,7 @@ typedef polymorph_ptr<control> control_ptr;
 REFL_STRUCT(anchor_point_t)
     REFL_ENTRY(pos)
     REFL_NUM(speed, 0., 100., 0.1)
-    REFL_END()
+REFL_END()
 
 REFL_STRUCT(settings_t)
     REFL_NUM(speed, 0., 100., 0.1)
