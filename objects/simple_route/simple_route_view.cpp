@@ -150,6 +150,8 @@ void view::point_removed(size_t idx)
 void view::points_changed()
 {
     points_ = all_points();
+	
+	speed_.clear();
 
     for (size_t i = 0; i < points_.size(); ++i)
     {
@@ -159,6 +161,9 @@ void view::points_changed()
         else
             speed_.push_back(settings_.speed);
     }
+	
+	if(speed_.size()>1)
+		speed_.back() = 0;
 
     length_ = 0;
 
