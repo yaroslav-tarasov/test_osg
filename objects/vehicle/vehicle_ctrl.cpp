@@ -79,6 +79,31 @@ namespace vehicle
             send_cmd(msg::follow_route_msg_t(routeptr->object_id()));
         }
     }
+
+    void ctrl::attach_tow()
+    {
+        aircraft::info_ptr towair;
+
+        visit_objects<aircraft::info_ptr>(collection_, [this, &towair](aircraft::info_ptr air)->bool
+        {       
+            geo_point_3 tow_pos = geo_base_3(air->pos())(cg::rotation_3(cpr(air->orien().course, 0, 0)) * (point_3(0, 5., 0) + point_3(air->tow_point_transform().translation())));
+            if (cg::distance2d(tow_pos, this->pos()) < 25)
+            {              
+                towair = air;
+                return false;
+            }
+
+            return true;
+        });
+
+        if (towair)
+            send_cmd(msg::attach_tow_msg_t(object_info_ptr(towair)->object_id()));
+    }
+
+    void ctrl::detach_tow()
+    {
+        send_cmd(msg::detach_tow_msg_t());
+    }
 }
 
 

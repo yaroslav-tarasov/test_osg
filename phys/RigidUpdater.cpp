@@ -99,7 +99,7 @@ namespace bi
 		: _root        (root)
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
-		, _debug       (true)
+		, _debug       (cfg().debug.debug_drawer)
 		, _sys         (phys::create_phys_system())
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
@@ -149,19 +149,22 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
+        cg::geo_point_3 apos(0.0,0.0005,0.0);
         aircraft::settings_t as;
         as.kind = "A319";
-        //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as);
+        geo_position agp(apos,quaternion(cpr(0,0,0)));
+        auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
 
         vehicle::settings_t vs;
-        vs.model = "niva_chevrolet";//"buksir";//
+        vs.model = "buksir";//"niva_chevrolet";//
         
-        cg::point_3 vpos(330,750,00);
-        decart_position target_pos(vpos,cg::quaternion());
-        geo_position gp(target_pos, ::get_base());
+        //cg::point_3 vpos(330,750,00);
+        cg::point_3 vpos(572,032,0);
+        decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
+        geo_position vgp(target_pos, ::get_base());
 
-        // cg::geo_point_3 vpos(0.0,0.0005,0.0);
-        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,gp.pos);
+        
+        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,vgp);
 
 
         //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
@@ -174,7 +177,7 @@ namespace bi
         
         simple_route::settings_t srs;
         srs.speed = 6;
-        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,gp.pos);
+        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
         
     }
 
@@ -313,7 +316,7 @@ namespace bi
         //rotated->addChild(node);
 
         addPhysicsData( id, addGUIObject(node), pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
-        phys::aircraft::control_ptr(_aircrafts.back())->apply_force(vel);
+        phys::aircraft::control_ptr(_aircrafts.back())->apply_force(from_osg_vector3(vel));
     }
 
 
@@ -565,7 +568,7 @@ namespace bi
                 });
 #endif
             }
-            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_L )
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_M /*&& (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)*/)
             {
  // FIXME перенести в модель
 #if 0
@@ -578,6 +581,19 @@ namespace bi
                         shassis_group.close(false);
                 });
 #endif
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
+                if(vvv)
+                {
+                    vvv->attach_tow();      
+                }
+            }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_N /*&& (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)*/)
+            {
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
+                if(vvv)
+                {
+                    vvv->detach_tow();
+                }
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {

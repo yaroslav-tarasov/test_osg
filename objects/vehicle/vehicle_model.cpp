@@ -535,7 +535,7 @@ void model::create_phys_vehicle()
     //p.pos.z -= 0.2;
     p.pos.z = 0;
     FIXME(Масса тел: 2000 или 200 вот вопрос )
-    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(200, s, p);
+    phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(cfg().model_params.vehicle_mass, s, p);
 
     // implementation
 #ifdef OSG_NODE_IMPL 

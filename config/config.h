@@ -15,10 +15,12 @@ struct cfg_t
     struct model_params_t
     {   
         model_params_t()
-            : bullet_step(0.01)
-            , msys_step  (0.1)
-            , vsys_step  (0.01)
-            , csys_step  (0.03)
+            : bullet_step (0.01)
+            , msys_step   (0.1)
+            , vsys_step   (0.01)
+            , csys_step   (0.03)
+            , vehicle_mass(200.0)
+            , rod_mass    (100.0)
         {
 
         }
@@ -27,10 +29,23 @@ struct cfg_t
         double msys_step;
         double vsys_step;
         double csys_step;
+        double vehicle_mass;
+        double rod_mass;
     };
+
+    struct debug_t
+    {
+        debug_t()
+            : debug_drawer(false) 
+        {}
+
+        bool  debug_drawer;
+    };
+
 
     path_t               path;
     model_params_t       model_params;
+    debug_t              debug;
 };
 
 REFL_STRUCT(cfg_t::path_t)
@@ -42,11 +57,18 @@ REFL_STRUCT(cfg_t::model_params_t)
     REFL_ENTRY(msys_step)
     REFL_ENTRY(vsys_step)
     REFL_ENTRY(csys_step)
+    REFL_ENTRY(vehicle_mass)
+    REFL_ENTRY(rod_mass)
+REFL_END()
+
+REFL_STRUCT(cfg_t::debug_t)
+    REFL_ENTRY(debug_drawer)
 REFL_END()
 
 REFL_STRUCT(cfg_t)
     REFL_ENTRY(path)
     REFL_ENTRY(model_params)
+    REFL_ENTRY(debug)
 REFL_END()
 
 cfg_t const& cfg();

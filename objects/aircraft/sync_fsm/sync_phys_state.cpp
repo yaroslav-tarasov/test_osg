@@ -136,10 +136,11 @@ namespace sync_fsm
         //LOG_ODS_MSG( "TAS:  "  << self_.get_fms_info()->get_state().dyn_state.TAS << "\n" );
         
         geo_position physpos = phys_aircraft_->get_position();
-        physpos.pos += point_3(20.1,20.1,0);
+        //physpos.pos += point_3(20.1,20.1,0);
         geo_base_3 predict_pos  = physpos.pos;
-
-        phys_aircraft_->go_to_pos(predict_pos, self_.get_fms_info()->get_state().orien());
+         
+        // phys_aircraft_->go_to_pos(predict_pos, self_.get_fms_info()->get_state().orien());
+        phys_aircraft_->go_to_pos(predict_pos, physpos.orien);
         phys_aircraft_->set_air_cfg(self_.get_fms_info()->get_state().dyn_state.cfg);
         phys_aircraft_->set_prediction(prediction);
 

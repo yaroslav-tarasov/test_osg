@@ -505,7 +505,7 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
 		const double radius = (*it).radius*.75;
 		osg::Vec3 connection_point = (*it).trans_f_body.getTrans() + to_osg_vector3(cs.offset_); 
 
-		ctrl->add_wheel(0,0,radius,connection_point,phys::cpr(),false,(*it).front);
+		ctrl->add_wheel(0,0,radius,from_osg_vector3(connection_point),phys::cpr(),false,(*it).front);
 	}
 
 	return ctrl;

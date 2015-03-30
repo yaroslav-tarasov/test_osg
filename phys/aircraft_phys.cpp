@@ -223,11 +223,16 @@ namespace phys
         return false;
     }
 
+#define SIMEX_MOD
 	size_t impl::add_wheel( double /*mass*/, double /*width*/, double radius, point_3 const& offset, cpr const & /*orien*/, bool /*has_damper*/, bool is_front )
 	{
 		point_3 connection_point = offset;
 		// Source
-        //connection_point.z() += 1;
+        btScalar suspensionRestLength = 0.0f;
+#if defined(SIMEX_MOD)
+        connection_point.z += 1;
+        suspensionRestLength = 1.0f;
+#endif
 
         // Source
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);
@@ -237,7 +242,7 @@ namespace phys
         //tuning_.m_suspensionCompression = 4.4f;
         //tuning_.m_frictionSlip = 10.;
 
-		btWheelInfo& info = raycast_veh_->addWheel(osg_helpers::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,is_front);
+		btWheelInfo& info = raycast_veh_->addWheel(phys::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), suspensionRestLength,btScalar(radius),tuning_,is_front);
         info.m_suspensionStiffness = 20.f; 
 		info.m_wheelsDampingRelaxation = 2.3f;
 		info.m_wheelsDampingCompression = 4.4f;
@@ -295,7 +300,7 @@ namespace phys
 
     void impl::apply_force (point_3 const& f)
     {
-        chassis_->applyCentralForce(osg_helpers::to_bullet_vector3(f));
+        chassis_->applyCentralForce(to_bullet_vector3(f));
     }
 
     void impl::set_elevator(double elevator)

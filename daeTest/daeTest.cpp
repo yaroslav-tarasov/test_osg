@@ -7,6 +7,8 @@ namespace fs = boost::filesystem;
 boost::filesystem::path& dataPath();
 boost::filesystem::path& tmpPath();
 
+typedef std::basic_string<TCHAR>   tstring;
+
 //osg::Texture::WrapMode getWrapMode(domFx_sampler_wrap_common domWrap)
 //{
 //    switch (domWrap)
@@ -150,7 +152,7 @@ struct xml_helper
 	xml_helper(std::string full_path)
 	{
 		assert(outFileName().empty());
-		outFileName(fs::path(full_path).leaf().string() + ".mat.xml");
+		outFileName(/*fs::path(full_path).leaf().string()*/full_path + ".mat.xml");
 	}
 
 	static pugi::xml_node& createNewMaterial(std::string name)
@@ -218,7 +220,7 @@ domEffect* currentEffect(domEffect* de = nullptr)
 	return _currentEffect;
 }
 
-std::string lookupFile(const std::string& fileName) {
+std::string lookupFile(const tstring& fileName) {
 	return (dataPath() / fileName).string();// native_file_string();
 }
 
@@ -829,9 +831,16 @@ void processModel(domCOLLADA& root) {
 	
 }
 
+
+
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string file = lookupFile("vehicles/pojarka/pojarka.dae");
+    if(argc!=2) {
+        printf("Invalid args.\n");
+        exit(1);
+    }
+    
+    std::string file = lookupFile(tstring(argv[1]));
 
 	mat_reader mt(file);
 	

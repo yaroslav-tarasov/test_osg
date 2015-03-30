@@ -20,5 +20,8 @@ namespace vehicle
         void set_initial_position(cg::geo_point_3 const &p, double c);
         void goto_pos(geo_point_2 pos,double course) override;
         void follow_route(const std::string& name)   override;
+    private:
+        void attach_tow() override; 
+        void detach_tow() override; 
 	};
 }

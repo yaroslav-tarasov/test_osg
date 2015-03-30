@@ -5,6 +5,8 @@
 using boost::property_tree::ptree;
 using namespace boost::property_tree;
 
+void save_cfg(cfg_t const& config);
+
 struct cfg_holder
 {
     cfg_holder()
@@ -17,7 +19,10 @@ struct cfg_holder
             prop_tree::read(pt, cfg_, false);
         }
         else
+        {
             LogWarn("No config file found, using default") ;
+            save_cfg(cfg_);
+        }
     }
 
     cfg_t const& cfg() const

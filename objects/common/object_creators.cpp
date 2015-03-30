@@ -22,7 +22,7 @@ namespace aircraft
 
 using namespace kernel;
 
-object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
 {
     const std::string class_name = "aircraft";
     FIXME("”никальное им€")
@@ -44,15 +44,13 @@ namespace vehicle
 {
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
     {
         const std::string class_name = "vehicle";
         FIXME("”никальное им€")
         const std::string unique_name = "vehicle_0";
-        
-        const double course = 30;
 
-        obj_create_data ocd(class_name, unique_name, dict::wrap(vehicle_data(sett, state_t(init_pos, course, 10))));
+        obj_create_data ocd(class_name, unique_name, dict::wrap(vehicle_data(sett, state_t(init_pos.pos, init_pos.orien.get_course(), 10))));
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
 
