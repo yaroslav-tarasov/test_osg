@@ -74,6 +74,9 @@ void vis_node_impl::extrapolated_position_reseted()
 void vis_node_impl::pre_update(double time)
 {
     node_impl::pre_update(time);
+    if (!time_)
+        return;
+
     double dt = time - *time_;
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {

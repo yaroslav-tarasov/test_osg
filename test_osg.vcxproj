@@ -233,6 +233,7 @@
     <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
     <ClCompile Include="objects\vehicle\vehicle_view.cpp" />
+    <ClCompile Include="objects\vehicle\vehicle_visual.cpp" />
     <ClCompile Include="phys\aircraft_phys.cpp" />
     <ClCompile Include="phys\BulletInterface.cpp" />
     <ClCompile Include="phys\BulletMTInterface.cpp" />

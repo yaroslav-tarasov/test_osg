@@ -48,7 +48,7 @@ inline osg::Matrix to_osg_transform( const cg::transform_4& tr )
 {
     osg::Matrix m;
     cg::transform_4::translation_t t = tr.translation();
-    cg::rotation_3 r = tr.rotation();
+    cg::rotation_3 r = tr.rotation();   
     m.setTrans(to_osg_vector3(t));
     m.setRotate(to_osg_quat(r.cpr()));
     return m;

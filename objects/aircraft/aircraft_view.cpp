@@ -228,6 +228,11 @@ nodes_management::node_info_ptr view::root() const
     return nodes_manager_->get_node(0);
 }
 
+nodes_management::node_info_ptr view::tow_point() const
+{
+    return nodes_manager_->find_node("tow_point");
+}
+
 bool view::malfunction(malfunction_kind_t kind) const
 {
     return malfunctions_[kind];

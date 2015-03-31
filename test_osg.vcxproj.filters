@@ -590,5 +590,8 @@
     <ClCompile Include="objects\simple_route\simple_route_ctrl.cpp">
       <Filter>Source Files\simple_route</Filter>
     </ClCompile>
+    <ClCompile Include="objects\vehicle\vehicle_visual.cpp">
+      <Filter>Source Files\vehicle</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -188,6 +188,7 @@ struct info
     virtual bool                has_assigned_fpl() const = 0;
 
     virtual transform_4 const&  tow_point_transform() const = 0;
+    virtual nodes_management::node_info_ptr tow_point() const = 0;
 
     virtual nodes_management::node_info_ptr root() const = 0;
     virtual bool malfunction(malfunction_kind_t kind) const = 0;

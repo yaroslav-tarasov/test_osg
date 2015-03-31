@@ -118,7 +118,8 @@ protected:
     bool                has_assigned_fpl   () const override;
     transform_4 const&  tow_point_transform() const override;
 
-    nodes_management::node_info_ptr root() const override;
+    nodes_management::node_info_ptr root() const override; 
+    nodes_management::node_info_ptr tow_point() const override;
 
     bool malfunction(malfunction_kind_t kind) const override;
 #if 0
