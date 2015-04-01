@@ -43,8 +43,9 @@ struct tp_provider_impl
 
 struct craft_data
 {
-    explicit craft_data(settings_t const& settings = settings_t(), obj_id_opt fpl_id = boost::none)
+    explicit craft_data(settings_t const& settings = settings_t(), state_t const& state = state_t(),obj_id_opt fpl_id = boost::none)
         : settings_     (settings)
+        , state_        (state)
         , fpl_id_       (fpl_id)
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
@@ -56,13 +57,14 @@ protected:
     array<bool, MF_SIZE>    malfunctions_;
     atc_controls_t          atc_controls_;
     ipo_controls_t          ipo_controls_;
-
+    state_t                 state_;       // Исключительно для задания начальных параметров 
     REFL_INNER(craft_data)
         REFL_ENTRY(fpl_id_      )
         REFL_ENTRY(settings_    )
         REFL_ENTRY(malfunctions_)
         REFL_ENTRY(atc_controls_)
         REFL_ENTRY(ipo_controls_)
+        REFL_ENTRY(state_       )
     REFL_END()
 };
 

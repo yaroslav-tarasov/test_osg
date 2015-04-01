@@ -144,6 +144,8 @@ protected:
     object_class_vector const& object_classes() const                                                   override;
     object_class_ptr get_object_class(std::string const& name) const                                    override;
 
+    std::string generate_unique_name(std::string const &init_name) const override;
+
 private:
     void check_destroy(std::vector<object_info_wptr> const& objs_to_destroy);
 
@@ -719,6 +721,22 @@ object_class_vector const& fake_system_base::object_classes() const
 object_class_ptr fake_system_base::get_object_class(std::string const& name) const
 {
     return root_->find_class(name);
+}
+
+std::string fake_system_base::generate_unique_name(std::string const &init_name) const
+{
+    size_t index = 0;
+    std::string unique_name;
+
+    std::set<std::string> names;
+
+    for ( auto it = root_objects_.begin(), end = root_objects_.end(); it != end; ++it)
+        if ( boost::starts_with(it->second->name(), init_name) )
+            names.insert(it->second->name());
+
+    while (names.end() != names.find(unique_name = str(cpp_utils::inplace_format("%s %d") % init_name % index++))) {}
+
+    return unique_name;
 }
 
 void fake_system_base::fire_object_created(object_info_ptr obj)

@@ -36,6 +36,9 @@
     <ClInclude Include="..\..\stl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\visitors\heil_visitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

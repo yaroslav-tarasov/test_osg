@@ -23,15 +23,18 @@ class heilVisitor : public osg::NodeVisitor
     {  
 
     public:
-        heilVisitor(std::ofstream& filelogic)  
+        heilVisitor(std::ofstream& filelogic, const cg::point_3& offset)  
             :_level(0)
             , osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
             , root_visited(false)
             , lod_visited (false)
 			, got_lod(false)
             , ostream_nodes(filelogic)
+            , damned_offset(offset)
+            , damned_offset_added(false)
         {
-             using namespace binary;
+            
+            using namespace binary;
             // fill default
             //write(ostream_nodes, 1);
             auto d = wrap(binary::size_type(1));
@@ -60,10 +63,13 @@ class heilVisitor : public osg::NodeVisitor
             std::string node_name = boost::to_lower_copy(node.getName());
             std::string name_cut = node_name.substr(0, node_name.find("_lod"));
             std::string name_first_part = name_cut.substr(0, name_cut.find("_")); 
+            cg::point_3 offset;
 
             if(node_name == "root")
+            {
                root_visited = true;
-            
+               offset = damned_offset;
+            }
             FIXME("XXX")
             
             //if(boost::starts_with(node_name,"lod") && name_cut == name_first_part && name_first_part != "lod0")
@@ -94,11 +100,17 @@ class heilVisitor : public osg::NodeVisitor
 
                 model_structure::node_data new_node;
             
-                const binary::size_type  children_count = got_lod?1:(node.asGroup()?num_children(*node.asGroup()):0);
+                binary::size_type  children_count = got_lod?1:(node.asGroup()?num_children(*node.asGroup()):0);
                 
-				if(got_lod) got_lod=false;
+                if(node_name == "root")
+                    children_count++;  // For damned_offset
+				
+                if(got_lod)
+                {
+                    got_lod=false;
+                }
                 
-				new_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans());
+				new_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans()) + offset;
                 new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
                 const osg::BoundingSphere& bs = node.getBound();
                 new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
@@ -116,21 +128,34 @@ class heilVisitor : public osg::NodeVisitor
                 }
 
                 {
-                    auto d = wrap(children_count);// print root
+                    const binary::size_type  cc = children_count;
+                    auto d = wrap(cc);// print root
                     ostream_nodes.write(raw_ptr(d), size(d));
                 }
 
-                std::stringstream cstr;
+                print_node(new_node, children_count);
 
-                cstr << std::setprecision(8) 
-                    << "--------------------------------------- \n"
-                    << spaces() << "   Node /Name=   "          << new_node.name << "\n"
-                    << spaces() << "   Translate =   ("         << new_node.pos.x  << " ," << new_node.pos.y << " ,"  << new_node.pos.z << " )" << "\n"
-                    << spaces() << "   Rotate    =   ("         << new_node.orien.get_course()  << " ," << new_node.orien.get_pitch() << " ,"  << new_node.orien.get_roll() << " )" << "\n"
-                    << spaces() << "   Logic children number: " << children_count  
-                    << spaces() << "   visual nodes: " << new_node.victory_nodes  << "\n";
+                
+                if(!damned_offset_added)
+                {
+                    model_structure::node_data do_node;
+                    do_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans()) + offset;
+                    do_node.name =  "damned_offset";
 
-                OutputDebugStringA(cstr.str().c_str());
+                    damned_offset_added = true;
+
+                    {
+                        auto d = wrap(do_node);
+                        ostream_nodes.write(raw_ptr(d), size(d));
+                    }
+
+                    {
+                        auto d = wrap(0);// print root
+                        ostream_nodes.write(raw_ptr(d), size(d));
+                    }
+
+                    print_node(do_node,0);
+                }
 
             }
 
@@ -163,6 +188,21 @@ class heilVisitor : public osg::NodeVisitor
             _level--;
         }
 
+        void inline print_node( model_structure::node_data &new_node, const binary::size_type children_count ) 
+        {
+            std::stringstream cstr;
+
+            cstr << std::setprecision(8) 
+                << "--------------------------------------- \n"
+                << spaces() << "   Node /Name=   "          << new_node.name << "\n"
+                << spaces() << "   Translate =   ("         << new_node.pos.x  << " ," << new_node.pos.y << " ,"  << new_node.pos.z << " )" << "\n"
+                << spaces() << "   Rotate    =   ("         << new_node.orien.get_course()  << " ," << new_node.orien.get_pitch() << " ,"  << new_node.orien.get_roll() << " )" << "\n"
+                << spaces() << "   Logic children number: " << children_count  
+                << spaces() << "   visual nodes: "           << new_node.victory_nodes  << "\n";
+
+            OutputDebugStringA(cstr.str().c_str());
+        }
+
     protected:
         unsigned int             _level;
         std::ofstream&           ostream_nodes;
@@ -170,4 +210,6 @@ class heilVisitor : public osg::NodeVisitor
         bool                     lod_visited;
 		bool                     got_lod;
         std::vector<std::string> lods_;
+        cg::point_3              damned_offset;
+        bool                     damned_offset_added;   
     };

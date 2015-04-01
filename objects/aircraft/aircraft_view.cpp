@@ -97,7 +97,11 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         }
 
         if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
-            tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node);
+        {
+            auto damned_offset_node  = nodes_manager_->find_node("damned_offset");
+            cg::transform_4 tr = nodes_manager_->get_relative_transform(damned_offset_node);
+            tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node) * tr;
+        }
     }
 
 #if 0 

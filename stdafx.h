@@ -312,7 +312,7 @@ namespace aircraft
 }
 
 #define STR(x) STRINGIFY(x)
-#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))
+#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ));
 
 #include <tinyxml2/tinyxml2.h>
 #include "xml/tixml_xinclude.h"

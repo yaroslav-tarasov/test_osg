@@ -70,7 +70,6 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     shassis_ = boost::make_shared<shassis_support_impl>(get_nodes_manager());
     sync_state_.reset(new sync_fsm::none_state(*this));
 
-     FIXME(Нужна реализация системы)
      conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
 
 }
@@ -133,7 +132,7 @@ void model::sync_nm_root(double /*dt*/)
 
     nodes_management::node_position root_node_pos = root_->position();
     // 
-    FIXME(Если расскоментарить отлично синхронизируемся)
+    FIXME(Если раскоментарить отлично синхронизируемся)
     //root_node_pos.global().pos = desired_pos;
     
     root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
@@ -369,7 +368,7 @@ void model::sync_fms(bool force)
 {
 	if (!phys_aircraft_)
 		return ;
-#if 1
+
 	geo_position fmspos = fms_pos();
 	geo_position physpos = phys_aircraft_->get_position();
 
@@ -377,7 +376,33 @@ void model::sync_fms(bool force)
 
 	if (force || tow_attached_ || (cg::distance2d(fmspos.pos, physpos.pos) > cg::norm(physpos.dpos) * prediction * sys_->calc_step() * 2))
 		aircraft_fms::model_control_ptr(get_fms_info())->reset_pos(physpos.pos, physpos.orien.cpr().course);
-#endif
+
+}
+
+void model::on_child_removing(kernel::object_info_ptr child)
+{
+    bool had_nodes_manager = get_nodes_manager();
+
+    view::on_child_removing(child);
+
+    if (had_nodes_manager && !get_nodes_manager())
+    {
+        root_.reset();
+        elev_rudder_node_.reset();
+        rudder_node_.reset();
+        tow_point_node_.reset();
+        body_node_.reset();
+    }
+}
+
+void model::on_object_destroying(object_info_ptr object)
+{
+    view::on_object_destroying(object);
+
+    if (tow_attached_ && object->object_id() == *tow_attached_)
+    {
+        set_tow_attached(boost::none, boost::function<void()>());
+    }
 }
 
 phys::rigid_body_ptr model::get_rigid_body() const

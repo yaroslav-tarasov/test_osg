@@ -10,7 +10,6 @@
 namespace aircraft
 {
 
-//! настройки ответчика
 struct responder_settings
 {
     responder_settings()
@@ -33,7 +32,6 @@ inline bool operator !=(responder_settings const &lhs, responder_settings const 
     return lhs.code != rhs.code || lhs.mode != rhs.mode || lhs.type != rhs.type || lhs.flags != rhs.flags;
 }
 
-//! настройки ВС
 struct settings_t
 {
     settings_t()
@@ -87,7 +85,24 @@ struct settings_t
     }
 };
 
-//! некие типы эшелонов(?)
+
+// FIXME("Других мыслей по параметрам пока нет")
+
+
+// Исключительно для гармонии с авто
+struct state_t
+{
+    state_t()
+    {}
+
+    state_t(cg::geo_point_3 const& pos, cg::quaternion const orien)
+        : pos(pos), orien(orien)
+    {}
+
+    cg::geo_point_3 pos;
+    cg::quaternion  orien;
+};
+
 enum atc_level_kind
 {
     lk_cfl = 0, //! cleared flight level
@@ -145,6 +160,11 @@ REFL_STRUCT(settings_t)
     REFL_ENTRY(responder)
     REFL_FLAG_ENUM(equipment, ("W (RVSM)", NULL))
     REFL_SER(turbulence)
+REFL_END()
+
+REFL_STRUCT(state_t)
+    REFL_ENTRY(pos)
+    REFL_ENTRY(orien)
 REFL_END()
 
 //! особые случаи (повреждения) ВС

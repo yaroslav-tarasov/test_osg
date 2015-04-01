@@ -9,8 +9,13 @@ namespace aircraft
 
 	object_info_ptr ctrl::create(kernel::object_create_t const& oc, dict_copt dict)
 	{   
-        cg::geo_point_3 b_pos(0.000,0.005,0);
-		return object_info_ptr(new ctrl(oc, dict,b_pos,30));
+        cg::geo_point_3 b_pos(0.000,0.000,0.000);
+        if (dict)
+        {
+            return object_info_ptr(new ctrl(oc, *dict));
+        }
+        else
+    		return object_info_ptr(new ctrl(oc, dict,b_pos,double(0)));
 	}
 
 	AUTO_REG_NAME(aircraft_ext_ctrl, ctrl::create);
@@ -19,8 +24,14 @@ namespace aircraft
 		: view(oc,dict)
 	{
         ctrl_system* vsys = dynamic_cast<ctrl_system*>(sys_);
+        
         if(initial_pos && initial_course)
             set_initial_position(*initial_pos,*initial_course);
+
+        FIXME(»ли или)
+        
+        if(dict)
+            set_initial_position(state_.pos,state_.orien.get_course());
 	}
 
     void ctrl::update(double time)

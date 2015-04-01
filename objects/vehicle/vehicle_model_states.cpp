@@ -199,5 +199,81 @@ void go_to_pos_state::update(model * self, double dt)
     self->set_max_speed(max_speed);
 }
 
+follow_traj_state::follow_traj_state(fms::trajectory_ptr tr)
+    : traj_(tr)
+    , desired_velocity_(aircraft::min_desired_velocity())
+{
+}
+
+void follow_traj_state::update(model * self, double dt)
+{
+    auto it = self;
+
+    //if(traj_.get())
+    {
+        if (traj_->cur_len() < traj_->length())
+        {
+            //(*it).phys_aircraft_->set_prediction(15.); 
+            //(*it).phys_aircraft_->freeze(false);
+            const double  cur_len = traj_->cur_len();
+            traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
+            const double  tar_len = traj_->cur_len();
+            decart_position target_pos;
+
+            target_pos.pos = cg::point_3(traj_->kp_value(tar_len),0);
+            geo_position gtp(target_pos, get_base());
+            (*it)/*.phys_aircraft_->*/.go_to_pos(gtp.pos ,gtp.orien.get_course());
+
+
+            const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
+
+            if(cg::eq(curs_change,0.0))
+                desired_velocity_ = aircraft::max_desired_velocity();
+            else
+                desired_velocity_ = aircraft::min_desired_velocity();
+
+            // const decart_position cur_pos = _phys_aircrafts[0].phys_aircraft_->get_local_position();
+
+
+            //LOG_OSD_MSG(
+            //    "curr_pods_len:  "             << (*it).traj->cur_len() 
+            //    << "    desired_velocity :  "     << (*it).desired_velocity_   
+            //    << "    delta curs :  "           << curs_change
+            //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+            //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
+            //    );
+
+        }
+        else
+        {
+#if 0
+
+            cg::point_3 cur_pos = phys_aircraft_->get_local_position().pos;
+            cg::point_3 d_pos = phys_aircraft_->get_local_position().dpos;
+            cg::point_3 trg_p(traj_->kp_value(traj_->length()),0);
+            d_pos.z = 0;
+            if(cg::distance(trg_p,cur_pos) > 1.0 && cg::norm(d_pos) > 0.05)
+            {   
+                decart_position target_pos;
+                target_pos.pos = trg_p;
+                geo_position gp(target_pos, get_base());
+                (*it).phys_aircraft_->go_to_pos(gp.pos ,gp.orien);
+            }
+            else
+            {
+                // (*it).traj.reset();
+                (*it).phys_aircraft_->freeze(true);
+            }
+
+#endif
+
+        }
+
+    }
+}
+
+
+
+
 
 }

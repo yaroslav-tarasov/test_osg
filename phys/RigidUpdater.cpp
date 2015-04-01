@@ -149,26 +149,69 @@ namespace bi
 			manager->set_model(aircraft::get_model("A319"));
         }
 
-        cg::geo_point_3 apos(0.0,0.0005,0.0);
-        aircraft::settings_t as;
-        as.kind = "A319";
-        geo_position agp(apos,quaternion(cpr(0,0,0)));
-        auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        {
+            cg::geo_point_3 apos(0.0,0.0005,0.0);
+            aircraft::settings_t as;
+            as.kind = "A319";
+            geo_position agp(apos,quaternion(cpr(30,0,0)));
+            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
+            cg::geo_point_3 apos(0.0,0.0009,0.0);
+            aircraft::settings_t as;
+            as.kind = "A321";
+            geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
+            cg::geo_point_3 apos(0.0,0.0018,0.0);
+            aircraft::settings_t as;
+            as.kind = "B737";
+            geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
+            cg::geo_point_3 apos(0.0,0.0027,0.0);
+            aircraft::settings_t as;
+            as.kind = "B744";
+            geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
+            cg::geo_point_3 apos(0.0,0.0036,0.0);
+            aircraft::settings_t as;
+            as.kind = "B763";
+            geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
+            cg::geo_point_3 apos(0.0,0.0045,0.0);
+            aircraft::settings_t as;
+            as.kind = "A333";
+            geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
 
         vehicle::settings_t vs;
         vs.model = "buksir";//"niva_chevrolet";//
         
         //cg::point_3 vpos(330,750,00);
-        cg::point_3 vpos(572,032,0);
-        decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-        geo_position vgp(target_pos, ::get_base());
-
+        //cg::point_3 vpos(572,032,0);
+        //decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
+        //geo_position vgp(target_pos, ::get_base());
+        cg::geo_point_3 vpos(0.0006,0.0009,0.0);
+        geo_position vgp(vpos,quaternion(cpr(360 - 30,0,0)));
         
         auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,vgp);
 
 
         //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
-        //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle_0");
+        //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");
 		//auto nm = find_first_child<nodes_management::manager_ptr>(vvv);
 		//uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 		//uint32_t vv_id = kernel::object_info_ptr(vvv)->object_id();
@@ -581,7 +624,7 @@ namespace bi
                         shassis_group.close(false);
                 });
 #endif
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
                 if(vvv)
                 {
                     vvv->attach_tow();      
@@ -589,7 +632,7 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_N /*&& (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)*/)
             {
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
                 if(vvv)
                 {
                     vvv->detach_tow();
@@ -597,12 +640,12 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
-                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle_0");
-                 auto sr_obj = kernel::find_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"simple_route_0");
+                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                 auto sr_obj = kernel::find_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"simple_route 0");
                  if(sr_obj)
                  {
                     sr_obj->set_speed(5);
-                    vvv->follow_route("simple_route_0");
+                    vvv->follow_route("simple_route 0");
                  }
                  
             }
@@ -622,6 +665,16 @@ namespace bi
                 //_sys->update( dt );
 
                 const double dt_sys = dt; 
+
+                if(_time_delta_ctrl_sys >= cfg().model_params.csys_step)
+                {
+                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
+                    _time_delta_ctrl_sys = dt_sys;
+                }
+                else
+                    _time_delta_ctrl_sys += dt_sys;
+
+
                 // Физику обновляем через моделирующую 
                 if(_time_delta_mod_sys >= cfg().model_params.msys_step)
                 {
@@ -633,13 +686,7 @@ namespace bi
 
                 LOG_ODS_MSG("Update-------------------------" << "  dt=  " << dt << "--------------------------------\n");
                 
-                if(_time_delta_ctrl_sys >= cfg().model_params.csys_step)
-                {
-                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
-                    _time_delta_ctrl_sys = dt_sys;
-                }
-                else
-                    _time_delta_ctrl_sys += dt_sys;
+
 
                 //if(_time_delta_vis_sys >= cfg().model_params.vsys_step)
                 {
@@ -722,13 +769,13 @@ namespace bi
 
 
 
-    void RigidUpdater::createNodeHierarchy(osg::Node* node)
-    {
-          std::ofstream filelogic(std::string("test") + ".stbin", std::ios_base::binary);
-          
-          heilVisitor  hv(filelogic);
-          hv.apply(*node);
-    }
+    //void RigidUpdater::createNodeHierarchy(osg::Node* node)
+    //{
+    //      std::ofstream filelogic(std::string("test") + ".stbin", std::ios_base::binary);
+    //      
+    //      heilVisitor  hv(filelogic);
+    //      hv.apply(*node);
+    //}
 
 
     void RigidUpdater::handleSelectObjectEvent(uint32_t id )

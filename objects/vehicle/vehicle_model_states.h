@@ -47,6 +47,18 @@ private:
     bool end_;
 };
 
+
+struct follow_traj_state :model_state
+{
+    follow_traj_state(fms::trajectory_ptr tr);
+    void update(model * self, double dt);
+
+private:
+    double                                 desired_velocity_;
+    fms::trajectory_ptr                    traj_;
+};
+
+
 struct go_to_pos_state : model_state
 {
     go_to_pos_state(cg::geo_point_2 const& pos, optional<double> course, bool with_airtow);

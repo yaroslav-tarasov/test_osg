@@ -28,7 +28,7 @@ namespace bi
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
-        void createNodeHierarchy(osg::Node* node);
+        //void createNodeHierarchy(osg::Node* node);
 
         void handlePointEvent(std::vector<cg::point_3> const &simple_route);
         void handleSelectObjectEvent(uint32_t id );

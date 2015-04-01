@@ -21,6 +21,7 @@ struct fake_objects_factory
     virtual object_class_vector const&  object_classes         ()                        const = 0;
     virtual object_class_ptr            get_object_class       (std::string const& name) const = 0;
 
+    virtual std::string                 generate_unique_name   (std::string const &init_name) const = 0;
 };
 
 typedef polymorph_ptr<fake_objects_factory>      fake_objects_factory_ptr;

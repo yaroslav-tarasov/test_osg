@@ -2,7 +2,7 @@
 #include "precompiled_objects.h"
 
 #include "vehicle_visual.h"
-#include "nodes_manager/nodes_manager_visual.h"
+//#include "nodes_manager/nodes_manager_visual.h"
 
 namespace vehicle
 {
@@ -30,22 +30,6 @@ void visual::update(double time)
         
         aircraft::info_ptr towair;
         
-        auto nm = kernel::find_first_child<nodes_management::manager_ptr>(aerotow_);
-        uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
-
-        const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(sys_);
-        visit_objects<aircraft::info_ptr>(col, [this,&nm_id](aircraft::info_ptr air)->bool
-        {    
-            auto nm = kernel::find_first_child<nodes_management::manager_ptr>(air);
-            if (kernel::object_info_ptr(nm)->object_id() == nm_id)
-            {              
-                //towair = air; 
-                nodes_management::visual_manager_ptr(nm)->visual_object();
-                return false;
-            }
-
-            return true;
-        });
 
         if (tow_visual_object_ && *tow_visual_object_)
         {
@@ -55,30 +39,15 @@ void visual::update(double time)
             
             quaternion atr_quat = aerotow_root->get_global_orien();
 
-            point_3f damned_offset = from_osg_vector3((*tow_visual_object_)->pat()->asTransform()->asPositionAttitudeTransform()->getPosition());
-
             point_3f offset = base(tow_point_node_->get_global_pos());
-            geo_point_3 air_tow_pos = geo_base_3(aerotow_root->get_global_pos())(/*aerotow_root->get_global_orien()*/quaternion(cpr(atr_quat.get_course(),atr_quat.get_pitch(),atr_quat.get_roll())).rotate_vector(damned_offset + point_3(aerotow_->tow_point_transform().translation())));
+            geo_point_3 air_tow_pos = geo_base_3(aerotow_root->get_global_pos())(aerotow_root->get_global_orien().rotate_vector(point_3(aerotow_->tow_point_transform().translation())));
             point_3f offset2 = base(air_tow_pos);
-            //point_3f offset2 = base(aerotow_root->get_global_pos());
 
             cg::polar_point_3f dir(offset2 - offset);
             cpr orien(dir.course, dir.pitch, 0);
-            
-            
 
-            FIXME(TBD)
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f(orien), cg::as_scale(point_3f(1., dir.range, 1.)));
             //(*tow_visual_object_)->node()->as_transform()->set_transform(tr);
-
-            std::stringstream cstr;
-            cstr << "dir.course : " << dir.course  
-                 << "  get_course() : " << aerotow_root->get_global_orien().get_course() 
-                 << "  get_roll() : " << aerotow_root->get_global_orien().get_roll()  
-                 << "  get_roll() : " << aerotow_root->get_global_orien().get_roll()                
-                <<"\n" ;
- 
-            OutputDebugString(cstr.str().c_str());    
 
             osg::Matrix trMatrix;
             trMatrix.setTrans(to_osg_vector3(offset));

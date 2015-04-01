@@ -6,7 +6,7 @@
 bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape)
 {
     btBulletWorldImporter import(0);//don't store info into the world
-    import.setVerboseMode(0xFF);
+    // import.setVerboseMode(0xFF);
     if (import.loadFile(name.c_str()))
     {
         int numBvh = import.getNumBvhs();

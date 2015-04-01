@@ -32,12 +32,18 @@ struct trajectory
         double q1[] = { end_pos.pos.x,end_pos.pos.y,cg::grad2rad()*(90 - end_pos.orien.get_course() )};
         keypoints_t         kpts_;
         curses_t             crs_;
+        DubinsPath          path_;
         dubins_init( q0, q1, radius, &path_);
         dubins_path_sample_many( &path_,std::bind(fill,std::ref(kpts_),std::ref(crs_),sp::_1,sp::_2,sp::_3), step, nullptr);
         kp_seg_.push_back(kpts_);
         curs_seg_.push_back(crs_);
     }
-    
+
+    trajectory(const trajectory &other)
+    {
+        append(other);
+    }
+
     void append(const trajectory &other) 
     {
 		const auto length_ = kp_seg_.back().length();
@@ -98,6 +104,12 @@ struct trajectory
             
     inline double cur_len() const { return curr_pos_ ;}
     void   set_cur_len(double curr_len = 0.0) { curr_pos_ = curr_len;}
+    
+    REFL_INNER(trajectory)
+        REFL_ENTRY(kp_seg_      )
+        REFL_ENTRY(curs_seg_    )
+        REFL_ENTRY(curr_pos_)
+    REFL_END()
 
 private:
     
@@ -120,10 +132,10 @@ private:
         return 0;
     }        
 
-    DubinsPath          path_;
     kp_segments_t     kp_seg_;
     cr_segments_t   curs_seg_;
     double          curr_pos_;
+
 };
 
 inline std::vector<cg::geo_point_2> to_geo_points(const trajectory& traj)

@@ -851,7 +851,7 @@ int main( int argc, char **argv )
 
         std::ofstream filelogic(base_file_name + ".stbin", std::ios_base::binary);
           
-        heilVisitor  hv(filelogic);
+        heilVisitor  hv(filelogic,offset);
         hv.apply(*root.get());
 
 

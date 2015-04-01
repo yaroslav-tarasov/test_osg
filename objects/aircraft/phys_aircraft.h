@@ -62,6 +62,7 @@ namespace aircraft
         size_t       get_zone() const override;
         void         set_malfunction(bool malfunction)  override;
         void         freeze(bool freeze) override;
+        // double       get_damned_offset() override;
 
     private:
         void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s);
@@ -74,11 +75,12 @@ namespace aircraft
         nodes_management::manager_ptr   nodes_manager_;
         //meteo::meteo_cursor_ptr       meteo_cursor_;
         shassis_support_ptr             shassis_;
-
+        cg::point_3                     damned_offset_;
+        
         phys::aircraft::control_ptr     phys_aircraft_;
         cg::transform_4                 body_transform_inv_;
         bool                            on_ground_;
-        fms::air_config_t             cfg_;
+        fms::air_config_t               cfg_;
         double                          prediction_;
         bool                            freeze_;
 

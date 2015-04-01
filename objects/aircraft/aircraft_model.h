@@ -32,8 +32,14 @@ namespace aircraft
 
     public:
         void on_malfunction_changed( malfunction_kind_t kind ); 
-
+    // base_presentation
+        FIXME(private)
         void update(double dt);
+
+        // base_view_presentation
+    protected:
+        void on_child_removing(kernel::object_info_ptr child) override;
+        void on_object_destroying(object_info_ptr object) override ;
 
         // model_info
     private:
