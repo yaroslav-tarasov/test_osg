@@ -3,8 +3,6 @@
 
 Version 0.0.1 [![Build Status](https://travis-ci.org/msgpack/msgpack-c.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-c)
 
-It's like JSON but small and fast.
-
 Overview
 --------
 
