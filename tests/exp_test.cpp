@@ -2,7 +2,7 @@
 #include "visitors/info_visitor.h"
 #include "visitors/find_tex_visitor.h"
 #include "creators.h"
-#include "shaders.h"
+#include "av/shaders.h"
 
 namespace {
 osg::Image* createSpotLight( const osg::Vec4& centerColor, const osg::Vec4& bgColor, unsigned int size, float power )

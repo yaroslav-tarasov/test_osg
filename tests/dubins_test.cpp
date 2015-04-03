@@ -1,10 +1,9 @@
 
 #include "stdafx.h"
-#include "dubins.h"
+#include "fms/dubins.h"
 #include <stdio.h>
 using namespace std;
 #include "geometry/curve.h"
-// #include "curve2.h"
 
 int printConfiguration(double q[3], double x, void* user_data) {
 	printf("%f, %f, %f, %f\n", q[0], q[1], q[2], x);

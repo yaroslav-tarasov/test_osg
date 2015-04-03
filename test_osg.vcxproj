@@ -119,6 +119,7 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="av\av_scene.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />
@@ -127,13 +128,11 @@
     <ClCompile Include="av\Object.cpp" />
     <ClCompile Include="av\PreRender.cpp" />
     <ClCompile Include="av\Scene.cpp" />
+    <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
-    <ClCompile Include="av_scene.cpp" />
-    <ClCompile Include="common\CommonFunctions.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
     <ClCompile Include="creators.cpp" />
-    <ClCompile Include="dubins.cpp" />
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
     <ClCompile Include="ext\spark\fire_effect.cpp" />
     <ClCompile Include="ext\spark\osgspark.cpp" />
@@ -141,6 +140,7 @@
     <ClCompile Include="ext\spark\simple_effect.cpp" />
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
+    <ClCompile Include="kernel\fms\dubins.cpp" />
     <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />
@@ -221,7 +221,6 @@
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />
-    <ClCompile Include="shaders.cpp" />
     <ClCompile Include="sm\ShadowedScene.cpp" />
     <ClCompile Include="sm\ShadowMap.cpp" />
     <ClCompile Include="sm\ShadowSettings.cpp" />

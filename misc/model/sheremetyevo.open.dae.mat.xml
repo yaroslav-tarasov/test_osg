@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<root>
+	<Material name="plane_buslambert4">
+		<texture unit="0" path="bus32.dds" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="plane_car01_lambert71gc2">
+		<texture unit="0" path="car01.dds" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="plane__lambert4">
+		<texture unit="0" path="lorry17.dds" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="lambert1" />
+	<Material name="plane__lambert8">
+		<texture unit="0" path="car09.dds" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_grass">
+		<texture unit="3" path="GRASS2-I.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="GRASS2-I.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="building_wall_mat1">
+		<texture unit="2" path="WALL_g.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="3" path="WALL.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="WALL.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="building_part1_ma1">
+		<texture unit="2" path="build_part1_g.dds" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="3" path="build_part1.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="build_part1.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_mat1">
+		<texture unit="3" path="RAILING.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="RAILING.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_building1">
+		<texture unit="3" path="BUILDINS.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="BUILDINS.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_lmm_07l_01_mat1">
+		<texture unit="3" path="LMM_07L_.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="LMM_07L_.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="building_lmm_07l_02_mat1">
+		<texture unit="2" path="LMM_07L1_g.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="3" path="LMM_07L1.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="LMM_07L1.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_loc_07l_mat1">
+		<texture unit="3" path="LOC_07L.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="LOC_07L.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_gp_07l_01_mat1">
+		<texture unit="3" path="GP_07L_0.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="GP_07L_0.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_gp_07l_02_mat1">
+		<texture unit="3" path="GP_07L_1.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="GP_07L_1.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="tree_mat_7">
+		<texture unit="3" path="tree_sum.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="tree_sum.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_avia_alpha_1Mate1">
+		<texture unit="3" path="AVIA_ALP.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="AVIA_ALP.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_arp_mat1">
+		<texture unit="3" path="ARP.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="ARP.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="railing_drl_mat1">
+		<texture unit="3" path="DRL.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="DRL.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="building_prl_mat1">
+		<texture unit="2" path="PRL_g.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="3" path="PRL.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="PRL.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="plane_il_18_mat1">
+		<texture unit="3" path="il_18_ru.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="il_18_ru.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_">
+		<texture unit="0" path="beton.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_composite">
+		<texture unit="0" path="composite.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_rulejka1">
+		<texture unit="0" path="rulekja.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_vpp_01">
+		<texture unit="0" path="vpp_01.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_vpp_03">
+		<texture unit="0" path="vpp_03.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="concrete_vpp_02">
+		<texture unit="0" path="vpp_02.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_obo4ina">
+		<texture unit="0" path="asfalt.tga" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_mat1">
+		<texture unit="3" path="GROUND.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="GROUND.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_Default12">
+		<texture unit="3" path="UNDER_LO.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="UNDER_LO.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="ground_2___hi1">
+		<texture unit="3" path="UNDER_HI.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="UNDER_HI.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="panorama_Material1">
+		<texture unit="3" path="pnm1.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="pnm1.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="tree_mat_5">
+		<texture unit="3" path="8a7e7522.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="8a7e7522.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="tree_mat1">
+		<texture unit="3" path="6a2fc114.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="6a2fc114.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+	<Material name="tree_mat_4">
+		<texture unit="3" path="d10f31ac.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="d10f31ac.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+</root>

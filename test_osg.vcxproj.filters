@@ -82,6 +82,9 @@
     <Filter Include="Source Files\simple_route">
       <UniqueIdentifier>{94a9fb94-bf61-458c-8700-9cb04ab5f5e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\fms">
+      <UniqueIdentifier>{78b7d137-c2a8-484d-aa52-0d5dc4accf72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -170,12 +173,6 @@
     <ClCompile Include="creators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="common\CommonFunctions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="shaders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="light_maps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -193,9 +190,6 @@
     </ClCompile>
     <ClCompile Include="sm\ShadowSettings.cpp">
       <Filter>Source Files\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="dubins.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="av\CloudLayer.cpp">
       <Filter>Source Files\av</Filter>
@@ -298,9 +292,6 @@
     </ClCompile>
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp">
       <Filter>Source Files\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="av_scene.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="kernel\systems\system_base\fake_system.cpp">
       <Filter>Source Files\systems</Filter>
@@ -457,6 +448,15 @@
     </ClCompile>
     <ClCompile Include="kernel\phys\aircraft_phys.cpp">
       <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="av\av_scene.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\fms\dubins.cpp">
+      <Filter>Source Files\fms</Filter>
+    </ClCompile>
+    <ClCompile Include="av\shaders.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

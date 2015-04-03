@@ -3,8 +3,8 @@
 #include "visitors/find_animation.h"
 
 #include "creators.h"
-#include <windows.h>
-#include "shaders.h"
+//#include <windows.h>
+#include "av/shaders.h"
 #include "visitors/ct_visitor.h"
 
 #include "pugixml.hpp"
