@@ -84,6 +84,11 @@ namespace vehicle
     {
         send_cmd(msg::detach_tow_msg_t());
     }
+
+    void ctrl::set_brake(double val)
+    {
+        send_cmd(msg::brake_msg_t(val));
+    }
 }
 
 

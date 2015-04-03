@@ -36,6 +36,7 @@ You will need:
  - `OpenSceneGraph 3.2.1`
  - `osgWorks 3.0.0`
  - `osgBullet 3.0.0`
+ - `osgEphemeris`
  - `COLLADA`
  - `pugixml`
  - `bullet`

@@ -10,6 +10,7 @@ namespace vehicle
          virtual void follow_route(const std::string& name)=0;
          virtual void attach_tow()=0; 
          virtual void detach_tow()=0; 
+         virtual void set_brake(double brake)=0; 
     };
 
 }

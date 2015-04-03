@@ -51,6 +51,7 @@ private:
     void on_detach_tow();
     void on_go_to_pos(msg::go_to_pos_data const& data);
     void on_follow_route(uint32_t route_id);
+    void on_brake(double val);
     //void on_debug_controls(msg::debug_controls_data const&);
     //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
 

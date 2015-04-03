@@ -648,6 +648,11 @@ namespace bi
                  }
                  
             }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_B )
+            {
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                vvv->set_brake(0.35);
+            }
 
             break;
         case osgGA::GUIEventAdapter::FRAME:

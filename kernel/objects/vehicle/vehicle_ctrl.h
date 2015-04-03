@@ -23,5 +23,6 @@ namespace vehicle
     private:
         void attach_tow() override; 
         void detach_tow() override; 
+        void set_brake(double val) override;
 	};
 }

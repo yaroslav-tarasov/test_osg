@@ -21,22 +21,18 @@ enum id
     vm_disable_debug_controls,
 
     vm_tow,
+
+    vm_brake
 };
 
-//! сообщение - настройки подвижного объекта
 typedef gen_msg<vm_settings, settings_t>    settings_msg_t;
-//! сообщение - присоединение буксира
 typedef gen_msg<vm_attach_tow, uint32_t>    attach_tow_msg_t;
-//! сообщение - отсоединение буксира
 typedef gen_msg<vm_detach_tow, void>        detach_tow_msg_t;
-//! сообщение - 
 typedef gen_msg<vm_follow_route, uint32_t>  follow_route_msg_t;
-//! сообщение - 
 typedef gen_msg<vm_disable_debug_controls>  disable_debug_ctrl_msg_t;
-//! сообщение - 
 typedef gen_msg<vm_tow, boost::optional<uint32_t>> tow_msg_t;
+typedef gen_msg<vm_brake, double> brake_msg_t;
 
-//! сообщение - состояние подвижного объекта
 struct state_msg_t
     : network::msg_id<vm_state>
 {               

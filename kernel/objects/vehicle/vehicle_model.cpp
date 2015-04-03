@@ -86,6 +86,7 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::detach_tow_msg_t          >(boost::bind(&model::on_detach_tow             , this))
         .add<msg::go_to_pos_data            >(boost::bind(&model::on_go_to_pos              , this, _1))
         .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
+        .add<msg::brake_msg_t>               (boost::bind(&model::on_brake                  , this, _1))
 //        .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
 //        .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
         ;
@@ -208,6 +209,11 @@ void model::on_follow_route(uint32_t route_id)
         /*state_*/model_state_ = boost::make_shared<follow_route_state>(routeptr);
 }
 
+
+void model::on_brake(double val)
+{
+    phys_vehicle_->set_brake(val);
+}
 
 void model::on_go_to_pos(msg::go_to_pos_data const& data)
 {
