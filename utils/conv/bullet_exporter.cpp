@@ -49,10 +49,6 @@ namespace vehicle
         {   
             if((*it)->asTransform()) // А потом они взяли и поименовали геометрию как трансформы, убил бы
             {
-                FIXME(Как передать радиус?)
-                //wheel_info wii((*it)->getBound().radius(),/*is_front*/false);
-                //wii.trans_f_body = get_relative_transform(node,(*it)/*,body*/);
-                //wi.push_back(wii);
                 (*it)->setNodeMask(0);
             }
         }
@@ -106,23 +102,6 @@ namespace airplane
             auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",findNodeVisitor::not_exact);
             auto sh_f_wheel   = findFirstNode(sh_f,"wheel",findNodeVisitor::not_exact);
 
-            //const bool is_front = true;
-            //{
-            //    wheel_info wii(sh_f_wheel->getBound().radius(),is_front);
-            //    wii.trans_f_body = get_relative_transform(node,sh_f_wheel/*,body*/);
-            //    wi.push_back(wii);
-            //}
-            //{
-            //    wheel_info wii(sh_r_r_wheel->getBound().radius(),!is_front);
-            //    wii.trans_f_body = get_relative_transform(node,sh_r_r_wheel/*,body*/);
-            //    wi.push_back(wii);
-            //}
-            //{
-            //    wheel_info wii(sh_r_l_wheel->getBound().radius(),!is_front);
-            //    wii.trans_f_body = get_relative_transform(node,sh_r_l_wheel/*,body*/);
-            //    wi.push_back(wii);
-            //}
-
             btCollisionShape* cs_body = nullptr;
             btCompoundShape*  s = new btCompoundShape;
 
@@ -173,24 +152,6 @@ namespace heli
         auto tail_rotor     = findFirstNode(node,"tailrotor",findNodeVisitor::not_exact);
         auto sagged_rotor   = findFirstNode(node,"sagged",findNodeVisitor::not_exact);
 
-
-        //const bool is_front = true;
-        //{
-        //    wheel_info wii(sh_f_wheel->getBound().radius(),is_front);
-        //    wii.trans_f_body = get_relative_transform(node,sh_f_wheel/*,body*/);
-        //    wi.push_back(wii);
-        //}
-        //{
-        //    wheel_info wii(sh_r_r_wheel->getBound().radius(),!is_front);
-        //    wii.trans_f_body = get_relative_transform(node,sh_r_r_wheel/*,body*/);
-        //    wi.push_back(wii);
-        //}
-        //{
-        //    wheel_info wii(sh_r_l_wheel->getBound().radius(),!is_front);
-        //    wii.trans_f_body = get_relative_transform(node,sh_r_l_wheel/*,body*/);
-        //    wi.push_back(wii);
-        //}
-
         btCollisionShape* cs_body = nullptr;
         btCompoundShape*  s = new btCompoundShape;
 
@@ -215,6 +176,54 @@ namespace heli
 
 }
 
+namespace default
+{
+    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
+    {          
+        osg::Node* lod3 =  findFirstNode(node,"Lod3");
+
+        osg::ComputeBoundsVisitor cbv;
+        (lod3?lod3:node)->accept( cbv );
+        const osg::BoundingBox& bb = cbv.getBoundingBox();
+
+        float xm = bb.xMax() - bb.xMin();
+        float ym = bb.yMax() - bb.yMin();
+        float zm = bb.zMax() - bb.zMin();
+
+        btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/0,0);
+        offset = cg::point_3(0,0,0);
+
+        //auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
+
+        auto wheels = findNodes(node,"wheel",findNodeVisitor::not_exact);
+
+        for (auto it = wheels.begin();it != wheels.end();++it)
+        {   
+            if((*it)->asTransform()) // А потом они взяли и поименовали геометрию как трансформы, убил бы
+            {
+                    (*it)->setNodeMask(0);
+            }
+        }
+
+        btCompoundShape*  s = new btCompoundShape;
+
+#if 0
+        btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( lod3?lod3:node );
+#else    
+        btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( lod3?lod3:node,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
+#endif
+
+        for (auto it = wheels.begin();it != wheels.end();++it)
+            (*it)->setNodeMask(0xffffffff);
+
+
+        s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);
+
+        return s;
+    }
+
+}
+
 btCompoundShape* fill_cs(osg::Node* node, cg::point_3& offset)
 {
     auto lod3 =  findFirstNode(node,"lod3");
@@ -225,11 +234,13 @@ btCompoundShape* fill_cs(osg::Node* node, cg::point_3& offset)
     bool heli     = findFirstNode(node ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
 
     if(airplane)
-        return airplane::fill_cs(lod3?lod3:node,offset);
-    else if(vehicle)
-        return vehicle::fill_cs(lod3?lod3:node,offset);
-    else if(vehicle)
         return  airplane::fill_cs(lod3?lod3:node,offset);
+    else if(vehicle)
+        return  vehicle::fill_cs(lod3?lod3:node,offset);
+    else if(heli)
+        return  heli::fill_cs(lod3?lod3:node,offset);
+    else
+        return  default::fill_cs(lod3?lod3:node,offset);
 
     return nullptr;
 }
