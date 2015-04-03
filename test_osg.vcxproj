@@ -53,7 +53,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\kernel;$(SolutionDir)\_include\kernel\systems;$(SolutionDir)\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BULLET_DIR)\src;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -72,7 +72,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\objects;$(SolutionDir)\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -102,68 +102,23 @@
   <ItemGroup>
     <ClInclude Include="aircraft.h" />
     <ClInclude Include="aircraft_phys.h" />
-    <ClInclude Include="aircraft_shassis_impl.h" />
     <ClInclude Include="aircraft_visual.h" />
     <ClInclude Include="animation_handler.h" />
-    <ClInclude Include="bada_import.h" />
-    <ClInclude Include="bi\BulletMTInterface.h" />
-    <ClInclude Include="bi\RigidMTUpdater.h" />
-    <ClInclude Include="bi\RigidUpdater.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
-    <ClInclude Include="ct_visitor.h" />
-    <ClInclude Include="curve2.h" />
-    <ClInclude Include="EnvRenderer.h" />
-    <ClInclude Include="Ephemeris.h" />
-    <ClInclude Include="find_animation.h" />
-    <ClInclude Include="find_node_visitor.h" />
-    <ClInclude Include="find_tex_visitor.h" />
-    <ClInclude Include="fms.h" />
-    <ClInclude Include="fn_reg.h" />
-    <ClInclude Include="geo_points.h" />
-    <ClInclude Include="heil_visitor.h" />
-    <ClInclude Include="hi_res_timer.h" />
-    <ClInclude Include="info_visitor.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials.h" />
-    <ClInclude Include="materials_visitor.h" />
-    <ClInclude Include="nodes_manager.h" />
-    <ClInclude Include="nodes_managment.h" />
-    <ClInclude Include="node_impl.h" />
-    <ClInclude Include="objects\conditions\meteo_proxy_view.h" />
-    <ClInclude Include="objects\nm\nodes_manager.h" />
-    <ClInclude Include="objects\nm\node_impl.h" />
-    <ClInclude Include="objects\nodes_manager\mod_node_impl.h" />
-    <ClInclude Include="objects\nodes_manager\nodes_factory.h" />
-    <ClInclude Include="objects\nodes_manager\nodes_manager_common.h" />
-    <ClInclude Include="objects\nodes_manager\nodes_manager_view.h" />
-    <ClInclude Include="objects\nodes_manager\nodes_manager_visual.h" />
-    <ClInclude Include="objects\nodes_manager\node_tree_iterator.h" />
-    <ClInclude Include="objects\nodes_manager\vis_node_impl.h" />
     <ClInclude Include="osg_helpers.h" />
-    <ClInclude Include="phys_sys.h" />
     <ClInclude Include="pickhandler.h" />
-    <ClInclude Include="Scene.h" />
     <ClInclude Include="shaders.h" />
-    <ClInclude Include="shadow_map.h" />
-    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="sv\FogLayer.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="teapot.h" />
-    <ClInclude Include="Terrain.h" />
     <ClInclude Include="trajectory.h" />
     <ClInclude Include="trajectory_drawer.h" />
-    <ClInclude Include="utils\str.h" />
     <ClInclude Include="callbacks.h" />
-    <ClInclude Include="vehicle_common.h" />
-    <ClInclude Include="vehicle_model.h" />
-    <ClInclude Include="vehicle_model_states.h" />
-    <ClInclude Include="visitors.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="animation_handler.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />
@@ -173,9 +128,10 @@
     <ClCompile Include="av\PreRender.cpp" />
     <ClCompile Include="av\Scene.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
-    <ClCompile Include="bada\bada_import.cpp" />
+    <ClCompile Include="av_scene.cpp" />
     <ClCompile Include="common\CommonFunctions.cpp" />
-    <ClCompile Include="config\config.cpp" />
+    <ClCompile Include="core\config\config.cpp" />
+    <ClCompile Include="core\nfi\lib_loader.cpp" />
     <ClCompile Include="creators.cpp" />
     <ClCompile Include="dubins.cpp" />
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
@@ -185,66 +141,63 @@
     <ClCompile Include="ext\spark\simple_effect.cpp" />
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
-    <ClCompile Include="fake_system.cpp" />
+    <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_shassis_impl.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_view.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_visual.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\phys_aircraft.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fsm.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_none_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp" />
+    <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
+    <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
+    <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
+    <ClCompile Include="kernel\objects\common\object_creators.cpp" />
+    <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
+    <ClCompile Include="kernel\objects\nm\nodes_management.cpp" />
+    <ClCompile Include="kernel\objects\nm\nodes_manager.cpp" />
+    <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp" />
+    <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp" />
+    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp" />
+    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp" />
+    <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\simple_route\simple_route_view.cpp" />
+    <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\vehicle\vehicle_model.cpp" />
+    <ClCompile Include="kernel\objects\vehicle\vehicle_model_states.cpp" />
+    <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp" />
+    <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp" />
+    <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
+    <ClCompile Include="kernel\phys\BulletInterface.cpp" />
+    <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
+    <ClCompile Include="kernel\phys\bvh_static_mesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\GLDebugDrawer.cpp" />
+    <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp" />
+    <ClCompile Include="kernel\phys\RigidUpdater.cpp" />
+    <ClCompile Include="kernel\phys\static_convex.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp" />
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
+    <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
     <ClCompile Include="light_maps.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="main_scene2.cpp" />
-    <ClCompile Include="materials.cpp" />
-    <ClCompile Include="nfi\lib_loader.cpp" />
-    <ClCompile Include="objects\ada\ada_view.cpp" />
-    <ClCompile Include="objects\aircraft\aircraft_ctrl.cpp" />
-    <ClCompile Include="objects\aircraft\aircraft_model.cpp" />
-    <ClCompile Include="objects\aircraft\aircraft_shassis_impl.cpp" />
-    <ClCompile Include="objects\aircraft\aircraft_view.cpp" />
-    <ClCompile Include="objects\aircraft\aircraft_visual.cpp" />
-    <ClCompile Include="objects\aircraft\phys_aircraft.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_fms_state.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_fsm.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_none_state.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_phys_state.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
-    <ClCompile Include="objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
-    <ClCompile Include="objects\aircraft_fms\aircraft_fms_model.cpp" />
-    <ClCompile Include="objects\aircraft_fms\aircraft_fms_view.cpp" />
-    <ClCompile Include="objects\airports_manager\airports_manager_view.cpp" />
-    <ClCompile Include="objects\airport\airport_model.cpp" />
-    <ClCompile Include="objects\airport\airport_view.cpp" />
-    <ClCompile Include="objects\common\object_creators.cpp" />
-    <ClCompile Include="objects\conditions\meteo_proxy_view.cpp" />
-    <ClCompile Include="objects\nm\nodes_management.cpp" />
-    <ClCompile Include="objects\nm\nodes_manager.cpp" />
-    <ClCompile Include="objects\nm\node_osg_impl.cpp" />
-    <ClCompile Include="objects\nodes_manager\mod_node_impl.cpp" />
-    <ClCompile Include="objects\nodes_manager\nodes_manager_view.cpp" />
-    <ClCompile Include="objects\nodes_manager\nodes_manager_visual.cpp" />
-    <ClCompile Include="objects\nodes_manager\node_impl.cpp" />
-    <ClCompile Include="objects\nodes_manager\node_tree_iterator.cpp" />
-    <ClCompile Include="objects\nodes_manager\vis_node_impl.cpp" />
-    <ClCompile Include="objects\phys_sys_object\phys_sys_object_model.cpp" />
-    <ClCompile Include="objects\phys_sys_object\phys_sys_object_view.cpp" />
-    <ClCompile Include="objects\simple_route\simple_route_ctrl.cpp" />
-    <ClCompile Include="objects\simple_route\simple_route_view.cpp" />
-    <ClCompile Include="objects\vehicle\vehicle_ctrl.cpp" />
-    <ClCompile Include="objects\vehicle\vehicle_model.cpp" />
-    <ClCompile Include="objects\vehicle\vehicle_model_states.cpp" />
-    <ClCompile Include="objects\vehicle\vehicle_view.cpp" />
-    <ClCompile Include="objects\vehicle\vehicle_visual.cpp" />
-    <ClCompile Include="phys\aircraft_phys.cpp" />
-    <ClCompile Include="phys\BulletInterface.cpp" />
-    <ClCompile Include="phys\BulletMTInterface.cpp" />
-    <ClCompile Include="phys\bvh_static_mesh.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="phys\GLDebugDrawer.cpp" />
-    <ClCompile Include="phys\ray_cast_vehicle.cpp" />
-    <ClCompile Include="phys\RigidUpdater.cpp" />
-    <ClCompile Include="phys\static_convex.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -263,11 +216,11 @@
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
     <ClCompile Include="tests\tex_test.cpp" />
+    <ClCompile Include="utils\animation_handler.cpp" />
+    <ClCompile Include="utils\materials.cpp" />
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />
-    <ClInclude Include="sensor.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
     <ClCompile Include="shaders.cpp" />
     <ClCompile Include="sm\ShadowedScene.cpp" />
     <ClCompile Include="sm\ShadowMap.cpp" />

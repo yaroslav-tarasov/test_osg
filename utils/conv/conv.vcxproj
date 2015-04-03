@@ -87,7 +87,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\boost.h" />
     <ClInclude Include="..\..\stl.h" />
     <ClInclude Include="..\visitors\heil_visitor.h" />
     <ClInclude Include="optimize_nodes.h" />

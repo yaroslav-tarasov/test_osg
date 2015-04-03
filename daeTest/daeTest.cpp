@@ -1,10 +1,7 @@
-// daeTest.cpp : Defines the entry point for the console application.
-//
 
 #include "stdafx.h"
 
-namespace fs = boost::filesystem;
-boost::filesystem::path& dataPath();
+namespace fs = boost::filesystem;                  boost::filesystem::path& dataPath();
 boost::filesystem::path& tmpPath();
 
 typedef std::basic_string<TCHAR>   tstring;

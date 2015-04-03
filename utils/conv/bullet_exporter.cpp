@@ -62,7 +62,7 @@ namespace vehicle
     #if 0
         btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
     #else    
-        btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::AXIS::Y,3 );
+        btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
     #endif
 
         for (auto it = wheels.begin();it != wheels.end();++it)
@@ -133,7 +133,7 @@ namespace airplane
             FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
     #else
-            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::AXIS::Y,3 );
+            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
     #endif
             sh_f->setNodeMask(0xffffffff);
             sh_r_r->setNodeMask(0xffffffff);
@@ -201,7 +201,7 @@ namespace heli
         FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
 #else
-        cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::AXIS::Y,3 );
+        cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
 #endif
         if(main_rotor) main_rotor->setNodeMask(0xffffffff);
         if(tail_rotor)   tail_rotor->setNodeMask(0xffffffff);

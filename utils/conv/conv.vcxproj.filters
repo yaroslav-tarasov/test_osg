@@ -30,9 +30,6 @@
     <ClInclude Include="optimize_nodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\boost.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\stl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

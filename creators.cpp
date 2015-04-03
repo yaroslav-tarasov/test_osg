@@ -18,7 +18,7 @@
 #include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
-#include "../cpp_utils/str.h"
+#include "utils/cpp_utils/str.h"
 
 #include "materials.h"
 

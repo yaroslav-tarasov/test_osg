@@ -11,160 +11,14 @@
 
 #include "targetver.h"
 
-#include "boost.h"
-#include "stl.h"
+#include "common/boost.h"
+#include "common/stl.h"
 
+#include "common/osg_inc.h"
 
-//////////////////////////////////////
-//
-//  osg include
-//
-#include <osg/Notify>
-#include <osg/MatrixTransform>
-#include <osg/PositionAttitudeTransform>
-#include <osg/Geometry>
-#include <osg/Geode>
-#include <osg/ShapeDrawable>
-#include <osg/Point>
-
-#include <osg/BlendFunc>
-
-#include <osg/PatchParameter>
-
-#include <osgUtil/Optimizer>
-
-#include <osgDB/Registry>
-#include <osgDB/ReadFile>
-#include <osgDB/WriteFile>
-#include <osgDB/FileUtils>
-
-#include <osgGA/TrackballManipulator>
-#include <osgGA/FlightManipulator>
-#include <osgGA/DriveManipulator>
-#include <osgGA/StateSetManipulator>
-#include <osgGA/FirstPersonManipulator>
-#include <osgGA/SphericalManipulator>
-#include <osgGA/OrbitManipulator>
-#include <osgGA/TerrainManipulator>
-
-#include <osgSim/OverlayNode>
-
-#include <osgViewer/Viewer>
-#include <osgViewer/config/SingleScreen>
-
-#include <osgAnimation/BasicAnimationManager>
-#include <osgAnimation/TimelineAnimationManager>
-
-#include <osg/AnimationPath>
-#include <osg/PositionAttitudeTransform>  
-
-#include <osgParticle/ExplosionEffect>
-#include <osgParticle/ExplosionDebrisEffect>
-#include <osgParticle/SmokeEffect>
-#include <osgParticle/SmokeTrailEffect>
-#include <osgParticle/FireEffect>
-
-#include <osgParticle/PrecipitationEffect>
-
-#include <osgFX/Outline>
-
-#include <osg/Depth>
-                 
-#include <osgUtil/CullVisitor> 
-
-#include <osg/TextureCubeMap>
-#include <osg/Transform>
-
-#include <osgViewer/ViewerEventHandlers>
-
-#include <osg/StateSet>
-#include <osg/LightModel>
-
-#include <osgShadow/ShadowedScene>
-#include <osgShadow/ShadowMap>
-#include <osgShadow/SoftShadowMap>
-#include <osgShadow/LightSpacePerspectiveShadowMap>
-#include <osgShadow/ShadowTexture>
-#include <osgShadow/ViewDependentShadowMap>
-
-#include <osgGA/NodeTrackerManipulator>
-#include <osgUtil/LineSegmentIntersector>
-#include <osg/io_utils>
-
-#include <osg/Texture1D>
-#include <osg/Texture2D>
-#include <osg/Texture3D>
-#include <osgUtil/PerlinNoise>
-#include <osg/TriangleFunctor>
-#include <osg/ImageSequence>
-#include <osgFX/BumpMapping>
-#include <osgUtil/TangentSpaceGenerator>
-
-#include <osg/AlphaFunc>
-#include <osg/BlendEquation>
-
-#include <osg/TexGen>
-#include <osg/TexEnvCombine>
-
-#include <osgUtil/ReflectionMapGenerator>
-#include <osgUtil/HighlightMapGenerator>
-#include <osgUtil/HalfWayMapGenerator>
-#include <osgUtil/Simplifier>
-
-#include <osg/ComputeBoundsVisitor>
-#include <osg/CameraNode>
-#include <osg/FrontFace>
-#include <osg/CullFace>
-
-#include <osg/ValueObject>
-
-
-#define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
-#define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
 
 #define BASE_SHADOW_TEXTURE_UNIT 6
 
-#define STRINGIFY(x) #x 
-
-#ifdef _DEBUG
-    #pragma comment(lib, "osgTextd.lib")
-    #pragma comment(lib, "osgShadowd.lib")
-    #pragma comment(lib, "osgFXd.lib")
-    #pragma comment(lib, "osgEphemerisd.lib")
-    #pragma comment(lib, "OpenThreadsd.lib")
-    #pragma comment(lib, "osgd.lib")
-    #pragma comment(lib, "osgDBd.lib")
-    #pragma comment(lib, "osgViewerd.lib")
-    #pragma comment(lib, "osgAnimationd.lib")
-    #pragma comment(lib, "osgGAd.lib")
-    #pragma comment(lib, "osgUtild.lib")
-    #pragma comment(lib, "osgSimd.lib")
-    #pragma comment(lib, "osgParticled.lib")
-    #pragma comment(lib, "BulletCollision_Debug.lib")
-    #pragma comment(lib, "LinearMath_Debug.lib")
-    #pragma comment(lib, "BulletDynamics_Debug.lib")
-    #pragma comment(lib, "BulletWorldImporter_Debug.lib")
-    #pragma comment(lib, "BulletFileLoader_Debug.lib")
-#else 
-    #pragma comment(lib, "osgText.lib")
-    #pragma comment(lib, "osgShadow.lib")
-    #pragma comment(lib, "osgFX.lib")
-    #pragma comment(lib, "osgEphemeris.lib")
-    #pragma comment(lib, "OpenThreads.lib")
-    #pragma comment(lib, "osg.lib")
-    #pragma comment(lib, "osgDB.lib")
-    #pragma comment(lib, "osgViewer.lib")
-    #pragma comment(lib, "osgAnimation.lib")
-    #pragma comment(lib, "osgGA.lib")
-    #pragma comment(lib, "osgUtil.lib")
-    #pragma comment(lib, "osgSim.lib")
-    #pragma comment(lib, "osgParticle.lib")
-    #pragma comment(lib, "BulletCollision.lib")
-    #pragma comment(lib, "LinearMath.lib")
-    #pragma comment(lib, "BulletDynamics.lib")   
-    #pragma comment(lib, "BulletWorldImporter.lib")
-    #pragma comment(lib, "BulletFileLoader.lib")
-#endif
 
 #ifndef _DEBUG
 #pragma comment(lib, "SPARK_GL.lib")
@@ -188,16 +42,6 @@
 
 #pragma warning(disable:4996)
 
-
-#ifdef _DEBUG
-#pragma comment(lib, "boost_thread-vc100-mt-gd-1_50.lib")
-#pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_50.lib")
-#pragma comment(lib, "boost_system-vc100-mt-gd-1_50.lib")
-#else
-#pragma comment(lib, "boost_thread-vc100-mt-1_50.lib")
-#pragma comment(lib, "boost_filesystem-vc100-mt-1_50.lib")
-#pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
-#endif
 
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
@@ -228,11 +72,8 @@ inline T cbrt(T n)
 #define Assert(x) if(x){};
 
 #include "common/points.h"
-
 #include "common/util.h"
-
 #include "geometry/xmath.h"
-//#include "geometry/primitives.h"
 
 ////////////////////////////////
 
@@ -250,8 +91,6 @@ inline T cbrt(T n)
 namespace nm = nodes_management;
 namespace sp = std::placeholders;
 
-
-
 inline cg::geo_base_3 get_base()
 {
     return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
@@ -260,10 +99,9 @@ inline cg::geo_base_3 get_base()
 #include "trajectory.h"
 
 #include "phys/phys_sys_fwd.h"
-#include "aircraft/aircraft_common.h"  // FIXME объекты надо прятать 
 
 #include "objects/aircraft_model_inf.h"
-#include "mod_system.h"
+#include "kernel/systems/mod_system.h"
 
 #include "osg_helpers.h"
 #include "visitors/find_node_visitor.h"
@@ -284,6 +122,8 @@ namespace python {
 
 }
 
+
+#include "aircraft/aircraft_common.h"
 #include "vehicle/vehicle_common.h"
 
 namespace vehicle
@@ -310,6 +150,8 @@ namespace aircraft
     inline static   double                 min_radius() {return 18.75;}; 
     inline static   double                 step()       {return 2.0;}; 
 }
+
+#define STRINGIFY(x) #x 
 
 #define STR(x) STRINGIFY(x)
 #define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ));
@@ -349,7 +191,6 @@ private:
     }                                                                                     \
     } while(0)
 
-// #define LOG_ODS_MSG( msg ) #msg ;
 
 #endif // precompile_header
 
