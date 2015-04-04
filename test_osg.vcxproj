@@ -41,11 +41,13 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Work_terminal\simex\src\_Include;$(IncludePath)</IncludePath>
     <OutDir>$(SIMEX_DIR)\bin\debug\</OutDir>
+    <IntDir>$(SolutionDir)\bin\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <OutDir>$(SIMEX_DIR)\bin\release\</OutDir>
+    <IntDir>$(SolutionDir)\bin\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
