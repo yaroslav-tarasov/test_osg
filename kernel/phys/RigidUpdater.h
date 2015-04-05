@@ -139,6 +139,7 @@ namespace bi
 		aircrafts_t                              _aircrafts;
         aircraft_models_t                        _model_aircrafts;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
+		osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer2;
         vehicles_t                               _phys_vehicles;
 
 

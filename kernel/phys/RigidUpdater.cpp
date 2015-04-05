@@ -106,6 +106,7 @@ namespace bi
         , _time_delta_mod_sys(0)
         , _time_delta_vis_sys(0)
         , _time_delta_ctrl_sys(0)
+		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
 	{
         
         using namespace kernel;
@@ -117,11 +118,7 @@ namespace bi
 		_d->_vsys = create_visual_system(_d->msg_service_, props_);
 
         _d->_csys = create_ctrl_system(_d->msg_service_);
-
-	    FIXME(”никальное им€ наверное хороша€ вещь)
-        // void editor_document_impl::create_clicked(std::string const &class_name)
-        //std::string unique_name = objects_factory_ptr(chart_sys())->generate_unique_name(class_name) ;
-        
+       
         create_auto_object(_d->_msys,"phys_sys","phys_sys");
         create_auto_object(_d->_msys,"airports_manager","aiports_manager");
         create_auto_object(_d->_msys,"ada","ada");
