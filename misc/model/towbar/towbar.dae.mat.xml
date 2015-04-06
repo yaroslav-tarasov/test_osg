@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<root>
+	<Material name="default_towbar_mat">
+		<texture unit="3" path="towbar.png" wrap_s="repeat" wrap_t="repeat" />
+		<texture unit="0" path="towbar.png" wrap_s="repeat" wrap_t="repeat" />
+	</Material>
+</root>
