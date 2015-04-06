@@ -26,10 +26,12 @@ void visual::update(double time)
     if (nodes_management::vis_node_info_ptr(root_)->is_visible() && aerotow_)
     {
         if (!tow_visual_object_)
-            tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object("tube") ;
-        
+        {
+            tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object("towbar"/*"tube"*/) ;
+            radius_ = (*tow_visual_object_)->root()->getBound().radius(); 
+        }
+
         aircraft::info_ptr towair;
-        
 
         if (tow_visual_object_ && *tow_visual_object_)
         {
@@ -45,15 +47,17 @@ void visual::update(double time)
 
             cg::polar_point_3f dir(offset2 - offset);
             cpr orien(dir.course, dir.pitch, 0);
+            
+            
 
-            cg::transform_4f tr(cg::as_translation(offset), rotation_3f(orien), cg::as_scale(point_3f(1., dir.range, 1.)));
-            //(*tow_visual_object_)->node()->as_transform()->set_transform(tr);
+            // cg::transform_4f tr(cg::as_translation(offset), rotation_3f(orien), cg::as_scale(point_3f(1., dir.range, 1.)));
+            // (*tow_visual_object_)->node()->as_transform()->set_transform(tr);
 
-            osg::Matrix trMatrix;
+            osg::Matrix trMatrix;            
             trMatrix.setTrans(to_osg_vector3(offset));
             trMatrix.setRotate(osg::Quat(osg::inDegrees(-dir.course), osg::Z_AXIS));
             osg::Matrix scaleMatrix;
-            scaleMatrix.makeScale(1., dir.range, 1.);
+            scaleMatrix.makeScale(/*1.*/dir.range / radius_ *.25, dir.range / radius_ *.5, /*1.*/dir.range / radius_ *.25);
 
             (*tow_visual_object_)->root()->asTransform()->asMatrixTransform()->setMatrix(scaleMatrix);
             (*tow_visual_object_)->node()->asTransform()->asMatrixTransform()->setMatrix(trMatrix);

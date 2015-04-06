@@ -671,6 +671,13 @@ void Scene::createObjects()
         }
     }
 
+
+    auto towbar = creators::createObject("towbar");
+    osg::MatrixTransform* positioned = new osg::MatrixTransform;
+    positioned->setMatrix(osg::Matrix::translate(osg::Vec3d(200,100,0)));
+    positioned->addChild(towbar);
+    addChild(towbar);
+
 #if 0
     auto trap = creators::createObject("trap");
     _rigidUpdater->addVehicle(trap,

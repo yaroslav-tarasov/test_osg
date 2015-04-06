@@ -153,7 +153,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A319";
             geo_position agp(apos,quaternion(cpr(30,0,0)));
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {

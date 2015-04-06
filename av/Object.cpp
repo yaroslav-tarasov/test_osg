@@ -178,6 +178,16 @@ osg::Node* createObject(std::string name, bool fclone)
         pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
         pat->setPosition(osg::Vec3(0,airplane?-(ym)/2.0f:0.f,0)); // FIXME Дурацкое смещение и не понятно чего с ним делать
 
+#if 1
+        if(name=="towbar")
+        {
+           auto towpoint =  findFirstNode(object_file,"tow_point"); 
+
+           pat->setPosition(osg::Vec3(0,zm,towpoint->asTransform()?-towpoint->asTransform()->asMatrixTransform()->getMatrix().getTrans().z():0));
+           
+        }
+#endif
+
 		objCache[name] = object_file;
 
 	}

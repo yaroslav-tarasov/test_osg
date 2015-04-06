@@ -20,6 +20,7 @@ namespace vehicle
     private:
         optional<visual_object_ptr>      tow_visual_object_;
         nodes_management::node_info_ptr  aero_tow_point_; 
+        double                           radius_;
     };
 
 }
