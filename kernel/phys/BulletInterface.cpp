@@ -731,7 +731,7 @@ void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
-	// rigid_bodies_.erase(rb);
+	//rigid_bodies_.erase(rb);
     // FIXME  пока не удаляем
     FIXME("Нету удаления, а надо бы особенно для сомолей")
 }

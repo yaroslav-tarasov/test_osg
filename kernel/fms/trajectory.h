@@ -28,8 +28,8 @@ struct trajectory
     trajectory(const decart_position& begin_pos,decart_position const& end_pos,double radius, double step = 1)
         :  curr_pos_(0)
     {
-        double q0[] = { begin_pos.pos.x,begin_pos.pos.y,cg::grad2rad()*(90 - begin_pos.orien.get_course()) };
-        double q1[] = { end_pos.pos.x,end_pos.pos.y,cg::grad2rad()*(90 - end_pos.orien.get_course() )};
+        double q0[] = { begin_pos.pos.x,begin_pos.pos.y,to_dubin( begin_pos.orien) };
+        double q1[] = { end_pos.pos.x,end_pos.pos.y,to_dubin( end_pos.orien)};
         keypoints_t         kpts_;
         curses_t             crs_;
         DubinsPath          path_;

@@ -153,9 +153,6 @@
     <ClInclude Include="materials.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="trajectory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="trajectory_drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
