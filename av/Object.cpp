@@ -183,7 +183,7 @@ osg::Node* createObject(std::string name, bool fclone)
         {
            auto towpoint =  findFirstNode(object_file,"tow_point"); 
 
-           pat->setPosition(osg::Vec3(0,zm,towpoint->asTransform()?-towpoint->asTransform()->asMatrixTransform()->getMatrix().getTrans().z():0));
+           pat->setPosition(osg::Vec3(0,zm/2,towpoint->asTransform()?-towpoint->asTransform()->asMatrixTransform()->getMatrix().getTrans().z():0));
            
         }
 #endif

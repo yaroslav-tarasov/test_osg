@@ -278,9 +278,6 @@
     <ClCompile Include="ext\spark\osgspark.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
@@ -454,6 +451,9 @@
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

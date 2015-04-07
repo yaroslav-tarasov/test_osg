@@ -374,7 +374,7 @@ void model::sync_phys()
     phys_vehicle_->set_thrust(thrust);
     phys_vehicle_->set_brake(brake);
     
-    logger::need_to_log(true);
+    logger::need_to_log(false);
 
     LOG_ODS_MSG ("sync_phys  steer:  "  << steer 
                  << "    thrust: " << thrust 
