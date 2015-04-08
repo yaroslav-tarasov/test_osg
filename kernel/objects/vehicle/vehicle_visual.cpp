@@ -95,7 +95,7 @@ void visual::update(double time)
             trMatrix.setTrans(to_osg_vector3(offset));
             trMatrix.setRotate(osg::Quat(osg::inDegrees(-dir.course), osg::Z_AXIS));
             osg::Matrix scaleMatrix;
-            scaleMatrix.makeScale(1., scale_coeff *1.1 , 1.);
+            scaleMatrix.makeScale(1., scale_coeff * 1.1 , 1.);
             
              
             // (*tow_visual_object_)->root()->asTransform()->asMatrixTransform()->setMatrix(scaleMatrix);
@@ -107,7 +107,7 @@ void visual::update(double time)
                 trMatrix.setTrans(osg::Vec3(0,2*dy/*dir.range *.5 - radius_*/,0));
                 body_a_->asTransform()->asMatrixTransform()->setMatrix(trMatrix);
                 osg::Matrix m3;
-                m3.setTrans(osg::Vec3(0,-(0/*dir.range *.5 - radius_*/),0));
+                m3.setTrans(osg::Vec3(0,-(0.05*dy/*dir.range *.5 - radius_*/),0));
                 scaleMatrix.postMult(m3);
                 body_s_->asTransform()->asMatrixTransform()->setMatrix(scaleMatrix);
             }

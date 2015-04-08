@@ -387,7 +387,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -755,7 +755,9 @@ osg::Node*   Scene::load(std::string path, uint32_t seed)
 
         osg::Node* root =  findFirstNode(obj,"root"); 
         root->setUserValue("id",seed);
-        addChild(mt);
+
+        _terrainRoot->asGroup()->addChild(mt);
+        
     }
 
     return mt;

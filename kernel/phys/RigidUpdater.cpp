@@ -188,7 +188,7 @@ namespace bi
         {
             cg::geo_point_3 apos(0.0,0.0045,0.0);
             aircraft::settings_t as;
-            as.kind = "A333";
+            as.kind = "AN26";//"A333";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
             auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }

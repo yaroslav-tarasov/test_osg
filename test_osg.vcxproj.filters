@@ -16,14 +16,8 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\sm">
-      <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\aircraft">
-      <UniqueIdentifier>{1e8dee50-dcac-42b3-8d09-d3f8317b93e1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\aircraft">
       <UniqueIdentifier>{b7d5d9ec-80d9-42fc-92e6-4fecd9062fce}</UniqueIdentifier>
@@ -34,14 +28,8 @@
     <Filter Include="Source Files\nfi">
       <UniqueIdentifier>{ac4ce2b3-ce67-487c-90c5-91e58e87d521}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\vehicle">
-      <UniqueIdentifier>{4646637e-3fc3-44ef-a0f3-b6a80d22d301}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\tests">
       <UniqueIdentifier>{baec0567-4405-4fd5-a2ed-21305b2b44e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\phys">
-      <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\bada">
       <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
@@ -49,41 +37,56 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\nm">
-      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\aircraft\sync_fms">
-      <UniqueIdentifier>{ee4fda0b-563d-4762-ae9b-f55d9224a6eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\aircraft_fms">
-      <UniqueIdentifier>{90453dd4-b788-4821-8e97-a1903a771500}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\airport">
-      <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\phys_sys_obj">
-      <UniqueIdentifier>{84d8ac5f-3c1a-4a06-b37b-7cd4da0ba62e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\systems">
       <UniqueIdentifier>{9debcb17-2ead-4d63-8cae-1087f2ec1b5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\nodes_manager">
-      <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ada">
-      <UniqueIdentifier>{b8984683-8efa-40f4-ad2e-1f255c5052f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\meteo">
-      <UniqueIdentifier>{a11a04c7-6b70-4e15-90d5-8b1f61ee4ac1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\simple_route">
-      <UniqueIdentifier>{94a9fb94-bf61-458c-8700-9cb04ab5f5e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\fms">
       <UniqueIdentifier>{78b7d137-c2a8-484d-aa52-0d5dc4accf72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects">
+      <UniqueIdentifier>{1bb2266e-2979-4c3d-80ed-96c93ff77ee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\ada">
+      <UniqueIdentifier>{b8984683-8efa-40f4-ad2e-1f255c5052f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\aircraft">
+      <UniqueIdentifier>{1e8dee50-dcac-42b3-8d09-d3f8317b93e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\aircraft\sync_fms">
+      <UniqueIdentifier>{ee4fda0b-563d-4762-ae9b-f55d9224a6eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\aircraft_fms">
+      <UniqueIdentifier>{90453dd4-b788-4821-8e97-a1903a771500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\airport">
+      <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\meteo">
+      <UniqueIdentifier>{a11a04c7-6b70-4e15-90d5-8b1f61ee4ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\nodes_manager">
+      <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\nm">
+      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\phys">
+      <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\phys_sys_obj">
+      <UniqueIdentifier>{84d8ac5f-3c1a-4a06-b37b-7cd4da0ba62e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\simple_route">
+      <UniqueIdentifier>{94a9fb94-bf61-458c-8700-9cb04ab5f5e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\vehicle">
+      <UniqueIdentifier>{4646637e-3fc3-44ef-a0f3-b6a80d22d301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\sm">
+      <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -167,26 +170,23 @@
     <ClCompile Include="test_osg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="creators.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="light_maps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowedScene.cpp">
-      <Filter>Source Files\sm</Filter>
+      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowMap.cpp">
-      <Filter>Source Files\sm</Filter>
+      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowTechnique.cpp">
-      <Filter>Source Files\sm</Filter>
+      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="sm\ViewDependentShadowMap.cpp">
-      <Filter>Source Files\sm</Filter>
+      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="sm\ShadowSettings.cpp">
-      <Filter>Source Files\sm</Filter>
+      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="av\CloudLayer.cpp">
       <Filter>Source Files\av</Filter>
@@ -312,133 +312,124 @@
       <Filter>Source Files\phys</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fsm.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_none_state.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp">
-      <Filter>Source Files\aircraft\sync_fms</Filter>
+      <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_shassis_impl.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_view.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_visual.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\phys_aircraft.cpp">
-      <Filter>Source Files\aircraft</Filter>
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp">
-      <Filter>Source Files\aircraft_fms</Filter>
+      <Filter>Source Files\objects\aircraft_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp">
-      <Filter>Source Files\aircraft_fms</Filter>
+      <Filter>Source Files\objects\aircraft_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_model.cpp">
-      <Filter>Source Files\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_view.cpp">
-      <Filter>Source Files\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp">
-      <Filter>Source Files\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\ada\ada_view.cpp">
-      <Filter>Source Files\ada</Filter>
+      <Filter>Source Files\objects\ada</Filter>
     </ClCompile>
     <ClCompile Include="_include\bada\bada_import.cpp">
       <Filter>Source Files\bada</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp">
-      <Filter>Source Files\meteo</Filter>
+      <Filter>Source Files\objects\meteo</Filter>
     </ClCompile>
     <ClCompile Include="core\nfi\lib_loader.cpp">
       <Filter>Source Files\nfi</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp">
-      <Filter>Source Files\nm</Filter>
+      <Filter>Source Files\objects\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp">
-      <Filter>Source Files\nm</Filter>
+      <Filter>Source Files\objects\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\nodes_manager.cpp">
-      <Filter>Source Files\nm</Filter>
+      <Filter>Source Files\objects\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp">
-      <Filter>Source Files\nodes_manager</Filter>
+      <Filter>Source Files\objects\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp">
-      <Filter>Source Files\phys_sys_obj</Filter>
+      <Filter>Source Files\objects\phys_sys_obj</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp">
-      <Filter>Source Files\phys_sys_obj</Filter>
+      <Filter>Source Files\objects\phys_sys_obj</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp">
-      <Filter>Source Files\simple_route</Filter>
+      <Filter>Source Files\objects\simple_route</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\simple_route\simple_route_view.cpp">
-      <Filter>Source Files\simple_route</Filter>
+      <Filter>Source Files\objects\simple_route</Filter>
     </ClCompile>
     <ClCompile Include="core\config\config.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\animation_handler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\materials.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\common\object_creators.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp">
-      <Filter>Source Files\vehicle</Filter>
+      <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_model.cpp">
-      <Filter>Source Files\vehicle</Filter>
+      <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_model_states.cpp">
-      <Filter>Source Files\vehicle</Filter>
+      <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp">
-      <Filter>Source Files\vehicle</Filter>
+      <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp">
-      <Filter>Source Files\vehicle</Filter>
+      <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
     <ClCompile Include="kernel\phys\aircraft_phys.cpp">
       <Filter>Source Files\phys</Filter>
@@ -454,6 +445,18 @@
     </ClCompile>
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\common\object_creators.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\animation_handler.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="creators.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\materials.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
