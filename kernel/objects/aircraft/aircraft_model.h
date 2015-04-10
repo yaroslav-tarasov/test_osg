@@ -61,6 +61,8 @@ namespace aircraft
         aircraft_fms::info_ptr get_fms_info() const;
         //meteo::meteo_cursor_ptr get_meteo_cursor() const;
         shassis_support_ptr get_shassis() const;
+        rotors_support_ptr  get_rotors() const;
+
         geo_position get_root_pos() const;
         bool is_fast_session() const;
         void set_desired_nm_pos  (geo_point_3 const& pos);

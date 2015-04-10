@@ -245,6 +245,11 @@ shassis_support_ptr model::get_shassis() const
     return shassis_;
 }
 
+rotors_support_ptr model::get_rotors() const
+{
+    return rotors_;
+}
+
 geo_position model::get_root_pos() const
 {
     FIXME("Позиция рута в глобальных координатах ооооочень больной вопрос")
