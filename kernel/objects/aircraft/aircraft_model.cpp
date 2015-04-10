@@ -8,6 +8,10 @@
 #include "sync_fsm/sync_none_state.h"
 #include "sync_fsm/sync_fms_state.h"
 
+
+#include "aircraft_shassis_impl.h"
+#include "aircraft_rotors_impl.h"
+
 namespace aircraft
 {
 
@@ -68,6 +72,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     }
 
     shassis_ = boost::make_shared<shassis_support_impl>(get_nodes_manager());
+    rotors_ =  boost::make_shared<rotors_support_impl>(get_nodes_manager());
     sync_state_.reset(new sync_fsm::none_state(*this));
 
      conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));

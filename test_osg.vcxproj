@@ -145,6 +145,7 @@
     <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />
+    <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_shassis_impl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_visual.cpp" />

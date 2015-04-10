@@ -70,8 +70,6 @@ namespace
     
 }
 
-
-
 namespace vehicle
 {
     btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
@@ -119,7 +117,6 @@ namespace vehicle
     }
 
 }
-
 
 
 namespace airplane
@@ -249,11 +246,12 @@ btCompoundShape* fill_cs(osg::Node* node, cg::point_3& offset)
     auto lod3 =  findFirstNode(node,"lod3");
 
     bool airplane = findFirstNode(node ,"shassi_",findNodeVisitor::not_exact)!=nullptr;
+    bool got_rotor = findFirstNode(node ,"rotor",findNodeVisitor::not_exact)!=nullptr;
     bool vehicle  = findFirstNode(node ,"wheel",findNodeVisitor::not_exact)!=nullptr;
     FIXME(Палец пол и потолок при определении модели)
     bool heli     = findFirstNode(node ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
 
-    if(airplane)
+    if(airplane /*&& !got_rotor*/)
         return  airplane::fill_cs(lod3?lod3:node,offset);
     else if(vehicle)
         return  vehicle::fill_cs(lod3?lod3:node,offset);

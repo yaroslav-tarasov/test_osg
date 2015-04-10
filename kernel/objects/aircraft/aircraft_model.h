@@ -4,7 +4,6 @@
 #include "phys/phys_sys.h"
 #include "common/phys_object_model_base.h"
 #include "phys_sys/aircraft.h"
-#include "aircraft_shassis_impl.h"
 #include "sync_fsm/sync_fsm.h"
 
 #include "network/msg_dispatcher.h"
@@ -105,6 +104,7 @@ namespace aircraft
         nodes_management::node_info_ptr        body_node_;
 
         shassis_support_ptr                    shassis_;
+        rotors_support_ptr                     rotors_;
 
         aircraft::phys_aircraft_ptr            phys_aircraft_;
 

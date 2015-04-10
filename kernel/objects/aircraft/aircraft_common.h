@@ -54,7 +54,7 @@ namespace aircraft
 
         void freeze()
         {
-#if 0   // TODO or not TODO
+#if 1   // TODO or not TODO
             {
                 auto pos = wheel_node->position();
                 pos.local().dpos = point_3();
@@ -184,5 +184,77 @@ namespace aircraft
 
     typedef polymorph_ptr<shassis_support> shassis_support_ptr;
 
+
+    struct rotors_group_t
+    {
+        rotors_group_t(nm::node_control_ptr node)
+            : node(node)
+            , malfunction(false)
+            , started    (false) 
+            , broken     (false)
+        {
+
+        }
+
+        bool                 malfunction;
+        bool                 started;
+        bool                 broken;
+        nm::node_control_ptr node;
+
+        nodes_management::node_control_ptr rotor_node;
+        double                             radius;
+
+        void freeze()
+        {
+#if 1   // TODO or not TODO
+            {
+                auto pos = rotor_node->position();
+                pos.local().dpos = point_3();
+                pos.local().omega = point_3();
+                rotor_node->set_position(pos);
+            }
+#endif
+        }
+
+        void start(bool immediate = false)
+        {
+        }
+
+        void stop(bool immediate = false)
+        {
+        }
+
+        void broke(phys_aircraft_ptr aircraft_phys)
+        {
+            //broken = true;
+            //for (auto it= shassis.begin(); it != shassis.end(); ++it)
+            //{
+            //    it->node->set_visibility(false);
+            //    it->freeze();
+            //    for (size_t j = 0; j < it->phys_wheels.size(); ++j)
+            //        aircraft_phys->remove_wheel(it->phys_wheels[j]);
+
+            //    it->phys_wheels.clear();
+            //}
+        }
+
+    };
+
+    enum rotors_group
+    {
+        RG_FRONT = 0, RG_REAR_LEFT, RG_REAR_RIGHT, RG_TAIL
+    };
+
+    struct rotors_support
+    {
+        virtual void visit_groups   (std::function<void(rotors_group_t &)> out) = 0;
+        virtual void visit_rotors   (std::function<void(rotors_group_t const& )> out) = 0;
+        virtual void set_malfunction(rotors_group group, bool val) = 0;
+        virtual void freeze() = 0;
+
+        virtual ~rotors_support() {}
+    };
+
+    typedef polymorph_ptr<rotors_support> rotors_support_ptr;
 
 } // aircraft
