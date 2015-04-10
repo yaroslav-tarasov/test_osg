@@ -172,12 +172,23 @@ osg::Node* createObject(std::string name, bool fclone)
         float xm = bb.xMax() - bb.xMin();
         float ym = bb.yMax() - bb.yMin();
         float zm = bb.zMax() - bb.zMin();   
+        
+        osg::PositionAttitudeTransform* pat;
+        
+        if (object_file->asTransform())
+        {
+            pat = object_file->asTransform()->asPositionAttitudeTransform();
+            pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+        }
+        else
+        {
+            pat = new osg::PositionAttitudeTransform; 
+            pat->addChild(object_file);
+            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+        }
 
-        auto pat = object_file->asTransform()->asPositionAttitudeTransform();
         pat->setName("pat");
-        pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
         pat->setPosition(osg::Vec3(0,airplane?-(ym)/2.0f:0.f,0)); // FIXME Дурацкое смещение и не понятно чего с ним делать
-
 #if 1
         if(name=="towbar")
         {

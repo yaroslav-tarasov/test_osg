@@ -103,8 +103,8 @@ namespace bi
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
-        , _time_delta_mod_sys(0)
-        , _time_delta_vis_sys(0)
+        , _time_delta_mod_sys (0)
+        , _time_delta_vis_sys (0)
         , _time_delta_ctrl_sys(0)
 		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
 	{
@@ -150,7 +150,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A319";
             geo_position agp(apos,quaternion(cpr(30,0,0)));
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -186,7 +186,7 @@ namespace bi
         }
 
         {
-            cg::geo_point_3 apos(0.0,0.0045,0.0);
+            cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
             aircraft::settings_t as;
             as.kind = "AN26";//"A333";
             geo_position agp(apos,quaternion(cpr(60,0,0)));

@@ -24,6 +24,54 @@ inline btVector3 to_bullet_vector3( osg::Vec3 const& v  )
 // http://bulletphysics.org/mediawiki-1.5.8/index.php/Bullet_binary_serialization
 //
 
+namespace 
+{
+    template <typename T, size_t N>
+    size_t array_size(T (&)[N]) {
+        return N;  // size of array
+    }
+
+    struct  nodes_hider 
+    {   
+        
+        nodes_hider(osg::Node * base, std::vector< std::string >& a)
+           : node_(base)
+        {
+            std::for_each(a.begin(),a.end(),[=](const std::string name){add_nodes(name);});
+
+            for (auto it = nodes_list_.begin();it != nodes_list_.end();++it)
+            {   
+                if((*it)->asTransform()) // ј потом они вз€ли и поименовали геометрию как трансформы, убил бы
+                {
+                    (*it)->setNodeMask(0);
+                }
+            }
+        }
+
+        ~nodes_hider()
+        {
+            for (auto it = nodes_list_.begin();it != nodes_list_.end();++it)
+                (*it)->setNodeMask(0xffffffff);
+        }
+
+    protected:
+        
+        inline void add_nodes(const std::string& name)
+        {
+            auto ns = findNodes(node_,name,findNodeVisitor::not_exact);
+            nodes_list_.insert(nodes_list_.end(), ns.begin(), ns.end());
+        }
+
+    private:
+        osg::Node* node_;
+        findNodeVisitor::nodeListType  nodes_list_;
+        std::vector< std::string > a;
+    };
+    
+}
+
+
+
 namespace vehicle
 {
     btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
@@ -72,6 +120,8 @@ namespace vehicle
 
 }
 
+
+
 namespace airplane
 {
 
@@ -93,30 +143,19 @@ namespace airplane
             offset = cg::point_3(0,-dz,0);
 
             auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
-
-            auto sh_r_l = findFirstNode(node,"shassi_r_l",findNodeVisitor::not_exact);
-            auto sh_r_r = findFirstNode(node,"shassi_r_r",findNodeVisitor::not_exact);
-            auto sh_f   = findFirstNode(node,"shassi_f",findNodeVisitor::not_exact);
-
-            auto sh_r_l_wheel = findFirstNode(sh_r_l,"wheel",findNodeVisitor::not_exact);
-            auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",findNodeVisitor::not_exact);
-            auto sh_f_wheel   = findFirstNode(sh_f,"wheel",findNodeVisitor::not_exact);
+            
+            const char* nn[] = { "shassi", "rotor" };
+            nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
 
             btCollisionShape* cs_body = nullptr;
             btCompoundShape*  s = new btCompoundShape;
 
-            sh_f->setNodeMask(0);
-            sh_r_r->setNodeMask(0);
-            sh_r_l->setNodeMask(0);
     #if 0
             FIXME("ѕри btTriMeshCollisionShape проваливаемс€ при столкновени€х, btConvexTriMeshCollisionShape не сериализуетс€" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
     #else
             cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
     #endif
-            sh_f->setNodeMask(0xffffffff);
-            sh_r_r->setNodeMask(0xffffffff);
-            sh_r_l->setNodeMask(0xffffffff);
 
             if(cs_body)
                 s->addChildShape(btTransform(btQuaternion(0,0,0),offset_),cs_body);
@@ -148,25 +187,18 @@ namespace heli
 
         auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
 
-        auto main_rotor     = findFirstNode(node,"main",findNodeVisitor::not_exact);
-        auto tail_rotor     = findFirstNode(node,"tailrotor",findNodeVisitor::not_exact);
-        auto sagged_rotor   = findFirstNode(node,"sagged",findNodeVisitor::not_exact);
-
+        const char* nn[] = { "shassi", "rotor" };
+        nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
+        
         btCollisionShape* cs_body = nullptr;
         btCompoundShape*  s = new btCompoundShape;
 
-        if(main_rotor)  main_rotor->setNodeMask(0);
-        if(tail_rotor)    tail_rotor->setNodeMask(0);
-        if(sagged_rotor)  sagged_rotor->setNodeMask(0);
 #if 0
         FIXME("ѕри btTriMeshCollisionShape проваливаемс€ при столкновени€х, btConvexTriMeshCollisionShape не сериализуетс€" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
 #else
         cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
 #endif
-        if(main_rotor) main_rotor->setNodeMask(0xffffffff);
-        if(tail_rotor)   tail_rotor->setNodeMask(0xffffffff);
-        if(sagged_rotor) sagged_rotor->setNodeMask(0xffffffff);
 
         if(cs_body)
             s->addChildShape(btTransform(btQuaternion(0,0,0),offset_),cs_body);
@@ -192,19 +224,11 @@ namespace default
 
         btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/0,0);
         offset = cg::point_3(0,0,0);
+       
+        const char* nn[] = { "shassi", "rotor" };
+        nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
 
-        //auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
-
-        auto wheels = findNodes(node,"wheel",findNodeVisitor::not_exact);
-
-        for (auto it = wheels.begin();it != wheels.end();++it)
-        {   
-            if((*it)->asTransform()) // ј потом они вз€ли и поименовали геометрию как трансформы, убил бы
-            {
-                    (*it)->setNodeMask(0);
-            }
-        }
-
+        
         btCompoundShape*  s = new btCompoundShape;
 
 #if 0
@@ -212,10 +236,6 @@ namespace default
 #else    
         btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( lod3?lod3:node,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
 #endif
-
-        for (auto it = wheels.begin();it != wheels.end();++it)
-            (*it)->setNodeMask(0xffffffff);
-
 
         s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);
 
