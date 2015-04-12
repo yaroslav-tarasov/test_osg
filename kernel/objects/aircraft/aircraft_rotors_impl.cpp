@@ -24,25 +24,25 @@ namespace aircraft
         }
     }
 
-    void rotors_support_impl::visit_groups(std::function<void(rotors_group_t &)> out)
+    void rotors_support_impl::visit_groups(std::function<void(rotors_group_t &,size_t&)> out)
     {
         for (size_t i = 0; i < util::array_size(rotors_groups_); ++i)
         {
             if (rotors_groups_[i])
             {
-                out(*rotors_groups_[i]);
+                out(*rotors_groups_[i],i);
             }
         }
     }
 
-    void rotors_support_impl::visit_rotors(std::function<void(rotors_group_t const&)> out)
+    void rotors_support_impl::visit_rotors(std::function<void(rotors_group_t const&,size_t&)> out)
     {
         for (size_t i = 0; i < util::array_size(rotors_groups_); ++i)
         {
             if (rotors_groups_[i])
             {
                 //for (auto it= rotors_groups_[i]->shassis.begin(); it != rotors_groups_[i]->shassis.end(); ++it)
-                    out(*rotors_groups_[i]/*, *it*/);
+                    out(*rotors_groups_[i],i/*, *it*/);
             }
         }
     }

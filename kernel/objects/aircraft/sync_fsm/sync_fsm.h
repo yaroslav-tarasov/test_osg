@@ -46,6 +46,7 @@ namespace aircraft
             //virtual meteo::meteo_cursor_ptr get_meteo_cursor() const = 0;
             virtual bool tow_attached() const = 0;
             virtual shassis_support_ptr get_shassis() const = 0;
+			virtual rotors_support_ptr get_rotors() const = 0;
             virtual geo_position get_root_pos() const = 0;
             virtual bool is_fast_session() const = 0;
 

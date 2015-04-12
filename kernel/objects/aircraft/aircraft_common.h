@@ -247,8 +247,8 @@ namespace aircraft
 
     struct rotors_support
     {
-        virtual void visit_groups   (std::function<void(rotors_group_t &)> out) = 0;
-        virtual void visit_rotors   (std::function<void(rotors_group_t const& )> out) = 0;
+        virtual void visit_groups   (std::function<void(rotors_group_t &,size_t&)> out) = 0;
+        virtual void visit_rotors   (std::function<void(rotors_group_t const& ,size_t&)> out) = 0;
         virtual void set_malfunction(rotors_group group, bool val) = 0;
         virtual void freeze() = 0;
 

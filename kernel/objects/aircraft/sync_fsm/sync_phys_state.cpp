@@ -219,7 +219,53 @@ namespace sync_fsm
             wnode->set_position(wheel_node_pos);
             chassis_node->set_position(chassis_node_pos);
         });
-    }
+
+		self_.get_rotors()->visit_rotors([this, &root_next_orien, &root_next_pos, &body_pos, dt](rotors_group_t const& rg,size_t& id)
+		{
+			auto wnode = rg.node;
+
+			//if (shassis.phys_wheels.empty())
+			//	return;
+
+			if(id==RG_REAR_LEFT)
+				return;
+
+			// geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
+			geo_position wpos;
+			
+			wpos.orien = quaternion(cpr(0,0,0));
+			
+		    quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
+			point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
+
+			nodes_management::node_info_ptr rel_node = wnode->rel_node();
+
+			geo_base_3 global_pos = wnode->get_global_pos();
+			quaternion global_orien = wnode->get_global_orien();
+
+			transform_4 rel_node_root_tr = rel_node->get_root_transform();
+
+			point_3    desired_pos_in_rel = rel_node_root_tr.inverted() * wpos_rel_pos;
+			quaternion desired_orien_in_rel = (!quaternion(rel_node_root_tr.rotation().cpr())) * wpos_rel_orien;
+
+			desired_orien_in_rel = quaternion(cpr(0,  -root_next_orien.get_roll(),0)) * desired_orien_in_rel;
+
+			nodes_management::node_position wheel_node_pos = wnode->position();
+			//nodes_management::node_position chassis_node_pos = chassis_node->position();
+
+			//chassis_node_pos.local().dpos.z = (desired_pos_in_rel.z - wheel_node_pos.local().pos.z) / dt;
+
+			quaternion q = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel);
+			point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (dt);
+			
+			//wheel_node_pos.local().omega = omega_rel;
+
+			wnode->set_position(wheel_node_pos);
+			//chassis_node->set_position(chassis_node_pos);
+		});
+
+	
+	}
 
 }
 }

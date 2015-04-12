@@ -34,9 +34,6 @@
     <Filter Include="Source Files\bada">
       <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\utils">
-      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\systems">
       <UniqueIdentifier>{9debcb17-2ead-4d63-8cae-1087f2ec1b5d}</UniqueIdentifier>
     </Filter>
@@ -87,6 +84,9 @@
     </Filter>
     <Filter Include="Source Files\tests\sm">
       <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\aircraft\utils">
+      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -255,7 +255,7 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\objects\aircraft\utils</Filter>
     </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp">
       <Filter>Source Files\spark</Filter>
@@ -414,7 +414,7 @@
       <Filter>Source Files\objects\simple_route</Filter>
     </ClCompile>
     <ClCompile Include="core\config\config.cpp">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\objects\aircraft\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp">
       <Filter>Source Files\objects\vehicle</Filter>
@@ -450,13 +450,13 @@
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="utils\animation_handler.cpp">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\objects\aircraft\utils</Filter>
     </ClCompile>
     <ClCompile Include="creators.cpp">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\objects\aircraft\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\materials.cpp">
-      <Filter>Source Files\utils</Filter>
+      <Filter>Source Files\objects\aircraft\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp">
       <Filter>Source Files\objects\aircraft</Filter>

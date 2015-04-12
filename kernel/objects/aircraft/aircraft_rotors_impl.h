@@ -11,8 +11,8 @@ namespace aircraft
         rotors_support_impl(nodes_management::manager_ptr nodes_manager);
 
     private:
-        void visit_groups   (std::function<void(rotors_group_t &)> out);
-        void visit_rotors   (std::function<void(rotors_group_t const&)> out);
+        void visit_groups   (std::function<void(rotors_group_t &,size_t&)> out);
+        void visit_rotors   (std::function<void(rotors_group_t const&,size_t&)> out);
         void set_malfunction(rotors_group group, bool val);
         void freeze();
 
