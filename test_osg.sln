@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_osg", "test_osg.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "conv", "utils\conv\conv.vcxproj", "{7680809C-6415-4374-8032-854C333EAD52}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "daeTest", "utils\daeTest\daeTest.vcxproj", "{9904DE03-E7DC-4404-BFEC-75288C7223B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "daextr", "utils\daextr\daextr.vcxproj", "{9904DE03-E7DC-4404-BFEC-75288C7223B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
