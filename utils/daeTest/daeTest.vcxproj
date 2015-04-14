@@ -14,6 +14,7 @@
     <ProjectGuid>{9904DE03-E7DC-4404-BFEC-75288C7223B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>daeTest</RootNamespace>
+    <ProjectName>daextr</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -58,8 +59,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libcollada14dom22-d.lib;libboost_filesystem-d.lib;libboost_system-d.lib;pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4;C:\simex\ext\lib\boost</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcollada14dom22-d.lib;pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4-d;C:\simex\ext\lib\boost</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,7 +90,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="daeTest.cpp" />
+    <ClCompile Include="daextr.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

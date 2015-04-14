@@ -209,10 +209,10 @@ private:
                 {   
                     auto imf = osgDB::readImageFile(name);
                     t.normalTex->setImage( imf );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-                    //t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    //t.normalTex->setMaxAnisotropy(16.0f);
+                    t.normalTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP );
+                    t.normalTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP );
+                    t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+                    t.normalTex->setMaxAnisotropy(16.0f);
 
                     normal_tex = true;
                 } 
@@ -373,7 +373,8 @@ void computeAttributes(osg::Node* model,std::string mat_name)
         || mat_name.find("sea")      !=std::string::npos     
         || mat_name.find("mountain") !=std::string::npos 
         || mat_name.find("concrete") !=std::string::npos 
-        || mat_name.find("default")  !=std::string::npos 
+        || mat_name.find("default")  !=std::string::npos
+        || mat_name.find("plane")  !=std::string::npos 
         )
     {
         ComputeTangentVisitor ctv;

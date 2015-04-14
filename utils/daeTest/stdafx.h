@@ -51,3 +51,7 @@
 #pragma comment(lib, "boost_system-vc100-mt-1_50.lib")
 #endif
 
+#define STRINGIFY(x) #x 
+
+#define STR(x) STRINGIFY(x)
+#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ));

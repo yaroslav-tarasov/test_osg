@@ -247,9 +247,9 @@ namespace sync_fsm
 
 			desired_orien_in_rel = quaternion(cpr(0,  -root_next_orien.get_pitch(),0)) * desired_orien_in_rel;
 #endif
-            const float ob_min = 2;
+            const float ob_min = 45;
             nodes_management::node_position wheel_node_pos = wnode->position();
-            const float angular_velocity = ob_min * 30 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
+            const float angular_velocity = ob_min * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
 
             quaternion des_orien;
             des_orien = wheel_node_pos.local().orien * quaternion(cpr(0,0,cg::rad2grad() * angular_velocity * dt));

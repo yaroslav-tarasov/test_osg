@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include "dom/domcommon_newparam_type.h"
 
 namespace fs = boost::filesystem;                  boost::filesystem::path& dataPath();
 boost::filesystem::path& tmpPath();
@@ -217,7 +218,7 @@ domEffect* currentEffect(domEffect* de = nullptr)
 	return _currentEffect;
 }
 
-std::string lookupFile(const tstring& fileName) {
+std::string sourceFilePath(const tstring& fileName) {
 	return (dataPath() / fileName).string();// native_file_string();
 }
 
@@ -458,13 +459,14 @@ std::shared_ptr<TextureParameters> processTexture(
     return /*t2D*/parameters;
 }
 
-enum  mat_type_t {DIFFUSE,AMBIENT,EMISSION,SPECULAR};
+enum  mat_type_t {DIFFUSE,BUMPMAP,AMBIENT,EMISSION,SPECULAR};
 
 inline int stringify(mat_type_t mt)
 {
-	if     (mt == DIFFUSE)  return 0;
+	if     (mt == DIFFUSE ) return 0;
+    else if(mt == BUMPMAP ) return 1;
 	else if(mt == EMISSION) return 2;
-    else if(mt == AMBIENT)  return 3;
+    else if(mt == AMBIENT ) return 3;
     else if(mt == SPECULAR) return 4;
 	return -1;
 }
@@ -671,6 +673,91 @@ bool processColorOrTextureType( domCommon_color_or_texture_type *cot, mat_type_t
     return retVal;
 }
 
+std::string imagePathFromSampler(domCOLLADA& root, const std::string& sampler_name)
+{
+    domLibrary_effects* e = daeSafeCast<domLibrary_effects>(root.getDescendant(COLLADA_ELEMENT_LIBRARY_EFFECTS));
+
+    std::string image_name;
+
+    if(e)
+    {
+        domEffect_Array& ea =  e->getEffect_array();
+        for (size_t i = 0; i < ea.getCount(); i++)
+        {	
+            xsID s = ea[i]->getId();
+
+            domFx_profile_abstract_Array & aaa =  ea[i]->getFx_profile_abstract_array();
+            FIXME(Опасное упрощение)
+                domProfile_COMMON *pc = daeSafeCast< domProfile_COMMON >( aaa[0] );
+
+            //const domImage_Array& ia =  pc->getImage_array();
+            //for (size_t j = 0; j < ia.getCount(); j++)
+            //{	
+            //    xsNCName s = ia[j]->getName();
+            //    std::string path = ia[j]->getInit_from()->getValue().pathFile();
+
+            //    int jj = 1;
+            //}
+
+
+            const domCommon_newparam_type_Array & npa =  pc->getNewparam_array();
+
+            std::string surface_name;
+
+            for (size_t j = 0; j < npa.getCount(); j++)
+            {	
+                xsNCName sid = npa[j]->getSid();
+
+                domFx_sampler2D_commonRef sampl = npa[j]->getSampler2D();
+
+                if(sampl && sampler_name==sid)
+                { 
+                    const domFx_sampler2D_common_complexType::domSourceRef src = sampl->getSource();
+                    surface_name = src->getValue();
+                    break;
+                }
+            }
+
+            for (size_t j = 0; j < npa.getCount(); j++)
+            {
+                xsNCName sid = npa[j]->getSid();
+                domFx_surface_commonRef  sur = npa[j]->getSurface();
+
+                if(sur && surface_name==sid)
+                { 
+                    domFx_surface_init_commonRef sir = sur->getFx_surface_init_common();
+                    const domFx_surface_init_from_common_Array & aaaa = sir->getInit_from_array();
+                    FIXME(Опасное упрощение)
+                        for (size_t jj = 0; jj < aaaa.getCount(); jj++)
+                        {
+                            const xsIDREF & vv = aaaa[jj]->getValue();
+                            image_name = vv.getID();
+                            break;
+                        }
+
+                }
+
+            }
+
+        }
+    }
+
+    domLibrary_images* il = daeSafeCast<domLibrary_images>(root.getDescendant(COLLADA_ELEMENT_LIBRARY_IMAGES));
+
+    if(il)
+    {
+        domImage_Array& ia =  il->getImage_array();
+        for (size_t i = 0; i < ia.getCount(); i++)
+        {	
+            xsNCName s = ia[i]->getName();
+            if(image_name == s)
+                return ia[i]->getInit_from()->getValue().pathFile();
+        }
+    }
+
+    return "";
+}
+
 
 template <typename T> 
 void process(T* p)
@@ -712,7 +799,7 @@ void process(domProfile_COMMON::domTechnique::domLambert* p)
     }
 }
 
-void processProfileCOMMON( domProfile_COMMON *pc )
+void processProfileCOMMON( domCOLLADA& root,domProfile_COMMON *pc )
 {
     domProfile_COMMON::domTechnique *teq = pc->getTechnique();
 
@@ -731,9 +818,19 @@ void processProfileCOMMON( domProfile_COMMON *pc )
 				name = arr[j]->getElementName();
 				auto bump = arr[j]->getChild("bump");
 				auto bump_texture = bump->getChild("texture");
-				// processTexture(daeSafeCast<domCommon_color_or_texture_type_complexType::domTexture>(bump_texture));
-				// processColorOrTextureType(daeSafeCast<domCommon_color_or_texture_type>(bump_texture) );
-				std::cout << "Bump: " <<  std::endl;
+                
+                std::string file_name = imagePathFromSampler(root,  bump_texture->getAttribute("texture"));
+                
+                if(!file_name.empty()){
+                    auto tex = xml_helper::currentMaterial().append_child("texture");
+                    tex.append_attribute("unit") = stringify(BUMPMAP);
+                    tex.append_attribute("path") = file_name.c_str();
+                    FIXME(И какой у нас wrap для bump?)
+                    tex.append_attribute("wrap_s") = stringify(FX_SAMPLER_WRAP_COMMON_CLAMP).c_str();
+                    tex.append_attribute("wrap_t") = stringify(FX_SAMPLER_WRAP_COMMON_CLAMP).c_str();
+                }
+
+				std::cout << "Bump: " << imagePathFromSampler(root,  bump_texture->getAttribute("texture")) <<  std::endl;
 			}
 	}
 
@@ -744,7 +841,7 @@ void processProfileCOMMON( domProfile_COMMON *pc )
 	
 }
 
-void processEffect( domEffect *effect )
+void processEffect( domCOLLADA& root,domEffect *effect )
 {
     bool hasCOMMON = false;
 
@@ -760,7 +857,7 @@ void processEffect( domEffect *effect )
             }
             // _currentEffect = effect;
 			currentEffect(effect);
-            processProfileCOMMON(pc);
+            processProfileCOMMON(root,pc);
             hasCOMMON = true;
             continue;
         }
@@ -769,7 +866,7 @@ void processEffect( domEffect *effect )
     }
 }
 
-void    processMaterial( domMaterial *mat )
+void    processMaterial( domCOLLADA& root, domMaterial *mat )
 {
     if (!mat)
     {
@@ -792,7 +889,7 @@ void    processMaterial( domMaterial *mat )
     domEffect *effect = daeSafeCast< domEffect >( getElementFromURI( _currentInstance_effect->getUrl() ) );
     if (effect)
     {
-        processEffect(effect);
+        processEffect(root,effect);
 
         //TODO: process all of the setParams that could happen here in the material. ESP. the textures
     }
@@ -804,7 +901,7 @@ void    processMaterial( domMaterial *mat )
 
 
 
-void processModel(domCOLLADA& root) {
+void processModel(const std::string& full_path) {
 
 	//domVisual_scene* visualScene = daeSafeCast<domVisual_scene>(root.getDescendant("visual_scene"));
 
@@ -815,14 +912,19 @@ void processModel(domCOLLADA& root) {
 	//	xsNCName s = nodes[i]->getName();
 	//}
 
-	domLibrary_materials* m = daeSafeCast<domLibrary_materials>(root.getDescendant(COLLADA_ELEMENT_LIBRARY_MATERIALS));
+    // mat_reader mt(full_path);
+    
+    domCOLLADA* root = GetDAE().open(full_path);
+    xml_helper xw(full_path);
+
+	domLibrary_materials* m = daeSafeCast<domLibrary_materials>(root->getDescendant(COLLADA_ELEMENT_LIBRARY_MATERIALS));
 	if(m){
 		
 		domMaterial_Array& ms = m->getMaterial_array();
 		for (size_t i = 0; i < ms.getCount(); i++)
 		{	
 			xsNCName s = ms[i]->getName();
-			processMaterial( ms[i] );
+			processMaterial( *root,ms[i] );
 		}
 	}
 	
@@ -837,18 +939,10 @@ int _tmain(int argc, _TCHAR* argv[])
         exit(1);
     }
     
-    std::string file = lookupFile(tstring(argv[1]));
+    std::string file = sourceFilePath(tstring(argv[1]));
 
-	mat_reader mt(file);
-	
-	domCOLLADA* root = GetDAE().open(file);
-	
-	xml_helper xw(file);
-    
-	
-
-	try {
-		processModel(*root);
+    try {
+		processModel(file);
 	}
 	catch (...) {
 		// return testResult(false);

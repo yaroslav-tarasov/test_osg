@@ -243,7 +243,8 @@ namespace aircraft
         // FIXME TYV  сдается мне нефига не нужный код 
         // В модели симекса съедается трансформ на геометрии, и Body оказывается востребованным
         // get_relative_transform(nodes_manager_, body_node).inverted();
-
+      
+        FIXME(Осознать)
 #if 0 // TODO or not TODO
 
         phys::collision_ptr collision = phys_sys_;
@@ -286,6 +287,10 @@ namespace aircraft
         params.ClAOA = 0.4;
         params.Cs = 0.2;
         params.thrust = (fsettings.ct_1 * (100. / fsettings.ct_2 + fsettings.ct_3 * 100. * 100.));
+        
+        logger::need_to_log(true);
+        LOG_ODS_MSG ( "aircraft mass = " << params.mass << "\n");
+        logger::need_to_log(false);
 
         phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
@@ -515,7 +520,7 @@ namespace aircraft
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
 
-#if 0
+#if 1
             if (cfg_ == fms::CFG_GD)
 #endif
                 desired_vel.z = 0;
@@ -529,7 +534,7 @@ namespace aircraft
 
             bool reverse = false;
             bool low_attack = false;
-#if 0
+#if 1
             if (cfg_ == fms::CFG_GD/* && root_glb_pos.pos.height < 0.5*/)
 #endif
             {
