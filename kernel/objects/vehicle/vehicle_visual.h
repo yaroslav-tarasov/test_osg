@@ -22,13 +22,8 @@ namespace vehicle
         nodes_management::node_info_ptr  aero_tow_point_; 
         // experimental part
     private:
-        double                           radius_;
-        double                           radius_s_;
-        double                           radius_a_;
-        double                           radius_b_;
-        osg::Node *                      body_s_;
-        osg::Node *                      body_a_;
-        osg::Node *                      body_b_;
+        struct tow_support;
+        boost::shared_ptr<tow_support>   ts_;
 
     };
 
