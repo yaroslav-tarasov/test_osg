@@ -14,7 +14,6 @@ namespace kernel
     {
         node_ = scene_->load(res, seed);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
-        pat_ = findFirstNode(node_,"pat",findNodeVisitor::not_exact);
         // node_->setNodeMask(0);
     }
 
@@ -35,11 +34,6 @@ namespace kernel
         return root_;
     }
     
-    osg::ref_ptr<osg::Node> visual_object_impl::pat() const
-    {
-        return pat_;
-    }
-
     void visual_object_impl::set_visible(bool visible)
     {
         node_->setNodeMask(visible?0xffffffff:0);

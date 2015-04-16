@@ -262,6 +262,10 @@ namespace phys
 namespace phys
 {
 	static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/);
+    static bool contact_added_callback (btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0,
+        int partId0, int index0,
+        const btCollisionObjectWrapper* colObj1,
+        int partId1, int index1);
 
 #if 0
 BulletInterface* BulletInterface::instance()
@@ -322,6 +326,9 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
 	_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
 	
 	_dw->setInternalTickCallback(internal_tick_callback);
+    
+    FIXME(Использование голобальных коллбеков не приветствуется даешь альтернативу)
+    // gContactAddedCallback = contact_added_callback;
 
     osg::Vec3 norm = plane.getNormal();
     btCollisionShape* groundShape = new btStaticPlaneShape( btVector3(norm[0], norm[1], norm[2]), plane[3] );
@@ -700,17 +707,8 @@ void BulletInterface::CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1)
         {
 
         }
-
     }
-    //GameObject* pObj0 = FindGameObject(pBody0);
-    //GameObject* pObj1 = FindGameObject(pBody1);
 
-    //// exit if we didn't find anything
-    //if (!pObj0 || !pObj1) return;
-
-    //// set their colors to white
-    //pObj0->SetColor(btVector3(1.0,1.0,1.0));
-    //pObj1->SetColor(btVector3(1.0,1.0,1.0));
 }
 
 phys::bt_dynamics_world_ptr BulletInterface::dynamics_world() const
@@ -840,7 +838,59 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 	}  
 }
 
+btVector3 get_face_normal (const btStridingMeshInterface *mesh, int face) {
+    PHY_ScalarType vertexes_type, indexes_type;
+    const unsigned char *vertexes;
+    int num_vertexes;
+    int vertexes_stride;
+    const unsigned char *indexes;
+    int num_faces;
+    int face_stride;
+    mesh->getLockedReadOnlyVertexIndexBase(&vertexes, num_vertexes, vertexes_type, vertexes_stride,
+        &indexes, face_stride, num_faces, indexes_type);
+    assert(vertexes_type == PHY_FLOAT);
+    assert(indexes_type == PHY_INTEGER);
+    const int *indexes2 = reinterpret_cast<const int *>(indexes + face_stride*face);
+    int i1=indexes2[0], i2=indexes2[1], i3=indexes2[2];
+    btVector3 v1 = *reinterpret_cast<const btVector3 *>(vertexes + vertexes_stride * i1);
+    btVector3 v2 = *reinterpret_cast<const btVector3 *>(vertexes + vertexes_stride * i2);
+    btVector3 v3 = *reinterpret_cast<const btVector3 *>(vertexes + vertexes_stride * i3);
+    btVector3 r;
+    r = (v2-v1).cross(v3-v1);
+    r.normalize();
+    return r;
+}
 
+static void contact_added_callback_obj (btManifoldPoint& cp,
+    const btCollisionObject* colObj,
+    int partId, int index)
+{
+    (void) partId;
+    (void) index;
+    btCollisionShape const* shape = colObj->getCollisionShape();
+
+    if (shape->getShapeType() != TRIANGLE_MESH_SHAPE_PROXYTYPE) 
+        return;
+
+    btTriangleMeshShape const* tshape = static_cast<const btTriangleMeshShape*>(shape);
+
+    const btStridingMeshInterface *mesh = tshape->getMeshInterface();
+
+    btVector3 face_normal = get_face_normal(mesh,index);
+    float dot = face_normal.dot(cp.m_normalWorldOnB);
+    cp.m_normalWorldOnB = dot > 0 ? face_normal : -face_normal;
+}
+
+static bool contact_added_callback (btManifoldPoint& cp,
+    const btCollisionObjectWrapper* colObj0,
+    int partId0, int index0,
+    const btCollisionObjectWrapper* colObj1,
+    int partId1, int index1)
+{
+    contact_added_callback_obj(cp, colObj0->getCollisionObject(), partId0, index0);
+    contact_added_callback_obj(cp, colObj1->getCollisionObject(), partId1, index1);
+    return true;
+}
 
 
 } // namespace phys

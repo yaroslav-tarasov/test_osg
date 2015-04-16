@@ -52,45 +52,7 @@ class LogFileHandler : public osg::NotifyHandler
 //                                             ,main_net              //17
 //                                           };    
 
-struct krv_data
-{
-	float x;
-	float y; 
-	float h;
-	float fi;
-	float fiw;
-	float kr;
-	float v;
-    float w; 
-	float vb;
-	float tg;
-	float time;
-};
 
-std::ostream &operator <<(std::ostream &os, const krv_data &kp) {
-	using namespace std;
-
-	for(size_t i = 0 ; i < sizeof(kp)/sizeof(float); ++i)
-		os << *((float*)(&kp) + i*sizeof(float))  << "  ";
-	return os;
-}
-
-struct value_getter
-{
-	value_getter(std::string const& line)
-	{
-		boost::split(values_, line, boost::is_any_of(" \t="), boost::token_compress_on);
-	}
-
-	template <class T>
-	T get(size_t index)
-	{
-		return boost::lexical_cast<T>(values_[index]);
-	}
-
-private:
-	std::vector<std::string> values_;
-};
 
 int main( int argc, char** argv )
 {  
@@ -98,26 +60,7 @@ int main( int argc, char** argv )
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
     
 	
-	krv_data kd;
 
-	{
-
-		std::ifstream ifs("log_AFL319.txt");
-		
-		int num =0;
-		while (ifs.good())
-		{
-			char buf[0x400] = {};
-			ifs.getline(buf, 0x400);
-
-			std::string line = buf;
-			value_getter items(line);
-
-			std::cout << line;
-		} 
-
-
-	}
 
 	osg::notify(osg::INFO) << "Start this program \n";
     

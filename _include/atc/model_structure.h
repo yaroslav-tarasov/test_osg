@@ -27,7 +27,7 @@ struct node_data
     std::string                    name;
     cg::point_3                    pos;
     cg::quaternion                 orien;
-    cg::sphere_3                   bound;
+    /*cg::sphere_3 */cg::rectangle_3                  bound;
     std::vector<std::string>       victory_nodes;
 };
 

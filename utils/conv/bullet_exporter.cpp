@@ -137,7 +137,7 @@ namespace airplane
             float dz = abs(bb.zMax()) - zm / 2.f;
 
             btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
-            offset = cg::point_3(0,-dz,0);
+            offset = cg::point_3(0,-dz,/*-dy*/0);
 
             auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
             
@@ -149,9 +149,11 @@ namespace airplane
 
     #if 0
             FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
+            
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
     #else
-            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
+            FIXME(TRIANGLE_MESH_SHAPE_PROXYTYPE хорошаявесчь наверное но перестаем сталкиваться самолетами хо хо)
+            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
     #endif
 
             if(cs_body)
@@ -194,7 +196,7 @@ namespace heli
         FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
 #else
-        cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
+        cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
 #endif
 
         if(cs_body)
@@ -231,7 +233,7 @@ namespace default
 #if 0
         btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( lod3?lod3:node );
 #else    
-        btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( lod3?lod3:node,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
+        btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( lod3?lod3:node,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
 #endif
 
         s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);

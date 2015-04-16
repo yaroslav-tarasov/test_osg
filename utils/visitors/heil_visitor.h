@@ -112,9 +112,15 @@ class heilVisitor : public osg::NodeVisitor
                 
 				new_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans()) + offset;
                 new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
-                const osg::BoundingSphere& bs = node.getBound();
-                new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
+                //const osg::BoundingSphere& bs = node.getBound();
+                //new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
                 
+                osg::ComputeBoundsVisitor cbvs;
+                node.accept( cbvs );
+                const osg::BoundingBox bb = cbvs.getBoundingBox();
+                new_node.bound = cg::rectangle_3(cg::rectangle_3::point_t(bb.xMin(),bb.yMin(),bb.zMin()),cg::rectangle_3::point_t(bb.xMax(),bb.yMax(),bb.zMax()));
+
+
                 if (lod_visited && node_name.find("_lod")!= std::string::npos)
                     std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut](const std::string name){new_node.victory_nodes.push_back(name_cut + "_" + name);});
                 else

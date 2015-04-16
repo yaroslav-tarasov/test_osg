@@ -73,7 +73,7 @@ public:
         BOOST_FOREACH(const auto &p, kp)
         {   
             if(i!=0) traj_lines_->push_back(i);
-            vert_->push_back( osg::Vec3( p.x, p.y, 0.8) );
+            vert_->push_back( osg::Vec3( p.x, p.y, p.z + 0.1) );
             traj_lines_->push_back(i++);
         } 
 

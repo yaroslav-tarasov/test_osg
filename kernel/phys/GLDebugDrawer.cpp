@@ -248,6 +248,12 @@ void GLDebugDrawer::reportErrorWarning(const char* warningString)
     if( !getEnabled() )
         return;
 
+    logger::need_to_log(true);
+
+    LOG_ODS_MSG( warningString << std::endl );
+
+    logger::need_to_log(false);
+
     osg::notify( osg::WARN ) << warningString << std::endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,6 +375,7 @@ GLDebugDrawer::initText()
     //return( text.release() );
     return text;
 }
+
 
 
 // osgbCollision

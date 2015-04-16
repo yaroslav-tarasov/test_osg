@@ -65,6 +65,8 @@ namespace ray_cast_vehicle
 
         sys_->register_rigid_body(this);
         
+        chassis_->setUserPointer(this);
+        
         sys_->dynamics_world()->addAction(this);
     }
 

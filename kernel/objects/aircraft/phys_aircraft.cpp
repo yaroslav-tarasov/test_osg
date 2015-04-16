@@ -235,7 +235,7 @@ namespace aircraft
 
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
-        const double phys_mass_factor_ = 1000;
+        const double phys_mass_factor_ = 1;
 
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
@@ -337,18 +337,18 @@ namespace aircraft
                 return;
 
             double mass = wheel_mass;
-            size_t fake_count = 0;
+            size_t fake_count = 1;
 
-            //if (group.is_front)
-            //    mass = wheel_mass*10, fake_count = 2;
+            if (group.is_front)
+                mass = wheel_mass*10, fake_count = 2;
 
             cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node/*,body_node*/);
-            point_3 wheel_offset = wt.translation() + s->get_offset();
-
+            point_3 wheel_offset = wt.translation() + s->get_offset() + cg::point_3(0.,0.,-(0.1));
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
-            const double radius = 0.75 * node->get_bound().radius ;
-
+            //const double radius = 0.75 * node->get_bound().radius ;
+            double radius = get_wheel_radius(node);//0.75 * (node->get_bound().size().z / 2.);
+            
             size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
             shassis.phys_wheels.push_back(wid);
 

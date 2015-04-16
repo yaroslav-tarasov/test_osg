@@ -6,7 +6,26 @@
 
 #include "geometry/filter.h"
 
+template<typename T,int N>
+struct ff
+{
 
+    double next(T value )
+    {
+        T sum=value;
+        int i;
+        for (i=0;i<N;i++)
+        {
+           sum+=val_[i];
+           if(i<(N-1)) 
+               val_[i] = val_[i+1];
+        }
+        val_[i] = sum/N;
+        return val_[i];
+    }
+
+    std::array<T,N> val_;
+};
 
 namespace vehicle
 {

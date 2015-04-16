@@ -60,7 +60,7 @@ public:
     transform_4                 transform       ()   const;
     uint32_t                    node_id         ()   const;
     uint32_t                    object_id       ()   const;
-    cg::sphere_3                get_bound       ()   const override;
+    /*cg::sphere_3*/cg::rectangle_3                get_bound       ()   const override;
     std::string const&          name            ()   const override;
     node_info_ptr               rel_node        ()   const override;
     node_info_ptr               root_node       ()   const override;

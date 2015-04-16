@@ -192,6 +192,13 @@ private:
     } while(0)
 
 
+template<typename T>
+inline double get_wheel_radius(T node)
+{  
+   //const double radius = 0.75 * node->get_bound().radius ;
+   return /*0.75 **/ (node->get_bound().size().z / 2.);
+}
+
 #endif // precompile_header
 
 

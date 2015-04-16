@@ -45,16 +45,115 @@ namespace aircraft
     kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
 };
 
+namespace
+{
+    struct krv_data
+    {
+        float x;
+        float y; 
+        float h;
+        float fi;
+        float fiw;
+        float kr;
+        float v;
+        float w; 
+        float vb;
+        float tg;
+        float time;
+    };
+
+    std::ostream &operator <<(std::ostream &os, const krv_data &kp) {
+        using namespace std;
+
+        for(size_t i = 0 ; i < sizeof(kp)/sizeof(float); ++i)
+            os << *((float*)(&kp) + i*sizeof(float))  << "  ";
+        return os;
+    }
+
+    struct value_getter
+    {
+        value_getter(std::string const& line)
+        {
+            boost::split(values_, line, boost::is_any_of(" \t="), boost::token_compress_on);
+        }
+
+        template <class T>
+        T get(size_t index)
+        {
+            return boost::lexical_cast<T>(values_[index]);
+        }
+
+        bool valid()
+        {
+            return values_.size()>0;
+        }
+
+    private:
+        std::vector<std::string> values_;
+    };
+
+    
+
+    struct  krv_data_getter
+    {
+        std::vector<krv_data>    kd_;
+        std::vector<cg::point_3> kp_;
+
+        krv_data_getter(const std::string& file_name = std::string("log_AFL319.txt") )
+        {
+            std::ifstream ifs(file_name);
+
+            int num =0;
+            while (ifs.good())
+            {
+                char buf[0x400] = {};
+                ifs.getline(buf, 0x400);
+
+                std::string line = buf;
+                value_getter items(line);
+                krv_data kd;
+                
+                if(items.valid())
+                {
+                    kd.x = items.get<float>(1);
+                    kd.y = items.get<float>(3); 
+                    kd.h = items.get<float>(5);
+                    //kd.fi = items.get<float>(7);
+                    //kd.fiw = items.get<float>(9);
+                    //kd.kr = items.get<float>(11);
+                    //kd.v = items.get<float>(13);
+                    //kd.w = items.get<float>(15); 
+                    //kd.vb = items.get<float>(17);
+                    //kd.tg = items.get<float>(19);
+                    //kd.time = items.get<float>(21);
+
+                    //kd_.push_back(kd);
+                    kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
+                }
+
+
+                // std::cout << line;
+            } 
+
+
+        }
+    };
+};
+
 
 namespace bi
 {
 	struct RigidUpdater::RigidUpdater_private
 	{
-		        RigidUpdater::phys_vehicles_t                          _vehicles;
+		        RigidUpdater_private()
+                    : _krv_data_getter("log_sochi_3.txt")
+                {}
+                RigidUpdater::phys_vehicles_t                          _vehicles;
                 kernel::system_ptr                                     _msys;
 				kernel::system_ptr                                     _vsys;
                 kernel::system_ptr                                     _csys;
-                kernel::msg_service                             msg_service_; 
+                kernel::msg_service                             msg_service_;
+                krv_data_getter                             _krv_data_getter;
 	};
 
     void create_auto_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
@@ -158,7 +257,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A321";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -166,7 +265,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B737";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -174,7 +273,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B744";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -182,7 +281,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B763";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -222,6 +321,8 @@ namespace bi
         simple_route::settings_t srs;
         srs.speed = 6;
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
+
+        _trajectory_drawer2->set(_d->_krv_data_getter.kp_);
         
     }
 

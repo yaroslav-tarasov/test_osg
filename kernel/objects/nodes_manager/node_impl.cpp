@@ -194,7 +194,7 @@ model_structure::collision_volume const* node_impl::get_collision() const
     return collision_ ? *collision_ : NULL;
 }
 
-cg::sphere_3    node_impl::get_bound() const
+/*cg::sphere_3 */cg::rectangle_3   node_impl::get_bound() const
 {
    return data_.bound;
 }

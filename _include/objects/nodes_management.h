@@ -102,7 +102,7 @@ REFL_END()
         virtual cg::quaternion               get_global_orien()   const = 0;
 
         virtual model_structure::collision_volume const* get_collision() const = 0;
-        virtual cg::sphere_3                 get_bound() const = 0;
+        virtual /*cg::sphere_3*/ cg::rectangle_3                get_bound() const = 0;
     };
 
 
