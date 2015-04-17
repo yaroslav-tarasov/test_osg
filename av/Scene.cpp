@@ -58,6 +58,11 @@ namespace {
             return boost::lexical_cast<T>(values_[index]);
         }
 
+        bool valid()
+        {
+            return values_.size()>0;
+        }
+
     private:
         std::vector<std::string> values_;
     };
@@ -742,8 +747,21 @@ void Scene::createObjects()
 
 osg::Node*   Scene::load(std::string path, uint32_t seed)
 {
-    osg::Node* obj = creators::createObject(path);
     osg::ref_ptr<osg::MatrixTransform> mt = nullptr ;
+
+    if( path == "sfx//smoke.scg" )
+    {
+        mt = new osg::MatrixTransform;
+
+        spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
+        sp3.first->setName("fire");
+        mt->addChild(sp3.first);
+        
+        addChild(mt);
+        return mt/*.release()*/;
+    }
+
+    osg::Node* obj = creators::createObject(path);
 
     if(obj)
     {
@@ -759,6 +777,8 @@ osg::Node*   Scene::load(std::string path, uint32_t seed)
         _terrainRoot->asGroup()->addChild(mt);
         
     }
+    
+
 
     return mt;
 }

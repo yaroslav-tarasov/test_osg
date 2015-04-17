@@ -152,7 +152,7 @@ namespace airplane
             
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
     #else
-            FIXME(TRIANGLE_MESH_SHAPE_PROXYTYPE хорошаявесчь наверное но перестаем сталкиваться самолетами хо хо)
+            FIXME(TRIANGLE_MESH_SHAPE_PROXYTYPE хорошая весчь наверное но перестаем сталкиваться самолетами хо хо)
             cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
     #endif
 

@@ -102,9 +102,6 @@
     <None Include="shaders\tess_tri.tes" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aircraft.h" />
-    <ClInclude Include="aircraft_phys.h" />
-    <ClInclude Include="aircraft_visual.h" />
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />

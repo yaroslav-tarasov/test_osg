@@ -343,7 +343,7 @@ namespace aircraft
                 mass = wheel_mass*10, fake_count = 2;
 
             cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node/*,body_node*/);
-            point_3 wheel_offset = wt.translation() + s->get_offset() + cg::point_3(0.,0.,-(0.1));
+            point_3 wheel_offset = wt.translation() + s->get_offset() + cg::point_3(0.,0.,group.is_front?0.0:-(0.1));
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
             //const double radius = 0.75 * node->get_bound().radius ;

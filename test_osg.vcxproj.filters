@@ -19,9 +19,6 @@
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\aircraft">
-      <UniqueIdentifier>{b7d5d9ec-80d9-42fc-92e6-4fecd9062fce}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\utils">
       <UniqueIdentifier>{aee982bd-2830-4184-9a57-25ddf09d060b}</UniqueIdentifier>
     </Filter>
@@ -131,15 +128,6 @@
     </ClInclude>
     <ClInclude Include="pickhandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="aircraft.h">
-      <Filter>Header Files\aircraft</Filter>
-    </ClInclude>
-    <ClInclude Include="aircraft_phys.h">
-      <Filter>Header Files\aircraft</Filter>
-    </ClInclude>
-    <ClInclude Include="aircraft_visual.h">
-      <Filter>Header Files\aircraft</Filter>
     </ClInclude>
     <ClInclude Include="cg_math.h">
       <Filter>Header Files\utils</Filter>

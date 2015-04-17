@@ -43,9 +43,9 @@ namespace aircraft
         // model_info
     private:
         phys::rigid_body_ptr get_rigid_body() const;
-        point_3 tow_offset() const;
-        bool tow_attached() const;
-        geo_position get_phys_pos() const;
+        point_3              tow_offset() const;
+        bool                 tow_attached() const;
+        geo_position         get_phys_pos() const;
         
         // model_control
     private:

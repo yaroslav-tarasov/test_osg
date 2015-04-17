@@ -429,6 +429,7 @@ bool model::tow_attached() const
 {
     return tow_attached_;
 }
+
 geo_position model::get_phys_pos() const
 {
     // TODO

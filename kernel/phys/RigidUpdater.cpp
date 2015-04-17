@@ -257,7 +257,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A321";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -265,7 +265,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B737";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -273,7 +273,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B744";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -281,7 +281,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B763";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -293,7 +293,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "AN26";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         vehicle::settings_t vs;
@@ -701,17 +701,13 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
-// FIXME перенести в модель
-#if 0
-                _phys_aircrafts.back().get_chassis()->visit_groups([=](aircraft::shassis_group_t & shassis_group)
+
+                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 0");
+                if(vvv)
                 {
-                    //if (to_be_opened)
-                    if (!shassis_group.is_front)
-                        shassis_group.open(false);
-                    //else
-                    //  shassis_group.close(true);
-                });
-#endif
+                      aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true);   
+                }
+
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_M /*&& (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)*/)
             {

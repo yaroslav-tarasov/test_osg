@@ -100,6 +100,52 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     //    if (auto v_node = (*(it))->as_animgroup())
     //        v_node->play_sequence(victory::animation_player::sequence_play_info(anim.name, anim.len, float(anim.time), anim.from, anim.size));
     //}
+
+    // FIXME  Заглушка для анимации
+    FIXME(Анимация на коленке)
+    osgAnimation::Animation::PlayMode pm = anim.from > 0?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
+    
+    // victory_nodes_->
+    auto root = victory_nodes_[0];
+    node_     = victory_nodes_[0];
+
+    while(0 != root->getNumParents() && "root" != boost::to_lower_copy(root->getName()))
+        root = root->getParent(0);
+
+
+    auto god_node =  root->getParent(0);
+
+    auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( god_node->getUpdateCallback() );
+
+    if ( manager_ )
+    {   
+        const osgAnimation::AnimationList& animations =
+            manager_->getAnimationList();
+
+        if(childs_callbacks_.size()==0)
+        {
+            for (int i =0; i < node_->asGroup()->getNumChildren();++i)
+            {
+                auto child_node = node_->asGroup()->getChild(i); 
+                childs_callbacks_.push_back(child_node->getUpdateCallback());
+            }
+        }
+
+        for ( unsigned int i=0; i<animations.size(); ++i )
+        {
+            const std::string& name = animations[i]->getName();
+
+            LOG_ODS_MSG("animation name: " << name << "\n" );
+            if(!manager_->isPlaying(name))
+            {
+                animations[i]->setPlayMode(pm);                   
+                manager_->playAnimation( animations[i].get(),2,2.0 );
+
+            }
+        }
+
+    }
+
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)

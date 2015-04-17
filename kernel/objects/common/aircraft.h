@@ -95,29 +95,21 @@ inline std::string get_texture(std::string const& kind, std::string const& compa
     return "";
 }
 
-//! интерфейс информации о модели
 struct model_info
 {
     virtual ~model_info() {}
 
-    //! для bullet  - твердое тело самолета
     virtual phys::rigid_body_ptr get_rigid_body() const = 0;
-    //! прицеплен ли буксир
-    virtual bool tow_attached() const = 0;
-    //! координата буксира
-    virtual cg::point_3     tow_offset() const = 0;
-    //! физическая позиция, включающая координаты и ориентацию в пространстве
-    virtual geo_position get_phys_pos() const = 0;
+    virtual bool                 tow_attached() const = 0;
+    virtual cg::point_3          tow_offset() const = 0;
+    virtual geo_position         get_phys_pos() const = 0;
 };
 
-//! интерфейс управления моделью
 struct model_control
 {
     virtual ~model_control() {}
 
-    //! прицепить буксир
     virtual void set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback) = 0;
-    //! ??? направить по курсу???
     virtual void set_steer( double steer ) = 0;
 };
 
