@@ -19,7 +19,7 @@ namespace aircraft
         
         nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
         {
-            if (boost::starts_with(n->name(), "engine"))
+            if (boost::starts_with(n->name(), "engine_r"))
             {
                 this->engine_node_ = n;
                 return false;
@@ -32,6 +32,10 @@ namespace aircraft
     {
         view::update(time);
         update_len(time);
+
+        double dt = time - (last_update_ ? *last_update_ : 0);
+        //if (cg::eq_zero(dt))
+        //    return;
 
         bool has_smoke = malfunction(MF_FIRE_ON_BOARD) || malfunction(MF_SMOKE_ON_BOARD);
         
@@ -52,8 +56,14 @@ namespace aircraft
                 quaternion node_orien = engine_node_->get_global_orien();
                 point_3f   pos        = base(node_pos);
 
+                quaternion sr = from_osg_quat(smoke_object_->node()->asTransform()->asMatrixTransform()->getMatrix().getRotate());
+                const float angular_velocity = 5 * 2 * osg::PI/60.0;
+                quaternion des_orien;
+                des_orien = sr * quaternion(cpr(cg::rad2grad() * angular_velocity * dt,0,0));
+                quaternion omega_rel     = cg::get_rotate_quaternion(node_orien,des_orien)/*.rot_axis().omega()*/ / (dt);                
+                
                 // smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
-                smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation()))));
+                smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(des_orien.rotation()/*node_orien.rotation()*/))));
                 smoke_object_->set_visible(true);
 
             }
@@ -61,6 +71,7 @@ namespace aircraft
                 smoke_object_->set_visible(false);
         }
 
+        last_update_ = time;
     }
 
     void visual::on_malfunction_changed( malfunction_kind_t kind )

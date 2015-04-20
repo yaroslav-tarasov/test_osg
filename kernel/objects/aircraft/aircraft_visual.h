@@ -21,5 +21,6 @@ namespace aircraft
     private:
         nm::node_info_ptr engine_node_;
         visual_object_ptr smoke_object_;
+        optional<double>  last_update_;
 	};
 }

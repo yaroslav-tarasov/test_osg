@@ -9,7 +9,7 @@
 extern SPK::SPK_ID createSimpleSystem( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createExplosion( const SparkDrawable::TextureIDMap&, int, int );
-extern SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap&, int, int , float);
 extern SPK::SPK_ID createRain( const SparkDrawable::TextureIDMap&, int, int );
 
 namespace {
@@ -30,11 +30,32 @@ osg::AnimationPath* createAnimationPath( float radius, float time )
     }
     return path.release();    
 }
-}
+
+struct fire_creator
+{
+    fire_creator(float sc = 1.0f)
+    {
+        scale_coeff(sc);
+    }
+
+    static SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
+    {
+        return ::createFire(textureIDMap,screenWidth,screenHeight,scale_coeff());
+    }
+private:
+    static inline float scale_coeff(float sc = 1.0f)
+    {
+        static float scale_coeff_ = sc;
+        return scale_coeff_;
+    }
+};    
+
+};
 
 namespace spark
 {
     //enum spark_t {EXPLOSION,FIRE,RAIN,SMOKE};
+    
     void init()
     {
         SPK::randomSeed = static_cast<unsigned int>( time(NULL) );
@@ -47,6 +68,7 @@ namespace spark
         static int count = 0; 
         osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;
         bool trackingModel = false;
+        fire_creator fc(1.0);
         switch ( effectType )
         {
         case EXPLOSION:  // Explosion
@@ -60,7 +82,7 @@ namespace spark
             spark->addImage( "wave", osgDB::readImageFile("data/wave.bmp"), GL_RGBA );
             break;
         case FIRE:  // Fire
-            spark->setBaseSystemCreator( &createFire );
+            spark->setBaseSystemCreator( /*&createFire*/&fc.createFire );
             spark->addParticleSystem();
             spark->addImage( "fire", osgDB::readImageFile("data/fire2.bmp"), GL_ALPHA );
             spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
@@ -139,7 +161,7 @@ int main_spark( int argc, char** argv )
         spark->addImage( "wave", osgDB::readImageFile("data/wave.bmp"), GL_RGBA );
         break;
     case 2:  // Fire
-        spark->setBaseSystemCreator( &createFire );
+        spark->setBaseSystemCreator( /*&createFire*/&fire_creator(2).createFire );
         spark->addParticleSystem();
         spark->addImage( "fire", osgDB::readImageFile("data/fire2.bmp"), GL_ALPHA );
         spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
