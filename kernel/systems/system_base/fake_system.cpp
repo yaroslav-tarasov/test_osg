@@ -1206,7 +1206,7 @@ private:
     // visual_system
 private:
     visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 );
-
+    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0 );
 
     // visual_system_props
 private:
@@ -1276,6 +1276,13 @@ visual_object_ptr visual_system_impl::create_visual_object( std::string const & 
 {
     return boost::make_shared<visual_object_impl>( res, seed);
 }
+
+visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed/* = 0*/ )
+{
+    return boost::make_shared<visual_object_impl>( parent, res, seed);
+}
+
+
 
 void visual_system_impl::object_destroying(object_info_ptr object)
 {

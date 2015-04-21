@@ -17,6 +17,14 @@ namespace kernel
         // node_->setNodeMask(0);
     }
 
+    visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed )
+                        : scene_( avScene::GetScene() )
+    {
+        node_ = scene_->load(res, seed);
+        root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+        // node_->setNodeMask(0);
+    }
+
     visual_object_impl::~visual_object_impl()
     {
         scene_->removeChild(node_.get());
