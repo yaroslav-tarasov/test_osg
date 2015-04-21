@@ -138,6 +138,7 @@
     <ClCompile Include="ext\spark\simple_effect.cpp" />
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
+    <ClCompile Include="ext\spark\test_effect.cpp" />
     <ClCompile Include="kernel\fms\dubins.cpp" />
     <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />

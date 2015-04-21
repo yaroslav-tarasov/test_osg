@@ -49,56 +49,77 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
     interpolator->addEntry(0.5f,2.0f,5.0f);
     interpolator->addEntry(1.0f,0.0f);
 
+
+#if 1
     SPK::Model* smokeModel = SPK::Model::create(
         SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_ALPHA |
         SPK::FLAG_SIZE | SPK::FLAG_ANGLE | SPK::FLAG_TEXTURE_INDEX,
         SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_SIZE | SPK::FLAG_ANGLE,
         SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,
         SPK::FLAG_ALPHA);
+    
     smokeModel->setParam(SPK::PARAM_RED,0.3f,0.2f);
     smokeModel->setParam(SPK::PARAM_GREEN,0.25f,0.2f);
     smokeModel->setParam(SPK::PARAM_BLUE,0.2f);
     smokeModel->setParam(SPK::PARAM_ALPHA,0.2f,0.0f);
-    smokeModel->setParam(SPK::PARAM_SIZE,5.0,10.0f);
+    smokeModel->setParam(SPK::PARAM_SIZE,5.0,15.0f);
     smokeModel->setParam(SPK::PARAM_TEXTURE_INDEX,0.0f,4.0f);
-    smokeModel->setParam(SPK::PARAM_ANGLE,0.0f,2.0f * osg::PI,0.0f,2.0f * osg::PI);
-    smokeModel->setLifeTime(5.0f,5.0f);
-
+    // Где-то тут округлость задается
+    //smokeModel->setParam(SPK::PARAM_ANGLE,0.0f,2.0f * osg::PI,0.0f,2.0f * osg::PI);
+    FIXME(Tests)
+    smokeModel->setLifeTime(1.0f,5.0f/*25.0f*/);
+    
     interpolator = smokeModel->getInterpolator(SPK::PARAM_ALPHA);
     interpolator->addEntry(0.0f,0.0f);
     interpolator->addEntry(0.2f,0.2f);
     interpolator->addEntry(1.0f,0.0f);
+#else
+    // Creates the model
+    SPK::Model* smokeModel = SPK::Model::create(
+        SPK::FLAG_SIZE | SPK::FLAG_ALPHA | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,
+        SPK::FLAG_SIZE | SPK::FLAG_ALPHA,
+        SPK::FLAG_SIZE | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE);
 
+    smokeModel->setParam(SPK::PARAM_SIZE,5.0f,10.0f,100.0f,200.0f);
+    smokeModel->setParam(SPK::PARAM_ALPHA,1.0f,0.0f);
+    smokeModel->setParam(SPK::PARAM_TEXTURE_INDEX,0.0f,4.0f);
+    smokeModel->setParam(SPK::PARAM_ANGLE,0.0f,osg::PI * 0.5f,0.0f,1.0f * osg::PI);
+    smokeModel->setLifeTime(2.0f,5.0f);
+#endif
+
+    FIXME(Tests)
+    const float base_z = -1.f;
     // Emitters
     // The emitters are arranged so that the fire looks realistic
     SPK::StraightEmitter* fireEmitter1 = SPK::StraightEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f));
-    fireEmitter1->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,-1.0f),0.5f * scale_coeff));
+    fireEmitter1->setZone(SPK::Sphere::create(SPK::Vector3D(0.0f,0.0f,/*-1.0f*/base_z),0.5f * scale_coeff));
     fireEmitter1->setFlow(40 *scale_coeff);
     fireEmitter1->setForce(1.0f,2.5f);
 
     SPK::StraightEmitter* fireEmitter2 = SPK::StraightEmitter::create(SPK::Vector3D(1.0f,0.0f,0.6f));
-    fireEmitter2->setZone(SPK::Sphere::create(SPK::Vector3D(0.15f,0.075f,-1.2f),0.1f * scale_coeff));
+    fireEmitter2->setZone(SPK::Sphere::create(SPK::Vector3D(0.15f,0.075f,/*-1.2f*/base_z - .2f),0.1f * scale_coeff));
     fireEmitter2->setFlow(15*scale_coeff);
     fireEmitter2->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter3 = SPK::StraightEmitter::create(SPK::Vector3D(-0.6f,-0.8f,0.8f));
-    fireEmitter3->setZone(SPK::Sphere::create(SPK::Vector3D(-0.375f,-0.375f,-1.15f),0.3f * scale_coeff));
+    fireEmitter3->setZone(SPK::Sphere::create(SPK::Vector3D(-0.375f,-0.375f,/*-1.15f*/base_z - .15f),0.3f * scale_coeff));
     fireEmitter3->setFlow(15*scale_coeff);
     fireEmitter3->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter4 = SPK::StraightEmitter::create(SPK::Vector3D(-0.8f,0.2f,0.5f));
-    fireEmitter4->setZone(SPK::Sphere::create(SPK::Vector3D(-0.255f,0.225f,-1.2f),0.2f* scale_coeff));
+    fireEmitter4->setZone(SPK::Sphere::create(SPK::Vector3D(-0.255f,0.225f,/*-1.2f*/base_z - .2f),0.2f* scale_coeff));
     fireEmitter4->setFlow(10*scale_coeff);
     fireEmitter4->setForce(0.5f,1.5f);
 
     SPK::StraightEmitter* fireEmitter5 = SPK::StraightEmitter::create(SPK::Vector3D(0.1f,-1.0f,0.8f));
-    fireEmitter5->setZone(SPK::Sphere::create(SPK::Vector3D(-0.075f,-0.3f,-1.2f),0.2f * scale_coeff ));
+    fireEmitter5->setZone(SPK::Sphere::create(SPK::Vector3D(-0.075f,-0.3f,/*-1.2f*/base_z - .2f),0.2f * scale_coeff ));
     fireEmitter5->setFlow(10*scale_coeff);
     fireEmitter5->setForce(0.5f,1.5f);
 
     SPK::SphericEmitter* smokeEmitter = SPK::SphericEmitter::create(SPK::Vector3D(0.0f,0.0f,1.0f),0.0f,0.5f * osg::PI*scale_coeff);
     smokeEmitter->setZone(SPK::Sphere::create(SPK::Vector3D(),1.2f * scale_coeff));
-    smokeEmitter->setFlow(25*scale_coeff);
+    FIXME(Tests)
+    smokeEmitter->setFlow(/*100*/25*scale_coeff);
     smokeEmitter->setForce(0.5f,1.0f);
 
     // Groups
@@ -110,12 +131,13 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
     fireGroup->addEmitter(fireEmitter5);
     fireGroup->setRenderer(fireRenderer);
     fireGroup->setGravity(SPK::Vector3D(0.0f,0.0f,3.0f));
-
-    SPK::Group* smokeGroup = SPK::Group::create(smokeModel,135);
+    FIXME(Tests)
+    SPK::Group* smokeGroup = SPK::Group::create(smokeModel,135/*500000*/);
     smokeGroup->addEmitter(smokeEmitter);
     smokeGroup->setRenderer(smokeRenderer);
     smokeGroup->setGravity(SPK::Vector3D(0.0f,0.0f,0.4f));
-    
+    smokeGroup->enableSorting(true);
+
     // System
     SPK::System* particleSystem = SPK::System::create();
     particleSystem->addGroup(smokeGroup);

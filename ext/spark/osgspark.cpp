@@ -11,6 +11,7 @@ extern SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createExplosion( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap&, int, int , float);
 extern SPK::SPK_ID createRain( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createTest( const SparkDrawable::TextureIDMap&, int, int );
 
 namespace {
 osg::AnimationPath* createAnimationPath( float radius, float time )
@@ -54,8 +55,7 @@ private:
 
 namespace spark
 {
-    //enum spark_t {EXPLOSION,FIRE,RAIN,SMOKE};
-    
+   
     void init()
     {
         SPK::randomSeed = static_cast<unsigned int>( time(NULL) );
@@ -68,7 +68,7 @@ namespace spark
         static int count = 0; 
         osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;
         bool trackingModel = false;
-        fire_creator fc(1.0);
+        fire_creator fc(2.0);
         switch ( effectType )
         {
         case EXPLOSION:  // Explosion
@@ -97,6 +97,10 @@ namespace spark
             spark->addImage( "smoke", osgDB::readImageFile("data/smoke.png"), GL_RGBA );
             trackingModel = true;
             break;
+        case TEST:
+            spark->setBaseSystemCreator( &createTest );
+            spark->addParticleSystem();
+
         default:  // Simple
             spark->setBaseSystemCreator( &createSimpleSystem );
             spark->addParticleSystem();
@@ -141,10 +145,8 @@ int main_spark( int argc, char** argv )
     else if ( arguments.read("--rain") ) effectType = 3;
     else if ( arguments.read("--smoke") ) effectType = 4;
     
-    //SPK::randomSeed = static_cast<unsigned int>( time(NULL) );
-    //SPK::System::setClampStep( true, 0.1f );
-    //SPK::System::useAdaptiveStep( 0.001f, 0.01f );
-    
+    effectType = 4;
+
     spark::init();
 
     osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;

@@ -116,13 +116,13 @@ protected:
     GLuint compileInternalTexture( osg::Image* image, GLuint type, GLuint clamp ) const;
     void convertData( osg::Image* image, GLuint type, unsigned int numCurrent, unsigned int numRequired ) const;
     
-    TextureObjMap _textureObjMap;
-    ParticleSystemList _particleSystems;
-    CreateBaseSystemFunc _baseSystemCreator;
-    mutable SPK::SPK_ID _baseSystemID;
+    TextureObjMap           _textureObjMap;
+    ParticleSystemList      _particleSystems;
+    CreateBaseSystemFunc    _baseSystemCreator;
+    mutable SPK::SPK_ID     _baseSystemID;
     
-    mutable SPK::System* _protoSystem;
-    mutable unsigned int _activeContextID;
+    mutable SPK::System*    _protoSystem;
+    mutable unsigned int    _activeContextID;
     double _lastTime;
     bool _sortParticles;
     bool _useProtoSystem;

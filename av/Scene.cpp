@@ -753,7 +753,7 @@ osg::Node*   Scene::load(std::string path, uint32_t seed)
     {
         mt = new osg::MatrixTransform;
 
-        spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
+        spark::spark_pair_t sp3 =  spark::create(spark::SMOKE/*,mt*/);
         sp3.first->setName("fire");
         mt->addChild(sp3.first);
         

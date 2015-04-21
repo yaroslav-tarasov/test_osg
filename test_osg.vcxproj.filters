@@ -449,5 +449,8 @@
     <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp">
       <Filter>Source Files\objects\aircraft</Filter>
     </ClCompile>
+    <ClCompile Include="ext\spark\test_effect.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
