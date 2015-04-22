@@ -378,13 +378,14 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // And some fire
     //
 
-    spark::spark_pair_t sp =   spark::create(spark::FIRE);
-    spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
+    //spark::spark_pair_t sp =   spark::create(spark::FIRE);
+    //spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
 
     osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
-    posed->addChild(sp.first);
-    posed->addChild(sp2.first);
-    _viewerPtr->addEventHandler(sp.second);
+    //posed->addChild(sp.first);
+    //posed->addChild(sp2.first);
+    //_viewerPtr->addEventHandler(sp.second);
+    //_viewerPtr->addEventHandler(sp2.second);
     addChild(posed);
 
     //
@@ -745,7 +746,7 @@ void Scene::createObjects()
 
 }
 
-osg::Node*   Scene::load(std::string path, uint32_t seed)
+osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 {
     osg::ref_ptr<osg::MatrixTransform> mt = nullptr ;
 
@@ -753,11 +754,19 @@ osg::Node*   Scene::load(std::string path, uint32_t seed)
     {
         mt = new osg::MatrixTransform;
 
-        spark::spark_pair_t sp3 =  spark::create(spark::SMOKE/*,mt*/);
+        //bool got_phys_node=false;
+        //while(0 != parent->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(parent->getName())))
+        //{                  
+        //    parent = parent->getParent(0);
+        //}
+
+        spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,parent?parent->asTransform():nullptr);
         sp3.first->setName("fire");
         mt->addChild(sp3.first);
         
         addChild(mt);
+
+        _viewerPtr->addEventHandler(sp3.second);
         return mt/*.release()*/;
     }
 

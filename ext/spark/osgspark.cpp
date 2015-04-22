@@ -63,6 +63,7 @@ namespace spark
         SPK::System::useAdaptiveStep( 0.001f, 0.01f );
     }
 
+    FIXME(Возвращаем handler каждый раз, а нужно только один раз добавить к вьюверу)
     spark_pair_t create(spark_t effectType,osg::Transform* model)
     {
         static int count = 0; 
@@ -95,6 +96,7 @@ namespace spark
             spark->setBaseSystemCreator( &createSmoke );
             spark->addParticleSystem();
             spark->addImage( "smoke", osgDB::readImageFile("data/smoke.png"), GL_RGBA );
+            //spark->addImage( "smoke", osgDB::readImageFile("data/fire2.bmp"), GL_RGBA );
             trackingModel = true;
             break;
         case TEST:
@@ -115,8 +117,6 @@ namespace spark
 
         static osg::ref_ptr<SparkUpdatingHandler> handler = new SparkUpdatingHandler;
         handler->addSpark( spark.get() );
-        
-        
         
         if ( trackingModel )
         {

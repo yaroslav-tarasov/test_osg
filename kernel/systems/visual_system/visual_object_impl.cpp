@@ -12,17 +12,18 @@ namespace kernel
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed )
         : scene_( avScene::GetScene() )
     {
-        node_ = scene_->load(res, seed);
+        node_ = scene_->load(res, nullptr, seed);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
         // node_->setNodeMask(0);
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed )
-                        : scene_( avScene::GetScene() )
+                        : scene_ ( avScene::GetScene() )
+                        , parent_(parent)
     {
-        node_ = scene_->load(res, seed);
+        auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
+        node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
-        // node_->setNodeMask(0);
     }
 
     visual_object_impl::~visual_object_impl()

@@ -75,6 +75,7 @@ SPK::SPK_ID createSimpleSystem( const SparkDrawable::TextureIDMap& textureIDMap,
 
 SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
 {
+    const float scale_coeff = 2;  
     SparkDrawable::TextureIDMap::const_iterator itr;
     GET_TEXTURE_ID( "smoke", textureParticle );
     
@@ -83,24 +84,35 @@ SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int sc
     particleRenderer->setAtlasDimensions( 2, 2 );
     particleRenderer->setTexture( textureParticle );
     particleRenderer->setTextureBlending( GL_MODULATE );
-    particleRenderer->setScale( 0.05f, 0.05f );
-    particleRenderer->setBlending( SPK::BLENDING_ADD );
+    particleRenderer->setScale( 0.05f*scale_coeff, 0.05f*scale_coeff );
+    particleRenderer->setBlending( SPK::BLENDING_ADD/*SPK::BLENDING_ALPHA*/ );
     particleRenderer->enableRenderingHint( SPK::DEPTH_WRITE, false );
     
     // Model
     SPK::Model* particleModel = SPK::Model::create(
-        SPK::FLAG_SIZE | SPK::FLAG_ALPHA | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,
-        SPK::FLAG_SIZE | SPK::FLAG_ALPHA,
-        SPK::FLAG_SIZE | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE );
+        SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_SIZE | SPK::FLAG_ALPHA | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,
+        SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_SIZE | SPK::FLAG_ALPHA,
+        SPK::FLAG_SIZE | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE /*,
+        SPK::FLAG_ALPHA*/);
+    
+    particleModel->setParam(SPK::PARAM_RED,0.3f,0.2f);
+    particleModel->setParam(SPK::PARAM_GREEN,0.25f,0.2f);
+    particleModel->setParam(SPK::PARAM_BLUE,0.2f);
+
     particleModel->setParam( SPK::PARAM_SIZE, 0.5f, 1.0f, 10.0f, 20.0f );
     particleModel->setParam( SPK::PARAM_ALPHA, 1.0f, 0.0f );
     particleModel->setParam( SPK::PARAM_ANGLE, 0.0f, 2.0f * osg::PI );
     particleModel->setParam( SPK::PARAM_TEXTURE_INDEX, 0.0f, 4.0f );
-    particleModel->setLifeTime( 2.0f, 5.0f );
-    
+    particleModel->setLifeTime( 2.0f, 10.0f );
+   
+    //SPK::Interpolator* interpolator = particleModel->getInterpolator(SPK::PARAM_ALPHA);
+    //interpolator->addEntry(0.0f,0.0f);
+    //interpolator->addEntry(0.2f,0.2f);
+    //interpolator->addEntry(1.0f,0.0f);
+
     // Emitter
     SPK::SphericEmitter* particleEmitter = SPK::SphericEmitter::create(
-        SPK::Vector3D(-1.0f, 0.0f, 0.0f), 0.0f, 0.1f * osg::PI );
+        SPK::Vector3D(/*-1.0f*/0.0f, 0.0f, 1.0f), 0.0f, 0.1f * osg::PI );
     particleEmitter->setZone( SPK::Point::create(SPK::Vector3D(0.0f, 0.015f, 0.0f)) );
     particleEmitter->setFlow( 250.0 );
     particleEmitter->setForce( 1.5f, 1.5f );

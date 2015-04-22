@@ -193,6 +193,11 @@ namespace aircraft
         phys_aircraft_->set_steer(steer);
     }
 
+    void phys_aircraft_impl::set_brake   (double brake)
+    {          
+        phys_aircraft_->set_brake(brake);
+    }
+
     double  phys_aircraft_impl::get_steer()
     {
         return  phys_aircraft_->get_steer();

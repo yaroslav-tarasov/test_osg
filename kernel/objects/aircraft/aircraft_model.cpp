@@ -458,6 +458,15 @@ void model::set_steer( double steer )
         phys_aircraft_->set_steer(steer);
 }
 
+void model::set_brake( double brake )
+{   
+    Assert(tow_attached_);
+
+    if (phys_aircraft_)
+        phys_aircraft_->set_brake(brake);
+}
+
+ 
 geo_position model::fms_pos() const
 {
  

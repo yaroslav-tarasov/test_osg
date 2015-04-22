@@ -47,7 +47,7 @@ namespace avScene {
         inline osg::Group*                          getCommonNode();
         inline osg::Camera*                         getCamera();
         
-        osg::Node*                                  load(std::string path, uint32_t seed);
+        osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
     private:
         Scene();
         virtual									    ~Scene();

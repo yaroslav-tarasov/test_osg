@@ -29,9 +29,17 @@ bool SparkUpdatingHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIA
                     itr->_transformMatrix = computeTransformMatrix( spark, trackee );
                     itr->_dirtyMatrix = false;
                 }
-                
-                osg::Matrix matrix; trackee->computeLocalToWorldMatrix(matrix, NULL);
-                spark->setGlobalTransformMatrix( matrix * itr->_transformMatrix );
+      
+#if 1
+                osg::NodePathList& lst = trackee->getParentalNodePaths();
+                if(lst.size()==0)
+                    return false;
+
+                osg::NodePath& trackeePath = lst[0];
+                //trackeePath.pop_back();
+#endif
+                osg::Matrix matrix = osg::computeLocalToWorld(trackeePath); //trackee->computeLocalToWorldMatrix(matrix, NULL);
+                spark->setGlobalTransformMatrix( matrix /** itr->_transformMatrix*/ );
             }
             spark->update( time, eye );
         }
@@ -50,7 +58,7 @@ osg::Matrix SparkUpdatingHandler::computeTransformMatrix( SparkDrawable* spark, 
         return osg::Matrix::identity();
     
     // Collect the parent paths, ignoring the last one (the spark/trackee itself)
-    osg::NodePath& sparkPath = sparkGeode->getParentalNodePaths()[0]; sparkPath.pop_back();
+    osg::NodePath& sparkPath = sparkGeode->getParentalNodePaths().size()>0?sparkGeode->getParentalNodePaths()[0]:osg::NodePath(); if(sparkPath.size()>0) sparkPath.pop_back();
     
     osg::NodePathList& lst = trackee->getParentalNodePaths();
     

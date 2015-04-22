@@ -25,6 +25,8 @@ private:
     osg::ref_ptr<avScene::Scene> scene_;
     osg::ref_ptr<osg::Node>      node_;
     osg::ref_ptr<osg::Node>      root_;
+
+    nm::node_control_ptr         parent_;
 };
 
 } // kernel

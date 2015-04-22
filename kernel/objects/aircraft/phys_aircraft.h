@@ -44,24 +44,25 @@ namespace aircraft
 
     // phys_aircraft
     private:
-        void         update() override;
-        void         attach_tow(bool attached) override;
-        void         go_to_pos(cg::geo_point_3 const& pos, quaternion const& orien) override;
-        geo_position get_position() const override;
-        decart_position get_local_position() const override;
-        void         set_air_cfg(fms::air_config_t cfg);
-        void         set_prediction(double prediction) override;
-        geo_position get_wheel_position( size_t i ) const override;
+        void         update                () override;
+        void         attach_tow            (bool attached) override;
+        void         go_to_pos             (cg::geo_point_3 const& pos, quaternion const& orien) override;
+        geo_position get_position          () const override;
+        decart_position get_local_position () const override;
+        void         set_air_cfg           (fms::air_config_t cfg);
+        void         set_prediction        (double prediction) override;
+        geo_position get_wheel_position    ( size_t i ) const override;
         phys::rigid_body_ptr get_rigid_body() const;
-        void         set_steer   (double steer);
-        double       get_steer() override;
+        void         set_steer             (double steer);
+        void         set_brake             (double brake);
+        double       get_steer             () override;
         std::vector<phys::aircraft::contact_info_t> get_body_contacts() const;
-        bool         has_wheel_contact(size_t id) const;
-        double       wheel_skid_info(size_t id) const;
-        void         remove_wheel(size_t id);
-        size_t       get_zone() const override;
-        void         set_malfunction(bool malfunction)  override;
-        void         freeze(bool freeze) override;
+        bool         has_wheel_contact     (size_t id) const;
+        double       wheel_skid_info       (size_t id) const;
+        void         remove_wheel          (size_t id);
+        size_t       get_zone              () const override;
+        void         set_malfunction       (bool malfunction)  override;
+        void         freeze                (bool freeze) override;
         // double       get_damned_offset() override;
 
     private:

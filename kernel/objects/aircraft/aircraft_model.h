@@ -51,6 +51,7 @@ namespace aircraft
     private:
         void set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback);
         void set_steer( double steer );
+        void set_brake( double brake );
 
         // sync_fsm::self_t
     private:

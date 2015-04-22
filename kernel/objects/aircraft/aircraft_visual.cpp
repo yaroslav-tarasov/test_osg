@@ -19,7 +19,7 @@ namespace aircraft
         
         nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
         {
-            if (boost::starts_with(n->name(), "engine_l"))
+            if (boost::starts_with(n->name(), "engine_r"))
             {
                 this->engine_node_ = n;
                 return false;
@@ -63,7 +63,8 @@ namespace aircraft
                 quaternion omega_rel     = cg::get_rotate_quaternion(node_orien,des_orien)/*.rot_axis().omega()*/ / (dt);                
                 
                 // smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
-                smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(des_orien.rotation()/*node_orien.rotation()*/))));
+                // smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(des_orien.rotation()/*node_orien.rotation()*/))));
+                
                 smoke_object_->set_visible(true);
 
             }
@@ -84,7 +85,7 @@ namespace aircraft
 
             if (!smoke_object_ && has_smoke && engine_node_)
             {
-                smoke_object_ = vsys->create_visual_object("sfx//smoke.scg");
+                smoke_object_ = vsys->create_visual_object(nm::node_control_ptr(engine_node_),"sfx//smoke.scg");
             }
 
 

@@ -111,6 +111,7 @@ struct model_control
 
     virtual void set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback) = 0;
     virtual void set_steer( double steer ) = 0;
+    virtual void set_brake( double brake ) = 0;
 };
 
 } // end of aircraft
