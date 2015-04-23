@@ -85,6 +85,9 @@
     <Filter Include="Source Files\objects\aircraft\utils">
       <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\dubin_route">
+      <UniqueIdentifier>{7e51963d-118e-4a3d-bfbd-c1ef62107c0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -148,6 +151,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_include\objects\object_creators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\fms\trajectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -451,6 +457,12 @@
     </ClCompile>
     <ClCompile Include="ext\spark\test_effect.cpp">
       <Filter>Source Files\spark</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp">
+      <Filter>Source Files\objects\dubin_route</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp">
+      <Filter>Source Files\objects\dubin_route</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

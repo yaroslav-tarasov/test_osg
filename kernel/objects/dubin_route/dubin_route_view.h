@@ -1,32 +1,32 @@
 #pragma once
 
-#include "common/simple_route.h"
+#include "common/dubin_route.h"
 #include "impl/extra_route/extra_route_view.h"
 #include "impl/extra_route/extra_route_chart.h"
-#include "simple_route_msg.h"
+#include "dubin_route_msg.h"
 
 namespace extra_route
 {
     template<>
-    inline ani::point_pos anchor_point_get_pos< ::simple_route::anchor_point_t>(::simple_route::anchor_point_t const& pnt)
+    inline ani::point_pos anchor_point_get_pos< ::dubin_route::anchor_point_t>(::dubin_route::anchor_point_t const& pnt)
     {
         return ani::point_pos(pnt.pos);
     }
 
     template<>
-    inline void anchor_point_set_pos< ::simple_route::anchor_point_t>(::simple_route::anchor_point_t & pnt, ani::point_pos const& pos)
+    inline void anchor_point_set_pos< ::dubin_route::anchor_point_t>(::dubin_route::anchor_point_t & pnt, ani::point_pos const& pos)
     {
         pnt.pos = pos ;
     }
 }
 
-namespace simple_route
+namespace dubin_route
 {
     struct route_data
         : extra_route::view<anchor_point_t>
     {
      //protected:// TYV обойдетесь 
-        typedef extra_route::view <anchor_point_t>  route_base_t;
+        typedef extra_route::view<anchor_point_t>  route_base_t;
         typedef extra_route::chart<anchor_point_t> extra_route_chart;
 
         route_data()
@@ -48,6 +48,7 @@ namespace simple_route
         REFL_END()
     };
 
+    //! представление простого маршрута
     struct view
         : base_view_presentation        
         , info                          

@@ -3,8 +3,6 @@
 #include "dubins.h"
 #include "geometry/curve.h"
 
-class TrajectoryDrawer;
-
 namespace fms
 {
 

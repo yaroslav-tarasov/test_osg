@@ -373,7 +373,15 @@ void model::sync_phys()
     phys_vehicle_->set_steer(steer);
     phys_vehicle_->set_thrust(thrust);
     phys_vehicle_->set_brake(brake);
-    
+
+    if (aerotow_)
+    {
+        if ( aircraft::model_info_ptr(aerotow_)->tow_attached())
+        {                          
+            aircraft::model_control_ptr(aerotow_)->set_brake(brake*100);
+        }
+    }  
+
     logger::need_to_log(false);
 
     LOG_ODS_MSG ("sync_phys  steer:  "  << steer 

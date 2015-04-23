@@ -12,6 +12,7 @@
 #include "aircraft_shassis_impl.h"
 #include "aircraft_rotors_impl.h"
 
+
 namespace aircraft
 {
 

@@ -111,6 +111,7 @@
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
+    <ClInclude Include="kernel\fms\trajectory.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials.h" />
     <ClInclude Include="osg_helpers.h" />
@@ -167,6 +168,8 @@
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
     <ClCompile Include="kernel\objects\common\object_creators.cpp" />
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_manager.cpp" />
     <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp" />

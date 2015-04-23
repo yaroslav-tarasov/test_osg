@@ -393,7 +393,7 @@ namespace aircraft
         {
             //phys_aircraft_->set_steer(steer);
             phys_aircraft_->set_thrust(0);
-            phys_aircraft_->set_brake(0);
+            //phys_aircraft_->set_brake(0);
             phys_aircraft_->set_elevator(0);
             phys_aircraft_->set_ailerons(0);
 

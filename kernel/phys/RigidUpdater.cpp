@@ -900,11 +900,11 @@ namespace bi
          }
     }
 
-    void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &simple_route)
+    void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &cartesian_simple_route)
     {   
         decart_position target_pos;
-        target_pos.pos = simple_route.back();
-        geo_position gp(target_pos, ::get_base() /*cg::geo_base_3(cg::geo_point_3(0.0,0.0,0))*/);
+        target_pos.pos = cartesian_simple_route.back();
+        geo_position gp(target_pos, ::get_base());
         
         if(selected_obj_id_)
         {

@@ -283,7 +283,7 @@ protected:
     void update_len(double time);
 
 protected:
-#if 0 
+#if 1 
     ani_object::info_ptr    ani_;
 #endif
     meteo_proxy::info_ptr   met_proxy_obj_;

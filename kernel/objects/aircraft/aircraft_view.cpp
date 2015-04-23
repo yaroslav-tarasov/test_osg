@@ -71,7 +71,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 #if 0
     , gui_                      (find_first_child<aircraft_gui::control_ptr    >(this))
 #endif
-#if 0    
+#if 1    
     , ani_                      (find_first_object<ani_object::info_ptr>(collection_))
 #endif
     , met_proxy_obj_            (find_first_object<meteo_proxy::info_ptr>(collection_))
