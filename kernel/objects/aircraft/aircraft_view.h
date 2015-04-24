@@ -8,6 +8,9 @@
 #include "common/meteo_proxy.h"
 //#include "common/conflicts_manager.h"
 //#include "common/fpl_manager.h"
+// FIXME из fpl_list
+#include "objects/ani.h"
+
 
 #include "objects/nodes_management.h"
 //#include "objects/aircraft_gui.h"

@@ -100,6 +100,9 @@ namespace extra_route
             set_free_points(idx, free_points);
         }
 
+
+        // Не используется 
+        FIXME(Не используется)
         size_t anchor_idx(size_t anchor) const
         {
             Assert(anchor < anchor_points_.size());
