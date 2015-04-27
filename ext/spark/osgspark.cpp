@@ -63,7 +63,7 @@ namespace spark
         SPK::System::useAdaptiveStep( 0.001f, 0.01f );
     }
 
-    FIXME(Возвращаем handler каждый раз, а нужно только один раз добавить к вьюверу)
+    FIXME("Возвращаем handler каждый раз, а нужно только один раз добавить к вьюверу")
     spark_pair_t create(spark_t effectType,osg::Transform* model)
     {
         static int count = 0; 

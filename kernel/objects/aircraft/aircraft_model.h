@@ -37,8 +37,8 @@ namespace aircraft
 
         // base_view_presentation
     protected:
-        void on_child_removing(kernel::object_info_ptr child) override;
-        void on_object_destroying(object_info_ptr object) override ;
+        void on_child_removing(kernel::object_info_ptr child) override ;
+        void on_object_destroying(object_info_ptr object)     override ;
 
         // model_info
     private:
@@ -63,6 +63,8 @@ namespace aircraft
         //meteo::meteo_cursor_ptr get_meteo_cursor() const;
         shassis_support_ptr get_shassis() const;
         rotors_support_ptr  get_rotors() const;
+
+        fms::trajectory_ptr get_trajectory() const;
 
         geo_position get_root_pos() const;
         bool is_fast_session() const;
@@ -92,7 +94,8 @@ namespace aircraft
         decart_position get_local_position() {return phys_aircraft_->get_local_position();};
         
         void set_trajectory(fms::trajectory_ptr  traj){traj_ = traj;}
-        fms::trajectory_ptr  get_trajectory(){return traj_;}               
+        void set_trajectory(std::vector<cg::geo_point_2>  traj){/*traj_-> traj;*/}
+        fms::trajectory_ptr  get_trajectory(){return traj_;} 
 
     private:
         model_system *    sys_;
@@ -117,11 +120,6 @@ namespace aircraft
         
         boost::function<void()>                tow_invalid_callback_;
         optional<uint32_t>                     tow_attached_;
-
-        //////////////////////////////////////
-        double                                 desired_velocity_;
-        fms::trajectory_ptr                    traj_;
-        /////////////////////////////////////
 
     private:
         bool fast_session_;

@@ -128,7 +128,7 @@ namespace python {
 
 namespace vehicle
 {
-	// FIXME just stub
+	// FIXME for debugging purposes
 	struct model_base
 	{
 		virtual ~model_base() {};
@@ -198,6 +198,14 @@ inline double get_wheel_radius(T node)
    //const double radius = 0.75 * node->get_bound().radius ;
    return /*0.75 **/ (node->get_bound().size().z / 2.);
 }
+
+enum objects_t{
+    NONE_TYPE    ,
+    AIRCRAFT_TYPE,
+    VEHICLE_TYPE
+};
+
+
 
 #endif // precompile_header
 

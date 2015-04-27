@@ -8,8 +8,9 @@ public:
         if ( !_selectionBox )
         {
             osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-            geode->addDrawable(
-                new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f)) );
+            auto shape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
+            shape->setColor(osg::Vec4(0,0,255,255));
+            geode->addDrawable( shape );
             
             _selectionBox = new osg::MatrixTransform;
             _selectionBox->setNodeMask( 0x1 );

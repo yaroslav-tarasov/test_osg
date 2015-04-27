@@ -241,6 +241,8 @@ private:
     void on_ipo_controls        (msg::ipo_controls_msg  const& controls);
     void on_contact_effect      (msg::contact_effect    const& eff)     ;
     void on_wheel_contact_effect(msg::wheel_contact_effect const& eff)  ;
+    
+    void on_traj_assign         (msg::traj_assign_msg const &m)         ;
 
 protected:
     void set_fpl_initial_position();
@@ -286,11 +288,14 @@ protected:
     void update_len(double time);
 
 protected:
-#if 1 
     ani_object::info_ptr    ani_;
-#endif
     meteo_proxy::info_ptr   met_proxy_obj_;
     meteo::meteo_proxy_ptr  meteo_proxy_;
+
+protected:
+    //////////////////////////////////////
+    fms::trajectory_ptr                    traj_;
+    /////////////////////////////////////
 
 private:
 #if 0 
@@ -313,6 +318,7 @@ private:
 
 private:
     std::vector< std::pair<double, std::string> > oldi_sequence_ ;
+
 
 };
 

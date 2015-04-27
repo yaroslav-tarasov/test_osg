@@ -895,11 +895,48 @@ namespace bi
 
          if(it_am!=_model_aircrafts.end())
          {
-            auto traj = aircraft::int_control_ptr(*it_am)->get_trajectory().get();
-            if (traj) _trajectory_drawer->set(*(traj));
-         }
+            auto traj = aircraft::int_control_ptr(*it_am)->get_trajectory();
+            if (traj) _trajectory_drawer->set(traj);
+         } 
+
+         bool a_or_v = false;
+
+         const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+
+         kernel::visit_objects<vehicle::control_ptr>(col,[this,&a_or_v](vehicle::control_ptr a)->bool
+         {
+             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+             if( nm_id == this->selected_obj_id_)
+             {
+                 selected_object_type_signal_(VEHICLE_TYPE);
+                 a_or_v = true;
+                 return false;
+             }
+             return true;
+         });
+
+         kernel::visit_objects<aircraft::control_ptr>(col,[this,&a_or_v](aircraft::control_ptr a)->bool
+         {
+             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+             if( nm_id == this->selected_obj_id_)
+             {
+                 selected_object_type_signal_(AIRCRAFT_TYPE);
+                 a_or_v = true;
+                 return false;
+             }
+             return true;
+         });
+
+         if(!a_or_v)
+            selected_object_type_signal_(NONE_TYPE);
+         
     }
 
+    FIXME(Нужен ли полный путь? Не думаю.)
     void RigidUpdater::handlePointEvent(std::vector<cg::point_3> const &cartesian_simple_route)
     {   
         decart_position target_pos;
@@ -925,7 +962,7 @@ namespace bi
 
                 if (!aircraft::int_control_ptr(am)->get_trajectory())
                 {
-                     aircraft::int_control_ptr(am)->set_trajectory( boost::make_shared<fms::trajectory>(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
+                     aircraft::int_control_ptr(am)->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
                 }
                 else
                 {  
@@ -936,16 +973,16 @@ namespace bi
             
                     target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 			
-                    fms::trajectory_ptr traj = boost::make_shared<fms::trajectory>( begin_pos,
-                                                                                    target_pos,
-                                                                                    aircraft::min_radius(),
-                                                                                    aircraft::step());
+                    fms::trajectory_ptr traj = fms::trajectory::create ( begin_pos,
+                                                                         target_pos,
+                                                                         aircraft::min_radius(),
+                                                                         aircraft::step());
 
-                    main_->append(*traj.get());
+                    main_->append(traj);
                 }
        
                 // Подробная отрисовка
-                _trajectory_drawer->set(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
+                _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory());
 
                 auto vgp2 = fms::to_geo_points(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
             }
@@ -978,11 +1015,74 @@ namespace bi
                 return true;
             });
 #endif
-            auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get());
-            // simple_route::control_ptr(sr_obj)->add_point();
-            sr_obj->add_point(gp.pos);
+
+            kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
+            {
+                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                if( nm_id == this->selected_obj_id_)
+                {
+                    auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get());
+                    sr_obj->add_point(gp.pos);
+                    return false;
+                }
+                return true;
+            });
+
+            FIXME(Гиде контроль?)
+            const kernel::object_collection  *  mcol = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
+            
+            kernel::visit_objects<aircraft::control_ptr>(mcol,[this,&target_pos](aircraft::control_ptr a)->bool
+            {
+                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                if( nm_id == this->selected_obj_id_)
+                {
+                    aircraft::info_ptr am= aircraft::info_ptr(a);
+                    
+                    decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
+                    target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+
+                    if (!aircraft::int_control_ptr(am)->get_trajectory())
+                    {
+                        aircraft::int_control_ptr(am)->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
+                    }
+                    else
+                    {  
+                        fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
+
+                        decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+                            ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+
+                        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+
+                        fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
+                                                                            target_pos,
+                                                                            aircraft::min_radius(),
+                                                                            aircraft::step());
+
+                        main_->append(traj);
+                    }
+
+                    // Подробная отрисовка
+                    _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory());
+
+                    auto vgp2 = fms::to_geo_points(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
+
+
+                    return false;
+                }
+                return true;
+            });
 
         }
+
+
+
+
+
 
         // _trajectory_drawer->set(simple_route);
 

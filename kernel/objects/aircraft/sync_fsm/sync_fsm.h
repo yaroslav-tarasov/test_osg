@@ -10,7 +10,6 @@ namespace aircraft
 {
     namespace sync_fsm
     {
-        //! состояние снихронизации... это переход между физической моделью (столкновений) и проводкой
         FIXME("Завести завели, а не используем чего так?")
         enum state
         {
@@ -21,7 +20,6 @@ namespace aircraft
             sync_transition_fms_phys,
         };
 
-        //! состояние???
         struct state_t
         {
             virtual ~state_t() {}
@@ -33,7 +31,6 @@ namespace aircraft
 
         typedef polymorph_ptr<state_t> state_ptr;
 
-        //! интерфейс самолета???
         struct self_t
         {
             virtual ~self_t() {}
@@ -56,6 +53,8 @@ namespace aircraft
             virtual void freeze_position() = 0;
             virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;
             virtual void set_nm_angular_smooth(double val) = 0;
+            
+            virtual fms::trajectory_ptr get_trajectory() const = 0;  
         };
 
         inline static double phys_height() { return 80.0; }

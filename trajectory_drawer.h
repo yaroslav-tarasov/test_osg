@@ -28,7 +28,7 @@ public:
             parent->addChild(this);        
     }
 
-    void set(const fms::trajectory& traj)
+    void set(const fms::trajectory_ptr traj)
     {
 
        vert_->clear();
@@ -42,7 +42,7 @@ public:
        traj_lines_ = new osg::DrawElementsUInt(osg::PrimitiveSet::POINTS, 0);
 
        int i=0;
-       BOOST_FOREACH(const auto &p, traj.extract_values())
+       BOOST_FOREACH(const auto &p, traj->extract_values())
        {
            vert_->push_back( osg::Vec3( p.x, p.y, 0.8) );
            traj_lines_->push_back(i++);

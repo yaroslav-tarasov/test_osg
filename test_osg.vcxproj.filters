@@ -82,11 +82,11 @@
     <Filter Include="Source Files\tests\sm">
       <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\aircraft\utils">
-      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\dubin_route">
       <UniqueIdentifier>{7e51963d-118e-4a3d-bfbd-c1ef62107c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -154,7 +154,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kernel\fms\trajectory.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h">
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,7 +252,7 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
-      <Filter>Source Files\objects\aircraft\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp">
       <Filter>Source Files\spark</Filter>
@@ -408,7 +411,7 @@
       <Filter>Source Files\objects\simple_route</Filter>
     </ClCompile>
     <ClCompile Include="core\config\config.cpp">
-      <Filter>Source Files\objects\aircraft\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp">
       <Filter>Source Files\objects\vehicle</Filter>
@@ -444,13 +447,13 @@
       <Filter>Source Files\systems</Filter>
     </ClCompile>
     <ClCompile Include="utils\animation_handler.cpp">
-      <Filter>Source Files\objects\aircraft\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="creators.cpp">
-      <Filter>Source Files\objects\aircraft\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\materials.cpp">
-      <Filter>Source Files\objects\aircraft\utils</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp">
       <Filter>Source Files\objects\aircraft</Filter>
@@ -463,6 +466,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp">
       <Filter>Source Files\objects\dubin_route</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\fms\trajectory.cpp">
+      <Filter>Source Files\fms</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

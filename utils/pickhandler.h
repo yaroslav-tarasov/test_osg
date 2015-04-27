@@ -7,7 +7,7 @@ class PickHandler : public osgGA::GUIEventHandler {
     enum action_t {ADD_ROUTE_POINT,DELETE_ROUTE_POINT,SELECT_OBJECT};
 public: 
 
-    PickHandler() {}        
+    PickHandler(): _selected_object(NONE_TYPE) {}        
 
     bool handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter& aa)
     {
@@ -32,8 +32,9 @@ public:
         if ( !_selectionBox )
         {
             osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-            geode->addDrawable(
-                new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f)) );
+            auto shape = new osg::ShapeDrawable(new osg::Box(osg::Vec3(), 1.0f));
+            shape->setColor(osg::Vec4(0,0,255,255));
+            geode->addDrawable( shape );
 
             _selectionBox = new osg::MatrixTransform;
             _selectionBox->setNodeMask( 0x1 );
@@ -87,9 +88,12 @@ public:
  
             if(act==ADD_ROUTE_POINT)           
             {
+                if( _selected_object == NONE_TYPE)
+                   return;
+
                 osg::Geode* geode = new osg::Geode;
                 geode->addDrawable(new osg::ShapeDrawable(new osg::Sphere(position,scale)));
-                dynamic_cast<osg::ShapeDrawable *>(geode->getDrawable(0))->setColor( osg::Vec4(1.0,0,0,0) );
+                dynamic_cast<osg::ShapeDrawable *>(geode->getDrawable(0))->setColor( _selected_object == AIRCRAFT_TYPE? osg::Vec4(1.0,0,0,0) : osg::Vec4(0.0,1.0,0,0) );
                 root->addChild(geode);
                 _points.push_back(geode);
                 _route.push_back(cg::point_3(position.x(),position.y(),position.z()));
@@ -97,6 +101,9 @@ public:
             }
             else if(act==DELETE_ROUTE_POINT) 
             { 
+                if( _selected_object == NONE_TYPE)
+                    return;
+
                 if(_points.size()>0)
                 {
                     root->removeChild(_points.back());
@@ -107,13 +114,8 @@ public:
             }
             else if(act==SELECT_OBJECT) 
             {
-                //auto parent = hit.drawable->getParent(0);
                 bool is_root=false;
-                //while (parent && (not_root=boost::to_lower_copy(parent->getName())!="phys_ctrl") && parent->getNumParents()>0)
-                //{
-                //     parent = parent->getParent(0);
-                //};
-                
+
                 osg::Node* parent = nullptr;
                 for(auto it = hit.nodePath.begin();it!=hit.nodePath.end() ;++it)
                 {
@@ -151,15 +153,20 @@ public:
 
         }
     }
-    
+
+    void handleSelectObjectEvent(objects_t type )
+    {
+         _selected_object =  type;
+    }
+
     DECLARE_EVENT(choosed_point, (std::vector<cg::point_3> const &) ) ;
     DECLARE_EVENT(selected_node, (uint32_t) ) ;
 
 protected:
     virtual ~PickHandler() {}
     std::list<osg::ref_ptr<osg::Geode>> _points;
-    std::vector<cg::point_3>            _route;
-    
+    std::vector<cg::point_3>             _route;
+    objects_t                  _selected_object;
 
 protected:
     osg::ref_ptr<osg::MatrixTransform> _selectionBox;

@@ -422,7 +422,9 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     
     conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
     conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
-
+    
+    conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
+    
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
 
     //

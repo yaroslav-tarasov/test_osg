@@ -67,6 +67,12 @@ namespace aircraft
 
         aircraft_fms::control_ptr(get_fms_info())->set_state(st);
     }
+
+
+
+
+
+
 }
 
 

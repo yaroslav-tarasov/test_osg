@@ -47,6 +47,8 @@ namespace bi
            _trajectory_drawer =  drawer;
         }
 
+        DECLARE_EVENT(selected_object_type, (objects_t) ) ;
+
     protected:
         void addPhysicsData( int id, osg::Shape* shape, const osg::Vec3& pos,
             const osg::Vec3& vel, double mass );
@@ -121,6 +123,7 @@ namespace bi
             return positioned;
         }
 #endif
+
 
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;

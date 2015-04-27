@@ -112,6 +112,7 @@
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
+    <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials.h" />
     <ClInclude Include="osg_helpers.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
     <ClCompile Include="ext\spark\test_effect.cpp" />
     <ClCompile Include="kernel\fms\dubins.cpp" />
+    <ClCompile Include="kernel\fms\trajectory.cpp" />
     <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />

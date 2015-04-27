@@ -115,7 +115,9 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
         .add<msg::atc_controls_msg  >(boost::bind(&view::on_atc_controls, this, _1))
         .add<msg::ipo_controls_msg  >(boost::bind(&view::on_ipo_controls, this, _1))
-        
+        .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
+
+                                           
         // just for recording visual effect to history 
         .add<msg::contact_effect        >(boost::bind(&view::on_contact_effect      , this, _1))
         .add<msg::wheel_contact_effect  >(boost::bind(&view::on_wheel_contact_effect, this, _1));
@@ -917,6 +919,14 @@ void view::on_fpl(optional<uint32_t> const& id)
         assigned_fpl_changed_signal_(fpl_);
     }
 #endif
+}
+
+void view::on_traj_assign(msg::traj_assign_msg const &m)
+{
+    //if(!traj_.get())
+    {
+        traj_ = fms::trajectory::create(m.traj);
+    }
 }
 
 void view::on_atc_state(msg::atc_state_msg const &m)
