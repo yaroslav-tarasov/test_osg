@@ -545,9 +545,8 @@ namespace aircraft
 
             bool reverse = false;
             bool low_attack = false;
-#if 1
+
             if (cfg_ == fms::CFG_GD/* && root_glb_pos.pos.height < 0.5*/)
-#endif
             {
                 reverse = true;
                 if (on_ground_)
@@ -614,7 +613,7 @@ namespace aircraft
 
 
        // TODO
-        //        send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
+       //         send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
     }
 
     void phys_aircraft_impl::calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, cg::point_3 const& desired_accel, cg::point_3 const& /*wind*/, bool reverse, bool low_attack)

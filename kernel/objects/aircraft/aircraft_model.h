@@ -30,7 +30,9 @@ namespace aircraft
         model( kernel::object_create_t const& oc, dict_copt dict);
 
     public:
-        void on_malfunction_changed( malfunction_kind_t kind ); 
+        void on_malfunction_changed( malfunction_kind_t kind ) override; 
+        void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
+
     // base_presentation
         FIXME(private)
         void update(double dt);
@@ -85,6 +87,7 @@ namespace aircraft
         void update_shassi_anim (double time);
         void update_contact_effects(double time);
         void check_wheel_brake();
+        void check_rotors_brake();
         void on_time_factor_changed(double time, double factor);
             
         void sync_nm_root(double dt);
@@ -94,7 +97,6 @@ namespace aircraft
         decart_position get_local_position() {return phys_aircraft_->get_local_position();};
         
         void set_trajectory(fms::trajectory_ptr  traj){traj_ = traj;}
-        void set_trajectory(std::vector<cg::geo_point_2>  traj){/*traj_-> traj;*/}
         fms::trajectory_ptr  get_trajectory(){return traj_;} 
 
     private:

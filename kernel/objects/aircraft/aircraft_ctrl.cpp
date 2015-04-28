@@ -68,8 +68,26 @@ namespace aircraft
         aircraft_fms::control_ptr(get_fms_info())->set_state(st);
     }
 
+    void ctrl::set_trajectory(fms::trajectory_ptr  traj)
+    {
+        traj_ = traj;
+        fms::traj_data data(*traj);
+        set(msg::traj_assign_msg(data));
+    }
+    
+    fms::trajectory_ptr  ctrl::get_trajectory()
+    {
+        return traj_;
+    } 
 
+    decart_position ctrl::get_local_position()
+    {
+        FIXME(Oooooooooooooo)
+        geo_base_3 base = ::get_base();
+        aircraft_fms::state_t st = get_fms_info()->get_state();
 
+        return decart_position(base(st.dyn_state.pos),/*st.orien()*/cg::cpr(st.dyn_state.course,0,0));
+    };
 
 
 

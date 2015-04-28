@@ -193,6 +193,7 @@ namespace aircraft
             , malfunction(false)
             , started    (false) 
             , broken     (false)
+            , ang_velocity  (45)
         {
 
         }
@@ -200,6 +201,8 @@ namespace aircraft
         bool                 malfunction;
         bool                 started;
         bool                 broken;
+        double               ang_velocity;
+
         nm::node_control_ptr node;
 
         nodes_management::node_control_ptr rotor_node;
@@ -225,18 +228,14 @@ namespace aircraft
         {
         }
 
+        void angular_velocity(double av)
+        {
+            ang_velocity = av;
+        }
+
         void broke(phys_aircraft_ptr aircraft_phys)
         {
             //broken = true;
-            //for (auto it= shassis.begin(); it != shassis.end(); ++it)
-            //{
-            //    it->node->set_visibility(false);
-            //    it->freeze();
-            //    for (size_t j = 0; j < it->phys_wheels.size(); ++j)
-            //        aircraft_phys->remove_wheel(it->phys_wheels[j]);
-
-            //    it->phys_wheels.clear();
-            //}
         }
 
     };

@@ -437,8 +437,8 @@ void model::sync_nodes_manager( double /*dt*/ )
             nodes_management::node_info_ptr rel_node = wheels_[i].node->rel_node();
 #endif  
 
-            cg::geo_base_3 global_pos = wheels_[i].node->get_global_pos();
-            cg::quaternion global_orien = wheels_[i].node->get_global_orien();
+            //cg::geo_base_3 global_pos = wheels_[i].node->get_global_pos();
+            //cg::quaternion global_orien = wheels_[i].node->get_global_orien();
 
             cg::transform_4 rel_node_root_tr = rel_node->get_root_transform();
 

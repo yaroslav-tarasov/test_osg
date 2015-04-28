@@ -293,7 +293,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "AN26";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         vehicle::settings_t vs;
@@ -705,7 +705,8 @@ namespace bi
                 auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 0");
                 if(vvv)
                 {
-                      aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true);   
+                      aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true); 
+                      aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_ONE_ENGINE,true); 
                 }
 
             }
@@ -765,7 +766,6 @@ namespace bi
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
-                //_sys->update( dt );
 
                 const double dt_sys = dt; 
 
@@ -1030,10 +1030,7 @@ namespace bi
                 return true;
             });
 
-            FIXME(Гиде контроль?)
-            const kernel::object_collection  *  mcol = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
-            
-            kernel::visit_objects<aircraft::control_ptr>(mcol,[this,&target_pos](aircraft::control_ptr a)->bool
+            kernel::visit_objects<aircraft::control_ptr>(col,[this,&target_pos](aircraft::control_ptr a)->bool
             {
                 auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
                 uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
@@ -1041,7 +1038,7 @@ namespace bi
                 if( nm_id == this->selected_obj_id_)
                 {
                     aircraft::info_ptr am= aircraft::info_ptr(a);
-                    
+
                     decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
                     target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
 
@@ -1059,18 +1056,17 @@ namespace bi
                         target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 
                         fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
-                                                                            target_pos,
-                                                                            aircraft::min_radius(),
-                                                                            aircraft::step());
+                            target_pos,
+                            aircraft::min_radius(),
+                            aircraft::step());
 
                         main_->append(traj);
+
+                        aircraft::int_control_ptr(am)->set_trajectory(main_);
                     }
 
                     // Подробная отрисовка
                     _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory());
-
-                    auto vgp2 = fms::to_geo_points(*(aircraft::int_control_ptr(am)->get_trajectory().get()));
-
 
                     return false;
                 }
@@ -1078,11 +1074,6 @@ namespace bi
             });
 
         }
-
-
-
-
-
 
         // _trajectory_drawer->set(simple_route);
 

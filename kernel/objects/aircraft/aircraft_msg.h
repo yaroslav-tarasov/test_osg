@@ -70,7 +70,11 @@ struct traj_assign_msg
 {
     traj_assign_msg() {}
 
-    traj_assign_msg(fms::traj_data&& traj)
+    traj_assign_msg(const fms::traj_data& traj)
+        : traj(traj)
+    {}
+
+    traj_assign_msg(const fms::traj_data&& traj)
         : traj(move(traj))
     {}
 

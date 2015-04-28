@@ -18,7 +18,7 @@ namespace aircraft
         {
             phys_state(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
                 : self_(self)
-                , on_ground_(false)
+                //, on_ground_(false)
                 , phys_aircraft_(phys_aircraft)
                 , base_(base)
             {
@@ -51,7 +51,7 @@ namespace aircraft
             geo_base_3 base_;
             size_t zone_;
             phys_aircraft_ptr phys_aircraft_;
-            bool on_ground_;
+            //bool on_ground_;
 
         //public:
         //    static const double phys_height;
@@ -137,8 +137,6 @@ namespace sync_fsm
 
         if(auto traj_ = self_.get_trajectory())
         {
-            auto it = this;
-
             if (traj_->cur_len() < traj_->length())
             {
                 phys_aircraft_->set_prediction(15.); 
@@ -159,7 +157,7 @@ namespace sync_fsm
 
                 const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
 
-                if(cg::eq(curs_change,0.0))
+                if(cg::eq(curs_change,0.0,0.085))
                     desired_velocity_ = aircraft::max_desired_velocity();
                 else
                     desired_velocity_ = aircraft::min_desired_velocity();
@@ -213,7 +211,7 @@ namespace sync_fsm
             fms::procedure_model_ptr pm =  self_.get_fms_info()->procedure_model();
             double prediction = cg::clamp(pm->taxi_TAS(), pm->takeoff_TAS(), 15., 30.)(self_.get_fms_info()->get_state().dyn_state.TAS);
             //geo_base_3 predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(prediction*0.1));
-
+            self_.get_fms_info()->get_mass();
             //LOG_ODS_MSG( "TAS:  "  << self_.get_fms_info()->get_state().dyn_state.TAS << "\n" );
 
             geo_position physpos = phys_aircraft_->get_position();
@@ -278,8 +276,8 @@ namespace sync_fsm
             nodes_management::node_info_ptr rel_node = wnode->rel_node();
 #endif            
 
-            geo_base_3 global_pos = wnode->get_global_pos();
-            quaternion global_orien = wnode->get_global_orien();
+            //geo_base_3 global_pos = wnode->get_global_pos();
+            //quaternion global_orien = wnode->get_global_orien();
 
             transform_4 rel_node_root_tr = rel_node->get_root_transform();
 
@@ -303,29 +301,28 @@ namespace sync_fsm
 
 	}
 
-    FIXME(А оно нам надо? Здесь?)
     void phys_state::sync_rotors(double dt)
     {
         self_.get_rotors()->visit_rotors([this, dt](rotors_group_t const& rg,size_t& id)
         {
-            auto wnode = rg.node;
+            auto rnode = rg.node;
+            
+            geo_position rpos;
 
-            geo_position wpos;
-
-            const float ob_min = 45;
-            nodes_management::node_position wheel_node_pos = wnode->position();
+            const float ob_min = rg.ang_velocity/*45*/;
+            nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_velocity = ob_min * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
 
             quaternion des_orien;
-            des_orien = wheel_node_pos.local().orien * quaternion(cpr(0,0,cg::rad2grad() * angular_velocity * dt));
+            des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,cg::rad2grad() * angular_velocity * dt));
 
-            const cg::transform_4 wheel_node_trans = cg::transform_4(cg::as_translation(-wheel_node_pos.local().pos), /*wpos.orien*/des_orien.rotation()); 
-            point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
+            const cg::transform_4 rotor_node_trans = cg::transform_4(cg::as_translation(-rotor_node_pos.local().pos), /*rpos.orien*/des_orien.rotation()); 
+            point_3 omega_rel     = cg::get_rotate_quaternion(rotor_node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
 
-            // wheel_node_pos.local().orien = /*wpos.orien*/wheel_node_trans.rotation().quaternion();
-            wheel_node_pos.local().omega = omega_rel;
+            // rotor_node_pos.local().orien = /*rpos.orien*/rotor_node_trans.rotation().quaternion();
+            rotor_node_pos.local().omega = omega_rel;
 
-            wnode->set_position(wheel_node_pos);
+            rnode->set_position(rotor_node_pos);
 
         });
     }

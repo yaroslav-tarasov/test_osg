@@ -109,6 +109,8 @@ void model::update( double time )
     update_atc_state();
     sync_fms();
 
+    check_rotors_brake();
+
     if (phys_aircraft_)
     {
         bool has_malfunction = false;
@@ -185,10 +187,6 @@ fms::trajectory_ptr model::get_trajectory() const
 
 geo_position model::get_root_pos() const
 {
-    FIXME("Позиция рута в глобальных координатах ооооочень больной вопрос")
-    if(root_->position().is_local())
-     root_->position().local();
-
     return root_->position().global();
 }
 
@@ -230,8 +228,11 @@ void model::on_malfunction_changed( malfunction_kind_t kind )
         if (malfunction(MF_ALL_ENGINES))
             factor = 0;
         else if (malfunction(MF_ONE_ENGINE))
+        {
             factor = 0.7;
-
+            FIXME(Test)
+            rotors_->set_malfunction(RG_REAR_LEFT,malfunction(kind));
+        }
         // FIXME TODO OR NOT TODO
         //auto controls = flight_manager_control_->get_controls();
         //controls.engine_factor = factor;
@@ -244,6 +245,13 @@ void model::on_malfunction_changed( malfunction_kind_t kind )
         //controls.fuel_leaking = true;
         //flight_manager_control_->set_controls(controls);
     }
+}
+
+// TYV
+void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& /*contacts*/)
+{
+     if(traj_)
+         traj_.reset();
 }
 
 void model::update_contact_effects(double time)
@@ -377,7 +385,10 @@ void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()
     tow_attached_ = attached;
     tow_invalid_callback_ = tow_invalid_callback;
     if (phys_aircraft_)
+    {
         phys_aircraft_->attach_tow(attached);
+        traj_.reset();
+    }
 
     if (!tow_attached_)
         sync_fms(true);
@@ -453,6 +464,22 @@ void model::check_wheel_brake()
         }
     });
 }
+
+void model::check_rotors_brake()
+{
+    if (!phys_aircraft_)
+        return;
+
+    rotors_->visit_groups([this](rotors_group_t & rotors_group,size_t& ind)
+    {
+        if ( rotors_group.malfunction )
+        {
+           rotors_group.angular_velocity(0);
+        }
+    });
+}
+
+
 
 void model::on_time_factor_changed(double /*time*/, double factor)
 {

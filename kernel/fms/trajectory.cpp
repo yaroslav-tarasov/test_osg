@@ -49,7 +49,7 @@ struct trajectory_impl : trajectory
     {
         trajectory_impl_ptr other = trajectory_impl_ptr(o);
 
-        const auto length_ = kp_seg_.back().length();
+        const auto length_ = length();
 
         for(auto it = other->kp_seg_.begin();it!= other->kp_seg_.end();++it)
         {                         
@@ -66,7 +66,7 @@ struct trajectory_impl : trajectory
 
     void append(const traj_data& other) 
     {
-        const auto length_ = kp_seg_.back().length();
+        const auto length_ = length();
 
         for(auto it = other.kp_seg_.begin();it!= other.kp_seg_.end();++it)
         {                         
@@ -83,7 +83,7 @@ struct trajectory_impl : trajectory
 
     inline double length() const
     {
-        return kp_seg_.back().length();
+        return  kp_seg_.size()>0?kp_seg_.back().length():0;
     }
 
     inline const keypoints_t::value_type kp_value(double arg) /*const*/

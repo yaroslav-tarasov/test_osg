@@ -71,9 +71,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 #if 0
     , gui_                      (find_first_child<aircraft_gui::control_ptr    >(this))
 #endif
-#if 1    
     , ani_                      (find_first_object<ani_object::info_ptr>(collection_))
-#endif
     , met_proxy_obj_            (find_first_object<meteo_proxy::info_ptr>(collection_))
     , meteo_proxy_              (met_proxy_obj_->get_general_proxy())
 #if 0 
@@ -923,10 +921,13 @@ void view::on_fpl(optional<uint32_t> const& id)
 
 void view::on_traj_assign(msg::traj_assign_msg const &m)
 {
-    //if(!traj_.get())
-    {
-        traj_ = fms::trajectory::create(m.traj);
-    }
+    double len =0;
+    if(traj_.get())
+        len = traj_->cur_len();
+
+    traj_ = fms::trajectory::create(m.traj);
+    traj_->set_cur_len(len);
+
 }
 
 void view::on_atc_state(msg::atc_state_msg const &m)
