@@ -619,17 +619,18 @@ void Scene::createObjects()
 
             positioned->addChild(rotated);
             //rotated->addChild(p_copy);
-
+#ifdef OLD_STYLE
             if(_rigidUpdater.valid())
              _rigidUpdater->addPhysicsAirplane( p_copy,
                 pos, osg::Vec3(0,0,0), 800.0f );
-
+#endif
             osg::Vec3 pos2( radius * sin (angle),   radius * cos(angle), 0.f);
 
+#ifdef OLD_STYLE
             if(_rigidUpdater.valid())
                 _rigidUpdater->addPhysicsAirplane( p_copy,
                 pos2, osg::Vec3(0,60,0), 1000.0f );
-
+#endif
             // add it
             // _terrainRoot->addChild(positioned);  
 

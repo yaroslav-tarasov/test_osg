@@ -1598,20 +1598,20 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 			
 			positioned->addChild(rotated);
 			//rotated->addChild(p_copy);
-            
+#ifdef OLD_STYLE            
             rigidUpdater->addPhysicsAirplane( p_copy,
                 pos, osg::Vec3(0,0,0), 800.0f );
-
+#endif
             osg::Vec3 pos2( radius * sin (angle),   radius * cos(angle), 0.f);
             //osg::MatrixTransform* positioned2 = new osg::MatrixTransform(osg::Matrix::translate(pos2));
             //osg::MatrixTransform* rotated2 = new osg::MatrixTransform(osg::Matrix::rotate(quat));
 
             //positioned2->addChild(rotated2);
             //rotated2->addChild(p_copy);
-            
+#ifdef OLD_STYLE            
             rigidUpdater->addPhysicsAirplane( p_copy,
                 pos2, osg::Vec3(0,60,0), 1000.0f );
-
+#endif
             // add it
      		root->addChild(positioned);
             

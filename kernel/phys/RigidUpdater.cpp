@@ -148,7 +148,9 @@ namespace bi
 		        RigidUpdater_private()
                     : _krv_data_getter("log_sochi_3.txt")
                 {}
+#ifdef OLD_STYLE
                 RigidUpdater::phys_vehicles_t                          _vehicles;
+#endif
                 kernel::system_ptr                                     _msys;
 				kernel::system_ptr                                     _vsys;
                 kernel::system_ptr                                     _csys;
@@ -351,7 +353,7 @@ namespace bi
     }
 
 
-
+#ifdef OLD_STYLE
     void RigidUpdater::addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
@@ -628,6 +630,7 @@ namespace bi
         //veh->set_steer(10);
 
     }
+#endif
 
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
@@ -688,16 +691,19 @@ namespace bi
             } 
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Right )
             {
+#ifdef OLD_STYLE
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/++steer),-65., 65.);
                 phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);  
-
+#endif
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Left )
             {
+#ifdef OLD_STYLE
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/--steer),-65., 65.);
                 phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);
+#endif
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
@@ -801,17 +807,9 @@ namespace bi
                 
                 
                 
-
+#ifdef OLD_STYLE
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   
-                     //high_res_timer        _hr_timer2;
-     //               double dt2 = _hr_timer2.get_delta();
-     //               std::stringstream cstr;
-     //               cstr << std::setprecision(8) 
-     //                   << "dt2:  "     << dt2 
-     //                   <<"\n" ;
-					//OutputDebugString(cstr.str().c_str());
-                    
                     aircraft::int_control_ptr(*it)->update( view->getFrameStamp()->getSimulationTime()/*dt*/ );
                 } 
 
@@ -819,7 +817,7 @@ namespace bi
                 {   
                           (*it)->update( view->getFrameStamp()->getSimulationTime()/*dt*/ );
                 }   
-                 
+#endif                 
 
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
@@ -870,21 +868,11 @@ namespace bi
     }
 
 
-
-
-    //void RigidUpdater::createNodeHierarchy(osg::Node* node)
-    //{
-    //      std::ofstream filelogic(std::string("test") + ".stbin", std::ios_base::binary);
-    //      
-    //      heilVisitor  hv(filelogic);
-    //      hv.apply(*node);
-    //}
-
-
     void RigidUpdater::handleSelectObjectEvent(uint32_t id )
     {
          selected_obj_id_ = id;
 
+#ifdef OLD_STYLE
          auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
          {
              if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
@@ -898,7 +886,7 @@ namespace bi
             auto traj = aircraft::int_control_ptr(*it_am)->get_trajectory();
             if (traj) _trajectory_drawer->set(traj);
          } 
-
+#endif
          bool a_or_v = false;
 
          const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
@@ -945,7 +933,8 @@ namespace bi
         
         if(selected_obj_id_)
         {
-             
+
+#ifdef OLD_STYLE             
             auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
             {
                 if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
@@ -999,7 +988,7 @@ namespace bi
                 if(it_vh!=_phys_vehicles.end())
                     (*it_vh)->go_to_pos(gp.pos,90);
             }
-            
+#endif            
             const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
 #if 0  // Рабочий код ездим           
             kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
