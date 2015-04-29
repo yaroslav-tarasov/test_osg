@@ -84,9 +84,8 @@ namespace aircraft
     {
         FIXME(Oooooooooooooo)
         geo_base_3 base = ::get_base();
-        aircraft_fms::state_t st = get_fms_info()->get_state();
-
-        return decart_position(base(st.dyn_state.pos),/*st.orien()*/cg::cpr(st.dyn_state.course,0,0));
+        //aircraft_fms::state_t st = get_fms_info()->get_state();
+        return decart_position(base(pos()),orien()/*cg::cpr(st.dyn_state.course,0,0)*/);
     };
 
 

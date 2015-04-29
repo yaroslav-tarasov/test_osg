@@ -25,6 +25,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::state_msg_t   >(boost::bind(&view::on_state   , this, _1))
         .add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
         .add<msg::tow_msg_t>     (boost::bind(&view::on_tow     , this, _1))
+
+        .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
         ;
 }
     
@@ -96,6 +98,17 @@ void view::set_state(state_t const& state)
 void view::set_tow(optional<uint32_t> tow_id)
 {
     set(msg::tow_msg_t(tow_id), true);
+}
+
+void view::on_traj_assign(msg::traj_assign_msg const &m)
+{
+    double len =0;
+    if(traj_.get())
+        len = traj_->cur_len();
+
+    traj_ = fms::trajectory::create(m.traj);
+    traj_->set_cur_len(len);
+
 }
 
 }

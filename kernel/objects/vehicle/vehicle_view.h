@@ -55,6 +55,8 @@ protected:
     void on_tow     (optional<uint32_t> id);
     void on_model_changed();
 
+    void on_traj_assign         (msg::traj_assign_msg const &m);
+
 public:
     geo_point_2 const& pos() const {return state_.pos;}
     double course() const {return state_.course;}
@@ -76,6 +78,11 @@ protected:
     nodes_management::node_control_ptr  root_;
     nodes_management::node_info_ptr     tow_point_node_;
     aircraft::info_ptr                  aerotow_;
+
+protected:
+    //////////////////////////////////////
+    fms::trajectory_ptr                    traj_;
+    /////////////////////////////////////
 
 private:
     using vehicle_data::state_;

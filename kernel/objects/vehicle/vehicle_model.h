@@ -54,9 +54,11 @@ private:
     void on_brake(double val);
     //void on_debug_controls(msg::debug_controls_data const&);
     //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
+    void on_follow_trajectory(uint32_t /*route_id*/);
 
 public:
     void go_to_pos(  cg::geo_point_2 pos, double course );
+    fms::trajectory_ptr  get_trajectory();
 
 private:
     void follow_route(std::string const& route);
@@ -118,13 +120,14 @@ private:
 
     model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
 
-    bool                manual_controls_;
+    bool                 manual_controls_;
 
 private:
     double rod_course ;
     double air_course ;
     double steer_course ;
 
+#ifdef OLD_STYLE
 // from view / data
 public:
     // FIXME преносим обратно
@@ -133,6 +136,7 @@ public:
         // И здесь тоже чего-то надо сделать
         set(msg::state_msg_t(state), false);
     }
+#endif
 
 };
 

@@ -173,16 +173,16 @@ void go_to_pos_state::update(model * self, double dt)
     double         cur_course = self->course();
     double         cur_speed  = self->speed();
     
-    //std::stringstream cstr;
+    std::stringstream cstr;
 
-    //cstr << std::setprecision(8) 
-    //    << "x:  "         << cur_pos.lat
-    //    << "    y: "      << cur_pos.lon
-    //    << "    curs :  " << cur_course 
-    //    << "    cur_speed:  " << cur_speed 
-    //    << "\n" ;
+    cstr << std::setprecision(8) 
+        << "x:  "         << cur_pos.lat
+        << "    y: "      << cur_pos.lon
+        << "    curs :  " << cur_course 
+        << "    cur_speed:  " << cur_speed 
+        << "\n" ;
 
-    //OutputDebugString(cstr.str().c_str());
+    OutputDebugString(cstr.str().c_str());
 
     double max_speed = 0;
 
@@ -218,17 +218,15 @@ void go_to_pos_state::update(model * self, double dt)
     self->set_max_speed(max_speed);
 }
 
-follow_traj_state::follow_traj_state(fms::trajectory_ptr tr)
-    : traj_(tr)
-    , desired_velocity_(aircraft::min_desired_velocity())
+follow_traj_state::follow_traj_state()
+    : desired_velocity_(aircraft::min_desired_velocity())
 {
 }
 
 void follow_traj_state::update(model * self, double dt)
 {
-    auto it = self;
-
-    //if(traj_.get())
+#if 1
+    if(auto traj_ = self->get_trajectory())
     {
         if (traj_->cur_len() < traj_->length())
         {
@@ -241,8 +239,9 @@ void follow_traj_state::update(model * self, double dt)
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len),0);
             geo_position gtp(target_pos, get_base());
-            (*it)/*.phys_aircraft_->*/.go_to_pos(gtp.pos ,gtp.orien.get_course());
-
+            // self->go_to_pos(gtp.pos ,gtp.orien.get_course()); // Ãû ãû
+            go_to_pos_state gps(gtp.pos,gtp.orien.get_course(),false);
+            gps.update(self,dt);
 
             const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
 
@@ -250,17 +249,6 @@ void follow_traj_state::update(model * self, double dt)
                 desired_velocity_ = aircraft::max_desired_velocity();
             else
                 desired_velocity_ = aircraft::min_desired_velocity();
-
-            // const decart_position cur_pos = _phys_aircrafts[0].phys_aircraft_->get_local_position();
-
-
-            //LOG_OSD_MSG(
-            //    "curr_pods_len:  "             << (*it).traj->cur_len() 
-            //    << "    desired_velocity :  "     << (*it).desired_velocity_   
-            //    << "    delta curs :  "           << curs_change
-            //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-            //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
-            //    );
 
         }
         else
@@ -289,6 +277,8 @@ void follow_traj_state::update(model * self, double dt)
         }
 
     }
+
+#endif
 }
 
 

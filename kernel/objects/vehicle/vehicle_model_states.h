@@ -50,12 +50,11 @@ private:
 
 struct follow_traj_state :model_state
 {
-    follow_traj_state(fms::trajectory_ptr tr);
+    follow_traj_state();
     void update(model * self, double dt);
 
 private:
-    double                                 desired_velocity_;
-    fms::trajectory_ptr                    traj_;
+    double                desired_velocity_;
 };
 
 

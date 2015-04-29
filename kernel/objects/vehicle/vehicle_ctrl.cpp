@@ -89,6 +89,31 @@ namespace vehicle
     {
         send_cmd(msg::brake_msg_t(val));
     }
+
+    void ctrl::follow_trajectory(std::string const& /*route*/)
+    {
+        send_cmd(msg::follow_trajectory_msg_t(0));
+    }
+
+    void ctrl::set_trajectory(fms::trajectory_ptr  traj)
+    {
+        traj_ = traj;
+        fms::traj_data data(*traj);
+        set(msg::traj_assign_msg(data));
+    }
+
+    fms::trajectory_ptr  ctrl::get_trajectory()
+    {
+        return traj_;
+    } 
+
+    decart_position ctrl::get_local_position() const
+    {
+        FIXME(Oooooooooooooo)
+        geo_base_3 base = ::get_base();
+
+        return decart_position(base(geo_point_3(pos(),0)),cg::cpr(course(),0,0));
+    };
 }
 
 

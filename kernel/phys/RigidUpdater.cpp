@@ -753,6 +753,15 @@ namespace bi
                     vvv->follow_route("simple_route 0");
                  }
                  
+            } 
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_T )
+            {
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                if(vvv)
+                {
+                    vvv->follow_trajectory("simple_route 0");
+                }
+
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_B )
             {
@@ -1005,15 +1014,45 @@ namespace bi
             });
 #endif
 
-            kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
+            kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp, &target_pos](vehicle::control_ptr vc)->bool
             {
-                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(vc);
                 uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
                 if( nm_id == this->selected_obj_id_)
                 {
+
+#ifdef USING_SIMPLE_ROUTE
                     auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get());
                     sr_obj->add_point(gp.pos);
+#else
+                    decart_position cur_pos = vc->get_local_position();
+                    target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+
+                    if (!vc->get_trajectory())
+                    {
+                        vc->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
+                    }
+                    else
+                    {  
+                        fms::trajectory_ptr main_ = vc->get_trajectory();
+
+                        decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+                            ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+
+                        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+
+                        fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
+                            target_pos,
+                            aircraft::min_radius(),
+                            aircraft::step());
+
+                        main_->append(traj);
+
+                        vc->set_trajectory(main_);
+                    }
+#endif
+
                     return false;
                 }
                 return true;
