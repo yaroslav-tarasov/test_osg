@@ -19,7 +19,7 @@ namespace aircraft
         
         nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
         {
-            if (boost::starts_with(n->name(), "engine_r"))
+            if (boost::starts_with(n->name(), "engine_l"))
             {
                 this->engine_node_ = n;
                 return false;

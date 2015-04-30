@@ -48,13 +48,19 @@ private:
 };
 
 
-struct follow_traj_state :model_state
+struct follow_traj_state : model_state
 {
     follow_traj_state();
     void update(model * self, double dt);
 
 private:
     double                desired_velocity_;
+
+
+    bool with_airtow_;
+    cg::geo_point_2 target_pos_;
+    optional<double> target_course_;
+    double dcourse_;
 };
 
 

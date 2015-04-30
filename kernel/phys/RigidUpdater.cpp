@@ -324,7 +324,7 @@ namespace bi
         srs.speed = 6;
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
 
-        _trajectory_drawer2->set(_d->_krv_data_getter.kp_);
+        _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
         
     }
 
@@ -708,7 +708,7 @@ namespace bi
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
 
-                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 0");
+                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 1");
                 if(vvv)
                 {
                       aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true); 
@@ -908,6 +908,8 @@ namespace bi
              if( nm_id == this->selected_obj_id_)
              {
                  selected_object_type_signal_(VEHICLE_TYPE);
+                 auto traj = a->get_trajectory();
+                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(0.0f,1.f,0.f,1.0f));
                  a_or_v = true;
                  return false;
              }
@@ -922,6 +924,8 @@ namespace bi
              if( nm_id == this->selected_obj_id_)
              {
                  selected_object_type_signal_(AIRCRAFT_TYPE);
+                 auto traj = aircraft::int_control_ptr(a)->get_trajectory();
+                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
                  a_or_v = true;
                  return false;
              }
@@ -1094,7 +1098,7 @@ namespace bi
                     }
 
                     // Подробная отрисовка
-                    _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory());
+                    _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory(),cg::coloraf(1.0f,0.0f,0.0f,1.0f));
 
                     return false;
                 }

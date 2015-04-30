@@ -220,12 +220,19 @@ void go_to_pos_state::update(model * self, double dt)
 
 follow_traj_state::follow_traj_state()
     : desired_velocity_(aircraft::min_desired_velocity())
+    , with_airtow_(false)
 {
 }
 
 void follow_traj_state::update(model * self, double dt)
 {
-#if 1
+
+    const double nominal_speed = with_airtow_ ? 3. : 10;
+    desired_velocity_  = nominal_speed;
+    cg::geo_base_2 cur_pos    = self->pos();
+    double         cur_course = self->course();
+    double         cur_speed  = self->speed();
+
     if(auto traj_ = self->get_trajectory())
     {
         if (traj_->cur_len() < traj_->length())
@@ -240,15 +247,51 @@ void follow_traj_state::update(model * self, double dt)
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len),0);
             geo_position gtp(target_pos, get_base());
             // self->go_to_pos(gtp.pos ,gtp.orien.get_course()); // Ãû ãû
-            go_to_pos_state gps(gtp.pos,gtp.orien.get_course(),false);
-            gps.update(self,dt);
+            target_pos_ =  gtp.pos;
+            target_course_ = gtp.orien.get_course();
+//////////////////////////////////////////////////////////////////////////////////////            
+            double max_speed = 0;
+
+            cur_pos += cg::point_2(cg::polar_point_2(1., cur_course)) * cur_speed * dt;
+            cur_course += dcourse_ * dt;
+
+            cg::point_2 offset = cur_pos(target_pos_);
+            double dist = cg::norm(offset);
+
+            cg::point_2 loc_offset = offset * cg::rotation_2(cur_course);
+            double dist_signed = loc_offset.y < 0 ? -dist : dist;
+
+            if (dist < 1.5 * nominal_speed * dt)
+            {
+                cur_pos = target_pos_;
+                cur_speed = 0;
+            }
+            else
+            {
+                cur_speed = filter::BreakApproachSpeed(0., dist_signed, cur_speed, nominal_speed, 10., dt, 1.1);
+
+                double desired_course = cg::polar_point_2(offset).course;
+                if (cur_speed < 0)
+                    desired_course = cg::norm180(180. + desired_course);
+                double max_dcourse = cg::clamp(0., nominal_speed, 0., 100.)(fabs(cur_speed));
+                dcourse_ = filter::BreakApproachSpeed<cg::degree180_value>(cur_course, desired_course, dcourse_, max_dcourse, 100., dt, 1.1);
+            }
+
+            max_speed = nominal_speed;
+
+
+            self->set_state(state_t(cur_pos, cur_course, cur_speed));
+            self->set_max_speed(max_speed);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
             const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
 
             if(cg::eq(curs_change,0.0))
-                desired_velocity_ = aircraft::max_desired_velocity();
+                desired_velocity_ = nominal_speed;
             else
-                desired_velocity_ = aircraft::min_desired_velocity();
+                desired_velocity_ = with_airtow_ ? 3. : 5;
 
         }
         else
@@ -278,7 +321,7 @@ void follow_traj_state::update(model * self, double dt)
 
     }
 
-#endif
+
 }
 
 

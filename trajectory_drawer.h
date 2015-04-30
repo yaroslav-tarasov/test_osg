@@ -28,7 +28,7 @@ public:
             parent->addChild(this);        
     }
 
-    void set(const fms::trajectory_ptr traj)
+    void set(const fms::trajectory_ptr traj,const cg::coloraf& color)
     {
 
        vert_->clear();
@@ -52,13 +52,13 @@ public:
        geometry_->addPrimitiveSet(traj_lines_);
 
        osg::Vec4Array* colors = new osg::Vec4Array;
-       colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f) ); 
+       colors->push_back(osg::Vec4(color.r, color.g, color.b, 1.0f) ); 
        geometry_->setColorArray(colors);
        geometry_->setColorBinding(osg::Geometry::BIND_OVERALL);
 
     }
 
-    void set(const std::vector<cg::point_3>& kp)
+    void set(const std::vector<cg::point_3>& kp,const cg::coloraf& color)
     {
         vert_->clear();
         if(traj_lines_.get())
@@ -81,7 +81,7 @@ public:
         geometry_->addPrimitiveSet(traj_lines_);
 
         osg::Vec4Array* colors = new osg::Vec4Array;
-        colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f) ); 
+        colors->push_back(osg::Vec4(color.r, color.g, color.b, 1.0f)  ); 
         geometry_->setColorArray(colors);
         geometry_->setColorBinding(osg::Geometry::BIND_OVERALL);
 
