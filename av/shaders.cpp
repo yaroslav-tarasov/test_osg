@@ -315,7 +315,8 @@ namespace shaders
             //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
             // gl_FragColor = vec4( result,1.0);
             gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-            //gl_FragColor = vec4( shadow,shadow,shadow,1.0);           
+            // gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), base.a);  // for dynamic rotor
+            
         }
     )
 
@@ -493,6 +494,7 @@ namespace shaders
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+
            }
        )
 
