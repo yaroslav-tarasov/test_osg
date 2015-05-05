@@ -56,6 +56,9 @@ void vis_node_impl::fill_victory_nodes()
             if (auto visnode = findFirstNode(vis_manager->visual_object()->node().get(), *jt))
             {
                 victory_nodes_.push_back(visnode);
+
+
+
                 FIXME(fill_victory_nodes Need to be realized)
                 //if (texture_ && visnode->as_root())
                 //    visnode->as_root()->set_base_texture(*texture_);
@@ -80,9 +83,9 @@ void vis_node_impl::pre_update(double time)
     double dt = time - *time_;
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {
-        
         LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt << "   node type: " << (extrapolated_position_.is_local()?"local":"global") << "\n" );
     }
+
     sync_position(dt);
 }
 
@@ -212,7 +215,9 @@ void vis_node_impl::sync_position(double dt)
     bool visible = is_visible();
 
     for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+    {
         (*(it))->setNodeMask(visible?0xffffffff:0);   // set_process_flag(visible);
+    }
 
     if (visible)
     {

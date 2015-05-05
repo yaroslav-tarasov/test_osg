@@ -18,7 +18,7 @@ namespace bi
 
 		void addGround( const osg::Vec3& gravity );
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
         void addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
 		void addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
 		void addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass);
@@ -63,7 +63,7 @@ namespace bi
     private:
         typedef std::map<int, osg::observer_ptr<osg::MatrixTransform> > NodeMap;
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
 		typedef std::vector<phys::aircraft::info_ptr>                   aircrafts_t;
         typedef std::vector<aircraft::phys_aircraft_ptr>                phys_aircrafts_t;
         typedef std::vector<aircraft::info_ptr>                         aircraft_models_t;
@@ -80,7 +80,7 @@ namespace bi
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer2;
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
 		aircrafts_t                              _aircrafts;
         aircraft_models_t                        _model_aircrafts;
         vehicles_t                               _phys_vehicles;

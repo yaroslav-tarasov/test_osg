@@ -127,7 +127,7 @@ private:
     double air_course ;
     double steer_course ;
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
 // from view / data
 public:
     // FIXME преносим обратно

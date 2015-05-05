@@ -476,6 +476,8 @@ void model::check_rotors_brake()
         {
            rotors_group.angular_velocity(0);
         }
+        else
+           rotors_group.angular_velocity(120);
     });
 }
 

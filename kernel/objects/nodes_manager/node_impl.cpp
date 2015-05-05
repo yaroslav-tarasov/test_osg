@@ -263,6 +263,13 @@ void node_impl::set_visibility  (bool visible)
     manager_->send_node_msg(
         node_id_, 
         network::wrap_msg(msg::visibility_msg(visible)));
+
+    visibility_ = visible;
+}
+
+boost::optional<bool> node_impl::get_visibility()
+{
+    return visibility_;
 }
 
 void node_impl::on_object_created(object_info_ptr object)

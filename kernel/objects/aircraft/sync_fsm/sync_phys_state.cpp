@@ -309,10 +309,10 @@ namespace sync_fsm
             
             geo_position rpos;
 
-            const float ob_min = rg.ang_velocity/*45*/;
+            const float ob_min = rg.ang_velocity;
             nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_velocity = ob_min * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
-
+           
             quaternion des_orien;
             des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,cg::rad2grad() * angular_velocity * dt));
 
@@ -322,8 +322,51 @@ namespace sync_fsm
             // rotor_node_pos.local().orien = /*rpos.orien*/rotor_node_trans.rotation().quaternion();
             rotor_node_pos.local().omega = omega_rel;
 
-            rnode->set_position(rotor_node_pos);
+            rnode->set_position(rotor_node_pos);   
 
+            //if(rg.ang_velocity != av)
+            if(rg.ang_velocity>60)
+            {
+                if(rg.dyn_rotor_node)
+                {
+                    if(!rg.dyn_rotor_node->get_visibility() || rg.dyn_rotor_node->get_visibility() && !*(rg.dyn_rotor_node->get_visibility()))
+                    {
+                        rg.dyn_rotor_node->set_visibility(true);
+                        rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.rotor_node)
+                {
+                    if(!rg.rotor_node->get_visibility() || rg.rotor_node->get_visibility() && *(rg.rotor_node->get_visibility()))
+                    {
+                        rg.rotor_node->set_visibility(false);
+                        rg.rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+            }
+            else
+            {
+                if(rg.dyn_rotor_node)
+                {   
+                    if(!rg.dyn_rotor_node->get_visibility() || rg.dyn_rotor_node->get_visibility() && *(rg.dyn_rotor_node->get_visibility()))
+                    {
+                        rg.dyn_rotor_node->set_visibility(false);
+                        rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.rotor_node)
+                {
+                    if(!rg.rotor_node->get_visibility() || rg.rotor_node->get_visibility() && !*(rg.rotor_node->get_visibility()))
+                    {
+                        rg.rotor_node->set_visibility(true);
+                        rg.rotor_node->set_position(rg.dyn_rotor_node->position());
+
+                    }
+                }
+            }
         });
     }
 

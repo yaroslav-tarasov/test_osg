@@ -55,7 +55,6 @@ namespace aircraft
 
         void freeze()
         {
-#if 1   // TODO or not TODO
             {
                 auto pos = wheel_node->position();
                 pos.local().dpos = point_3();
@@ -68,7 +67,6 @@ namespace aircraft
                 pos.local().omega = point_3();
                 node->set_position(pos);
             }
-#endif
         }
 
     };
@@ -193,7 +191,7 @@ namespace aircraft
             , malfunction(false)
             , started    (false) 
             , broken     (false)
-            , ang_velocity  (45)
+            , ang_velocity  (0)
         {
 
         }
@@ -205,19 +203,20 @@ namespace aircraft
 
         nm::node_control_ptr node;
 
-        nodes_management::node_control_ptr rotor_node;
-        double                             radius;
+        nm::node_control_ptr rotor_node;
+        nm::node_control_ptr dyn_rotor_node;
+        nm::node_control_ptr sag_rotor_node;
+
+        double               radius;
 
         void freeze()
         {
-#if 1   // TODO or not TODO
             {
                 auto pos = rotor_node->position();
                 pos.local().dpos = point_3();
                 pos.local().omega = point_3();
                 rotor_node->set_position(pos);
             }
-#endif
         }
 
         void start(bool immediate = false)

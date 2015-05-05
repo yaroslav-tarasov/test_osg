@@ -22,6 +22,7 @@ namespace aircraft
             rotors_groups_[RG_REAR_RIGHT] = boost::in_place(rotors_group_node/*, false*/);
             find_rotors(RG_REAR_RIGHT, rotors_group_node);
         }
+
     }
 
     void rotors_support_impl::visit_groups(std::function<void(rotors_group_t &,size_t&)> out)
@@ -73,38 +74,19 @@ namespace aircraft
         nm::visit_sub_tree(it, [this, i](nm::node_info_ptr node)->bool
         {
             std::string name = node->name();
-            if (boost::starts_with(node->name(), "rotor"))
+            if (boost::starts_with(node->name(), "rotordyn"))
             {
-                //nm::node_info_ptr wheel_node;
-                //nm::visit_sub_tree(this->nodes_manager_->get_node_tree_iterator(node->node_id()), [&wheel_node](nm::node_info_ptr n)->bool
-                //{
-                //    if (boost::starts_with(n->name(), "wheel"))
-                //    {
-                //        wheel_node = n;
-                //        return false;
-                //    }
-                //    return true;
-                //});
-
-                //if (wheel_node)
-                //{
-                //    FIXME ("We don't have collision volumes")
-
-                //    if (auto collision = wheel_node->get_collision())
-                //    {
-                //        cg::rectangle_3 bound = model_structure::bounding(*collision);
-                //        double radius = 0.75 * (bound.size().y / 2.);
-
-                //        this->rotors_groups_[i]->add_chassis(shassis_t(node, wheel_node, radius));
-                //    }
-                //    else
-                //    {
-                //        this->rotors_groups_[i]->add_chassis(shassis_t(node, wheel_node,  0.75 * node->get_bound().radius));
-                //    }
-
-                //}
-
+                this->rotors_groups_[i]->dyn_rotor_node  =  node;
+            }
+            else
+            if (boost::starts_with(node->name(), "rotorstatic"))
+            {
                 this->rotors_groups_[i]->rotor_node  =  node;
+            }
+            else
+            if (boost::starts_with(node->name(), "rotorsagged"))
+            {
+                this->rotors_groups_[i]->sag_rotor_node  =  node;
             }
 
             return true;

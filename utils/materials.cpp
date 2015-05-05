@@ -309,51 +309,56 @@ private:
             return shaders::building_mat::get_shader(t); 
         }
         else
-            if (mat_name.find("tree") !=std::string::npos)
-            {
-                return shaders::tree_mat::get_shader(t);  
-            }
-            else
-                if (mat_name.find("ground") !=std::string::npos || mat_name.find("sea") !=std::string::npos || mat_name.find("mountain") !=std::string::npos)
-                {
-                    return shaders::ground_mat::get_shader(t);  
-                }    
-                else
-                    if (mat_name.find("concrete") !=std::string::npos)
-                    {
-                        return shaders::concrete_mat::get_shader(t);  
-                    }
-                    else
-                        if (mat_name.find("railing") !=std::string::npos)
-                        {
-                            return shaders::railing_mat::get_shader(t);  
-                        }
-                        else
-                            if (mat_name.find("plane") !=std::string::npos)
-                            {
-                                return shaders::plane_mat::get_shader(t);  
-                            }
-                            else
-                                if (mat_name.find("panorama") !=std::string::npos)
-                                {
-                                    return shaders::panorama_mat::get_shader(t);  
-                                }
-                                else
-                                    if (mat_name.find("sky") !=std::string::npos)
-                                    {
-                                        return shaders::sky_fog_mat::get_shader(t);  
-                                    }            
-                                    else
-                                        if (mat_name.find("clouds") !=std::string::npos)
-                                        {
-                                            return shaders::clouds_mat::get_shader(t);  
-                                        }
-                                        else
-                                            if (mat_name.find("default") !=std::string::npos)
-                                            {
-                                                return shaders::default_mat::get_shader(t);  
-                                            }
-                                            return nullptr;
+        if (mat_name.find("tree") !=std::string::npos)
+        {
+            return shaders::tree_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("ground") !=std::string::npos || mat_name.find("sea") !=std::string::npos || mat_name.find("mountain") !=std::string::npos)
+        {
+                return shaders::ground_mat::get_shader(t);  
+        }    
+        else
+        if (mat_name.find("concrete") !=std::string::npos)
+        {
+            return shaders::concrete_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("railing") !=std::string::npos)
+        {
+            return shaders::railing_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("plane") !=std::string::npos)
+        {
+            return shaders::plane_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("rotor") !=std::string::npos)
+        {
+            return shaders::rotor_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("panorama") !=std::string::npos)
+        {
+            return shaders::panorama_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("sky") !=std::string::npos)
+        {
+            return shaders::sky_fog_mat::get_shader(t);  
+        }            
+        else
+        if (mat_name.find("clouds") !=std::string::npos)
+        {
+            return shaders::clouds_mat::get_shader(t);  
+        }
+        else
+        if (mat_name.find("default") !=std::string::npos)
+        {
+            return shaders::default_mat::get_shader(t);  
+        }
+         return nullptr;
 
     }
 

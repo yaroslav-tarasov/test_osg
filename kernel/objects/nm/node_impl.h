@@ -19,18 +19,26 @@ struct view;
 struct node_impl : public node_control
 {
 public:
+
+#ifndef DEPRECATED
     node_impl( osg::Node* n,  view  * manager )
         : node_(n)
         , manager_(manager)
     {
         node_->getUserValue("id",node_id_);
     }
+#endif
 
     node_impl(view * manager, node_impl const&  parent, model_structure::node_data const& data, uint32_t id);
     node_impl(view * manager, geo_position const& pos, model_structure::node_data const& data, uint32_t id);
     node_impl(view * manager, binary::input_stream & stream );
 
-    virtual ~node_impl(){childs_callbacks_.clear();}
+    virtual ~node_impl()
+    {
+#ifndef DEPRECATED
+        childs_callbacks_.clear();
+#endif
+    }
 
 public:
     void save( binary::output_stream& stream ) const;
@@ -48,7 +56,8 @@ private:
     void set_texture     (std::string const& texture) override;
     void set_visibility  (bool visible) override;
     void set_position    (node_position const& pos) override;
-    virtual model_structure::collision_volume const* get_collision() const override;
+    model_structure::collision_volume const* get_collision() const override;
+    boost::optional<bool> get_visibility  () override;
 
 public:
     virtual void on_object_created   (object_info_ptr object);
@@ -81,9 +90,12 @@ protected:
 private:
     void init_disp();
 
+#ifndef DEPRECATED
 public:
 //  node_impl
     osg::Node*                  as_osg_node() {return node_.get();}
+#endif
+
 protected:
     view *      manager_;
     uint32_t    node_id_;
@@ -91,14 +103,17 @@ protected:
     optional<double>                              time_; 
 
     model_structure::node_data                    data_;
-    osg::ref_ptr<osg::Node>                       node_;
     node_position                                 position_;
     optional<std::string>                         texture_;
     mutable node_position                         extrapolated_position_;
     mutable node_position                         prev_extrapolated_position_;
     mutable optional<node_info_ptr>               rel_node_;
+#ifndef DEPRECATED
     std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
+    osg::ref_ptr<osg::Node>                       node_;
     mutable std::string                           name_;
+#endif
+    boost::optional<bool>                         visibility_;
 
 protected:
     mutable optional<model_structure::collision_volume const*> collision_;

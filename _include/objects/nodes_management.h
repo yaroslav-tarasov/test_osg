@@ -115,6 +115,7 @@ REFL_END()
         virtual void play_animation  (std::string const& seq, double len, double from, double size) = 0;
         virtual void set_texture     (std::string const& texture) = 0;
         virtual void set_visibility  (bool visible) = 0;
+        virtual boost::optional<bool> get_visibility  () = 0;
     };
 
 	struct node_tree_iterator

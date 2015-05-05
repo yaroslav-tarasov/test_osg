@@ -393,7 +393,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -619,14 +619,14 @@ void Scene::createObjects()
 
             positioned->addChild(rotated);
             //rotated->addChild(p_copy);
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
             if(_rigidUpdater.valid())
              _rigidUpdater->addPhysicsAirplane( p_copy,
                 pos, osg::Vec3(0,0,0), 800.0f );
 #endif
             osg::Vec3 pos2( radius * sin (angle),   radius * cos(angle), 0.f);
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
             if(_rigidUpdater.valid())
                 _rigidUpdater->addPhysicsAirplane( p_copy,
                 pos2, osg::Vec3(0,60,0), 1000.0f );

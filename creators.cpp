@@ -1598,7 +1598,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 			
 			positioned->addChild(rotated);
 			//rotated->addChild(p_copy);
-#ifdef OLD_STYLE            
+#ifdef DEPRECATED            
             rigidUpdater->addPhysicsAirplane( p_copy,
                 pos, osg::Vec3(0,0,0), 800.0f );
 #endif
@@ -1608,7 +1608,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
             //positioned2->addChild(rotated2);
             //rotated2->addChild(p_copy);
-#ifdef OLD_STYLE            
+#ifdef DEPRECATED            
             rigidUpdater->addPhysicsAirplane( p_copy,
                 pos2, osg::Vec3(0,60,0), 1000.0f );
 #endif

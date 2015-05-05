@@ -47,6 +47,7 @@ namespace aircraft
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
         geo_base_3 root_pos = root()->get_global_pos();
         quaternion root_orien = root()->get_global_orien();
+
         
         if (smoke_object_ && engine_node_)
         {

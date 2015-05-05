@@ -148,7 +148,7 @@ namespace bi
 		        RigidUpdater_private()
                     : _krv_data_getter("log_sochi_3.txt")
                 {}
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
                 RigidUpdater::phys_vehicles_t                          _vehicles;
 #endif
                 kernel::system_ptr                                     _msys;
@@ -353,7 +353,7 @@ namespace bi
     }
 
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
     void RigidUpdater::addPhysicsAirplane( osg::Node* node, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
@@ -691,7 +691,7 @@ namespace bi
             } 
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Right )
             {
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/++steer),-65., 65.);
                 phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);  
@@ -699,7 +699,7 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Left )
             {
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
                 double steer  = phys::aircraft::control_ptr(_aircrafts[0])->get_steer();
                 steer = cg::bound(cg::norm180(/*desired_course - cur_course*/--steer),-65., 65.);
                 phys::aircraft::control_ptr(_aircrafts[1])->set_steer(steer);
@@ -816,7 +816,7 @@ namespace bi
                 
                 
                 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   
                     aircraft::int_control_ptr(*it)->update( view->getFrameStamp()->getSimulationTime()/*dt*/ );
@@ -881,7 +881,7 @@ namespace bi
     {
          selected_obj_id_ = id;
 
-#ifdef OLD_STYLE
+#ifdef DEPRECATED
          auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
          {
              if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
@@ -947,7 +947,7 @@ namespace bi
         if(selected_obj_id_)
         {
 
-#ifdef OLD_STYLE             
+#ifdef DEPRECATED             
             auto it_am = std::find_if(_model_aircrafts.begin(),_model_aircrafts.end(),[this](aircraft::info_ptr amp)->bool
             {
                 if(amp->root() && amp->root()->object_id()==this->selected_obj_id_)
