@@ -195,6 +195,11 @@ bool vis_node_impl::is_visible() const
     return *visible_;
 }
 
+void vis_node_impl::set_visibility  (bool visible)
+{
+    user_visible_ = visible;
+}
+
 void vis_node_impl::init_disp()
 {                   
     msg_disp()

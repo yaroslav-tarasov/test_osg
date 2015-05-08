@@ -38,6 +38,9 @@ namespace nodes_management
         bool is_visible() const;
 
     private:
+        void set_visibility  (bool visible);
+
+    private:
         void init_disp();
 
     private:

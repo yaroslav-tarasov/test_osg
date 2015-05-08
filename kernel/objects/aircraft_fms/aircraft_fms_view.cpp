@@ -857,7 +857,9 @@ void view::make_aircraft_info()
 {
     if (ada_)
     {
-        aircraft_data_ = *ada_->get_data(aircraft_kind_);
+        FIXME("Stub");
+
+        aircraft_data_ = *ada_->get_data("A319"/*aircraft_kind_*/);
         procedure_model_ = fms::create_bada_procedure_model(*aircraft_data_);
 
         instruments_env_.procedure_model = procedure_model_;

@@ -510,7 +510,6 @@ namespace shaders
                 // gl_FragColor = vec4( result,1.0);
                 //gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
                 gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), base.a);  // for dynamic rotor
-                gl_FragColor = vec4( 1.0,0.0,0.0,1.0);
             }
             )
 

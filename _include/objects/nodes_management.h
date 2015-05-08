@@ -135,6 +135,7 @@ REFL_END()
 		virtual ~vis_node_control(){}
 		virtual vis_nodes_t const& vis_nodes() const = 0;
 		virtual bool is_visible() const = 0;
+        virtual void set_visibility  (bool visible) = 0;
 	};
 
 	struct vis_node_info

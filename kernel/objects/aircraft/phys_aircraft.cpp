@@ -105,6 +105,7 @@ namespace aircraft
 
     void phys_aircraft_impl::update()
     {     
+#if 0
         if (!freeze_)
         {
             shassis_->visit_chassis([this](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
@@ -123,6 +124,7 @@ namespace aircraft
 
             });
         }
+#endif 
         sync_phys(0.1);
     }
 
@@ -137,7 +139,7 @@ namespace aircraft
         if(freeze)
         {
             phys_aircraft_->set_thrust(0);                                 
-            phys_aircraft_->set_brake(100000); 
+            phys_aircraft_->set_brake(1); 
             phys_aircraft_->set_steer(0);
         }
     }
@@ -241,7 +243,7 @@ namespace aircraft
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
         FIXME(Mass real mass)
-        const double phys_mass_factor_ = 1; //1000; // 
+        const double phys_mass_factor_ = 1; // 1000;  // 1; //   1; //
 
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
@@ -292,16 +294,13 @@ namespace aircraft
         params.Cd2 = cd_2;
         params.ClAOA = 0.4;
         params.Cs = 0.2;
-        // params.thrust = (fsettings.ct_1 * (100. * 1000. / phys_mass_factor_ / fsettings.ct_2 + fsettings.ct_3 * 100. * 1000. / phys_mass_factor_ * 100. * 1000. / phys_mass_factor_ ));
+        //params.thrust = (fsettings.ct_1 * (100. * 1000. / phys_mass_factor_ / fsettings.ct_2 + fsettings.ct_3 * 100. * 1000. / phys_mass_factor_ * 100. * 1000. / phys_mass_factor_ ));
         
         FIXME( "Не ну для разных двигателей разный, не все же реактивные" )
         const double hp = 0.0;
         const double ct_cr = 0.95; // Maximum cruise thrust coefficient
-        params.thrust = fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr;
+        params.thrust =  fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr;
 
-        logger::need_to_log(true);
-        LOG_ODS_MSG ( "aircraft mass = " << params.mass << "\n");
-        logger::need_to_log(false);
 
         phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
@@ -527,7 +526,7 @@ namespace aircraft
 
             double desired_slide_angle = slide_angle;
             double desired_thrust = phys_aircraft_->thrust();
-            double desired_attack_angle = /*attack_angle*/0;
+            double desired_attack_angle = attack_angle;  // TYV 0
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
 
