@@ -46,8 +46,10 @@ namespace phys
 
 		// FIXME TODO
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+FIXME("Off point for bullet")
+#if 1
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
-
+#endif
 		//chassis_->setDamping(0.05f, 0.5f);
 		chassis_->setRestitution(0.1f);
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
@@ -81,28 +83,37 @@ namespace phys
             return;
 
         // special aircraft forces
-        cg::point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
+            point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
         double speed = cg::norm(vel - wind_);
-        cg::quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
-        cg::point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
-        cg::point_3 omega_loc = (!orien).rotate_vector(omega);
+
+        logger::need_to_log(true);
+
+        LOG_ODS_MSG(
+            "speed:  "                << speed << "\n" 
+            );
+
+        logger::need_to_log(false);
+
+            quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
+            point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
+            point_3 omega_loc = (!orien).rotate_vector(omega);
         dcpr cur_dcpr = cg::rot_axis2dcpr(orien.cpr(), rot_axis(omega));
 
         double const air_density = 1.225;
-        //            double const g = 9.8;
+//            double const g = 9.8;
         double const q = 0.5 * air_density * speed * speed; // dynamic pressure
 
-        cg::point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(cg::point_3(0, 1, 0))) ;
-        cg::point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(cg::point_3(1, 0, 0))) ;
-        cg::point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(cg::point_3(0, 0, 1))) ;
+            point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(point_3(0, 1, 0))) ;
+            point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(point_3(1, 0, 0))) ;
+            point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(point_3(0, 0, 1))) ;
 
-        cg::point_3 vk = vel - wind_;
-        cg::point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
+            point_3 vk = vel - wind_;
+            point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
 
-        cg::point_3 Z = cg::normalized_safe(right_dir ^ Y);
-        cg::point_3 X = cg::normalized_safe(Y ^ Z);
+            point_3 Z = cg::normalized_safe(right_dir ^ Y);
+            point_3 X = cg::normalized_safe(Y ^ Z);
 
-        cg::point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
+            point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
         double attack_angle = cg::rad2grad(cg::angle(Y_right_dir_proj, forward_dir)) * (-cg::sign(Y * up_dir));
         double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
 
@@ -148,19 +159,24 @@ namespace phys
         }
 
 
-        //            double zmoment = -Izz() * cg::rad2grad() * params_.Cl * params_.S * 0.5 * air_density * speed * sin(cg::grad2rad(orien.get_roll())) / params_.mass;
+//            double zmoment = -Izz() * cg::rad2grad() * params_.Cl * params_.S * 0.5 * air_density * speed * sin(cg::grad2rad(orien.get_roll())) / params_.mass;
 
-        cg::point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
+            point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
         //chassis_->applyTorque(to_bullet_vector3(torq*cg::grad2rad()));
+FIXME("Off point for bullet")
+#if 1
         chassis_->applyTorqueImpulse(to_bullet_vector3(torq*(cg::grad2rad()*dt)));
+#endif
 
-
-        cg::point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
+            point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
 
         //LogTrace("lift " << lift << " liftAOA " << liftAOA << " drag " << drag << " thrust_ " << thrust_ );
 
         //chassis_->applyCentralForce(to_bullet_vector3(force));
+FIXME("Off point for bullet")
+#if 1
         chassis_->applyCentralImpulse(to_bullet_vector3(force * dt));
+#endif
 
         prev_attack_angle_ = attack_angle;
 
@@ -222,7 +238,7 @@ namespace phys
         return false;
     }
 
-#define SIMEX_MOD
+//#define SIMEX_MOD
 	size_t impl::add_wheel( double /*mass*/, double /*width*/, double radius, point_3 const& offset, cpr const & /*orien*/, bool /*has_damper*/, bool is_front )
 	{
 		point_3 connection_point = offset;
@@ -237,7 +253,9 @@ namespace phys
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);
         //tuning_.m_suspensionStiffness = 5.f; // 20.f
         //tuning_.m_suspensionDamping = 2.3f;
-        tuning_.m_maxSuspensionForce = 60000000;
+//#if !defined(SIMEX_MOD)
+        tuning_.m_maxSuspensionForce = 600000;
+//#endif
         //tuning_.m_suspensionCompression = 4.4f;
         //tuning_.m_frictionSlip = 10.;
 
@@ -317,7 +335,7 @@ namespace phys
         rudder_ = rudder;
     }
 
-    void impl::set_wind    (cg::point_3 const& wind)
+        void impl::set_wind    (point_3 const& wind)
     {
         wind_ = wind;
     }
@@ -336,7 +354,7 @@ namespace phys
 		raycast_veh_.activate(chassis_->isActive());
 	}
 
-    void impl::has_contact(rigid_body_user_info_t const* /*other*/, cg::point_3 const& local_point, cg::point_3 const& vel)
+        void impl::has_contact(rigid_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
     {
         has_chassis_contact_ = true;
         size_t id = body_contact_points_.insert(local_point).first;
@@ -355,7 +373,7 @@ namespace phys
         std::vector<contact_info_t> res;
         for (auto it = body_contact_points_.begin(); it != body_contact_points_.end(); ++it)
         {
-            cg::point_3 vel = body_contacts_[it.id()].sum_vel / body_contacts_[it.id()].count;
+                point_3 vel = body_contacts_[it.id()].sum_vel / body_contacts_[it.id()].count;
             res.push_back(contact_info_t(*it, vel));
         }
 
@@ -380,7 +398,9 @@ namespace phys
         {
             raycast_veh_->resetSuspension();
             raycast_veh_->updateWheelTransform(i,false);
+//            raycast_veh_->applyEngineForce(0,i);
         }
+        
     }
 
     decart_position impl::get_position() const
@@ -436,7 +456,7 @@ namespace phys
         double drag = 0;
         if (speed > 5)
             drag = Cd * params_.S * q;
-
+                                                    
         return drag;
     }
 

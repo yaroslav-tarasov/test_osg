@@ -52,21 +52,20 @@ namespace ray_cast_vehicle
         void reset_suspension();
 
     private:
-        system_impl_ptr                      sys_;
+        system_impl_ptr sys_;
 
-        bt_collision_shape_ptr               chassis_shape_;
-        rigid_body_proxy                     chassis_;
+        double                         steer_;
 
-        raycast_vehicle_proxy                raycast_veh_;
-
-        double                               steer_;
-
+        bt_collision_shape_ptr         chassis_shape_;
+        rigid_body_proxy               chassis_;
+        raycast_vehicle_proxy          raycast_veh_;
         btRaycastVehicle::btVehicleTuning    tuning_;
 
-        bt_rigid_body_ptr      tow_;
-        bt_collision_shape_ptr tow_rod_shape_;
-        
-        rigid_body_proxy                            tow_rod_;
+        bt_rigid_body_ptr              tow_;
+        bt_collision_shape_ptr         tow_rod_shape_;
+        rigid_body_proxy               tow_rod_;
+        double                         tow_mass_;
+
         constraint_proxy<bt_generic_constraint_ptr> tow_constraint_self_;
         constraint_proxy<bt_generic_constraint_ptr> tow_constraint_tow_;
     };

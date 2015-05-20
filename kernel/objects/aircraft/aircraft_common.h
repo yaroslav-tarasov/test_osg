@@ -45,8 +45,8 @@ namespace aircraft
         nodes_management::node_control_ptr node;
         nodes_management::node_control_ptr wheel_node;
         std::vector<size_t>                phys_wheels;
-        double radius;
-        bool landing_dust;
+        double                             radius;
+        bool                               landing_dust;
 
         void clear_wheels()
         {

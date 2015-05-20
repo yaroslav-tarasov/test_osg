@@ -133,11 +133,11 @@ namespace airplane
             float zm = abs(bb.zMax()) + abs(bb.zMin());
 
 #if 1
-            float dx = xm / 4.f; // abs(bb.xMax()) - xm / 2.f;
-            float dy = ym / 4.f; // abs(bb.yMax()) - ym / 2.f;
-            float dz = zm / 4.f; // abs(bb.zMax()) - zm / 2.f;
+            float dx = -xm / 4.f; // abs(bb.xMax()) - xm / 2.f;
+            float dy = -ym / 4.f; // abs(bb.yMax()) - ym / 2.f;
+            float dz = -zm / 4.f; // abs(bb.zMax()) - zm / 2.f;
 
-            btVector3 offset_ = btVector3(0,-dy + (abs(bb.yMax()) - ym / 2.f)*2,0);
+            btVector3 offset_ = btVector3(0,dy /*+ (abs(bb.yMax()) - ym / 2.f)*2*/,0);
             offset = cg::point_3(offset_.x(),offset_.y(),offset_.z());
 
 #else

@@ -30,7 +30,7 @@ osg::Node* createObject(std::string name, bool fclone)
 	osg::Node* object_file = nullptr;
 	nodesMap::iterator it;
     
-
+    osg::PositionAttitudeTransform* pat;
 
 	if(( it = objCache.find(name))!=objCache.end())
 	{
@@ -47,6 +47,8 @@ osg::Node* createObject(std::string name, bool fclone)
 			);
 		else
 			object_file = it->second.get();
+
+        pat = object_file->asTransform()->asPositionAttitudeTransform();
 	}
 	else
 	{
@@ -67,15 +69,6 @@ osg::Node* createObject(std::string name, bool fclone)
         FIXME(Палец пол и потолок при определении модели)
         bool heli     = findFirstNode(object_file ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
 
-
-        MaterialVisitor::namesList nl;
-        nl.push_back("building");
-        nl.push_back("default");
-        nl.push_back("plane");
-
-        
-        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(mat_file_name));
-        object_file->accept(mv);
 
 		osg::Node* engine = nullptr; 
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 
@@ -168,27 +161,50 @@ osg::Node* createObject(std::string name, bool fclone)
         osg::ComputeBoundsVisitor cbv;
         object_file->accept( cbv );
         const osg::BoundingBox& bb = cbv.getBoundingBox();
-
+        /*
         float xm = bb.xMax() - bb.xMin();
         float ym = bb.yMax() - bb.yMin();
-        float zm = bb.zMax() - bb.zMin();   
+        float zm = bb.zMax() - bb.zMin();*/   
         
-        osg::PositionAttitudeTransform* pat;
+        float xm = abs(bb.xMax()) + abs(bb.xMin());
+        float ym = abs(bb.yMax()) + abs(bb.yMin());
+        float zm = abs(bb.zMax()) + abs(bb.zMin());
+        
+        //float dx = abs(bb.xMax()) - xm / 2.f;
+        //float dy = abs(bb.yMax()) - ym / 2.f;
+        //float dz = abs(bb.zMax()) - zm / 2.f;
+        
+        float dx = -xm / 4.f; 
+        float dy = -ym / 4.f; 
+        float dz = -zm / 4.f; 
         
         if (object_file->asTransform())
         {
             pat = object_file->asTransform()->asPositionAttitudeTransform();
             pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+            pat->setPosition(osg::Vec3(0,airplane?dz:0.f,0)); // FIXME Дурацкое смещение и не понятно чего с ним делать
+            
         }
         else
         {
             pat = new osg::PositionAttitudeTransform; 
             pat->addChild(object_file);
-            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+            pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+            pat->setPosition(osg::Vec3(0.,airplane?dy:0.f,0.)); // FIXME Дурацкое смещение и не понятно чего с ним делать
+
         }
+        
+        MaterialVisitor::namesList nl;
+        nl.push_back("building");
+        nl.push_back("default");
+        nl.push_back("plane");
+        //nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
+
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(mat_file_name));
+        pat->accept(mv);
 
         pat->setName("pat");
-        pat->setPosition(osg::Vec3(0,airplane?-(ym)/2.0f:0.f,0)); // FIXME Дурацкое смещение и не понятно чего с ним делать
+        
 #if 1
         if(name=="towbar")
         {
@@ -203,7 +219,7 @@ osg::Node* createObject(std::string name, bool fclone)
 
 	}
 
-	return object_file;
+	return pat/*object_file*/;
 }
 
 }

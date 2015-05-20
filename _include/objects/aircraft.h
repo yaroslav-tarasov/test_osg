@@ -200,23 +200,23 @@ struct info
 {
     virtual ~info(){}
 
-    virtual geo_point_3 const&  pos     () const = 0;
-    virtual point_3             dpos    () const = 0;
-    virtual cpr                 orien   () const = 0;
-    virtual settings_t const &  settings() const = 0;
-    virtual fpl::info_ptr       get_fpl () const = 0;
-    virtual bool                has_assigned_fpl() const = 0;
+    virtual geo_point_3 const&              pos              () const = 0;
+    virtual point_3                         dpos             () const = 0;
+    virtual cpr                             orien            () const = 0;
+    virtual settings_t const &              settings         () const = 0;
+    virtual fpl::info_ptr                   get_fpl          () const = 0;
+    virtual bool                            has_assigned_fpl () const = 0;
 
-    virtual transform_4 const&  tow_point_transform() const = 0;
-    virtual nodes_management::node_info_ptr tow_point() const = 0;
+    virtual transform_4 const&              tow_point_transform() const = 0;
+    virtual nodes_management::node_info_ptr tow_point        () const = 0;
 
-    virtual nodes_management::node_info_ptr root() const = 0;
-    virtual bool malfunction(malfunction_kind_t kind) const = 0;
+    virtual nodes_management::node_info_ptr root             () const = 0;
+    virtual bool                            malfunction      (malfunction_kind_t kind) const = 0;
 
 // FIXME not relized yet 
     //virtual tp_provider_ptr  get_tp_provider(double duration_sec) = 0;
 
-    virtual aircraft_fms::info_ptr get_fms() const = 0;
+    virtual aircraft_fms::info_ptr          get_fms          () const = 0;
 
 
     //virtual atc_controls_t const& get_atc_controls() const = 0;
@@ -225,7 +225,7 @@ struct info
     //virtual aircraft_gui::control_ptr get_gui() const = 0;
 
     virtual optional<double> get_prediction_length() const = 0;
-    virtual optional<double> get_proc_length() const = 0;
+    virtual optional<double> get_proc_length      () const = 0;
 
     DECLARE_EVENT(assigned_fpl_changed, (fpl::info_ptr));
     DECLARE_EVENT(responder_changed, (fpl::info*));

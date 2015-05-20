@@ -100,13 +100,13 @@ follow_curve_state::follow_curve_state(cg::geo_curve_2 const& route, double end_
 
 void follow_curve_state::update(model * self, double dt)
 {
-    double const model_calc_step = 0.1;
+    double const model_calc_step = cfg().model_params.msys_step;
 
     cg::geo_base_2 cur_pos = self->pos();
     double cur_course = self->course();
     double cur_speed = self->speed();
     
-    size_t steps = cg::floor(dt / model_calc_step + 0.01);
+    size_t steps = cg::floor(dt / model_calc_step + model_calc_step * .1);
 
     double max_speed = 0;
     bool end = false;

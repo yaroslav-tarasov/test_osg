@@ -45,30 +45,32 @@ namespace aircraft
         // model_info
     private:
         phys::rigid_body_ptr get_rigid_body() const;
-        point_3              tow_offset() const;
-        bool                 tow_attached() const;
-        geo_position         get_phys_pos() const;
-        
+        point_3              tow_offset    () const;
+        bool                 tow_attached  () const;
+        geo_position         get_phys_pos  () const;
+        double               rotors_angular_speed () const override;
+
         // model_control
     private:
-        void set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback);
-        void set_steer( double steer );
-        void set_brake( double brake );
+        void                 set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback);
+        void                 set_steer                ( double steer ) override;
+        void                 set_brake                ( double brake ) override;
+        void                 set_rotors_angular_speed ( double val ) override;
 
         // sync_fsm::self_t
     private:
-        geo_position fms_pos() const;
+        geo_position           fms_pos() const;
         airports_manager::info_ptr get_airports_manager() const;
-        phys::control_ptr phys_control() const;
+        phys::control_ptr      phys_control() const;
         nodes_management::manager_ptr get_nodes_manager() const;
         aircraft_fms::info_ptr get_fms_info() const;
         //meteo::meteo_cursor_ptr get_meteo_cursor() const;
-        shassis_support_ptr get_shassis() const;
-        rotors_support_ptr  get_rotors() const;
+        shassis_support_ptr    get_shassis() const;
+        rotors_support_ptr     get_rotors() const;
 
-        fms::trajectory_ptr get_trajectory() const;
+        fms::trajectory_ptr    get_trajectory() const;
 
-        geo_position get_root_pos() const;
+        geo_position           get_root_pos() const;
         bool is_fast_session() const;
         void set_desired_nm_pos  (geo_point_3 const& pos);
         void set_desired_nm_orien(quaternion const& orien);
@@ -87,7 +89,7 @@ namespace aircraft
         void update_shassi_anim (double time);
         void update_contact_effects(double time);
         void check_wheel_brake();
-        void check_rotors_brake();
+        void check_rotors_malfunction();
         void on_time_factor_changed(double time, double factor);
             
         void sync_nm_root(double dt);
@@ -100,10 +102,10 @@ namespace aircraft
         fms::trajectory_ptr  get_trajectory(){return traj_;} 
 
     private:
-        model_system *    sys_;
-        optional<double> last_update_;
+        model_system *                         sys_;
+        optional<double>                       last_update_;
 
-        airports_manager::info_ptr airports_manager_;
+        airports_manager::info_ptr             airports_manager_;
         
         nodes_management::node_control_ptr     root_;
         nodes_management::node_control_ptr     elev_rudder_node_;
@@ -113,6 +115,8 @@ namespace aircraft
 
         shassis_support_ptr                    shassis_;
         rotors_support_ptr                     rotors_;
+
+        double                                 rotors_angular_speed_;
 
         aircraft::phys_aircraft_ptr            phys_aircraft_;
 

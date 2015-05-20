@@ -243,7 +243,7 @@ namespace aircraft
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
         FIXME(Mass real mass)
-        const double phys_mass_factor_ = 1; // 1000;  // 1; //   1; //
+        const double phys_mass_factor_ = 1; // 1000;  // 1; //  
 
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
@@ -300,7 +300,11 @@ namespace aircraft
         const double hp = 0.0;
         const double ct_cr = 0.95; // Maximum cruise thrust coefficient
         params.thrust =  fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr;
+        
 
+        FIXME("» по какой формуле считать?")
+        if(fsettings.engine == 1)
+            params.thrust = 132050;
 
         phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
@@ -324,7 +328,6 @@ namespace aircraft
             //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
             cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node);
             point_3 wheel_offset = wt.translation() /*+ s->get_offset()*/;
-            FIXME(To Offset or not to offset )
 
             //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
             const double radius = 0.75 * node->get_bound().radius ;
@@ -394,7 +397,7 @@ namespace aircraft
 
         //LogTrace("phys height " << cur_pos.pos.z);
 
-        if (tow_attached_ )
+        if ( tow_attached_ )
         {
             //phys_aircraft_->set_steer(steer);
             phys_aircraft_->set_thrust(0);
@@ -480,9 +483,11 @@ namespace aircraft
         const double  min_aerodynamic_speed = phys_aircraft_->params().min_aerodynamic_speed;
         
         // 
+        // FIXME TYV 
+        //on_ground_ = true;
+        //cfg_ = fms::CFG_GD;
 
-
-        if (cur_speed < phys_aircraft_->params().min_aerodynamic_speed )
+        if (cur_speed < min_aerodynamic_speed )
         {
             on_ground_ = true;
 
@@ -503,8 +508,17 @@ namespace aircraft
             //double max_speed_clamped = max_speed;
 
             double desired_speed_signed = (dist2target_signed - cur_speed_signed) / (1.2 * prediction_*dt);
+            logger::need_to_log(true);
+
+            LOG_ODS_MSG(
+                "desired_speed_signed:  "                << desired_speed_signed << "\n" 
+                );
+
+            logger::need_to_log(false);
+
 // FIXME TYV      ј не то при рулении взлетаем хвостом вперед хо-хо   
-            desired_speed_signed = cg::bound(desired_speed_signed, -30., 30.);
+            // desired_speed_signed = cg::bound(desired_speed_signed, -30., 30.);
+
             //        double desired_speed_signed = filter::BreakApproachSpeed(0., dist2target_signed, cur_speed_signed, max_speed_clamped, 500, dt, prediction);
             if (fabs(desired_speed_signed) < 0.1)
                 desired_speed_signed = 0;

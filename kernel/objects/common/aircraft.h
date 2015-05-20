@@ -34,7 +34,9 @@ inline std::string get_model(std::string const& kind)
     else if (kind == "AN26")
         return "an_26";
     else if (kind == "SB20")
-        return "sb20";
+        return "sb20"; 
+    else if (kind == "KA27")
+        return "ka27";
     else
         return "checker";
 }
@@ -102,18 +104,20 @@ struct model_info
     virtual ~model_info() {}
 
     virtual phys::rigid_body_ptr get_rigid_body() const = 0;
-    virtual bool                 tow_attached() const = 0;
-    virtual cg::point_3          tow_offset() const = 0;
-    virtual geo_position         get_phys_pos() const = 0;
+    virtual bool                 tow_attached  () const = 0;
+    virtual cg::point_3          tow_offset    () const = 0;
+    virtual geo_position         get_phys_pos  () const = 0;
+    virtual double               rotors_angular_speed () const = 0;
 };
 
 struct model_control
 {
     virtual ~model_control() {}
 
-    virtual void set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback) = 0;
-    virtual void set_steer( double steer ) = 0;
-    virtual void set_brake( double brake ) = 0;
+    virtual void                 set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback) = 0;
+    virtual void                 set_steer( double steer ) = 0;
+    virtual void                 set_brake( double brake ) = 0;
+    virtual void                 set_rotors_angular_speed ( double val ) = 0;
 };
 
 } // end of aircraft

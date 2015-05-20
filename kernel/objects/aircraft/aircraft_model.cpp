@@ -60,6 +60,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
+    , rotors_angular_speed_ (0)
 {
 
     if (get_nodes_manager())
@@ -109,7 +110,7 @@ void model::update( double time )
     update_atc_state();
     sync_fms();
 
-    check_rotors_brake();
+    check_rotors_malfunction();
 
     if (phys_aircraft_)
     {
@@ -377,6 +378,11 @@ geo_position model::get_phys_pos() const
     return phys_aircraft_->get_position();
 }
 
+double model::rotors_angular_speed() const
+{
+    return rotors_angular_speed_ ;
+}
+
 void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback)
 {
     if (tow_attached_ == attached)
@@ -447,6 +453,10 @@ void model::set_nm_angular_smooth(double val)
     nm_ang_smooth_ = val;
 }
 
+void model::set_rotors_angular_speed(double val)
+{
+    rotors_angular_speed_ = val;
+}
 
 
 void model::check_wheel_brake()
@@ -465,7 +475,7 @@ void model::check_wheel_brake()
     });
 }
 
-void model::check_rotors_brake()
+void model::check_rotors_malfunction()
 {
     if (!phys_aircraft_)
         return;
@@ -477,7 +487,7 @@ void model::check_rotors_brake()
             rotors_group.angular_velocity(0);
         }
         else
-            rotors_group.angular_velocity(120);
+            rotors_group.angular_velocity(rotors_angular_speed_);
     });
 }
 

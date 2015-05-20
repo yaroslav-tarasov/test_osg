@@ -119,15 +119,15 @@ namespace
                     kd.y = items.get<float>(3); 
                     kd.h = items.get<float>(5);
                     //kd.fi = items.get<float>(7);
-                    //kd.fiw = items.get<float>(9);
+                    kd.fiw = items.get<float>(7);
                     //kd.kr = items.get<float>(11);
                     //kd.v = items.get<float>(13);
                     //kd.w = items.get<float>(15); 
                     //kd.vb = items.get<float>(17);
                     //kd.tg = items.get<float>(19);
-                    //kd.time = items.get<float>(21);
+                    kd.time = items.get<float>(17);
 
-                    //kd_.push_back(kd);
+                    kd_.push_back(kd);
                     kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
                 }
 
@@ -225,6 +225,7 @@ namespace bi
         create_auto_object(_d->_msys,"ada","ada");
         create_auto_object(_d->_msys,"meteo_proxy","meteo_proxy");
         create_auto_object(_d->_msys,"airport","aiport_0");
+        
 
         if(false)
         {
@@ -251,15 +252,15 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A319";
             geo_position agp(apos,quaternion(cpr(30,0,0)));
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
         {
 
             cg::geo_point_3 apos(-0.0006,-0.0005,0.0);
             aircraft::settings_t as;
             as.kind = "SB20";
-            geo_position agp(apos,quaternion(cpr(30,0,0)));
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            geo_position agp(apos,quaternion(cpr(0,0,0)));
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -304,6 +305,54 @@ namespace bi
             as.kind = "AN26";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
             //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+        
+        {
+            cg::point_3 vpos(250,650,0);
+            decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
+            geo_position agp(target_pos, ::get_base());
+
+            aircraft::settings_t as;
+            as.kind = "KA27";
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        fms::trajectory::keypoints_t  kpts;
+        fms::trajectory::curses_t      crs;
+        fms::trajectory::velocities_t vls ;
+
+        const unsigned start_idx = 400;
+        cg::point_2 prev(_d->_krv_data_getter.kd_[start_idx].x,_d->_krv_data_getter.kd_[start_idx].y);
+        double tlength = 0;
+        for(auto it = _d->_krv_data_getter.kd_.begin() + start_idx; it!= _d->_krv_data_getter.kd_.end();++it )
+        {
+            auto p = cg::point_2(it->x,it->y);
+            auto dist = cg::distance(prev,p);
+            tlength += dist;
+            crs.insert(std::make_pair(tlength,(it->fiw - 45)));
+            kpts.insert(std::make_pair(tlength,cg::point_3(p,it->h)));
+
+            auto pit = std::prev(it);
+            if(pit!=it)
+                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 10));
+                // vel.push_back(dist/(it->time - pit->time));
+            prev = p;
+        }
+
+
+        
+
+        {
+            cg::point_3 vpos(_d->_krv_data_getter.kp_[start_idx]);
+            decart_position target_pos(vpos,cpr(/*180 -*/ _d->_krv_data_getter.kd_[start_idx].fiw,0,0));
+            geo_position agp(target_pos, ::get_base());
+            
+            agp.orien = cpr( _d->_krv_data_getter.kd_[start_idx].fiw - 45,0,0);
+
+            aircraft::settings_t as;
+            as.kind = "A319";
+            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
         }
 
         vehicle::settings_t vs;
@@ -776,7 +825,42 @@ namespace bi
                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
                 vvv->set_brake(0.35);
             }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Up )
+            {
+                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
+                
+                kernel::visit_objects<aircraft::model_control_ptr>(col,[this](aircraft::model_control_ptr a)->bool
+                {
+                    auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                    uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
+                    if( nm_id == this->selected_obj_id_)
+                    {
+                        const double ras = aircraft::model_info_ptr(a)->rotors_angular_speed() + 10;
+                        a->set_rotors_angular_speed( ras>250 ? 250 : ras);
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Down )
+            {
+                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
+
+                kernel::visit_objects<aircraft::model_control_ptr>(col,[this](aircraft::model_control_ptr a)->bool
+                {
+                    auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                    uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                    if( nm_id == this->selected_obj_id_)
+                    {
+                        const double ras = aircraft::model_info_ptr(a)->rotors_angular_speed() - 10;
+                        a->set_rotors_angular_speed( ras>0? ras : 0);
+                        return false;
+                    }
+                    return true;
+                });
+            }
             break;
         case osgGA::GUIEventAdapter::FRAME:
             {

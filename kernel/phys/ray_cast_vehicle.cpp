@@ -21,6 +21,7 @@ namespace ray_cast_vehicle
         , chassis_(sys->dynamics_world())
         , raycast_veh_(sys->dynamics_world())
         , steer_(0)
+        , tow_mass_(0)
         , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
     {
         tuning_.m_maxSuspensionTravelCm = 50;
@@ -169,7 +170,7 @@ namespace ray_cast_vehicle
     {
         for (int i=0;i<raycast_veh_->getNumWheels();i++)
         {
-            raycast_veh_->applyEngineForce(btScalar(1000 * thrust),i);
+            raycast_veh_->applyEngineForce(btScalar(1000 * thrust * (tow_?1000:50) ),i);
         }
         
         if (!cg::eq_zero(thrust))
@@ -225,6 +226,8 @@ namespace ray_cast_vehicle
     void impl::set_tow(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
     {
         tow_ = rigid_body_impl_ptr(rb)->get_body();
+        
+        tow_mass_ = tow_->getInvMass()?1/tow_->getInvMass():0;
 
         cg::transform_4 self_transform = from_bullet_transform(chassis_->getWorldTransform());
         cg::point_3 self_point = self_transform * self_offset;
@@ -238,7 +241,9 @@ namespace ray_cast_vehicle
 //        tow_rod_shape_ = bt_collision_shape_ptr(new btCylinderShape(to_bullet_vector3(point_3(0.1, half_dist, 0.1))));
         tow_rod_shape_ = bt_collision_shape_ptr(new btEmptyShape());
 
-        double const rod_mass = cfg().model_params.rod_mass;
+        // double const rod_mass = cfg().model_params.rod_mass;
+        // double const rod_mass = 100;
+        double const rod_mass = cg::clamp(1000.0,650000.0,1.0,200.0)(tow_mass_); //1; //100; // TYV  на самый легкий и самый тяжелый самолет (Ан-225)
         double const rod_radius = 0.1;
 
         btVector3 inertia(btScalar(rod_mass*(3*cg::sqr(rod_radius)+ cg::sqr(2*half_dist))/12), 
@@ -307,6 +312,7 @@ namespace ray_cast_vehicle
         tow_rod_.reset();
         tow_rod_shape_.reset();
         tow_.reset();
+        tow_mass_ = 0;
     }
 
 

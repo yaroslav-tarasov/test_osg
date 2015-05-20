@@ -1167,11 +1167,10 @@ private:
 };
 
 FIXME(Имя файла объектов в конструкторе это очень на круто)
-FIXME("calc_step_  (.01)")
 model_system_impl::model_system_impl(msg_service& service, string const& script)
     : fake_system_base( sys_model, service, "objects.xml" )
     , time_factor_( 0)
-    , calc_step_  (.1)
+    , calc_step_  (cfg().model_params.msys_step)
     //, py_engine_  (this)
     , ex_script_  (script)
 

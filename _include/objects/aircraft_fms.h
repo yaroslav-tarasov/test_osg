@@ -61,29 +61,29 @@ struct info
 {
     virtual ~info(){}
 
-    virtual state_t const& get_state()  const = 0;
-    virtual double get_mass() const  = 0;
-    virtual double get_payload_mass() const  = 0;
+    virtual state_t const&                get_state()  const = 0;
+    virtual double                        get_mass() const  = 0;
+    virtual double                        get_payload_mass() const  = 0;
     virtual fms::manual_controls_t const& get_controls()  const = 0;
     virtual fms::instrument_ptr           get_instrument() const  = 0;
     virtual fms::instrument_ptr           get_next_instrument() const = 0;
     virtual fms::plan_t const&            get_plan() const  = 0;
 
-    virtual double length_fwd() const = 0;
-    virtual double length_bwd() const = 0;
+    virtual double                        length_fwd() const = 0;
+    virtual double                        length_bwd() const = 0;
 
-    virtual optional<ada::data_t> const& fsettings() const = 0;
+    virtual optional<ada::data_t> const&  fsettings() const = 0;
 
-    virtual fms::procedure_model_ptr procedure_model() const = 0;
-    virtual fms::operation_model_ptr operation_model() const = 0;
+    virtual fms::procedure_model_ptr      procedure_model() const = 0;
+    virtual fms::operation_model_ptr      operation_model() const = 0;
 
-    virtual point_3 ground_velocity()  const = 0;
-    virtual double max_fuel() const = 0;
-    virtual ani::airport_info_ptr closest_airport() const = 0;
-    virtual optional<double> get_desired_course() const = 0; // information only, not state
-    virtual optional<double> get_desired_height() const = 0;
-    virtual optional<double> get_desired_CAS() const = 0;
-    virtual optional<double> get_desired_ROCD() const = 0;
+    virtual point_3                       ground_velocity()  const = 0;
+    virtual double                        max_fuel() const = 0;
+    virtual ani::airport_info_ptr         closest_airport() const = 0;
+    virtual optional<double>              get_desired_course() const = 0; // information only, not state
+    virtual optional<double>              get_desired_height() const = 0;
+    virtual optional<double>              get_desired_CAS() const = 0;
+    virtual optional<double>              get_desired_ROCD() const = 0;
 
     DECLARE_EVENT(state_changed, ()) ;
     DECLARE_EVENT(fms_changed, ()) ;

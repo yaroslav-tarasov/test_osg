@@ -126,16 +126,17 @@ protected:
     nodes_management::node_info_ptr root() const override; 
     nodes_management::node_info_ptr tow_point() const override;
 
-    bool malfunction(malfunction_kind_t kind) const override;
+    bool        malfunction(malfunction_kind_t kind) const override;
 #if 0
     tp_provider_ptr get_tp_provider(double duration_sec) override;
 
-    atc_controls_t const&     get_atc_controls() const override;
-    ipo_controls_t const&     get_ipo_controls() const override;
-    aircraft_gui::control_ptr get_gui()          const override;
+    atc_controls_t const&           get_atc_controls() const override;
+    ipo_controls_t const&           get_ipo_controls() const override;
+    aircraft_gui::control_ptr       get_gui()          const override;
 #endif
-    optional<double> get_prediction_length() const override;
-    optional<double> get_proc_length() const override;
+
+    optional<double>    get_prediction_length() const override;
+    optional<double>    get_proc_length() const override;
 
     // ani_info
 #if 0
@@ -272,49 +273,49 @@ private:
 #endif
 
 private:
-    scoped_connection fms_changed_connection_ ;
-    scoped_connection state_changed_connection_ ;
-    scoped_connection plan_changed_connection_ ;
+    scoped_connection              fms_changed_connection_ ;
+    scoped_connection              state_changed_connection_ ;
+    scoped_connection              plan_changed_connection_ ;
 
 protected:
-    transform_4 tow_point_transform_;
+    transform_4                    tow_point_transform_;
 
 protected:
-    fpl::info_ptr       fpl_ ;
+    fpl::info_ptr                  fpl_ ;
  
-	optional<double>    proc_len_;
-    optional<double>    prediction_len_;
+	optional<double>               proc_len_;
+    optional<double>               prediction_len_;
 
     void update_len(double time);
 
 protected:
-    ani_object::info_ptr    ani_;
-    meteo_proxy::info_ptr   met_proxy_obj_;
-    meteo::meteo_proxy_ptr  meteo_proxy_;
+    ani_object::info_ptr           ani_;
+    meteo_proxy::info_ptr          met_proxy_obj_;
+    meteo::meteo_proxy_ptr         meteo_proxy_;
 
 protected:
     //////////////////////////////////////
-    fms::trajectory_ptr                    traj_;
+    fms::trajectory_ptr            traj_;
     /////////////////////////////////////
 
 private:
 #if 0 
-    tp_sys::control_ptr    tp_sys_;
-    fms::tp::aircraft_ptr  airc_tp_;
+    tp_sys::control_ptr            tp_sys_;
+    fms::tp::aircraft_ptr          airc_tp_;
 #endif
 
-    size_t                 providers_count_;
-    double                 max_pred_len_;
+    size_t                         providers_count_;
+    double                         max_pred_len_;
 
 private:
-    atc_state_t               atc_state_ ;
-    boost::optional<uint32_t> state_arm_id_ ;
+    atc_state_t                    atc_state_ ;
+    boost::optional<uint32_t>      state_arm_id_ ;
 
 private:
-    boost::optional<unsigned> old_responder_code_ ;
+    boost::optional<unsigned>      old_responder_code_ ;
 
 private:
-    scoped_connection fpl_changed_conn_;
+    scoped_connection              fpl_changed_conn_;
 
 private:
     std::vector< std::pair<double, std::string> > oldi_sequence_ ;

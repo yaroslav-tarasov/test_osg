@@ -36,6 +36,10 @@ namespace ada
 			//auto proxy = bada::create_proxy(bada_path);
 
 			auto syn_data        = proxy->get_synonim_data(aircraft_kind) ;
+            
+            if(!syn_data)
+                syn_data = proxy->get_synonim_data("A319")  ;
+
 			auto air_data        = proxy->get_aircraft_data(syn_data->getSynonim()) ;
 			auto air_global_data = proxy->get_global_data() ;
 

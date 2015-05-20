@@ -139,16 +139,21 @@ namespace sync_fsm
         {
             if (traj_->cur_len() < traj_->length())
             {
-                phys_aircraft_->set_prediction(15.); 
+                phys_aircraft_->set_prediction(/*15.*/30.); 
                 phys_aircraft_->freeze(false);
                 const double  cur_len = traj_->cur_len();
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
                 const double  tar_len = traj_->cur_len();
                 decart_position target_pos;
 
-                target_pos.pos = cg::point_3(traj_->kp_value(tar_len),0);
+                target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
                 geo_position gtp(target_pos, get_base());
                 phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+
+                if(gtp.pos.height > 0)
+                {
+                    phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
+                }
 
                 auto physpos = phys_aircraft_->get_position();
 
@@ -157,6 +162,9 @@ namespace sync_fsm
 
                 const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
 
+                if(traj_->velocity_value(tar_len))
+                    desired_velocity_ = *traj_->velocity_value(tar_len);
+                else
                 if(cg::eq(curs_change,0.0,0.085))
                     desired_velocity_ = aircraft::max_desired_velocity();
                 else
@@ -164,17 +172,17 @@ namespace sync_fsm
 
                 const decart_position cur_pos = phys_aircraft_->get_local_position();
 
-                logger::need_to_log(true);
+                //logger::need_to_log(true);
 
-                LOG_ODS_MSG(
-                    "curr_pods_len:  "                << traj_->cur_len() 
-                    << "    desired_velocity :  "     << desired_velocity_   
-                    << "    delta curs :  "           << curs_change
-                    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-                    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
-                    );
+                //LOG_ODS_MSG(
+                //    "curr_pods_len:  "                << traj_->cur_len() 
+                //    << "    desired_velocity :  "     << desired_velocity_   
+                //    << "    delta curs :  "           << curs_change
+                //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+                //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
+                //    );
 
-                logger::need_to_log(false);
+                //logger::need_to_log(false);
 
             }
             else
@@ -255,10 +263,12 @@ namespace sync_fsm
 
         quaternion root_next_orien = quaternion(cg::rot_axis(root_pos.omega * dt)) * root_pos.orien;
         geo_base_3 root_next_pos = root_pos.pos(root_pos.dpos * dt);
+        
+        logger::need_to_log(true);
 
         geo_position body_pos = phys_aircraft_->get_position();
 
-        self_.get_shassis()->visit_chassis([this, &root_next_orien, &root_next_pos, &body_pos, dt](shassis_group_t const&, shassis_t & shassis)
+        self_.get_shassis()->visit_chassis([this, &root_next_orien, &root_next_pos, &body_pos, dt](shassis_group_t const& gr, shassis_t & shassis)
         {
             auto wnode = shassis.wheel_node;
             auto chassis_node = shassis.node;
@@ -267,9 +277,20 @@ namespace sync_fsm
                 return;
 
             geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
+            
+            //LOG_ODS_MSG( "  wpos.pos.x() = " << wpos.pos.lat <<   
+            //    "  wpos.pos.y() = " <<  wpos.pos.lon <<
+            //    "  wpos.pos.z() = " <<  wpos.pos.height << "\n"                 
+            //    );
 
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
+            
+            //LOG_ODS_MSG( "  wpos_rel_pos.x() = " << wpos_rel_pos.x <<   
+            //    "  wpos_rel_pos.y() = " <<  wpos_rel_pos.y <<
+            //    "  wpos_rel_pos.z() = " <<  wpos_rel_pos.z << "\n"                 
+            //    );
+
 #ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wnode;
 #else
@@ -285,20 +306,45 @@ namespace sync_fsm
             quaternion desired_orien_in_rel = (!quaternion(rel_node_root_tr.rotation().cpr())) * wpos_rel_orien;
 
             desired_orien_in_rel = quaternion(cpr(0, 0, -root_next_orien.get_roll())) * desired_orien_in_rel;
+            
+            //LOG_ODS_MSG( "  desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
+            //    "  desired_orien_in_rel.get_pitch() = " <<  desired_orien_in_rel.get_pitch() <<
+            //    "  desired_orien_in_rel.get_roll() = " <<  desired_orien_in_rel.get_roll() << "\n"                 
+            //    );
 
             nodes_management::node_position wheel_node_pos = wnode->position();
             nodes_management::node_position chassis_node_pos = chassis_node->position();
 
             chassis_node_pos.local().dpos.z = (desired_pos_in_rel.z - wheel_node_pos.local().pos.z) / dt;
 
-            quaternion q = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel);
+#if 0
+            const float angular_velocity = 45 * 2 * cg::pif/60.0; 
+            desired_orien_in_rel = wheel_node_pos.local().orien * quaternion(cpr(0,-cg::rad2grad() * angular_velocity * dt,0));
+#endif
+            //quaternion q = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel);
             point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (dt);
-            wheel_node_pos.local().omega = omega_rel;
+            wheel_node_pos.local().omega = omega_rel ;
+            
+            //LOG_ODS_MSG( "  omega_rel.x() = " << omega_rel.x <<   
+            //    "  omega_rel.y() = " <<  omega_rel.y <<
+            //    "  omega_rel.z() = " <<  omega_rel.z << "\n"                 
+            //    );
+
+
+            //LOG_ODS_MSG( "  wheel_node_pos.local().orien.get_course() = " << wheel_node_pos.local().orien.get_course() <<   
+            //    "  wheel_node_pos.local().orien.get_pitch() = " <<  wheel_node_pos.local().orien.get_pitch() <<
+            //    "  wheel_node_pos.local().orien.get_roll() = " <<  wheel_node_pos.local().orien.get_roll() << "\n"                 
+            //    );
+
+
 
             wnode->set_position(wheel_node_pos);
             chassis_node->set_position(chassis_node_pos);
         });
 
+
+
+        logger::need_to_log(false);
 	}
 
     void phys_state::sync_rotors(double dt)
@@ -313,10 +359,9 @@ namespace sync_fsm
             nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_velocity = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
            
-            quaternion des_orien;
-            des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,cg::rad2grad() * angular_velocity * dt));
+            quaternion des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,-cg::rad2grad() * angular_velocity * dt));
 
-            const cg::transform_4 rotor_node_trans = cg::transform_4(cg::as_translation(-rotor_node_pos.local().pos), /*rpos.orien*/des_orien.rotation()); 
+            // const cg::transform_4 rotor_node_trans = cg::transform_4(cg::as_translation(-rotor_node_pos.local().pos), /*rpos.orien*/des_orien.rotation()); 
             point_3 omega_rel     = cg::get_rotate_quaternion(rotor_node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
 
             // rotor_node_pos.local().orien = /*rpos.orien*/rotor_node_trans.rotation().quaternion();
@@ -325,7 +370,7 @@ namespace sync_fsm
             rnode->set_position(rotor_node_pos);   
 
             //if(rg.ang_velocity != av)
-            if(rg.ang_velocity>60)
+            if(rg.ang_velocity>150)
             {
                 if(rg.dyn_rotor_node)
                 {

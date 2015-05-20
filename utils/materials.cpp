@@ -49,6 +49,7 @@ public:
             || mat_name.find("railing")  !=std::string::npos
             || mat_name.find("panorama") !=std::string::npos
             || mat_name.find("plane") !=std::string::npos
+            || mat_name.find("rotor") !=std::string::npos
             || mat_name.find("default") !=std::string::npos
             )
         {
@@ -93,6 +94,13 @@ private:
         emptyTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
         emptyTex->setMaxAnisotropy(16.0f);
 
+        decalTex = new osg::Texture2D;
+        decalTex->setTextureSize(1024, 1024);
+        decalTex->setInternalFormat( GL_RGBA );
+        decalTex->setBorderWidth( 0 );
+        decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
+        decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
+
         // create and setup the texture object
         envTex = new osg::TextureCubeMap;
         const unsigned envSize = 256;
@@ -104,30 +112,27 @@ private:
         envTex->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR_MIPMAP_LINEAR/*LINEAR*/);
         envTex->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
         envTex->setMaxAnisotropy(16.0f);
+#ifndef TEST_EVN_CUBE_MAP 
         envTex->setNumMipmapLevels(3);
         envTex->setUseHardwareMipMapGeneration(true);
+#endif
 
-        decalTex = new osg::Texture2D;
-        decalTex->setTextureSize(1024, 1024);
-        decalTex->setInternalFormat( GL_RGBA );
-        decalTex->setBorderWidth( 0 );
-        decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
-        decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
-#if 0
+
+#ifdef TEST_EVN_CUBE_MAP 
 #if 1
-        envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+/*        envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
         envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
         envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP);
         envTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-        envTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR);    
+        envTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR); */   
         // assign the six images to the texture object
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("day_posx.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("day_negx.jpg"));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("day_posy.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("day_negy.jpg"));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("day_posz.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("day_negz.jpg"));
-        // envTex->setUseHardwareMipMapGeneration(true);
+        envTex->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("test_posx.jpg"));
+        envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("test_negx.jpg"));
+        envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("test_posy.jpg"));
+        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("test_negy.jpg"));
+        envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("test_posz.jpg"));
+        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("test_negz.jpg"));
+        //envTex->setUseHardwareMipMapGeneration(true);
 #else
         // generate the six highlight map images (light direction = [1, 1, -1])
         osgUtil::HighlightMapGenerator *mapgen = new osgUtil::HighlightMapGenerator(
@@ -428,9 +433,11 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
         uni_fog->setDataVariance(osg::Object::DYNAMIC);
     }
 
+    FIXME(Alpha to coverage и прочие прелести надо бы включать во внешнем источнике)
     if (   mat_name.find("panorama") !=std::string::npos
         || mat_name.find("railing")  !=std::string::npos 
-        || mat_name.find("tree")     !=std::string::npos 
+        || mat_name.find("tree")     !=std::string::npos
+        || mat_name.find("rotor")     !=std::string::npos
         )
     { 
         stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               

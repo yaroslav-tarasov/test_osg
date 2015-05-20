@@ -43,7 +43,7 @@ void model::update( double time )
 {
     view::update(time);
 
-    double const fms_calc_step = 0.1;
+    double const fms_calc_step = cfg().model_params.msys_step;
     if(pilot_impl_)
     {
         double dt = last_time_ ? time - *last_time_ : 0.;
@@ -53,7 +53,7 @@ void model::update( double time )
             geo_base_3 prev_pos = pilot_impl_->state().dyn_state.pos;
             if (dt > 0)
             {
-                size_t steps = cg::floor(dt / fms_calc_step + 0.01);
+                size_t steps = cg::floor(dt / fms_calc_step + fms_calc_step * .1);
                 fms::pilot_simulation_ptr pilot_sim(pilot_impl_);
                 for (size_t i = 0; i < steps; ++i)
                 {

@@ -29,6 +29,7 @@
 #include <osg/AlphaFunc>
 #include <osg/BlendEquation>
 #include <osg/TexGen>
+#include <osg/TexMat>
 #include <osg/TexEnvCombine>
 #include <osg/StateSet>
 #include <osg/LightModel>

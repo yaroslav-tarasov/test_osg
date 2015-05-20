@@ -3,6 +3,7 @@
 
 namespace phys
 {
+#if 0
     class cpr : public osg::Vec3
     {
     public:
@@ -24,7 +25,7 @@ namespace phys
         inline quaternion( const osg::Vec4d& v ): osg::Quat( v ) {}
         inline quaternion( const cg::quaternion q) { _v[0] = q.get_w();_v[1] = q.get_v().x;_v[2] = q.get_v().y;_v[3] = q.get_v().z;  }
     };
-#if 0
+
     class point_3 : public osg::Vec3
     {
     public:

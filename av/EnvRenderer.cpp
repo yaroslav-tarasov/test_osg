@@ -4,6 +4,32 @@
 
 namespace avEnv
 {
+    class TexMatCullCallback : public osg::NodeCallback
+    {
+    public:
+
+        TexMatCullCallback(osg::TexMat* texmat):
+          _texmat(texmat)
+          {
+          }
+
+          virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+          {
+              // first update subgraph to make sure objects are all moved into position
+              traverse(node,nv);
+
+              osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nv);
+              if (cv)
+              {
+                  osg::Quat quat = cv->getModelViewMatrix()->getRotate();
+                  _texmat->setMatrix(osg::Matrix::rotate(quat.inverse()));
+              }
+          }
+
+    protected:
+
+        osg::ref_ptr<osg::TexMat>    _texmat;
+    };
 
 class UpdateCameraAndTexGenCallback : public osg::NodeCallback
 {

@@ -351,7 +351,8 @@ namespace avSky
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );
 
-#if 1   // Environment to cube map renderer 
+        FIXME(Env renderer turned off)
+#ifndef TEST_EVN_CUBE_MAP   // Environment to cube map renderer 
         osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
         fbo_node->addChild(_d->_ephemerisModel.get());
         _sceneRoot->asGroup()->addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));

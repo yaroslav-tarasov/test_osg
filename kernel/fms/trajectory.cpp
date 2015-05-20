@@ -17,6 +17,12 @@ trajectory_ptr trajectory::create(const traj_data& data)
     return boost::make_shared<trajectory_impl>(data);
 }
 
+trajectory_ptr trajectory::create(const keypoints_t& kpts,curses_t const& crs,velocities_t const& vel)
+{
+    return boost::make_shared<trajectory_impl>(kpts,crs,vel);
+}
+
+
 typedef polymorph_ptr<trajectory_impl> trajectory_impl_ptr;
 
 struct trajectory_impl : trajectory
@@ -33,6 +39,15 @@ struct trajectory_impl : trajectory
         dubins_path_sample_many( &path,std::bind(fill,std::ref(kpts),std::ref(crs),sp::_1,sp::_2,sp::_3), step, nullptr);
         kp_seg_.push_back(kpts);
         curs_seg_.push_back(crs);
+    }
+    
+    trajectory_impl(const keypoints_t& kpts,curses_t const& crs,velocities_t const& vel)   
+        : curr_pos_(0)
+    {
+
+        kp_seg_.push_back(kpts);
+        curs_seg_.push_back(crs);
+        (*vel_seg_).push_back(vel);
     }
 
     trajectory_impl(const trajectory_impl_ptr& other)
@@ -62,6 +77,16 @@ struct trajectory_impl : trajectory
             auto seg = (*it).apply_offset(length_); 
             curs_seg_.push_back(seg);
         }
+
+        if(vel_seg_)
+        {
+            for(auto it = other->vel_seg_->begin();it!= other->vel_seg_->end();++it)
+            {                         
+                auto seg = (*it).apply_offset(length_); 
+                vel_seg_->push_back(seg);
+            }
+        }
+
     }
 
     void append(const traj_data& other) 
@@ -79,6 +104,14 @@ struct trajectory_impl : trajectory
             auto seg = (*it).apply_offset(length_); 
             curs_seg_.push_back(seg);
         }
+        if(vel_seg_)
+        for(auto it = other.vel_seg_->begin();it!= other.vel_seg_->end();++it)
+        {                         
+            auto seg = (*it).apply_offset(length_); 
+            vel_seg_->push_back(seg);
+        }
+        
+
     }
 
     inline double length() const
@@ -98,6 +131,14 @@ struct trajectory_impl : trajectory
         return curs_seg_.at(ind).value(arg);
     }
 
+    /*inline*/ boost::optional<velocities_t::value_type> velocity_value(double arg) /*const*/
+    { 
+        size_t ind = current_segment(arg);
+        if(vel_seg_)
+            return vel_seg_->at(ind).value(arg);
+        else
+            return boost::none;
+    }
 
     std::vector<keypoints_t::value_type> extract_values() const
     {
