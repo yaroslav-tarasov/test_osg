@@ -29,6 +29,13 @@
 
 #include "pickhandler.h"
 
+
+
+namespace gui 
+{ 
+    osgGA::GUIEventHandler*  createCEGUI(osg::Group* root);
+}
+
 using namespace avScene;
 
 std::vector<osg::ref_ptr<osg::Node>> _lamps;
@@ -265,9 +272,11 @@ Scene::Scene()
 {
     // Common nodes for scene etc.
     _commonNode = new Group();
+
     osg::StateSet * pCommonStateSet = _commonNode->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
     pCommonStateSet->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
+
     addChild(_commonNode.get());
 
     // Add backface culling to the whole bunch
@@ -304,7 +313,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer(cArgs);
-    
+     
     _viewerPtr->apply(new osgViewer::SingleScreen(1));
 
 
@@ -328,10 +337,10 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
 
     _viewerPtr->setSceneData( this );
-    //_viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    // _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // TODO: enabled this for instructor tab, need implement special setting
-    //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
+    _viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
 
     // disable ESC key
     // _viewerPtr->setKeyEventSetsDone(0);
@@ -360,13 +369,16 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Add event handlers to the viewer
     //
     _pickHandler = new PickHandler();
-    _viewerPtr->addEventHandler(new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()));
-    _viewerPtr->addEventHandler(new osgViewer::StatsHandler);
-    _viewerPtr->addEventHandler(_pickHandler);
+
+    _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
+    _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
+    _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
+    _viewerPtr->addEventHandler( _pickHandler );
+    // _viewerPtr->addEventHandler( gui::createCEGUI(_commonNode) );
     _viewerPtr->realize();
     addChild(_pickHandler->getOrCreateSelectionBox()); 
+    
 
-    //geo_position(root_pos, base_);
 
     //
     // Initialize particle engine
@@ -381,22 +393,32 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //spark::spark_pair_t sp =   spark::create(spark::FIRE);
     //spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
 
-    osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
+    //osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
     //posed->addChild(sp.first);
     //posed->addChild(sp2.first);
     //_viewerPtr->addEventHandler(sp.second);
     //_viewerPtr->addEventHandler(sp2.second);
-    addChild(posed);
+    //addChild(posed);
 
     //
     // Create terrain / shadowed scene
     //
+
+
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
+
+#if 1
+    fill_navids(
+        scene_name + ".txt", 
+        _lamps, 
+        this, 
+        lights_offset(scene_name) ); 
+#endif
 
     osg::Node* ct =  findFirstNode(_terrainNode,"camera_tower");
 
@@ -411,28 +433,27 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 	    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
         manip->home(0);
 	}
-    
 
 
     //
     // Init physic updater
     //
-
+#if 1
     createObjects();
-    
+
     conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
     conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
-    
+   
     conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
-    
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
+#endif
 
     //
     // Create ephemeris
     //                                                                       
     _ephemerisNode = new avSky::Ephemeris( this,
                                            _terrainNode.get(),
-                                          [=](float illum){ _st->setNightMode(illum < .35);  } //  FIXME magic night value    
+                                          [=](float illum){ if(_st) _st->setNightMode(illum < .35);  } //  FIXME magic night value    
     );  
 
     //
@@ -442,20 +463,21 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     if( _ephemerisNode->getSunLightSource())
     {
         _ls =_ephemerisNode->getSunLightSource();  
-        _terrainRoot->addChild(_ls.get());
+        if(_terrainRoot) _terrainRoot->addChild(_ls.get());
     }
     else
     {
         _ls = new osg::LightSource;
         _ls->getLight()->setLightNum(0);
-        _terrainRoot->addChild(_ls.get());
+        if(_terrainRoot) _terrainRoot->addChild(_ls.get());
         _ephemerisNode->setSunLightSource(_ls);
     }
 
     addChild( _ephemerisNode.get() );
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
-    
+
+
     //
     // Create weather
     //
@@ -467,13 +489,9 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
-#if 1
-    fill_navids(
-        scene_name + ".txt", 
-        _lamps, 
-        this, 
-        lights_offset(scene_name) ); 
-#endif
+
+
+
 
     return true;
 }
@@ -481,6 +499,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
 void  Scene::createTerrainRoot()
 {
+
 
 #if defined(TEST_SHADOWS_FROM_OSG)
 
@@ -513,7 +532,7 @@ void  Scene::createTerrainRoot()
 
 void Scene::createObjects()
 {
-
+ 
     _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
             if(!findFirstNode(mt,"fire"))
@@ -524,7 +543,8 @@ void Scene::createObjects()
             }
     }
     );
-    
+
+
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
 
@@ -534,7 +554,9 @@ void Scene::createObjects()
 
     const std::string name = "a_319";
 
+
 	auto obj = creators::createObject(name,true);
+
 
 #if 0
 	if(_rigidUpdater.valid())
@@ -680,12 +702,13 @@ void Scene::createObjects()
         }
     }
 
-
+#if 0
     auto towbar = creators::createObject("towbar");
     osg::MatrixTransform* positioned = new osg::MatrixTransform;
     positioned->setMatrix(osg::Matrix::translate(osg::Vec3d(200,100,0)));
     positioned->addChild(towbar);
     addChild(towbar);
+#endif
 
 #if 0
     auto trap = creators::createObject("trap");
@@ -743,7 +766,7 @@ void Scene::createObjects()
     }
 
     if(_rigidUpdater.valid())
-        _viewerPtr->addEventHandler( _rigidUpdater/*avTerrain::bi::getUpdater().get()*/ );
+        _viewerPtr->addEventHandler( _rigidUpdater);
 
 
 

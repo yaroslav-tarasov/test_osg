@@ -209,7 +209,6 @@ namespace bi
         , _time_delta_ctrl_sys(0)
 		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
 	{
-        
         using namespace kernel;
         _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
         
@@ -334,7 +333,7 @@ namespace bi
 
             auto pit = std::prev(it);
             if(pit!=it)
-                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 10));
+                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 40));
                 // vel.push_back(dist/(it->time - pit->time));
             prev = p;
         }
@@ -381,8 +380,9 @@ namespace bi
         srs.speed = 6;
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
 
+
         _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
-        
+      
     }
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
@@ -731,7 +731,6 @@ namespace bi
     bool RigidUpdater::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
     {
         osgViewer::View* view = static_cast<osgViewer::View*>( &aa );
-
         frame_timer ftm (view,_last_frame_time);
 
         if ( !view || !_root ) return false;

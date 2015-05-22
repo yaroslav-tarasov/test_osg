@@ -55,13 +55,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\debug;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixmld.lib;osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -90,11 +90,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;ext\bada;ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\release;$(OSG_DIR)\cegui-0.8.4\build\lib;ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;ext\bada;ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <ShowProgress>NotSet</ShowProgress>
+      <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -213,6 +215,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="tests\bump_mapping.cpp" />
+    <ClCompile Include="tests\cegui\CEGUIDrawable.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\cegui\cegui_main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\common\CommonFunctions.cpp" />
     <ClCompile Include="tests\dubins_test.cpp" />
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp">
@@ -220,6 +229,14 @@
     </ClCompile>
     <ClCompile Include="tests\main_shadows.cpp" />
     <ClCompile Include="tests\main_shadows_2.cpp" />
+    <ClCompile Include="tests\MyGui\MYGUIManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tests\MyGui\osgmygui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="tests\select_geometry.cpp" />
     <ClCompile Include="tests\shadow_map.cpp" />
     <ClCompile Include="tests\SimpleHUD.cpp" />

@@ -17,7 +17,7 @@ object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
     return object_info_ptr(new model(oc, dict));
 }
 
-
+#ifdef DEPRECATED  
 // FIXME Само собой чушь
 void block_obj_msgs(bool block)
 {}
@@ -49,7 +49,7 @@ object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nod
 
 	return model::create(oc,d);
 }
-
+#endif
 
 AUTO_REG_NAME(vehicle_model, model::create);
 

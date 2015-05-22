@@ -67,7 +67,7 @@ namespace osgCookBook
         camera->setRenderOrder( osg::Camera::POST_RENDER );
         camera->setAllowEventFocus( false );
         camera->setProjectionMatrix( osg::Matrix::ortho2D(left, right, bottom, top) );
-        camera->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+        camera->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED | osg::StateAttribute::OVERRIDE);
         return camera.release();
     }
     

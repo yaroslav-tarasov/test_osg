@@ -86,14 +86,6 @@ FIXME("Off point for bullet")
             point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
         double speed = cg::norm(vel - wind_);
 
-        logger::need_to_log(true);
-
-        LOG_ODS_MSG(
-            "speed:  "                << speed << "\n" 
-            );
-
-        logger::need_to_log(false);
-
             quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
             point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
             point_3 omega_loc = (!orien).rotate_vector(omega);
@@ -354,7 +346,7 @@ FIXME("Off point for bullet")
 		raycast_veh_.activate(chassis_->isActive());
 	}
 
-        void impl::has_contact(rigid_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
+    void impl::has_contact(rigid_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
     {
         has_chassis_contact_ = true;
         size_t id = body_contact_points_.insert(local_point).first;

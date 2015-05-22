@@ -88,6 +88,12 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\mygui">
+      <UniqueIdentifier>{dfe60ed9-4841-4e3a-9bf4-9d0491d4b4c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\cegui">
+      <UniqueIdentifier>{17c8c559-16b2-4002-a51f-6f5cc127b377}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -469,6 +475,21 @@
     </ClCompile>
     <ClCompile Include="kernel\fms\trajectory.cpp">
       <Filter>Source Files\fms</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\MyGui\MYGUIManager.cpp">
+      <Filter>Source Files\tests\mygui</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\MyGui\osgmygui.cpp">
+      <Filter>Source Files\tests\mygui</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\cegui\CEGUIDrawable.cpp">
+      <Filter>Source Files\tests\cegui</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\cegui\cegui_main.cpp">
+      <Filter>Source Files\tests\cegui</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\common\CommonFunctions.cpp">
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

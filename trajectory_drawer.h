@@ -25,12 +25,11 @@ public:
         geometry_->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 
         if (parent)
-            parent->addChild(this);        
+            parent->addChild(this);    
     }
 
     void set(const fms::trajectory_ptr traj,const cg::coloraf& color)
     {
-
        vert_->clear();
        if(traj_lines_.get())
            traj_lines_->clear();
@@ -55,7 +54,6 @@ public:
        colors->push_back(osg::Vec4(color.r, color.g, color.b, 1.0f) ); 
        geometry_->setColorArray(colors);
        geometry_->setColorBinding(osg::Geometry::BIND_OVERALL);
-
     }
 
     void set(const std::vector<cg::point_3>& kp,const cg::coloraf& color)
@@ -84,7 +82,6 @@ public:
         colors->push_back(osg::Vec4(color.r, color.g, color.b, 1.0f)  ); 
         geometry_->setColorArray(colors);
         geometry_->setColorBinding(osg::Geometry::BIND_OVERALL);
-
     }
 
 

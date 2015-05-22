@@ -15,7 +15,10 @@
 
 namespace aircraft
 {
+     
+    const double model::shassi_height_ = 130;
 
+#ifdef DEPRECATED  
 // FIXME Само собой чушь
 void /*system_base::*/block_obj_msgs(bool block)
 { }
@@ -45,6 +48,7 @@ object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr node
 
     return model::create(oc,d);
 }
+#endif
 
 object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 {
@@ -89,7 +93,7 @@ void model::update( double time )
     //    aircraft_fms::model_control_ptr(get_fms_info())->activate();
         
     FIXME(init_shassi_anim)
-    //init_shassi_anim();
+    init_shassi_anim();
 
     double dt = time - (last_update_ ? *last_update_ : 0);
     if (cg::eq_zero(dt))
@@ -106,7 +110,7 @@ void model::update( double time )
     update_contact_effects(time);
     check_wheel_brake();
     FIXME(update_shassi_anim)
-    //update_shassi_anim(time);
+    update_shassi_anim(time);
     update_atc_state();
     sync_fms();
 
@@ -253,6 +257,59 @@ void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const&
 {
      if(traj_)
          traj_.reset();
+}
+
+void model::init_shassi_anim ()
+{
+    if (shassi_anim_inited_)
+        return;
+
+    if (root_ && get_fms_info())
+    {
+        geo_point_3 const& pos = get_fms_info()->get_state().dyn_state.pos;
+
+        bool to_be_opened = pos.height < shassi_height_;
+
+        shassis_->visit_groups([to_be_opened](shassis_group_t & shassis_group)
+        {
+            if (to_be_opened)
+                shassis_group.open(true);
+            else
+                shassis_group.close(true);
+        });
+    }
+
+    shassi_anim_inited_ = true;
+}
+
+void model::update_shassi_anim (double time)
+{
+    if (last_shassi_play_ && time < *last_shassi_play_ + 5)
+        return;
+
+    if (root_ && get_fms_info())
+    {
+        geo_point_3 const& pos = get_fms_info()->get_state().dyn_state.pos;
+
+        bool to_be_opened = pos.height < shassi_height_;
+
+        shassis_->visit_groups([this, to_be_opened, time](shassis_group_t & shassis_group)
+        {
+            if (!shassis_group.malfunction)
+            {
+                if (shassis_group.opened && !to_be_opened)
+                {
+                    shassis_group.close();
+                    this->last_shassi_play_ = time;
+                }
+                else if (!shassis_group.opened && to_be_opened)
+                {
+                    shassis_group.open();
+                    this->last_shassi_play_ = time;
+                }
+            }
+        });
+    }
 }
 
 void model::update_contact_effects(double time)

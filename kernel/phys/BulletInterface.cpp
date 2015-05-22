@@ -342,6 +342,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     body->setFriction(1.3f); 
     body->setActivationState(DISABLE_SIMULATION);
     body->setRestitution(0.5f);
+    body->setUserPointer(new rigid_body_user_info_t(rb_terrain));
 
     _on_collision = on_collision;
 	
@@ -833,6 +834,21 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 						dynamic_cast<rigid_body_impl*>(rbB)->has_contact(rbA, from_bullet_vector3(pnt.m_localPointB), from_bullet_vector3(rel_vel));
 					}
 				}
+
+                if (rbB->rigid_body_kind() == rb_aircraft && rbA->rigid_body_kind() == rb_terrain ||
+                    rbA->rigid_body_kind() == rb_aircraft && rbB->rigid_body_kind() == rb_terrain
+                   )
+                {
+                     //btVector3 rel_vel = obB->getInterpolationLinearVelocity() - obA->getInterpolationLinearVelocity();
+                     {
+                         force_log fl;
+
+                         LOG_ODS_MSG( "  obB->getInterpolationLinearVelocity() length = " <<  obB->getInterpolationLinearVelocity().length() << "\n" <<
+                                      "  obA->getInterpolationLinearVelocity() length = " <<  obA->getInterpolationLinearVelocity().length() << "\n"  
+                             );
+
+                     }
+                }
 			}
 		}
 	}  

@@ -184,6 +184,12 @@ private:
     logger() {}
 };
 
+struct force_log
+{
+   force_log() {logger::need_to_log(true);}
+   ~force_log(){logger::need_to_log(false);}
+};
+
 #define LOG_ODS_MSG( msg )                                                                \
     do {                                                                                  \
     if(logger::need_to_log()) {                                                     \

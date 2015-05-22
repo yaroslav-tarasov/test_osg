@@ -242,9 +242,11 @@ namespace aircraft
 
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
-        FIXME(Mass real mass)
+#ifndef SIMEX_MOD
         const double phys_mass_factor_ = 1; // 1000;  // 1; //  
-
+#else
+       const double phys_mass_factor_ = 1000;
+#endif
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 
         body_transform_inv_ = cg::transform_4(); 
@@ -294,17 +296,19 @@ namespace aircraft
         params.Cd2 = cd_2;
         params.ClAOA = 0.4;
         params.Cs = 0.2;
-        //params.thrust = (fsettings.ct_1 * (100. * 1000. / phys_mass_factor_ / fsettings.ct_2 + fsettings.ct_3 * 100. * 1000. / phys_mass_factor_ * 100. * 1000. / phys_mass_factor_ ));
-        
+
+#ifdef SIMEX_MOD
+        params.thrust = (fsettings.ct_1 * (100. * 1000. / phys_mass_factor_ / fsettings.ct_2 + fsettings.ct_3 * 100. * 1000. / phys_mass_factor_ * 100. * 1000. / phys_mass_factor_ ));
+#else        
         FIXME( "Не ну для разных двигателей разный, не все же реактивные" )
         const double hp = 0.0;
         const double ct_cr = 0.95; // Maximum cruise thrust coefficient
         params.thrust =  fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr;
-        
 
         FIXME("И по какой формуле считать?")
         if(fsettings.engine == 1)
             params.thrust = 132050;
+#endif
 
         phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
@@ -482,11 +486,6 @@ namespace aircraft
         
         const double  min_aerodynamic_speed = phys_aircraft_->params().min_aerodynamic_speed;
         
-        // 
-        // FIXME TYV 
-        //on_ground_ = true;
-        //cfg_ = fms::CFG_GD;
-
         if (cur_speed < min_aerodynamic_speed )
         {
             on_ground_ = true;
@@ -543,10 +542,9 @@ namespace aircraft
             double desired_attack_angle = attack_angle;  // TYV 0
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
+            
 
-#if 1
             if (cfg_ == fms::CFG_GD)
-#endif
                 desired_vel.z = 0;
 
             point_3 desired_accel((desired_vel - cur_pos.dpos) / 0.3, 
@@ -581,6 +579,17 @@ namespace aircraft
 
             double max_roll = 15;
             max_roll = cg::clamp(5., 30., 0., max_roll)(cur_glb_pos.pos.height);
+            
+            {
+                force_log fl;
+
+                LOG_ODS_MSG(
+                    "max_roll:  "                << max_roll << "\n" <<
+                    "desired_slide_angle:  "                << desired_slide_angle << "\n" <<
+                    "desired_thrust:  "                << desired_thrust << "\n" <<
+                    "desired_attack_angle:  "                << desired_attack_angle << "\n" 
+                    );
+            }
 
             double roll_omega_smooth = on_ground_ ? 2. : 0.3;
             double aa_omega_smooth = on_ground_ ? 2. : 0.2;
