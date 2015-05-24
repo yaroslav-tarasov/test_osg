@@ -20,6 +20,8 @@
 //OpenThreads::Mutex  CEGUIDrawable::_mutex;
 //bool                CEGUIDrawable::_initialized = false;
 
+using namespace CEGUI;
+
 CEGUIDrawable::CEGUIDrawable()
     :   _lastSimulationTime(0.0), _activeContextID(0), _initialized(false)
 {
@@ -69,8 +71,10 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         osg::State* state = renderInfo.getState();
         state->disableAllVertexArrays();
         state->disableTexCoordPointer( 0 );
-
-        glPushMatrix();
+		
+		state->setActiveTextureUnit(0);
+        
+		glPushMatrix();
         glPushAttrib( GL_ALL_ATTRIB_BITS );
 
         CEGUI::OpenGL3Renderer* renderer = static_cast<CEGUI::OpenGL3Renderer*>(
@@ -98,39 +102,64 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
 void CEGUIDrawable::initializeControls()
 {
-    CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
+	
+    GUIContext& context = System::getSingleton().getDefaultGUIContext();
 
-    CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
+    SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
     // context.getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
 
-    CEGUI::FontManager::getSingleton().createFromFile( "DejaVuSans-10.font" );
+    FontManager::getSingleton().createFromFile( "DejaVuSans-10.font" );
     context.setDefaultFont( "DejaVuSans-10" );
     context.getDefaultFont()->setAutoScaled(CEGUI::AutoScaledMode::ASM_Disabled);
 
-    CEGUI::Window* root = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "Root" );
+    Window* root = WindowManager::getSingleton().createWindow( "DefaultWindow", "Root" );
     context.setRootWindow(root);
 
-    CEGUI::FrameWindow* demoWindow = static_cast<CEGUI::FrameWindow*>(
-        CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "DemoWindow") );
-    demoWindow->setPosition(CEGUI::UVector2(cegui_reldim(0.01f), cegui_reldim(0.01f)));
-    demoWindow->setSize(CEGUI::USize(cegui_reldim(0.5f), cegui_reldim(0.3f)));
-    demoWindow->setMinSize(CEGUI::USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
-    demoWindow->setText( "Example Dialog" );
+    //FrameWindow* demoWindow = static_cast<FrameWindow*>(
+    //    CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "DemoWindow") );
+    //demoWindow->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim(0.01f)));
+    //demoWindow->setSize(USize(cegui_reldim(0.5f), cegui_reldim(0.3f)));
+    //demoWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
+    //demoWindow->setText( "Example Dialog" );
 
-    CEGUI::PushButton* demoButtonOK = static_cast<CEGUI::PushButton*>(
-        CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
-    demoButtonOK->setPosition(CEGUI::UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
-    demoButtonOK->setSize( CEGUI::USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
-    demoButtonOK->setText( "OK" );
+    //PushButton* demoButtonOK = static_cast<PushButton*>(
+    //    WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
+    //demoButtonOK->setPosition(UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
+    //demoButtonOK->setSize( USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
+    //demoButtonOK->setText( "OK" );
 
-    demoWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,
-        CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
+    //demoWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,
+    //    CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
 
-    demoButtonOK->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,
-        CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
+    //demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,
+    //    CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
 
-    demoWindow->addChild( demoButtonOK );
-    root->addChild( demoWindow );
+    //demoWindow->addChild( demoButtonOK );
+    //root->addChild( demoWindow );
+
+	// create combo-box.
+	Combobox* cbbo = static_cast<Combobox*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Combobox", "SelModeBox"));
+	root->addChild(cbbo);
+	cbbo->setPosition(UVector2(cegui_reldim(0.04f), cegui_reldim( 0.06f)));
+	//cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
+
+	ListboxTextItem* itm;
+
+	// populate combobox with possible selection modes
+	const CEGUI::Image* sel_img = &ImageManager::getSingleton().get("TaharezLook/MultiListSelectionBrush");
+	itm = new ListboxTextItem("empty", 0);
+	itm->setSelectionBrushImage(sel_img);
+	cbbo->addItem(itm);
+	itm = new ListboxTextItem("sheremetyevo", 1);
+	itm->setSelectionBrushImage(sel_img);
+	cbbo->addItem(itm);
+	itm = new ListboxTextItem("adler", 2);
+	itm->setSelectionBrushImage(sel_img);
+	cbbo->addItem(itm);
+	cbbo->setReadOnly(true);
+	//cbbo->setSortingEnabled(false);
+	//cbbo->setSortingEnabled(true);
+	//cbbo->handleUpdatedListItemData();
 }
 
 bool CEGUIDrawable::handleClose( const CEGUI::EventArgs& e )
