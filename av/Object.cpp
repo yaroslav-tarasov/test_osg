@@ -24,6 +24,11 @@ typedef std::map< std::string, osg::ref_ptr<osg::Node> > nodesMap;
 
 nodesMap objCache;
 
+void  releaseObjectCache()
+{
+        objCache.clear();
+}
+
 osg::Node* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
@@ -115,12 +120,75 @@ osg::Node* createObject(std::string name, bool fclone)
 			return g_point;
 		};
 
-		auto tail = addAsChild("tail",white_light);
-		auto strobe_r = addAsChild("strobe_r",white_light);
-		auto strobe_l = addAsChild("strobe_l",white_light);
+		auto tail       = addAsChild("tail",white_light);
+		auto strobe_r   = addAsChild("strobe_r",white_light);
+		auto strobe_l   = addAsChild("strobe_l",white_light);
 
-		auto port = addAsChild("port",green_light);
+		auto port       = addAsChild("port",green_light);
 		auto star_board = addAsChild("starboard",red_light);
+#else  
+        findNodeVisitor::nodeNamesList list_name;
+
+        osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
+
+        const char* names[] =
+        {
+            "port",
+            "starboard",
+            "tail",
+            "steering_lamp",
+            "strobe_",
+            "landing_lamp",
+            "navaid_",
+        };
+
+        for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
+        {
+            list_name.push_back(names[i]);
+        }
+
+        findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+        root->accept(findNodes);
+        
+        findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+        
+        auto shift_phase = cg::rand(cg::range_2(0, 255));
+        
+        for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+        {
+             osgSim::LightPoint pnt;
+
+             if((*it)->getName() == "tail")  pnt._color      = white_color;
+             if((*it)->getName() == "port")  pnt._color      = green_color;
+             if((*it)->getName() == "starboard")  pnt._color = red_color;
+            
+             
+             if((*it)->getName() == "strobe_r" || (*it)->getName() == "strobe_l") 
+             {
+                 pnt._color  = white_color;
+                 pnt._blinkSequence = new osgSim::BlinkSequence;
+                 //for( int j = 10; j > 0; --j )
+                 //{
+                 //    float  intensity = j/10.0f;
+                 //    pnt._blinkSequence->addPulse( 1.0/10,
+                 //        osg::Vec4( intensity, intensity, intensity, intensity ) );
+                 //}
+                 pnt._blinkSequence->addPulse( 0.2,
+                     osg::Vec4( 1., 1., 1., 1. ) );
+
+                 pnt._blinkSequence->addPulse( 1.0,
+                     osg::Vec4( 0., 0., 0., 0. ) );
+
+                 pnt._blinkSequence->setPhaseShift(shift_phase);
+             }
+
+             pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+             pnt._radius = 0.2f;
+             obj_light->addLightPoint(pnt);
+        }
+
+        if(wln_list.size()>0)
+            object_file->asGroup()->addChild(obj_light);
 #endif
 		//
 		//  А здесь будет чертов некошерный лод

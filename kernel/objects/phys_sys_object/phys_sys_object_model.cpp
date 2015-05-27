@@ -17,8 +17,6 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     , last_time_(0)
     , exercise_loaded_connection_(oc.sys->subscribe_exercise_loaded(boost::bind(&model::on_exercise_loaded, this)))
 { 
-    FIXME(Тоже магия)
-    zones_.insert(0, zone_t(create_phys_system(), cg::geo_point_3(), "noname"));
 }
 
 model::~model()

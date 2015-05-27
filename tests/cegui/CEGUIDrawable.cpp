@@ -62,7 +62,8 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         CEGUI::WindowManager::setDefaultResourceGroup( "layouts" );
         CEGUI::ScriptModule::setDefaultResourceGroup( "lua_scripts" );
 
-        const_cast<CEGUIDrawable*>(this)->initializeControls();
+        // const_cast<CEGUIDrawable*>(this)->initializeControls();
+        ready_for_init_signal_();
         _activeContextID = contextID;
         _initialized = true;
     }
@@ -71,7 +72,6 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         osg::State* state = renderInfo.getState();
         state->disableAllVertexArrays();
         state->disableTexCoordPointer( 0 );
-		
 		state->setActiveTextureUnit(0);
         
 		glPushMatrix();
@@ -97,6 +97,7 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
         glPopAttrib();
         glPopMatrix();
+        
     }
 }
 
@@ -140,20 +141,25 @@ void CEGUIDrawable::initializeControls()
 	// create combo-box.
 	Combobox* cbbo = static_cast<Combobox*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Combobox", "SelModeBox"));
 	root->addChild(cbbo);
-	cbbo->setPosition(UVector2(cegui_reldim(0.04f), cegui_reldim( 0.06f)));
+	cbbo->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim( 0.01f)));
 	//cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
 
 	ListboxTextItem* itm;
+    
+    //russian
+    std::wstring ruswide = L"Русский";
+    CEGUI::Win32StringTranscoder stc;
+    CEGUI::String ruslang = stc.stringFromStdWString(ruswide);
 
 	// populate combobox with possible selection modes
 	const CEGUI::Image* sel_img = &ImageManager::getSingleton().get("TaharezLook/MultiListSelectionBrush");
-	itm = new ListboxTextItem("empty", 0);
+	itm = new ListboxTextItem(stc.stringFromStdWString(L"Пустая сцена"), 0);
 	itm->setSelectionBrushImage(sel_img);
 	cbbo->addItem(itm);
-	itm = new ListboxTextItem("sheremetyevo", 1);
+	itm = new ListboxTextItem(stc.stringFromStdWString(L"Шереметьево"), 1);
 	itm->setSelectionBrushImage(sel_img);
 	cbbo->addItem(itm);
-	itm = new ListboxTextItem("adler", 2);
+	itm = new ListboxTextItem(stc.stringFromStdWString(L"Сочи"), 2);
 	itm->setSelectionBrushImage(sel_img);
 	cbbo->addItem(itm);
 	cbbo->setReadOnly(true);

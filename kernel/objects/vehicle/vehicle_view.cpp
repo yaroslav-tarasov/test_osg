@@ -47,6 +47,7 @@ void view::on_object_destroying(object_info_ptr object)
         aerotow_.reset();
         on_aerotow_changed(old_aerotow) ;
     }
+
 }
 
 void view::on_child_removing(object_info_ptr child)

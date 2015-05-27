@@ -26,30 +26,31 @@ public:
         int x = ea.getX(), y = ea.getY(), width = ea.getWindowWidth(), height = ea.getWindowHeight();
         if ( ea.getMouseYOrientation()==osgGA::GUIEventAdapter::Y_INCREASING_UPWARDS )
             y = ea.getWindowHeight() - y;
+        
         if ( !CEGUI::System::getSingletonPtr() )
             return false;
 
-        //CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
+        CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
 
         switch ( ea.getEventType() )
         {
         case osgGA::GUIEventAdapter::PUSH:
-            CEGUI::System::getSingleton().getDefaultGUIContext().injectMousePosition( x, y );
-            CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(ea.getButton()));
+            context.injectMousePosition( x, y );
+            context.injectMouseButtonDown(convertMouseButton(ea.getButton()));
             break;
         case osgGA::GUIEventAdapter::RELEASE:
-            CEGUI::System::getSingleton().getDefaultGUIContext().injectMousePosition(x, y);
-            CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(ea.getButton()));
+            context.injectMousePosition(x, y);
+            context.injectMouseButtonUp(convertMouseButton(ea.getButton()));
             break;
         case osgGA::GUIEventAdapter::SCROLL:
             if ( ea.getScrollingMotion()==osgGA::GUIEventAdapter::SCROLL_DOWN )
-                CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseWheelChange(-1);
+                context.injectMouseWheelChange(-1);
             else if ( ea.getScrollingMotion()==osgGA::GUIEventAdapter::SCROLL_UP )
-                CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseWheelChange(+1);
+                context.injectMouseWheelChange(+1);
             break;
         case osgGA::GUIEventAdapter::DRAG:
         case osgGA::GUIEventAdapter::MOVE:
-            CEGUI::System::getSingleton().getDefaultGUIContext().injectMousePosition(x, y);
+            context.injectMousePosition(x, y);
             break;
         case osgGA::GUIEventAdapter::RESIZE:
             if ( _camera.valid() )
@@ -62,7 +63,7 @@ public:
             return false;
         }
 
-        CEGUI::Window* rootWindow = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
+        CEGUI::Window* rootWindow = context.getRootWindow();
         if ( rootWindow )
         {
             CEGUI::Window* anyWindow = rootWindow->getChildAtPosition( CEGUI::Vector2f(x, y) );
@@ -93,11 +94,12 @@ protected:
 namespace gui 
 {
 
-    osgGA::GUIEventHandler*  createCEGUI(osg::Group* root)
+    osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler)
     {                                                                     
         osg::ref_ptr<osg::Geode> geode = new osg::Geode;
         geode->setCullingActive( false );
-        geode->addDrawable( new CEGUIDrawable );
+        auto dr =new CEGUIDrawable;
+        geode->addDrawable( dr );
         geode->getOrCreateStateSet()->setAttributeAndModes( new osg::BlendFunc, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED );
         geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
         //geode->getOrCreateStateSet()->setRenderBinDetails( -4, "RenderBin" );
@@ -105,14 +107,20 @@ namespace gui
         osg::ref_ptr<osg::Camera> hudCamera = osgCookBook::createHUDCamera(1920, 0, 1920, 1200/*0, 800, 0, 600*/);
         hudCamera->setAllowEventFocus( true );
         hudCamera->addChild( geode.get() );
-        //_viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, nWidth, nHeight)); 1920 0 1920 1200
-        //hudCamera->setViewport(new osg::Viewport(0, 800, 0, 600));
 
         root->addChild( hudCamera.get() );
+        
+        dr->subscribe_ready_for_init(init_gui_handler);
 
         return  new CEGUIEventHandler(hudCamera.get()) ;
     }
 
+    void  releaseCEGUI()
+    {                                                                     
+        if ( !CEGUI::System::getSingletonPtr() ) return;
+
+        CEGUI::System::destroy();
+    }
 }
 
 int main_cegui( int argc, char** argv )

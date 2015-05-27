@@ -94,6 +94,9 @@
     <Filter Include="Source Files\tests\cegui">
       <UniqueIdentifier>{17c8c559-16b2-4002-a51f-6f5cc127b377}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hmi">
+      <UniqueIdentifier>{812b7a33-058f-4dc5-9f1d-8064f54d4bfb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -490,6 +493,9 @@
     </ClCompile>
     <ClCompile Include="tests\common\CommonFunctions.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

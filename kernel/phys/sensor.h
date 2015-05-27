@@ -1,7 +1,7 @@
 #pragma once
 
 class btCompoundShape;
-
+class btCollisionShape;
 
 namespace phys
 {

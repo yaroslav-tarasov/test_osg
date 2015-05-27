@@ -20,7 +20,9 @@ public:
     
     void initializeControls();
     bool handleClose( const CEGUI::EventArgs& e );
-    
+
+    DECLARE_EVENT(ready_for_init  , ());
+
 protected:
     virtual ~CEGUIDrawable() {}
     

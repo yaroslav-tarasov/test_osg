@@ -4,6 +4,8 @@
 #include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
+#include <osg/GLObjects>
+
 //Degree precision versus length
 //
 //          decimal                                                                               N/S or E/W    E/W at    E/W at       E/W at
@@ -29,11 +31,12 @@
 
 #include "pickhandler.h"
 
-
+#include "application/panels/vis_settings_panel.h"
 
 namespace gui 
 { 
-    osgGA::GUIEventHandler*  createCEGUI(osg::Group* root);
+    osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler);
+    void    releaseCEGUI();
 }
 
 using namespace avScene;
@@ -81,7 +84,8 @@ inline osg::Vec3f polar_point_2(S range, S course )
         (S)range * cos(cg::grad2rad(course)),0);
 }
 
-typedef osg::ref_ptr<osg::Group> navaid_group_node_ptr;
+// typedef osg::ref_ptr<osg::Group> navaid_group_node_ptr;
+typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
 
 osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)
 {
@@ -161,7 +165,7 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
                 boost::trim_if(line, boost::is_any_of("/#"));
                 //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
                 navid_node_ptr.release();
-                navid_node_ptr = new osg::Group();
+                navid_node_ptr = new osgSim::LightPointNode;// new osg::Group();
                 navid_node_ptr->setName(line);
                 group_ready = true;
             }
@@ -197,24 +201,32 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 
                 //victory::navaid_group_node::LightData lamp = {p, clr, .1,40000,/*.01f, 4000.f,*/ cg::range_2f(), cg::range_2f(), 1, 0, 0};
                 //navid_group->AddLight(lamp);
-                osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform();
-             
-                pat->addChild(CreateLight(clr,std::string("light"),nullptr));
-                pat->setPosition(osg::Vec3f(p.x(),p.y(),p.z()));
-                navid_node_ptr->addChild(pat);
+                
+                osgSim::LightPoint pnt;
 
-                const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
-                osg::StateSet* ss = pat->getOrCreateStateSet();
-                ss->setAttribute(new osg::Program(),value);
-                ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
-                ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-                ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF| osg::StateAttribute::OVERRIDE );
-                ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
+                pnt._position.set(p.x(),p.y(),p.z());
+                pnt._color = clr;
+                pnt._radius = 0.3f;
+                navid_node_ptr->addLightPoint(pnt);
+
+                //osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform();
+
+                //pat->addChild(CreateLight(clr,std::string("light"),nullptr));
+                //pat->setPosition(osg::Vec3f(p.x(),p.y(),p.z()));
+                //navid_node_ptr->addChild(pat);
+
+                //const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
+                //osg::StateSet* ss = pat->getOrCreateStateSet();
+                //ss->setAttribute(new osg::Program(),value);
+                //ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
+                //ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
+                //ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF| osg::StateAttribute::OVERRIDE );
+                //ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
 
 
             }
         }
-
+        
         if(navid_node_ptr && group_ready)
         {
             cur_lamps.push_back(navid_node_ptr);
@@ -234,6 +246,8 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 
 osg::ref_ptr<Scene>	 Scene::_scenePtr;
 
+std::string          Scene::zone_to_reload_;
+
 //////////////////////////////////////////////////////////////////////////
 bool Scene::Create( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
 {
@@ -251,12 +265,24 @@ void Scene::Release()
 {
     if ( _scenePtr.valid() )
     {
+
         // Release smart pointer with cross references
         _scenePtr->_viewerPtr	= NULL;
+        
+        gui::releaseCEGUI();
+
+        _scenePtr->_rigidUpdater->stopSession();
 
         // Release scene
         _scenePtr = NULL;
+
+        creators::releaseObjectCache();
     }
+
+
+
+    FIXME( Не в сцене этому место задвигать дальше надо)
+    osg::discardAllGLObjects(0);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -316,6 +342,12 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
      
     _viewerPtr->apply(new osgViewer::SingleScreen(1));
 
+    int ref = _scenePtr->referenceCount();
+    if(ref > 1)
+    {
+        force_log fl;
+        LOG_ODS_MSG("Additional references to Scene have been found. " << ref << "\n");
+    }
 
     // Set up camera
     if ( cTraitsPtr.valid() == true )
@@ -340,7 +372,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // TODO: enabled this for instructor tab, need implement special setting
-    _viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
+    //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
 
     // disable ESC key
     // _viewerPtr->setKeyEventSetsDone(0);
@@ -348,7 +380,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Set up the camera manipulators.
     //
-   
+
     // Use a default camera manipulator
     osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
      //new osgGA::DriveManipulator()
@@ -369,12 +401,29 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Add event handlers to the viewer
     //
     _pickHandler = new PickHandler();
+    ref = _scenePtr->referenceCount();
 
     _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
     _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
     _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
     _viewerPtr->addEventHandler( _pickHandler );
-    // _viewerPtr->addEventHandler( gui::createCEGUI(_commonNode) );
+    
+    if(false) _viewerPtr->addEventHandler( 
+        gui::createCEGUI( _commonNode, [this]()
+        {
+            if (!this->_vis_settings_panel )
+            {
+                app::zones_t zones_;
+                zones_.push_back(std::make_pair(0,std::wstring(L"Пустая сцена")));
+                zones_.push_back(std::make_pair(1,std::wstring(L"Шереметьево")));
+                zones_.push_back(std::make_pair(2,std::wstring(L"Сочи")));
+                this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
+                this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
+            }
+        } )
+    );
+    
+
     _viewerPtr->realize();
     addChild(_pickHandler->getOrCreateSelectionBox()); 
     
@@ -403,7 +452,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Create terrain / shadowed scene
     //
-
 
     createTerrainRoot();
     
@@ -434,27 +482,28 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         manip->home(0);
 	}
 
-
     //
     // Init physic updater
     //
-#if 1
-    createObjects();
 
+    createObjects();
+    
     conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
     conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
    
     conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
-#endif
+    
 
     //
     // Create ephemeris
     //                                                                       
     _ephemerisNode = new avSky::Ephemeris( this,
                                            _terrainNode.get(),
-                                          [=](float illum){ if(_st) _st->setNightMode(illum < .35);  } //  FIXME magic night value    
+                                          [=](float illum){ if(_st!=0) _st->setNightMode(illum < .35);  } //  FIXME magic night value    
     );  
+
+
 
     //
     //  Get or create sunlight
@@ -476,6 +525,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     addChild( _ephemerisNode.get() );
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
+    
 
 
     //
@@ -489,9 +539,10 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
 
+    osg::MatrixTransform* transform = new osg::MatrixTransform;
 
-
-
+    transform->setDataVariance(osg::Object::STATIC);
+    transform->setMatrix(osg::Matrix::scale(0.1,0.1,0.1));
 
     return true;
 }
@@ -499,7 +550,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
 void  Scene::createTerrainRoot()
 {
-
 
 #if defined(TEST_SHADOWS_FROM_OSG)
 
@@ -543,7 +593,6 @@ void Scene::createObjects()
             }
     }
     );
-
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
@@ -818,3 +867,16 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     return mt;
 }
 
+
+void   Scene::onZoneChanged(int zone)
+{
+    const char* scene_name[] = {"empty","adler","sheremetyevo"};
+    
+    zone_to_reload_ = scene_name[zone];
+
+    //_terrainRoot->removeChild(_terrainNode);
+    //_terrainNode.release();
+    //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
+    //_terrainNode->create(scene_name[zone]);
+
+}

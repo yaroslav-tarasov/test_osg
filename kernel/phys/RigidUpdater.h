@@ -2,9 +2,6 @@
 
 #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
-//#include "aircraft/aircraft_model.h"
-//#include "vehicle/vehicle_model.h"
-// #include "kernel/msg_proxy.h"
 
 namespace bi
 {
@@ -15,6 +12,7 @@ namespace bi
         typedef std::function<void(osg::MatrixTransform* mt)> on_collision_f;
     public:
         RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ); 
+        void stopSession();
 
 		void addGround( const osg::Vec3& gravity );
 
@@ -87,8 +85,7 @@ namespace bi
 #endif        
 
 
-        polymorph_ptr<phys::BulletInterface>      _sys;
-		struct RigidUpdater_private;
+    	struct RigidUpdater_private;
 	    boost::shared_ptr<RigidUpdater_private>  _d;
 
         //kernel::msg_service                      msg_service_;

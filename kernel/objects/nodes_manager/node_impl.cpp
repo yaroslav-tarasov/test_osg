@@ -4,7 +4,7 @@
 #include "nm/node_impl.h"
 #include "nodes_manager_common.h"
 #include "nodes_manager_view.h"
-#include "reflection/proc/prop_attr.h"
+//#include "reflection/proc/prop_attr.h"
 
 #ifndef OSG_NODE_IMPL
 namespace nodes_management

@@ -123,7 +123,7 @@ namespace ray_cast_vehicle
         raycast_veh_->debugDraw(debugDrawer);
     }
 #endif
-#define SIMEX_MOD
+//#define SIMEX_MOD
     void impl::add_wheel( double /*mass*/, double /*width*/, double radius, cg::point_3 const& offset, cg::cpr const & /*orien*/, bool /*has_damper*/ )
     {
         bool isFrontWheel = offset.y > 0;

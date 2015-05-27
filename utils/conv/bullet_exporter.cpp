@@ -72,7 +72,7 @@ namespace
 
 namespace vehicle
 {
-    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
+    /*btCompoundShape*/btCollisionShape*  fill_cs(osg::Node* node, cg::point_3& offset )
     {          
         osg::Node* lod3 =  findFirstNode(node,"Lod3");
 
@@ -89,31 +89,22 @@ namespace vehicle
 
         auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
 
-        auto wheels = findNodes(node,"wheel",findNodeVisitor::not_exact);
 
-        for (auto it = wheels.begin();it != wheels.end();++it)
-        {   
-            if((*it)->asTransform()) // А потом они взяли и поименовали геометрию как трансформы, убил бы
-            {
-                (*it)->setNodeMask(0);
-            }
-        }
-
-        btCompoundShape*  s = new btCompoundShape;
+        const char* nn[] = { "wheel"};
+        nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
 
     #if 0
         btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
-    #else    
+        return cs_body;
+    #else 
+        btCompoundShape*  s = new btCompoundShape;
         btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
-    #endif
-
-        for (auto it = wheels.begin();it != wheels.end();++it)
-            (*it)->setNodeMask(0xffffffff);
-
-
         s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);
-    
         return s;
+    #endif
+       
+    
+        
     }
 
 }
@@ -122,7 +113,7 @@ namespace vehicle
 namespace airplane
 {
 
-    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset)
+    /*btCompoundShape*/btCollisionShape*  fill_cs(osg::Node* node, cg::point_3& offset)
     {  
             osg::ComputeBoundsVisitor cbv;
             node->accept( cbv );
@@ -151,25 +142,30 @@ namespace airplane
 #endif 
             auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
             
-            const char* nn[] = { "shassi", "rotor" };
+            const char* nn[] = { "shassi", "rotor"/*, "engine"*/ };
             nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
 
             btCollisionShape* cs_body = nullptr;
-            btCompoundShape*  s = new btCompoundShape;
 
     #if 0
             FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
             
-            cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
+            cs_body   = osgbCollision::btConvexTriMeshCollisionShapeFromOSG/*btTriMeshCollisionShapeFromOSG*/( body );
+            return cs_body;
     #else
+            
+            btCompoundShape*  s = new btCompoundShape;
             FIXME(TRIANGLE_MESH_SHAPE_PROXYTYPE хорошая весчь наверное но перестаем сталкиваться самолетами хо хо)
-            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
-    #endif
-
+            cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,/*CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE*/CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
             if(cs_body)
                 s->addChildShape(btTransform(btQuaternion(0,0,0),offset_),cs_body);
+            
+            return s;
+    #endif
 
-           return s;
+
+
+           
     }
 
 }
@@ -177,7 +173,7 @@ namespace airplane
 namespace heli
 {
 
-    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset)
+    /*btCompoundShape*/btCollisionShape*  fill_cs(osg::Node* node, cg::point_3& offset)
     {  
         osg::ComputeBoundsVisitor cbv;
         node->accept( cbv );
@@ -205,21 +201,23 @@ namespace heli
 #if 0
         FIXME("При btTriMeshCollisionShape проваливаемся при столкновениях, btConvexTriMeshCollisionShape не сериализуется" )
             cs_body   = /*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
+        return cs_body;
 #else
         cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
-#endif
-
         if(cs_body)
             s->addChildShape(btTransform(btQuaternion(0,0,0),offset_),cs_body);
 
         return s;
+#endif
+
+
     }
 
 }
 
 namespace default
 {
-    btCompoundShape*  fill_cs(osg::Node* node, cg::point_3& offset )
+    /*btCompoundShape*/btCollisionShape*  fill_cs(osg::Node* node, cg::point_3& offset )
     {          
         osg::Node* lod3 =  findFirstNode(node,"Lod3");
 
@@ -242,18 +240,20 @@ namespace default
 
 #if 0
         btCollisionShape* cs_body   = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( lod3?lod3:node );
+        return cs_body;
 #else    
         btCollisionShape* cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( lod3?lod3:node,CONVEX_HULL_SHAPE_PROXYTYPE/*TRIANGLE_MESH_SHAPE_PROXYTYPE*/,osgbCollision::Y,3 );
+        s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);
+        return s;
+
 #endif
 
-        s->addChildShape(btTransform(btQuaternion(0,0,0),/*to_bullet_vector3(*/offset_/*)*/),cs_body);
 
-        return s;
     }
 
 }
 
-btCompoundShape* fill_cs(osg::Node* node, cg::point_3& offset)
+/*btCompoundShape*/btCollisionShape* fill_cs(osg::Node* node, cg::point_3& offset)
 {
     auto lod3 =  findFirstNode(node,"lod3");
 
@@ -281,7 +281,7 @@ bool generateBulletFile(std::string name, osg::Node* node, cg::point_3& offset)
 	
 	// /*Convex*/btTriangleMeshShape* trimeshShape = osgbCollision::/*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( node );
     
-    btCompoundShape * cs =  fill_cs(node,offset);
+    /*btCompoundShape*/btCollisionShape * cs =  fill_cs(node,offset);
 
     static const char* nodeName = node->getName().c_str();
     FIXME(Может надо для всех узлов проставить имена)

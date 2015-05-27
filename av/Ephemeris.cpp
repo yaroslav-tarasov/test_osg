@@ -329,7 +329,7 @@ namespace avSky
         
         setSummerTime();
 
-        osg::BoundingSphere bs = _terrainNode?_terrainNode->getBound():osg::BoundingSphere();
+        osg::BoundingSphere bs = _terrainNode.valid()?_terrainNode->getBound():osg::BoundingSphere();
         if (bs.valid())                                             // If the bs is not valid then the radius is -1
             radius = bs.radius()*2;                                 // which would result in an inside-out skydome...
 

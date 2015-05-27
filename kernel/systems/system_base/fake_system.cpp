@@ -1111,6 +1111,11 @@ void fake_system_base::check_destroy(std::vector<object_info_wptr> const& objs_t
             size_t use_count = it->use_count();
             string name = it->lock()->name();
             LogTrace("object (id = " << it->lock()->object_id() << ", name = " << name << ", sys = " << sys_name(kind()) << ") can't be destroyed  (use_count = " << use_count << ")");
+            {
+                force_log fl;
+                LOG_ODS_MSG ("object (id = " << it->lock()->object_id() << ", name = " << name << ", sys = " << sys_name(kind()) << ") can't be destroyed  (use_count = " << use_count << ")");
+            }
+
 
             vector<obj_id_t> roots = remove_roots_order();
 
@@ -1129,6 +1134,11 @@ void fake_system_base::check_destroy(std::vector<object_info_wptr> const& objs_t
                 if (use_count != it->use_count())
                 {
                     LogTrace("object (id = " << id2 << ", name = " << name2 << ") has references to " << name);
+                    {
+                        force_log fl;
+                        LOG_ODS_MSG ("object (id = " << id2 << ", name = " << name2 << ") has references to " << name);
+                    }
+
                     use_count = it->use_count();
                 }
             }

@@ -147,10 +147,12 @@ namespace bi
 	{
 		        RigidUpdater_private()
                     : _krv_data_getter("log_sochi_3.txt")
+                    , _sys            (phys::create_phys_system())
                 {}
 #ifdef DEPRECATED
                 RigidUpdater::phys_vehicles_t                          _vehicles;
-#endif
+#endif         
+                 polymorph_ptr<phys::BulletInterface>                   _sys;
                 kernel::system_ptr                                     _msys;
 				kernel::system_ptr                                     _vsys;
                 kernel::system_ptr                                     _csys;
@@ -200,7 +202,6 @@ namespace bi
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
 		, _debug       (cfg().debug.debug_drawer)
-		, _sys         (phys::create_phys_system())
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(boost::make_shared<RigidUpdater_private>())
@@ -210,15 +211,15 @@ namespace bi
 		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
 	{
         using namespace kernel;
-        _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
+
         
         vis_sys_props props_;
         props_.base_point = ::get_base();
-
-		_d->_vsys = create_visual_system(_d->msg_service_, props_);
-
+        
         _d->_csys = create_ctrl_system(_d->msg_service_);
-       
+		_d->_vsys = create_visual_system(_d->msg_service_, props_);
+        _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
+
         create_auto_object(_d->_msys,"phys_sys","phys_sys");
         create_auto_object(_d->_msys,"airports_manager","aiports_manager");
         create_auto_object(_d->_msys,"ada","ada");
@@ -251,7 +252,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A319";
             geo_position agp(apos,quaternion(cpr(30,0,0)));
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
         {
 
@@ -259,7 +260,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "SB20";
             geo_position agp(apos,quaternion(cpr(0,0,0)));
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -267,7 +268,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A321";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -275,7 +276,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B737";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -283,7 +284,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B744";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -303,7 +304,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "AN26";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
         
         {
@@ -385,9 +386,32 @@ namespace bi
       
     }
 
+
+    void RigidUpdater::stopSession()
+    {
+        if (_d->_csys)
+        {
+            kernel::system_session_ptr(_d->_csys)->on_session_stopped();
+            _d->_csys.reset();
+        }
+
+        if (_d->_msys)
+        {
+            kernel::system_session_ptr(_d->_msys)->on_session_stopped();
+            _d->_msys.reset();
+        }
+
+        if (_d->_vsys)
+        {
+            kernel::system_session_ptr(_d->_vsys)->on_session_stopped();
+            _d->_vsys.reset();
+        }
+    }
+
+
     void RigidUpdater::addGround( const osg::Vec3& gravity )
     {
-        _sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
+        _d->_sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
             [&](int id){
                 if(_on_collision)
                     _on_collision(_physicsNodes[id].get());   
@@ -406,7 +430,7 @@ namespace bi
         }
 
         if(_dbgDraw)
-            _sys->setDebugDrawer(_dbgDraw);
+            _d->_sys->setDebugDrawer(_dbgDraw);
     }
 
 
@@ -692,14 +716,14 @@ namespace bi
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        _sys->createBox( id, shape->getHalfLengths(), mass );
+        _d->_sys->createBox( id, shape->getHalfLengths(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
 
     void RigidUpdater::addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        _sys->createSphere( id, shape->getRadius(), mass );
+        _d->_sys->createSphere( id, shape->getRadius(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
 
@@ -904,7 +928,7 @@ namespace bi
                 }
                 //else
                 //    _time_delta_vis_sys += dt_sys;
-                
+             
                 
                 
 #ifdef DEPRECATED
@@ -922,18 +946,19 @@ namespace bi
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
                 {
-                    osg::Matrix matrix = _sys->getMatrix(itr->first);
+                    osg::Matrix matrix = _d->_sys->getMatrix(itr->first);
                     itr->second->setMatrix( matrix );
                 }
 
                 if( _dbgDraw)
                 {
-                    _sys->getScene()->debugDrawWorld();
+                    _d->_sys->getScene()->debugDrawWorld();
                     _dbgDraw->EndDraw();
                 }
             } 
 
             break;
+
         default: break;
         }
         return false;
@@ -950,8 +975,8 @@ namespace bi
         mt->addChild( geode.get() );
         _root->addChild( mt.get() );
 
-        _sys->setMatrix( id, osg::Matrix::translate(pos) );
-        _sys->setVelocity( id, vel );
+        _d->_sys->setMatrix( id, osg::Matrix::translate(pos) );
+        _d->_sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
 
@@ -962,8 +987,8 @@ namespace bi
         mt->addChild( node );
         _root->addChild( mt.get() );
 
-        _sys->setMatrix( id, osg::Matrix::translate(pos) );
-        _sys->setVelocity( id, vel );
+        _d->_sys->setMatrix( id, osg::Matrix::translate(pos) );
+        _d->_sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
 

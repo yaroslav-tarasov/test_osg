@@ -16,13 +16,14 @@ namespace creators
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
     osg::Node*          loadHelicopter();
 	osg::Node*          createObject(std::string name, bool fclone=true);
+    void                releaseObjectCache();
 
-    const osg::Vec4 red_color   = osg::Vec4(100.0f, 0.0f, 0.0f, 100.0f);
-    const osg::Vec4 blue_color  = osg::Vec4(0.0f, 0.0f, 100.0f, 100.0f);
-    const osg::Vec4 green_color = osg::Vec4(0.0f, 100.0f, 0.0f, 100.0f);
-    const osg::Vec4 white_color = osg::Vec4(100.0f, 100.0f, 100.0f, 100.0f);
-    const osg::Vec4 black_color = osg::Vec4(0.0f,0.0f,0.0f,100.0f);
-    const osg::Vec4 gray_color  = osg::Vec4(0.8f,0.8f,0.8f,100.0f);
+    const osg::Vec4 red_color   (100.0f, 0.0f, 0.0f, 100.0f);
+    const osg::Vec4 blue_color  (0.0f, 0.0f, 100.0f, 100.0f);
+    const osg::Vec4 green_color (0.0f, 100.0f, 0.0f, 100.0f);
+    const osg::Vec4 white_color (100.0f, 100.0f, 100.0f, 100.0f);
+    const osg::Vec4 black_color (0.0f,0.0f,0.0f,100.0f);
+    const osg::Vec4 gray_color  (0.8f,0.8f,0.8f,100.0f);
 }
 
 

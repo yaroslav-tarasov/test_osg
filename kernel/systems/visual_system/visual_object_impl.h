@@ -22,9 +22,9 @@ struct visual_object_impl
     void set_visible(bool visible);
 
 private:
-    osg::ref_ptr<avScene::Scene> scene_;
-    osg::ref_ptr<osg::Node>      node_;
-    osg::ref_ptr<osg::Node>      root_;
+    osg::observer_ptr<avScene::Scene> scene_;
+    osg::ref_ptr<osg::Node>           node_;
+    osg::ref_ptr<osg::Node>           root_;
 
     nm::node_control_ptr         parent_;
 };

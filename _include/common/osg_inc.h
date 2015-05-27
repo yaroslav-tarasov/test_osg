@@ -98,6 +98,7 @@
 
 #include <osgFX/BumpMapping>
 
+#include <osgSim/LightPointNode>
 
 #define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
 #define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F

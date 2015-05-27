@@ -34,11 +34,23 @@ int av_scene( int argc, char** argv )
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
 
-    avScene::Scene::Create(arguments/*,pTraits*/);
+    //do
+    //{
+        avScene::Scene::Create(arguments/*,pTraits*/);
     
-    osg::ref_ptr<avScene::Scene> scene = avScene::Scene::GetInstance() ;
-    
-    return scene->GetViewer()->run();
+        auto viewer = avScene::Scene::GetInstance()->GetViewer();
+
+        while (!viewer->done())
+        {
+             viewer->frame();
+        }
+
+        //avScene::Scene::Release();
+
+    //} while (!avScene::Scene::zoneToReload().empty());
+
+
+    return 0; //scene->GetViewer()->run();
 
 }
 

@@ -25,11 +25,11 @@ namespace avSky
        void                    setStarFieldMask(osg::Node::NodeMask nm);  
     private:
         struct data;
-        osg::ref_ptr<data>      _d;
-        osg::ref_ptr<osg::Node> _sceneRoot;  
-        osg::ref_ptr<osg::Node> _terrainNode;
-        float                   _illum;
-        on_illum_change_f       _ic;
+        osg::ref_ptr<data>             _d;
+        osg::observer_ptr<osg::Node>   _sceneRoot;  
+        osg::observer_ptr<osg::Node>   _terrainNode;
+        float                          _illum;
+        on_illum_change_f              _ic;
         osg::ref_ptr<osg::Uniform>     _specularUniform;
         osg::ref_ptr<osg::Uniform>     _ambientUniform;
         osg::ref_ptr<osg::Uniform>     _diffuseUniform;

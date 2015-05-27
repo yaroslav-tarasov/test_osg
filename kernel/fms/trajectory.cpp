@@ -104,7 +104,8 @@ struct trajectory_impl : trajectory
             auto seg = (*it).apply_offset(length_); 
             curs_seg_.push_back(seg);
         }
-        if(vel_seg_)
+
+        if(vel_seg_ && other.vel_seg_)
         for(auto it = other.vel_seg_->begin();it!= other.vel_seg_->end();++it)
         {                         
             auto seg = (*it).apply_offset(length_); 

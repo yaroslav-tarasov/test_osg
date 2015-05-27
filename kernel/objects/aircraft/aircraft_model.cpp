@@ -253,9 +253,17 @@ void model::on_malfunction_changed( malfunction_kind_t kind )
 }
 
 // TYV
-void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& /*contacts*/)
+void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& contacts)
 {
-     if(traj_)
+    FIXME(Критерий сильного удара?);
+
+    float vel = 0;
+    for (size_t i = 0; i < contacts.size(); ++i)
+    {
+          vel = cg::max(cg::norm(contacts[i].vel), vel);
+    }
+
+     if(traj_  && vel>50)
          traj_.reset();
 }
 
