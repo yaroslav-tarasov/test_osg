@@ -135,7 +135,7 @@ struct trajectory_impl : trajectory
     /*inline*/ boost::optional<velocities_t::value_type> velocity_value(double arg) /*const*/
     { 
         size_t ind = current_segment(arg);
-        if(vel_seg_)
+        if(vel_seg_ && vel_seg_->size() > ind && vel_seg_->size() > 0 )
             return vel_seg_->at(ind).value(arg);
         else
             return boost::none;

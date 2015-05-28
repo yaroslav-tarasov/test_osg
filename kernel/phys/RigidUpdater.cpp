@@ -146,7 +146,7 @@ namespace bi
 	struct RigidUpdater::RigidUpdater_private
 	{
 		        RigidUpdater_private()
-                    : _krv_data_getter("log_sochi_3.txt")
+                    : _krv_data_getter("log_sochi_4.txt")
                     , _sys            (phys::create_phys_system())
                 {}
 #ifdef DEPRECATED
@@ -252,7 +252,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A319";
             geo_position agp(apos,quaternion(cpr(30,0,0)));
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
         {
 
@@ -260,7 +260,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "SB20";
             geo_position agp(apos,quaternion(cpr(0,0,0)));
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -268,7 +268,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "A321";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -276,7 +276,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B737";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -284,7 +284,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "B744";
             geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         {
@@ -304,7 +304,7 @@ namespace bi
             aircraft::settings_t as;
             as.kind = "AN26";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
         
         {
@@ -334,7 +334,7 @@ namespace bi
 
             auto pit = std::prev(it);
             if(pit!=it)
-                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 40));
+                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 20));
                 // vel.push_back(dist/(it->time - pit->time));
             prev = p;
         }

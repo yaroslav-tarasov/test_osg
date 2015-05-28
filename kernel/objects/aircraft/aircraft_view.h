@@ -56,7 +56,7 @@ struct craft_data
 
 protected:
     obj_id_opt              fpl_id_;
-    settings_t              settings_;
+    aircraft::settings_t    settings_;
     array<bool, MF_SIZE>    malfunctions_;
     atc_controls_t          atc_controls_;
     ipo_controls_t          ipo_controls_;

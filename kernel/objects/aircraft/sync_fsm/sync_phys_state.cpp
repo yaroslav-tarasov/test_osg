@@ -172,17 +172,19 @@ namespace sync_fsm
 
                 const decart_position cur_pos = phys_aircraft_->get_local_position();
 
-                //logger::need_to_log(true);
+                {
 
-                //LOG_ODS_MSG(
-                //    "curr_pods_len:  "                << traj_->cur_len() 
-                //    << "    desired_velocity :  "     << desired_velocity_   
-                //    << "    delta curs :  "           << curs_change
-                //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-                //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
-                //    );
+                force_log fl;
 
-                //logger::need_to_log(false);
+                LOG_ODS_MSG(
+                    "curr_pods_len:  "                << traj_->cur_len() 
+                    << "    desired_velocity :  "     << desired_velocity_   
+                    << "    delta curs :  "           << curs_change
+                    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+                    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
+                    );
+
+                }
 
             }
             else
@@ -278,19 +280,9 @@ namespace sync_fsm
 
             geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
             
-            //LOG_ODS_MSG( "  wpos.pos.x() = " << wpos.pos.lat <<   
-            //    "  wpos.pos.y() = " <<  wpos.pos.lon <<
-            //    "  wpos.pos.z() = " <<  wpos.pos.height << "\n"                 
-            //    );
-
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
             
-            //LOG_ODS_MSG( "  wpos_rel_pos.x() = " << wpos_rel_pos.x <<   
-            //    "  wpos_rel_pos.y() = " <<  wpos_rel_pos.y <<
-            //    "  wpos_rel_pos.z() = " <<  wpos_rel_pos.z << "\n"                 
-            //    );
-
 #ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wnode;
 #else
@@ -325,19 +317,6 @@ namespace sync_fsm
             point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (dt);
             wheel_node_pos.local().omega = omega_rel ;
             
-            //LOG_ODS_MSG( "  omega_rel.x() = " << omega_rel.x <<   
-            //    "  omega_rel.y() = " <<  omega_rel.y <<
-            //    "  omega_rel.z() = " <<  omega_rel.z << "\n"                 
-            //    );
-
-
-            //LOG_ODS_MSG( "  wheel_node_pos.local().orien.get_course() = " << wheel_node_pos.local().orien.get_course() <<   
-            //    "  wheel_node_pos.local().orien.get_pitch() = " <<  wheel_node_pos.local().orien.get_pitch() <<
-            //    "  wheel_node_pos.local().orien.get_roll() = " <<  wheel_node_pos.local().orien.get_roll() << "\n"                 
-            //    );
-
-
-
             wnode->set_position(wheel_node_pos);
             chassis_node->set_position(chassis_node_pos);
         });

@@ -97,6 +97,9 @@
     <Filter Include="Source Files\hmi">
       <UniqueIdentifier>{812b7a33-058f-4dc5-9f1d-8064f54d4bfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\aircraft_physless">
+      <UniqueIdentifier>{f997ba06-b2e6-4bf4-a71d-85702562be88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -496,6 +499,12 @@
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp">
+      <Filter>Source Files\objects\aircraft_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp">
+      <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

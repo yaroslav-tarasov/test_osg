@@ -303,7 +303,7 @@ namespace aircraft
         FIXME( "Не ну для разных двигателей разный, не все же реактивные" )
         const double hp = 0.0;
         const double ct_cr = 0.95; // Maximum cruise thrust coefficient
-        params.thrust =  fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr;
+        params.thrust =  fsettings.ct_1 * (1 - hp/fsettings.ct_2 + fsettings.ct_3 * hp * hp) * ct_cr * 100;
 
         FIXME("И по какой формуле считать?")
         if(fsettings.engine == 1)
@@ -507,13 +507,17 @@ namespace aircraft
             //double max_speed_clamped = max_speed;
 
             double desired_speed_signed = (dist2target_signed - cur_speed_signed) / (1.2 * prediction_*dt);
-            logger::need_to_log(true);
+            
+            {
+                // force_log fl;
 
-            LOG_ODS_MSG(
-                "desired_speed_signed:  "                << desired_speed_signed << "\n" 
-                );
+                LOG_ODS_MSG(
+                    "desired_speed_signed:  "                << desired_speed_signed << "\n" 
+                    );
+            }
 
-            logger::need_to_log(false);
+
+
 
 // FIXME TYV      А не то при рулении взлетаем хвостом вперед хо-хо   
             // desired_speed_signed = cg::bound(desired_speed_signed, -30., 30.);

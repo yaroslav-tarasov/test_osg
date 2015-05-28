@@ -3,43 +3,6 @@
 
 namespace phys
 {
-#if 0
-    class cpr : public osg::Vec3
-    {
-    public:
-        inline cpr():osg::Vec3() {}
-        inline cpr(osg::Vec3::value_type x,osg::Vec3::value_type y,osg::Vec3::value_type z): osg::Vec3(x,y,z) {}
-        inline cpr(const osg::Vec2f& v2,osg::Vec3::value_type zz): osg::Vec3(v2,zz) {}
-        inline cpr(osg::Vec3 const& v3 ):osg::Vec3(v3) {}
-        inline cpr(osg::Vec3 & v3):osg::Vec3(v3) {}
-        inline cpr(cg::cpr const& c3 ) { _v[0] = c3.course;_v[1] = c3.pitch;_v[2] = c3.roll;  }
-
-    };
-
-    class quaternion : public osg::Quat
-    {
-    public:
-        inline quaternion(): osg::Quat() {}
-        inline quaternion( osg::Quat::value_type x, osg::Quat::value_type y, osg::Quat::value_type z, osg::Quat::value_type w): osg::Quat( x, y, z, w ) {}
-        inline quaternion( const osg::Vec4f& v ): osg::Quat( v ) {}
-        inline quaternion( const osg::Vec4d& v ): osg::Quat( v ) {}
-        inline quaternion( const cg::quaternion q) { _v[0] = q.get_w();_v[1] = q.get_v().x;_v[2] = q.get_v().y;_v[3] = q.get_v().z;  }
-    };
-
-    class point_3 : public osg::Vec3
-    {
-    public:
-        inline point_3():osg::Vec3() {}
-        inline point_3(osg::Vec3::value_type x,osg::Vec3::value_type y,osg::Vec3::value_type z): osg::Vec3(x,y,z) {}
-        inline point_3(const osg::Vec2f& v2,osg::Vec3::value_type zz): osg::Vec3(v2,zz) {}
-        inline point_3(osg::Vec3 const& v3 ):osg::Vec3(v3) {}
-        inline point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
-        inline point_3(cg::point_3 const& v3 ) { _v[0] = v3.x;_v[1] = v3.y;_v[2] = v3.z;  }
-//      point_3(osg::Vec3 & v3):osg::Vec3(v3) {}
-        
-    };
-#endif
-
 	namespace aircraft
 	{
 

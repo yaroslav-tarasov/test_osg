@@ -845,7 +845,7 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
                 {
                      //btVector3 rel_vel = obB->getInterpolationLinearVelocity() - obA->getInterpolationLinearVelocity();
                      {
-                         force_log fl;
+                         // force_log fl;
 
                          LOG_ODS_MSG( "  obB->getInterpolationLinearVelocity() length = " <<  obB->getInterpolationLinearVelocity().length() << "\n" <<
                                       "  obA->getInterpolationLinearVelocity() length = " <<  obA->getInterpolationLinearVelocity().length() << "\n"  
