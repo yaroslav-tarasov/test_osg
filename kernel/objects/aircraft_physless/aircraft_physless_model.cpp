@@ -4,9 +4,9 @@
 #include "aircraft_physless_model.h"
 #include "aircraft_physless_common.h"
 
-//#include "sync_fsm/sync_phys_state.h"
-//#include "sync_fsm/sync_none_state.h"
-//#include "sync_fsm/sync_fms_state.h"
+#include "sync_fsm/sync_pl_phys_state.h"
+#include "sync_fsm/sync_pl_none_state.h"
+#include "sync_fsm/sync_pl_fms_state.h"
 //
 
 #include "aircraft\aircraft_shassis_impl.h"
@@ -46,7 +46,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
 
     shassis_ = boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager());
     rotors_ =  boost::make_shared<aircraft::rotors_support_impl>(get_nodes_manager());
-    //sync_state_.reset(new sync_fsm::none_state(*this));
+    sync_state_.reset(new sync_fsm::none_state(*this));
 
      conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
 
@@ -70,8 +70,8 @@ void model::update( double time )
     desired_nm_pos_.reset();
     desired_nm_orien_.reset();
 
-    //sync_fsm::state_ptr prev_state = sync_state_;
-    //sync_state_->update(time, dt);
+    sync_fsm::state_ptr prev_state = sync_state_;
+    sync_state_->update(time, dt);
 
     sync_nm_root(dt);
 
@@ -80,7 +80,7 @@ void model::update( double time )
     FIXME(update_shassi_anim)
     update_shassi_anim(time);
     //update_atc_state();
-    //sync_fms();
+    sync_fms();
 
     check_rotors_malfunction();
 
@@ -139,12 +139,12 @@ nodes_management::manager_ptr model::get_nodes_manager() const
 }
 
 
-shassis_support_ptr model::get_shassis() const
+aircraft::shassis_support_ptr model::get_shassis() const
 {
     return shassis_;
 }
 
-rotors_support_ptr model::get_rotors() const
+aircraft::rotors_support_ptr model::get_rotors() const
 {
     return rotors_;
 }
@@ -181,15 +181,15 @@ void model::on_malfunction_changed( aircraft::malfunction_kind_t kind )
 {
     if (kind == aircraft::MF_CHASSIS_FRONT)
     {
-        shassis_->set_malfunction(SG_FRONT, malfunction(kind));
+        shassis_->set_malfunction(aircraft::SG_FRONT, malfunction(kind));
     }
     else if (kind == aircraft::MF_CHASSIS_REAR_LEFT)
     {
-        shassis_->set_malfunction(SG_REAR_LEFT, malfunction(kind));
+        shassis_->set_malfunction(aircraft::SG_REAR_LEFT, malfunction(kind));
     }
     else if (kind == aircraft::MF_CHASSIS_REAR_RIGHT)
     {
-        shassis_->set_malfunction(SG_REAR_RIGHT, malfunction(kind));
+        shassis_->set_malfunction(aircraft::SG_REAR_RIGHT, malfunction(kind));
     }
     else if (kind == aircraft::MF_ONE_ENGINE || kind == aircraft::MF_ALL_ENGINES)
     {
@@ -200,7 +200,7 @@ void model::on_malfunction_changed( aircraft::malfunction_kind_t kind )
         {
             factor = 0.7;
             FIXME(Test)
-            rotors_->set_malfunction(RG_REAR_LEFT,malfunction(kind));
+            rotors_->set_malfunction(aircraft::RG_REAR_LEFT,malfunction(kind));
         }
         // FIXME TODO OR NOT TODO
         //auto controls = flight_manager_control_->get_controls();
@@ -242,7 +242,7 @@ void model::init_shassi_anim ()
 
         bool to_be_opened = pos.height < shassi_height_;
 
-        shassis_->visit_groups([to_be_opened](shassis_group_t & shassis_group)
+        shassis_->visit_groups([to_be_opened](aircraft::shassis_group_t & shassis_group)
         {
             if (to_be_opened)
                 shassis_group.open(true);
@@ -265,7 +265,7 @@ void model::update_shassi_anim (double time)
 
         bool to_be_opened = pos.height < shassi_height_;
 
-        shassis_->visit_groups([this, to_be_opened, time](shassis_group_t & shassis_group)
+        shassis_->visit_groups([this, to_be_opened, time](aircraft::shassis_group_t & shassis_group)
         {
             if (!shassis_group.malfunction)
             {
@@ -344,14 +344,19 @@ void model::update_contact_effects(double time)
 
 void model::sync_fms(bool force)
 {
-#if 0	
-    if (!phys_aircraft_)
-		return ;
+#if 1	
+  //  if (!phys_aircraft_)
+		//return ;
 
 	geo_position fmspos = fms_pos();
-	geo_position physpos = phys_aircraft_->get_position();
+	nodes_management::node_position root_node_pos = root_->position();
+    geo_position physpos = geo_position(root_node_pos.global().pos,root_node_pos.global().orien); // phys_aircraft_->get_position();
 
 	double prediction = 300;
+    _state.dyn_state.pos = physpos.pos;
+    _state.dyn_state.course = physpos.orien.get_course();
+    _state.pitch = physpos.orien.get_pitch();
+    _state.roll  = physpos.orien.get_roll();
 
 	//if (force || tow_attached_ || (cg::distance2d(fmspos.pos, physpos.pos) > cg::norm(physpos.dpos) * prediction * sys_->calc_step() * 2))
 	//	aircraft_fms::model_control_ptr(get_fms_info())->reset_pos(physpos.pos, physpos.orien.cpr().course);
@@ -444,15 +449,15 @@ void model::set_brake( double brake )
 geo_position model::fms_pos() const
 {
     point_3 dir = cg::polar_point_3(1., /*get_fms_info()->*/get_state().orien().course, /*get_fms_info()->*/get_state().orien().pitch);
-    return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*/get_state().dyn_state.TAS * dir, /*get_fms_info()->*/get_state().orien(), point_3());
+    return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*//*get_state().dyn_state.TAS * dir*/point_3(), /*get_fms_info()->*/get_state().orien(), point_3());
 }
 
-//void model::switch_sync_state(sync_fsm::state_ptr state)
-//{
-//    if (sync_state_)
-//        sync_state_->deinit();
-//    sync_state_ = state;
-//}
+void model::switch_sync_state(sync_fsm::state_ptr state)
+{
+    if (sync_state_)
+        sync_state_->deinit();
+    sync_state_ = state;
+}
 
 void model::freeze_position()
 {
@@ -503,15 +508,15 @@ void model::check_rotors_malfunction()
     //if (!phys_aircraft_)
     //    return;
 
-    //rotors_->visit_groups([this](rotors_group_t & rotors_group,size_t& ind)
-    //{
-    //    if ( rotors_group.malfunction )
-    //    {
-    //        rotors_group.angular_velocity(0);
-    //    }
-    //    else
-    //        rotors_group.angular_velocity(rotors_angular_speed_);
-    //});
+    rotors_->visit_groups([this](aircraft::rotors_group_t & rotors_group,size_t& ind)
+    {
+        if ( rotors_group.malfunction )
+        {
+            rotors_group.angular_velocity(0);
+        }
+        else
+            rotors_group.angular_velocity(rotors_angular_speed_);
+    });
 }
 
 
@@ -523,10 +528,10 @@ void model::on_time_factor_changed(double /*time*/, double factor)
     if (fast_session_ != fast)
     {
 
-        //if (sync_state_)
+        if (sync_state_)
         {
-            //sync_fsm::state_ptr prev_state = sync_state_;
-            //sync_state_->on_fast_session(fast);
+            sync_fsm::state_ptr prev_state = sync_state_;
+            sync_state_->on_fast_session(fast);
         }
         fast_session_ = fast;
     }

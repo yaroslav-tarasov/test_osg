@@ -284,11 +284,7 @@ void follow_traj_state::update(model * self, double dt)
             self->set_max_speed(max_speed);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-            const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
-
-            if(cg::eq(curs_change,0.0))
+            if(cg::eq(traj_->curs_value(tar_len),traj_->curs_value(cur_len)))
                 desired_velocity_ = nominal_speed;
             else
                 desired_velocity_ = with_airtow_ ? 3. : 5;

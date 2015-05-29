@@ -115,6 +115,10 @@
     <ClInclude Include="creators.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
     <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
     <ClInclude Include="light_maps.h" />
     <ClInclude Include="materials.h" />
     <ClInclude Include="osg_helpers.h" />
@@ -168,8 +172,13 @@
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />

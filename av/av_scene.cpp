@@ -8,7 +8,7 @@
 int av_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
-    
+
     logger::need_to_log(/*true*/);
 
 #if 0
@@ -48,6 +48,7 @@ int av_scene( int argc, char** argv )
         //avScene::Scene::Release();
 
     //} while (!avScene::Scene::zoneToReload().empty());
+    
 
 
     return 0; //scene->GetViewer()->run();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aircraft_physless_view.h"
-//#include "sync_fsm/sync_fsm.h"
+#include "sync_fsm/sync_pl_fsm.h"
 
 #include "network/msg_dispatcher.h"
 
@@ -13,78 +13,12 @@ using network::msg_t;
 
 namespace aircraft_physless
 {
-    namespace ums
-    {
-
-        struct state_t
-        {
-            state_t()
-                : course(0)
-                , fuel_mass  (1)
-                , TAS   (0)
-                //, cfg   (CFG_CR)
-            {}
-
-            state_t(cg::geo_point_3 const& pos, double course, double fuel_mass, double TAS/*, air_config_t cfg*/)
-                : pos   (pos)
-                , course(course)
-                , fuel_mass (fuel_mass)
-                , TAS   (TAS)
-                //, cfg   (cfg)
-            {}
-
-            cg::geo_point_3 pos;
-            double course;
-            double fuel_mass;
-            double TAS;
-            //air_config_t cfg;
-        };
-
-        struct pilot_state_t
-        {
-            pilot_state_t(state_t const& dyn_state)
-                : dyn_state(dyn_state)
-            {}
-
-            pilot_state_t()
-            {}
-
-            state_t                 dyn_state;
-        };
-    }
-
-    struct state_t : ums::pilot_state_t
-    {
-        state_t();
-        state_t(ums::pilot_state_t const& ps, double pitch, double roll, uint32_t version);
-        cpr orien() const;
-
-        double pitch;
-        double roll;
-    };
-
-    inline state_t::state_t()
-        : pitch(0)
-        , roll(0)
-    {}
-
-    inline state_t::state_t(ums::pilot_state_t const& ps, double pitch, double roll, uint32_t version)
-        : pilot_state_t(ps)
-        , pitch(pitch)
-        , roll(roll)
-    {}
-
-    inline cpr state_t::orien() const
-    {
-        return cpr(dyn_state.course, pitch, roll);
-    }
-
     struct model
         : view
         , aircraft::model_info                // интерфейс информации о модели
         , aircraft::model_control             // интерфейс управления моделью
         , aircraft::int_control
-        //, sync_fsm::self_t
+        , sync_fsm::self_t
     {
         static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
@@ -126,11 +60,11 @@ namespace aircraft_physless
 
         // sync_fsm::self_t
     private:  
-        geo_position           fms_pos() const;
-        airports_manager::info_ptr get_airports_manager() const;
-        nodes_management::manager_ptr get_nodes_manager() const;
-        shassis_support_ptr    get_shassis() const;
-        rotors_support_ptr     get_rotors() const;
+        geo_position                     fms_pos() const;
+        airports_manager::info_ptr       get_airports_manager() const;
+        nodes_management::manager_ptr    get_nodes_manager() const;
+        aircraft::shassis_support_ptr    get_shassis() const;
+        aircraft::rotors_support_ptr     get_rotors() const;
 
         ::fms::trajectory_ptr    get_trajectory() const;
 
@@ -138,7 +72,7 @@ namespace aircraft_physless
         bool is_fast_session() const;
         void set_desired_nm_pos  (geo_point_3 const& pos);
         void set_desired_nm_orien(quaternion const& orien);
-        //void switch_sync_state(sync_fsm::state_ptr state);
+        void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
         void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
         void set_nm_angular_smooth(double val);
@@ -176,10 +110,10 @@ namespace aircraft_physless
         nodes_management::node_info_ptr        tow_point_node_;
         nodes_management::node_info_ptr        body_node_;
 
-        rotors_support_ptr                 rotors_;
-        shassis_support_ptr                shassis_;
+        aircraft::rotors_support_ptr                 rotors_;
+        aircraft::shassis_support_ptr               shassis_;
         optional<double>                   last_shassi_play_;
-        bool                               shassi_anim_inited_;
+        bool                             shassi_anim_inited_;
 
         double                                 rotors_angular_speed_;
 
@@ -195,10 +129,11 @@ namespace aircraft_physless
     private:
         bool fast_session_;
 
-    //private:
-    //    sync_fsm::state_ptr sync_state_;
+    private:
+        sync_fsm::state_ptr                    sync_state_;
         state_t                                _state;
-        inline        state_t  const&                get_state() const {return _state;}
+        inline        state_t  const&          get_state() const {return _state;}
+
     FIXME(Офигенная статическая переменная)
 public:
     static const double shassi_height_;

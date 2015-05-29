@@ -100,6 +100,9 @@
     <Filter Include="Source Files\objects\aircraft_physless">
       <UniqueIdentifier>{f997ba06-b2e6-4bf4-a71d-85702562be88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\aircraft_physless\sync_fms">
+      <UniqueIdentifier>{44c6cd61-e198-42d8-9945-9a9ed03048aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -170,6 +173,18 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h">
       <Filter>Source Files\objects\aircraft</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -504,6 +519,21 @@
       <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp">
+      <Filter>Source Files\objects\aircraft_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp">
       <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
   </ItemGroup>

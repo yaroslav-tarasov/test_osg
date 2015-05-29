@@ -1,32 +1,29 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "sync_phys_state.h"
-#include "sync_transition_phys_fms.h"
-#include "sync_none_state.h"
-#include "sync_fms_state.h"
+#include "sync_pl_phys_state.h"
+//#include "sync_transition_phys_fms.h"
+#include "sync_pl_none_state.h"
+#include "sync_pl_fms_state.h"
 
-
-
-
-
-namespace aircraft
+namespace aircraft_physless
 {
     namespace sync_fsm
     {
-        struct phys_state : state_t
+        struct phys_state2 : state_t
         {
-            phys_state(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+            phys_state2(self_t &self, /*phys_aircraft_ptr phys_aircraft,*/ geo_base_3 const& base)
                 : self_(self)
+                , desired_velocity_(aircraft::min_desired_velocity())
                 //, on_ground_(false)
-                , phys_aircraft_(phys_aircraft)
+                //, phys_aircraft_(phys_aircraft)
                 , base_(base)
             {
                 self.set_nm_angular_smooth(2);
-                self_.set_phys_aircraft(phys_aircraft_);
+                //self_.set_phys_aircraft(phys_aircraft_);
             }
 
-            ~phys_state()
+            ~phys_state2()
             {
             }
 
@@ -34,7 +31,7 @@ namespace aircraft
             {
                 if (self_.get_shassis())
                     self_.get_shassis()->freeze();
-                self_.set_phys_aircraft(nullptr);
+                //self_.set_phys_aircraft(nullptr);
             }
 
             void update(double /*time*/, double dt);
@@ -50,117 +47,61 @@ namespace aircraft
             self_t &self_;
             geo_base_3 base_;
             size_t zone_;
-            phys_aircraft_ptr phys_aircraft_;
+            //phys_aircraft_ptr phys_aircraft_;
             //bool on_ground_;
-
-        //public:
-        //    static const double phys_height;
-        };
-
-        struct phys_state2 : phys_state
-        {
-            phys_state2(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
-                    : phys_state(self,phys_aircraft,base)
-                    , desired_velocity_(aircraft::min_desired_velocity())
-                    { }
-
-            void update(double /*time*/, double dt) override;
 
             double                                 desired_velocity_;
         };
 
-        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+
+        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, /*phys_aircraft_ptr phys_aircraft,*/ geo_base_3 const& base)
         {
-            if(type!=TEST_NEW)
-                return boost::make_shared<phys_state>(self,phys_aircraft,base);
-            else
-                return boost::make_shared<phys_state2>(self,phys_aircraft,base);
+                return boost::make_shared<phys_state2>(self,/*phys_aircraft,*/base);
         }
 
     }
 }
 
 
-namespace aircraft
+namespace aircraft_physless
 {
 namespace sync_fsm
 {
-    void phys_state::update(double time, double dt) 
-    {
-        if (!phys_aircraft_)
-            return;
-
-        fms::procedure_model_ptr pm =  self_.get_fms_info()->procedure_model();
-        double prediction = cg::clamp(pm->taxi_TAS(), pm->takeoff_TAS(), 15., 30.)(self_.get_fms_info()->get_state().dyn_state.TAS);
-        geo_base_3 predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(prediction*0.1));
-        phys_aircraft_->go_to_pos(predict_pos, self_.get_fms_info()->get_state().orien());
-        phys_aircraft_->set_air_cfg(self_.get_fms_info()->get_state().dyn_state.cfg);
-        phys_aircraft_->set_prediction(prediction);
-
-        phys_aircraft_->update();
-
-        //             if (fms_info_->get_state().cfg == fms::CFG_GD)
-        //             {
-        //                 bool on_ground = phys_aircraft_->has_contact();
-        // 
-        //                 if (on_ground || !on_ground_time_ || time > *on_ground_time_ + 5)
-        //                 {
-        //                     on_ground_ = on_ground;
-        //                     on_ground_time_ = time;
-        //                 }
-        //             }
-        //             else
-        //                 on_ground_ = false;
-        // 
-
-        auto physpos = phys_aircraft_->get_position();
-
-        self_.set_desired_nm_pos(physpos.pos);
-        self_.set_desired_nm_orien(physpos.orien);
-
-        sync_wheels(dt);
-        sync_rotors(dt);
-
-        auto fmspos = self_.fms_pos();
-
-        if (fmspos.pos.height > phys_height())
-        {
-            self_.switch_sync_state(boost::make_shared<transition_phys_fms_state>(self_, phys_aircraft_, time));
-        }
-    }
 
     void phys_state2::update(double time, double dt) 
     {
-        if (!phys_aircraft_)
-            return;
+        //if (!phys_aircraft_)
+        //    return;
 
 
         if(auto traj_ = self_.get_trajectory())
         {
             if (traj_->cur_len() < traj_->length())
             {
-                phys_aircraft_->set_prediction(/*15.*/30.); 
-                phys_aircraft_->freeze(false);
+                //phys_aircraft_->set_prediction(/*15.*/30.); 
+                //phys_aircraft_->freeze(false);
                 const double  cur_len = traj_->cur_len();
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
                 const double  tar_len = traj_->cur_len();
                 decart_position target_pos;
 
                 target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
+                target_pos.orien = traj_->curs_value(tar_len);//cg::cpr(traj_->curs_value(tar_len),0,0);
                 geo_position gtp(target_pos, get_base());
-                phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+                //phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
 
                 if(gtp.pos.height > 0)
                 {
-                    phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
+                    // phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
                 }
 
-                auto physpos = phys_aircraft_->get_position();
+                FIXME(Нужен позишн я я)
+                auto physpos = gtp; //phys_aircraft_->get_position();
 
                 self_.set_desired_nm_pos(physpos.pos);
                 self_.set_desired_nm_orien(physpos.orien);
 
-                //const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
+                ///const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
 
                 if(traj_->velocity_value(tar_len))
                     desired_velocity_ = *traj_->velocity_value(tar_len);
@@ -170,26 +111,26 @@ namespace sync_fsm
                 else
                     desired_velocity_ = aircraft::min_desired_velocity();
 
-                const decart_position cur_pos = phys_aircraft_->get_local_position();
+                //const decart_position cur_pos = phys_aircraft_->get_local_position();
 
-                {
+                //{
 
-                    //force_log fl;
+                //force_log fl;
 
-                    LOG_ODS_MSG(
-                        "curr_pods_len:  "                << traj_->cur_len() 
-                        << "    desired_velocity :  "     << desired_velocity_   
-                        //<< "    delta curs :  "           << curs_change
-                        << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-                        << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
-                        );
+                //LOG_ODS_MSG(
+                //    "curr_pods_len:  "                << traj_->cur_len() 
+                //    << "    desired_velocity :  "     << desired_velocity_   
+                //    << "    delta curs :  "           << curs_change
+                //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+                //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
+                //    );
 
-                }
+                //}
 
             }
             else
             {
-
+#if 0
                 cg::point_3 cur_pos = phys_aircraft_->get_local_position().pos;
                 cg::point_3 d_pos   = phys_aircraft_->get_local_position().dpos;
                 cg::point_3 trg_p(traj_->kp_value(traj_->length()),0);
@@ -206,18 +147,30 @@ namespace sync_fsm
                     // traj.reset();
                     phys_aircraft_->freeze(true);
                 }
+#endif
+                auto physpos = self_.fms_pos();//phys_aircraft_->get_position();
 
-                auto physpos = phys_aircraft_->get_position();
+                //self_.set_desired_nm_pos(physpos.pos);
+                //self_.set_desired_nm_orien(physpos.orien);
+                {
+                    force_log fl;
 
-                self_.set_desired_nm_pos(physpos.pos);
-                self_.set_desired_nm_orien(physpos.orien);
+                    LOG_ODS_MSG (
+                        " physpos.lat " << physpos.pos.lat <<
+                        " physpos.lon " << physpos.pos.lon <<
+                        " \n"
+                    );
+                }
+                
+                self_.freeze_position();
 
             }
 
-            phys_aircraft_->update();
+            // phys_aircraft_->update();
         }
         else
         {
+#if 0
             fms::procedure_model_ptr pm =  self_.get_fms_info()->procedure_model();
             double prediction = cg::clamp(pm->taxi_TAS(), pm->takeoff_TAS(), 15., 30.)(self_.get_fms_info()->get_state().dyn_state.TAS);
             //geo_base_3 predict_pos = geo_base_3(aircraft_fms::model_info_ptr(self_.get_fms_info())->prediction(prediction*0.1));
@@ -238,6 +191,13 @@ namespace sync_fsm
             physpos = phys_aircraft_->get_position();
             self_.set_desired_nm_pos(physpos.pos);
             self_.set_desired_nm_orien(physpos.orien);
+#endif
+            auto physpos = self_.fms_pos();//phys_aircraft_->get_position();
+
+            self_.set_desired_nm_pos(physpos.pos);
+            self_.set_desired_nm_orien(physpos.orien);
+            
+            self_.freeze_position();
         }
 
 
@@ -246,20 +206,20 @@ namespace sync_fsm
 
     }
 
-    void phys_state::on_zone_destroyed( size_t id )
+    void phys_state2::on_zone_destroyed( size_t id )
     {
-        if (phys_aircraft_->get_zone() == id)
-            self_.switch_sync_state(boost::make_shared<none_state>(self_));
+        //if (phys_aircraft_->get_zone() == id)
+        //    self_.switch_sync_state(boost::make_shared<none_state>(self_));
     }
 
-    void phys_state::on_fast_session( bool fast )
+    void phys_state2::on_fast_session( bool fast )
     {
         if (fast)
             self_.switch_sync_state(boost::make_shared<fms_state>(self_));
     }
 
 
-    void phys_state::sync_wheels(double dt)
+    void phys_state2::sync_wheels(double dt)
     {
         geo_position root_pos = self_.get_root_pos();
 
@@ -268,9 +228,9 @@ namespace sync_fsm
         
         logger::need_to_log(true);
 
-        geo_position body_pos = phys_aircraft_->get_position();
+        geo_position body_pos = geo_position(); //phys_aircraft_->get_position();
 
-        self_.get_shassis()->visit_chassis([this, &root_next_orien, &root_next_pos, &body_pos, dt](shassis_group_t const& gr, shassis_t & shassis)
+        self_.get_shassis()->visit_chassis([this, &root_next_orien, &root_next_pos, &body_pos, dt](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
         {
             auto wnode = shassis.wheel_node;
             auto chassis_node = shassis.node;
@@ -278,7 +238,7 @@ namespace sync_fsm
             if (shassis.phys_wheels.empty())
                 return;
 
-            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
+            geo_position wpos = geo_position();//this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
             
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
@@ -326,9 +286,9 @@ namespace sync_fsm
         logger::need_to_log(false);
 	}
 
-    void phys_state::sync_rotors(double dt)
+    void phys_state2::sync_rotors(double dt)
     {
-        self_.get_rotors()->visit_rotors([this, dt](rotors_group_t const& rg,size_t& id)
+        self_.get_rotors()->visit_rotors([this, dt](aircraft::rotors_group_t const& rg,size_t& id)
         {
             auto rnode = rg.node;
             

@@ -2,7 +2,7 @@
 
 
 #include "common/aircraft.h"
-
+#include "objects/aircraft_physless.h"
 
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
@@ -30,40 +30,7 @@ protected:
     REFL_END()
 };
 
-struct info
-{
-    virtual ~info(){}
 
-    virtual geo_point_3 const&              pos              () const = 0;
-    virtual point_3                         dpos             () const = 0;
-    virtual cpr                             orien            () const = 0;
-    virtual aircraft::settings_t const &    settings         () const = 0;
-    //virtual fpl::info_ptr                   get_fpl          () const = 0;
-    //virtual bool                            has_assigned_fpl () const = 0;
-
-    virtual transform_4 const&              tow_point_transform() const = 0;
-    virtual nodes_management::node_info_ptr tow_point        () const = 0;
-
-    virtual nodes_management::node_info_ptr root             () const = 0;
-    virtual bool                            malfunction      (aircraft::malfunction_kind_t kind) const = 0;
-
-    //virtual aircraft_fms::info_ptr          get_fms          () const = 0;
-
-    virtual optional<double> get_prediction_length() const = 0;
-    virtual optional<double> get_proc_length      () const = 0;
-
-    DECLARE_EVENT(assigned_fpl_changed, (fpl::info_ptr));
-    DECLARE_EVENT(responder_changed, (fpl::info*));
-};
-
-struct control
-{
-    virtual ~control(){}
-    virtual void unassign_fpl() = 0;
-    //
-    virtual void set_kind(std::string const& kind) = 0;
-    virtual void set_turbulence(unsigned turb) = 0;
-};
 
 
 //////////////////////////////////////////////////////////////////////////

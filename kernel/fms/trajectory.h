@@ -26,7 +26,9 @@ struct traj_data
     {}
 
     typedef cg::curve_t<cg::point_3>           keypoints_t;
-    typedef cg::curve_t<double>                   curses_t;
+    //typedef cg::curve_t<double>                 curses_t;
+    typedef cg::curve_t<cg::quaternion>           curses_t;
+    
     typedef cg::curve_t<double>               velocities_t;
 
     typedef std::vector<keypoints_t>         kp_segments_t;

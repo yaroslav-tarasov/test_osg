@@ -585,7 +585,7 @@ namespace aircraft
             max_roll = cg::clamp(5., 30., 0., max_roll)(cur_glb_pos.pos.height);
             
             {
-                force_log fl;
+                // force_log fl;
 
                 LOG_ODS_MSG(
                     "max_roll:  "                << max_roll << "\n" <<

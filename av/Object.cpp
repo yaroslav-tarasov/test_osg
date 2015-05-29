@@ -139,7 +139,8 @@ osg::Node* createObject(std::string name, bool fclone)
             "steering_lamp",
             "strobe_",
             "landing_lamp",
-            "navaid_",
+            "back_tail",
+            // "navaid_",
         };
 
         for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
@@ -154,37 +155,54 @@ osg::Node* createObject(std::string name, bool fclone)
         
         auto shift_phase = cg::rand(cg::range_2(0, 255));
         
+        osgSim::Sector* sector = new osgSim::AzimSector(-osg::inDegrees(45.0),osg::inDegrees(45.0),osg::inDegrees(90.0));
+        
         for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
         {
              osgSim::LightPoint pnt;
+             bool need_to_add = false;
 
-             if((*it)->getName() == "tail")  pnt._color      = white_color;
-             if((*it)->getName() == "port")  pnt._color      = green_color;
-             if((*it)->getName() == "starboard")  pnt._color = red_color;
+             if((*it)->getName() == "tail")
+             { 
+                 pnt._color      = white_color;
+                 need_to_add     = true;
+             }
+
+             if((*it)->getName() == "port")
+             {   
+                 pnt._color      = green_color;
+                 need_to_add     = true;
+                 pnt._sector = sector;
+             }
+
+             if((*it)->getName() == "starboard") 
+             {
+                 pnt._color = red_color;
+                 need_to_add     = true;
+                 pnt._sector = sector;
+             }
             
              
-             if((*it)->getName() == "strobe_r" || (*it)->getName() == "strobe_l") 
+             if(boost::starts_with((*it)->getName(), "strobe_")) 
              {
                  pnt._color  = white_color;
                  pnt._blinkSequence = new osgSim::BlinkSequence;
-                 //for( int j = 10; j > 0; --j )
-                 //{
-                 //    float  intensity = j/10.0f;
-                 //    pnt._blinkSequence->addPulse( 1.0/10,
-                 //        osg::Vec4( intensity, intensity, intensity, intensity ) );
-                 //}
                  pnt._blinkSequence->addPulse( 0.2,
                      osg::Vec4( 1., 1., 1., 1. ) );
 
                  pnt._blinkSequence->addPulse( 1.0,
                      osg::Vec4( 0., 0., 0., 0. ) );
 
+                 pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
+
                  pnt._blinkSequence->setPhaseShift(shift_phase);
+                 need_to_add     = true;
              }
 
              pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
              pnt._radius = 0.2f;
-             obj_light->addLightPoint(pnt);
+             if(need_to_add)
+                 obj_light->addLightPoint(pnt);
         }
 
         if(wln_list.size()>0)
@@ -283,7 +301,7 @@ osg::Node* createObject(std::string name, bool fclone)
         }
 #endif
 
-		objCache[name] = object_file;
+		objCache[name] = pat/*object_file*/;
 
 	}
 

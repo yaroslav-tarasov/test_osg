@@ -29,6 +29,8 @@
 #include "objects/vehicle.h"
 
 
+#include "aircraft_physless.h"
+
 
 FIXME("kernel/systems.h")
 #include "kernel/systems.h"
@@ -120,11 +122,11 @@ namespace
                     kd.h = items.get<float>(5);
                     //kd.fi = items.get<float>(7);
                     kd.fiw = items.get<float>(7);
-                    //kd.kr = items.get<float>(11);
-                    //kd.v = items.get<float>(13);
-                    //kd.w = items.get<float>(15); 
+                    kd.kr  = items.get<float>(9);
+                    //kd.v  = items.get<float>(13);
+                    //kd.w  = items.get<float>(15); 
                     //kd.vb = items.get<float>(17);
-                    //kd.tg = items.get<float>(19);
+                    kd.tg   = items.get<float>(15);
                     kd.time = items.get<float>(17);
 
                     kd_.push_back(kd);
@@ -329,7 +331,7 @@ namespace bi
             auto p = cg::point_2(it->x,it->y);
             auto dist = cg::distance(prev,p);
             tlength += dist;
-            crs.insert(std::make_pair(tlength,(it->fiw - 45)));
+            crs.insert(std::make_pair(tlength,cpr(it->fiw,it->tg, it->kr )));
             kpts.insert(std::make_pair(tlength,cg::point_3(p,it->h)));
 
             auto pit = std::prev(it);
@@ -338,8 +340,6 @@ namespace bi
                 // vel.push_back(dist/(it->time - pit->time));
             prev = p;
         }
-
-
         
 
         {
@@ -347,12 +347,25 @@ namespace bi
             decart_position target_pos(vpos,cpr(/*180 -*/ _d->_krv_data_getter.kd_[start_idx].fiw,0,0));
             geo_position agp(target_pos, ::get_base());
             
-            agp.orien = cpr( _d->_krv_data_getter.kd_[start_idx].fiw - 45,0,0);
+            agp.orien = cpr( _d->_krv_data_getter.kd_[start_idx].fiw /*- 45*/,0,0);
 
             aircraft::settings_t as;
             as.kind = "A319";
             auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
             aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
+        }
+        
+        {
+            // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
+            cg::point_3 vpos(350,650,0);
+            decart_position target_pos(vpos,cg::quaternion(cg::cpr(_d->_krv_data_getter.kd_[start_idx].fiw , 0, 0)));
+            geo_position agp(target_pos, ::get_base());
+
+            aircraft::settings_t as;
+            as.kind = "A319";//"A333";
+            //geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
         }
 
         vehicle::settings_t vs;
@@ -382,7 +395,7 @@ namespace bi
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
 
 
-        _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
+        // _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
       
     }
 
@@ -750,7 +763,7 @@ namespace bi
         double  current_time;
         double& last_frame_time;
     };
-
+                                                
 
     bool RigidUpdater::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
     {
@@ -865,7 +878,8 @@ namespace bi
                     }
                     return true;
                 });
-            }
+
+            }  
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Down )
             {
                 const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
@@ -883,6 +897,8 @@ namespace bi
                     }
                     return true;
                 });
+
+
             }
             break;
         case osgGA::GUIEventAdapter::FRAME:
@@ -1048,6 +1064,22 @@ namespace bi
              return true;
          });
 
+         kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&a_or_v](aircraft_physless::control_ptr a)->bool
+         {
+             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+             if( nm_id == this->selected_obj_id_)
+             {
+                 selected_object_type_signal_(AIRCRAFT_TYPE);
+                 auto traj = aircraft::int_control_ptr(a)->get_trajectory();
+                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
+                 a_or_v = true;
+                 return false;
+             }
+             return true;
+         });
+
          if(!a_or_v)
             selected_object_type_signal_(NONE_TYPE);
          
@@ -1158,7 +1190,7 @@ namespace bi
                         fms::trajectory_ptr main_ = vc->get_trajectory();
 
                         decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
-                            ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+                            ,main_->curs_value(main_->length()).cpr()/*cg::cpr(main_->curs_value(main_->length()),0,0)*/ );
 
                         target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 
@@ -1199,7 +1231,51 @@ namespace bi
                         fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
 
                         decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
-                            ,cg::cpr(main_->curs_value(main_->length()),0,0) );
+                            ,main_->curs_value(main_->length()).cpr()/*cg::cpr(main_->curs_value(main_->length()),0,0)*/ );
+
+                        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+
+                        fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
+                            target_pos,
+                            aircraft::min_radius(),
+                            aircraft::step());
+
+                        main_->append(traj);
+
+                        aircraft::int_control_ptr(am)->set_trajectory(main_);
+                    }
+
+                    // Подробная отрисовка
+                    _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory(),cg::coloraf(1.0f,0.0f,0.0f,1.0f));
+
+                    return false;
+                }
+                return true;
+            });
+
+
+            kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&target_pos](aircraft_physless::control_ptr a)->bool
+            {
+                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                if( nm_id == this->selected_obj_id_)
+                {
+                    aircraft_physless::info_ptr am= aircraft_physless::info_ptr(a);
+
+                    decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
+                    target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+
+                    if (!aircraft::int_control_ptr(am)->get_trajectory())
+                    {
+                        aircraft::int_control_ptr(am)->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
+                    }
+                    else
+                    {  
+                        fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
+
+                        decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+                            ,main_->curs_value(main_->length()).cpr()/*cg::cpr(main_->curs_value(main_->length()),0,0)*/ );
 
                         target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 
