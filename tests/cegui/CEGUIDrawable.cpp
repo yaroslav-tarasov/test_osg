@@ -5,8 +5,8 @@
 #include "stdafx.h"
 
 #include <cegui/CEGUI.h>
-//#include <RendererModules/OpenGL/CEGUIOpenGLRenderer.h>
-#include <CEGUI\RendererModules\OpenGL\GL3Renderer.h>
+#include <CEGUI\RendererModules/OpenGL/GLRenderer.h>
+//#include <CEGUI\RendererModules\OpenGL\GL3Renderer.h>
 #include "CEGUIDrawable"
 
 #ifdef _DEBUG
@@ -17,13 +17,13 @@
 #pragma comment(lib, "CEGUIOpenGLRenderer-0.lib")
 #endif
 
-//OpenThreads::Mutex  CEGUIDrawable::_mutex;
-//bool                CEGUIDrawable::_initialized = false;
+OpenThreads::Mutex  CEGUIDrawable::_mutex;
+bool                CEGUIDrawable::_initialized = false;
 
 using namespace CEGUI;
 
 CEGUIDrawable::CEGUIDrawable()
-    :   _lastSimulationTime(0.0), _activeContextID(0), _initialized(false)
+    :   _lastSimulationTime(0.0), _activeContextID(0)/*, _initialized(false)*/
 {
     setSupportsDisplayList( false );
     setDataVariance( osg::Object::DYNAMIC );
@@ -32,18 +32,24 @@ CEGUIDrawable::CEGUIDrawable()
 }
 
 CEGUIDrawable::CEGUIDrawable( const CEGUIDrawable& copy,const osg::CopyOp& copyop )
-    :   osg::Drawable(copy, copyop),
-    _lastSimulationTime(copy._lastSimulationTime),
-    _activeContextID(copy._activeContextID),
-    _initialized(copy._initialized)
+    :   osg::Drawable(copy, copyop)
+    ,_lastSimulationTime(copy._lastSimulationTime)
+    ,_activeContextID(copy._activeContextID)
+    /*_initialized(copy._initialized)*/
 {}
 
 void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 {
     unsigned int contextID = renderInfo.getContextID();
+    
     if ( !_initialized )
     {
-        CEGUI::OpenGL3Renderer::bootstrapSystem( /*CEGUI::OpenGLRenderer::TTT_NONE*//*TTT_FBO*//*TTT_AUTO*//*TTT_NONE*/ );
+
+        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
+
+        if ( !_initialized )
+        {
+        CEGUI::OpenGLRenderer::bootstrapSystem( CEGUI::OpenGLRenderer::TTT_NONE/*TTT_FBO*//*TTT_AUTO*//*TTT_NONE*/ );
         if ( !CEGUI::System::getSingletonPtr() ) return;
 
         CEGUI::DefaultResourceProvider* resource =
@@ -63,10 +69,11 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         CEGUI::ScriptModule::setDefaultResourceGroup( "lua_scripts" );
 
         // const_cast<CEGUIDrawable*>(this)->initializeControls();
-        ready_for_init_signal_();
+         ready_for_init_signal_();
         _activeContextID = contextID;
         _initialized = true;
-    }
+        }
+   }
     else if ( contextID==_activeContextID )
     {
         osg::State* state = renderInfo.getState();
@@ -77,7 +84,7 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 		glPushMatrix();
         glPushAttrib( GL_ALL_ATTRIB_BITS );
 
-        CEGUI::OpenGL3Renderer* renderer = static_cast<CEGUI::OpenGL3Renderer*>(
+        CEGUI::OpenGLRenderer* renderer = static_cast<CEGUI::OpenGLRenderer*>(
             CEGUI::System::getSingleton().getRenderer() );
         osg::Viewport* viewport = renderInfo.getCurrentCamera()->getViewport();
         if ( renderer && viewport )
@@ -99,6 +106,7 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         glPopMatrix();
         
     }
+
 }
 
 void CEGUIDrawable::initializeControls()
@@ -111,7 +119,7 @@ void CEGUIDrawable::initializeControls()
 
     FontManager::getSingleton().createFromFile( "DejaVuSans-10.font" );
     context.setDefaultFont( "DejaVuSans-10" );
-    context.getDefaultFont()->setAutoScaled(CEGUI::AutoScaledMode::ASM_Disabled);
+    context.getDefaultFont()->setAutoScaled(CEGUI::ASM_Disabled);
 
     Window* root = WindowManager::getSingleton().createWindow( "DefaultWindow", "Root" );
     context.setRootWindow(root);

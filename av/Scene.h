@@ -63,7 +63,7 @@ namespace avScene {
 
     private:
         void                                        onZoneChanged(int zone);
-
+        bool                                        onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
     private:
 
         static osg::ref_ptr<Scene>                  _scenePtr;

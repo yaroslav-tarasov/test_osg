@@ -88,6 +88,12 @@ protected:
     void unassign_fpl()     {};
     void set_kind           (std::string const& kind) override;
     void set_turbulence     (unsigned turb) override;
+    
+
+    void set_state          (state_t const& st) override;
+
+protected:
+    void set_state          (state_t const& st, bool sure);
 
     // aircraft_ipo_control
 protected:
@@ -127,6 +133,9 @@ private:
     void on_traj_assign         (msg::traj_assign_msg const &m)         ;
 
 protected:
+    virtual void on_state       (msg::state_msg const& msg); // fms
+
+protected:
     void set_fpl_initial_position();
     //void update_atc_state();
     
@@ -161,6 +170,8 @@ protected:
     //////////////////////////////////////
     fms::trajectory_ptr            traj_;
     /////////////////////////////////////
+    state_t                                _state;
+    inline        state_t  const&          get_state() const {return _state;}
 
 private:
 #if 0 

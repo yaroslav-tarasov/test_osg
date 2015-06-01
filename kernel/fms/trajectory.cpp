@@ -65,7 +65,7 @@ struct trajectory_impl : trajectory
         trajectory_impl_ptr other = trajectory_impl_ptr(o);
 
         const auto length_ = length();
-
+        
         for(auto it = other->kp_seg_.begin();it!= other->kp_seg_.end();++it)
         {                         
             auto seg = (*it).apply_offset(length_); 
@@ -176,7 +176,8 @@ private:
             if(curr_len <= (*it).length())
                 return  std::distance(kp_seg_.begin(),it);
         }
-        return 0;
+
+        return std::distance(kp_seg_.begin(),kp_seg_.end()) - 1;
     }
 
     static int fill(keypoints_t& kp,curses_t& cr,double q[3], double x, void* /*user_data*/)

@@ -21,7 +21,9 @@ enum id
     am_malfunction   ,
     am_contact_effect,
     am_wheel_contact_effect,
-    am_traj_assign   ,
+    am_traj_assign   , 
+    afm_state        ,
+    afm_kind,
 };
 
 //! тела сообщений, сгенерированные специальным шаблоном
@@ -125,6 +127,66 @@ REFL_END()
 
 } // msg
 
+namespace msg 
+{
+
+struct state_msg
+    : network::msg_id<afm_state>
+{               
+    state_msg();
+    explicit state_msg(state_t const& state);
+    operator state_t() const;
+
+    geo_point_2 pos;
+    float       height;
+    cprf        orien;
+    float       TAS;
+    float       fuel_mass;
+    unsigned char cfg;
+    unsigned char alt_state;
+    uint32_t version;
+};
+
+
+typedef network::gen_msg<afm_kind           , string>                       kind_msg;
+
+
+REFL_STRUCT(state_msg)
+    REFL_ENTRY(pos)
+    REFL_ENTRY(height)
+    REFL_ENTRY(orien)
+    REFL_ENTRY(TAS)
+    REFL_ENTRY(fuel_mass)
+    //REFL_ENTRY(cfg)
+    //REFL_ENTRY(alt_state)
+    //REFL_ENTRY(version)
+REFL_END   ()
+
+
+    inline state_msg::state_msg()
+{
+}
+
+inline state_msg::state_msg(state_t const& state)
+    : pos(state.dyn_state.pos)
+    , height((float)state.dyn_state.pos.height)
+    , orien(state.orien())
+    , TAS((float)state.dyn_state.TAS)
+    //, cfg((unsigned char)state.dyn_state.cfg)
+    , fuel_mass((float)state.dyn_state.fuel_mass)
+    //, alt_state(state.alt_state)
+    //, version(state.version)
+{
+}
+
+inline state_msg::operator state_t() const
+{
+    ums::pilot_state_t pilot(ums::state_t(geo_point_3(pos, height), orien.course, fuel_mass, TAS/*, (fms::air_config_t)cfg*/)/*, (fms::alt_state_t)alt_state*/);
+
+    return state_t(pilot, orien.pitch, orien.roll, version);
+}
+
+} // msg
 
 
 } // aircraft

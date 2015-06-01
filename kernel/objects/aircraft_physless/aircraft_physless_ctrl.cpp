@@ -46,8 +46,8 @@ namespace aircraft_physless
         nodes_management::node_control_ptr root(get_nodes_manager()->get_node(0));
         root->set_position(geo_position(p, quaternion(cpr(c, 0, 0))));
 
-#if 0
-        aircraft_fms::state_t st = get_fms_info()->get_state();
+#if 1
+        /*aircraft_fms::*/state_t st = /*get_fms_info()->*/get_state();
         st.dyn_state.pos = p;
         st.dyn_state.course = c;
 
@@ -63,10 +63,11 @@ namespace aircraft_physless
             }
         }
 
-        if (cg::eq_zero(p.height))
-            st.dyn_state.cfg = fms::CFG_GD;
+        FIXME("grnd cfg?");
+        //if (cg::eq_zero(p.height))
+        //    st.dyn_state.cfg = fms::CFG_GD;
 
-        aircraft_fms::control_ptr(get_fms_info())->set_state(st);
+        /*aircraft_fms::control_ptr(get_fms_info())->*/set_state(st);
 #endif
 
     }

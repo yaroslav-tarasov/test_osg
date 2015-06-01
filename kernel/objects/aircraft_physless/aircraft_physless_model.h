@@ -91,6 +91,9 @@ namespace aircraft_physless
             
         void sync_nm_root(double dt);
 
+    private:
+        void on_state(msg::state_msg const& msg) override;   // fms
+
    public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};
         decart_position get_local_position() {return decart_position()/*phys_aircraft_->get_local_position()*/;};
@@ -131,8 +134,6 @@ namespace aircraft_physless
 
     private:
         sync_fsm::state_ptr                    sync_state_;
-        state_t                                _state;
-        inline        state_t  const&          get_state() const {return _state;}
 
     FIXME(Офигенная статическая переменная)
 public:

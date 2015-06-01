@@ -75,6 +75,8 @@ namespace aircraft_physless
     {
         virtual ~info(){}
 
+        virtual state_t const&                get_state()           const = 0;  // fms
+        
         virtual geo_point_3 const&              pos              () const = 0;
         virtual point_3                         dpos             () const = 0;
         virtual cpr                             orien            () const = 0;
@@ -95,6 +97,8 @@ namespace aircraft_physless
 
         DECLARE_EVENT(assigned_fpl_changed, (fpl::info_ptr));
         DECLARE_EVENT(responder_changed, (fpl::info*));
+        DECLARE_EVENT(state_changed, ()) ;                       // fms
+
     };
 
     struct control
@@ -102,8 +106,9 @@ namespace aircraft_physless
         virtual ~control(){}
         virtual void unassign_fpl() = 0;
         //
-        virtual void set_kind(std::string const& kind) = 0;
-        virtual void set_turbulence(unsigned turb) = 0;
+        virtual void set_state      ( state_t const& st ) = 0;      // fms
+        virtual void set_kind       (std::string const& kind) = 0;
+        virtual void set_turbulence (unsigned turb) = 0;
     };
 
 

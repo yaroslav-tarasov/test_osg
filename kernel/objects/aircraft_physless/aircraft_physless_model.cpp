@@ -364,6 +364,17 @@ void model::sync_fms(bool force)
 
 }
 
+void model::on_state(msg::state_msg const& msg)
+{
+    FIXME(useless or useful)
+    //fms::pilot_state_t fmsst = (state_t)msg;
+
+    //if (pilot_impl_)
+    //    fms::pilot_simulation_ptr(pilot_impl_)->reset_state(fmsst);
+
+    view::on_state(msg);
+}
+
 void model::on_child_removing(kernel::object_info_ptr child)
 {
     bool had_nodes_manager = get_nodes_manager();
@@ -449,7 +460,7 @@ void model::set_brake( double brake )
 geo_position model::fms_pos() const
 {
     point_3 dir = cg::polar_point_3(1., /*get_fms_info()->*/get_state().orien().course, /*get_fms_info()->*/get_state().orien().pitch);
-    return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*//*get_state().dyn_state.TAS * dir*/point_3(), /*get_fms_info()->*/get_state().orien(), point_3());
+    return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*//*get_state().dyn_state.TAS * dir*/point_3(0,0,0), /*get_fms_info()->*/get_state().orien(), point_3(0,0,0));
 }
 
 void model::switch_sync_state(sync_fsm::state_ptr state)

@@ -106,26 +106,26 @@ namespace sync_fsm
                 if(traj_->velocity_value(tar_len))
                     desired_velocity_ = *traj_->velocity_value(tar_len);
                 else
-                if(cg::eq(traj_->curs_value(tar_len),traj_->curs_value(cur_len),0.085))
+                if(cg::eq(traj_->curs_value(tar_len).cpr(),traj_->curs_value(cur_len).cpr(),0.085))
                     desired_velocity_ = aircraft::max_desired_velocity();
                 else
                     desired_velocity_ = aircraft::min_desired_velocity();
 
                 //const decart_position cur_pos = phys_aircraft_->get_local_position();
 
-                //{
+                {
 
-                //force_log fl;
+                    force_log fl;
 
-                //LOG_ODS_MSG(
-                //    "curr_pods_len:  "                << traj_->cur_len() 
-                //    << "    desired_velocity :  "     << desired_velocity_   
-                //    << "    delta curs :  "           << curs_change
-                //    << ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
-                //    << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
-                //    );
+                    LOG_ODS_MSG(
+                        "curr_pods_len:  "                << traj_->cur_len() 
+                        << "    desired_velocity :  "     << desired_velocity_   
+                        << "    delta curs :  "           << traj_->curs_value(tar_len).get_course() - traj_->curs_value(cur_len).get_course()
+                        //<< ";   cur_pos x= "              << cur_pos.pos.x << " y= "  << cur_pos.pos.y  
+                        << "    target_pos x= "           << target_pos.pos.x << " y= "  << target_pos.pos.y << "\n" 
+                        );
 
-                //}
+                }
 
             }
             else

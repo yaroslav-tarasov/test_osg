@@ -28,7 +28,9 @@ protected:
     
     mutable double _lastSimulationTime;
     mutable unsigned int _activeContextID;
-    mutable bool _initialized;
+    // mutable bool _initialized;
+    static  OpenThreads::Mutex  _mutex;
+    static   bool    _initialized;
 };
 
 #endif

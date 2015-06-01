@@ -57,11 +57,23 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::settings_msg      >(boost::bind(&view::on_settings    , this, _1))
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
-
+        
+        .add<msg::state_msg>   (boost::bind(&view::on_state, this, _1))
                                            
         // just for recording visual effect to history 
         .add<msg::contact_effect        >(boost::bind(&view::on_contact_effect      , this, _1))
         .add<msg::wheel_contact_effect  >(boost::bind(&view::on_wheel_contact_effect, this, _1));
+
+    if(dict)
+    {
+        _state.dyn_state.pos     = state_.pos;
+        _state.dyn_state.course  = state_.orien.get_course();
+        _state.pitch             = state_.orien.get_pitch();
+        _state.roll              = state_.orien.get_roll();
+
+
+    }
+
 }
 
 view::~view()
@@ -101,19 +113,32 @@ void view::on_child_removing(object_info_ptr child)
 geo_point_3 const& view::pos() const
 {
     FIXME(position);
-    return geo_point_3(); 
+    // return return fms_info_->get_state().dyn_state.pos;
+
+    return get_state().dyn_state.pos;
+
 }
 
 cg::point_3 view::dpos() const
 {  
     FIXME(dpos);
-    return cg::polar_point_3();
+    return  cg::polar_point_3(get_state().dyn_state.TAS, get_state().orien().course, get_state().orien().pitch);
 }
 
 cpr view::orien() const
 {   
     FIXME(orien());
-    return cpr();
+    return get_state().orien();
+}
+
+void view::set_state(state_t const& state)
+{
+    set_state(state, true);
+}
+
+void view::set_state(state_t const& st, bool sure)
+{                   
+    set(msg::state_msg(st), sure);
 }
 
 aircraft::settings_t const & view::settings() const
@@ -229,6 +254,11 @@ void view::set_parking_initial_position(std::string const &airport_name, std::st
 #endif
 }
 
+void view::on_state(msg::state_msg const& msg)
+{
+    _state = msg;
+    state_changed_signal_();
+}
 
 void view::on_settings(aircraft::settings_t const& s)
 {

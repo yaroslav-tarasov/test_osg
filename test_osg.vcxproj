@@ -251,6 +251,7 @@
     <ClCompile Include="tests\SkyBox.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
+    <ClCompile Include="tests\test_curves.cpp" />
     <ClCompile Include="tests\tex_test.cpp" />
     <ClCompile Include="utils\animation_handler.cpp" />
     <ClCompile Include="utils\materials.cpp" />

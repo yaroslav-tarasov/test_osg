@@ -243,6 +243,36 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 
 }
 
+namespace avGUI {
+
+    template <class T>
+    class GUIEventHandlerImpl : public osgGA::GUIEventHandler
+    {
+    public:
+        GUIEventHandlerImpl( T * object, bool (T::*func)( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv ) ) 
+            : _object(object)
+            , _func(func)
+        {
+        }
+
+        virtual bool handle( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv )
+        {
+            return (_object->*_func)(ea, aa, obj, nv) || osgGA::GUIEventHandler::handle(ea, aa, obj, nv);
+        }
+
+    private:
+        T * _object;
+        bool (T::*_func)( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
+    };
+
+    template<class T>
+    inline GUIEventHandlerImpl<T> * makeGUIEventHandlerImpl( T * object, bool (T::*func)( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv ) )
+    {
+        return new GUIEventHandlerImpl<T>(object, func);
+    }
+
+} // namespace avGUI
+
 
 osg::ref_ptr<Scene>	 Scene::_scenePtr;
 
@@ -342,13 +372,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
      
     _viewerPtr->apply(new osgViewer::SingleScreen(1));
 
-    int ref = _scenePtr->referenceCount();
-    if(ref > 1)
-    {
-        force_log fl;
-        LOG_ODS_MSG("Additional references to Scene have been found. " << ref << "\n");
-    }
-
     // Set up camera
     if ( cTraitsPtr.valid() == true )
     {
@@ -375,7 +398,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
 
     // disable ESC key
-    // _viewerPtr->setKeyEventSetsDone(0);
+    _viewerPtr->setKeyEventSetsDone(0);
 
     //
     // Set up the camera manipulators.
@@ -401,14 +424,8 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Add event handlers to the viewer
     //
     _pickHandler = new PickHandler();
-    ref = _scenePtr->referenceCount();
-
-    _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
-    _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
-    _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
-    _viewerPtr->addEventHandler( _pickHandler );
     
-    if(false) _viewerPtr->addEventHandler( 
+    if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
         {
             if (!this->_vis_settings_panel )
@@ -419,11 +436,17 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                 zones_.push_back(std::make_pair(2,std::wstring(L"Сочи")));
                 this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
+                this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
+                this->_vis_settings_panel->set_visible(false);
             }
         } )
     );
-    
-
+     
+    _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
+    _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
+    _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
+    _viewerPtr->addEventHandler( _pickHandler );    
+    _viewerPtr->addEventHandler( avGUI::makeGUIEventHandlerImpl(this, &Scene::onEvent));
     _viewerPtr->realize();
     addChild(_pickHandler->getOrCreateSelectionBox()); 
     
@@ -879,4 +902,20 @@ void   Scene::onZoneChanged(int zone)
     //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
     //_terrainNode->create(scene_name[zone]);
 
+}
+
+bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv )
+{
+    if (ea.getHandled() || ea.getEventType() != osgGA::GUIEventAdapter::KEYUP)
+        return false;
+
+    const int key = ea.getKey();
+
+    if (key == osgGA::GUIEventAdapter::KEY_Escape)
+    {
+        _vis_settings_panel->set_visible(!_vis_settings_panel->visible());
+        return true;
+    }
+
+    return false;
 }
