@@ -79,6 +79,7 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         osg::State* state = renderInfo.getState();
         state->disableAllVertexArrays();
         state->disableTexCoordPointer( 0 );
+        auto tex_unit = state->getActiveTextureUnit();
 		state->setActiveTextureUnit(0);
         
 		glPushMatrix();
@@ -104,7 +105,8 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
         glPopAttrib();
         glPopMatrix();
-        
+
+        state->setActiveTextureUnit(tex_unit);
     }
 
 }

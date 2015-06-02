@@ -57,9 +57,10 @@ void  Terrain::create( std::string name )
         scene_name = "adler.osgb";  
         mat_file_name = "adler.open.dae.mat.xml"; 
     }
-	else
+	else if(name == "minsk")
 	{
-	
+        scene_name = "minsk.dae";  
+        mat_file_name = "minsk.dae.mat.xml"; 
 	}
 
 

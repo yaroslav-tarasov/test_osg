@@ -128,13 +128,6 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
     //     if (!boost::filesystem::is_regular_file(file))
     //         LogWarn("No lights for airport found: " << file.string());
 
-
-    //osg::ref_ptr<osg::Geode> red_light   = CreateLight(creators::red_color,std::string("red"),nullptr);
-    //osg::ref_ptr<osg::Geode> blue_light  = CreateLight(creators::blue_color,std::string("blue"),nullptr);
-    //osg::ref_ptr<osg::Geode> green_light = CreateLight(creators::green_color,std::string("green"),nullptr);
-    // osg::ref_ptr<osg::Geode> white_light = CreateLight(creators::white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
-
-
     std::ifstream ifs(file);
 
     for (auto it = cur_lamps.begin(); it != cur_lamps.end(); ++it)
@@ -185,7 +178,6 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
             float      step  = items.get<float>(ofs + 7);
             osg::Vec4f clr (items.get<float>(ofs + 8), items.get<float>(ofs + 9), items.get<float>(ofs + 10),1.0f); 
 
-            // special AI, hello from VNIIRA
             size_t count = 0;
             if (!cg::eq_zero(step) && !cg::eq_zero(len))
             {
@@ -478,7 +470,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -913,7 +905,7 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
 
     if (key == osgGA::GUIEventAdapter::KEY_Escape)
     {
-        _vis_settings_panel->set_visible(!_vis_settings_panel->visible());
+        if(_vis_settings_panel) _vis_settings_panel->set_visible(!_vis_settings_panel->visible());
         return true;
     }
 
