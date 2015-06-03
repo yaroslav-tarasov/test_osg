@@ -167,11 +167,6 @@ class logger:
     public boost::noncopyable
 {
 public:
-    //logger& get()
-    //{
-    //    static logger l;
-    //    return l;
-    //}
 
     static bool need_to_log(boost::optional<bool> ntl = boost::none)
     {
@@ -213,6 +208,12 @@ enum objects_t{
     VEHICLE_TYPE
 };
 
+
+namespace avSky
+{
+
+    typedef std::function<void(float&)> on_visible_range_change_f;
+}
 
 
 #endif // precompile_header

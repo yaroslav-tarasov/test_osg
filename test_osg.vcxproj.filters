@@ -539,5 +539,8 @@
     <ClCompile Include="tests\test_curves.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="av\NavigationalLight.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

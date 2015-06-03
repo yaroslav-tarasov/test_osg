@@ -23,7 +23,6 @@ public:
     }
 };
 
-
 class texturesHolder  : public texturesHolder_base
 {
 public:
@@ -173,13 +172,6 @@ private:
             t.nightTex = new osg::Texture2D;
             t.normalTex  = new osg::Texture2D;
             t.detailsTex = th.detailsTex;
-            //t.detailsTex = new osg::Texture2D;
-
-            //t.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-            //t.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-            //t.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-
-
             t.envTex = th.envTex;
 
             auto range = mats.equal_range(mat_name);
@@ -268,11 +260,6 @@ texturesHolder_base&   getTextureHolder()
 
 class programsHolder: public programsHolder_base
 {
-    //public:
-    //    struct program_t
-    //    {
-    //        osg::ref_ptr<osg::Program> program;
-    //    };
 
 public:
     static inline const program_t& Create(std::string mat_name)
@@ -309,61 +296,24 @@ private:
 
     static inline const char* GetShader(shaders::shader_t t, std::string mat_name)
     {
+        std::string mat_name_cut = mat_name.substr(0, mat_name.find("_"));
+
+        auto fp = fn_reg::function<const char*(shaders::shader_t)>(mat_name_cut);
+        
+        if (fp)
+            return fp(t);
+
+        FIXME(Есть где-то buildingtrack) 
         if (mat_name.find("building") !=std::string::npos)
         {
             return shaders::building_mat::get_shader(t); 
         }
-        else
-        if (mat_name.find("tree") !=std::string::npos)
-        {
-            return shaders::tree_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("ground") !=std::string::npos || mat_name.find("sea") !=std::string::npos || mat_name.find("mountain") !=std::string::npos)
-        {
-                return shaders::ground_mat::get_shader(t);  
-        }    
-        else
-        if (mat_name.find("concrete") !=std::string::npos)
-        {
-            return shaders::concrete_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("railing") !=std::string::npos)
-        {
-            return shaders::railing_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("plane") !=std::string::npos)
-        {
-            return shaders::plane_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("rotor") !=std::string::npos)
-        {
-            return shaders::rotor_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("panorama") !=std::string::npos)
-        {
-            return shaders::panorama_mat::get_shader(t);  
-        }
-        else
-        if (mat_name.find("sky") !=std::string::npos)
-        {
-            return shaders::sky_fog_mat::get_shader(t);  
-        }            
-        else
-        if (mat_name.find("clouds") !=std::string::npos)
-        {
-            return shaders::clouds_mat::get_shader(t);  
-        }
-        else
         if (mat_name.find("default") !=std::string::npos)
         {
             return shaders::default_mat::get_shader(t);  
         }
-         return nullptr;
+
+        return nullptr;
 
     }
 

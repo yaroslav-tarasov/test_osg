@@ -137,6 +137,9 @@
     <ClCompile Include="av\Ephemeris.cpp" />
     <ClCompile Include="av\FogLayer.cpp" />
     <ClCompile Include="av\LOD.cpp" />
+    <ClCompile Include="av\NavigationalLight.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="av\Object.cpp" />
     <ClCompile Include="av\PreRender.cpp" />
     <ClCompile Include="av\Scene.cpp" />

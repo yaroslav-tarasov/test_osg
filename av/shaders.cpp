@@ -335,6 +335,8 @@ namespace shaders
             return nullptr;
     }
 
+     AUTO_REG_NAME(plane, shaders::plane_mat::get_shader)
+
     } // ns plane_mat
 
     namespace rotor_mat
@@ -442,6 +444,8 @@ namespace shaders
             else 
                 return nullptr;
         }
+
+        AUTO_REG_NAME(rotor, shaders::rotor_mat::get_shader)
 
     } // ns rotor_mat
 
@@ -620,7 +624,9 @@ namespace shaders
            else 
                return nullptr;
        }
-    
+
+       AUTO_REG_NAME(default, shaders::default_mat::get_shader)
+
     }  // ns default_mat
 
     namespace building_mat 
@@ -804,7 +810,11 @@ namespace shaders
                 return nullptr;
         }
 
-    }  // ns building_mat
+        AUTO_REG_NAME(building, shaders::building_mat::get_shader)
+
+    }  // ns building_mat    
+
+    
 
     namespace tree_mat 
     {
@@ -929,6 +939,8 @@ namespace shaders
             else 
                 return nullptr;
         }
+
+        AUTO_REG_NAME(tree, shaders::tree_mat::get_shader)
 
     }  // ns tree_mat
 
@@ -1116,6 +1128,10 @@ namespace shaders
                 return nullptr;
         }
 
+        AUTO_REG_NAME(ground, shaders::ground_mat::get_shader)
+        AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
+        AUTO_REG_NAME(mountain, shaders::ground_mat::get_shader)
+
     }  // ns ground_mat
 
     namespace concrete_mat 
@@ -1299,8 +1315,6 @@ namespace shaders
  \n
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
- \n               //gl_FragColor = vec4( 1.0,0.0,0.0,1.0);  
-
  \n           }
             )
  
@@ -1513,6 +1527,8 @@ namespace shaders
             else 
                 return nullptr;
         }
+        
+        AUTO_REG_NAME(concrete, shaders::concrete_mat::get_shader)
 
     }  // ns concrete_mat
 
@@ -1654,6 +1670,8 @@ namespace shaders
                 return nullptr;
         }
 
+        AUTO_REG_NAME(railing, shaders::railing_mat::get_shader)
+
     }  // ns railing_mat
 
     namespace panorama_mat 
@@ -1752,6 +1770,8 @@ namespace shaders
             else 
                 return nullptr;
         }
+
+        AUTO_REG_NAME(panorama, shaders::panorama_mat::get_shader)
 
     }  // ns panorama_mat
 
@@ -1874,6 +1894,8 @@ namespace shaders
                 return nullptr;
         }
 
+        AUTO_REG_NAME(sky, shaders::sky_fog_mat::get_shader)
+
     }  // ns sky_fog_mat
 
     namespace clouds_mat 
@@ -1962,7 +1984,119 @@ namespace shaders
             else 
                 return nullptr;
         }
+        
+        AUTO_REG_NAME(clouds, shaders::clouds_mat::get_shader)
 
     }  // ns clouds_mat
+
+    namespace  light_mat
+    {
+
+        const char* vs = { 
+            INCLUDE_VS
+
+            INCLUDE_UNIFORMS
+
+            STRINGIFY ( 
+
+            // saturation helper                         
+            float saturate( const in float x )          
+            {                                           
+                return clamp(x, 0.0, 1.0);               
+            }  
+
+            float lerp(float a, float b, float w)
+            {
+                return a + w*(b-a);
+            }
+
+            vec4 LightScreenSettings;
+            
+            void main (void)
+            {
+                LightScreenSettings = vec4(1.0,5.0,10000.0,40000.0);
+                // constants here
+                float ScreenClarity = LightScreenSettings.x;
+                float VerticalScale = LightScreenSettings.y;
+                float DistanceFadeOut = LightScreenSettings.z;
+                float DistanceFog = LightScreenSettings.w;
+
+                // position in view space
+                gl_Position.xyz = gl_Vertex.xyz;
+                // gl_Position = ftransform();
+
+                // vis distances
+                //float fDistSqr = dot(gl_Vertex.xyz, gl_Vertex.xyz);
+                float fDistSqr = dot(gl_Position.xyz, gl_Position.xyz);
+                float fDistInv = inversesqrt(fDistSqr);
+                float fDist = fDistInv * fDistSqr;
+
+                // get vis dist factor (1 - before 2/3*D, 0 - after 2*D)
+                float fVisDistFactor = saturate(fDistInv * gl_MultiTexCoord0.y - 0.5);
+                // make it be more sharp
+                fVisDistFactor *= 2.0 - fVisDistFactor;
+
+                // total fogging
+                float fGlobalFogFactor = SceneFogParams.a * fDist;
+                vec4 cDummy;
+                float fLocalFogFactor = 0.0;//suppressVisibilityByLocalBanks(gl_Position.xyz, cDummy);
+                float fTotalFogDistAtt = fGlobalFogFactor + fLocalFogFactor;
+
+                // alpha based on fogging
+                float fAlphaFogFactor = exp(-0.35 * fTotalFogDistAtt);
+                float fAlphaSizeFogFactor = fAlphaFogFactor;
+                fAlphaFogFactor *= 2.0 - fAlphaFogFactor;
+                // size growing based on fogging
+                // reflection size growing is prohibited
+                float fSizeFogFactor = lerp(1.0 + 3.5 * step(VerticalScale, 1.0), 1.0, fAlphaSizeFogFactor);
+
+                // global alpha fall-off (for reflections)
+                float fAlphaDistFade = saturate(max((fDistInv * DistanceFadeOut - 1.0) * 0.25, 0.03));
+
+                // real size, pixel screen size, magic vertical scale
+                //gl_TexCoord[0].xyz = vec3(
+                //    gl_MultiTexCoord0.x,
+                //    ScreenClarity * fVisDistFactor * fSizeFogFactor,
+                //    VerticalScale);
+
+                // color (transp is also modulated by visible distance)
+                gl_FrontColor = gl_Color;
+                gl_FrontColor.a *= fVisDistFactor * fAlphaDistFade * fAlphaFogFactor;
+
+            }
+            )
+        };
+
+        const char* fs = { 
+
+            INCLUDE_VS
+
+            STRINGIFY ( 
+            
+
+            // uniform sampler2D texCulturalLight;
+
+            void main(void)                                                         
+            {                                                                       
+                gl_FragColor = vec4(gl_Color.rgb, 1.0);//gl_Color.a * texture2D(texCulturalLight, gl_TexCoord[0].xy).r);                                               
+            }
+
+            )
+        };
+
+        const char* get_shader(shader_t t)
+        {
+            if(t==VS)
+                return vs; 
+            else if(t==FS)
+                return fs; 
+            else 
+                return nullptr;
+        }
+
+        AUTO_REG_NAME(simlight , shaders::light_mat::get_shader)
+
+    }  // ns light_mat
+
 
 }  // ns shaders

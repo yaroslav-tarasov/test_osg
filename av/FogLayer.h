@@ -81,7 +81,7 @@ class FogLayer : public osg::Geode
 public:
 
     // constructor
-    FogLayer(osg::Group * sceneRoot);
+    FogLayer(osg::Group * sceneRoot,on_visible_range_change_f vc = nullptr);
 
     // set fog parameters
     void setFogParams( const osg::Vec3f & vFogColor, float fFogDensity );
@@ -94,6 +94,12 @@ public:
 
     // get fog density
     float getFogDensity() const { return m_fogDensity; }
+
+private: 
+    // create geometry
+    void _createGeometry();
+    // create state set
+    void _buildStateSet();
 
 private:
 
@@ -111,11 +117,12 @@ private:
     float m_fRealVisDist;
     float m_realExp2Density;
     float m_fogDensity;
+    
+    on_visible_range_change_f _vc;
 
-    // create geometry
-    void _createGeometry();
-    // create state set
-    void _buildStateSet();
+
+
+
 };
 
 

@@ -293,12 +293,13 @@ namespace avSky
 
     };
 
-
-    Ephemeris::Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode,on_illum_change_f ic)
+        
+    Ephemeris::Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode,on_illum_change_f ic, on_visible_range_change_f vc)
         : _d          (new data)
         , _sceneRoot  (sceneRoot)
         , _terrainNode(terrainNode)
         , _ic         (ic)
+        , _vc         (vc)
     {
         Initialize();    
         
@@ -338,9 +339,9 @@ namespace avSky
         // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
         _d->_ephemerisModel->setMoveWithEyePoint (false);
 
-        _d->_fogLayer = new FogLayer(_sceneRoot->asGroup());
+        _d->_fogLayer = new FogLayer(_sceneRoot->asGroup(),_vc);
         _d->_ephemerisModel->asGroup()->addChild(_d->_fogLayer.get());
-        auto fogColor =osg::Vec3f(1.0,1.0,1.0);
+        auto fogColor = osg::Vec3f(1.0,1.0,1.0);
         _d->_fogLayer->setFogParams(fogColor,0.1);    // (начинаем с 0.1 до максимум 1.0)
         float coeff = _d->_fogLayer->getFogExp2Coef();
        

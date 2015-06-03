@@ -77,7 +77,7 @@ namespace avScene {
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
         osg::ref_ptr<PickHandler>                   _pickHandler; 
-        
+        std::vector<osg::ref_ptr<osg::Node>>        _lamps;
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
         connection_holder                           conn_holder_;

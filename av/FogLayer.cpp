@@ -23,7 +23,7 @@ static float convertTraineeDensityToExp2SceneFog( float fTraineeDensity, float *
     static const double dLN256 = log(256.0);
     const double
         dDistFactor = pow(1.0 - fTraineeDensity, g_fogPowRampCoef),
-        dRealVisDist = cg::lerp01(dDistFactor,g_totalFogVisibility, g_clearDayVisibility );
+        dRealVisDist = cg::lerp01(g_totalFogVisibility, g_clearDayVisibility,dDistFactor );
     // save vis dist
     if (fVisDistPtr)
         *fVisDistPtr = float(dRealVisDist);
@@ -49,14 +49,15 @@ static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
 
 
 // constructor
-FogLayer::FogLayer(osg::Group * pScene)
+FogLayer::FogLayer(osg::Group * pScene,on_visible_range_change_f vc)
     : m_fRealVisDist(30000.0f)
     , m_realExp2Density(0.f)
     , m_fogDensity (0.f)
+    , _vc(vc)
 {
     // create fog uniform for the whole scene
     osg::StateSet * pSceneSS = pScene->getOrCreateStateSet();
-    _sceneFogUniform = new osg::Uniform("SceneFogParams", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
+    _sceneFogUniform = new osg::Uniform("SceneFogParams", osg::Vec4f(1.f, 1.f, 1.f, 1.f));
     pSceneSS->addUniform(_sceneFogUniform.get());
 
 
@@ -74,8 +75,13 @@ void FogLayer::setFogParams( const osg::Vec3f & vFogColor, float fFogDensity )
     // for sky
     _skyFogUniform->set(osg::Vec4f(vFogColor, fFogDensity));
 
+    float fRealVisDist = m_fRealVisDist;
     // for scene                
     m_realExp2Density = convertTraineeDensityToExp2SceneFog(fFogDensity, &m_fRealVisDist);
+    
+    if (_vc && fRealVisDist != m_fRealVisDist)
+                  _vc(m_fRealVisDist);
+
     // save uniform
     _sceneFogUniform->set(osg::Vec4f(vFogColor, m_realExp2Density));
 

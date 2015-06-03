@@ -41,7 +41,6 @@ namespace gui
 
 using namespace avScene;
 
-std::vector<osg::ref_ptr<osg::Node>> _lamps;
 
 namespace {
 
@@ -127,6 +126,15 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 {
     //     if (!boost::filesystem::is_regular_file(file))
     //         LogWarn("No lights for airport found: " << file.string());
+    const bool usePointSprites = true;
+    osg::Texture2D *tex;
+    if(usePointSprites)
+    {
+        tex = new osg::Texture2D();
+        tex->setImage(osgDB::readImageFile("Images/particle.rgb"));
+    }
+
+    
 
     std::ifstream ifs(file);
 
@@ -160,6 +168,23 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
                 navid_node_ptr.release();
                 navid_node_ptr = new osgSim::LightPointNode;// new osg::Group();
                 navid_node_ptr->setName(line);
+                                //
+                osg::StateSet* set = navid_node_ptr->getOrCreateStateSet();
+
+                if (usePointSprites)
+                {
+                    navid_node_ptr->setPointSprite();
+
+                    // Set point sprite texture in LightPointNode StateSet.
+
+                    set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+#if 0                    
+                    osg::ref_ptr<osg::Program> cLightPointProg = creators::createProgram("simlight").program; 
+                    cLightPointProg->setName("LightLayerShader");
+                    set->setAttribute(cLightPointProg.get());
+#endif
+                }
+
                 group_ready = true;
             }
             else
@@ -198,9 +223,13 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 
                 pnt._position.set(p.x(),p.y(),p.z());
                 pnt._color = clr;
-                pnt._radius = 0.3f;
-                navid_node_ptr->addLightPoint(pnt);
+                if (!usePointSprites)
+                    pnt._radius = 0.3f;
+                else
+                    pnt._radius = 0.6f;
 
+                navid_node_ptr->addLightPoint(pnt);
+                
                 //osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform();
 
                 //pat->addChild(CreateLight(clr,std::string("light"),nullptr));
@@ -470,7 +499,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -513,9 +542,16 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Create ephemeris
     //                                                                       
-    _ephemerisNode = new avSky::Ephemeris( this,
-                                           _terrainNode.get(),
-                                          [=](float illum){ if(_st!=0) _st->setNightMode(illum < .35);  } //  FIXME magic night value    
+    _ephemerisNode = new avSky::Ephemeris( this
+                                          , _terrainNode.get()
+                                          ,[=](float illum){ if(_st!=0) _st->setNightMode(illum < .35);} //  FIXME magic night value    
+                                          ,[this](float fog_vr){
+                                            BOOST_FOREACH( auto g, this->_lamps)
+                                            {
+                                                 dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
+                                            }
+                                          }
+    
     );  
 
 
@@ -553,11 +589,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
-
-    osg::MatrixTransform* transform = new osg::MatrixTransform;
-
-    transform->setDataVariance(osg::Object::STATIC);
-    transform->setMatrix(osg::Matrix::scale(0.1,0.1,0.1));
 
     return true;
 }

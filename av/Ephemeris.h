@@ -8,10 +8,12 @@ namespace avSky
     class Ephemeris : public osg::Group
     {
        friend class EphemerisDataUpdateCallback;
+    public:       
+        
+        typedef std::function<void(float)>  on_illum_change_f;
+        
     public:
-        typedef std::function<void(float)> on_illum_change_f;
-    public:
-       Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode,on_illum_change_f ic = nullptr);
+       Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode,on_illum_change_f ic = nullptr, on_visible_range_change_f vc = nullptr);
        bool			           Initialize();
        void                    setSkyDomeRadius(double radius);
        void                    setSunLightSource(osg::LightSource* ls);
@@ -26,10 +28,11 @@ namespace avSky
     private:
         struct data;
         osg::ref_ptr<data>             _d;
-        osg::observer_ptr<osg::Node>   _sceneRoot;  
-        osg::observer_ptr<osg::Node>   _terrainNode;
-        float                          _illum;
+        osg::ref_ptr<osg::Node>        _sceneRoot;  
+        osg::ref_ptr<osg::Node>        _terrainNode;
+        float                          _illum; 
         on_illum_change_f              _ic;
+        on_visible_range_change_f      _vc;
         osg::ref_ptr<osg::Uniform>     _specularUniform;
         osg::ref_ptr<osg::Uniform>     _ambientUniform;
         osg::ref_ptr<osg::Uniform>     _diffuseUniform;
