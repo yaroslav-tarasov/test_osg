@@ -19,28 +19,29 @@ namespace shaders
 
     namespace include_mat
     {
-#define INCLUDE_MAT                                                                                      \
+
+#define  SHADERS_GETTER                            \
+        const char* get_shader(shader_t t)         \
+        {                                          \
+            if(t==VS)                              \
+                return vs;                         \
+            else if(t==FS)                         \
+                return fs;                         \
+            else                                   \
+                return nullptr;                    \
+        }                                          \
+
+
+#define INCLUDE_FUNCS                                                                                    \
         STRINGIFY (                                                                                      \
         float saturate( const in float x )                                                               \
         {                                                                                                \
             return clamp(x, 0.0, 1.0);                                                                   \
         }                                                                                                \
-        \
-        \
-        float fog_decay_factor( const in vec3 view_pos )                                                 \
+                                                                                                         \
+        float lerp(float a, float b, float w)                                                            \
         {                                                                                                \
-            return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       \
-        }                                                                                                \
-        vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
-        {                                                                                                \
-            vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-            return mix(textureCube(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));   \
-            /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
-        }                                                                                                \
-        \
-        vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
-        {                                                                                                \
-            return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));             \
+            return a + w*(b-a);                                                                          \
         }                                                                                                \
                                                                                                          \
         vec3 hardlight( const in vec3 color, const in vec3 hl )                                          \
@@ -69,6 +70,26 @@ namespace shaders
                                                                                                          \
                                                                                                          \
         )
+
+#define INCLUDE_FOG_FUNCS                                                                                        \
+    STRINGIFY (                                                                                                  \
+                float fog_decay_factor( const in vec3 view_pos )                                                 \
+                {                                                                                                \
+                    return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       \
+                }                                                                                                \
+                vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
+                {                                                                                                \
+                    vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
+                    return mix(textureCube(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
+                    /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
+                }                                                                                                \
+                                                                                                                 \
+                vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
+                {                                                                                                \
+                    return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));             \
+                }                                                                                                \
+                                                                                                                 \
+                )
 
 
 #define INCLUDE_VS                                                                                     \
@@ -204,7 +225,9 @@ namespace shaders
         mat4 viewworld_matrix;
         )
 
-        INCLUDE_MAT
+        INCLUDE_FUNCS
+        
+        INCLUDE_FOG_FUNCS
 
         INCLUDE_VS
 
@@ -325,15 +348,7 @@ namespace shaders
 
     };
 
-    const char* get_shader(shader_t t)
-    {
-        if(t==VS)
-            return vs;
-        else if(t==FS)
-            return fs;
-        else 
-            return nullptr;
-    }
+    SHADERS_GETTER
 
      AUTO_REG_NAME(plane, shaders::plane_mat::get_shader)
 
@@ -389,7 +404,9 @@ namespace shaders
             mat4 viewworld_matrix;
             )
 
-            INCLUDE_MAT
+            INCLUDE_FUNCS
+
+            INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
 
@@ -435,15 +452,7 @@ namespace shaders
         };   
 
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(rotor, shaders::rotor_mat::get_shader)
 
@@ -505,7 +514,9 @@ namespace shaders
            mat4 viewworld_matrix;
        )
        
-       INCLUDE_MAT
+        INCLUDE_FUNCS
+
+        INCLUDE_FOG_FUNCS
 
        INCLUDE_VS
 
@@ -615,15 +626,7 @@ namespace shaders
 
        };   
 
-       const char* get_shader(shader_t t)
-       {
-           if(t==VS)
-               return vs;
-           else if(t==FS)
-               return fs;
-           else 
-               return nullptr;
-       }
+       SHADERS_GETTER
 
        AUTO_REG_NAME(default, shaders::default_mat::get_shader)
 
@@ -680,7 +683,9 @@ namespace shaders
              mat4 viewworld_matrix;
             )
 
-            INCLUDE_MAT
+                INCLUDE_FUNCS
+
+                INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
 
@@ -800,15 +805,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+    SHADERS_GETTER
 
         AUTO_REG_NAME(building, shaders::building_mat::get_shader)
 
@@ -868,7 +865,9 @@ namespace shaders
              mat4 viewworld_matrix;
             )
             
-            INCLUDE_MAT
+            INCLUDE_FUNCS
+
+            INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
 
@@ -930,15 +929,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(tree, shaders::tree_mat::get_shader)
 
@@ -1005,7 +996,9 @@ namespace shaders
            mat4 viewworld_matrix;
             )
             
-            INCLUDE_MAT
+            INCLUDE_FUNCS
+
+            INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
             
@@ -1118,15 +1111,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(ground, shaders::ground_mat::get_shader)
         AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
@@ -1200,7 +1185,9 @@ namespace shaders
 \n            mat4 viewworld_matrix;
 \n            )
             
-              INCLUDE_MAT
+              INCLUDE_FUNCS
+
+              INCLUDE_FOG_FUNCS
 
               INCLUDE_VS
             
@@ -1518,15 +1505,7 @@ namespace shaders
             )
         };
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs; // vs_test2; - рабочий тестовый вариант
-            else if(t==FS)
-                return fs; // fs_test; - тоже
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
         
         AUTO_REG_NAME(concrete, shaders::concrete_mat::get_shader)
 
@@ -1583,7 +1562,9 @@ namespace shaders
             mat4 viewworld_matrix;
             )
 
-            INCLUDE_MAT
+            INCLUDE_FUNCS
+
+            INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
             
@@ -1660,15 +1641,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(railing, shaders::railing_mat::get_shader)
 
@@ -1719,7 +1692,9 @@ namespace shaders
 
             )
 
-            INCLUDE_MAT
+            INCLUDE_FUNCS
+
+            INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
 
@@ -1761,15 +1736,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(panorama, shaders::panorama_mat::get_shader)
 
@@ -1814,6 +1781,8 @@ namespace shaders
 
             INCLUDE_UNIFORMS
 
+            INCLUDE_FUNCS
+
             STRINGIFY ( 
 
 
@@ -1823,17 +1792,6 @@ namespace shaders
 
             mat4 viewworld_matrix;                       
 			                                            
-            // saturation helper                         
-            float saturate( const in float x )          
-            {                                           
-                return clamp(x, 0.0, 1.0);               
-            }                                           
-            
-            float lerp(float a, float b, float w)
-            {
-                return a + w*(b-a);
-            }
-
             )
 
             STRINGIFY ( 
@@ -1884,15 +1842,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(sky, shaders::sky_fog_mat::get_shader)
 
@@ -1975,15 +1925,7 @@ namespace shaders
 
         };   
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs;
-            else if(t==FS)
-                return fs;
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
         
         AUTO_REG_NAME(clouds, shaders::clouds_mat::get_shader)
 
@@ -1997,18 +1939,9 @@ namespace shaders
 
             INCLUDE_UNIFORMS
 
+            INCLUDE_FUNCS
+
             STRINGIFY ( 
-
-            // saturation helper                         
-            float saturate( const in float x )          
-            {                                           
-                return clamp(x, 0.0, 1.0);               
-            }  
-
-            float lerp(float a, float b, float w)
-            {
-                return a + w*(b-a);
-            }
 
             vec4 LightScreenSettings;
             
@@ -2084,19 +2017,104 @@ namespace shaders
             )
         };
 
-        const char* get_shader(shader_t t)
-        {
-            if(t==VS)
-                return vs; 
-            else if(t==FS)
-                return fs; 
-            else 
-                return nullptr;
-        }
+        SHADERS_GETTER
 
         AUTO_REG_NAME(simlight , shaders::light_mat::get_shader)
-
     }  // ns light_mat
 
+
+    namespace  spot_mat
+    {
+
+        const char* vs = { 
+            "#version 130 \n"
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            INCLUDE_VS
+
+            INCLUDE_UNIFORMS
+            
+            INCLUDE_FUNCS
+
+            STRINGIFY ( 
+
+            uniform mat4 mvp_matrix;
+
+            attribute vec3 position;
+            attribute vec3 from_l;
+            attribute vec3 l_dir;
+            attribute vec3 l_color;
+            attribute dist_falloff;
+            attribute vec2 cone_falloff;
+
+            out block
+            {
+                vec3 from_l;
+                flat vec3 l_dir;
+                flat vec3 l_color;
+                flat vec2 dist_falloff;
+                flat vec2 cone_falloff;
+            } v_out;
+
+            void main()
+            {
+                gl_Position = mvp_matrix * vec4(position, 1.0);
+
+                v_out.from_l = from_l;
+                v_out.l_dir = l_dir;
+                v_out.l_color = l_color;
+                v_out.dist_falloff = dist_falloff;
+                v_out.cone_falloff = cone_falloff;
+            }
+
+            )
+        };
+
+        const char* fs = { 
+
+            "#version 130 \n"
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            INCLUDE_VS
+
+            STRINGIFY ( 
+
+            in block
+            {
+                vec3 from_l;
+                flat vec3 l_dir;
+                flat vec3 l_color;
+                flat vec2 dist_falloff;
+                flat vec2 cone_falloff;
+            } f_in;
+
+            out vec4 FragColor; 
+
+            void main()
+            {
+                // get dist falloff
+                const float dist_rcp = inversesqrt(dot(f_in.from_l, f_in.from_l));
+                const vec3 from_l_nrm = dist_rcp * f_in.from_l;
+                const float dist_atten = clamp(fma(dist_rcp, f_in.dist_falloff.x, f_in.dist_falloff.y), 0.0, 1.0);
+                // get conical falloff
+                const float angle_dot = dot(from_l_nrm, f_in.l_dir);
+                const float angle_atten = clamp(fma(angle_dot, f_in.cone_falloff.x, f_in.cone_falloff.y), 0.0, 1.0);
+                // diffuse-like term for planar surfaces
+                //const float ndotl = clamp(fma(-from_l_nrm.z, 0.35, 0.65), 0.0, 1.0);
+                // write color
+                const float height_packed = -f_in.from_l.z;
+                const float angledist_atten = angle_atten * dist_atten;
+                const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);
+                FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);
+            }
+
+            )
+        };
+
+        SHADERS_GETTER
+
+        AUTO_REG_NAME(spot , shaders::spot_mat::get_shader)
+
+    }  // ns light_mat
 
 }  // ns shaders

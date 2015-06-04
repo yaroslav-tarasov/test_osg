@@ -13,11 +13,17 @@ namespace scn
     struct line_data
     {
         std::string     name;
-        uint            rwy_num;
+        uint16_t        rwy_num;  
         cg::point_3f    pos;
         float           angle;
         float           step;
         cg::coloraf     col;
+    };
+
+    struct lights_group
+    {
+        std::string    name;
+        uint16_t       rwy_num;  
     };
 
 }

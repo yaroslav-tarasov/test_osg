@@ -50,8 +50,22 @@ namespace {
             return osg::Vec3f(18, 17, .2f);
         else if (name == "adler")
             return osg::Vec3f(0 , 0 , .2f);
+        else if (name == "minsk")
+            return osg::Vec3f(0 , 0 , .5f);
 
         return osg::Vec3f();
+    }
+
+    inline std::string lights_file(std::string name)
+    {
+        if (name == "sheremetyevo")
+            return "sheremetyevo.txt";
+        else if (name == "adler")
+            return "sochi.scn";
+        else if (name == "minsk")
+            return "minsk.scn";
+
+        return "";
     }
 
     struct value_getter
@@ -499,14 +513,14 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
 
 #if 1
     fill_navids(
-        scene_name + ".txt", 
+        lights_file(scene_name), 
         _lamps, 
         this, 
         lights_offset(scene_name) ); 

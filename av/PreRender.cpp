@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Prerender.h"
 
+#define K_ORIGIN
 
 Prerender::Prerender(int width, int height)
 {
@@ -17,7 +18,9 @@ Prerender::Prerender(const Prerender& prerender,const osg::CopyOp& copyop):
 void Prerender::traverse(osg::NodeVisitor& nv)
 {
     // So do not allow any Visitors except CULL_VISITOR
+#ifdef K_ORIGIN     
     if (nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
+#endif
         osg::Group::traverse(nv);
 }
 
@@ -38,6 +41,7 @@ void Prerender::init(int width, int height)
 {
     _texture = createTexture(width,height);
 
+#ifdef K_ORIGIN  
     // set clear the color and depth buffer
     setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     setClearColor(osg::Vec4(0,0,0,0));
@@ -69,5 +73,9 @@ void Prerender::init(int width, int height)
     im &= ~(osg::CullSettings::CULL_MASK);
     setInheritanceMask(im);
     setCullMask(REFLECTION_CULL_MASK);
+#else
+
+#endif
+
 }
 

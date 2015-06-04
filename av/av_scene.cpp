@@ -4,6 +4,7 @@
 #include "creators.h"
 #include "av/Terrain.h"
 
+void fill_navids(std::string file,   point_3f const& offset);
 
 int av_scene( int argc, char** argv )
 {
@@ -30,7 +31,7 @@ int av_scene( int argc, char** argv )
     pTraits->width = 1920;//rect.right - rect.left + 1;
     pTraits->height = 1200;//rect.bottom - rect.top + 1;
 #endif
-    
+
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
 

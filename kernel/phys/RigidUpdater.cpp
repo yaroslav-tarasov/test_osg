@@ -148,7 +148,7 @@ namespace bi
 	struct RigidUpdater::RigidUpdater_private
 	{
 		        RigidUpdater_private()
-                    : _krv_data_getter("log_sochi_4.txt")
+                    : _krv_data_getter("log_minsk.txt")
                     , _sys            (phys::create_phys_system())
                 {}
 #ifdef DEPRECATED
@@ -365,7 +365,7 @@ namespace bi
             as.kind = "A319";//"A333";
             //geo_position agp(apos,quaternion(cpr(60,0,0)));
             auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-            //aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
+            aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
         }
 
         vehicle::settings_t vs;
@@ -395,7 +395,7 @@ namespace bi
         auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
 
 
-        // _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
+        _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
       
     }
 

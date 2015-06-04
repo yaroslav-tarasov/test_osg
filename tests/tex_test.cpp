@@ -177,6 +177,8 @@ int main_tex_test( int argc, char** argv )
     camera->setRenderTargetImplementation( osg::Camera::FRAME_BUFFER_OBJECT );
     camera->attach( osg::Camera::COLOR_BUFFER, textureFBO.get() );
 
+    //camera->setViewMatrix(osg::Matrixd::scale(1,1,-1)); // Flip Z axis
+
     const osg::BoundingSphere& bs = airplane->getBound();
     //if (!bs.valid())
     //{
@@ -216,7 +218,7 @@ int main_tex_test( int argc, char** argv )
     root->addChild(airplane/*effet.get()*/);
     root->addChild(sub_model.get());
 
-#if 0
+#if 1
     // add creation of main reflection texture
     static const int
         g_nReflectionWidth = 512,

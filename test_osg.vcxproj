@@ -139,10 +139,12 @@
     <ClCompile Include="av\LOD.cpp" />
     <ClCompile Include="av\NavigationalLight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="av\Object.cpp" />
     <ClCompile Include="av\PreRender.cpp" />
     <ClCompile Include="av\Scene.cpp" />
+    <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
     <ClCompile Include="core\config\config.cpp" />
