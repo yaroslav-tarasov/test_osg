@@ -4,6 +4,9 @@
 #include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
+#include "Lights.h"
+#include "LightManager.h"
+
 #include <osg/GLObjects>
 
 //Degree precision versus length
@@ -427,7 +430,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
 
     _viewerPtr->setSceneData( this );
-    // _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // TODO: enabled this for instructor tab, need implement special setting
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
@@ -526,6 +529,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         lights_offset(scene_name) ); 
 #endif
 
+       
     osg::Node* ct =  findFirstNode(_terrainNode,"camera_tower");
 
     if(ct) 
@@ -591,6 +595,29 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
     
+
+    LightManager::Create();
+
+    //
+    // Dynamic lights manager
+    //
+
+    addChild(LightManager::GetInstance());
+
+    //
+    // Create dynamic lights
+    //
+    _lights = new Lights();
+    _ephemerisNode->addChild(_lights.get());
+    /*_commonNode*/this->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
+
+    osg::Node* lm1 =  findFirstNode(_terrainNode,"lightmast_1");
+
+    LightManager::GetInstance()->addLight(1,lm1->asTransform()->asMatrixTransform());
+    //LightManager::GetInstance()->addLight(2,lm1->asTransform()->asMatrixTransform());
+    //LightManager::GetInstance()->addLight(3,lm1->asTransform()->asMatrixTransform());
+    //LightManager::GetInstance()->addLight(4,lm1->asTransform()->asMatrixTransform());
+    //LightManager::GetInstance()->addLight(5,lm1->asTransform()->asMatrixTransform());
 
 
     //

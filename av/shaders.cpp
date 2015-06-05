@@ -159,6 +159,62 @@ namespace shaders
         uniform vec4                SceneFogParams;                                                     \
         )
 
+#define INCLUDE_DL                                                                                       \
+    STRINGIFY (                                                                                          \
+    \
+    const int nMaxLights = 24;                                                                           \
+    \
+    \
+    uniform int LightsActiveNum;                                                                         \
+    \
+    uniform vec4 LightVSPosAmbRatio[nMaxLights];                                                         \
+    uniform vec4 LightVSDirSpecRatio[nMaxLights];                                                        \
+    uniform vec4 LightAttenuation[nMaxLights];                                                           \
+    uniform vec3 LightDiffuse[nMaxLights];                                                               \
+    \
+    void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
+   {                                                                                                     \
+   int curLight = 0;                                                                                     \
+   while (curLight < LightsActiveNum)                                                                    \
+       {                                                                                                 \
+       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
+       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
+       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
+       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
+       \
+       vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                        \
+       float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                               \
+       vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                 \
+       \
+       float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                        \
+       float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);               \
+       \
+       fTotalAtt *= clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);              \
+       \
+       if (fTotalAtt != 0.0)                                                                             \
+           {                                                                                             \
+           \
+           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
+           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
+           \
+           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
+           fSpecPower *= fSpecPower;                                                                     \
+           fSpecPower *= fSpecPower;                                                                     \
+           cSpecular += (fTotalAtt * curVSDirSpecRatio.w * fSpecPower) * curDiffuse;                     \
+           }                                                                                             \
+           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
+           cAmbDiff  = vec3(vDistToLightInv,0.0,0.0);                 \
+           ++curLight;                                                                                   \
+       }                                                                                                 \
+                                                                                                         \
+                                                                                                         \
+       return;                                                                                           \
+   }                                                                                                     \
+   )            
+
+
+
+
     }                                                                                                  
 
     namespace plane_mat
@@ -1192,6 +1248,8 @@ namespace shaders
               INCLUDE_VS
             
               INCLUDE_SCENE_PARAM
+              
+              INCLUDE_DL
 
               STRINGIFY ( 
 \n
@@ -1300,6 +1358,13 @@ namespace shaders
  \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
  \n               }
  \n
+                  // Apply spot lights
+                  vec3 vLightsAddOn;
+                  vec3 vLightsSpecAddOn;
+                  ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, vLightsAddOn, vLightsSpecAddOn);
+                  result += vLightsAddOn;//vLightsAddOn ;//* saturate(0.85 - 0.55 * saturate(FresnelDamping));
+                  // SpecColor += vLightsSpecAddOn;
+
  \n               // gl_FragColor = vec4( result,1.0);
  \n               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
  \n           }

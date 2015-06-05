@@ -70,6 +70,8 @@ inline T cbrt(T n)
 }
 
 #define Assert(x) if(x){};
+#define avAssert(x) assert(x)
+
 
 #include "common/points.h"
 #include "common/util.h"

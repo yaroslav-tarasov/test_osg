@@ -66,8 +66,9 @@ void  Terrain::create( std::string name )
 
     osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
     
-    osg::PositionAttitudeTransform* pat = scene->asTransform()->asPositionAttitudeTransform();
-    pat->setAttitude( osg::Quat(osg::inDegrees(90.0),osg::X_AXIS,osg::inDegrees(-49.0 - 33.0),osg::Y_AXIS,osg::inDegrees(0.0),osg::Z_AXIS));
+    // Здесь был Минск
+    //osg::PositionAttitudeTransform* pat = scene->asTransform()->asPositionAttitudeTransform();
+    //pat->setAttitude( osg::Quat(osg::inDegrees(90.0),osg::X_AXIS,osg::inDegrees(/*-49.0 - 33.0*/0.0),osg::Y_AXIS,osg::inDegrees(0.0),osg::Z_AXIS));
 
     scene->setName("scene");
 

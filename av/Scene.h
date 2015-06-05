@@ -22,6 +22,11 @@ namespace avShadow
     class ShadowTechnique;
 }
 
+namespace avScene
+{
+    class Lights;
+}
+
 namespace bi
 {
     class RigidUpdater;
@@ -49,7 +54,8 @@ namespace avScene {
         inline osg::Group*                          getEphemerisNode();
         inline osg::Group*                          getCommonNode();
         inline osg::Camera*                         getCamera();
-        
+        inline avScene::Lights *                    getLights();
+
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
 
         static std::string                          zoneToReload(){return zone_to_reload_;}
@@ -78,6 +84,7 @@ namespace avScene {
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
         osg::ref_ptr<PickHandler>                   _pickHandler; 
         std::vector<osg::ref_ptr<osg::Node>>        _lamps;
+         osg::ref_ptr<Lights>                       _lights;                                            
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
         connection_holder                           conn_holder_;
@@ -89,6 +96,8 @@ namespace avScene {
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }
     inline osg::Camera*                         Scene::getCamera() {  return _viewerPtr->getCamera(); }
     inline osg::Group*                          Scene::getCommonNode() { return _commonNode.get(); }  
+    avScene::Lights*                            Scene::getLights() { return _lights.get(); }
+
 
     inline Scene* GetScene()
     {

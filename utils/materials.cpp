@@ -303,7 +303,8 @@ private:
         if (fp)
             return fp(t);
 
-        FIXME(Есть где-то buildingtrack) 
+        FIXME( "Есть где-то buildingtrack" ) 
+
         if (mat_name.find("building") !=std::string::npos)
         {
             return shaders::building_mat::get_shader(t); 

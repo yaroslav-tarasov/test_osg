@@ -92,7 +92,7 @@ namespace utils
     template<class T>
     inline NodeCallback<T> * makeNodeCallback( T * object, void (T::*func)( osg::NodeVisitor * nv ), bool isPure = false )
     {
-        return new NodeCallback<T>(object, func, isPure);
+        return new NodeCallback<T>(object, /*func*/std::bind(func,object,sp::_1), isPure);
     }
 
 }

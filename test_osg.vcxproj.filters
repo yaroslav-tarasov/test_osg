@@ -103,6 +103,9 @@
     <Filter Include="Source Files\objects\meteo">
       <UniqueIdentifier>{a11a04c7-6b70-4e15-90d5-8b1f61ee4ac1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\lights">
+      <UniqueIdentifier>{cd6a76f6-d361-4815-b76b-25a810594a1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -539,11 +542,17 @@
     <ClCompile Include="tests\test_curves.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="av\NavigationalLight.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="av\scn_parser.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\NavigationalLight.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\LightManager.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Lights.cpp">
+      <Filter>Source Files\av\lights</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
