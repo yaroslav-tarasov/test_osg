@@ -11,6 +11,7 @@ namespace do_not_optimize
         "strobe_",
         "landing_lamp",
         "camera_tower",
+        "headlight",
         "masts",
         "lightmast",
         "navaid_",

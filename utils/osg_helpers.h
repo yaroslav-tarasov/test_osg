@@ -38,6 +38,17 @@ inline cg::matrix_3 from_osg_matrix( osg::Matrix3 const& m )
     return mm;
 }
 
+inline cg::matrix_4 from_osg_matrix( osg::Matrix const& m )
+{
+    cg::matrix_4 mm;
+    mm(0,0) = m(0,0),  mm(0,1) = m(0,1), mm(0,2) = m(0,2), mm(0,3) = m(0,3);
+    mm(1,0) = m(1,0),  mm(1,1) = m(1,1), mm(1,2) = m(1,2), mm(1,3) = m(1,3);
+    mm(2,0) = m(2,0),  mm(2,1) = m(2,1), mm(2,2) = m(2,2), mm(2,3) = m(2,3);
+    mm(3,0) = m(3,0),  mm(3,1) = m(3,1), mm(3,2) = m(3,2), mm(3,3) = m(3,3);
+
+    return mm;
+}
+
 inline cg::transform_4 from_osg_transform( const osg::Matrix& m )
 {
 	// FIXME  Мать, мать, мать, ну чего все так не прямо

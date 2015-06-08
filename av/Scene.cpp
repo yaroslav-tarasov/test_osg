@@ -543,18 +543,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 	    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
         manip->home(0);
 	}
-
-    //
-    // Init physic updater
-    //
-
-    createObjects();
-    
-    conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
-    conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
-   
-    conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
-    _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
     
 
     //
@@ -611,14 +599,17 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _ephemerisNode->addChild(_lights.get());
     /*_commonNode*/this->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
 
-    osg::Node* lm1 =  findFirstNode(_terrainNode,"lightmast_1");
+    auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
 
-    LightManager::GetInstance()->addLight(1,lm1->asTransform()->asMatrixTransform());
-    //LightManager::GetInstance()->addLight(2,lm1->asTransform()->asMatrixTransform());
-    //LightManager::GetInstance()->addLight(3,lm1->asTransform()->asMatrixTransform());
-    //LightManager::GetInstance()->addLight(4,lm1->asTransform()->asMatrixTransform());
-    //LightManager::GetInstance()->addLight(5,lm1->asTransform()->asMatrixTransform());
-
+    for (auto it = light_masts.begin();it != light_masts.end();++it)
+    {   
+        if((*it)->asTransform())
+        {
+            std::string node_name((*it)->getName());
+            std::string mast_index = node_name.substr(node_name.find("_")+1);
+            LightManager::GetInstance()->addLight(boost::lexical_cast<int>(mast_index),(*it)->asTransform()->asMatrixTransform());
+        }
+    }
 
     //
     // Create weather
@@ -630,6 +621,21 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
+
+
+    //
+    // Init physic updater
+    //
+
+    createObjects();
+
+    conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
+    conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
+
+    conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
+    _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
+
+
 
     return true;
 }

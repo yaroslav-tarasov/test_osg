@@ -36,21 +36,7 @@ static const unsigned g_nMessageTableSize = sizeof(g_MessageTable) / sizeof(g_Me
 static const LightManagerMessageMap g_MessageMap(&g_MessageTable[0], &g_MessageTable[0] + g_nMessageTableSize);
 
 
-struct LightManager::Light
-{
-    osg::MatrixTransform * transform;
 
-    cg::range_2f spotFalloff;
-    cg::range_2f distanceFalloff;
-    cg::colorf color;
-
-    cg::point_3f position;
-    cg::vector_3f direction;
-
-    bool active;
-
-    inline Light() : transform(NULL), active(false) { }
-};
 
 LightManager::LightManager()
 {
@@ -162,36 +148,42 @@ void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageSt
 
 void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
 {
-    const unsigned lightID = id;
-    
-    //if(m_LightsMap.find(lightID) == m_LightsMap.end())
-    //   m_LightsMap.insert(std::make_pair(lightID,Light()));
+    const unsigned lightID = m_LightsMap.size()/*id*/;
     
     Light & light = m_LightsMap[lightID];
 
-    // FIXME
-    // light.transform = dynamicObject->GetVisualModel();
     light.transform = mt;
 
-    const float spotFalloff0 = osg::DegreesToRadians(0.f);
-    const float spotFalloff1 = osg::DegreesToRadians(359.f);
+    const float spotFalloff0 = osg::DegreesToRadians(1.f);
+    const float spotFalloff1 = osg::DegreesToRadians(5.f);
     light.spotFalloff = cg::range_2f(spotFalloff0, spotFalloff1);
 
-    const float distanceFalloff0 = 0;
-    const float distanceFalloff1 = 50000;
+    const float distanceFalloff0 = 1;
+    const float distanceFalloff1 = 100;
     light.distanceFalloff = cg::range_2f(distanceFalloff0, distanceFalloff1);
 
-    light.color.r = 255;
-    light.color.g = 0;
-    light.color.b = 0;
+    light.color.r = 0.99;
+    light.color.g = 0.99;
+    light.color.b = 0.99;
 
-    light.direction = as_vector(cg::point_3f(-100.f,-100.f,-100.f));
     light.position = cg::point_3f(0,0,0);
+
+    const float heading = osg::DegreesToRadians(-90.f);
+    const float pitch = osg::DegreesToRadians(88.f);
+    light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
     light.active = true;
 
 }
 
+void LightManager::addLight(uint32_t id, const Light& data)
+{
+    const unsigned lightID = m_LightsMap.size()/*id*/;
+
+    Light & light = m_LightsMap[lightID];
+
+    light = data;
+}
 
 void LightManager::update( osg::NodeVisitor * nv )
 {
@@ -211,17 +203,16 @@ void LightManager::update( osg::NodeVisitor * nv )
 
         if (!light.active)
             continue;
-
-
       
 #if 0
         osg::Matrix matrix = light.transform->getMatrix() * svCore::GetCoordinateSystem()->GetLCS2LTPMatrix();
         matrix4d transform = matrix4d(matrix.ptr(), matrix::unscaled).transpose();
 #else
         osg::Matrix matrix = light.transform->getMatrix() ;
-        cg::transform_4 transform = from_osg_transform(matrix);
+        cg::matrix_4 trm = from_osg_matrix(matrix);
+        cg::transform_4 transform = trm.transpose();
 #endif
-
+         
         const cg::point_3f position = transform.treat_point(light.position );
         const cg::vector_3 direction = transform.treat_vector(light.direction);
 
