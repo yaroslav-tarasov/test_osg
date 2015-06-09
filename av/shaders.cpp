@@ -241,7 +241,7 @@ namespace shaders
         vec3 sd = normalize(vec3(-curVSDirSpecRatio.xyz));                                               \
                                                                                                          \
                                                                                                          \
-        if (dot(ld,sd) > cos(PI/4)/*l_spotCutOff*/) {                                                    \
+        if (dot(ld,sd) > cos(PI/2)/*l_spotCutOff*/) {                                                    \
                                                                                                          \
                     vec3 n = normalize(vViewSpaceNormal);                                                \
                     intensity = max(dot(n,ld), 0.0);                                                     \
@@ -250,7 +250,7 @@ namespace shaders
                                 vec3 eye = normalize(vViewSpacePoint);                                   \
                                 vec3 h = normalize(ld + eye);                                            \
                                 float intSpec = max(dot(h,n), 0.0);                                      \
-                                spec = specular_ * pow(intSpec, 0.1/*shininess*/);                       \
+                                spec = specular_ * pow(intSpec, 1/*shininess*/);                       \
                             }                                                                            \
                 }                                                                                        \
                                                                                                          \
@@ -985,11 +985,8 @@ namespace shaders
             )
             
             INCLUDE_FUNCS
-
             INCLUDE_FOG_FUNCS
-
             INCLUDE_VS
-
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 

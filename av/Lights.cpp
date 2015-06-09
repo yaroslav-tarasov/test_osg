@@ -30,7 +30,7 @@ struct avScene::LightExternalInfo
     cg::vector_3 vDirWorld;
     cg::range_2f rDistAtt, rConeAtt;
     cg::colorf   cDiffuse;
-    float        fAmbRatio, fSpecRatio;
+    float        fAmbRatio, fSpecRatio; 
 
     bool operator< ( const LightExternalInfo & second ) const
     {

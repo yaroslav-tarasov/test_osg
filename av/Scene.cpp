@@ -408,7 +408,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer(cArgs);
      
-    _viewerPtr->apply(new osgViewer::SingleScreen(1));
+    _viewerPtr->apply(new osgViewer::SingleScreen(0));
 
     // Set up camera
     if ( cTraitsPtr.valid() == true )
@@ -601,15 +601,15 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
 
-    for (auto it = light_masts.begin();it != light_masts.end();++it)
-    {   
-        if((*it)->asTransform())
-        {
-            std::string node_name((*it)->getName());
-            std::string mast_index = node_name.substr(node_name.find("_")+1);
-            LightManager::GetInstance()->addLight(boost::lexical_cast<int>(mast_index),(*it)->asTransform()->asMatrixTransform());
-        }
-    }
+    //for (auto it = light_masts.begin();it != light_masts.end();++it)
+    //{   
+    //    if((*it)->asTransform())
+    //    {
+    //        std::string node_name((*it)->getName());
+    //        std::string mast_index = node_name.substr(node_name.find("_")+1);
+    //        LightManager::GetInstance()->addLight(boost::lexical_cast<int>(mast_index),(*it)->asTransform()->asMatrixTransform());
+    //    }
+    //}
 
     //
     // Create weather
@@ -953,6 +953,44 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         _terrainRoot->asGroup()->addChild(mt);
         
+        osg::Node* sl =  mt; //findFirstNode(object_file,"port",findNodeVisitor::not_exact);
+
+        if(sl)
+        {
+            //             mast_spot_node_ptr steering_spot = (mast_spot_node *)create(node::NT_MastSpot).get();
+            //             steering_spot->set_name(nodeName);
+            //             steering_spot->SetState(true);
+            //             mast_spot_node::LightData spot_data;
+            //             spot_data.color.r = randgen_.random_dev(0.92f, 0.04f);
+            //             spot_data.color.g = randgen_.random_dev(0.92f, 0.03f);
+            //             spot_data.color.b = randgen_.random_dev(0.85f, 0.03f);
+            //             spot_data.distance_falloff = cg::range_2f(70.f, 140.f);
+            //             spot_data.cone_falloff = cg::range_2f(25.f, 33.f);
+            //             steering_spot->SetLightData(spot_data);
+            //             ptrNode->add(steering_spot.get());
+
+            avScene::LightManager::Light data;
+            data.transform  = sl->asTransform()/*->asMatrixTransform()*/;
+
+            data.spotFalloff = cg::range_2f(osg::DegreesToRadians(1.f), osg::DegreesToRadians(5.f));
+            data.distanceFalloff = cg::range_2f(1.f, 100.f);
+
+            data.color.r = 0.92f;
+            data.color.g = 0.92f;
+            data.color.b = 0.85f;
+
+            data.position = cg::point_3f(0,0,0);
+
+            const float heading = osg::DegreesToRadians(270.f + 90);
+            const float pitch   = osg::DegreesToRadians(45.f);
+            data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+            data.active = true;
+
+            avScene::LightManager::GetInstance()->addLight(666, data);
+        }
+
+
     }
     
 

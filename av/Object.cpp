@@ -210,46 +210,6 @@ osg::Node* createObject(std::string name, bool fclone)
         if(wln_list.size()>0)
             object_file->asGroup()->addChild(obj_light);
 
-        osg::Node* sl =  findFirstNode(object_file,"port",findNodeVisitor::not_exact);
-
-        if(sl)
-        {
-//             mast_spot_node_ptr steering_spot = (mast_spot_node *)create(node::NT_MastSpot).get();
-//             steering_spot->set_name(nodeName);
-//             steering_spot->SetState(true);
-//             mast_spot_node::LightData spot_data;
-//             spot_data.color.r = randgen_.random_dev(0.92f, 0.04f);
-//             spot_data.color.g = randgen_.random_dev(0.92f, 0.03f);
-//             spot_data.color.b = randgen_.random_dev(0.85f, 0.03f);
-//             spot_data.distance_falloff = cg::range_2f(70.f, 140.f);
-//             spot_data.cone_falloff = cg::range_2f(25.f, 33.f);
-//             steering_spot->SetLightData(spot_data);
-//             ptrNode->add(steering_spot.get());
-            
-            avScene::LightManager::Light data;
-            data.transform  = sl->asTransform()->asMatrixTransform();
-            
-            const float spotFalloff0 = osg::DegreesToRadians(1.f);
-            const float spotFalloff1 = osg::DegreesToRadians(5.f);
-            data.spotFalloff = cg::range_2f(spotFalloff0, spotFalloff1);
-
-            data.distanceFalloff = cg::range_2f(1.f, 100.f);
-
-            data.color.r = 0.92f;
-            data.color.g = 0.92f;
-            data.color.b = 0.85f;
-
-            data.position = cg::point_3f(0,0,0);
-
-            const float heading = osg::DegreesToRadians(90.f);
-            const float pitch = osg::DegreesToRadians(45.f);
-            data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
-            data.active = true;
-
-            avScene::LightManager::GetInstance()->addLight(666, data);
-        }
-
 
 #endif
 		//

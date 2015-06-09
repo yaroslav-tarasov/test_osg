@@ -168,7 +168,7 @@ void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
 
     light.position = cg::point_3f(0,0,0);
 
-    const float heading = osg::DegreesToRadians(-90.f);
+    const float heading = osg::DegreesToRadians(270.f);
     const float pitch = osg::DegreesToRadians(88.f);
     light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
@@ -208,7 +208,22 @@ void LightManager::update( osg::NodeVisitor * nv )
         osg::Matrix matrix = light.transform->getMatrix() * svCore::GetCoordinateSystem()->GetLCS2LTPMatrix();
         matrix4d transform = matrix4d(matrix.ptr(), matrix::unscaled).transpose();
 #else
-        osg::Matrix matrix = light.transform->getMatrix() ;
+        
+        osg::Matrix matrix; 
+        
+        if(light.transform)
+        if(light.transform->asMatrixTransform())
+        {
+           matrix = light.transform->asMatrixTransform()->getMatrix() ;
+           //matrix.setTrans(matrix.getTrans().x(),matrix.getTrans().y(),36);
+        }
+        else
+        {
+           const osg::PositionAttitudeTransform* pat = light.transform->asPositionAttitudeTransform();
+           matrix.setTrans(pat->getPosition());
+           //matrix.setRotate(pat->getAttitude());
+        }
+
         cg::matrix_4 trm = from_osg_matrix(matrix);
         cg::transform_4 transform = trm.transpose();
 #endif

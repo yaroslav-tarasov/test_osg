@@ -21,7 +21,7 @@ public:
 
     struct Light
     {
-        osg::MatrixTransform * transform;
+        osg::Transform * transform;
 
         cg::range_2f spotFalloff;
         cg::range_2f distanceFalloff;
