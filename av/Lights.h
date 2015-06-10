@@ -22,7 +22,7 @@ namespace avScene
 {
 
     // maximum number of visible dynamic lights per object
-    static const unsigned nMaxLights = 24;
+    static const unsigned nMaxLights = 130;
 
     // light affect type
     // local - means it doesn't affect sea and may be other ships (but do affect other dynamic objects forsure)
@@ -117,7 +117,7 @@ namespace avScene
 
     public:
 
-        LightNodeHandler( LightInfluence maxInfluenceToUse );
+        LightNodeHandler( LightInfluence maxInfluenceToUse, bool init = false );
 
     public:
 
@@ -151,6 +151,8 @@ namespace avScene
         // last time active flags
         bool m_bMainWasActive, m_bReflWasActive;
 
+        static bool   _init;
+            
     };
 
     //

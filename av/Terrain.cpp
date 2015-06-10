@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "Terrain.h"
 
 #include "visitors/find_tex_visitor.h"
@@ -12,6 +13,7 @@
 #include "visitors/materials_visitor.h"
 #include "pugixml.hpp"
 #include "high_res_timer.h"
+#include "utils/callbacks.h"
 
 #include <osgwTools/AbsoluteModelTransform.h>
 #include "phys/BulletInterface.h"
@@ -29,8 +31,15 @@ namespace avTerrain
 
 Terrain::Terrain (osg::Group* sceneRoot)
     : _sceneRoot(sceneRoot)
+    , _lightsHandler(avScene::GlobalInfluence)
 {
     sceneRoot->addChild(this);
+    //
+    // Callbacks
+    //
+
+    // callbacks setup
+    setCullCallback(utils::makeNodeCallback(this, &Terrain::cull, true));
 }
 
 void  Terrain::create( std::string name )
@@ -134,7 +143,18 @@ void  Terrain::create( std::string name )
 
 }
 
+// cull method
+void Terrain::cull( osg::NodeVisitor * pNV )
+{
+    // get cull visitor
+    osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
+    avAssert(pCV);
 
+    // cull down
+    _lightsHandler.onCullBegin(pCV);
+    pNV->traverse(*this);
+    _lightsHandler.onCullEnd(pCV);
+}
 
 
 

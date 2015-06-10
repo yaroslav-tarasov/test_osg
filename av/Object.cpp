@@ -92,6 +92,7 @@ osg::Node* createObject(std::string name, bool fclone)
 
 		// FIXME Ну и огни в отдельный функционал
 #if 0
+#if 0
 		auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
 			osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
 			shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
@@ -212,7 +213,8 @@ osg::Node* createObject(std::string name, bool fclone)
 
 
 #endif
-		//
+#endif
+        //
 		//  А здесь будет чертов некошерный лод
 		//
         osg::Node* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact);

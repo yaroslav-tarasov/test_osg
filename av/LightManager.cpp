@@ -146,7 +146,7 @@ void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageSt
 }
 #endif
 
-void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
+void  LightManager::addLight(/*uint32_t id,*/ osg::MatrixTransform* mt )
 {
     const unsigned lightID = m_LightsMap.size()/*id*/;
     
@@ -154,29 +154,29 @@ void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
 
     light.transform = mt;
 
-    const float spotFalloff0 = osg::DegreesToRadians(1.f);
-    const float spotFalloff1 = osg::DegreesToRadians(5.f);
+    const float spotFalloff0 = osg::DegreesToRadians(15.f);
+    const float spotFalloff1 = osg::DegreesToRadians(45.f);
     light.spotFalloff = cg::range_2f(spotFalloff0, spotFalloff1);
 
-    const float distanceFalloff0 = 1;
-    const float distanceFalloff1 = 100;
+    const float distanceFalloff0 = 80.f;
+    const float distanceFalloff1 = 220.f;
     light.distanceFalloff = cg::range_2f(distanceFalloff0, distanceFalloff1);
 
     light.color.r = 0.99;
     light.color.g = 0.99;
     light.color.b = 0.99;
-
+    
     light.position = cg::point_3f(0,0,0);
 
-    const float heading = osg::DegreesToRadians(270.f);
-    const float pitch = osg::DegreesToRadians(88.f);
+    const float heading = osg::DegreesToRadians(0.f);
+    const float pitch = osg::DegreesToRadians(0.f);
     light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
     light.active = true;
 
 }
 
-void LightManager::addLight(uint32_t id, const Light& data)
+void LightManager::addLight(/*uint32_t id,*/ const Light& data)
 {
     const unsigned lightID = m_LightsMap.size()/*id*/;
 
@@ -215,7 +215,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         if(light.transform->asMatrixTransform())
         {
            matrix = light.transform->asMatrixTransform()->getMatrix() ;
-           //matrix.setTrans(matrix.getTrans().x(),matrix.getTrans().y(),36);
+           // matrix.setTrans(matrix.getTrans().x(),matrix.getTrans().y(),36);
         }
         else
         {

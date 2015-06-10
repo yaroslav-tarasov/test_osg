@@ -38,8 +38,8 @@ public:
 public:
 
     void update  ( osg::NodeVisitor * nv );
-    void addLight(uint32_t id, osg::MatrixTransform* mt);
-    void addLight(uint32_t id, const Light& light);
+    void addLight(/*uint32_t id,*/ osg::MatrixTransform* mt);
+    void addLight(/*uint32_t id,*/ const Light& light);
 
 private:
 

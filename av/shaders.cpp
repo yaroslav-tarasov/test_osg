@@ -162,7 +162,7 @@ namespace shaders
 #define INCLUDE_DL                                                                                       \
     STRINGIFY (                                                                                          \
     \
-    const int nMaxLights = 24;                                                                           \
+    const int nMaxLights = 130;                                                                           \
     \
     \
     uniform int LightsActiveNum;                                                                         \
@@ -175,6 +175,8 @@ namespace shaders
     void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
    {                                                                                                     \
    int curLight = 0;                                                                                     \
+   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
+   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
    while (curLight < LightsActiveNum)                                                                    \
        {                                                                                                 \
        vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
@@ -189,10 +191,7 @@ namespace shaders
        float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                        \
        float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);               \
                                                                                                          \
-       /*curAttenuation = vec4(0.6,0.2,0.2,0.0);*/                                                       \
-                                                                                                         \
        fTotalAtt *= clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);              \
-       /*fTotalAtt = 0.09 * vDistToLightInv;*/ \
        \
        if (fTotalAtt != 0.0)                                                                             \
            {                                                                                             \
@@ -233,15 +232,22 @@ namespace shaders
        vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
                                                                                                          \
                                                                                                          \
+        vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);                                    \
+        vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                       \
+        float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                              \
+        vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                \
+                                                                                                         \
+        float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                       \
+        float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);              \
+                                                                                                         \
+        /*float*/ fTotalAtt = clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);    \
+                                                                                                         \
         float intensity = 0.0;                                                                           \
         vec4 spec = vec4(0.0);                                                                           \
-        vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);                                    \
-                                                                                                         \
-        vec3 ld = normalize(curVSPosAmbRatio.xyz - vViewSpacePoint.xyz);                                 \
+        vec3 ld = normalize(vVecToLight);                                                                \
         vec3 sd = normalize(vec3(-curVSDirSpecRatio.xyz));                                               \
                                                                                                          \
-                                                                                                         \
-        if (dot(ld,sd) > cos(PI/2)/*l_spotCutOff*/) {                                                    \
+        if (dot(ld,sd) > cos(PI/4)) {                                                        \
                                                                                                          \
                     vec3 n = normalize(vViewSpaceNormal);                                                \
                     intensity = max(dot(n,ld), 0.0);                                                     \
@@ -250,11 +256,11 @@ namespace shaders
                                 vec3 eye = normalize(vViewSpacePoint);                                   \
                                 vec3 h = normalize(ld + eye);                                            \
                                 float intSpec = max(dot(h,n), 0.0);                                      \
-                                spec = specular_ * pow(intSpec, 1/*shininess*/);                       \
+                                spec = specular_ * pow(intSpec, 1/*shininess*/);                         \
                             }                                                                            \
                 }                                                                                        \
                                                                                                          \
-           cAmbDiff += intensity * curDiffuse + spec.rgb;                                                \
+           cAmbDiff += fTotalAtt *(intensity * curDiffuse + spec.rgb);                                   \
                                                                                                          \
                                                                                                          \
            ++curLight;                                                                                   \
@@ -436,7 +442,7 @@ namespace shaders
             //vec3 lightmap_color = vec3(0.6f,0.6f,0.6f); // FIXME dummy code
             vec3  light_res;  
             vec3  vLightsSpecAddOn; 
-            compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+            /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
             vec3 lightmap_color = light_res; 
 
@@ -721,7 +727,7 @@ namespace shaders
                //vec3 lightmap_color = vec3(0.1f,0.1f,0.1f); // FIXME dummy code
                vec3  light_res;  
                vec3  vLightsSpecAddOn; 
-               compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+               /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
                vec3 lightmap_color = light_res; 
 
@@ -884,7 +890,7 @@ namespace shaders
                 
                 vec3  light_res;  
                 vec3  vLightsSpecAddOn; 
-                compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+                /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
                 vec3 lightmap_color = light_res; 
 
@@ -1202,7 +1208,7 @@ namespace shaders
                 
                 vec3  light_res;  
                 vec3  vLightsSpecAddOn; 
-                compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+                /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
 \n               vec3 lightmap_color = light_res; //vec3(0.0f,0.0f,0.0f); // FIXME dummy code
 \n
@@ -1433,7 +1439,7 @@ namespace shaders
                   
                   vec3  light_res;  
                   
-                  compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+                  /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
 \n                // GET_LIGHTMAP(f_in.viewpos, f_in);
 \n                // #define GET_LIGHTMAP(viewpos, in_frag) 
@@ -1792,7 +1798,7 @@ namespace shaders
                 
                 vec3  light_res;  
                 vec3  vLightsSpecAddOn; 
-                compute_dynamic_lights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
+                /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
                 vec3 lightmap_color = light_res; 
 

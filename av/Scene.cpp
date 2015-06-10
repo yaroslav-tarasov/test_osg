@@ -44,6 +44,59 @@ namespace gui
 
 using namespace avScene;
 
+namespace {
+    cg::transform_4 get_relative_transform( osg::Node* node, osg::Node* rel=nullptr )
+    {
+        osg::Matrix tr;
+        osg::Node* n = node;
+        //osg::Node* root = nullptr;
+
+        while( 0 != n->getNumParents() && n->getName() != "phys_ctrl" && (rel?n != rel:true)  )
+        {
+            if(n->asTransform())
+                if(n->asTransform()->asMatrixTransform())
+                {
+                    tr = n->asTransform()->asMatrixTransform()->getMatrix() * tr;
+                }
+                else
+                {
+                    osg::Matrix matrix;
+                    const osg::PositionAttitudeTransform* pat = n->asTransform()->asPositionAttitudeTransform();
+                    matrix.setTrans(pat->getPosition());
+                    tr =  matrix * tr;
+                }
+
+            n = n->getParent(0);
+        }
+
+        if (rel == NULL || n == rel  )
+            return from_osg_transform(tr);
+
+        osg::Matrix tr_rel;
+        n = rel;
+        while(0 != n->getNumParents() && n->getName() != "phys_ctrl"/*root->getName()*/)
+        {                  
+            if(n->asTransform())
+                if(n->asTransform()->asMatrixTransform())
+                {
+                    tr_rel = n->asTransform()->asMatrixTransform()->getMatrix() * tr_rel;
+                }
+                else
+                {
+                    osg::Matrix matrix;
+                    const osg::PositionAttitudeTransform* pat = n->asTransform()->asPositionAttitudeTransform();
+                    matrix.setTrans(pat->getPosition());
+                    tr_rel = matrix * tr_rel;
+                }
+
+            n = n->getParent(0);
+        }
+
+        return from_osg_transform((osg::Matrix::inverse(tr_rel)) * tr);
+    }
+
+}
+
 
 namespace {
 
@@ -363,7 +416,10 @@ Scene* Scene::GetInstance()
 
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene()
-{
+{      
+    _environmentNode = new Group();
+    addChild(_environmentNode.get());
+
     // Common nodes for scene etc.
     _commonNode = new Group();
 
@@ -430,7 +486,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
 
     _viewerPtr->setSceneData( this );
-    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    //_viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // TODO: enabled this for instructor tab, need implement special setting
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
@@ -516,7 +572,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -596,20 +652,20 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Create dynamic lights
     //
     _lights = new Lights();
-    _ephemerisNode->addChild(_lights.get());
+    _environmentNode->addChild(_lights.get());
     /*_commonNode*/this->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
 
     auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
 
-    //for (auto it = light_masts.begin();it != light_masts.end();++it)
-    //{   
-    //    if((*it)->asTransform())
-    //    {
-    //        std::string node_name((*it)->getName());
-    //        std::string mast_index = node_name.substr(node_name.find("_")+1);
-    //        LightManager::GetInstance()->addLight(boost::lexical_cast<int>(mast_index),(*it)->asTransform()->asMatrixTransform());
-    //    }
-    //}
+    for (auto it = light_masts.begin();it != light_masts.end();++it)
+    {   
+        if((*it)->asTransform())
+        {
+            std::string node_name((*it)->getName());
+            std::string mast_index = node_name.substr(node_name.find("_")+1);
+            LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
+        }
+    }
 
     //
     // Create weather
@@ -916,6 +972,8 @@ void Scene::createObjects()
 
 osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 {
+    using namespace creators;
+
     osg::ref_ptr<osg::MatrixTransform> mt = nullptr ;
 
     if( path == "sfx//smoke.scg" )
@@ -953,41 +1011,174 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         _terrainRoot->asGroup()->addChild(mt);
         
-        osg::Node* sl =  mt; //findFirstNode(object_file,"port",findNodeVisitor::not_exact);
-
-        if(sl)
+        if(mt)
         {
-            //             mast_spot_node_ptr steering_spot = (mast_spot_node *)create(node::NT_MastSpot).get();
-            //             steering_spot->set_name(nodeName);
-            //             steering_spot->SetState(true);
-            //             mast_spot_node::LightData spot_data;
-            //             spot_data.color.r = randgen_.random_dev(0.92f, 0.04f);
-            //             spot_data.color.g = randgen_.random_dev(0.92f, 0.03f);
-            //             spot_data.color.b = randgen_.random_dev(0.85f, 0.03f);
-            //             spot_data.distance_falloff = cg::range_2f(70.f, 140.f);
-            //             spot_data.cone_falloff = cg::range_2f(25.f, 33.f);
-            //             steering_spot->SetLightData(spot_data);
-            //             ptrNode->add(steering_spot.get());
+            
+            osg::Node* sl =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
+            osg::Node* pat =  findFirstNode(mt,"pat",findNodeVisitor::not_exact);
 
-            avScene::LightManager::Light data;
-            data.transform  = sl->asTransform()/*->asMatrixTransform()*/;
+            const auto offset =  pat->asTransform()->asPositionAttitudeTransform()->getPosition();
 
-            data.spotFalloff = cg::range_2f(osg::DegreesToRadians(1.f), osg::DegreesToRadians(5.f));
-            data.distanceFalloff = cg::range_2f(1.f, 100.f);
+            if(sl)
+            {
+                avScene::LightManager::Light data;
+                data.transform  = mt;  
 
-            data.color.r = 0.92f;
-            data.color.g = 0.92f;
-            data.color.b = 0.85f;
+                data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+                data.distanceFalloff = cg::range_2f(75.f, 140.f);
 
-            data.position = cg::point_3f(0,0,0);
+                data.color.r = 0.92f;
+                data.color.g = 0.92f;
+                data.color.b = 0.85f;
 
-            const float heading = osg::DegreesToRadians(270.f + 90);
-            const float pitch   = osg::DegreesToRadians(45.f);
-            data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                FIXME(Смещение мать его)
+                // cg::transform_4 tr = get_relative_transform(sl);
+                data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
+                                                  + offset);
 
-            data.active = true;
+                const float heading = osg::DegreesToRadians(0.f);
+                const float pitch = osg::DegreesToRadians(2.f);
 
-            avScene::LightManager::GetInstance()->addLight(666, data);
+                data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+                data.active = true;
+
+                avScene::LightManager::GetInstance()->addLight(/*1000,*/ data);
+            }
+
+
+            findNodeVisitor::nodeNamesList list_name;
+
+            osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
+
+            const char* names[] =
+            {
+                "port",
+                "starboard",
+                "tail",
+                "steering_lamp",
+                "strobe_",
+                "landing_lamp",
+                "back_tail",
+                // "navaid_",
+            };
+
+            for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
+            {
+                list_name.push_back(names[i]);
+            }
+
+            findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+            root->accept(findNodes);
+
+            findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+
+            auto shift_phase = cg::rand(cg::range_2(0, 255));
+
+            osgSim::Sector* sector = new osgSim::AzimSector(-osg::inDegrees(45.0),osg::inDegrees(45.0),osg::inDegrees(90.0));
+
+            for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+            {
+                osgSim::LightPoint pnt;
+                bool need_to_add = false;
+                avScene::LightManager::Light data;
+
+                if((*it)->getName() == "tail")
+                { 
+                    pnt._color      = creators::white_color;
+                    need_to_add     = true;
+                }
+
+                if((*it)->getName() == "port")
+                {   
+                    pnt._color      = green_color;
+                    need_to_add     = true;
+                    pnt._sector = sector;
+
+                    data.transform  = mt;  
+
+                    data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+                    data.distanceFalloff = cg::range_2f(1.5f, 13.f);
+
+                    data.color.r = pnt._color.r();
+                    data.color.g = pnt._color.g();
+                    data.color.b = pnt._color.b();
+
+                    FIXME(Смещение мать его)
+                        // cg::transform_4 tr = get_relative_transform(sl);
+                        data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
+                        + offset);
+
+                    const float heading = osg::DegreesToRadians(0.f);
+                    const float pitch   = osg::DegreesToRadians(-90.f);
+
+                    data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+                    data.active = true;
+
+                    avScene::LightManager::GetInstance()->addLight(data);
+
+
+                }
+
+                if((*it)->getName() == "starboard") 
+                {
+                    pnt._color = red_color;
+                    need_to_add     = true;
+                    pnt._sector = sector;
+
+                    data.transform  = mt;  
+
+                    data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+                    data.distanceFalloff = cg::range_2f(1.5f, 13.f);
+
+                    data.color.r = pnt._color.r();
+                    data.color.g = pnt._color.g();
+                    data.color.b = pnt._color.b();
+
+                    FIXME(Смещение мать его)
+                        // cg::transform_4 tr = get_relative_transform(sl);
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
+                        + offset);
+
+                    const float heading = osg::DegreesToRadians(0.f);
+                    const float pitch   = osg::DegreesToRadians(-90.f);
+
+                    data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+                    data.active = true;
+
+                    avScene::LightManager::GetInstance()->addLight(data);
+
+                }
+
+
+                if(boost::starts_with((*it)->getName(), "strobe_")) 
+                {
+                    pnt._color  = white_color;
+                    pnt._blinkSequence = new osgSim::BlinkSequence;
+                    pnt._blinkSequence->addPulse( 0.2,
+                        osg::Vec4( 1., 1., 1., 1. ) );
+
+                    pnt._blinkSequence->addPulse( 1.0,
+                        osg::Vec4( 0., 0., 0., 0. ) );
+
+                    pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
+
+                    pnt._blinkSequence->setPhaseShift(shift_phase);
+                    need_to_add     = true;
+                }
+
+                pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+                pnt._radius = 0.2f;
+                if(need_to_add)
+                    obj_light->addLightPoint(pnt);
+            }
+
+            if(wln_list.size()>0)
+                root->asGroup()->addChild(obj_light);
+
+
         }
 
 

@@ -3,9 +3,6 @@
 #include <osgUtil/UpdateVisitor>
 #include <osgUtil/CullVisitor>
 
-//#include "svCore/svCore.h"
-//#include "svCore/Utils.h"
-//#include "svCore/Global.h"
 #include "utils/callbacks.h"
 
 #include "av/Scene.h"
@@ -106,7 +103,6 @@ void Lights::update( osg::NodeVisitor * nv )
 {
     // clear lights
     m_aFrameActiveLights.resize(0);
-    FIXME(update must be after cull)
 }
 
 // cull pass
@@ -208,21 +204,29 @@ LightNodeHandler::LightsPackStateSet::LightsPackStateSet()
     pStateSet->addUniform(LightDiffuse.get());
 }
 
+bool LightNodeHandler::_init = false;
 
 // constructor
-LightNodeHandler::LightNodeHandler( LightInfluence maxInfluenceToUse )
+LightNodeHandler::LightNodeHandler( LightInfluence maxInfluenceToUse, bool init )
     : m_pFatherRef(GetScene()->getLights())
     , m_uMaxPriority((unsigned)maxInfluenceToUse)
     , m_bStatePushed(false)
     , m_bMainWasActive(false)
     , m_bReflWasActive(false)
 {
+    _init = init;
     return;
 }
 
 // on cull begin
 void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::BoundingSphere * pSpherePtr /* = NULL */ )
 {
+    if(!_init)
+        return;
+
+    if(!m_pFatherRef)
+        m_pFatherRef = GetScene()->getLights();
+
     // current stateset to work with
     const bool bReflPass = (pCV->getCullMask() == 0x00010000UL);
     LightsPackStateSet & curStatePack = (bReflPass) ? m_lightsRefl : m_lightsMain;
@@ -305,7 +309,7 @@ void LightNodeHandler::onCullEnd( osgUtil::CullVisitor * pCV )
 
 // constructor
 DynamicLightsObjectCull::DynamicLightsObjectCull( LightInfluence maxInfluenceToUse )
-    : m_LightsHandler(maxInfluenceToUse)
+    : m_LightsHandler(maxInfluenceToUse,true)
 {
 }
 
@@ -319,6 +323,7 @@ void DynamicLightsObjectCull::operator()( osg::Node * node, osg::NodeVisitor * n
     const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
     osg::BoundingSphere boundSphere = node->getBound();
     boundSphere.center() = boundSphere.center() * mWorldToView;
+    
 
     // cull down
     m_LightsHandler.onCullBegin(pCV, &boundSphere);
