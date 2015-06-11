@@ -214,25 +214,37 @@ void LightManager::update( osg::NodeVisitor * nv )
         if(light.transform)
         if(light.transform->asMatrixTransform())
         {
-           matrix = light.transform->asMatrixTransform()->getMatrix() ;
-           // matrix.setTrans(matrix.getTrans().x(),matrix.getTrans().y(),36);
-        }
-        else
-        {
-           const osg::PositionAttitudeTransform* pat = light.transform->asPositionAttitudeTransform();
-           matrix.setTrans(pat->getPosition());
-           //matrix.setRotate(pat->getAttitude());
+           osg::Node* parent = light.transform->getParent(0);
+           if(parent->asTransform())
+                matrix =  light.transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
+           else
+                matrix =  light.transform->asMatrixTransform()->getMatrix() ;
         }
 
         cg::matrix_4 trm = from_osg_matrix(matrix);
         cg::transform_4 transform = trm.transpose();
 #endif
-         
         const cg::point_3f position = transform.treat_point(light.position );
         const cg::vector_3 direction = transform.treat_vector(light.direction);
+        
+        cg::range_2f spotFalloff = light.spotFalloff;
+
+#if 1
+        //const cg::point_3f world_light_dir = mv_.treat_vector(spot.view_dir, false);
+        //// angle corrected
+        //auto corrected_spot = spot;
+        //if (!corrected_spot.angle_falloff.empty())
+        //    corrected_spot.angle_falloff |= cg::lerp01(spot.angle_falloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
+        
+        const cg::point_3f world_light_dir = transform.treat_vector(light.direction, false);
+        // angle corrected
+
+        if (!spotFalloff.empty())
+            spotFalloff |= cg::lerp01(spotFalloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
+#endif
 
         lights->AddLight(avScene::GlobalInfluence, avScene::ConicalLight,
-            position, direction, light.distanceFalloff, light.spotFalloff, 
+            position, direction, light.distanceFalloff, spotFalloff, 
             light.color, 0.60f, 0.35f);
     }
 

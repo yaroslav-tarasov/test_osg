@@ -58,8 +58,8 @@ void  Terrain::create( std::string name )
 
     if(name == "sheremetyevo")
     {
-        scene_name = "sheremetyevo.open.osgb";//"sheremetyevo.osgb";// "sheremetyevo.open.osgb";   
-        mat_file_name = "sheremetyevo.open.dae.mat.xml"; 
+        scene_name =    "sheremetyevo.osgb";//"sheremetyevo.open.osgb";//"sheremetyevo.osgb"; 
+        mat_file_name = "sheremetyevo.dae.mat.xml"; //"sheremetyevo.open.dae.mat.xml"; 
     }
     else if(name == "adler")
     {
@@ -99,6 +99,7 @@ void  Terrain::create( std::string name )
     nl.push_back("sea");
     nl.push_back("railing");
     nl.push_back("panorama");
+    nl.push_back("plane");
 
     MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);

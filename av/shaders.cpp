@@ -162,7 +162,7 @@ namespace shaders
 #define INCLUDE_DL                                                                                       \
     STRINGIFY (                                                                                          \
     \
-    const int nMaxLights = 130;                                                                           \
+    const int nMaxLights = 124;                                                                           \
     \
     \
     uniform int LightsActiveNum;                                                                         \
@@ -892,7 +892,7 @@ namespace shaders
                 vec3  vLightsSpecAddOn; 
                 /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
-                vec3 lightmap_color = light_res; 
+                vec3 lightmap_color = light_res ; 
 
                 //    LIGHTMAP_BUILDING_HEIGHT_TRICK;
                 float up_dot_clamped = saturate(fma(normal_world_space_z, 0.4, 0.6));
@@ -1210,7 +1210,7 @@ namespace shaders
                 vec3  vLightsSpecAddOn; 
                 /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
-\n               vec3 lightmap_color = light_res; //vec3(0.0f,0.0f,0.0f); // FIXME dummy code
+\n               vec3 lightmap_color = light_res ; //vec3(0.0f,0.0f,0.0f); // FIXME dummy code
 \n
 \n                // LIGHTMAP_SHADOW_TRICK(shadow);
 \n               vec3 non_ambient_term = max(lightmap_color, shadow * (diffuse.rgb * n_dot_l + specular_color));
@@ -1448,7 +1448,7 @@ namespace shaders
 \n                // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
 \n                // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
- \n               vec3 lightmap_color = light_res; // FIXME dummy code
+ \n               vec3 lightmap_color = light_res ; // FIXME dummy code
  \n
  \n               // FIXME
  \n               // LIGHTMAP_SHADOW_TRICK(shadow);
@@ -1800,7 +1800,7 @@ namespace shaders
                 vec3  vLightsSpecAddOn; 
                 /*compute_dynamic_lights*/ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, light_res, vLightsSpecAddOn);
 
-                vec3 lightmap_color = light_res; 
+                vec3 lightmap_color = light_res ; 
 
                 non_ambient_term = max(lightmap_color, non_ambient_term);
 

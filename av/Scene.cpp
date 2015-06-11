@@ -464,7 +464,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer(cArgs);
      
-    _viewerPtr->apply(new osgViewer::SingleScreen(0));
+    _viewerPtr->apply(new osgViewer::SingleScreen(1));
 
     // Set up camera
     if ( cTraitsPtr.valid() == true )
@@ -572,7 +572,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("adler"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -1097,12 +1097,16 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.transform  = mt;  
 
-                    data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+                    data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
-
+                    
                     data.color.r = pnt._color.r();
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
+                    
+                    FIXME(Нормализовать)
+
+                    data.color  *= 0.01;
 
                     FIXME(Смещение мать его)
                         // cg::transform_4 tr = get_relative_transform(sl);
@@ -1110,7 +1114,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                         + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(-90.f);
+                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
                     data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
@@ -1129,20 +1133,23 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.transform  = mt;  
 
-                    data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+                    data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
 
                     data.color.r = pnt._color.r();
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
 
+                    FIXME(Нормализовать)
+                    data.color  *= 0.01;
+                    
                     FIXME(Смещение мать его)
                         // cg::transform_4 tr = get_relative_transform(sl);
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(-90.f);
+                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
                     data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
