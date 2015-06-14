@@ -49,7 +49,7 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
         if ( !_initialized )
         {
-        CEGUI::OpenGLRenderer::bootstrapSystem( CEGUI::OpenGLRenderer::TTT_NONE/*TTT_FBO*//*TTT_AUTO*//*TTT_NONE*/ );
+        CEGUI::OpenGLRenderer::bootstrapSystem( CEGUI::OpenGLRenderer::TTT_NONE );
         if ( !CEGUI::System::getSingletonPtr() ) return;
 
         CEGUI::DefaultResourceProvider* resource =

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="TaharezLook/FrameWindow" name="FrameWindow" >
+        <Property name="Area" value="{{0,30},{0,180},{0.3,61},{0.3,334}}" />
+        <Property name="Text" value="Параметры" />
+        <Window type="TaharezLook/GroupBox" name="LightParams" >
+            <Property name="Area" value="{{0,16},{0,16},{0.3,35},{0.3,265}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="TaharezLook/Checkbox" name="chkLights" >
+                <Property name="Area" value="{{0,25},{0,32},{0,153},{0,64}}" />
+                <Property name="Text" value="Огни" />
+            </Window>
+        </Window>
+    </Window>
+</GUILayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project CEGUIDefaultResolution="1920x1080" CEGUIVersion="0.8" baseDirectory="." fontsPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/fonts" imagesetsPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/imagesets" layoutsPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/layouts" looknfeelsPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/looknfeel" schemesPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/schemes" version="CEED Project 1" xmlSchemasPath="../../../../Projects/OSG/cegui-0.8.4/datafiles/xml_schemas">
+    <Items>
+        <Item path="layouts/vis_settings.layout" type="file" />
+    </Items>
+</Project>

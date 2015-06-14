@@ -554,5 +554,11 @@
     <ClCompile Include="av\Lights.cpp">
       <Filter>Source Files\av\lights</Filter>
     </ClCompile>
+    <ClCompile Include="hmi\gui_vis\main_window_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="hmi\gui_vis\menu_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

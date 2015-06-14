@@ -35,6 +35,8 @@
 #include "pickhandler.h"
 
 #include "application/panels/vis_settings_panel.h"
+#include "application/main_window.h"
+#include "application/menu.h"
 
 namespace gui 
 { 
@@ -528,10 +530,22 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                 zones_.push_back(std::make_pair(0,std::wstring(L"Пустая сцена")));
                 zones_.push_back(std::make_pair(1,std::wstring(L"Шереметьево")));
                 zones_.push_back(std::make_pair(2,std::wstring(L"Сочи")));
-                this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
+
+
+				this->_mw = app::create_main_win();
+				app::menu_ptr fm = this->_mw->add_main_menu("File");
+				fm->add_string("Exit" , [=]() { exit(0); });
+
+				app::menu_ptr vm = this->_mw->add_main_menu("View");
+				vm->add_string("Lights" , [=]() {  });
+
+				this->_mw->set_visible(false);
+
+				this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
                 this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
-                this->_vis_settings_panel->set_visible(false);
+				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
+
             }
         } )
     );
@@ -572,7 +586,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("sheremetyevo"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -1196,6 +1210,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     return mt;
 }
 
+void   Scene::onSetLights(bool on)
+{
+	_lights->setNodeMask(on?0xffffffff:0);
+
+}
 
 void   Scene::onZoneChanged(int zone)
 {
@@ -1219,7 +1238,8 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
 
     if (key == osgGA::GUIEventAdapter::KEY_Escape)
     {
-        if(_vis_settings_panel) _vis_settings_panel->set_visible(!_vis_settings_panel->visible());
+		if(_mw) _mw->set_visible(!_mw->visible());
+
         return true;
     }
 

@@ -160,6 +160,8 @@
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
     <ClCompile Include="ext\spark\test_effect.cpp" />
+    <ClCompile Include="hmi\gui_vis\main_window_impl.cpp" />
+    <ClCompile Include="hmi\gui_vis\menu_impl.cpp" />
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp" />
     <ClCompile Include="kernel\fms\dubins.cpp" />
     <ClCompile Include="kernel\fms\trajectory.cpp" />

@@ -1,6 +1,7 @@
 #pragma once 
 
 
+#include "application/application_fwd.h"
 #include "application/panels_fwd.h"
 
 //
@@ -68,7 +69,8 @@ namespace avScene {
         void                                        createObjects();
 
     private:
-        void                                        onZoneChanged(int zone);
+        void                                        onZoneChanged( int zone );
+		void										onSetLights  ( bool on  );
         bool                                        onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
     private:
 
@@ -88,6 +90,7 @@ namespace avScene {
          osg::ref_ptr<Lights>                       _lights;                                            
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
+		app::main_window_ptr						_mw;
         connection_holder                           conn_holder_;
 
         static std::string                           zone_to_reload_;
