@@ -560,5 +560,8 @@
     <ClCompile Include="hmi\gui_vis\menu_impl.cpp">
       <Filter>Source Files\hmi</Filter>
     </ClCompile>
+    <ClCompile Include="tests\render_points.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

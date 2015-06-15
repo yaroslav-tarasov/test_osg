@@ -38,6 +38,8 @@
 #include "application/main_window.h"
 #include "application/menu.h"
 
+#include "tests/common/CommonFunctions"
+
 namespace gui 
 { 
     osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler);
@@ -519,6 +521,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Add event handlers to the viewer
     //
+
     _pickHandler = new PickHandler();
     
     if(true) _viewerPtr->addEventHandler( 
@@ -659,6 +662,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     //
     // Dynamic lights manager
     //
+    
 
     addChild(LightManager::GetInstance());
 
@@ -705,7 +709,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
 
-
+    createRTT();
 
     return true;
 }
@@ -1244,4 +1248,31 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
     }
 
     return false;
+}
+
+
+#include "tests/teapot.h"
+
+void Scene::createRTT()
+{
+    int tex_width = 1024, tex_height = 1024;
+
+
+    osg::ref_ptr<osg::Texture2D> textureFBO = new osg::Texture2D;
+    textureFBO->setTextureSize( tex_width, tex_height );
+    textureFBO->setInternalFormat( GL_RGBA );
+    textureFBO->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR );
+    textureFBO->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
+    textureFBO->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_BORDER);
+    textureFBO->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_BORDER);
+
+    osg::ref_ptr<osg::Camera> rttCamera = osgCookBook::createRTTCamera(osg::Camera::COLOR_BUFFER0, textureFBO,true);
+
+    addChild(rttCamera);
+
+    //rttCamera->addChild(LightManager::GetInstance());
+
+    osg::ref_ptr<osg::Geode> tn = new osg::Geode;
+    tn->addDrawable( new TeapotDrawable(1.0f) );
+    rttCamera->addChild(tn);
 }

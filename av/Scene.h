@@ -67,7 +67,7 @@ namespace avScene {
         bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth = 0, int nHeight = 0);
         void                                        createTerrainRoot();
         void                                        createObjects();
-
+        void                                        createRTT();
     private:
         void                                        onZoneChanged( int zone );
 		void										onSetLights  ( bool on  );
