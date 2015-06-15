@@ -16,7 +16,9 @@ struct vis_settings_panel
     
     virtual void set_visible(bool visible) = 0;
     virtual bool visible() = 0; 
-
+    
+    virtual void set_light(bool on) = 0;
+    
     DECLARE_EVENT(zone_changed , (int) );
     DECLARE_EVENT(exit_app     , ()    );
 	DECLARE_EVENT(set_lights   , (bool) );

@@ -37,6 +37,7 @@ bool isCheckboxSelected(const CEGUI::String& checkbox)
     }
     return false;
 }
+
 vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
 {
     GUIContext& context = System::getSingleton().getDefaultGUIContext();
@@ -97,6 +98,7 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
 	demoWindow->addChild( demoButtonOK );
     root->addChild( demoWindow );
 
+    demoWindow->setVisible(false);
 
     ListboxTextItem* itm;
     CEGUI::Win32StringTranscoder stc;
@@ -112,7 +114,8 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
     cbbo->subscribeEvent(Combobox::EventListSelectionAccepted, 
         Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
             {
-                Combobox* combo = static_cast<Combobox*>(static_cast<const WindowEventArgs&>(args).window->getRootWindow()->getChild(combo_name));
+                Combobox* combo = static_cast<Combobox*>(static_cast<const WindowEventArgs&>(args).window->getRootWindow()->getChild("DemoWindow/" + combo_name));
+                
                 ListboxItem* item = combo->findItemWithText(combo->getText(), 0);
                 if (item)
                 {
@@ -173,6 +176,17 @@ bool vis_settings_panel_impl::visible()
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
     return root->getChild(btn_exit_name)->isVisible() || root->getChild(combo_name)->isVisible();
+}
+
+void vis_settings_panel_impl::set_light(bool on)
+{
+    CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
+    CEGUI::Window* root = context.getRootWindow();
+    if (root->isChild("FrameWindow/LightParams/chkLights"))
+    {
+        ToggleButton* button = static_cast<ToggleButton*>(root->getChild("FrameWindow/LightParams/chkLights"));
+        return button->setSelected(on);
+    }
 }
 
 void vis_settings_panel_impl::init_menu_bar(CEGUI::Menubar* menuBar)

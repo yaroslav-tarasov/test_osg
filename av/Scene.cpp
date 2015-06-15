@@ -545,7 +545,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
                 this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
 				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
-
+                this->_vis_settings_panel->set_light(true);
             }
         } )
     );
@@ -586,7 +586,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     createTerrainRoot();
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
 
     _terrainNode =  new avTerrain::Terrain (_terrainRoot);
     _terrainNode->create(scene_name);
@@ -1213,7 +1213,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 void   Scene::onSetLights(bool on)
 {
 	_lights->setNodeMask(on?0xffffffff:0);
-
+    LightManager::GetInstance()->setNodeMask(on?0xffffffff:0);
 }
 
 void   Scene::onZoneChanged(int zone)

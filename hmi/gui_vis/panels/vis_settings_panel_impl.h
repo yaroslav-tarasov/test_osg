@@ -13,6 +13,8 @@ public:
 
     void set_visible(bool visible) override;
     bool visible    () override;
+
+    void set_light(bool on);
 private:
 	void init_menu_bar(CEGUI::Menubar* menuBar);
 };

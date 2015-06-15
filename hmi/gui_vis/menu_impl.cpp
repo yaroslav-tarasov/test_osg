@@ -58,7 +58,7 @@ size_t menu_impl::add_string(std::string const &text, target const &click, targe
 			); 	
 	}
 
-	size_t act;
+	size_t act = 0;
 
     return (size_t)act ;
 }
