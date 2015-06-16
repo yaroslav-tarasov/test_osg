@@ -4,6 +4,8 @@
 #include "application/application_fwd.h"
 #include "application/panels_fwd.h"
 
+#include "light_maps.h"
+
 //
 //  Forwards
 //
@@ -88,6 +90,7 @@ namespace avScene {
         osg::ref_ptr<PickHandler>                   _pickHandler; 
         std::vector<osg::ref_ptr<osg::Node>>        _lamps;
          osg::ref_ptr<Lights>                       _lights;                                            
+        ILightMapRendererPtr                         light_map;
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
 		app::main_window_ptr						_mw;

@@ -67,12 +67,12 @@ void Prerender::init(int width, int height)
     getOrCreateStateSet()->setAttribute(new osg::FrontFace(osg::FrontFace::CLOCKWISE));
 
     // don't reflect stars,ships,area (if nodemask is set)
-    #define REFLECTION_CULL_MASK 0x00010000
+    //#define REFLECTION_CULL_MASK 0x00010000
 
-    int im = getInheritanceMask();
-    im &= ~(osg::CullSettings::CULL_MASK);
-    setInheritanceMask(im);
-    setCullMask(REFLECTION_CULL_MASK);
+    //int im = getInheritanceMask();
+    //im &= ~(osg::CullSettings::CULL_MASK);
+    //setInheritanceMask(im);
+    //setCullMask(REFLECTION_CULL_MASK);
 #else
 
 #endif

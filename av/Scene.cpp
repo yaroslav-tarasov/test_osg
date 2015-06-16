@@ -710,6 +710,25 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
 
     createRTT();
+    
+    light_map = createLightMapRenderer();
+    addChild( light_map );
+    
+    
+    LightMapRenderer::SpotData  data;
+
+    data.angle_falloff = cg::range_2f();
+    data.dist_falloff = cg::range_2f(1.5f, 13.f);
+
+    data.spot_color = cg::colorf(1.,0.,0.);
+
+    const float heading = osg::DegreesToRadians(0.f);
+    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+
+    data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
+
+    light_map->AddSpotLight(data);
+
 
     return true;
 }
@@ -1275,4 +1294,5 @@ void Scene::createRTT()
     osg::ref_ptr<osg::Geode> tn = new osg::Geode;
     tn->addDrawable( new TeapotDrawable(1.0f) );
     rttCamera->addChild(tn);
+    rttCamera->setViewMatrix(osg::Matrixd::scale(1,1,-1)); // Flip Z axis
 }
