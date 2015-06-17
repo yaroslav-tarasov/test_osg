@@ -231,9 +231,7 @@
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
     <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
-    <ClCompile Include="light_maps.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="light_maps.cpp" />
     <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />

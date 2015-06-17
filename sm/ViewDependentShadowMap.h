@@ -191,7 +191,7 @@ protected:
         Uniforms                                _uniforms;
         osg::ref_ptr<osg::Program>              _program;
         osg::ref_ptr<osg::Uniform>              _shadowMatrix;
-        osg::ref_ptr<osg::Uniform>              _refMatrix;
+        //osg::ref_ptr<osg::Uniform>              _refMatrix;
 
 };
 

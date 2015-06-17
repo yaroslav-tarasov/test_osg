@@ -1231,8 +1231,8 @@ void ViewDependentShadowMap::createShaders()
     _shadowMatrix = new osg::Uniform("shadowMatrix",osg::Matrixf());
     _uniforms.push_back(_shadowMatrix.get());
     
-    _refMatrix = new osg::Uniform("refMatrix",osg::Matrixf());
-    _uniforms.push_back(_refMatrix.get());
+    //_refMatrix = new osg::Uniform("refMatrix",osg::Matrixf());
+    //_uniforms.push_back(_refMatrix.get());
 
     switch(settings->getShaderHint())
     {
@@ -2309,8 +2309,9 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
                             osg::Matrix::translate(1.0,1.0,1.0) *
                             osg::Matrix::scale(0.5,0.5,0.5));
 
-    if(_shadowMatrix.valid())
-        _shadowMatrix->set(planes);
+    FIXME (ѕри переходе на 1.4 можно сделать rowmajor в шейдере);
+
+
 
     texgen->setPlanesFromMatrix( planes );
 
@@ -2318,8 +2319,11 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
     osg::ref_ptr<osg::RefMatrix> refMatrix =
         new osg::RefMatrix( camera->getInverseViewMatrix() * (*(cv->getModelViewMatrix())) );
     
-    if(_refMatrix.valid())
-        _refMatrix->set(*refMatrix.get());
+    if(_shadowMatrix.valid())
+        _shadowMatrix->set(osg::Matrix::inverse((*refMatrix.get())) * planes );
+    
+    //if(_refMatrix.valid())
+    //    _refMatrix->set( osg::Matrix::inverse((*refMatrix.get())) * planes );
     
     osgUtil::RenderStage* currentStage = cv->getCurrentRenderBin()->getStage();
     currentStage->getPositionalStateContainer()->addPositionedTextureAttribute( textureUnit, refMatrix.get(), texgen );

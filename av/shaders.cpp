@@ -80,7 +80,7 @@ namespace shaders
                 vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
                 {                                                                                                \
                     vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-                    return mix(textureCube(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
+                    return mix(/*textureCube*/texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
                     /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
                 }                                                                                                \
                                                                                                                  \
@@ -108,7 +108,7 @@ namespace shaders
 \n            for(int x=-size.x; x<=size.x; x++){                                                      \
 \n                for(int y=-size.y; y<=size.y; y++){                                                  \
 \n                    count++;                                                                         \
-\n                    result += shadow2DProjOffset(depths, stpq, ivec2(x,y)).r;                        \
+\n                    result += textureProjOffset(depths, stpq, ivec2(x,y));/*.r;*/                    \
 \n                }                                                                                    \
 \n            }                                                                                        \
 \n            return result/count;                                                                     \
@@ -116,29 +116,30 @@ namespace shaders
                                                                                                        \
 \n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
 \n            float result = 0.0;                                                                      \
-\n            result += shadow2DProjOffset(depths, stpq, ivec2(0,-1)).r;                               \
-\n            result += shadow2DProjOffset(depths, stpq, ivec2(0,1)).r;                                \
-\n            result += shadow2DProjOffset(depths, stpq, ivec2(1,0)).r;                                \
-\n            result += shadow2DProjOffset(depths, stpq, ivec2(-1,0)).r;                               \
+\n            result += textureProjOffset(depths, stpq, ivec2(0,-1));/*.r;*/                           \
+\n            result += textureProjOffset(depths, stpq, ivec2(0,1));/*.r;*/                            \
+\n            result += textureProjOffset(depths, stpq, ivec2(1,0));/*.r;*/                            \
+\n            result += textureProjOffset(depths, stpq, ivec2(-1,0));/*.r;*/                           \
 \n            return result*.25;                                                                       \
     }                                                                                                  \
                                                                                                        \
 \n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
-\n            return shadow2DProj(depths, stpq).r;                                          \
+\n            return textureProj(depths, stpq);/*.r;*/                                                 \
     }                                                                                                  \
       const ivec2 pcf_size = ivec2(1,1);                                                               \
                                                                                                        \
-     vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
-     {                                                                                                 \
-         return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] ),dot( posEye, gl_EyePlaneR[index]),dot( posEye, gl_EyePlaneQ[index] ) );  \
-     }                                                                                                  \
                                                                                                         \
      uniform sampler2D baseTexture;                                                                     \
      uniform int baseTextureUnit;                                                                       \
      uniform sampler2DShadow shadowTexture0;                                                            \
      uniform int shadowTextureUnit0;                                                                    \
-                                                                                                        \
+     uniform mat4            shadowMatrix;                                                              \
      )
+
+/*vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
+{                                                                                                 \
+return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] ),dot( posEye, gl_EyePlaneR[index]),dot( posEye, gl_EyePlaneQ[index] ) );  \
+} */                                                                                                 
 
 #define INCLUDE_SCENE_PARAM                                                                             \
      STRINGIFY (                                                                                        \
@@ -316,8 +317,9 @@ namespace shaders
             v_out.normal    = normal;
             v_out.viewpos   = vertexInEye.xyz;
             v_out.texcoord  = gl_MultiTexCoord1.xy;
-            v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-
+            //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+            mat4 EyePlane =  transpose(shadowMatrix); 
+            v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
         }
     )
@@ -366,6 +368,7 @@ namespace shaders
             vec4 lightmap_coord;
         } f_in;
 
+        out vec4  aFragColor;
 
         void main (void)
         {
@@ -427,8 +430,8 @@ namespace shaders
             float spec_compose_fraction = 0.35;
 
 
-            // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
-            vec3 cube_color = textureCube(envTex, refl_vec_world).rgb + pure_spec_color;
+            //const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
+            vec3 cube_color = texture(envTex, refl_vec_world).rgb + pure_spec_color;
 
 
             vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
@@ -454,11 +457,9 @@ namespace shaders
             vec3  day_result = mix(composed_lighting * dif_tex_col.rgb, cube_color, fresnel) + (1.0 - spec_compose_fraction) * pure_spec_color;
             float night_factor = step(ambient.a, 0.35);
             vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
-            //ALFA-TEST// gl_FragColor = vec4( glass_factor,0,0,1.0f);
-            //LIGHT_VIEW_TEST//gl_FragColor = vec4(lightDir,1.0);    
-            // gl_FragColor = vec4( result,1.0);
-            gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-            //gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), base.a);  // for dynamic rotor
+  
+
+            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
             
         }
     )
@@ -503,8 +504,9 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-
+                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             }       
             )
         };
@@ -543,6 +545,8 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
+            
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -560,8 +564,8 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
 
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                //gl_FragColor = vec4(1.0,0.0,0,1.0);
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+
             }
 
             )
@@ -614,7 +618,9 @@ namespace shaders
                v_out.normal    = normal;
                v_out.viewpos   = vertexInEye.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
-               v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+               //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+               mat4 EyePlane =  transpose(shadowMatrix); 
+               v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
            }       
        )
        };
@@ -655,6 +661,7 @@ namespace shaders
                vec4 lightmap_coord;
            } f_in;
 
+           out vec4  aFragColor;
 
            void main (void)
            {
@@ -714,7 +721,7 @@ namespace shaders
 
 
                // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
-               vec3 cube_color = textureCube(envTex, refl_vec_world).rgb + pure_spec_color;
+               vec3 cube_color = texture(envTex, refl_vec_world).rgb + pure_spec_color;
 
                vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
                // GET_LIGHTMAP(f_in.viewpos, f_in);
@@ -740,7 +747,7 @@ namespace shaders
                float night_factor = step(ambient.a, 0.35);
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
-               gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 
            }
        )
@@ -787,7 +794,9 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             }       
             )
         };
@@ -825,6 +834,8 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
+            
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -913,7 +924,7 @@ namespace shaders
                     vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
                     refl_vec_world.z = abs(refl_vec_world.z);
                     float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
-                    vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
+                    vec3 cube_color = texture(envTex, refl_vec_world).rgb;
                     day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
                     night_tex = texture2D(nightTex, f_in.texcoord).rgb;
                 }
@@ -921,10 +932,7 @@ namespace shaders
                 float night_factor = step(ambient.a, 0.35);
                 vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
                
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-                // gl_FragColor = vec4( result,1.0);  
-                /// gl_FragColor =  mix(texture2D(colorTex,f_in.texcoord), texture2D(nightTex, f_in.texcoord),night_factor);
-                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
             }
             )
 
@@ -972,8 +980,9 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-
+                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             }       
             )
         };
@@ -1009,6 +1018,8 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
+            
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -1041,10 +1052,8 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
 
-                // FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                // gl_FragColor = vec4( result, dif_tex_col.a);
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+
             }
 
             )
@@ -1060,10 +1069,13 @@ namespace shaders
     namespace ground_mat 
     {
         const char* vs = {
-			 "#version 130 \n"
+			"#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            
+
+
             INCLUDE_VS
+            
+            INCLUDE_UNIFORMS
 
             STRINGIFY ( 
             attribute vec3 tangent;
@@ -1100,8 +1112,15 @@ namespace shaders
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.detail_uv = gl_Vertex.xy * 0.03;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-
+                // v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                
+                //vec4 EyePlane_S = shadowMatrix[0] * refMatrix;
+                //vec4 EyePlane_T = shadowMatrix[1] * refMatrix;
+                //vec4 EyePlane_P = shadowMatrix[2] * refMatrix;
+                //vec4 EyePlane_Q = shadowMatrix[3] * refMatrix;
+                
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
            }       
             )
         };
@@ -1141,6 +1160,8 @@ namespace shaders
                 vec4 shadow_view;
                 vec4 lightmap_coord;
             } f_in;
+            
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -1222,15 +1243,12 @@ namespace shaders
 \n                {
 \n                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
 \n                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.25, 0.05));
-\n                    vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
+\n                    vec3 cube_color = texture(envTex, refl_vec_world).rgb;
 \n                    result = mix(result, lightmap_color + cube_color + specular_color, fresnel * rainy_value);
 \n                }
 \n
-\n                //gl_FragColor = vec4( result,1.0);
 \n
-\n                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-\n
-\n                //gl_FragColor = vec4( shadow,shadow,shadow,1.0);  
+\n                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n            }
             )
 
@@ -1292,8 +1310,9 @@ namespace shaders
                 // SAVE_DECAL_VARYINGS_VP
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-                
+                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             }       
             )
         };
@@ -1462,7 +1481,7 @@ namespace shaders
  \n               {
  \n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
  \n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.45, 0.05));
- \n                   vec3 cube_color = textureCube(envTex, refl_vec_world).rgb;
+ \n                   vec3 cube_color = texture(envTex, refl_vec_world).rgb;
  \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
  \n               }
  \n
@@ -1470,7 +1489,6 @@ namespace shaders
 
 
  \n 
- \n              // aFragColor = vec4( result,1.0);
                  aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
               }
             )
@@ -1714,8 +1732,9 @@ namespace shaders
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
-
+                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
+                mat4 EyePlane =  transpose(shadowMatrix); 
+                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             }       
             )
         };
@@ -1753,6 +1772,7 @@ namespace shaders
                 vec4 lightmap_coord;
             } f_in;
 
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -1807,9 +1827,9 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + non_ambient_term) * dif_tex_col.rgb;
 
-                // gl_FragColor = vec4( result,dif_tex_col.a);
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                //gl_FragColor = vec4( shadow,shadow,shadow,1.0); 
+
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+
                 
             }
             )
@@ -1886,6 +1906,8 @@ namespace shaders
                 vec3 normal;
                 vec3 viewpos;
             } f_in;
+            
+            out vec4  aFragColor;
 
             void main (void)
             {
@@ -1903,9 +1925,7 @@ namespace shaders
                 vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb * 0.5;
                 
-                gl_FragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-                // gl_FragColor = vec4( result,dif_tex_col.a);
-                // gl_FragColor = vec4(SceneFogParams.rgb * (1-SceneFogParams.a),dif_tex_col.a);
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
             }
             )
 
@@ -1981,13 +2001,10 @@ namespace shaders
                 vec3 pos;                               
             } f_in;                                     
 			
+            out vec4  aFragColor;
+
             void main (void)                              
             {
-                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-				
-			
                 // vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;       
                 
@@ -2008,10 +2025,8 @@ namespace shaders
                 // pow(fHorizonFactor, 35.0 - 34.0 * fFogHeightRamp); 
 
                 // make fogging
-                gl_FragColor = vec4(SkyFogParams.rgb, fFogFactor); 
+                aFragColor = vec4(SkyFogParams.rgb, fFogFactor); 
 
-                //gl_FragColor = vec4( result,dif_tex_col.a);
-                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
 
@@ -2072,12 +2087,12 @@ namespace shaders
             const float fOneOver2Pi = 0.5 / 3.141593;
             const float fTwoOverPi = 2.0 / 3.141593;   
 
-            // varying vec3 lightDir;
-
             in block                                    
             {                                           
                 vec3 pos;                               
             } f_in;                                     
+            
+            out vec4  aFragColor;
 
             void main (void)                              
             {
@@ -2091,10 +2106,8 @@ namespace shaders
                 vec4 cl_color = textureLod(Clouds, vTexCoord, 0.0);
 
                 // make fogging
-                gl_FragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
+                aFragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
 
-                //gl_FragColor = vec4( result,dif_tex_col.a);
-                //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
             }
             )
 
@@ -2183,10 +2196,11 @@ namespace shaders
             
 
             // uniform sampler2D texCulturalLight;
+            out vec4  aFragColor;
 
             void main(void)                                                         
             {                                                                       
-                gl_FragColor = vec4(gl_Color.rgb, 1.0);//gl_Color.a * texture2D(texCulturalLight, gl_TexCoord[0].xy).r);                                               
+                aFragColor = vec4(gl_Color.rgb, 1.0);//gl_Color.a * texture2D(texCulturalLight, gl_TexCoord[0].xy).r);                                               
             }
 
             )
@@ -2263,7 +2277,7 @@ namespace shaders
                 flat vec2 cone_falloff;
             } f_in;
 
-            out vec4 FragColor; 
+            out vec4 aFragColor; 
 
             void main()
             {
@@ -2280,7 +2294,7 @@ namespace shaders
                 const float height_packed = -f_in.from_l.z;
                 const float angledist_atten = angle_atten * dist_atten;
                 const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);
-                FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);
+                aFragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);
             }
 
             )

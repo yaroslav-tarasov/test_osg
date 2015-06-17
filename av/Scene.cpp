@@ -455,7 +455,6 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     
     const int nAntialiasing = 8;
     
-
     if ( cTraitsPtr.valid())
     {
         cTraitsPtr->samples = nAntialiasing;
@@ -562,6 +561,20 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     addChild(_pickHandler->getOrCreateSelectionBox()); 
     
 
+    FIXME(140 shaders version needed);
+
+#if 0
+    osgViewer::Viewer::Windows windows;
+    _viewerPtr->getWindows(windows);
+    for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
+        itr != windows.end();
+        ++itr)
+    {
+        osg::State *s=(*itr)->getState();
+        s->setUseModelViewAndProjectionUniforms(true);
+        s->setUseVertexAttributeAliasing(true);
+    }
+#endif 
 
     //
     // Initialize particle engine
@@ -713,21 +726,21 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     
     light_map = createLightMapRenderer();
     addChild( light_map );
-    
-    
-    LightMapRenderer::SpotData  data;
 
-    data.angle_falloff = cg::range_2f();
-    data.dist_falloff = cg::range_2f(1.5f, 13.f);
+    //
+    //LightMapRenderer::SpotData  data;
 
-    data.spot_color = cg::colorf(1.,0.,0.);
+    //data.angle_falloff = cg::range_2f();
+    //data.dist_falloff = cg::range_2f(1.5f, 13.f);
 
-    const float heading = osg::DegreesToRadians(0.f);
-    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+    //data.spot_color = cg::colorf(1.,0.,0.);
 
-    data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
+    //const float heading = osg::DegreesToRadians(0.f);
+    //const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
-    light_map->AddSpotLight(data);
+    //data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
+
+    //light_map->AddSpotLight(data);
 
 
     return true;
