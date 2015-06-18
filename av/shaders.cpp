@@ -146,6 +146,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         uniform vec4 ambient;                                                                           \
         uniform vec4 diffuse;                                                                           \
         uniform vec4 specular;                                                                          \
+        uniform vec4 light_vec_view;                                                                    \
      )
 
 #define INCLUDE_UNIFORMS                                                                                \
@@ -287,7 +288,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         STRINGIFY ( 
         attribute vec3 tangent;
         attribute vec3 binormal;
-        varying   vec3 lightDir;
+        //varying   vec3 lightDir;
 
         out block
         {
@@ -307,7 +308,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
             // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
             // lightDir = normalize(rotation * normalize(lightDir));
-            lightDir = vec3(gl_LightSource[0].position.xyz);
+            //lightDir = vec3(gl_LightSource[0].position.xyz);
 
             gl_Position    = ftransform();
 
@@ -352,7 +353,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         
         uniform sampler2D colorTex;
         uniform sampler2D normalTex;
-        varying   vec3 lightDir;
+        //varying   vec3 lightDir;
         //varying   float illum; 
         
         
@@ -389,11 +390,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             //else if (split_test.z) 
             //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-            //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
-            //vec4  diffuse        = gl_LightSource[0].diffuse ;      // FIXME 
-            //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
-            vec4  light_vec_view = vec4(lightDir,1);
-            
+            //vec4  light_vec_view = vec4(lightDir,1);
             
             viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0)); 
             //viewworld_matrix = gl_ModelViewMatrixInverse; 
@@ -483,7 +480,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             STRINGIFY ( 
 
-            varying   vec3  lightDir;
+            //varying   vec3  lightDir;
 
             out block
             {
@@ -498,7 +495,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-                lightDir = vec3(gl_LightSource[0].position.xyz);;
+                //lightDir = vec3(gl_LightSource[0].position.xyz);;
                 gl_Position = ftransform();
 
                 v_out.normal    = normal;
@@ -535,7 +532,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             uniform sampler2D       colorTex;
             uniform sampler2D       nightTex;
-            varying   vec3          lightDir;
+            //varying   vec3          lightDir;
 
             in block
             {
@@ -554,7 +551,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 if(ambient.a > 0.35)
                     shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
-                vec4  light_vec_view = vec4(lightDir,1);
+                //vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
 
 
@@ -590,7 +587,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
            STRINGIFY ( 
            attribute vec3 tangent;
            attribute vec3 binormal;
-           varying   vec3 lightDir;
+           //varying   vec3 lightDir;
 
            out block
            {
@@ -610,7 +607,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                // lightDir = normalize(rotation * normalize(lightDir));
-               lightDir = vec3(gl_LightSource[0].position.xyz);
+               //lightDir = vec3(gl_LightSource[0].position.xyz);
                gl_Position = ftransform();
 
                v_out.tangent   = tangent;
@@ -648,7 +645,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
            uniform sampler2D colorTex;
            uniform sampler2D normalTex;
-           varying vec3 lightDir;
+           //varying vec3 lightDir;
 
            in block
            {
@@ -682,10 +679,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                //else if (split_test.z) 
                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-               //vec4  specular       = gl_LightSource[0].specular  ;     // FIXME 
-               //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
-               //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
-               vec4  light_vec_view = vec4(lightDir,1);
+               //vec4  light_vec_view = vec4(lightDir,1);
 
                viewworld_matrix = gl_ModelViewMatrixInverse;
                vec4 base = texture2D(colorTex, f_in.texcoord);
@@ -770,7 +764,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             STRINGIFY ( 
             
-            varying   vec3  lightDir;
+            //varying   vec3  lightDir;
 
             out block
             {
@@ -788,7 +782,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 //lightDir = normalize(rotation * normalize(lightDir));
-                lightDir = vec3(gl_LightSource[0].position.xyz);;
+                //lightDir = vec3(gl_LightSource[0].position.xyz);;
                 gl_Position = ftransform();
 
                 v_out.normal    = normal;
@@ -824,7 +818,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             uniform sampler2D           colorTex;
             uniform sampler2D           nightTex;
-            varying   vec3              lightDir;
+            //varying   vec3              lightDir;
 
             in block
             {
@@ -855,11 +849,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
-                //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
-                //vec4  ambient        = gl_LightSource[0].ambient ;      // FIXME 
-
-                vec4  light_vec_view = vec4(lightDir,1);
+                //vec4  light_vec_view = vec4(lightDir,1);
 
                 viewworld_matrix = gl_ModelViewMatrixInverse;
          
@@ -956,7 +946,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             STRINGIFY ( 
 
-            varying   vec3  lightDir;
+            //varying   vec3  lightDir;
 
             out block
             {
@@ -974,7 +964,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 //lightDir = normalize(rotation * normalize(lightDir));
-                lightDir = vec3(gl_LightSource[0].position.xyz);;
+                //lightDir = vec3(gl_LightSource[0].position.xyz);;
                 gl_Position = ftransform();
 
                 v_out.normal    = normal;
@@ -1008,7 +998,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             uniform sampler2D       colorTex;
             uniform sampler2D       nightTex;
-            varying   vec3          lightDir;
+            //varying   vec3          lightDir;
 
             in block
             {
@@ -1039,10 +1029,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                //vec4  specular       = gl_LightSource[0].specular ;     // FIXME 
-                //vec4  diffuse        = gl_LightSource[0].diffuse  ;      // FIXME 
-                //vec4  ambient        = gl_LightSource[0].ambient  ;      // FIXME 
-               vec4  light_vec_view = vec4(lightDir,1);
+               //vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
 
 
@@ -1072,7 +1059,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 			"#version 130 \n"
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
-
             INCLUDE_VS
             
             INCLUDE_UNIFORMS
@@ -1080,7 +1066,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            varying   vec3 lightDir;
+            //varying   vec3 lightDir;
             
             out block
             {
@@ -1101,7 +1087,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 // lightDir = normalize(rotation * normalize(lightDir));
-                lightDir = vec3(gl_LightSource[0].position.xyz);
+                //lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
 
                 
@@ -1147,7 +1133,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
-            varying vec3 lightDir;
+            //varying vec3 lightDir;
 
             in block
             {
@@ -1181,11 +1167,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //else if (split_test.z) 
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
-\n                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-\n                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-\n                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-
-\n                vec4  light_vec_view = vec4(lightDir,1);
+\n                // vec4  light_vec_view = vec4(lightDir,1);
 \n                viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                // specular.a = 0; // it's not rainy day hallelujah
@@ -1272,7 +1254,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            varying   vec3 lightDir;
+            //varying   vec3 lightDir;
             
             mat4 decal_matrix;
 
@@ -1295,7 +1277,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
-                lightDir = vec3(gl_LightSource[0].position.xyz);
+                //lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
 
                 v_out.normal    = normal;
@@ -1339,7 +1321,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
               STRINGIFY ( 
 \n
 \n            uniform sampler2D colorTex;
-\n            varying vec3 lightDir;
+\n            //varying vec3 lightDir;
 \n
 \n            in block
 \n            {
@@ -1373,11 +1355,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //else if (split_test.z) 
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
-\n                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-\n                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-\n                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 \n
-\n                vec4  light_vec_view = vec4(lightDir,1);
+\n                //vec4  light_vec_view = vec4(lightDir,1);
 \n                viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                //specular.a = 0; // it's not rainy day hallelujah
@@ -1709,7 +1688,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            varying   vec3 lightDir;
+            //varying   vec3 lightDir;
 
             out block
             {
@@ -1726,7 +1705,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
-                lightDir = vec3(gl_LightSource[0].position.xyz);
+                //lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
 
                 v_out.normal    = normal;
@@ -1761,7 +1740,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
-            varying vec3 lightDir;
+            //varying vec3 lightDir;
 
             in block
             {
@@ -1792,11 +1771,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
 
-                vec4  light_vec_view = vec4(lightDir,1);
+                //vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
                 // FIXME dummy code
 
@@ -1849,7 +1825,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            varying   vec3 lightDir;
+            //varying   vec3 lightDir;
 
             out block
             {
@@ -1862,7 +1838,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
-                lightDir = vec3(gl_LightSource[0].position.xyz);
+                //lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = ftransform();
 
                 v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
@@ -1898,7 +1874,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
-            varying vec3 lightDir;
+            //varying vec3 lightDir;
 
             in block
             {
@@ -1911,11 +1887,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)
             {
-                //vec4  specular       = gl_LightSource[0].specular;     // FIXME 
-                //vec4  diffuse        = gl_LightSource[0].diffuse;      // FIXME 
-                //vec4  ambient        = gl_LightSource[0].ambient;      // FIXME 
-
-                vec4  light_vec_view =  vec4(lightDir,1);
+                //vec4  light_vec_view =  vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;
                 // FIXME dummy code
 
@@ -1956,7 +1928,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 
                 v_out.pos = gl_Vertex.xyz;
-				    // perform conversion to post-projective space
+				// perform conversion to post-projective space
 
 				vec3 vLocalSpaceCamPos = gl_ModelViewMatrixInverse[3].xyz;
 				gl_Position = gl_ModelViewProjectionMatrix * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
@@ -1994,8 +1966,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                             
             const float fTwoOverPi = 2.0 / 3.141593;     
             
-            // varying vec3 lightDir;
-
             in block                                    
             {                                           
                 vec3 pos;                               
@@ -2005,7 +1975,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)                              
             {
-                // vec4  light_vec_view = vec4(lightDir,1);
                 viewworld_matrix = gl_ModelViewMatrixInverse;       
                 
                 // get point direction
@@ -2305,5 +2274,36 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         AUTO_REG_NAME(spot , shaders::spot_mat::get_shader)
 
     }  // ns light_mat
+
+    namespace todo
+    {
+        const char* uni_header = {
+        "#extension GL_ARB_uniform_buffer_object : enable\n"
+
+        "layout(std140) uniform colors0\n"
+        "{\n"
+        "float DiffuseCool;\n"
+        "float DiffuseWarm;\n"
+        "vec3  SurfaceColor;\n"
+        "vec3  WarmColor;\n"
+        "vec3  CoolColor;\n"
+        "};\n"
+
+        "layout (row_major, std140) uniform SceneParams           \
+        {                                                         \
+        mat4 projection_matrix;                               \
+        mat4 viewworld_matrix;                                \
+        mat4 lightmap_matrix;                                 \
+        mat4 decal_matrix;                                    \
+        mat4 shadow1_matrix;                                  \
+        mat4 shadow2_matrix;                                  \
+        vec4 shadow_split_borders;                            \
+        vec4 light_vec_view;                                  \
+        vec4 fog_params;                                      \
+        vec4 wind_time;                                       \
+        };"
+
+        } ;
+    }
 
 }  // ns shaders

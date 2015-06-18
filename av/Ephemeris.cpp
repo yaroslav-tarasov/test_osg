@@ -8,6 +8,7 @@
 #include <osgEphemeris/EphemerisModel.h>  
 
 #include "creators.h"
+#include "utils/callbacks.h"
 
 namespace avSky
 {
@@ -108,7 +109,11 @@ namespace avSky
             _ephem->_specularUniform->set(specular);
             _ephem->_ambientUniform->set(ambient);
             _ephem->_diffuseUniform->set(diffuse);
+            
+          
+            _ephem->_lightDirUniform->set( lightpos * _ephem->getModelViewMatrix() /*osg::Vec4(lightDir,1.)*/);
 
+                    
        }
 
         osgGA::GUIEventHandler* getHandler() {return _handler.get()/*.release()*/;};
@@ -313,7 +318,12 @@ namespace avSky
         // FIXME TODO secular.a wanna rain
         _specularUniform = new osg::Uniform("specular", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
         pSceneSS->addUniform(_specularUniform.get());
+        
+        _lightDirUniform = new osg::Uniform("light_vec_view", osg::Vec4f(0.f, 0.f, 0.f, 1.f));
+        pSceneSS->addUniform(_lightDirUniform.get());
 
+        // callbacks setup
+        setCullCallback(utils::makeNodeCallback(this, &Ephemeris::cull, true));
     }
 
     bool Ephemeris::Initialize()
@@ -419,5 +429,20 @@ namespace avSky
     osgGA::GUIEventHandler* Ephemeris::getEventHandler()
     {
         return  _d->_eCallback->getHandler();
+    }
+
+    // cull method
+    void Ephemeris::cull( osg::NodeVisitor * pNV )
+    {
+        // get cull visitor
+        osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
+        avAssert(pCV);
+        
+        _mv = *pCV->getModelViewMatrix();
+
+        // cull down
+
+        pNV->traverse(*this);
+
     }
 }
