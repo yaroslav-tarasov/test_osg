@@ -563,7 +563,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
     FIXME(140 shaders version needed);
 
-#if 0
+#if GLSL_VERSION > 130
     osgViewer::Viewer::Windows windows;
     _viewerPtr->getWindows(windows);
     for(osgViewer::Viewer::Windows::iterator itr = windows.begin();

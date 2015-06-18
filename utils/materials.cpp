@@ -3,6 +3,7 @@
 #include "av/shaders.h"
 #include "visitors/ct_visitor.h"
 #include "pugixml.hpp"
+#include "creators.h"
 
 namespace creators 
 {
@@ -258,29 +259,65 @@ texturesHolder_base&   getTextureHolder()
     return texturesHolder::getTextureHolder();
 }
 
+std::string osg_modification(uint16_t version, const std::string& prog)
+{
+      std::string source(prog);
+      if(version>130)
+      {   
+          const char* header = {
+          "uniform mat4 osg_ModelViewMatrix; \n"
+          "uniform mat4 osg_ModelViewProjectionMatrix; \n"
+          "uniform mat3 osg_NormalMatrix; \n"
+          "in vec4 osg_Vertex;\n"
+          "in vec3 osg_Normal;\n"
+          "in vec4 osg_Color;\n"
+          "in vec2 osg_MultiTexCoord0; \n"
+          "in vec2 osg_MultiTexCoord1; \n"
+          };
+
+          source = header + source;
+
+          utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"));
+          utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"));
+          utils::replaceAll(source,std::string("gl_ModelViewMatrix"), std::string("osg_ModelViewMatrix"));
+          utils::replaceAll(source,std::string("gl_ModelViewProjectionMatrix"), std::string("osg_ModelViewProjectionMatrix"));
+          utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"));
+          
+      }
+
+      return source;
+}
+
 class programsHolder: public programsHolder_base
 {
 
 public:
     static inline const program_t& Create(std::string mat_name)
     {
+        const uint16_t version = GLSL_VERSION;
+        
         if(GetPrograms().find(mat_name)==GetPrograms().end())
         {
             program_t p;
             p.program = new osg::Program;
             p.program->setName(mat_name);
+            
             if(GetShader(shaders::VS,mat_name))
             {
-                auto vs = new osg::Shader( osg::Shader::VERTEX,  GetShader(shaders::VS,mat_name));
+                std::string prog = "#version " + boost::lexical_cast<string>(version) + "\n " + osg_modification(version,*GetShader(shaders::VS,mat_name));
+                auto vs = new osg::Shader( osg::Shader::VERTEX, prog );
                 p.program->addShader( vs );
 
             }
+
             //std::string fs_shader(GetShader(shaders::FS,mat_name));
             //fs_shader.replace('','');
             if(GetShader(shaders::FS,mat_name))
             {
-                auto fs = new osg::Shader(osg::Shader::FRAGMENT, GetShader(shaders::FS,mat_name));
+                std::string prog = "#version " + boost::lexical_cast<string>(version) + "\n " + osg_modification(version,*GetShader(shaders::FS,mat_name));
+                auto fs = new osg::Shader(osg::Shader::FRAGMENT, prog);
                 p.program->addShader( fs );
+                
             }
 
             p.program->addBindAttribLocation( "tangent" , 6 );
@@ -293,8 +330,18 @@ public:
     }
 
 private:
+    
+    static inline boost::optional<std::string> GetShader(const shaders::shader_t& t, const std::string& mat_name)
+    {
+            const char* shader = GetShader_internal( t,  mat_name);
 
-    static inline const char* GetShader(shaders::shader_t t, std::string mat_name)
+            if(shader)
+                return std::string(shader);
+
+            return boost::none;
+    }
+
+    static inline const char* GetShader_internal(const shaders::shader_t& t, const std::string& mat_name)
     {
         std::string mat_name_cut = mat_name.substr(0, mat_name.find("_"));
 

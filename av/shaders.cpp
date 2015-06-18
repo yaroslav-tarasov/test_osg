@@ -19,6 +19,8 @@ namespace shaders
 
     namespace include_mat
     {
+#define  GLSL_VERSION  
+        //"#version 130 \n"
 
 #define  SHADERS_GETTER                            \
         const char* get_shader(shader_t t)         \
@@ -161,6 +163,15 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         uniform vec4                SceneFogParams;                                                     \
         )
 
+#define INCLUDE_COMPABILITY \
+     STRINGIFY(             \
+        in vec4 osg_Vertex; \
+        in vec3 osg_Normal; \
+     )
+
+#undef INCLUDE_COMPABILITY
+#define INCLUDE_COMPABILITY
+
 #define INCLUDE_DL                                                                                       \
     STRINGIFY (                                                                                          \
     \
@@ -280,15 +291,18 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
     const char* vs = {
-		"#version 130 \n"
+		GLSL_VERSION
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
         INCLUDE_VS
+        
+        INCLUDE_COMPABILITY
 
         STRINGIFY ( 
         attribute vec3 tangent;
         attribute vec3 binormal;
         //varying   vec3 lightDir;
+        out mat4 viewworld_matrix;
 
         out block
         {
@@ -310,7 +324,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             // lightDir = normalize(rotation * normalize(lightDir));
             //lightDir = vec3(gl_LightSource[0].position.xyz);
 
-            gl_Position    = ftransform();
+            gl_Position    = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
 
             v_out.tangent   = tangent;
@@ -322,13 +336,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             mat4 EyePlane =  transpose(shadowMatrix); 
             v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
+            
+            viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
+            //viewworld_matrix = inverse(gl_ModelViewMatrix); 
         }
     )
     };
 
 
     const char* fs = {
-        "#version 130 \n"
+        GLSL_VERSION
         "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
         
@@ -338,7 +355,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     
         // layout(early_fragment_tests) in;
 
-        mat4 viewworld_matrix;
+        in mat4 viewworld_matrix;
         )
 
         INCLUDE_FUNCS
@@ -392,7 +409,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             //vec4  light_vec_view = vec4(lightDir,1);
             
-            viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0)); 
+            //viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0)); 
             //viewworld_matrix = gl_ModelViewMatrixInverse; 
             // 
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
@@ -473,14 +490,17 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
         const char* vs = {  
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+            
+            INCLUDE_COMPABILITY
 
             STRINGIFY ( 
 
             //varying   vec3  lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -496,7 +516,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
                 //lightDir = vec3(gl_LightSource[0].position.xyz);;
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
@@ -504,20 +524,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
             }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-            mat4 viewworld_matrix;
+            in mat4 viewworld_matrix;
             )
 
             INCLUDE_FUNCS
@@ -552,7 +573,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                     shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
                 //vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+                // viewworld_matrix = gl_ModelViewMatrixInverse;
 
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
@@ -579,15 +600,17 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace default_mat 
     {
        const char* vs = {  
-		   "#version 130 \n"
+		   GLSL_VERSION
            "#extension GL_ARB_gpu_shader5 : enable \n"
 
            INCLUDE_VS
+           INCLUDE_COMPABILITY
 
            STRINGIFY ( 
            attribute vec3 tangent;
            attribute vec3 binormal;
            //varying   vec3 lightDir;
+           out mat4 viewworld_matrix;
 
            out block
            {
@@ -608,7 +631,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                // lightDir = normalize(rotation * normalize(lightDir));
                //lightDir = vec3(gl_LightSource[0].position.xyz);
-               gl_Position = ftransform();
+               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                v_out.tangent   = tangent;
                v_out.binormal  = binormal;
@@ -618,20 +641,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                mat4 EyePlane =  transpose(shadowMatrix); 
                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+               viewworld_matrix = inverse(gl_ModelViewMatrix);
            }       
        )
        };
 
 
        const char* fs = {
-       "#version 130 \n"
+       GLSL_VERSION
        "#extension GL_ARB_gpu_shader5 : enable \n "
         
        INCLUDE_UNIFORMS
 
        STRINGIFY ( 
 
-           mat4 viewworld_matrix;
+           in mat4 viewworld_matrix;
        )
        
        INCLUDE_FUNCS
@@ -681,7 +705,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
                //vec4  light_vec_view = vec4(lightDir,1);
 
-               viewworld_matrix = gl_ModelViewMatrixInverse;
+               //viewworld_matrix = gl_ModelViewMatrixInverse;
                vec4 base = texture2D(colorTex, f_in.texcoord);
                vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
                //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
@@ -757,14 +781,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace building_mat 
     {
         const char* vs = {  
-			"#version 130 \n"
+			GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS
+            INCLUDE_COMPABILITY
 
             STRINGIFY ( 
             
             //varying   vec3  lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -783,7 +809,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 //lightDir = normalize(rotation * normalize(lightDir));
                 //lightDir = vec3(gl_LightSource[0].position.xyz);;
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
@@ -791,20 +817,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
             }       
             )
         };
 
 
         const char* fs = { 
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-             mat4 viewworld_matrix;
+             in mat4 viewworld_matrix;
             )
 
             INCLUDE_FUNCS
@@ -851,7 +878,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
                 //vec4  light_vec_view = vec4(lightDir,1);
 
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+                //viewworld_matrix = gl_ModelViewMatrixInverse;
          
 
                 // get dist to point and normalized to-eye vector
@@ -928,7 +955,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-    SHADERS_GETTER
+        SHADERS_GETTER
 
         AUTO_REG_NAME(building, shaders::building_mat::get_shader)
 
@@ -939,14 +966,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace tree_mat 
     {
         const char* vs = {  
-			"#version 130 \n"
+			GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+            INCLUDE_COMPABILITY
 
             STRINGIFY ( 
 
             //varying   vec3  lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -965,7 +994,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 //lightDir = normalize(rotation * normalize(lightDir));
                 //lightDir = vec3(gl_LightSource[0].position.xyz);;
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
@@ -973,20 +1002,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
             }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-             mat4 viewworld_matrix;
+             in mat4 viewworld_matrix;
             )
             
             INCLUDE_FUNCS
@@ -1030,7 +1060,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
                //vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+                //viewworld_matrix = gl_ModelViewMatrixInverse;
 
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
@@ -1056,18 +1086,20 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace ground_mat 
     {
         const char* vs = {
-			"#version 130 \n"
+			GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
+            
 
             INCLUDE_VS
-            
+            INCLUDE_COMPABILITY
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             //varying   vec3 lightDir;
-            
+            out mat4 viewworld_matrix;
+
             out block
             {
                 vec2 texcoord;
@@ -1088,7 +1120,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
                 // lightDir = normalize(rotation * normalize(lightDir));
                 //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 
                 v_out.normal    = normal;
@@ -1107,20 +1139,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-           }       
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+            }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-           mat4 viewworld_matrix;
+           in mat4 viewworld_matrix;
             )
             
             INCLUDE_FUNCS
@@ -1168,7 +1201,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
 \n                // vec4  light_vec_view = vec4(lightDir,1);
-\n                viewworld_matrix = gl_ModelViewMatrixInverse;
+\n                //viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                // specular.a = 0; // it's not rainy day hallelujah
 \n
@@ -1246,16 +1279,19 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
     namespace concrete_mat 
     {
-        const char* vs = {  
+        const char* vs = {
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+            INCLUDE_COMPABILITY
 
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             //varying   vec3 lightDir;
-            
+            out mat4 viewworld_matrix;
+
             mat4 decal_matrix;
 
             out block
@@ -1278,7 +1314,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
                 //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
                 v_out.tangent   = tangent;
@@ -1295,12 +1331,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
             }       
             )
         };
 
         const char* fs = { 
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             INCLUDE_UNIFORMS
@@ -1308,7 +1345,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
 \n
-\n            mat4 viewworld_matrix;
+\n            in mat4 viewworld_matrix;
 \n            )
             
               INCLUDE_FUNCS
@@ -1357,7 +1394,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n
 \n
 \n                //vec4  light_vec_view = vec4(lightDir,1);
-\n                viewworld_matrix = gl_ModelViewMatrixInverse;
+\n                //viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                //specular.a = 0; // it's not rainy day hallelujah
 \n
@@ -1596,7 +1633,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 ecPosition = gl_ModelViewMatrix * gl_Vertex;
 
                 // Do fixed functionality vertex transform
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
                 transformedNormal = fnormal();
                 flight(transformedNormal, ecPosition, alphaFade);
             }
@@ -1613,7 +1650,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main (void)
             {
                vec4 posEye    =  gl_ModelViewMatrix * gl_Vertex;
-               gl_Position    =  gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex; //ftransform();                       
+               gl_Position    =  gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;                        
                gl_TexCoord[0] =  gl_MultiTexCoord1;                  
                gl_FrontColor  =  gl_Color;                          
                gl_BackColor   =  gl_Color;                          
@@ -1681,14 +1718,18 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace railing_mat 
     {
         const char* vs = {  
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
+
             INCLUDE_VS
+            INCLUDE_COMPABILITY
 
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             //varying   vec3 lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -1706,7 +1747,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
                 //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
                 v_out.viewpos   = vertexInEye.xyz;
@@ -1714,20 +1755,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
             }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
 
-            mat4 viewworld_matrix;
+            in mat4 viewworld_matrix;
             )
 
             INCLUDE_FUNCS
@@ -1773,7 +1815,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
                 //vec4  light_vec_view = vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+               // viewworld_matrix = gl_ModelViewMatrixInverse;
                 // FIXME dummy code
 
                 vec3 normal = normalize(f_in.normal);
@@ -1821,11 +1863,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace panorama_mat 
     {
         const char* vs = {  
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
+            
+            INCLUDE_COMPABILITY
+
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             //varying   vec3 lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -1839,19 +1886,19 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
                 //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = ftransform();
-
-                v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+                v_out.normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+                //v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-
             }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -1859,7 +1906,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
             uniform vec4                fog_params; 
-            mat4 viewworld_matrix;
+            in mat4 viewworld_matrix;
 
             )
 
@@ -1888,7 +1935,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main (void)
             {
                 //vec4  light_vec_view =  vec4(lightDir,1);
-                viewworld_matrix = gl_ModelViewMatrixInverse;
+                //viewworld_matrix = gl_ModelViewMatrixInverse;
                 // FIXME dummy code
 
                 vec3 normal = normalize(f_in.normal);
@@ -1911,12 +1958,17 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
     namespace sky_fog_mat 
     {
-        const char* vs = {  
+        const char* vs = { 
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            INCLUDE_COMPABILITY
+
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
             //varying   vec3 lightDir;
+            out mat4 viewworld_matrix;
 
             out block
             {
@@ -1929,19 +1981,22 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 
                 v_out.pos = gl_Vertex.xyz;
 				// perform conversion to post-projective space
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
 
-				vec3 vLocalSpaceCamPos = gl_ModelViewMatrixInverse[3].xyz;
+                vec3 vLocalSpaceCamPos = viewworld_matrix[3].xyz;
+				//vec3 vLocalSpaceCamPos = gl_ModelViewMatrixInverse[3].xyz;
 				gl_Position = gl_ModelViewProjectionMatrix * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
 
 				gl_Position.z = 0.0;
                 //gl_Position.z = gl_Position.w;
+
             }       
             )
         };
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable  \n"
             
             INCLUDE_SCENE_PARAM
@@ -1957,7 +2012,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             uniform vec4                SkyFogParams;  
             
 
-            mat4 viewworld_matrix;                       
+            in mat4 viewworld_matrix;                       
 			                                            
             )
 
@@ -1975,8 +2030,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)                              
             {
-                viewworld_matrix = gl_ModelViewMatrixInverse;       
-                
+                //viewworld_matrix = gl_ModelViewMatrixInverse;       
+
+
                 // get point direction
                 vec3 vPnt = normalize(f_in.pos.xyz);                
 
@@ -2011,8 +2067,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            STRINGIFY ( 
 
+            INCLUDE_COMPABILITY
+
+            STRINGIFY ( 
             uniform mat4 MVP;
             out block
             {
@@ -2022,7 +2080,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 v_out.pos = gl_Vertex.xyz;
-                mat4 im = inverse(gl_ModelViewMatrix*MVP);
+                mat4 im = inverse(gl_ModelViewMatrix * MVP);
                 vec3 vLocalSpaceCamPos = im[3].xyz;//gl_ModelViewMatrixInverse[3].xyz;
 
                // gl_Position = gl_ModelViewProjectionMatrix   * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
@@ -2035,7 +2093,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable  \n"
 
             STRINGIFY ( 
@@ -2093,9 +2151,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         const char* vs = { 
             INCLUDE_VS
-
             INCLUDE_UNIFORMS
-
+            INCLUDE_COMPABILITY
             INCLUDE_FUNCS
 
             STRINGIFY ( 
@@ -2185,7 +2242,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
         const char* vs = { 
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -2230,7 +2287,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         const char* fs = { 
 
-            "#version 130 \n"
+            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS

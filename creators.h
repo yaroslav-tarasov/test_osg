@@ -148,3 +148,5 @@ namespace spark
     spark_pair_t create(spark_t effectType,osg::Transform* model=nullptr);
 }
 
+
+#define GLSL_VERSION  130

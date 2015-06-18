@@ -236,7 +236,7 @@ namespace
 \n             v_out.shadow_view = shadow0_matrix*gl_Vertex;  
 \n             gl_Position     = ftransform();
 \n             v_out.color     = gl_Vertex;
-               gl_TexCoord[0] = gl_MultiTexCoord0;
+               gl_TexCoord[0]  = gl_MultiTexCoord0;
 \n         }
          )
 
