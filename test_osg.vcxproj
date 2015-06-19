@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
+    <ClInclude Include="av\Utils.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
@@ -131,8 +132,17 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="av\avSky\CelestialBodies.cpp" />
+    <ClCompile Include="av\avSky\DateTime.cpp" />
+    <ClCompile Include="av\avSky\EphemerisEngine.cpp" />
+    <ClCompile Include="av\avSky\EphemerisModel.cpp" />
+    <ClCompile Include="av\avSky\Moon.cpp" />
+    <ClCompile Include="av\avSky\Sky.cpp" />
+    <ClCompile Include="av\avSky\SkyDome.cpp" />
+    <ClCompile Include="av\avSky\StarField.cpp" />
     <ClCompile Include="av\av_scene.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
+    <ClCompile Include="av\Environment.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />
     <ClCompile Include="av\FogLayer.cpp" />
@@ -149,6 +159,7 @@
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
+    <ClCompile Include="av\Utils.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
     <ClCompile Include="creators.cpp" />

@@ -46,8 +46,6 @@
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
 
-
-
 #include "nfi/fn_reg.h"
 
 #include "common/meta.h"
@@ -69,9 +67,55 @@ inline T cbrt(T n)
         return -std::pow(n, 1/3.);
 }
 
+namespace cg
+{
+    template<typename T, typename D>
+    __forceinline D lerp_clamp( const T x, const T x0, const T x1, const D & y0, const D & y1 )
+    {
+        if (x <= x0)
+            return y0;
+        else if (x < x1)
+            return lerp( x0, x1, y0, y1)(x);
+        else
+            return y1;
+    }
+
+    template<typename T> __forceinline T slerp01( const T x )
+    {
+        return (T(3) - T(2) * x) * x * x;
+    };
+}
+
+
 #define Assert(x) if(x){};
 #define avAssert(x) assert(x)
 
+enum render_order_t {
+    RENDER_BIN_SCENE                    =  0,
+    // rendered first - sky-dome, stars, clouds, etc...
+    RENDER_BIN_SKYDOME                  = -5, // global sky dome
+    RENDER_BIN_STARS                    = -4, // stars
+    RENDER_BIN_SUN_MOON                 = -3, // sun. moon and other planet
+    RENDER_BIN_CLOUDS                   = -2, // sky clouds
+    RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
+
+};
+
+enum masks_t{
+    NODE_STARFIELD_MASK                 = 0x2
+};
+
+namespace avSky
+{
+    enum cloud_type
+    {
+        none,
+        cloudy,
+        cirrus,
+        overcast,
+        clouds_types_num
+    } clouds_type;
+}
 
 #include "common/points.h"
 #include "common/util.h"

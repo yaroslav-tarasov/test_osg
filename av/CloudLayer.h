@@ -9,14 +9,7 @@ namespace avSky
 class CloudsLayer : public osg::Geode
 {
 public:
-    enum cloud_type
-    {
-        none,
-        cloudy,
-        cirrus,
-        overcast,
-        clouds_types_num
-    } clouds_type;
+
 
 public:
 

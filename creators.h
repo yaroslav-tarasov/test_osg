@@ -130,15 +130,6 @@ namespace utils
     std::string format( std::string const & str );
 }
 
-enum render_order_t {
-    RENDER_BIN_SCENE                    =  0,
-    RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
-    RENDER_BIN_CLOUDS                   = -2, 
-};
-
-enum masks_t{
-    NODE_STARFIELD_MASK                 = 0x2
-};
 
 namespace spark
 {   
@@ -149,4 +140,4 @@ namespace spark
 }
 
 
-#define GLSL_VERSION  130
+#define GLSL_VERSION  140

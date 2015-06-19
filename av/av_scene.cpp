@@ -4,8 +4,6 @@
 #include "creators.h"
 #include "av/Terrain.h"
 
-void fill_navids(std::string file,   point_3f const& offset);
-
 int av_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
@@ -34,6 +32,8 @@ int av_scene( int argc, char** argv )
 
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\sky");
+    
 
     //do
     //{

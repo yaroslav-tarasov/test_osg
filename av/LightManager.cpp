@@ -67,7 +67,7 @@ LightManager * LightManager::GetInstance()
 
 
 #if 0
-void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageStream & stream )
+void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStream & stream )
 {
     avAssert(name != NULL);
 
@@ -85,12 +85,12 @@ void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageSt
     {
     case CreateDynamicLight:
         {
-            const unsigned lightID = stream.get<svCore::uint32>();
+            const unsigned lightID = stream.get<utils::uint32_t>();
 
             Light & light = m_LightsMap[lightID];
 
-            const unsigned objectID = stream.get<svCore::uint32>();
-            svDynamicObject::VisualDynamicObject * dynamicObject = svCore::ObjectManager::GetInstance()->GetObjectByID<svDynamicObject::VisualDynamicObject>(svCore::ObjectBase::OBJECT_DYNAMIC, objectID);
+            const unsigned objectID = stream.get<utils::uint32_t>();
+            svDynamicObject::VisualDynamicObject * dynamicObject = utils::ObjectManager::GetInstance()->GetObjectByID<svDynamicObject::VisualDynamicObject>(utils::ObjectBase::OBJECT_DYNAMIC, objectID);
             avAssert(dynamicObject != NULL);
             light.transform = dynamicObject->GetVisualModel();
 
@@ -110,7 +110,7 @@ void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageSt
 
     case DeleteDynamicLight:
         {
-            const unsigned lightID = stream.get<svCore::uint32>();
+            const unsigned lightID = stream.get<utils::uint32_t>();
 
             LightsMap::const_iterator it = m_LightsMap.find(lightID);
             avAssert(it != m_LightsMap.end());
@@ -121,7 +121,7 @@ void LightManager::OnEvent( const char * name, svCore::MessageManager::MessageSt
 
     case UpdateDynamicLight:
         {
-            const unsigned lightID = stream.get<svCore::uint32>();
+            const unsigned lightID = stream.get<utils::uint32_t>();
             avAssert(m_LightsMap.find(lightID) != m_LightsMap.end());
 
             Light & light = m_LightsMap[lightID];
@@ -205,7 +205,7 @@ void LightManager::update( osg::NodeVisitor * nv )
             continue;
       
 #if 0
-        osg::Matrix matrix = light.transform->getMatrix() * svCore::GetCoordinateSystem()->GetLCS2LTPMatrix();
+        osg::Matrix matrix = light.transform->getMatrix() * utils::GetCoordinateSystem()->GetLCS2LTPMatrix();
         matrix4d transform = matrix4d(matrix.ptr(), matrix::unscaled).transpose();
 #else
         

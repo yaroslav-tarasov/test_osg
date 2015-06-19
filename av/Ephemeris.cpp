@@ -125,7 +125,7 @@ namespace avSky
         public:  
             handler(Ephemeris *ephem) 
                 : _ephem(ephem) 
-                , _currCloud  (avSky::CloudsLayer::cirrus)
+                , _currCloud  (avSky::cirrus)
                 , _intensivity(0.1)
             {}
 
@@ -144,9 +144,9 @@ namespace avSky
                         if(_skyClouds)
                         {
                             int cc = _currCloud;cc++;
-                            _currCloud = static_cast<avSky::CloudsLayer::cloud_type>(cc);
-                            if(_currCloud >= avSky::CloudsLayer::clouds_types_num)
-                                _currCloud = avSky::CloudsLayer::none;
+                            _currCloud = static_cast<avSky::cloud_type>(cc);
+                            if(_currCloud >= avSky::clouds_types_num)
+                                _currCloud = avSky::none;
 
                             _skyClouds->setCloudsTexture(_currCloud);
                         }
@@ -288,7 +288,7 @@ namespace avSky
 
         private:
             osg::ref_ptr<Ephemeris>                           _ephem;
-            avSky::CloudsLayer::cloud_type                    _currCloud;
+            avSky::cloud_type                    _currCloud;
             float                                             _intensivity;
         };
 
@@ -362,7 +362,6 @@ namespace avSky
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );
 
-        FIXME(Env renderer turned off)
 #ifndef TEST_EVN_CUBE_MAP   // Environment to cube map renderer 
         osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
         fbo_node->addChild(_d->_ephemerisModel.get());

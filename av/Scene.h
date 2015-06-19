@@ -13,6 +13,7 @@
 namespace avSky
 {
     class Ephemeris;
+    class Sky;
 }
 
 namespace avTerrain
@@ -80,6 +81,7 @@ namespace avScene {
         osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
         osg::ref_ptr<osg::Group>                    _commonNode;
         osg::ref_ptr<osg::Group>                    _environmentNode;
+        osg::ref_ptr<avSky::Sky>                    _Sky;
         osg::ref_ptr<avSky::Ephemeris>              _ephemerisNode;
         osg::ref_ptr<osg::Group>                    _weatherNode;
         osg::ref_ptr<avTerrain::Terrain>            _terrainNode; 

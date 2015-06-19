@@ -310,6 +310,18 @@ namespace bi
         }
         
         {
+            // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
+            cg::point_3 vpos(300,600,0);
+            decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
+            geo_position agp(target_pos, ::get_base());
+
+            aircraft::settings_t as;
+            as.kind = "A319";//"A333";
+            //geo_position agp(apos,quaternion(cpr(60,0,0)));
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+        }
+
+        {
             cg::point_3 vpos(250,650,0);
             decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
             geo_position agp(target_pos, ::get_base());
