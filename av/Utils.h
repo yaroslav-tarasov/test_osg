@@ -16,7 +16,7 @@ namespace utils
     void        PostprocessModel( osg::Node* pNode );
     void        SetDynamicNode( osg::Node* pNode, bool bDynamicChildren = true );
     void        RemoveNodeFromAllParents( osg::Node* pNode );
-    bool        SetTextureUniform( const char* szTextureName, const char* szUniformName, int nID, osg::StateSet* pStateSet, osg::Texture::WrapMode eWrapMode = osg::Texture::REPEAT );
+    bool        SetTextureUniform( const char* szTextureName, const char* szUniformName, int nID, osg::StateSet* pStateSet, osg::Texture::WrapMode eWrapMode = osg::Texture::REPEAT, const osgDB::Options* options = nullptr);
     float       GetScreenClarity( osgUtil::CullVisitor * pCV );
     bool        IsPowerOf2( unsigned int nValue );
     bool        CheckIfAFileExists( const std::string& cAbsolutePath );

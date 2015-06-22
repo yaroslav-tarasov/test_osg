@@ -17,7 +17,7 @@ public:
             _selectionBox->addChild( geode.get() );
             
             osg::StateSet* ss = _selectionBox->getOrCreateStateSet();
-            ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+            ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED );
             ss->setAttributeAndModes( new osg::PolygonMode(
                 osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE) );
         }

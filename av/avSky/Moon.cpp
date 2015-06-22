@@ -59,11 +59,11 @@ void MoonSphere::_buildGeometry()
     pMoonTexCoords->setDataVariance(osg::Object::STATIC);
     pMoonGeom->setTexCoordArray(0, pMoonTexCoords);
     osg::ref_ptr<osg::Vec3Array> pMoonTangents = new osg::Vec3Array();
-    pMoonGeom->setVertexAttribBinding(5, osg::Geometry::BIND_PER_VERTEX);
-    pMoonGeom->setVertexAttribArray(5, pMoonTangents.get());
+    //pMoonGeom->setVertexAttribBinding(5, osg::Geometry::BIND_PER_VERTEX);
+    pMoonGeom->setVertexAttribArray(5, pMoonTangents.get(), osg::Array::BIND_PER_VERTEX);
     osg::ref_ptr<osg::Vec3Array> pMoonBiTangents = new osg::Vec3Array();
-    pMoonGeom->setVertexAttribBinding(6, osg::Geometry::BIND_PER_VERTEX);
-    pMoonGeom->setVertexAttribArray(6, pMoonBiTangents.get());
+    //pMoonGeom->setVertexAttribBinding(6, osg::Geometry::BIND_PER_VERTEX);
+    pMoonGeom->setVertexAttribArray(6, pMoonBiTangents.get(), osg::Array::BIND_PER_VERTEX);
 
     // fill them
     pMoonVerts->resize(g_uTotalVertsNum);

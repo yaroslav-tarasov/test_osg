@@ -17,8 +17,8 @@ Sky::Sky( osg::Group * pScene )
     // addChild(_cSkydomePtr.get());
 
     // Create clouds
-    _cCloudsPtr = new avSky::CloudsLayer(pScene);
-    addChild(_cCloudsPtr.get());
+    //_cCloudsPtr = new avSky::CloudsLayer(pScene);
+    //addChild(_cCloudsPtr.get());
 
     // global sky state-set
     osg::StateSet * pSkyStateSet = getOrCreateStateSet();
@@ -35,7 +35,9 @@ Sky::Sky( osg::Group * pScene )
 
     osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
     fbo_node->addChild(_cSkydomePtr.get());
-    /*pScene->asGroup()->*/addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+    // fbo_node->addChild(_cCloudsPtr.get());
+
+    addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 
     //setStarFieldMask(NODE_STARFIELD_MASK);
 
@@ -63,3 +65,4 @@ osg::LightSource* Sky::getSunLightSource()
 {
     return _cSkydomePtr->getSunLightSource(); 
 }
+

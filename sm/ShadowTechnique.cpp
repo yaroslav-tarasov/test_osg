@@ -32,9 +32,10 @@ void ShadowTechnique::CameraCullCallback::operator()(osg::Node*, osg::NodeVisito
     }
 }
 
-ShadowTechnique::ShadowTechnique():
-    _shadowedScene(0),
-    _dirty(true)
+ShadowTechnique::ShadowTechnique()
+    : _shadowedScene(0)
+    , _dirty(true)
+    , _nightMode(false)
 {
 }
 
@@ -42,7 +43,6 @@ ShadowTechnique::ShadowTechnique(const ShadowTechnique& copy, const osg::CopyOp&
     : osg::Object(copy,copyop)
     , _shadowedScene(0)
     , _dirty(true)
-    , _nightMode(false)
 {
 }
 

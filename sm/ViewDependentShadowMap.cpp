@@ -734,7 +734,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
     if (!_shadowCastingStateSet || _nightMode)
     {
-        OSG_INFO<<"Warning, init() has not yet been called so ShadowCastingStateSet has not been setup yet, unable to create shadows."<<std::endl;
+        if(!_nightMode )
+            OSG_INFO<<"Warning, init() has not yet been called so ShadowCastingStateSet has not been setup yet, unable to create shadows."<<std::endl;
+        
         _shadowedScene->osg::Group::traverse(cv);
         return;
     }

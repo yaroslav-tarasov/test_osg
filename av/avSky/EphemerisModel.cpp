@@ -5,6 +5,8 @@
 #include "EphemerisModel.h"
 #include "av/Environment.h"
 
+#include "av/CloudLayer.h"
+
 //
 // Global namespaces
 //
@@ -36,12 +38,17 @@ EphemerisModel::EphemerisModel( osg::Group * scene )
 
     // set our update callback
     setUpdateCallback(utils::makeNodeCallback(this, &EphemerisModel::update));
+   
+    setCullCallback(utils::makeNodeCallback(this, &EphemerisModel::cull, true));
+
 
     // create skydome, etc
     _initialize();
 
     // set default settings
     _setDefault();
+
+    
 }
 
 
@@ -70,10 +77,31 @@ bool EphemerisModel::_initialize()
     _skyStarField = new StarField();
     addChild(_skyStarField.get());
 
+    // clouds
+
+    // Create clouds
+    _skyClouds = new avSky::CloudsLayer(_scene);
+    addChild(_skyClouds.get());
+
+     osg::StateSet * pSceneSS = _scene->getOrCreateStateSet();
+
     // illumination uniform
     _uniformSunIntensity = new osg::Uniform("sunIntensity", float(1.0f));
-    _scene->getOrCreateStateSet()->addUniform(_uniformSunIntensity.get());
+    pSceneSS->addUniform(_uniformSunIntensity.get());
 
+    _ambientUniform = new osg::Uniform("ambient", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
+    pSceneSS->addUniform(_ambientUniform.get());
+
+    _diffuseUniform = new osg::Uniform("diffuse", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
+    pSceneSS->addUniform(_diffuseUniform.get());
+
+    // FIXME TODO secular.a wanna rain
+    _specularUniform = new osg::Uniform("specular", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
+    pSceneSS->addUniform(_specularUniform.get());
+
+    _lightDirUniform = new osg::Uniform("light_vec_view", osg::Vec4f(0.f, 0.f, 0.f, 1.f));
+    pSceneSS->addUniform(_lightDirUniform.get());
+    
     return true;
 }
 
@@ -138,6 +166,23 @@ void EphemerisModel::setHumidityTemperature( float humidity, float skytemperatur
     _skyDome->setTemperature(temperature);
 }
 
+// cull method
+void EphemerisModel::cull( osg::NodeVisitor * pNV )
+{
+    // get cull visitor
+    osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
+    avAssert(pCV);
+
+    _mv = *pCV->getModelViewMatrix();
+
+    // cull down
+    
+    FIXME(Хорошее место, но есть лучше);
+    FrameCall();
+    pNV->traverse(*this);
+
+}
+
 void EphemerisModel::update( osg::NodeVisitor * nv )
 {
     if (_needsToUpdate)
@@ -152,6 +197,8 @@ void EphemerisModel::update( osg::NodeVisitor * nv )
         // update stars
         _updateStars();
 
+        _updateClouds();
+        
         // update sky
         _skyDome->updateSkyTexture();
 
@@ -221,7 +268,18 @@ void EphemerisModel::_updateStars()
         );
     }
 }
- 
+
+void EphemerisModel::_updateClouds()
+{
+    if(_skyClouds.valid())
+    {
+        const float fCloudLum = cg::max(0.06f, _illumination);
+        _skyClouds->setCloudsColors(osg::Vec3f(fCloudLum,fCloudLum,fCloudLum), osg::Vec3f(fCloudLum,fCloudLum,fCloudLum));
+
+        _skyClouds->setRotationSiderealTime(-float(fmod(localSiderealTime / 24.0, 1.0)) * 360.0f);
+    }
+}
+
 void EphemerisModel::_calculateIllumFactors()
 {
     // saving sun vector for future purposes
@@ -230,7 +288,7 @@ void EphemerisModel::_calculateIllumFactors()
 
     // just save calculated illumination
     _illumination = _skyDome->getIllumination();
-    _uniformSunIntensity->set(_illumination);
+    //_uniformSunIntensity->set(_illumination);
 
     // setting the GL light
     osg::Light & light = *(_sunLightSource->getLight());
@@ -257,6 +315,12 @@ void EphemerisModel::_calculateIllumFactors()
     // position = position * utils::GetCoordinateSystem()->GetLTP2LCSMatrix();
     light.setPosition(position);
 
+    _lightDirUniform->set( position * _mv /*_ephem->getModelViewMatrix()*/ /*osg::Vec4(lightDir,1.)*/);
+    
+    FIXME("Что-то новое");
+    const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
+    _illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+
     // when ambient is low - get it's color directly (to make more realistic fog at dusk/dawn)
     const float fFogDesatFactor = _skyDome->getAmbient()[0];
     _cFogColor = cg::lerp01( _skyDome->getAmbient(), osg::Vec3f(_illumination, _illumination, _illumination),fFogDesatFactor);
@@ -267,11 +331,27 @@ void EphemerisModel::_calculateIllumFactors()
     // save fog
     _skyFogLayer->setFogParams(_cFogColor, _fogDensity);
 
+    
+    _uniformSunIntensity->set(_illumination);
+    
     // notify starts and moon about characteristics
     _skyStarField->setIlluminationFog(_illumination, _fogDensity);
     osg::Vec3f cMoonColor = _skyDome->getSpecular();
     cMoonColor /= std::max(cMoonColor.x(), std::max(cMoonColor.y(), cMoonColor.z()));
     _skyMoon->setMoonReflColor(cMoonColor);
+
+    FIXME(Свет здесь);
+    osg::Vec4 diffuse  = osg::Vec4(cFogDif/**1.6f*/,1.0f);     //sls->getDiffuse();
+    osg::Vec4 ambient  = osg::Vec4(cFogAmb/**1.2*/,1.0f);      //sls->getAmbient();
+    osg::Vec4 specular = osg::Vec4(cFogSpec/**1.6*/,1.0f);     // sls->getSpecular();
+
+    ambient.w() = _illumination ;
+    specular.w() = 0;                    // FIXME power of rain here
+
+    _specularUniform->set(specular);
+    _ambientUniform->set(ambient);
+    _diffuseUniform->set(diffuse);
+
 
 }
 
@@ -281,15 +361,20 @@ void EphemerisModel::SetClouds( int nType, float fCloudIntensity )
 {
     // avAssertMessage(nType >= 0 && nType < 4, "Unknown clouds type");
 
+    FIXME("Чет перебор с облаками, хотя некоторые ракурсы ничего так получаются");
     if (nType != _nCloudsType)
     {
         _nCloudsType = nType;
 
         char szBuffer[64];
-        sprintf_s(szBuffer, sizeof(szBuffer), "Sky/Clouds%d.dds", _nCloudsType + 1);
+        sprintf_s(szBuffer, sizeof(szBuffer), "Sky/Clouds%d.dds", /*_nCloudsType + 1*/2 );
 
-        osg::Texture2D * pTexture = new osg::Texture2D(osgDB::readImageFile(szBuffer));//utils::GetDatabase()->LoadTexture(szBuffer);
+        osg::Texture2D * pTexture = new osg::Texture2D(osgDB::readImageFile(szBuffer,new osgDB::Options));//utils::GetDatabase()->LoadTexture(szBuffer);
         _skyDome->setCloudsTexture(pTexture);
+
+        _skyClouds->setCloudsTexture(static_cast<avSky::cloud_type>(_nCloudsType));
+        _skyClouds->setCloudsDensity(fCloudIntensity);
+        _needsToUpdate = true;
     }
 }
 
@@ -339,10 +424,10 @@ void EphemerisModel::updateUnderWaterColor( const osg::Vec3f & cWaterColor )
 // called once before everything
 bool EphemerisModel::FrameCall()
 {
-
-
     // Set position
     auto cOrigin = ::get_base();
+    cOrigin.lat = 43.44444;
+    cOrigin.lon = 39.94694;
     setLatitudeLongitude(cOrigin.lat, cOrigin.lon);
 
     // Set humidity and temperature
@@ -362,14 +447,14 @@ bool EphemerisModel::FrameCall()
     const avCore::Environment::WeatherParameters & cWeatherParameters = avCore::GetEnvironment()->GetWeatherParameters();
 
     // Set clouds
-    SetClouds((int)cWeatherParameters.CloudType);
+    SetClouds((int)cWeatherParameters.CloudType,cWeatherParameters.CloudDensity);
 
     // Update fog density (unit value - must somehow correspond to real physical values inside)
     // Fog color is computed afterwards in SkyDome, based on sun intensity and so on, saved also there
     // Global Hail, Rain and Snow also affects fog density, snow especially
     const float
         fPrecipitationFogImpact = 0.7f * powf(osg::maximum(cWeatherParameters.SnowDensity, osg::maximum(cWeatherParameters.RainDensity * 0.8f, cWeatherParameters.HailDensity * 0.5f)), 0.5f);
-    setFogDensity(cg::lerp01(cWeatherParameters.FogDensity, fPrecipitationFogImpact, 1.f));
+    setFogDensity(cg::lerp01( fPrecipitationFogImpact, 1.f, cWeatherParameters.FogDensity));
 
     // xEvguenZ: we must take proper care of clouds density, because current realization, which was here, looked not sufficient at all
     _fCloudsDensity = cWeatherParameters.CloudDensity;

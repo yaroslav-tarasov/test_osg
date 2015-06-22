@@ -19,8 +19,6 @@ namespace shaders
 
     namespace include_mat
     {
-#define  GLSL_VERSION  
-        //"#version 130 \n"
 
 #define  SHADERS_GETTER                            \
         const char* get_shader(shader_t t)         \
@@ -291,7 +289,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
     const char* vs = {
-		GLSL_VERSION
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
         INCLUDE_VS
@@ -345,7 +342,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
     const char* fs = {
-        GLSL_VERSION
         "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
         
@@ -490,7 +486,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
         const char* vs = {  
-            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -531,7 +526,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             INCLUDE_UNIFORMS
@@ -600,7 +595,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace default_mat 
     {
        const char* vs = {  
-		   GLSL_VERSION
            "#extension GL_ARB_gpu_shader5 : enable \n"
 
            INCLUDE_VS
@@ -648,7 +642,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
        const char* fs = {
-       GLSL_VERSION
+       
        "#extension GL_ARB_gpu_shader5 : enable \n "
         
        INCLUDE_UNIFORMS
@@ -781,7 +775,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace building_mat 
     {
         const char* vs = {  
-			GLSL_VERSION
+			
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS
@@ -824,7 +818,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = { 
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -966,7 +960,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace tree_mat 
     {
         const char* vs = {  
-			GLSL_VERSION
+			
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -1009,7 +1003,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -1086,7 +1080,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace ground_mat 
     {
         const char* vs = {
-			GLSL_VERSION
+			
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
 
@@ -1146,7 +1140,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -1280,7 +1274,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace concrete_mat 
     {
         const char* vs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -1337,7 +1331,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         };
 
         const char* fs = { 
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
 
             INCLUDE_UNIFORMS
@@ -1718,7 +1712,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace railing_mat 
     {
         const char* vs = {  
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
 
@@ -1762,7 +1756,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -1863,7 +1857,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace panorama_mat 
     {
         const char* vs = {  
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_COMPABILITY
@@ -1898,7 +1892,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
@@ -1959,7 +1953,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     namespace sky_fog_mat 
     {
         const char* vs = { 
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_COMPABILITY
@@ -1996,7 +1990,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable  \n"
             
             INCLUDE_SCENE_PARAM
@@ -2093,7 +2087,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 
         const char* fs = {
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable  \n"
 
             STRINGIFY ( 
@@ -2242,7 +2236,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     {
 
         const char* vs = { 
-            GLSL_VERSION
+            
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
@@ -2287,7 +2281,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         const char* fs = { 
 
-            GLSL_VERSION
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS

@@ -134,13 +134,15 @@ void CloudsLayer::_buildStateSet()
     osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
     blendEquation->setDataVariance(osg::Object::DYNAMIC);
     sset->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-    
+
+#ifdef ORIG_EPHEMERIS      
     // enable depth test but disable depth write
     osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
     sset->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     // disable cull-face just for the case
     sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+#endif
 
     _cloudsColorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
     _cloudsColorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));

@@ -344,9 +344,10 @@ class EnvHandler : public osgGA::GUIEventHandler
 {
 
 public:  
-    EnvHandler() 
+    EnvHandler(avSky::Sky* sky) 
         : _currCloud  (avSky::cirrus)
         , _intensivity(0.1)
+        , _sky(sky)
     {}
 
     virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
@@ -358,7 +359,7 @@ public:
         {
             if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Insert)
             {
-                if(_skyClouds)
+                //if(_skyClouds)
                 {
                     int cc = _currCloud;cc++;
                     _currCloud = static_cast<avSky::cloud_type>(cc);
@@ -386,36 +387,33 @@ public:
                     else
                         if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Add)
                         {
+                            avCore::Environment::TimeParameters &timeParameters = avCore::GetEnvironment()->m_TimeParameters;
 
-                            //osgEphemeris::DateTime dt = ephem->getDateTime();
+                            if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
+                                timeParameters.Hour += 1;
+                            else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
+                                timeParameters.Day += 1;
+                            else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
+                               timeParameters.Month += 1;
+                            else                                                                    // Increment by one minute
+                                timeParameters.Minute += 1;
 
-                            //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
-                            //    dt.setHour( dt.getHour() + 1 );
-                            //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
-                            //    dt.setDayOfMonth( dt.getDayOfMonth() + 1 );
-                            //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
-                            //    dt.setMonth( dt.getMonth() + 1 );
-                            //else                                                                    // Increment by one minute
-                            //    dt.setMinute( dt.getMinute() + 1 );
-
-                            //ephem->setDateTime(dt);
-    
+   
                             return true;
                         }
 
                         else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Subtract)
                         {
-                            //osgEphemeris::DateTime dt = ephem->getDateTime();
-                            //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Decrement by one hour
-                            //    dt.setHour( dt.getHour() - 1 );
-                            //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Decrement by one day
-                            //    dt.setDayOfMonth( dt.getDayOfMonth() - 1 );
-                            //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Decrement by one month
-                            //    dt.setMonth( dt.getMonth() - 1 );
-                            //else                                                                    // Decrement by one minute
-                            //    dt.setMinute( dt.getMinute() - 1 );
+                            avCore::Environment::TimeParameters &timeParameters = avCore::GetEnvironment()->m_TimeParameters;
 
-                            //ephem->setDateTime(dt);
+                            if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
+                                timeParameters.Hour -= 1;
+                            else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
+                                timeParameters.Day -= 1;
+                            else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
+                                timeParameters.Month -= 1;
+                            else                                                                    // Increment by one minute
+                                timeParameters.Minute -= 1;
 
                             return true;
                         }
@@ -467,6 +465,8 @@ public:
 private:
     avSky::cloud_type                                  _currCloud;
     float                                             _intensivity;
+    avSky::Sky *                                      _sky;
+
 };
 
 
@@ -568,11 +568,11 @@ Scene::Scene()
     addChild(_commonNode.get());
 
     // Add backface culling to the whole bunch
-    //osg::StateSet * pSS = getOrCreateStateSet();
-    //pSS->setNestRenderBins(false);
-    //pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    //// disable alpha writes for whole bunch
-    //pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
+    osg::StateSet * pSS = getOrCreateStateSet();
+    pSS->setNestRenderBins(false);
+    pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    // disable alpha writes for whole bunch
+    pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
 
 }
 
@@ -764,7 +764,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         manip->home(0);
 	}
     
-#if 0
+#ifdef ORIG_EPHEMERIS
     //
     // Create ephemeris
     //                                                                       
@@ -808,7 +808,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     // Create sky
     //
     _Sky = new avSky::Sky( this );
-    _environmentNode->addChild( _Sky.get() );
+    /*_environmentNode->*/addChild( _Sky.get() );
     
     if( _Sky->getSunLightSource())
     {
@@ -816,7 +816,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         if(_terrainRoot) _terrainRoot->addChild(_ls.get());
     }
 
-    _viewerPtr->addEventHandler(new EnvHandler);
+    _viewerPtr->addEventHandler(new EnvHandler(_Sky));
 #endif
 
     LightManager::Create();
@@ -871,10 +871,10 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
     conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
     _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
 
-    createRTT();
-    
-    light_map = createLightMapRenderer();
-    addChild( light_map );
+    //createRTT();
+    //
+    //light_map = createLightMapRenderer();
+    //addChild( light_map );
 
     //
     //LightMapRenderer::SpotData  data;

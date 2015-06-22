@@ -241,11 +241,11 @@ void utils::RemoveNodeFromAllParents( osg::Node* pNode )
 
 //////////////////////////////////////////////////////////////////////////
 bool utils::SetTextureUniform( const char* szTextureName, const char* szUniformName, int nID, osg::StateSet* pStateSet,
-                               osg::Texture::WrapMode eWrapMode /*= osg::Texture::REPEAT*/ )
+                               osg::Texture::WrapMode eWrapMode /*= osg::Texture::REPEAT*/, const osgDB::Options* options )
 {
     avAssert( szTextureName && szUniformName && nID >= 0 && pStateSet );
 
-    osg::Texture2D* pTexture = new osg::Texture2D(osgDB::readImageFile(szTextureName));// GetDatabase()->LoadTexture( szTextureName, eWrapMode );
+    osg::Texture2D* pTexture = new osg::Texture2D(osgDB::readImageFile(szTextureName, options));// GetDatabase()->LoadTexture( szTextureName, eWrapMode );
 
     if ( pTexture == NULL )
         return false;

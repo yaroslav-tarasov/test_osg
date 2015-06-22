@@ -26,6 +26,11 @@
 
 namespace avSky
 {
+    class CloudsLayer;
+}
+
+namespace avSky
+{
 
 
 /**
@@ -126,9 +131,9 @@ public:
     /**
       * Effect an update.  Used internally by the internal UpdateCallback
       */
-    void update( osg::NodeVisitor * nv );
+    void update( osg::NodeVisitor * pNV );
     
-
+    void cull( osg::NodeVisitor * pNV );
 
     // fog control
     void setFogDensity(float fFogDensity);
@@ -150,31 +155,39 @@ private:
     void _updateStars();
     void _updateMoon();
     void _calculateIllumFactors();
+    void _updateClouds();
 
     osg::Group * _scene;
 
     osg::ref_ptr<osg::LightSource> _sunLightSource;
 
-    osg::ref_ptr<SkyDome>    _skyDome;
-    osg::ref_ptr<avSky::FogLayer>   _skyFogLayer;
-    osg::ref_ptr<StarField>  _skyStarField;
-    osg::ref_ptr<MoonSphere> _skyMoon;
+    osg::ref_ptr<SkyDome>             _skyDome;
+    osg::ref_ptr<avSky::FogLayer>     _skyFogLayer;
+    osg::ref_ptr<StarField>           _skyStarField;
+    osg::ref_ptr<MoonSphere>          _skyMoon;
+    osg::ref_ptr<avSky::CloudsLayer>  _skyClouds;
 
-    float _fogDensity;
-    osg::Vec3f _cFogColor;
+    float                          _fogDensity;
+    osg::Vec3f                     _cFogColor;
 
-    bool _manualSunElevationMode;
-    float _desiredIllumination;
+    bool                           _manualSunElevationMode;
+    float                          _desiredIllumination;
 
-    osg::Vec3d _sunVec;
+    osg::Vec3d                     _sunVec;
 
-    osg::ref_ptr<EphemerisEngine> _ephemerisEngine;
+    osg::ref_ptr<EphemerisEngine>  _ephemerisEngine;
 
-    float _illumination;
-    osg::ref_ptr<osg::Uniform> _uniformSunIntensity;
+    float                          _illumination;
+    osg::ref_ptr<osg::Uniform>     _uniformSunIntensity;
 
-    int _nCloudsType;
-    float _fCloudsDensity;
+    int                            _nCloudsType;
+    float                          _fCloudsDensity;
+
+    osg::ref_ptr<osg::Uniform>     _lightDirUniform; 
+    osg::ref_ptr<osg::Uniform>     _specularUniform;
+    osg::ref_ptr<osg::Uniform>     _ambientUniform;
+    osg::ref_ptr<osg::Uniform>     _diffuseUniform;
+    osg::Matrixd                   _mv; 
 
 public:
 
