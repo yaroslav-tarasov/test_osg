@@ -1,10 +1,9 @@
 TEMPLATE = app
 
-DEV_ROOT = C:/simex
+DEV_ROOT = $$(SIMEX_DIR)
 
-
-OSG_DIR  = C:/Work/OSG
-BULLET_DIR = C:/Work/bullet-2.82-r2704
+#OSG_DIR  = C:/Work/OSG
+#BULLET_DIR = C:/Work/bullet-2.82-r2704
 
 PROJECT_FILE_NAME = $$replace(_PRO_FILE_, $$_PRO_FILE_PWD_/, )
 PROJECT_NAME      = $$replace(PROJECT_FILE_NAME, .pro, )
@@ -95,6 +94,8 @@ MOC_DIR     = $$MISC_PATH
 UI_DIR      = $$MISC_PATH
 RCC_DIR     = $$MISC_PATH
 
+include(test_osg.pri)
+
 #############
 # include paths
 
@@ -104,8 +105,8 @@ INCLUDEPATH += \
                $$PWD/_include                                 \
                $$PWD/_include/objects                         \
                $$PWD/objects                                  \
-               C:/simex/src/_Include                          \
-               C:/simex/src/_Include/network                  \
+               $$(SIMEX_DIR)/src/_Include                     \
+               $$(SIMEX_DIR)/src/_Include/network             \
                $$PWD/ext/pugixml-1.4/src                      \
                $$(OSG_DIR)/3rdparty/include                   \
                $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
@@ -128,15 +129,20 @@ LIBS += -L$$EXT_LIB/qt/$$PATH_SUFFIX
 LIBS += -L$$(OSG_DIR)/OpenSceneGraph-3.2.1/build/lib
 LIBS += -L$$BINS/$$PATH_SUFFIX
 win32:LIBS += -L$$(BULLET_DIR)/build/lib/$$PATH_SUFFIX
-LIBS += -L$$PWD/ext/pugixml-1.4/scripts/vs2010/$$TARGETX
+#LIBS += -L$$PWD/ext/pugixml-1.4/scripts/vs2010/$$TARGETX
 LIBS += -L$$(OSG_DIR)/SPARK-1.5.5/lib/vc2008/static
 LIBS += -L$$(OSG_DIR)/3rdparty/lib
+LIBS += -L$$(BULLET_DIR)/lib
+LIBS += -L$$(SIMEX_DIR)/ext/lib/tinyxml2/$$PATH_SUFFIX
+LIBS += -L$$(SIMEX_DIR)/bin/$$PATH_SUFFIX
 
 CONFIG(debug,debug|release){
-LIBS += -lpugixmld
+LIBS += -lpugixmld -ltinyxml2 -lnet_layer -lfms -llogger -lasync_services -lalloc -lmeteo
 } else {
-LIBS += -lpugixml
+LIBS += -lpugixml -ltinyxml2 -lnet_layer -lfms -llogger -lasync_services -lalloc -lmeteo
 }
+
+#tinyxml2.lib;net_layer.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixml.lib
 
 message($$LIBS)
 
@@ -144,7 +150,9 @@ win32:{
 DEFINES -= UNICODE
 DEFINES += DISABLE_ROBUST_COMPUTATIONS
 DEFINES += BOOST_ALL_NO_LIB
+DEFINES += CG_PRIMITIVES
 }
+
 
 ######################
 # common configuration
@@ -188,81 +196,85 @@ win32{
 CONFIG += qt
 QT += core gui
 
-HEADERS += \
-    stdafx.h \
-    phys/RigidUpdater.h \
-    phys/rigid_body_info.h \
-    phys/phys_sys_common.h \
-    phys/GLDebugDrawer.h \
-    phys/BulletInterface.h \
-    phys/bullet_helpers.h \
-    av/Terrain.h \
-    utils/visitors/find_node_visitor.h \
-    creators.h \
-    tests/client.h \
-    utils/visitors/visitors.h \
-    utils/visitors/materials_visitor.h \
-    utils/visitors/info_visitor.h \
-    utils/visitors/find_tex_visitor.h \
-    utils/visitors/find_node_visitor.h \
-    utils/visitors/find_animation.h \
-    utils/visitors/ct_visitor.h \
-    av/Scene.h \
-    av/PreRender.h \
-    av/LOD.h \
-    av/FogLayer.h \
-    av/Ephemeris.h \
-    av/EnvRenderer.h \
-    av/CloudLayer.h
 
-SOURCES += \
-    test_osg.cpp \
-    objects/vehicle/vehicle_model_states.cpp \
-    objects/vehicle/vehicle_model.cpp \
+
+#HEADERS += \
+#    stdafx.h \
+#    phys/RigidUpdater.h \
+#    phys/rigid_body_info.h \
+#    phys/phys_sys_common.h \
+#    phys/GLDebugDrawer.h \
+#    phys/BulletInterface.h \
+#    phys/bullet_helpers.h \
+#    av/Terrain.h \
+#    utils/visitors/find_node_visitor.h \
+#    creators.h \
+#    tests/client.h \
+#    utils/visitors/visitors.h \
+#    utils/visitors/materials_visitor.h \
+#    utils/visitors/info_visitor.h \
+#    utils/visitors/find_tex_visitor.h \
+#    utils/visitors/find_node_visitor.h \
+#    utils/visitors/find_animation.h \
+#    utils/visitors/ct_visitor.h \
+#    av/Scene.h \
+#    av/PreRender.h \
+#    av/LOD.h \
+#    av/FogLayer.h \
+#    av/Ephemeris.h \
+#    av/EnvRenderer.h \
+#    av/CloudLayer.h
+
+#SOURCES += \
+#    test_osg.cpp \
+#    objects/vehicle/vehicle_model_states.cpp \
+#    objects/vehicle/vehicle_model.cpp \
     #static_convex.cpp \
-    shaders.cpp \
-    objects/nodes_manager/nodes_manager.cpp \
-    objects/nodes_manager/nodes_management.cpp \
-    objects/nodes_manager/node_impl.cpp \
-    materials.cpp \
-    dubins.cpp \
-    bada/bada_import.cpp \
-    animation_handler.cpp \
-    objects/aircraft/aircraft_visual.cpp \
-    objects/aircraft/aircraft_shassis_impl.cpp \
-    objects/aircraft/aircraft_model.cpp \
-    phys/RigidUpdater.cpp \
-    phys/GLDebugDrawer.cpp \
-    phys/BulletInterface.cpp \
-    phys/ray_cast_vehicle.cpp \
-    phys/phys_aircraft.cpp \
-    phys/bvh_static_mesh.cpp \
-    phys/aircraft_phys.cpp \
-    nfi/lib_loader.cpp \
-    sm/ViewDependentShadowMap.cpp \
-    sm/ShadowTechnique.cpp \
-    sm/ShadowSettings.cpp \
-    sm/ShadowMap.cpp \
-    sm/ShadowedScene.cpp \
-    av/Terrain.cpp \
-    av/Scene.cpp \
-    av/PreRender.cpp \
-    av/Object.cpp \
-    av/LOD.cpp \
-    av/FogLayer.cpp \
-    av/Ephemeris.cpp \
-    av/EnvRenderer.cpp \
-    av/CloudLayer.cpp \
-    utils/visitors/find_node_visitor.cpp \
-    creators.cpp \
-    ext/spark/SparkUpdatingHandler.cpp \
-    ext/spark/SparkDrawable.cpp \
-    ext/spark/simple_effect.cpp \
-    ext/spark/rain_effect.cpp \
-    ext/spark/fire_effect.cpp \
-    ext/spark/explosion_effect.cpp \
-    ext/spark/osgspark.cpp \
-    main_scene2.cpp \
-    tests/test_network.cpp \
-    tests/sync_qt.cpp \
-    utils/visitors/find_node_visitor.cpp
+#    shaders.cpp \
+#    objects/nodes_manager/nodes_manager.cpp \
+#    objects/nodes_manager/nodes_management.cpp \
+#    objects/nodes_manager/node_impl.cpp \
+#    materials.cpp \
+#    dubins.cpp \
+#    bada/bada_import.cpp \
+#    animation_handler.cpp \
+#    objects/aircraft/aircraft_visual.cpp \
+#    objects/aircraft/aircraft_shassis_impl.cpp \
+#    objects/aircraft/aircraft_model.cpp \
+#    phys/RigidUpdater.cpp \
+#    phys/GLDebugDrawer.cpp \
+#    phys/BulletInterface.cpp \
+#    phys/ray_cast_vehicle.cpp \
+#    phys/phys_aircraft.cpp \
+#    phys/bvh_static_mesh.cpp \
+#    phys/aircraft_phys.cpp \
+#    nfi/lib_loader.cpp \
+#    sm/ViewDependentShadowMap.cpp \
+#    sm/ShadowTechnique.cpp \
+#    sm/ShadowSettings.cpp \
+#    sm/ShadowMap.cpp \
+#    sm/ShadowedScene.cpp \
+#    av/Terrain.cpp \
+#    av/Scene.cpp \
+#    av/PreRender.cpp \
+#    av/Object.cpp \
+#    av/LOD.cpp \
+#    av/FogLayer.cpp \
+#    av/Ephemeris.cpp \
+#    av/EnvRenderer.cpp \
+#    av/CloudLayer.cpp \
+#    utils/visitors/find_node_visitor.cpp \
+#    creators.cpp \
+#    ext/spark/SparkUpdatingHandler.cpp \
+#    ext/spark/SparkDrawable.cpp \
+#    ext/spark/simple_effect.cpp \
+#    ext/spark/rain_effect.cpp \
+#    ext/spark/fire_effect.cpp \
+#    ext/spark/explosion_effect.cpp \
+#    ext/spark/osgspark.cpp \
+#    main_scene2.cpp \
+#    tests/test_network.cpp \
+#    tests/sync_qt.cpp \
+#    utils/visitors/find_node_visitor.cpp
+
+

@@ -1389,8 +1389,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
 
     }
-    
-
 
     return mt;
 }
@@ -1403,7 +1401,7 @@ void   Scene::onSetLights(bool on)
 
 void   Scene::onZoneChanged(int zone)
 {
-    const char* scene_name[] = {"empty","adler","sheremetyevo"};
+    const char* scene_name[] = {"empty","adler","sheremetyevo","minsk"};
     
     zone_to_reload_ = scene_name[zone];
 
