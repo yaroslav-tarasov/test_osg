@@ -599,5 +599,8 @@
     <ClCompile Include="av\Environment.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
+    <ClCompile Include="tests\osgrvo2.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

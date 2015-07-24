@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;$(SolutionDir)\ext\RVO\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -90,7 +90,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>tinyxml2.lib;net_layer.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\release;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\release;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada;$(SolutionDir)\ext\alloc;$(SolutionDir)\ext\RVO\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
@@ -262,6 +262,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="tests\osgrvo2.cpp" />
     <ClCompile Include="tests\render_points.cpp" />
     <ClCompile Include="tests\select_geometry.cpp" />
     <ClCompile Include="tests\shadow_map.cpp" />

@@ -67,7 +67,7 @@ namespace avScene {
 
         Scene();
         virtual									    ~Scene();
-        bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth = 0, int nHeight = 0);
+        bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
         void                                        createTerrainRoot();
         void                                        createObjects();
         void                                        createRTT();

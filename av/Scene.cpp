@@ -511,7 +511,7 @@ std::string          Scene::zone_to_reload_;
 bool Scene::Create( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
 {
     _scenePtr = new Scene();
-    if ( _scenePtr->Initialize( cArgs, cTraitsPtr, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0 ) == false )
+    if ( _scenePtr->Initialize( cArgs, cTraitsPtr/*, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0*/ ) == false )
     {
         OSG_FATAL << "Failed to initialize scene" ;
         _scenePtr = NULL;
@@ -582,7 +582,7 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth, int nHeight)
+bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
 {
     osg::StateSet* pGlobalStateSet = getOrCreateStateSet();
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
@@ -609,7 +609,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         osg::ref_ptr<osg::GraphicsContext> cGraphicsContextPtr = osg::GraphicsContext::createGraphicsContext( cTraitsPtr.get() );
 
         _viewerPtr->getCamera()->setGraphicsContext(cGraphicsContextPtr.get());
-        _viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, nWidth, nHeight));
+        _viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, cTraitsPtr->width, cTraitsPtr->height ));
     } 
     else if (getenv("OSG_SCREEN") == NULL)
     {
@@ -1412,7 +1412,7 @@ void   Scene::onZoneChanged(int zone)
 
 }
 
-bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv )
+bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & /*aa*/, osg::Object * /*obj*/, osg::NodeVisitor * /*nv*/ )
 {
     if (ea.getHandled() || ea.getEventType() != osgGA::GUIEventAdapter::KEYUP)
         return false;
