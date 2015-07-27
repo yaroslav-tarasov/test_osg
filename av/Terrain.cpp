@@ -21,6 +21,8 @@
 #include "phys/RigidMTUpdater.h"
 
 
+#include "av/Grass.h"
+
 
 namespace avTerrain
 {
@@ -130,6 +132,8 @@ void  Terrain::create( std::string name )
 
     addChild(baseModel);
     baseModel->setName("baseModel");
+
+	addChild(new Grass());
 
 #if 0
     auto ret_array  = creators::createMovingModel(center,radius*0.8f);

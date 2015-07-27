@@ -195,6 +195,9 @@
     <ClInclude Include="av\Utils.h">
       <Filter>Source Files\av</Filter>
     </ClInclude>
+    <ClInclude Include="av\Grass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -599,8 +602,8 @@
     <ClCompile Include="av\Environment.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="tests\osgrvo2.cpp">
-      <Filter>Source Files\tests</Filter>
+    <ClCompile Include="av\Grass.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

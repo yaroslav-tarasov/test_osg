@@ -141,5 +141,5 @@ namespace spark
 
 
 #define GLSL_VERSION  130
-//#define ORIG_EPHEMERIS
+#define ORIG_EPHEMERIS
 
