@@ -102,6 +102,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.frag" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.vert" />
     <None Include="ReadMe.txt" />
     <None Include="shaders\tess.frag" />
     <None Include="shaders\tess.geo" />

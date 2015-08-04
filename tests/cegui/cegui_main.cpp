@@ -15,6 +15,60 @@
 
 #include "../common/CommonFunctions"
 
+namespace {
+
+	inline CEGUI::Key::Scan key_conv(int osg_key)
+	{
+		    using namespace CEGUI;
+			const CEGUI::Key::Scan numpad[10] = {Key::Numpad0,Key::Numpad1,Key::Numpad2,Key::Numpad3,Key::Numpad4,Key::Numpad5,Key::Numpad6,Key::Numpad7,Key::Numpad8,Key::Numpad9};
+		
+		    if(osgGA::GUIEventAdapter::KEY_1 <=osg_key && osgGA::GUIEventAdapter::KEY_9 >=osg_key)
+				return (CEGUI::Key::Scan)((int)CEGUI::Key::One + (osg_key - osgGA::GUIEventAdapter::KEY_1 ));
+
+			if(osgGA::GUIEventAdapter::KEY_KP_0 <=osg_key && osgGA::GUIEventAdapter::KEY_KP_9 >=osg_key)
+				return numpad[(osg_key - osgGA::GUIEventAdapter::KEY_KP_0 )];
+		
+
+			CEGUI::Key::Scan ret = CEGUI::Key::Unknown; 
+			switch (osg_key)
+			{
+			case osgGA::GUIEventAdapter::KEY_0:
+				ret = CEGUI::Key::Zero;
+				break;
+			case osgGA::GUIEventAdapter::KEY_BackSpace:
+				ret = CEGUI::Key::Backspace;
+				break;
+			case osgGA::GUIEventAdapter::KEY_Return:
+				ret = CEGUI::Key::Return;
+				break;
+			case osgGA::GUIEventAdapter::KEY_KP_Enter:
+				ret = CEGUI::Key::NumpadEnter;
+				break;
+			case osgGA::GUIEventAdapter::KEY_Period:
+				ret = CEGUI::Key::Period;
+				break;
+			case osgGA::GUIEventAdapter::KEY_Comma:
+				ret = CEGUI::Key::Comma;
+				break;
+			}
+
+			return  ret;
+	}
+
+	inline CEGUI::String::value_type char_conv(int osg_key)
+	{
+		if(osgGA::GUIEventAdapter::KEY_0 <=osg_key && osgGA::GUIEventAdapter::KEY_9 >=osg_key)
+			return (L'0' + (osg_key - osgGA::GUIEventAdapter::KEY_0 ));
+		
+		if(osgGA::GUIEventAdapter::KEY_KP_0 <=osg_key && osgGA::GUIEventAdapter::KEY_KP_9 >=osg_key)
+			return (L'0' + (osg_key - osgGA::GUIEventAdapter::KEY_KP_0 )) ;
+
+		if (osg_key == osgGA::GUIEventAdapter::KEY_Period || osg_key == osgGA::GUIEventAdapter::KEY_Comma)
+			return L'.';
+
+		return L'';
+	}
+}
 
 class CEGUIEventHandler : public osgGA::GUIEventHandler
 {
@@ -34,6 +88,15 @@ public:
 
         switch ( ea.getEventType() )
         {
+		case osgGA::GUIEventAdapter::KEYDOWN:
+			context.injectKeyDown(key_conv(ea.getKey()));
+			context.injectChar(char_conv(ea.getKey()));
+			// return key_conv(ea.getKey()) != CEGUI::Key::Unknown;
+			break;
+		case osgGA::GUIEventAdapter::KEYUP:
+			context.injectKeyUp(key_conv(ea.getKey()));
+			// return key_conv(ea.getKey()) != CEGUI::Key::Unknown;
+			break;
         case osgGA::GUIEventAdapter::PUSH:
             context.injectMousePosition( x, y );
             context.injectMouseButtonDown(convertMouseButton(ea.getButton()));

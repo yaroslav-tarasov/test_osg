@@ -133,6 +133,12 @@
     <None Include="shaders\tess_tri.tes">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">

@@ -132,8 +132,11 @@ void  Terrain::create( std::string name )
 
     addChild(baseModel);
     baseModel->setName("baseModel");
-
-	addChild(new Grass());
+	
+	Grass* grass = new Grass();
+	grass->setWindFactor(1.0);
+	addChild(grass);
+	_grass = grass;
 
 #if 0
     auto ret_array  = creators::createMovingModel(center,radius*0.8f);
@@ -161,6 +164,9 @@ void Terrain::cull( osg::NodeVisitor * pNV )
     _lightsHandler.onCullEnd(pCV);
 }
 
-
+void Terrain::setGrassMapFactor(float val)
+{
+	dynamic_cast<Grass*>(_grass.get())->setGrassMapFactor(val);
+}
 
 }

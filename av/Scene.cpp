@@ -681,6 +681,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
                 this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
 				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
+				this->_vis_settings_panel->subscribe_set_map(boost::bind(&Scene::onSetMap,this,_1));
                 this->_vis_settings_panel->set_light(true);
             }
         } )
@@ -1391,6 +1392,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     }
 
     return mt;
+}
+
+void   Scene::onSetMap(float val)
+{
+	_terrainNode->setGrassMapFactor(val);
 }
 
 void   Scene::onSetLights(bool on)

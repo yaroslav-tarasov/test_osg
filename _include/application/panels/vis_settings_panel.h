@@ -22,6 +22,7 @@ struct vis_settings_panel
     DECLARE_EVENT(zone_changed , (int) );
     DECLARE_EVENT(exit_app     , ()    );
 	DECLARE_EVENT(set_lights   , (bool) );
+	DECLARE_EVENT(set_map	   , (float) );
 };
 
 /*BASAPPLIC_API*/ vis_settings_panel_ptr create_vis_settings_panel( const zones_t &zones);
