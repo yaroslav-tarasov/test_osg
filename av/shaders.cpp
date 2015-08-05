@@ -2024,9 +2024,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)                              
             {
-                //viewworld_matrix = gl_ModelViewMatrixInverse;       
-
-
                 // get point direction
                 vec3 vPnt = normalize(f_in.pos.xyz);                
 
