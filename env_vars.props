@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <SIMEX_DIR>D:\simex</SIMEX_DIR>
+    <OSG_DIR>D:\Work\OSG</OSG_DIR>
+    <BULLET_DIR>D:\Work\bullet-2.82-r2704</BULLET_DIR>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="SIMEX_DIR">
+      <Value>$(SIMEX_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OSG_DIR">
+      <Value>$(OSG_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BULLET_DIR">
+      <Value>$(BULLET_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
