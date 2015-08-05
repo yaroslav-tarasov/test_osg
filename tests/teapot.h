@@ -17,7 +17,7 @@ public:
         return osg::BoundingBox(_min, _max);
     }
 
-    virtual void drawImplementation( osg::RenderInfo& renderInfo ) const
+    virtual void drawImplementation( osg::RenderInfo& /*renderInfo*/ ) const
     {
         glFrontFace( GL_CW );
         glutSolidTeapot( _size );

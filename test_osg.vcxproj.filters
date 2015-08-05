@@ -133,6 +133,12 @@
     <None Include="shaders\tess_tri.tes">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -194,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="av\Utils.h">
       <Filter>Source Files\av</Filter>
+    </ClInclude>
+    <ClInclude Include="av\Grass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -597,6 +606,9 @@
       <Filter>Source Files\av\sky</Filter>
     </ClCompile>
     <ClCompile Include="av\Environment.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Grass.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>

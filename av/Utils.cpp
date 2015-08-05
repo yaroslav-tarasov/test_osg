@@ -18,15 +18,15 @@ bool utils::GetMouseCursorShowState()
     return s_bMouseShowed;
 }
 
-void utils::ShowMouseCursor( bool bShow )
-{
-    if ( bShow != s_bMouseShowed )
-    {
-        ShowCursor( bShow ? TRUE : FALSE );
-        SetCursor( bShow ? LoadCursor( NULL, IDC_ARROW ) : NULL );
-        s_bMouseShowed = bShow;
-    }
-}
+//void utils::ShowMouseCursor( bool bShow )
+//{
+//    if ( bShow != s_bMouseShowed )
+//    {
+//        ShowCursor( bShow ? TRUE : FALSE );
+//        SetCursor( bShow ? LoadCursor( NULL, IDC_ARROW ) : NULL );
+//        s_bMouseShowed = bShow;
+//    }
+//}
 
 
 /////////////////////////////////////////////////////////////////////

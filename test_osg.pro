@@ -1,99 +1,10 @@
 TEMPLATE = app
 
-DEV_ROOT = C:/simex
+DEV_ROOT = $$(SIMEX_DIR)
 
+include($$DEV_ROOT/src/base.pri)
 
-OSG_DIR  = C:/Work/OSG
-BULLET_DIR = C:/Work/bullet-2.82-r2704
-
-PROJECT_FILE_NAME = $$replace(_PRO_FILE_, $$_PRO_FILE_PWD_/, )
-PROJECT_NAME      = $$replace(PROJECT_FILE_NAME, .pro, )
-TARGETX = x32
-
-win32:{
-contains(QMAKE_TARGET.arch, x86_64):{
- message("Platform x64")
- CONFIG += target_x86_64
- TARGETX = x64
-} else {
- message("Platform x86")
- CONFIG += target_x86
-}
-}
-
-INCLUDE_PATH = $$DEV_ROOT/src/_Include
-
-
-#paths
-INCLUDE_PATH = $$DEV_ROOT/src/_Include
-EXTS         = $$DEV_ROOT/ext
-BINS         = $$DEV_ROOT/bin
-
-target_x86_64:{
- EXT_LIB      = $$EXTS/lib64
- BINS = $$BINS"64"
-} else {
- EXT_LIB  = $$EXTS/lib
-}
-
-message($$EXT_LIB)
-
-EXT_INCLUDE  = $$EXTS/include
-
-##########################
-# vcproj generation
-contains(TEMPLATE, lib)|contains(TEMPLATE, app) {
-    CONFIG -= debug_and_release
-    CONFIG -= debug_and_release_target
-} else:contains(TEMPLATE, vclib)|contains(TEMPLATE, vcapp) {
-    CONFIG += debug_and_release
-}
-
-##########################
-# debug/release management
-CONFIG(debug,debug|release){
-    BUILD_PATH = $$BINS/debug
-    CONFIG    += debug
-    CONFIG    -= release
-
-    DEBUG_CFG   = True
-    PATH_SUFFIX = debug
-
-    unix:QMAKE_CXXFLAGS += -O0
-    win32:QMAKE_CXXFLAGS += -Od
-
-    INCLUDEPATH += $$EXT_INCLUDE/vld
-    LIBS += -L$$EXT_LIB/vld
-
-    message("Debug Configuration")
-} else {
-    BUILD_PATH = $$BINS/release
-    CONFIG    += release
-    CONFIG    -= debug
-
-    RELEASE_CFG = True
-    PATH_SUFFIX = release
-
-
-    unix:QMAKE_CXXFLAGS += -O2
-    win32:QMAKE_CXXFLAGS += -Ob2 -Oi -Ot /Oy- -fp:fast -fp:except-
-
-    DEFINES *= NDEBUG
-    win32:QMAKE_LFLAGS *= /DEBUG # for generating PDB files
-
-    message("Release Configuration")
-}
-
-MISC_PATH = $$BUILD_PATH/$$PROJECT_NAME
-
-#############
-# build paths
-OUT_PWD     = $$MISC_PATH
-DESTDIR     = $$BUILD_PATH
-OBJECTS_DIR = $$MISC_PATH
-MOC_DIR     = $$MISC_PATH
-UI_DIR      = $$MISC_PATH
-RCC_DIR     = $$MISC_PATH
+include(test_osg.pri)
 
 #############
 # include paths
@@ -104,8 +15,8 @@ INCLUDEPATH += \
                $$PWD/_include                                 \
                $$PWD/_include/objects                         \
                $$PWD/objects                                  \
-               C:/simex/src/_Include                          \
-               C:/simex/src/_Include/network                  \
+               $$(SIMEX_DIR)/src/_Include                     \
+               $$(SIMEX_DIR)/src/_Include/network             \
                $$PWD/ext/pugixml-1.4/src                      \
                $$(OSG_DIR)/3rdparty/include                   \
                $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
@@ -120,149 +31,89 @@ INCLUDEPATH += $$EXT_INCLUDE/gmp
 INCLUDEPATH += $$_PRO_FILE_PWD_
 
 
-#############
-# lib paths
-
-LIBS += -L$$EXT_LIB/boost
-LIBS += -L$$EXT_LIB/qt/$$PATH_SUFFIX
-LIBS += -L$$(OSG_DIR)/OpenSceneGraph-3.2.1/build/lib
-LIBS += -L$$BINS/$$PATH_SUFFIX
-win32:LIBS += -L$$(BULLET_DIR)/build/lib/$$PATH_SUFFIX
-LIBS += -L$$PWD/ext/pugixml-1.4/scripts/vs2010/$$TARGETX
-LIBS += -L$$(OSG_DIR)/SPARK-1.5.5/lib/vc2008/static
-LIBS += -L$$(OSG_DIR)/3rdparty/lib
-
-CONFIG(debug,debug|release){
-LIBS += -lpugixmld
-} else {
-LIBS += -lpugixml
-}
-
-message($$LIBS)
-
-win32:{
-DEFINES -= UNICODE
-DEFINES += DISABLE_ROBUST_COMPUTATIONS
-DEFINES += BOOST_ALL_NO_LIB
-}
-
-######################
-# common configuration
-CONFIG *= precompile_header
-CONFIG -= qt qt_no_framework
-
-PRECOMPILED_HEADER = precompiled.h
-DEFINES += precompile_header
-
-LIBS += -Wl,--start-group -lasync_services -llogger -lalloc -Wl,--end-group
-
-win32{
-    QMAKE_CXXFLAGS -= -Zc:wchar_t-
-    QMAKE_CXXFLAGS += -Zc:wchar_t
-
-#    equals(RELEASE_CFG, True):QMAKE_CXXFLAGS += $$QMAKE_CXXFLAGS_MT_DLL
-#    equals(DEBUG_CFG  , True):QMAKE_CXXFLAGS += $$QMAKE_CXXFLAGS_MT_DLLDBG
-
-    #correct versions for Windows 7
-    QMAKE_CXXFLAGS += -DWINVER=0x0601
-    QMAKE_CXXFLAGS += -D_WIN32_WINNT=0x0601
-    QMAKE_CXXFLAGS += -DWIN32_LEAN_AND_MEAN
-
-    # non dll-interface class ...
-    QMAKE_CXXFLAGS += /wd4275
-    # ... class 'boost::shared_ptr<T>' needs to have dll-interface to be used by clients of struct ...
-    QMAKE_CXXFLAGS += /wd4251
-    # ... 'this' : used in base member initializer list
-    QMAKE_CXXFLAGS += /wd4355
-
-    QMAKE_CXXFLAGS += -DNOMINMAX
-
-    QMAKE_CXXFLAGS += /MP8
-    QMAKE_CXXFLAGS -= -Zm200
-    QMAKE_CXXFLAGS *= -Zm400
-
-    LIBS += /NODEFAULTLIB:libcmt.lib
-}
-
 
 CONFIG += qt
-QT += core gui
+QT += core gui widgets
 
-HEADERS += \
-    stdafx.h \
-    phys/RigidUpdater.h \
-    phys/rigid_body_info.h \
-    phys/phys_sys_common.h \
-    phys/GLDebugDrawer.h \
-    phys/BulletInterface.h \
-    phys/bullet_helpers.h \
-    av/Terrain.h \
-    utils/visitors/find_node_visitor.h \
-    creators.h \
-    tests/client.h \
-    utils/visitors/visitors.h \
-    utils/visitors/materials_visitor.h \
-    utils/visitors/info_visitor.h \
-    utils/visitors/find_tex_visitor.h \
-    utils/visitors/find_node_visitor.h \
-    utils/visitors/find_animation.h \
-    utils/visitors/ct_visitor.h \
-    av/Scene.h \
-    av/PreRender.h \
-    av/LOD.h \
-    av/FogLayer.h \
-    av/Ephemeris.h \
-    av/EnvRenderer.h \
-    av/CloudLayer.h
 
-SOURCES += \
-    test_osg.cpp \
-    objects/vehicle/vehicle_model_states.cpp \
-    objects/vehicle/vehicle_model.cpp \
+
+#HEADERS += \
+#    stdafx.h \
+#    phys/RigidUpdater.h \
+#    phys/rigid_body_info.h \
+#    phys/phys_sys_common.h \
+#    phys/GLDebugDrawer.h \
+#    phys/BulletInterface.h \
+#    phys/bullet_helpers.h \
+#    av/Terrain.h \
+#    utils/visitors/find_node_visitor.h \
+#    creators.h \
+#    tests/client.h \
+#    utils/visitors/visitors.h \
+#    utils/visitors/materials_visitor.h \
+#    utils/visitors/info_visitor.h \
+#    utils/visitors/find_tex_visitor.h \
+#    utils/visitors/find_node_visitor.h \
+#    utils/visitors/find_animation.h \
+#    utils/visitors/ct_visitor.h \
+#    av/Scene.h \
+#    av/PreRender.h \
+#    av/LOD.h \
+#    av/FogLayer.h \
+#    av/Ephemeris.h \
+#    av/EnvRenderer.h \
+#    av/CloudLayer.h
+
+#SOURCES += \
+#    test_osg.cpp \
+#    objects/vehicle/vehicle_model_states.cpp \
+#    objects/vehicle/vehicle_model.cpp \
     #static_convex.cpp \
-    shaders.cpp \
-    objects/nodes_manager/nodes_manager.cpp \
-    objects/nodes_manager/nodes_management.cpp \
-    objects/nodes_manager/node_impl.cpp \
-    materials.cpp \
-    dubins.cpp \
-    bada/bada_import.cpp \
-    animation_handler.cpp \
-    objects/aircraft/aircraft_visual.cpp \
-    objects/aircraft/aircraft_shassis_impl.cpp \
-    objects/aircraft/aircraft_model.cpp \
-    phys/RigidUpdater.cpp \
-    phys/GLDebugDrawer.cpp \
-    phys/BulletInterface.cpp \
-    phys/ray_cast_vehicle.cpp \
-    phys/phys_aircraft.cpp \
-    phys/bvh_static_mesh.cpp \
-    phys/aircraft_phys.cpp \
-    nfi/lib_loader.cpp \
-    sm/ViewDependentShadowMap.cpp \
-    sm/ShadowTechnique.cpp \
-    sm/ShadowSettings.cpp \
-    sm/ShadowMap.cpp \
-    sm/ShadowedScene.cpp \
-    av/Terrain.cpp \
-    av/Scene.cpp \
-    av/PreRender.cpp \
-    av/Object.cpp \
-    av/LOD.cpp \
-    av/FogLayer.cpp \
-    av/Ephemeris.cpp \
-    av/EnvRenderer.cpp \
-    av/CloudLayer.cpp \
-    utils/visitors/find_node_visitor.cpp \
-    creators.cpp \
-    ext/spark/SparkUpdatingHandler.cpp \
-    ext/spark/SparkDrawable.cpp \
-    ext/spark/simple_effect.cpp \
-    ext/spark/rain_effect.cpp \
-    ext/spark/fire_effect.cpp \
-    ext/spark/explosion_effect.cpp \
-    ext/spark/osgspark.cpp \
-    main_scene2.cpp \
-    tests/test_network.cpp \
-    tests/sync_qt.cpp \
-    utils/visitors/find_node_visitor.cpp
+#    shaders.cpp \
+#    objects/nodes_manager/nodes_manager.cpp \
+#    objects/nodes_manager/nodes_management.cpp \
+#    objects/nodes_manager/node_impl.cpp \
+#    materials.cpp \
+#    dubins.cpp \
+#    bada/bada_import.cpp \
+#    animation_handler.cpp \
+#    objects/aircraft/aircraft_visual.cpp \
+#    objects/aircraft/aircraft_shassis_impl.cpp \
+#    objects/aircraft/aircraft_model.cpp \
+#    phys/RigidUpdater.cpp \
+#    phys/GLDebugDrawer.cpp \
+#    phys/BulletInterface.cpp \
+#    phys/ray_cast_vehicle.cpp \
+#    phys/phys_aircraft.cpp \
+#    phys/bvh_static_mesh.cpp \
+#    phys/aircraft_phys.cpp \
+#    nfi/lib_loader.cpp \
+#    sm/ViewDependentShadowMap.cpp \
+#    sm/ShadowTechnique.cpp \
+#    sm/ShadowSettings.cpp \
+#    sm/ShadowMap.cpp \
+#    sm/ShadowedScene.cpp \
+#    av/Terrain.cpp \
+#    av/Scene.cpp \
+#    av/PreRender.cpp \
+#    av/Object.cpp \
+#    av/LOD.cpp \
+#    av/FogLayer.cpp \
+#    av/Ephemeris.cpp \
+#    av/EnvRenderer.cpp \
+#    av/CloudLayer.cpp \
+#    utils/visitors/find_node_visitor.cpp \
+#    creators.cpp \
+#    ext/spark/SparkUpdatingHandler.cpp \
+#    ext/spark/SparkDrawable.cpp \
+#    ext/spark/simple_effect.cpp \
+#    ext/spark/rain_effect.cpp \
+#    ext/spark/fire_effect.cpp \
+#    ext/spark/explosion_effect.cpp \
+#    ext/spark/osgspark.cpp \
+#    main_scene2.cpp \
+#    tests/test_network.cpp \
+#    tests/sync_qt.cpp \
+#    utils/visitors/find_node_visitor.cpp
+
+

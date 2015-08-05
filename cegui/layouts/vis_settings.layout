@@ -2,14 +2,28 @@
 
 <GUILayout version="4" >
     <Window type="TaharezLook/FrameWindow" name="FrameWindow" >
-        <Property name="Area" value="{{0,30},{0,180},{0.3,61},{0.3,334}}" />
+        <Property name="Area" value="{{0,52},{0,184},{0.3,144},{0.3,338}}" />
         <Property name="Text" value="Параметры" />
         <Window type="TaharezLook/GroupBox" name="LightParams" >
-            <Property name="Area" value="{{0,16},{0,16},{0.3,35},{0.3,265}}" />
+            <Property name="Area" value="{{0,12},{0,14},{0.3,439},{0.3,264}}" />
             <Property name="MaxSize" value="{{1,0},{1,0}}" />
             <Window type="TaharezLook/Checkbox" name="chkLights" >
                 <Property name="Area" value="{{0,25},{0,32},{0,153},{0,64}}" />
                 <Property name="Text" value="Огни" />
+            </Window>
+            <Window type="TaharezLook/Label" name="Label" >
+                <Property name="Area" value="{{0,23},{0,80},{0,151},{0,112}}" />
+                <Property name="Text" value="Grass map" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="edtGrassMap" >
+                <Property name="Area" value="{{0,181},{0,78},{0,309},{0,114}}" />
+                <Property name="TextFormatting" value="RightAligned" />
+                <Property name="AutoRenderingSurface" value="true" />
+            </Window>
+            <Window type="TaharezLook/Button" name="btnApply" >
+                <Property name="Area" value="{{0,183},{0,141},{0,304},{0,173}}" />
+                <Property name="Text" value="Apply" />
             </Window>
         </Window>
     </Window>

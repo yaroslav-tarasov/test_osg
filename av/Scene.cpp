@@ -511,7 +511,7 @@ std::string          Scene::zone_to_reload_;
 bool Scene::Create( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
 {
     _scenePtr = new Scene();
-    if ( _scenePtr->Initialize( cArgs, cTraitsPtr, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0 ) == false )
+    if ( _scenePtr->Initialize( cArgs, cTraitsPtr/*, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0*/ ) == false )
     {
         OSG_FATAL << "Failed to initialize scene" ;
         _scenePtr = NULL;
@@ -582,7 +582,7 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr, int nWidth, int nHeight)
+bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
 {
     osg::StateSet* pGlobalStateSet = getOrCreateStateSet();
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
@@ -609,7 +609,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         osg::ref_ptr<osg::GraphicsContext> cGraphicsContextPtr = osg::GraphicsContext::createGraphicsContext( cTraitsPtr.get() );
 
         _viewerPtr->getCamera()->setGraphicsContext(cGraphicsContextPtr.get());
-        _viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, nWidth, nHeight));
+        _viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, cTraitsPtr->width, cTraitsPtr->height ));
     } 
     else if (getenv("OSG_SCREEN") == NULL)
     {
@@ -681,6 +681,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
                 this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
 				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
+				this->_vis_settings_panel->subscribe_set_map(boost::bind(&Scene::onSetMap,this,_1));
                 this->_vis_settings_panel->set_light(true);
             }
         } )
@@ -1389,10 +1390,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
 
     }
-    
-
 
     return mt;
+}
+
+void   Scene::onSetMap(float val)
+{
+	_terrainNode->setGrassMapFactor(val);
 }
 
 void   Scene::onSetLights(bool on)
@@ -1403,7 +1407,7 @@ void   Scene::onSetLights(bool on)
 
 void   Scene::onZoneChanged(int zone)
 {
-    const char* scene_name[] = {"empty","adler","sheremetyevo"};
+    const char* scene_name[] = {"empty","adler","sheremetyevo","minsk"};
     
     zone_to_reload_ = scene_name[zone];
 
@@ -1414,7 +1418,7 @@ void   Scene::onZoneChanged(int zone)
 
 }
 
-bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv )
+bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & /*aa*/, osg::Object * /*obj*/, osg::NodeVisitor * /*nv*/ )
 {
     if (ea.getHandled() || ea.getEventType() != osgGA::GUIEventAdapter::KEYUP)
         return false;

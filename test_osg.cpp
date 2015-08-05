@@ -57,14 +57,14 @@ class LogFileHandler : public osg::NotifyHandler
 
 int main( int argc, char** argv )
 {  
-    osg::setNotifyLevel( osg::NOTICE/*WARN*/ );
+    osg::setNotifyLevel( osg::INFO/*NOTICE*//*WARN*/ );
     osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
     osg::notify(osg::INFO) << "Start this program \n";
     
     osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
-    auto fp = fn_reg::function<int( int argc, char** argv )>("av_scene");
+    auto fp = fn_reg::function<int( int argc, char** argv )>("av_scene");//"av_scene"
 
     if(fp)
         return fp(argc, argv);

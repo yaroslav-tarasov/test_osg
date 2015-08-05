@@ -13,7 +13,7 @@ const  String btn_exit_name  ( "btnExit"		);
 const  String main_menu_name ( "mainMenuBar"    );
 const  String tb_name		 ( "tbLight"        );
 
-void subscribeEvent(const String& widget, const String& event, const Event::Subscriber& method)
+ void subscribeEvent(const String& widget, const String& event, const Event::Subscriber& method)
 {
     GUIContext& context = System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
@@ -38,6 +38,19 @@ bool isCheckboxSelected(const CEGUI::String& checkbox)
     return false;
 }
 
+std::string getEditboxText(const CEGUI::String& editbox)
+{
+	GUIContext& context = System::getSingleton().getDefaultGUIContext();
+	CEGUI::Window* root = context.getRootWindow();
+	// Check
+	if (root->isChild(editbox))
+	{
+		Editbox* button = static_cast<Editbox*>(root->getChild(editbox));
+		return std::string(button->getText().c_str());
+	}
+	return "";
+}
+
 vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
 {
     GUIContext& context = System::getSingleton().getDefaultGUIContext();
@@ -48,7 +61,7 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
     FrameWindow* demoWindow = static_cast<FrameWindow*>(
         CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "DemoWindow") );
     demoWindow->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim(0.5f)));
-    demoWindow->setSize(USize(cegui_reldim(0.3f), cegui_reldim(0.3f)));
+    //demoWindow->setSize(USize(cegui_reldim(0.3f), cegui_reldim(0.3f)));
     demoWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
     demoWindow->setText( "Choose Zone" );
 
@@ -148,7 +161,27 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
 
         }));
 
+	subscribeEvent("FrameWindow/LightParams/edtGrassMap", CEGUI::Editbox::EventTextAccepted,
+		Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
+	{
 
+		std::string param = getEditboxText("FrameWindow/LightParams/edtGrassMap");
+		set_map_signal_(boost::lexical_cast<float>(param.empty()?"0":param)); 
+		return true;
+
+	}));
+
+	subscribeEvent("FrameWindow/LightParams/btnApply", PushButton::EventClicked,
+		Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
+	{
+
+		std::string param = getEditboxText("FrameWindow/LightParams/edtGrassMap");
+		set_map_signal_(boost::lexical_cast<float>(param.empty()?"0":param)); 
+		return true;
+
+	}));
+
+ 
 	//CEGUI::Menubar* menuBar = dynamic_cast<CEGUI::Menubar*>(CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Menubar", main_menu_name));
 	//if(menuBar)
 	//{     
