@@ -1,8 +1,3 @@
-//////////////////////////////////////////////////////////////////////////
-// Copyright (C) 2009 Kongsberg Maritime AS, Marine IT Division Simulation
-// All rights reserved.
-//////////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
 #include <osg/BlendFunc>
 #include "Clouds.h"
@@ -36,7 +31,7 @@ private:
             uniform->set( osg::Vec4( 5000.0, clamp( (fCloudsDensity-0.666f) * 3.333f, 0.0f, 1.0f ), 3, -3 ) );
             break;
         default:
-            svError( "Unknwon clouds layer" );
+            avError( "Unknown clouds layer" );
             break;
         }
     }
@@ -159,7 +154,7 @@ bool Clouds::FrameCall()
 		vParams[ 3 ] = fTime * 0.04f;
 		break;
 	default:
-		svError( "Unknown clouds type" );
+		avError( "Unknown clouds type" );
 		break;
 	}
 

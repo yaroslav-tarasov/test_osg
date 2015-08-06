@@ -1,12 +1,11 @@
 #include "stdafx.h"
 
 #include "Grass.h"
+#include "creators.h"
+
 
 namespace avTerrain
 {
-
-
-
 
 void createDAIGeometry( osg::Geometry& geom, int nInstances=1 )
 {
@@ -51,7 +50,7 @@ void createDAIGeometry( osg::Geometry& geom, int nInstances=1 )
 Grass::Grass ()
 {
 
-	_instances	= 4024.0f;		// grid cells _instances*_instances // 40 bydef
+	_instances	= 1024.0f;		// grid cells _instances*_instances // 40 bydef
 	_spacing		= 0.2f;		// spacing
 	_heightAdjust	= 0.0f;
 	_grassStretch	= 0.1f;
@@ -86,18 +85,6 @@ osg::Node*  Grass::_create()
 	geomGrass->setInitialBound( bb );
 	_geodeGrass->addDrawable( geomGrass.get() );
 
-	osg::Shader* vertexShader = new osg::Shader();
-	vertexShader->setType( osg::Shader::VERTEX );
-	vertexShader->loadShaderSourceFromFile( "grass.vert" );
-
-	osg::Shader* fragShader = new osg::Shader();
-	fragShader->setType( osg::Shader::FRAGMENT );
-	fragShader->loadShaderSourceFromFile( "grass.frag" );
-
-	osg::Program*  program = new osg::Program();
-	program->addShader( vertexShader );
-	program->addShader( fragShader );
-
 	_buildStateSet(_geodeGrass);
 
 	osg::PositionAttitudeTransform* rPat = new osg::PositionAttitudeTransform;
@@ -111,17 +98,30 @@ osg::Node*  Grass::_create()
 
 void   Grass::_buildStateSet(osg::Node* node)
 {
-	osg::Shader* vertexShader = new osg::Shader();
-	vertexShader->setType( osg::Shader::VERTEX );
-	vertexShader->loadShaderSourceFromFile( "grass.vert" );
+    std::string grass_vert = Database::LoadShader("grass/grass.vert");     
+    
+    if (grass_vert.empty())
+        return;
 
-	osg::Shader* fragShader = new osg::Shader();
-	fragShader->setType( osg::Shader::FRAGMENT );
-	fragShader->loadShaderSourceFromFile( "grass.frag" );
+    std::string grass_frag = Database::LoadShader("grass/grass.frag");     
 
-	osg::Program*  program = new osg::Program();
-	program->addShader( vertexShader );
-	program->addShader( fragShader );
+    if (grass_frag.empty())
+        return;
+
+
+    osg::Shader* vertexShader = new osg::Shader();
+    vertexShader->setType( osg::Shader::VERTEX );
+    //vertexShader->loadShaderSourceFromFile( osgDB::findDataFile("grass/grass.vert") );
+    vertexShader->setShaderSource(grass_vert);
+
+    osg::Shader* fragShader = new osg::Shader();
+    fragShader->setType( osg::Shader::FRAGMENT );
+    //fragShader->loadShaderSourceFromFile( osgDB::findDataFile("grass/grass.frag") );
+    fragShader->setShaderSource(grass_frag);
+
+    osg::Program*  program = new osg::Program();
+    program->addShader( vertexShader );
+    program->addShader( fragShader );
 
 	osg::StateSet* ss = node->getOrCreateStateSet();
 	ss->setAttribute( program, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
@@ -158,7 +158,7 @@ void   Grass::_buildStateSet(osg::Node* node)
     ss->addUniform( unfGrassMapFactor_ );
 
 	osg::Texture2D* pTex = new osg::Texture2D;
-	osg::Image* pImage = osgDB::readImageFile( "grass2.tga" );
+	osg::Image* pImage = osgDB::readImageFile( osgDB::findDataFile("grass/grass2.tga") );
 	pTex->setImage( pImage );
 	ss->setTextureAttributeAndModes( 0, pTex, osg::StateAttribute::ON );
 	ss->setMode( GL_BLEND, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );

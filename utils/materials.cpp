@@ -7,22 +7,22 @@
 
 namespace creators 
 {
-class FogCallback: public osg::Uniform::Callback
-{
-public:
-    virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
-    {
-        //float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
-        //float sine = sinf( angle );        // -1 -> 1
-        //float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
-        //float v10 = 1.0f - v01;                //  1 -> 0
-
-        double  fractpart, intpart;
-        fractpart = modf (nv->getFrameStamp()->getSimulationTime() / 100.0f , &intpart);
-
-        uniform->set( osg::Vec4(/*1.505f*/1.5f, /*0.8f*v01*/1.5f, 1.5f, 100*fractpart) ); 
-    }
-};
+//class FogCallback: public osg::Uniform::Callback
+//{
+//public:
+//    virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
+//    {
+//        //float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
+//        //float sine = sinf( angle );        // -1 -> 1
+//        //float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
+//        //float v10 = 1.0f - v01;                //  1 -> 0
+//
+//        double  fractpart, intpart;
+//        fractpart = modf (nv->getFrameStamp()->getSimulationTime() / 100.0f , &intpart);
+//
+//        uniform->set( osg::Vec4(/*1.505f*/1.5f, /*0.8f*v01*/1.5f, 1.5f, 100*fractpart) ); 
+//    }
+//};
 
 class texturesHolder  : public texturesHolder_base
 {
@@ -310,8 +310,6 @@ public:
 
             }
 
-            //std::string fs_shader(GetShader(shaders::FS,mat_name));
-            //fs_shader.replace('','');
             if(GetShader(shaders::FS,mat_name))
             {
                 std::string prog = "#version " + boost::lexical_cast<string>(version) + "\n " + osg_modification(version,*GetShader(shaders::FS,mat_name));
@@ -423,13 +421,13 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
 
     stateset->setAttributeAndModes( p.program.get() );
 
-    if ( mat_name.find("panorama") !=std::string::npos )
-    {     
-        osg::Uniform* uni_fog =  new osg::Uniform("fog_params", osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-        stateset->addUniform( uni_fog );
-        uni_fog->setUpdateCallback(new FogCallback);
-        uni_fog->setDataVariance(osg::Object::DYNAMIC);
-    }
+    //if ( mat_name.find("panorama") !=std::string::npos )
+    //{     
+    //    osg::Uniform* uni_fog =  new osg::Uniform("fog_params", osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    //    stateset->addUniform( uni_fog );
+    //    uni_fog->setUpdateCallback(new FogCallback);
+    //    uni_fog->setDataVariance(osg::Object::DYNAMIC);
+    //}
 
     FIXME(Alpha to coverage и прочие прелести надо бы включать во внешнем источнике)
     if (   mat_name.find("panorama") !=std::string::npos

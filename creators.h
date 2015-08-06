@@ -139,6 +139,11 @@ namespace spark
     spark_pair_t create(spark_t effectType,osg::Transform* model=nullptr);
 }
 
+namespace Database
+{
+    std::string LoadShader(const std::string& name);
+} // ns Database
+
 
 #define GLSL_VERSION  130
 #define ORIG_EPHEMERIS

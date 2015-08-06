@@ -89,6 +89,7 @@ namespace cg
 
 #define Assert(x) if(x){};
 #define avAssert(x) assert(x)
+#define avError(x)  assert(x)
 
 enum render_order_t {
     RENDER_BIN_SCENE                    =  0,

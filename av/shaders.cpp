@@ -1880,10 +1880,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
 
                 //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
                 viewworld_matrix = inverse(gl_ModelViewMatrix);
                 v_out.normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
-                //v_out.normal = vec3(gl_ModelViewMatrixInverse[0][2], gl_ModelViewMatrixInverse[1][2], gl_ModelViewMatrixInverse[2][2]);
                 v_out.viewpos   = vertexInEye.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
             }       
@@ -1899,8 +1898,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             STRINGIFY ( 
 
-            uniform vec4                fog_params; 
-            in mat4 viewworld_matrix;
+            //uniform vec4    fog_params; 
+            in mat4         viewworld_matrix;
 
             )
 
@@ -1915,7 +1914,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
             uniform sampler2D colorTex;
-            //varying vec3 lightDir;
 
             in block
             {
@@ -1928,10 +1926,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)
             {
-                //vec4  light_vec_view =  vec4(lightDir,1);
-                //viewworld_matrix = gl_ModelViewMatrixInverse;
-                // FIXME dummy code
-
                 vec3 normal = normalize(f_in.normal);
                 float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
 
@@ -2002,7 +1996,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
 
 
-            uniform vec4                fog_params;     
+            //uniform vec4                fog_params;     
             uniform vec4                SkyFogParams;  
             
 

@@ -112,31 +112,43 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="shaders\tess.frag">
+    <None Include="misc\shaders\tess_quad.tcs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess.geo">
+    <None Include="misc\shaders\tess_quad.tes">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess.vs">
+    <None Include="misc\shaders\tess_tri.tcs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess_quad.tcs">
+    <None Include="misc\shaders\tess_tri.tes">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess_quad.tes">
+    <None Include="misc\shaders\grass.frag">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess_tri.tcs">
+    <None Include="misc\shaders\grass.vert">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="shaders\tess_tri.tes">
+    <None Include="misc\shaders\tess.frag">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.vert">
+    <None Include="misc\shaders\tess.geo">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\grass.frag">
+    <None Include="misc\shaders\tess.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\headers\fog.hlsl">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\headers\scene_params.hlsl">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\headers\spot_lights.hlsl">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\headers\utils.hlsl">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>

@@ -1,5 +1,22 @@
 // grass.vert
-#extension GL_EXT_gpu_shader4 : enable
+#version 130
+#extension GL_ARB_gpu_shader5 : enable
+
+
+#include "scene_params.hlsl" 
+#include "utils.hlsl" 
+#include "spot_lights.hlsl"
+
+out mat4 viewworld_matrix;
+
+out block
+{
+    vec2 texcoord;
+    vec3 normal;
+    vec3 viewpos;
+    vec4 shadow_view;
+    vec4 lightmap_coord;
+} v_out;
 
 uniform int			cc;
 uniform float		spacing;
@@ -101,7 +118,22 @@ void simple2()
 	xx.z = 0.0;
 	yy.z = 0.0;
 	vec3 vertex = xx + yy + vec3( 0.0, 0.0, gl_Vertex.z );
+
+/////////////////
+// FIXME not tested
+	viewworld_matrix = inverse(gl_ModelViewMatrix);
+
+	//vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+    vec4 vertexInEye = gl_ModelViewMatrix * mV * vec4( vertex, 1.0 );
+
+    v_out.normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+    //v_out.normal    = normal;
+    v_out.viewpos   = vertexInEye.xyz;
+    v_out.texcoord  = gl_TexCoord[0].st;
+
 	
+///////////////
+
     gl_Position = gl_ModelViewProjectionMatrix * mV * vec4( vertex, 1.0 );
 }
 

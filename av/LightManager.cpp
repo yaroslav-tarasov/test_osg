@@ -75,7 +75,7 @@ void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStr
 
     if (it == g_MessageMap.end())
     {
-        svError("Unknown event");
+        avError("Unknown event");
         return;
     }
 
@@ -140,7 +140,7 @@ void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStr
         break;
 
     default:
-        svError("message not handled");
+        avError("message not handled");
         break;
     }
 }
