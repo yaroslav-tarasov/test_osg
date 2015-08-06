@@ -32,7 +32,7 @@ void main()
     float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.75, 0.25));
 
     vec4 dif_tex_col = texture2D(tex, f_in.texcoord);
-    vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb * 0.75;
+    vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb * 0.65;
                 
     aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), dif_tex_col.a);
 }
