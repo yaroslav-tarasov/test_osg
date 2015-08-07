@@ -7,6 +7,8 @@
 #include "utils.hlsl" 
 #include "spot_lights.hlsl"
 
+#pragma alpha_to_coverage on
+
 out mat4 viewworld_matrix;
 
 out block

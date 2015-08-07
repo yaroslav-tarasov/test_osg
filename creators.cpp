@@ -1734,7 +1734,7 @@ namespace utils
     }
 }
 
-namespace Database
+namespace database
 {
 
 bool LoadShaderInternal( const std::string & fileName, std::ostream & text )

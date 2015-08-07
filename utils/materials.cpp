@@ -117,7 +117,7 @@ private:
         envTex->setUseHardwareMipMapGeneration(true);
 #endif
 
-
+FIXME(Все теже кривые плоскости)
 #ifdef TEST_EVN_CUBE_MAP 
 #if 1
 /*        envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
@@ -327,6 +327,19 @@ public:
         return GetPrograms()[mat_name];
     }
 
+    static inline std::string GetMaterialName( const std::string& mat_name )
+    {
+         std::string mat_name_cut = mat_name.substr(0, mat_name.find("_"));
+         FIXME( "Есть где-то buildingtrack" ) 
+
+         if (mat_name.find("building") !=std::string::npos)
+         {
+              return"building"; 
+         }
+
+         return mat_name_cut;
+    }
+
 private:
     
     static inline boost::optional<std::string> GetShader(const shaders::shader_t& t, const std::string& mat_name)
@@ -341,19 +354,20 @@ private:
 
     static inline const char* GetShader_internal(const shaders::shader_t& t, const std::string& mat_name)
     {
-        std::string mat_name_cut = mat_name.substr(0, mat_name.find("_"));
+        std::string mat_name_cut = GetMaterialName(mat_name);
 
         auto fp = fn_reg::function<const char*(shaders::shader_t)>(mat_name_cut);
         
         if (fp)
             return fp(t);
 
-        FIXME( "Есть где-то buildingtrack" ) 
+        //FIXME( "Есть где-то buildingtrack" ) 
 
-        if (mat_name.find("building") !=std::string::npos)
-        {
-            return shaders::building_mat::get_shader(t); 
-        }
+        //if (mat_name.find("building") !=std::string::npos)
+        //{
+        //    return shaders::building_mat::get_shader(t); 
+        //}
+
         if (mat_name.find("default") !=std::string::npos)
         {
             return shaders::default_mat::get_shader(t);  
@@ -362,6 +376,7 @@ private:
         return nullptr;
 
     }
+
 
 
     static inline std::map<std::string,program_t>& GetPrograms()
@@ -428,13 +443,10 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
     //    uni_fog->setUpdateCallback(new FogCallback);
     //    uni_fog->setDataVariance(osg::Object::DYNAMIC);
     //}
+ 
+    std::ifstream alpha_file(osgDB::findDataFile(programsHolder::GetMaterialName(mat_name) + "\\alpha_to_coverage.on"));
 
-    FIXME(Alpha to coverage и прочие прелести надо бы включать во внешнем источнике)
-    if (   mat_name.find("panorama") !=std::string::npos
-        || mat_name.find("railing")  !=std::string::npos 
-        || mat_name.find("tree")     !=std::string::npos
-        || mat_name.find("rotor")     !=std::string::npos
-        )
+    if ( alpha_file.good() )
     { 
         stateset->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);               
     }

@@ -11,6 +11,7 @@ in mat4 viewworld_matrix;
 #include "fog.hlsl"
 #include "utils.hlsl"
 
+
 in block
 {
     vec2 texcoord;
