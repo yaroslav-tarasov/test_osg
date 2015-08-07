@@ -81,8 +81,8 @@ osg::Node*  Grass::_create()
 	_geodeGrass->setCullingActive( false );   
 
 	float len = (_instances/2.0f)*_spacing;
-	osg::BoundingBox bb( -len, -len, 0.0f, len, len, 1.0f );
-	geomGrass->setInitialBound( bb );
+	//osg::BoundingBox bb( -len, -len, 0.0f, len, len, 1.0f );
+	//geomGrass->setInitialBound( bb );
 	_geodeGrass->addDrawable( geomGrass.get() );
 
 	_buildStateSet(_geodeGrass);
@@ -189,7 +189,7 @@ bool Grass::_createMap()
 	{
 		osg::StateSet* stateset = _geodeGrass->getOrCreateStateSet();
 		
-		stateset->addUniform( new osg::Uniform("texMap", 1));
+		stateset->addUniform( new osg::Uniform("texMap", 7));
 
 		_map = new osg::Texture2D;
 		_map->setTextureSize(_width, _height);
@@ -197,7 +197,7 @@ bool Grass::_createMap()
 		_map->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
 		//_map->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		//_map->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-		stateset->setTextureAttributeAndModes(1, _map.get(), osg::StateAttribute::ON);
+		stateset->setTextureAttributeAndModes(7, _map.get(), osg::StateAttribute::ON|osg::StateAttribute::PROTECTED);
 
 	}
 
@@ -210,7 +210,7 @@ bool Grass::_createMap()
 		for(unsigned x=0; x < _width; x++)
 		{
 			// data[y*_width + x] = (unsigned char) (0.5 * 255.0 + Utility::getNoise(x, y, random) * 0.5 * 255.0);
-			data[y*_width + x] = (unsigned char) (/*0.5 */ (y + _height *.5) * (y + _height *.5) +(x + _width *.5)*(x + _width *.5) < 10000? 255.0:0.0 /*+ Utility::getNoise(x, y, random) * 0.5 * 255.0*/);
+			data[y*_width + x] = (unsigned char) (/*0.5 */ (y - _height *.5) * (y - _height *.5) +(x - _width *.5)*(x - _width *.5) < 100000? 255.0:0.0 /*+ Utility::getNoise(x, y, random) * 0.5 * 255.0*/);
 		}
 #if 0
 	//if style isn't crayon style, smooth the noise map

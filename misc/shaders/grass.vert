@@ -31,6 +31,9 @@ uniform float		heightAdjust;
 uniform float		windFactor;
 uniform float		grassStretch;
 
+
+uniform sampler2D   texMap;
+
 float IntNoise1( int x )
 {
 	int iSeed = 1000;
@@ -60,16 +63,26 @@ void simple2()
 	// add random displacement
 	pos2.x = mod( pos2.x+IntNoise1( gl_InstanceID ), 1.0 );
 	pos2.y = mod( pos2.y+IntNoise1( gl_InstanceID ), 1.0 );
+
+
+
 	
 	// do displacement here (this is what lets the grass scroll when the camera moves)
 	vec4 thisCamPos = gl_ModelViewMatrixInverse*vec4(0,0,0,1);
 	float xNorm = -mod( thisCamPos.x, len )/len;
+
 	float yNorm = -mod( thisCamPos.y, len )/len;
 	pos2.x = mod( pos2.x+xNorm, 1.0 );
 	pos2.y = mod( pos2.y+yNorm, 1.0 );
 
-	pos2.x -= 0.5;
-	pos2.y -= 0.5;
+	//if( length(pos2) > 0.1 )
+	if (texture2D(texMap,vec2( pos2.y, pos2.x)).r==0)
+	{
+		gl_Position = vec4(1.1,1.1,1.1,1.0);
+		return;
+	}
+	
+	pos2 -= vec2(0.5);
 
 	// offsets for grass so it's always under the camera
 	vec4 cam_world_pos;
