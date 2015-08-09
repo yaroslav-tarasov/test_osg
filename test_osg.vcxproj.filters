@@ -623,5 +623,8 @@
     <ClCompile Include="av\Grass.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
+    <ClCompile Include="av\Grass2.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -156,6 +156,7 @@
     <ClCompile Include="av\Ephemeris.cpp" />
     <ClCompile Include="av\FogLayer.cpp" />
     <ClCompile Include="av\Grass.cpp" />
+    <ClCompile Include="av\Grass2.cpp" />
     <ClCompile Include="av\LightManager.cpp" />
     <ClCompile Include="av\Lights.cpp" />
     <ClCompile Include="av\LOD.cpp" />

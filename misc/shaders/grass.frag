@@ -1,5 +1,5 @@
 // grass.frag
-#version 130
+#version 150 compatibility
 #extension GL_ARB_gpu_shader5 : enable
 
 uniform sampler2D tex;
