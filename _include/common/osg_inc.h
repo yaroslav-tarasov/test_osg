@@ -123,7 +123,27 @@
 #pragma comment(lib, "BulletDynamics_Debug.lib")
 #pragma comment(lib, "BulletWorldImporter_Debug.lib")
 #pragma comment(lib, "BulletFileLoader_Debug.lib")
-#else 
+#else
+#ifdef OSG_USE_MINREL
+#pragma comment(lib, "osgTexts.lib")
+#pragma comment(lib, "osgShadows.lib")
+#pragma comment(lib, "osgFXs.lib")
+#pragma comment(lib, "osgEphemeriss.lib")
+#pragma comment(lib, "OpenThreadss.lib")
+#pragma comment(lib, "osgs.lib")
+#pragma comment(lib, "osgDBs.lib")
+#pragma comment(lib, "osgViewers.lib")
+#pragma comment(lib, "osgAnimations.lib")
+#pragma comment(lib, "osgGAs.lib")
+#pragma comment(lib, "osgUtils.lib")
+#pragma comment(lib, "osgSims.lib")
+#pragma comment(lib, "osgParticles.lib")
+#pragma comment(lib, "BulletCollision.lib")
+#pragma comment(lib, "LinearMath.lib")
+#pragma comment(lib, "BulletDynamics.lib")   
+#pragma comment(lib, "BulletWorldImporter.lib")
+#pragma comment(lib, "BulletFileLoader.lib")
+#else
 #pragma comment(lib, "osgText.lib")
 #pragma comment(lib, "osgShadow.lib")
 #pragma comment(lib, "osgFX.lib")
@@ -142,4 +162,5 @@
 #pragma comment(lib, "BulletDynamics.lib")   
 #pragma comment(lib, "BulletWorldImporter.lib")
 #pragma comment(lib, "BulletFileLoader.lib")
+#endif
 #endif

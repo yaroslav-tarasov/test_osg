@@ -138,8 +138,8 @@ void  Terrain::create( std::string name )
     addChild(grass);
     _grass = grass;
 
-	blender::Grass* grass2 = new blender::Grass();
-	addChild(grass2);
+	//blender::Grass* grass2 = new blender::Grass();
+	//addChild(grass2);
 
 #if 0
     auto ret_array  = creators::createMovingModel(center,radius*0.8f);

@@ -328,7 +328,7 @@ namespace bi
 
             aircraft::settings_t as;
             as.kind = "KA27";
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         fms::trajectory::keypoints_t  kpts;
@@ -348,7 +348,7 @@ namespace bi
 
             auto pit = std::prev(it);
             if(pit!=it)
-                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time) + 20));
+                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time)/* + 20*/));
                 // vel.push_back(dist/(it->time - pit->time));
             prev = p;
         }
