@@ -1,10 +1,11 @@
 @echo off
 
-set osg_bin_path = %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin
+set osg_bin_path=%OSG_DIR%\OpenSceneGraph-3.2.1\build\bin
 
-if not exist %osg_bin_path%\data md osg_bin_path\data
-if not exist %osg_bin_path%\data\materials md osg_bin_path\data\materials
-if not exist %osg_bin_path%\data\materials\blender md osg_bin_path\data\blender
+if not exist %osg_bin_path%\data md %osg_bin_path%\data
+if not exist %osg_bin_path%\data\materials md %osg_bin_path%\data\materials
+if not exist %osg_bin_path%\data\materials\blender md %osg_bin_path%\data\materials\blender
+if not exist %osg_bin_path%\data\materials\blender\grass md %osg_bin_path%\data\materials\blender\grass
 
 @echo on
 
