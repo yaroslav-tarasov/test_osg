@@ -192,8 +192,8 @@ FIXME(Все теже кривые плоскости)
                 {   
                     auto imf = osgDB::readImageFile(name);
                     t.colorTex->setImage( imf );
-                    t.colorTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                    t.colorTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+                    t.colorTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
+                    t.colorTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
                     t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.colorTex->setMaxAnisotropy(16.0f);
 
@@ -207,8 +207,8 @@ FIXME(Все теже кривые плоскости)
                 {   
                     auto imf = osgDB::readImageFile(name);
                     t.normalTex->setImage( imf );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP );
+                    t.normalTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::CLAMP*/ );
+                    t.normalTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::CLAMP*/ );
                     t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.normalTex->setMaxAnisotropy(16.0f);
 
@@ -218,8 +218,8 @@ FIXME(Все теже кривые плоскости)
                 if(it->second.unit == 2)
                 {
                     t.nightTex->setImage( osgDB::readImageFile(name) );
-                    t.nightTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-                    t.nightTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+                    t.nightTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
+                    t.nightTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
                     t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
                     t.nightTex->setMaxAnisotropy(16.0f);
 
@@ -467,7 +467,22 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
 
 namespace mat
 {
-
+    inline osg::Texture::WrapMode getWrapMode(std::string wrap)
+    {
+        if (wrap == "repeat")
+            return osg::Texture::REPEAT;
+        if (wrap == "mirror")
+            return osg::Texture::MIRROR;
+        if (wrap == "clamp")
+            return osg::Texture::CLAMP;
+        if (wrap == "clamp_to_edge")
+            return osg::Texture::CLAMP_TO_EDGE;
+        if (wrap == "clamp_to_border")
+            return osg::Texture::CLAMP_TO_BORDER;
+        
+        OSG_WARN << "Unrecognized WrapMode." << std::endl;
+        return osg::Texture::CLAMP;
+    }
 
     reader::reader()
     {
@@ -497,6 +512,8 @@ namespace mat
                     texture_t tex;
                     tex.path = t.attribute("path").as_string();
                     tex.unit = t.attribute("unit").as_int();
+                    tex.wrap_s =  getWrapMode(t.attribute("wrap_s").as_string());
+                    tex.wrap_t =  getWrapMode(t.attribute("wrap_t").as_string());
                     mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
                 }
             }	

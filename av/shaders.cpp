@@ -1109,12 +1109,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-                // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
-                // lightDir = normalize(rotation * normalize(lightDir));
-                //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 
                 v_out.normal    = normal;
@@ -1159,7 +1156,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             STRINGIFY ( 
 
-            uniform sampler2D colorTex;
+            uniform sampler2D       colorTex;
+
+            uniform sampler2D       nightTex;    // testing purpose only
+            uniform sampler2D       normalTex;
+
             //varying vec3 lightDir;
 
             in block
@@ -1201,6 +1202,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n
 \n                float rainy_value = 0.666 * specular.a;
 \n
+\n                // test for 
+\n                // vec3 dif_tex_col = mix(texture2D(nightTex, f_in.texcoord).rgb,texture2D(colorTex, f_in.texcoord).rgb,texture2D(normalTex, f_in.texcoord).r);
 \n                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
 \n                dif_tex_col *= fma(dif_tex_col, vec3(rainy_value,rainy_value,rainy_value)/*rainy_value.xxx*/, vec3(1.0 - rainy_value));
 \n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);

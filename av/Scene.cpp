@@ -662,6 +662,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         {
             if (!this->_vis_settings_panel )
             {
+
                 app::zones_t zones_;
                 zones_.push_back(std::make_pair(0,std::wstring(L"Пустая сцена")));
                 zones_.push_back(std::make_pair(1,std::wstring(L"Шереметьево")));
@@ -670,7 +671,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
 				this->_mw = app::create_main_win();
 				app::menu_ptr fm = this->_mw->add_main_menu("File");
-				fm->add_string("Exit" , [=]() { exit(0); });
+				fm->add_string("Exit" , boost::bind(&Scene::onExit,this)); // [&]() { /*exit(0);*/});
 
 				app::menu_ptr vm = this->_mw->add_main_menu("View");
 				vm->add_string("Lights" , [=]() {  });
@@ -679,7 +680,7 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
 
 				this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
                 this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
-                this->_vis_settings_panel->subscribe_exit_app    ([=]() { exit(0); });
+                this->_vis_settings_panel->subscribe_exit_app    (boost::bind(&Scene::onExit,this));
 				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
 				this->_vis_settings_panel->subscribe_set_map(boost::bind(&Scene::onSetMap,this,_1));
                 this->_vis_settings_panel->set_light(true);
@@ -1461,4 +1462,9 @@ void Scene::createRTT()
     tn->addDrawable( new TeapotDrawable(1.0f) );
     rttCamera->addChild(tn);
     rttCamera->setViewMatrix(osg::Matrixd::scale(1,1,-1)); // Flip Z axis
+}
+
+void Scene::onExit()
+{
+    _viewerPtr->setDone(true);
 }

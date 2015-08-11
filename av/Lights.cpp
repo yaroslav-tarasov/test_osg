@@ -208,7 +208,7 @@ bool LightNodeHandler::_init = false;
 
 // constructor
 LightNodeHandler::LightNodeHandler( LightInfluence maxInfluenceToUse, bool init )
-    : m_pFatherRef(GetScene()->getLights())
+    : m_pFatherRef(GetScene()?GetScene()->getLights():nullptr)
     , m_uMaxPriority((unsigned)maxInfluenceToUse)
     , m_bStatePushed(false)
     , m_bMainWasActive(false)

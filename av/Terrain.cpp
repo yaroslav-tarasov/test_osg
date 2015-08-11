@@ -24,6 +24,7 @@
 #include "av/Grass.h"
 #include "av/Grass2.h"
 
+
 namespace avTerrain
 {
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      

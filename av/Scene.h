@@ -76,6 +76,7 @@ namespace avScene {
 		void										onSetLights  ( bool on  );
 		void										onSetMap     ( float val );
         bool                                        onEvent      ( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
+        void                                        onExit();
     private:
 
         static osg::ref_ptr<Scene>                  _scenePtr;

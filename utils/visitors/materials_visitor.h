@@ -6,6 +6,8 @@ namespace mat
     {
         int         unit;
         std::string path;
+        osg::Texture::WrapMode wrap_s;
+        osg::Texture::WrapMode wrap_t;
     };
 
     typedef std::multimap<std::string,texture_t> materials_t;
