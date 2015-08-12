@@ -4,12 +4,20 @@
 #include "creators.h"
 
 #include "async_services/async_services.h"
+#include "network/msg_dispatcher.h"
+#include "common/test_msgs.h"
+
 
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
 using network::tcp_socket;
 using network::error_code;
+
+using network::msg_dispatcher;
+using network::tcp_fragment_wrapper;
+
+using namespace net_layer::test_msg;
 
 namespace
 {
@@ -33,6 +41,12 @@ struct server
         , timer_  (boost::bind(&server::update, this))
         
     {   
+
+        disp_
+            .add<setup                 >(boost::bind(&server::on_setup        , this, _1))
+            .add<run                   >(boost::bind(&server::on_run        , this, _1))
+            ;
+
         FIXME(Тут должно быть все гораздо сложнее);
         update();
     }
@@ -51,13 +65,56 @@ private:
 
     void on_accepted(network::tcp::socket& sock, endpoint const& peer)
     {
-        client_ = in_place(boost::ref(sock), network::on_receive_f(), &tcp_error, &tcp_error);
+        //client_ = in_place(boost::ref(sock), network::on_receive_f(), boost::bind(&server::on_disconnected,this,_1)/*&tcp_error*/, &tcp_error);
+        uint32_t id = next_id();
+        sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
+            sock, boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, id),
+            boost::bind(&server::on_disconnected, this, _1, id),
+            boost::bind(&server::on_error, this, _1, id)));        
+        
         LogInfo("Client " << peer << " accepted");
+    }
+
+    void on_disconnected(error_code const& ec)      
+    {
+         LogInfo("Client " << " disconnected with error: " << ec.message() );
+    }
+    
+    void on_disconnected(boost::system::error_code const& ec, uint32_t sock_id)
+    {  
+        LogInfo("Client " << sock_id << " disconnected with error: " << ec.message() );
+        sockets_.erase(sock_id);
+        // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
+    }
+    
+    void on_error(boost::system::error_code const& ec, uint32_t sock_id)
+    {
+        LogError("TCP error: " << ec.message());
+        sockets_.erase(sock_id);
+        // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
+    }
+    
+    void on_setup(setup const& msg)
+    {
+         LogError("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+    }
+
+    void on_run(run const& msg)
+    {
+        LogError("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+    }
+
+    uint32_t next_id()
+    {
+        static uint32_t id = 0;
+        return id++;
     }
 
 private:
     async_acceptor          acc_   ;
     optional<tcp_socket>    client_;
+    msg_dispatcher<uint32_t>  disp_;
+    std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
 
 private:
     async_timer             timer_; 
@@ -108,6 +165,8 @@ int av_scene( int argc, char** argv )
 
     async_services_initializer asi(false);
     
+    logging::add_console_writer();
+
     __main_srvc__ = &(asi.get_service());
 
     try
@@ -146,7 +205,7 @@ int av_scene( int argc, char** argv )
 
 
     
-    asi.get_service().run();
+    //asi.get_service().run();
 
 
 #if 0
