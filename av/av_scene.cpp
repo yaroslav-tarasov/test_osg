@@ -66,6 +66,7 @@ private:
     void on_accepted(network::tcp::socket& sock, endpoint const& peer)
     {
         //client_ = in_place(boost::ref(sock), network::on_receive_f(), boost::bind(&server::on_disconnected,this,_1)/*&tcp_error*/, &tcp_error);
+        
         uint32_t id = next_id();
         sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, id),
@@ -96,12 +97,12 @@ private:
     
     void on_setup(setup const& msg)
     {
-         LogError("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+         LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
 
     void on_run(run const& msg)
     {
-        LogError("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+        LogInfo("Got run message: " << msg.srv_time << " : " << msg.task_time );
     }
 
     uint32_t next_id()

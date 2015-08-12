@@ -35,6 +35,7 @@ struct client
 
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
+        , timer_  (boost::bind(&client::update, this))
     {
         LogInfo("Connecting to " << peer);
     }
@@ -58,57 +59,43 @@ struct client
         }
     }
 
+private:
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
     {
         LogInfo("Connected to " << peer);
         srv_ = in_place(boost::ref(sock), boost::bind(&client::on_receive, this, _1, _2), &tcp_error, &tcp_error);
         
-        binary::bytes_t bts =  /*std::move(*/wrap_msg(setup(1111,2222))/*)*/;
-        // srv_->send(&bts[0], bts.size());
+        binary::bytes_t bts =  std::move(wrap_msg(setup(1111,2222)));
         send(&bts[0], bts.size());
-        // srv_->read();
+
+        start_send();
     }
 
     void on_receive(const void* msg, size_t size)
     {
-        //LogInfo("Some data received");
-#if 0
-        auto cmsg = static_cast<const char*>(msg);
-        bytes_t data(cmsg, cmsg + size);
-
-        auto it = data.begin();
-        while (it != data.end())
-        {
-            auto new_it = find(it, data.end(), '\n');
-
-            partial_msg_.insert(partial_msg_.end(), it, new_it);
-            it = new_it;
-
-            if (it != data.end())
-            {
-                ++it;
-
-                string str(partial_msg_.begin(), partial_msg_.end());
-                partial_msg_.clear();
-
-                vector<string> strs;
-
-                boost::split(strs, str, boost::is_any_of("\t\n"), boost::token_compress_on);
-                Verify(strs.size() == 2);
-
-                on_new_msg(strs[0], strs[1] == "on");
-            }
-        }
-#endif
     }
 
-    void on_new_msg(std::string const& adf_name, bool on)
+    inline void start_send()
+    {
+        update();
+    }
+
+    void update()
     {   
-        //printf(
-        //    "=================  ADF name: %S; status: %s ====================\n", 
-        //    unicode::utf8to16(adf_name).c_str(), 
-        //    (on ? "turned on" : "turned off"));
+        binary::bytes_t bts =  std::move(wrap_msg(run(1111,2222)));
+        send(&bts[0], bts.size());
+
+        //if(!on_timer_( 0 ))
+        //{
+        //    timer_.cancel();
+        //    __main_srvc__->stop();
+        //}
+        //else
+            timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
     }
+
+private:
+    async_timer             timer_; 
 
 private:
     async_connector         con_;
