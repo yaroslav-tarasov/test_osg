@@ -3,7 +3,7 @@
 #include "utils/high_res_timer.h"
 #include "utils/pickhandler.h"
 
-#include "phys/BulletInterface.h"
+//#include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
 #include <osg/GLObjects>
@@ -943,9 +943,9 @@ void Scene::createObjects()
         ,[&](osg::MatrixTransform* mt){ 
             if(!findFirstNode(mt,"fire"))
             {
-                spark::spark_pair_t sp3 =  spark::create(spark::FIRE,mt);
-                sp3.first->setName("fire");
-                mt->addChild(sp3.first);
+                spark::spark_pair_t sp =  spark::create(spark::FIRE,mt);
+                sp.first->setName("fire");
+                mt->addChild(sp.first);
             }
     }
     );

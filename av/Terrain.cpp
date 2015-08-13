@@ -13,10 +13,10 @@
 #include "utils/callbacks.h"
 #include "utils/materials.h"
 
-#include <osgwTools/AbsoluteModelTransform.h>
-#include "phys/BulletInterface.h"
-#include "phys/BulletMTInterface.h"
-#include "phys/RigidMTUpdater.h"
+//#include <osgwTools/AbsoluteModelTransform.h>
+//#include "phys/BulletInterface.h"
+//#include "phys/BulletMTInterface.h"
+//#include "phys/RigidMTUpdater.h"
 
 
 #include "av/Grass.h"

@@ -18,7 +18,7 @@
 #include "utils/materials.h"
 #include "utils/high_res_timer.h"
 
-#include "phys/BulletInterface.h"
+//#include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
 //

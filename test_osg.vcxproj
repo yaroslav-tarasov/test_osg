@@ -157,6 +157,7 @@
     <ClCompile Include="av\av_scene.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
     <ClCompile Include="av\Database.cpp" />
+    <ClCompile Include="av\DebugRenderer.cpp" />
     <ClCompile Include="av\Environment.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />

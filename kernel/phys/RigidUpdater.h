@@ -1,17 +1,19 @@
 #pragma once 
 
-#include "GLDebugDrawer.h"
+// #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
+#include "common/debug_render.h"
 
 namespace bi
 {
     class RigidUpdater : public osgGA::GUIEventHandler 
     {
-	    friend struct RigidUpdater_private;
     public:
         typedef std::function<void(osg::MatrixTransform* mt)> on_collision_f;
     public:
         RigidUpdater( osg::Group* root, on_collision_f on_collision = nullptr ); 
+        virtual ~RigidUpdater();
+
         void stopSession();
 
 		void addGround( const osg::Vec3& gravity );
@@ -29,20 +31,12 @@ namespace bi
 
         void addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
         void addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass );
-        //void createNodeHierarchy(osg::Node* node);
-
+        
         void handlePointEvent(std::vector<cg::point_3> const &simple_route);
         void handleSelectObjectEvent(uint32_t id );
 
         bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
         
-        osg::Node* addGUIObject( osg::Node* node )
-        {
-            // assert(false);
-            // return addGUIObject_( node );
-            return nullptr;
-        }
-
         void setTrajectoryDrawer(TrajectoryDrawer * drawer)
         {
            _trajectory_drawer =  drawer;
@@ -72,7 +66,8 @@ namespace bi
         osg::observer_ptr<osg::Group>            _root;
         high_res_timer                           _hr_timer;
         on_collision_f                           _on_collision;
-        avCollision::GLDebugDrawer*              _dbgDraw;
+        osg::ref_ptr<debug_render>               _dbgDraw; 
+        //avCollision::GLDebugDrawer:  _dbgDraw; 
         bool                                     _debug;
         
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
@@ -85,8 +80,8 @@ namespace bi
 #endif        
 
 
-    	struct RigidUpdater_private;
-	    boost::shared_ptr<RigidUpdater_private>  _d;
+    	struct _private;
+	    _private*  _d;
 
         //kernel::msg_service                      msg_service_;
 

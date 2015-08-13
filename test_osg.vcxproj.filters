@@ -632,5 +632,8 @@
     <ClCompile Include="tests\light_maps.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="av\DebugRenderer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ public:
 private:
     struct private_data;
     osg::ref_ptr<private_data> d;
-    on_collision_f                        _on_collision;
+    on_collision_f                        on_collision_;
 };
 
 }

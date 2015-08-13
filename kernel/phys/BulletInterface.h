@@ -1,16 +1,13 @@
 #ifndef H_BULLETINTERFACE
 #define H_BULLETINTERFACE
 
-#include <btBulletDynamicsCommon.h> 
-
-#include "bullet_helpers.h"
 #include "phys/phys_sys_fwd.h"
 #include "common/phys_sys.h" 
 #include "phys_sys.h"
 #include "phys_sys_common.h" //FIXME  Â stdafx phys_sys
 #include "sensor.h"
 
-
+#include "common/debug_render.h"
 
 namespace phys
 {
@@ -22,31 +19,13 @@ class BulletInterface
     , public control
 {
 public:
-    typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
-    typedef std::set<CollisionPair> CollisionPairs;
-    #define BIT(x) (1<<(x))
-    enum object_t {
-        THE_GREAT_NOTHING = 0,
-        WORLD  = BIT(1),
-        SPHERE = BIT(2),
-        BOX    = BIT(3),
-        SHAPE  = BIT(4)
-    };
-    struct data
-    {
-      btRigidBody* _body;
-      object_t     _type;
-    };
+
     typedef std::function<void(int id)> on_collision_f;
 public:
 	BulletInterface();
 	virtual ~BulletInterface();
-
-#if 0
-    static BulletInterface*  instance();
-#endif    
-	btDynamicsWorld*            getScene() { return _dw.get(); }
-    
+  
+	    
     void                        createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
     void                        createBox    ( int id, const osg::Vec3& dim, double mass );
     void                        createSphere ( int id, double radius, double mass );
@@ -67,12 +46,8 @@ public:
     
     void                        update( double step );     // former simulate
 
-    void setDebugDrawer(btIDebugDraw* dd)
-    {
-        _dd=dd;    
-        if(_dd)
-        _dw->setDebugDrawer(_dd);
-    }
+    void                        setDebugDrawer(/*btIDebugDraw*/debug_render* dd);
+    void                        debugDrawWorld();
 	//
     //  phys::system_impl
 	//
@@ -85,55 +60,38 @@ public:
     // control
 public:
 
-    system_ptr        get_system(size_t zone) override;
+    system_ptr                get_system(size_t zone) override;
 
-    optional<size_t>  get_zone(cg::geo_point_3 const & pos) const override;
-    optional<size_t>  get_zone(std::string const& airport) const override;
-    cg::geo_base_3 const& get_base(size_t zone) const override;
-    std::string zone_name(size_t id) const override;
+    optional<size_t>          get_zone(cg::geo_point_3 const & pos) const override;
+    optional<size_t>          get_zone(std::string const& airport) const override;
+    cg::geo_base_3 const&     get_base(size_t zone) const override;
+    std::string               zone_name(size_t id) const override;
 
 	// collision
 private:
-	boost::optional<double> intersect_first(cg::point_3 const& p, cg::point_3 const& q) const;
+	boost::optional<double>   intersect_first(cg::point_3 const& p, cg::point_3 const& q) const;
 
 protected:  
-
     void checkForCollisionEvents();
-    void CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1);
+
 private:
-    //struct private_data;
-    //osg::ref_ptr<private_data> d;
+    #define BIT(x) (1<<(x))
+    enum object_t {
+        THE_GREAT_NOTHING = 0,
+        WORLD  = BIT(1),
+        SPHERE = BIT(2),
+        BOX    = BIT(3),
+        SHAPE  = BIT(4)
+    };
 
-    typedef std::map<int, data>            ActorMap;
-    ActorMap                              _actors;
-    // btDiscreteDynamicsWorld*              _dw;
-    bt_dynamics_world_ptr                 _dw;   
-    btDefaultCollisionConfiguration*      _configuration;
-    btCollisionDispatcher*                _dispatcher;
-    btBroadphaseInterface*                _overlappingPairCache;
-    btSequentialImpulseConstraintSolver*  _solver;
-
-	boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
-	boost::scoped_ptr<btCollisionDispatcher>           dispatcher_;
-	boost::scoped_ptr<btConstraintSolver>              solver_;
-	boost::scoped_ptr<btDefaultCollisionConfiguration> collision_configuration_;
-
-
-    CollisionPairs                        _pairsLastUpdate;
-    on_collision_f                        _on_collision;
-    btIDebugDraw*                         _dd;
-
-	bt_vehicle_raycaster_ptr              vehicle_raycaster_;
-	std::vector<rigid_body_impl *>	      rigid_bodies_;
-
+   
+    struct _private;
+    _private*  d_;
+    
+    on_collision_f                        on_collision_;
     cg::geo_base_3                        base_;
 
 };
-
-//inline static BulletInterface*  sys()
-//{
-//	return BulletInterface::instance();
-//}
 
 BulletInterface*  sys();
 

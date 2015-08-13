@@ -1,16 +1,22 @@
 #include "stdafx.h"
 
+#include "utils/high_res_timer.h"
+
+#include "visitors/heil_visitor.h"
+
+#include "RigidUpdater.h"
+#include "BulletInterface.h"
+
 #include "kernel/systems/systems_base.h"
 #include "kernel/systems/fake_system.h"
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 
-#include "utils/high_res_timer.h"
-#include "BulletInterface.h"
 #include "aircraft.h"                         // FIXME TODO don't need here 
 #include "aircraft/aircraft_common.h"
 #include "aircraft/aircraft_shassis_impl.h"   // And maybe this too
 #include "nm/nodes_manager.h"
+
 #include "ada/ada.h"
 #include "bada/bada_import.h"
 #include "aircraft/phys_aircraft.h"
@@ -18,19 +24,15 @@
 
 #include "common/simple_route.h"
 
-#include "RigidUpdater.h"
-
-#include "visitors/heil_visitor.h"
-
 #include "object_creators.h"
 
 // Моя фантазия
 #include "objects/vehicle_fwd.h"
 #include "objects/vehicle.h"
 
-
 #include "aircraft_physless.h"
 
+#include "av/DebugRenderer.h"
 
 FIXME("kernel/systems.h")
 #include "kernel/systems.h"
@@ -145,9 +147,9 @@ namespace
 
 namespace bi
 {
-	struct RigidUpdater::RigidUpdater_private
+	struct RigidUpdater::_private
 	{
-		        RigidUpdater_private()
+		        _private()
                     : _krv_data_getter("log_minsk.txt")
                     , _sys            (phys::create_phys_system())
                 {}
@@ -206,7 +208,7 @@ namespace bi
 		, _debug       (cfg().debug.debug_drawer)
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
-		, _d(boost::make_shared<RigidUpdater_private>())
+		, _d(new _private)
         , _time_delta_mod_sys (0)
         , _time_delta_vis_sys (0)
         , _time_delta_ctrl_sys(0)
@@ -411,6 +413,10 @@ namespace bi
       
     }
 
+    RigidUpdater::~RigidUpdater()
+    {
+        delete _d;
+    }
 
     void RigidUpdater::stopSession()
     {
@@ -446,12 +452,12 @@ namespace bi
         if( _debug )
         {
             //osg::notify( osg::INFO ) << "osgbpp: Debug" << std::endl;
-            _dbgDraw = new avCollision::GLDebugDrawer();
+            _dbgDraw = new avCollision::DebugRenderer();// new avCollision::GLDebugDrawer();
             _dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );
             if(_root->getNumParents()>0)
-                _root->getParent(0)->addChild( _dbgDraw->getSceneGraph() );
+                _root->getParent(0)->addChild( dynamic_cast<avCollision::DebugRenderer*>(_dbgDraw.get())->getSceneGraph() );
             else
-                _root->addChild( _dbgDraw->getSceneGraph() );
+                _root->addChild( dynamic_cast<avCollision::DebugRenderer*>(_dbgDraw.get())->getSceneGraph() );
         }
 
         if(_dbgDraw)
@@ -980,7 +986,7 @@ namespace bi
 
                 if( _dbgDraw)
                 {
-                    _d->_sys->getScene()->debugDrawWorld();
+                    _d->_sys->debugDrawWorld();
                     _dbgDraw->EndDraw();
                 }
             } 

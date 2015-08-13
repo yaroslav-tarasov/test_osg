@@ -155,7 +155,7 @@ void BulletMTInterface::createWorld( const osg::Plane& plane, const osg::Vec3& g
 
     body->setActivationState(DISABLE_SIMULATION);
 
-    _on_collision = on_collision;
+    on_collision_ = on_collision;
 
 }
 
