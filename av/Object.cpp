@@ -1,8 +1,11 @@
 #include "stdafx.h"
-#include "creators.h"
+#include "Object.h"
 #include "LOD.h"
 #include "Lights.h"
 #include "LightManager.h"
+
+#include "visitors/materials_visitor.h"
+#include "materials.h"
 
 namespace {
 

@@ -15,8 +15,6 @@ namespace creators
     nodes_array_t       loadAirplaneParts(std::string);
     osg::Node*          applyBM(osg::Node* model, std::string name,bool set_env_tex = false );
     osg::Node*          loadHelicopter();
-	osg::Node*          createObject(std::string name, bool fclone=true);
-    void                releaseObjectCache();
 
     const osg::Vec4 red_color   (100.0f, 0.0f, 0.0f, 100.0f);
     const osg::Vec4 blue_color  (0.0f, 0.0f, 100.0f, 100.0f);
@@ -122,28 +120,8 @@ namespace effects
      }
 }
 
-namespace utils
-{
-    bool replace(std::string& str, const std::string& from, const std::string& to);
-    void replaceAll(std::string& str, const std::string& from, const std::string& to);
-    std::string format( const char * str );
-    std::string format( std::string const & str );
-}
 
 
-namespace spark
-{   
-    typedef std::pair<osg::Node*, osgGA::GUIEventHandler*> spark_pair_t;  
-    enum spark_t {EXPLOSION,FIRE,RAIN,SMOKE,TEST};
-    void init();
-    spark_pair_t create(spark_t effectType,osg::Transform* model=nullptr);
-}
-
-namespace database
-{
-    std::string LoadShader(const std::string& name);
-} // ns Database
 
 
-#define GLSL_VERSION  130
-#define ORIG_EPHEMERIS
+

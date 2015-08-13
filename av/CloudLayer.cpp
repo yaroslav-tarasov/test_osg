@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #include "CloudLayer.h"
-#include "../creators.h"
+
+#include "utils/materials.h"
 
 //
 // Global namespace

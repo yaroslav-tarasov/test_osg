@@ -1,27 +1,31 @@
 #include "stdafx.h"
-#include "visitors/find_tex_visitor.h"
-#include "visitors/find_animation.h"
 
 #include "creators.h"
-#include "av/shaders.h"
+
+#include "visitors/find_tex_visitor.h"
+#include "visitors/find_animation.h"
 #include "visitors/ct_visitor.h"
 
-#include "pugixml.hpp"
+#include "av/shaders.h"
+#include "av/avShadows/ShadowedScene.h"
+#include "av/avShadows/ShadowMap.h"
+#include "av/avShadows/ViewDependentShadowMap.h"
+#include "av/LOD.h"
+
 #include "tests/shadow_map.h"
 
-#include "sm/ShadowedScene.h"
-#include "sm/ShadowMap.h"
-#include "sm/ViewDependentShadowMap.h"
+#include "utils/cpp_utils/str.h"
+#include "utils/materials.h"
+#include "utils/high_res_timer.h"
 
-#include "high_res_timer.h"
 #include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
-#include "utils/cpp_utils/str.h"
+//
+//  ext
+//
 
-#include "materials.h"
-
-#include "av/LOD.h"
+#include "spark/osgspark.h"
 
 #define TEST_SHADOWS
 // #define TEST_TEXTURE
@@ -1696,136 +1700,6 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
 } // ns creators
 
-namespace utils
-{
-    bool replace(std::string& str, const std::string& from, const std::string& to) {
-        size_t start_pos = str.find(from);
-        if(start_pos == std::string::npos)
-            return false;
-        str.replace(start_pos, from.length(), to);
-        return true;
-    }
 
-    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-        if(from.empty())
-            return;
-        size_t start_pos = 0;
-        while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-            str.replace(start_pos, from.length(), to);
-            start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-        }
-    }
 
-    std::string format( const char * str )
-    {
-        std::string source(str);
-        replaceAll(source,std::string("$define"), std::string("\n#define"));
-        replaceAll(source,std::string("$if"), std::string("\n#if"));
-        replaceAll(source,std::string("$else"), std::string("\n#else"));
-        replaceAll(source,std::string("$endif"), std::string("\n#endif"));
-        replaceAll(source,std::string("$extention"), std::string("\n#extention"));
-        replaceAll(source,std::string("$"), std::string("\n "));
-        return source;
-    }
 
-    std::string format( std::string const & str )
-    {
-        return format(str.c_str());
-    }
-}
-
-namespace database
-{
-
-bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
-{
-    std::ifstream file(fileName.c_str());
-
-    if (file.bad())
-    {
-        avError("Failed to load shader '%s'.", fileName.c_str());
-        return false;
-    }
-
-    bool commentBlock = false;
-    char szLineBuffer[1024];
-    while (file.getline(szLineBuffer, sizeof(szLineBuffer)))
-    {
-        const char * pLineBuffer = szLineBuffer;
-
-        // trim left
-        while (*pLineBuffer == ' ')
-            pLineBuffer++;
-
-        //
-        // Note: Not supported spaces after '#' and before 'include'
-        //
-
-        if (!commentBlock && strncmp(pLineBuffer, "#include", 8) == 0)
-        {
-            pLineBuffer += 8;
-            const char * beginFileName = strchr(pLineBuffer, '"') + 1;
-            const char * endFileName = strchr(beginFileName, '"');
-
-            if (beginFileName == NULL || endFileName == NULL || beginFileName == endFileName)
-            {
-                avError("#include directive error in shader '%s' shader.", fileName.c_str());
-                continue;
-            }
-
-            const std::string includeFileName(beginFileName, endFileName);
-            std::string includeFullFileName = osgDB::findDataFile(includeFileName);
-            
-            if (!includeFullFileName.empty())
-            {
-                if (!LoadShaderInternal(includeFullFileName, text))
-                {
-                    avError("Failed to load shader '%s'.", fileName.c_str());
-                    return false;
-                }
-            }
-            else
-            {
-                avError("Failed to find shader include '%s'.", includeFileName.c_str());
-                avError("Failed to load shader '%s'.", fileName.c_str());
-                return false;
-            }
-        }
-        else
-        {
-            //
-            // Note: Not supported all cases when comment block closes before 
-            //       #include directive on same text line.
-            // /* some comment
-            //    blah-blah-blah
-            // */ #include "file.inl"
-            //
-
-            const char * pComment = pLineBuffer;
-            while (pComment != NULL)
-            {
-                if (!commentBlock && (pComment = strstr(pComment, "/*")) != NULL)
-                    commentBlock = true;
-                else if (commentBlock && (pComment = strstr(pComment, "*/")) != NULL)
-                    commentBlock = false;
-            }
-
-            text << szLineBuffer << std::endl;
-        }
-    }
-
-    return true;
-}
-
-std::string LoadShader(const std::string& name)
-{
-    std::ostringstream shaderText;
-    //  shaderText << cIt->first.second; // Add all defines
-    if (!LoadShaderInternal(osgDB::findDataFile(name), shaderText))
-        return "";
-    shaderText << std::ends;
-
-    return shaderText.str();
-}
-
-} // ns Database

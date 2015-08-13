@@ -18,6 +18,9 @@
 
 
 #define BASE_SHADOW_TEXTURE_UNIT 6
+#define GLSL_VERSION  130
+#define ORIG_EPHEMERIS
+
 
 
 #ifndef _DEBUG

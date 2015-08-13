@@ -57,7 +57,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -76,7 +76,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>OSG_USE_MINREL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -141,6 +141,11 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="av\avShadows\ShadowedScene.cpp" />
+    <ClCompile Include="av\avShadows\ShadowMap.cpp" />
+    <ClCompile Include="av\avShadows\ShadowSettings.cpp" />
+    <ClCompile Include="av\avShadows\ShadowTechnique.cpp" />
+    <ClCompile Include="av\avShadows\ViewDependentShadowMap.cpp" />
     <ClCompile Include="av\avSky\CelestialBodies.cpp" />
     <ClCompile Include="av\avSky\DateTime.cpp" />
     <ClCompile Include="av\avSky\EphemerisEngine.cpp" />
@@ -151,6 +156,7 @@
     <ClCompile Include="av\avSky\StarField.cpp" />
     <ClCompile Include="av\av_scene.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
+    <ClCompile Include="av\Database.cpp" />
     <ClCompile Include="av\Environment.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />
@@ -173,7 +179,6 @@
     <ClCompile Include="av\Utils.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
-    <ClCompile Include="creators.cpp" />
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
     <ClCompile Include="ext\spark\fire_effect.cpp" />
     <ClCompile Include="ext\spark\osgspark.cpp" />
@@ -253,14 +258,15 @@
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
     <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
-    <ClCompile Include="light_maps.cpp" />
     <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />
     <ClCompile Include="tests\common\CommonFunctions.cpp" />
+    <ClCompile Include="tests\creators.cpp" />
     <ClCompile Include="tests\dubins_test.cpp" />
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
+    <ClCompile Include="tests\light_maps.cpp" />
     <ClCompile Include="tests\main_scene.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -288,11 +294,6 @@
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />
-    <ClCompile Include="sm\ShadowedScene.cpp" />
-    <ClCompile Include="sm\ShadowMap.cpp" />
-    <ClCompile Include="sm\ShadowSettings.cpp" />
-    <ClCompile Include="sm\ShadowTechnique.cpp" />
-    <ClCompile Include="sm\ViewDependentShadowMap.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

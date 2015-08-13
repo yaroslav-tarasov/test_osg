@@ -4,16 +4,14 @@
 
 #include "visitors/find_tex_visitor.h"
 #include "visitors/find_animation.h"
-
-#include "creators.h"
-//#include <windows.h>
-#include "shaders.h"
 #include "visitors/ct_visitor.h"
-
 #include "visitors/materials_visitor.h"
-#include "pugixml.hpp"
-#include "high_res_timer.h"
+
+#include "shaders.h"
+
+#include "utils/high_res_timer.h"
 #include "utils/callbacks.h"
+#include "utils/materials.h"
 
 #include <osgwTools/AbsoluteModelTransform.h>
 #include "phys/BulletInterface.h"
@@ -24,6 +22,8 @@
 #include "av/Grass.h"
 #include "av/Grass2.h"
 
+// Needs only for  creators::createBase
+#include "tests/creators.h"
 
 namespace avTerrain
 {

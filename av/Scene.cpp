@@ -1,11 +1,10 @@
 ﻿#include "stdafx.h"
 
-#include "high_res_timer.h"
+#include "utils/high_res_timer.h"
+#include "utils/pickhandler.h"
+
 #include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
-
-#include "Lights.h"
-#include "LightManager.h"
 
 #include <osg/GLObjects>
 
@@ -24,23 +23,30 @@
 //    8	    0.00000001	0° 00′ 0.000036″	specialized surveying (e.g. tectonic plate mapping)	1.1132 mm	1.0247 mm	787.1 µm	434.96 µm
       
 
-#include "Scene.h"
-#include "creators.h"
-#include "Ephemeris.h"
-#include "sm/ShadowedScene.h"
-#include "sm/ShadowMap.h"
-#include "sm/ViewDependentShadowMap.h"
-#include "Terrain.h"
+#include "avShadows/ShadowedScene.h"
+#include "avShadows/ShadowMap.h"
+#include "avShadows/ViewDependentShadowMap.h"
 #include "avSky/Sky.h"
-#include "Environment.h"
 
-#include "pickhandler.h"
+#include "Scene.h"
+#include "Lights.h"
+#include "LightManager.h"
+#include "Terrain.h"
+#include "Environment.h"
+#include "Ephemeris.h"
+#include "Object.h"
 
 #include "application/panels/vis_settings_panel.h"
 #include "application/main_window.h"
 #include "application/menu.h"
 
 #include "tests/common/CommonFunctions"
+#include "tests/creators.h"
+
+//
+//  ext
+//
+#include "spark/osgspark.h"
 
 namespace gui 
 { 

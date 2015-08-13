@@ -700,3 +700,42 @@ float utils::GetHorizontalIntersectionRadius( osg::Node* pNode, float fHeight )
 
     return Radius;
 }
+
+
+namespace utils
+{
+    bool replace(std::string& str, const std::string& from, const std::string& to) {
+        size_t start_pos = str.find(from);
+        if(start_pos == std::string::npos)
+            return false;
+        str.replace(start_pos, from.length(), to);
+        return true;
+    }
+
+    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        if(from.empty())
+            return;
+        size_t start_pos = 0;
+        while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+        }
+    }
+
+    std::string format( const char * str )
+    {
+        std::string source(str);
+        replaceAll(source,std::string("$define"), std::string("\n#define"));
+        replaceAll(source,std::string("$if"), std::string("\n#if"));
+        replaceAll(source,std::string("$else"), std::string("\n#else"));
+        replaceAll(source,std::string("$endif"), std::string("\n#endif"));
+        replaceAll(source,std::string("$extention"), std::string("\n#extention"));
+        replaceAll(source,std::string("$"), std::string("\n "));
+        return source;
+    }
+
+    std::string format( std::string const & str )
+    {
+        return format(str.c_str());
+    }
+}

@@ -76,9 +76,6 @@
     <Filter Include="Source Files\objects\vehicle">
       <UniqueIdentifier>{4646637e-3fc3-44ef-a0f3-b6a80d22d301}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tests\sm">
-      <UniqueIdentifier>{bec96533-47bb-4c95-8abf-6f4c8fa9aeaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\dubin_route">
       <UniqueIdentifier>{7e51963d-118e-4a3d-bfbd-c1ef62107c0e}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,9 @@
     </Filter>
     <Filter Include="Source Files\av\sky">
       <UniqueIdentifier>{d8f65343-33f7-463a-8a49-cb5c5a7f326d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\sm">
+      <UniqueIdentifier>{55691b10-34af-40ef-afd2-5b2a722c94d7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -223,24 +223,6 @@
     </ClCompile>
     <ClCompile Include="test_osg.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="light_maps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sm\ShadowedScene.cpp">
-      <Filter>Source Files\tests\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="sm\ShadowMap.cpp">
-      <Filter>Source Files\tests\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="sm\ShadowTechnique.cpp">
-      <Filter>Source Files\tests\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="sm\ViewDependentShadowMap.cpp">
-      <Filter>Source Files\tests\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="sm\ShadowSettings.cpp">
-      <Filter>Source Files\tests\sm</Filter>
     </ClCompile>
     <ClCompile Include="av\CloudLayer.cpp">
       <Filter>Source Files\av</Filter>
@@ -503,9 +485,6 @@
     <ClCompile Include="utils\animation_handler.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="creators.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\materials.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -627,6 +606,30 @@
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="tests\grass_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ShadowedScene.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ShadowSettings.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ShadowTechnique.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ViewDependentShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Database.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\creators.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\light_maps.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>

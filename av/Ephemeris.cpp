@@ -7,7 +7,6 @@
 
 #include <osgEphemeris/EphemerisModel.h>  
 
-#include "creators.h"
 #include "utils/callbacks.h"
 
 namespace avSky

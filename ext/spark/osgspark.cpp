@@ -1,8 +1,7 @@
 #include "stdafx.h"
 
+#include "osgspark.h"
 #include <GL/glut.h>
-
-#include "../creators.h"
 #include "SparkDrawable.h"
 #include "SparkUpdatingHandler.h"
 

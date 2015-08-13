@@ -223,3 +223,12 @@ template<class T, class U> T safe_cast(U p)
 
 #define foreach(Iter, Container)\
     for ( auto Iter = Container.begin(); Iter != Container.end(); ++Iter )
+
+
+namespace utils
+{
+    bool replace(std::string& str, const std::string& from, const std::string& to);
+    void replaceAll(std::string& str, const std::string& from, const std::string& to);
+    std::string format( const char * str );
+    std::string format( std::string const & str );
+}
