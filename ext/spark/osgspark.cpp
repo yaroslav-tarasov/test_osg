@@ -5,6 +5,15 @@
 #include "SparkDrawable.h"
 #include "SparkUpdatingHandler.h"
 
+#ifndef _DEBUG
+#pragma comment(lib, "SPARK_GL.lib")
+#pragma comment(lib, "SPARK.lib")
+#else 
+#pragma comment(lib, "SPARK_GL_debug.lib")
+#pragma comment(lib, "SPARK_debug.lib")
+#endif
+
+
 extern SPK::SPK_ID createSimpleSystem( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createExplosion( const SparkDrawable::TextureIDMap&, int, int );

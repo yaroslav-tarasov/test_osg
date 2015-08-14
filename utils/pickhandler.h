@@ -37,7 +37,7 @@ public:
             geode->addDrawable( shape );
 
             _selectionBox = new osg::MatrixTransform;
-            _selectionBox->setNodeMask( 0x1 );
+            _selectionBox->setNodeMask( PICK_NODE_MASK );
             _selectionBox->addChild( geode.get() );
 
             osg::StateSet* ss = _selectionBox->getOrCreateStateSet();
@@ -58,7 +58,7 @@ public:
         osg::ref_ptr<osgUtil::LineSegmentIntersector> intersector =
             new osgUtil::LineSegmentIntersector(osgUtil::Intersector::WINDOW, ea.getX(), ea.getY());
         osgUtil::IntersectionVisitor iv( intersector.get() );
-        iv.setTraversalMask( ~0x1 );
+        iv.setTraversalMask( /*~DO_NOT_*/PICK_NODE_MASK );
         viewer->getCamera()->accept( iv );
 
         if ( !intersector->containsIntersections() )

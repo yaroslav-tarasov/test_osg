@@ -1,6 +1,5 @@
 #pragma once 
 
-// #include "GLDebugDrawer.h"
 #include "trajectory_drawer.h"
 #include "common/debug_render.h"
 
@@ -15,7 +14,6 @@ namespace bi
         virtual ~RigidUpdater();
 
         void stopSession();
-
 		void addGround( const osg::Vec3& gravity );
 
 #ifdef DEPRECATED
@@ -67,7 +65,6 @@ namespace bi
         high_res_timer                           _hr_timer;
         on_collision_f                           _on_collision;
         osg::ref_ptr<debug_render>               _dbgDraw; 
-        //avCollision::GLDebugDrawer:  _dbgDraw; 
         bool                                     _debug;
         
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
@@ -82,8 +79,6 @@ namespace bi
 
     	struct _private;
 	    _private*  _d;
-
-        //kernel::msg_service                      msg_service_;
 
 private:
         double                                   _last_frame_time;

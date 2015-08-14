@@ -56,6 +56,9 @@ namespace gui
 
 using namespace avScene;
 
+
+// Useless
+#if 0
 namespace {
     cg::transform_4 get_relative_transform( osg::Node* node, osg::Node* rel=nullptr )
     {
@@ -108,7 +111,7 @@ namespace {
     }
 
 }
-
+#endif
 
 namespace {
 
@@ -165,7 +168,6 @@ inline osg::Vec3f polar_point_2(S range, S course )
         (S)range * cos(cg::grad2rad(course)),0);
 }
 
-// typedef osg::ref_ptr<osg::Group> navaid_group_node_ptr;
 typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
 
 osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)
@@ -187,8 +189,6 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
         colors [fcolor] = light;
     }
 
-
-
 #if 0  // Перенесено см ниже
     const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
     osg::StateSet* ss = light->getOrCreateStateSet();
@@ -206,8 +206,9 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
 
 void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
 {
-    //     if (!boost::filesystem::is_regular_file(file))
-    //         LogWarn("No lights for airport found: " << file.string());
+    if (!boost::filesystem::is_regular_file(file))
+        LogWarn("No lights for airport found: " << file);
+
     const bool usePointSprites = true;
     osg::Texture2D *tex;
     if(usePointSprites)
@@ -248,7 +249,7 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
                 boost::trim_if(line, boost::is_any_of("/#"));
                 //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
                 navid_node_ptr.release();
-                navid_node_ptr = new osgSim::LightPointNode;// new osg::Group();
+                navid_node_ptr = new osgSim::LightPointNode;
                 navid_node_ptr->setName(line);
                                 //
                 osg::StateSet* set = navid_node_ptr->getOrCreateStateSet();
@@ -297,10 +298,7 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
             for (size_t i = 0; i < count; ++i)
             {
                 osg::Vec3f p = pos + dir * step * i  + offset;
-
-                //victory::navaid_group_node::LightData lamp = {p, clr, .1,40000,/*.01f, 4000.f,*/ cg::range_2f(), cg::range_2f(), 1, 0, 0};
-                //navid_group->AddLight(lamp);
-                
+               
                 osgSim::LightPoint pnt;
 
                 pnt._position.set(p.x(),p.y(),p.z());
@@ -312,22 +310,7 @@ void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lam
 
                 navid_node_ptr->addLightPoint(pnt);
                 
-                //osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform();
-
-                //pat->addChild(CreateLight(clr,std::string("light"),nullptr));
-                //pat->setPosition(osg::Vec3f(p.x(),p.y(),p.z()));
-                //navid_node_ptr->addChild(pat);
-
-                //const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED| osg::StateAttribute::OVERRIDE | osg::StateAttribute::OFF;
-                //osg::StateSet* ss = pat->getOrCreateStateSet();
-                //ss->setAttribute(new osg::Program(),value);
-                //ss->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
-                //ss->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-                //ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF| osg::StateAttribute::OVERRIDE );
-                //ss->setRenderBinDetails(RENDER_BIN_SCENE, "RenderBin");
-
-
-            }
+           }
         }
         
         if(navid_node_ptr && group_ready)
@@ -514,9 +497,10 @@ osg::ref_ptr<Scene>	 Scene::_scenePtr;
 std::string          Scene::zone_to_reload_;
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Create( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
+bool Scene::Create( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
 {
     _scenePtr = new Scene();
+
     if ( _scenePtr->Initialize( cArgs, cTraitsPtr/*, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0*/ ) == false )
     {
         OSG_FATAL << "Failed to initialize scene" ;
@@ -588,7 +572,7 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
+bool Scene::Initialize( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
 {
     osg::StateSet* pGlobalStateSet = getOrCreateStateSet();
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
@@ -604,8 +588,9 @@ bool Scene::Initialize( osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsCo
         osg::DisplaySettings::instance()->setNumMultiSamples( nAntialiasing );
     }
 
+    osg::ArgumentParser  args(cArgs);
     // Create viewer and 
-    _viewerPtr = new osgViewer::Viewer(cArgs);
+    _viewerPtr = new osgViewer::Viewer( args );
      
     _viewerPtr->apply(new osgViewer::SingleScreen(1));
 

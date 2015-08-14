@@ -1,9 +1,18 @@
 #include "stdafx.h"
-#include "Database.h"
 
 
 namespace database
 {
+
+void initDataPaths()
+{
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\sky");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\lib");   
+}
+
 
 bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
 {

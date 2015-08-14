@@ -2,5 +2,7 @@
 
 namespace database
 {
-    std::string LoadShader(const std::string& name);
+    std::string LoadShader   (const std::string& name);
+    void        initDataPaths();
+
 } // ns Database

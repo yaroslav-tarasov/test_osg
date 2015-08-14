@@ -115,14 +115,14 @@ void FogLayer::_buildStateSet()
     _skyFogUniform = new osg::Uniform("SkyFogParams", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
     sset->addUniform(_skyFogUniform.get());
     
-#ifdef ORIG_EPHEMERIS    
+//#ifdef ORIG_EPHEMERIS    
     // enable depth test but disable depth write
     osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
     sset->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     // disable cull-face just for the case
     sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-#endif
+//#endif
 
     return;
 }

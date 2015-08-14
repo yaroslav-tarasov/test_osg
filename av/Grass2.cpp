@@ -2,10 +2,6 @@
 
 #include "Grass2.h"
 
-FIXME(to local pch)
-#include "Database.h"
-
-
 namespace blender
 {
 

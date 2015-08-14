@@ -2,8 +2,6 @@
 
 // #include <math/sincos.h>
 
-#include <osg/Geometry>
-
 #include "utils/lut.h"
 
 #include "SkyDome.h"
@@ -56,6 +54,8 @@ SkyDome::SkyDome()
     , _sunAzimuth(-1.0)
     , _sunAltitude(-1.0)
 {
+     setNodeMask( DO_NOT_PICK_NODE_MASK );
+    
     _updateDistributionCoefficients();
 
     _buildStateSet();

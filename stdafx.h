@@ -16,20 +16,12 @@
 
 #include "common/osg_inc.h"
 
-
 #define BASE_SHADOW_TEXTURE_UNIT 6
 #define GLSL_VERSION  130
-#define ORIG_EPHEMERIS
+//#define ORIG_EPHEMERIS
+#define PICK_NODE_MASK  0x1
+#define DO_NOT_PICK_NODE_MASK  0x2
 
-
-
-#ifndef _DEBUG
-#pragma comment(lib, "SPARK_GL.lib")
-#pragma comment(lib, "SPARK.lib")
-#else 
-#pragma comment(lib, "SPARK_GL_debug.lib")
-#pragma comment(lib, "SPARK_debug.lib")
-#endif
 
 #ifndef _DEBUG
 #pragma comment(lib, "osgwTools.lib")
@@ -258,6 +250,7 @@ enum objects_t{
     VEHICLE_TYPE
 };
 
+#include "av/Database.h"
 
 namespace avSky
 {

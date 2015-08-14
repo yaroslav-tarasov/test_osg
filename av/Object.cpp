@@ -314,6 +314,8 @@ osg::Node* createObject(std::string name, bool fclone)
 
 	}
 
+    pat->setNodeMask( PICK_NODE_MASK );
+
 	return pat/*object_file*/;
 }
 

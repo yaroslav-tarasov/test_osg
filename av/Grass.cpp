@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "Grass.h"
-#include "Database.h"
 
 
 namespace avTerrain

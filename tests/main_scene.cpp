@@ -23,6 +23,11 @@
 #include "shadow_map.h"
 #include "teapot.h"
 
+//
+//  ext
+//
+#include "spark/osgspark.h"
+
 #if defined (DEVELOP_SHADOWS) || defined(TEST_SHADOWS_FROM_OSG)
 #if !defined(TEST_SHADOWS_FROM_OSG)
 #define TEST_SHADOWS_2

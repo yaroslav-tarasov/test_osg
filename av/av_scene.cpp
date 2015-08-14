@@ -4,8 +4,14 @@
 
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
+#include "kernel/systems.h"
+#include "kernel/systems/systems_base.h"
+#include "kernel/systems/fake_system.h"
+#include "kernel/object_class.h"
+#include "kernel/msg_proxy.h"
 #include "common/test_msgs.h"
 
+#include "kernel/systems/vis_system.h"
 
 using network::endpoint;
 using network::async_acceptor;
@@ -46,7 +52,6 @@ struct server
             .add<run                   >(boost::bind(&server::on_run        , this, _1))
             ;
 
-        FIXME(Тут должно быть все гораздо сложнее);
         update();
     }
 
@@ -110,12 +115,28 @@ private:
         return id++;
     }
 
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, binary::bytes_cref bytes)
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        //systems_factory_ptr sys_fab = nfi::function<systems_factory_ptr()>("systems", "create_system_factory")();
+        auto ptr = /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
+
+        //dict_t dic;
+        //binary::unwrap(bytes, dic);
+
+        //system_ptr(ptr)->load_exercise(dic);
+        return ptr;
+    }
+
 private:
-    async_acceptor          acc_   ;
-    optional<tcp_socket>    client_;
+    async_acceptor            acc_   ;
+    optional<tcp_socket>      client_;
     msg_dispatcher<uint32_t>  disp_;
     std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
 
+    kernel::msg_service       msg_service_;
 private:
     async_timer             timer_; 
     on_timer_f              on_timer_;
@@ -125,21 +146,12 @@ private:
     randgen<> rng_;
 };
 
-inline void initDataPaths()
-{
-    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
-    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
-    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials");
-    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\sky");
-    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\lib");   
-}
-
 
 int av_scene( int argc, char** argv )
 {
     osg::ArgumentParser arguments(&argc,argv);
     
-    initDataPaths();
+    database::initDataPaths();
     
     logger::need_to_log(/*true*/);
 

@@ -36,6 +36,8 @@ Terrain::Terrain (osg::Group* sceneRoot)
     : _sceneRoot(sceneRoot)
     , _lightsHandler(avScene::GlobalInfluence)
 {
+    setNodeMask( PICK_NODE_MASK );
+
     sceneRoot->addChild(this);
     //
     // Callbacks
@@ -43,6 +45,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
     // callbacks setup
     setCullCallback(utils::makeNodeCallback(this, &Terrain::cull, true));
+
 }
 
 void  Terrain::create( std::string name )

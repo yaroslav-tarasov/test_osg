@@ -48,7 +48,7 @@ namespace avScene {
     class Scene : public osg::Group
     {
     public:
-        static bool                                 Create( osg::ArgumentParser& cArgs ,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr = NULL );
+        static bool                                 Create( const osg::ArgumentParser& cArgs ,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr = NULL );
         static void                                 Release();
         static Scene*                               GetInstance();
         
@@ -67,7 +67,7 @@ namespace avScene {
 
         Scene();
         virtual									    ~Scene();
-        bool									    Initialize( osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
+        bool									    Initialize( const osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
         void                                        createTerrainRoot();
         void                                        createObjects();
         void                                        createRTT();
