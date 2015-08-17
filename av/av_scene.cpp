@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include "av/Scene.h"
-
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
@@ -12,6 +10,9 @@
 #include "common/test_msgs.h"
 
 #include "kernel/systems/vis_system.h"
+
+#include "av/Visual.h"
+#include "av/test_systems.h"
 
 using network::endpoint;
 using network::async_acceptor;
@@ -37,13 +38,12 @@ namespace
 
 struct server
 {
-    typedef boost::function<bool (double /*time*/)> on_timer_f;
-
-    server(endpoint peer,on_timer_f on_timer,double period = 0.01)
+    server(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
         : acc_      (peer, boost::bind(&server::on_accepted, this, _1, _2), tcp_error)
-        , period_   (period)
-        , on_timer_ (on_timer)
-        , timer_  (boost::bind(&server::update, this))
+        , period_   (0.01)
+        , osg_vis   (CreateVisual())
+        , vis_sys_  (create_vis(props/*, bytes*/))
+        , timer_    (boost::bind(&server::update, this))
         
     {   
 
@@ -51,20 +51,33 @@ struct server
             .add<setup                 >(boost::bind(&server::on_setup        , this, _1))
             .add<run                   >(boost::bind(&server::on_run        , this, _1))
             ;
+        
+        
+        osg_vis->Initialize(argc,argv);
 
         update();
+    }
+
+    ~server()
+    {
+       vis_sys_.reset();
     }
 
 private:
     void update()
     {   
-        if(!on_timer_( 0 ))
+        double sim_time = osg_vis->GetInternalTime();
+        if(sim_time  < 0)
         {
            timer_.cancel();
            __main_srvc__->stop();
+           return;
         }
         else
            timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
+
+        kernel::system_ptr(vis_sys_)->update(sim_time);
+        osg_vis->Render();
     }
 
     void on_accepted(network::tcp::socket& sock, endpoint const& peer)
@@ -115,14 +128,14 @@ private:
         return id++;
     }
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, binary::bytes_cref bytes)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
     {
         using namespace binary;
         using namespace kernel;
 
         //systems_factory_ptr sys_fab = nfi::function<systems_factory_ptr()>("systems", "create_system_factory")();
-        auto ptr = /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
-
+        auto ptr = // /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
+                   create_systems()->get_visual_sys();
         //dict_t dic;
         //binary::unwrap(bytes, dic);
 
@@ -130,17 +143,22 @@ private:
         return ptr;
     }
 
-private:
-    async_acceptor            acc_   ;
-    optional<tcp_socket>      client_;
-    msg_dispatcher<uint32_t>  disp_;
-    std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
 
-    kernel::msg_service       msg_service_;
+
 private:
-    async_timer             timer_; 
-    on_timer_f              on_timer_;
-    double                  period_;
+    async_acceptor                                              acc_   ;
+    optional<tcp_socket>                                        client_;
+    msg_dispatcher<uint32_t>                                    disp_;
+    std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
+    //kernel::msg_service                                         msg_service_;
+
+private:
+    kernel::visual_system_ptr                                   vis_sys_;
+    IVisual*                                                    osg_vis;
+
+private:
+    async_timer                                                 timer_; 
+    double                                                      period_;
 
 private:
     randgen<> rng_;
@@ -149,31 +167,8 @@ private:
 
 int av_scene( int argc, char** argv )
 {
-    osg::ArgumentParser arguments(&argc,argv);
-    
-    database::initDataPaths();
     
     logger::need_to_log(/*true*/);
-
-#if 0
-    // OSG graphics context
-    osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = new osg::GraphicsContext::Traits();
-    //pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
-    pTraits->alpha                         = 8;
-    pTraits->setInheritedWindowPixelFormat = true;
-    pTraits->doubleBuffer                  = true;
-    pTraits->windowDecoration              = true;
-    pTraits->sharedContext                 = NULL;
-    pTraits->supportsResize                = true;
-    pTraits->vsync                         = true;
-
-    //RECT rect;
-    //::GetWindowRect(hWnd, &rect);
-    pTraits->x = 0;
-    pTraits->y = 0;
-    pTraits->width = 1920;//rect.right - rect.left + 1;
-    pTraits->height = 1200;//rect.bottom - rect.top + 1;
-#endif    
 
     async_services_initializer asi(false);
     
@@ -183,23 +178,13 @@ int av_scene( int argc, char** argv )
 
     try
     {
-        endpoint peer(std::string("127.0.0.1:30000"));
-        
-        avScene::Scene::Create(arguments/*,pTraits*/);
 
-        server s(peer,[](double)->bool{
+        endpoint peer(cfg().network.local_address);
 
-            auto viewer = avScene::Scene::GetInstance()->GetViewer();
+        kernel::vis_sys_props props_;
+        props_.base_point = ::get_base();
 
-            if (!viewer->done())
-            {
-                viewer->frame();
-                return true;
-            }
-            
-            return false;
-
-        });
+        server s(peer, props_ , argc, argv);
         
         __main_srvc__->run();
 
@@ -214,10 +199,6 @@ int av_scene( int argc, char** argv )
         LogError("Exception caught: " << err.what());
         return -1;
     }
-
-
-    
-    //asi.get_service().run();
 
 
 #if 0
@@ -238,7 +219,7 @@ int av_scene( int argc, char** argv )
 #endif
 
 
-    return 0; //scene->GetViewer()->run();
+    return 0; 
 
 }
 

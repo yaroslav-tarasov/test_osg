@@ -67,20 +67,23 @@ namespace aircraft_physless
 {
 namespace sync_fsm
 {
+    const double comfortable_acceleration  = 2.5;
+    const double max_dx =   aircraft::max_desired_velocity() * aircraft::max_desired_velocity() / comfortable_acceleration *.5; 
 
     void phys_state2::update(double time, double dt) 
     {
         //if (!phys_aircraft_)
         //    return;
 
-
         if(auto traj_ = self_.get_trajectory())
         {
-            if (traj_->cur_len() < traj_->length())
+             const double  cur_len = traj_->cur_len();
+
+            if (cur_len < traj_->length())
             {
                 //phys_aircraft_->set_prediction(/*15.*/30.); 
                 //phys_aircraft_->freeze(false);
-                const double  cur_len = traj_->cur_len();
+               
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
                 const double  tar_len = traj_->cur_len();
                 decart_position target_pos;
@@ -102,14 +105,32 @@ namespace sync_fsm
                 self_.set_desired_nm_orien(physpos.orien);
 
                 ///const double curs_change = traj_->curs_value(tar_len) - traj_->curs_value(cur_len);
+                
+                double current_velocity = desired_velocity_;
 
                 if(traj_->velocity_value(tar_len))
+                {
                     desired_velocity_ = *traj_->velocity_value(tar_len);
+                }
                 else
-                if(cg::eq(traj_->curs_value(tar_len).cpr(),traj_->curs_value(cur_len).cpr(),0.085))
-                    desired_velocity_ = aircraft::max_desired_velocity();
-                else
-                    desired_velocity_ = aircraft::min_desired_velocity();
+                {
+                    if(cg::eq(traj_->curs_value(tar_len).cpr(),traj_->curs_value(cur_len).cpr(),0.085))
+                        desired_velocity_ = aircraft::max_desired_velocity();
+                    else
+                        desired_velocity_ = aircraft::min_desired_velocity();
+                }
+
+                if (traj_->length() - cur_len < max_dx  )
+                {
+                    desired_velocity_ = sqrt((traj_->length() - cur_len) / comfortable_acceleration * .5)  ;
+                }
+
+                if (current_velocity > desired_velocity_)
+                    desired_velocity_ =  current_velocity - comfortable_acceleration * dt;
+                else if (current_velocity < desired_velocity_)
+                    desired_velocity_ =  current_velocity + comfortable_acceleration * dt;
+
+ 
 
                 //const decart_position cur_pos = phys_aircraft_->get_local_position();
 
