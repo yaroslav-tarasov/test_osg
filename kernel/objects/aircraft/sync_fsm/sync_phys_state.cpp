@@ -139,7 +139,7 @@ namespace sync_fsm
         {
             if (traj_->cur_len() < traj_->length())
             {
-                phys_aircraft_->set_prediction(/*15.*/30.); 
+                phys_aircraft_->set_prediction(15./*30.*/); 
                 phys_aircraft_->freeze(false);
                 const double  cur_len = traj_->cur_len();
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
@@ -165,7 +165,7 @@ namespace sync_fsm
                 if(traj_->velocity_value(tar_len))
                     desired_velocity_ = *traj_->velocity_value(tar_len);
                 else
-                if(cg::eq(traj_->curs_value(tar_len),traj_->curs_value(cur_len),0.085))
+                if(cg::eq(traj_->curs_value(tar_len).cpr(),traj_->curs_value(cur_len).cpr(),0.085))
                     desired_velocity_ = aircraft::max_desired_velocity();
                 else
                     desired_velocity_ = aircraft::min_desired_velocity();

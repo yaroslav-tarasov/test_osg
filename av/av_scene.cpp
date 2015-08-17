@@ -200,25 +200,6 @@ int av_scene( int argc, char** argv )
         return -1;
     }
 
-
-#if 0
-    //do
-    //{
-        avScene::Scene::Create(arguments/*,pTraits*/);
-    
-        auto viewer = avScene::Scene::GetInstance()->GetViewer();
-
-        while (!viewer->done())
-        {
-             viewer->frame();
-        }
-
-        //avScene::Scene::Release();
-
-    //} while (!avScene::Scene::zoneToReload().empty());
-#endif
-
-
     return 0; 
 
 }
