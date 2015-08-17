@@ -34,8 +34,12 @@
 
 #include "av/DebugRenderer.h"
 
+
 FIXME("kernel/systems.h")
 #include "kernel/systems.h"
+
+
+#include "av/test_systems.h"
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -152,11 +156,14 @@ namespace bi
 		        _private()
                     : _krv_data_getter("log_minsk.txt")
                     , _sys            (phys::create_phys_system())
+                    , _msys(nullptr)
+                    , _vsys(nullptr)
+                    , _csys(nullptr)
                 {}
 #ifdef DEPRECATED
                 RigidUpdater::phys_vehicles_t                          _vehicles;
 #endif         
-                 polymorph_ptr<phys::BulletInterface>                   _sys;
+                polymorph_ptr<phys::BulletInterface>                   _sys;
                 kernel::system_ptr                                     _msys;
 				kernel::system_ptr                                     _vsys;
                 kernel::system_ptr                                     _csys;
@@ -217,12 +224,14 @@ namespace bi
         using namespace kernel;
 
         
-        vis_sys_props props_;
-        props_.base_point = ::get_base();
+        //vis_sys_props props_;
+        //props_.base_point = ::get_base();
         
-        _d->_csys = create_ctrl_system(_d->msg_service_);
-		_d->_vsys = create_visual_system(_d->msg_service_, props_);
-        _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
+        // _d->_csys = create_ctrl_system(_d->msg_service_);
+		// _d->_vsys = create_visual_system(_d->msg_service_, props_);
+        // _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
+        _d->_csys = create_systems()->get_control_sys();
+        _d->_msys = create_systems()->get_model_sys();
 
         create_auto_object(_d->_msys,"phys_sys","phys_sys");
         create_auto_object(_d->_msys,"airports_manager","aiports_manager");
@@ -957,7 +966,8 @@ namespace bi
 
                 //if(_time_delta_vis_sys >= cfg().model_params.vsys_step)
                 {
-                    _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
+                    if(_d->_vsys)
+                       _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
                     _time_delta_vis_sys = dt_sys;
                 }
                 //else

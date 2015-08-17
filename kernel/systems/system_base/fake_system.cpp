@@ -1330,7 +1330,7 @@ ctrl_system_impl::ctrl_system_impl(msg_service& service)
     : fake_system_base(sys_ext_ctrl, service, "objects.xml")
     //, object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&ctrl_system_impl::object_destroying, this, _1)))
 {
-    LogInfo("Create Visual Subsystem");
+    LogInfo("Create Control Subsystem");
 }
 
 void ctrl_system_impl::update(double time)

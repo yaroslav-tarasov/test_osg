@@ -216,6 +216,15 @@
     <ClInclude Include="av\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="av\Visual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="av\IVisual.h">
+      <Filter>Source Files\av</Filter>
+    </ClInclude>
+    <ClInclude Include="av\test_systems.h">
+      <Filter>Source Files\av</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -633,6 +642,12 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="av\DebugRenderer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Visual.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="av\test_systems.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>

@@ -120,7 +120,10 @@
   <ItemGroup>
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="av\Grass.h" />
+    <ClInclude Include="av\IVisual.h" />
+    <ClInclude Include="av\test_systems.h" />
     <ClInclude Include="av\Utils.h" />
+    <ClInclude Include="av\Visual.h" />
     <ClInclude Include="cg_math.h" />
     <ClInclude Include="creators.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
@@ -177,7 +180,9 @@
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
+    <ClCompile Include="av\test_systems.cpp" />
     <ClCompile Include="av\Utils.cpp" />
+    <ClCompile Include="av\Visual.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
     <ClCompile Include="ext\spark\explosion_effect.cpp" />

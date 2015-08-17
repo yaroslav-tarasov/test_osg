@@ -42,10 +42,19 @@ struct cfg_t
         bool  debug_drawer;
     };
 
+    struct network_t
+    {
+        network_t()
+            : local_address("127.0.0.1:30000") 
+        {}
+
+        std::string  local_address;
+    };
 
     path_t               path;
     model_params_t       model_params;
     debug_t              debug;
+    network_t            network;
 };
 
 REFL_STRUCT(cfg_t::path_t)
@@ -69,6 +78,10 @@ REFL_STRUCT(cfg_t)
     REFL_ENTRY(path)
     REFL_ENTRY(model_params)
     REFL_ENTRY(debug)
+REFL_END()
+
+REFL_STRUCT(cfg_t::network_t)
+    REFL_ENTRY(network)
 REFL_END()
 
 cfg_t const& cfg();
