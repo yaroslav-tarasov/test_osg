@@ -3,7 +3,38 @@
 
 #include "Scene.h"
 
+namespace
+{
+	class LogFileHandler : public osg::NotifyHandler
+	{
+	public:
+		LogFileHandler( const std::string& file )
+		{ _log.open( file.c_str() ); }
+		virtual ~LogFileHandler() { _log.close(); }
+		virtual void notify(osg::NotifySeverity severity,
+			const char* msg)
+		{ 
+			static std::string str_severity[] =
+			{
+				"ALWAYS",
+				"FATAL",
+				"WARN",
+				"NOTICE",
+				"INFO",
+				"DEBUG_INFO",
+				"DEBUG_FP"
+			};
+
+			_log << str_severity[severity] << ": " << msg;
+
+		}
+	protected:
+		std::ofstream _log;
+	};
+}
+
 Visual * Visual::m_pInstance = nullptr;
+
 
 
 Visual::Visual()
@@ -55,6 +86,13 @@ void Visual::Initialize(int argc, char** argv)
     osg::ArgumentParser arguments(&argc,argv);
     
     database::initDataPaths();
+
+	osg::setNotifyLevel( osg::WARN/*INFO*//*NOTICE*//*WARN*/ );
+	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
+
+	osg::notify(osg::INFO) << "Start Visual \n";
+
+	osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); // dds_flip dds_dxt1_rgba  
 
     avScene::Scene::Create(arguments/*,pTraits*/);
 

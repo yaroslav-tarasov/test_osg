@@ -988,7 +988,7 @@ void Scene::createObjects()
     if(_rigidUpdater.valid())
         _rigidUpdater->addUFO4( creators::createObject(name,true),
         osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
-#endif
+
 
     const bool add_planes = false;
 
@@ -1091,6 +1091,7 @@ void Scene::createObjects()
             
         }
     }
+#endif
 
 #if 0
     auto towbar = creators::createObject("towbar");

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "creators.h"
-
+#include "utils/empty_scene.h"
 
 // #define TEST_SHADOWS
 

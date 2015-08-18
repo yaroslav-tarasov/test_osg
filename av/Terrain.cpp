@@ -22,8 +22,7 @@
 #include "av/Grass.h"
 #include "av/Grass2.h"
 
-// Needs only for  creators::createBase
-#include "tests/creators.h"
+#include "utils/empty_scene.h"
 
 namespace avTerrain
 {

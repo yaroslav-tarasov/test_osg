@@ -228,6 +228,9 @@
     <ClInclude Include="utils\krv_import.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="utils\empty_scene.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -655,6 +658,9 @@
     </ClCompile>
     <ClCompile Include="av\test_objects1.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\empty_scene.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

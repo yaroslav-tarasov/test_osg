@@ -8,7 +8,6 @@ namespace creators
     typedef std::array<osg::Node*, 6> nodes_array_t;
 
     osg::AnimationPath* createAnimationPath(const osg::Vec3& center,float radius,double looptime);
-    osg::Node*          createBase(const osg::Vec3& center,float radius);
     nodes_array_t       createMovingModel(const osg::Vec3& center, float radius);
     nodes_array_t       createModel(osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgSim::OverlayNode::OverlayTechnique technique);
     osg::Node*          loadAirplane(std::string);

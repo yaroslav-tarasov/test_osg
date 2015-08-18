@@ -33,10 +33,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="env_vars.props" />
+    <Import Project="common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="env_vars.props" />
+    <Import Project="common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -64,7 +66,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\debug;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>tinyxml2.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixmld.lib;osgTextd.lib;osgShadowd.lib;osgEphemerisd.lib;osgFXd.lib;OpenThreadsd.lib;osgd.lib;osgDBd.lib;osgViewerd.lib;osgAnimationd.lib;osgGAd.lib;osgUtild.lib;osgSimd.lib;osgParticled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -91,7 +93,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>tinyxml2.lib;net_layer.lib;fms.lib;logger.lib;async_services.lib;alloc.lib;meteo.lib;pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pugixml.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\lib\release;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(BULLET_DIR)\lib;$(BULLET_DIR)\build\lib\Release;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(SIMEX_DIR)\ext\lib\tinyxml2\release\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
@@ -141,6 +143,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trajectory_drawer.h" />
     <ClInclude Include="callbacks.h" />
+    <ClInclude Include="utils\empty_scene.h" />
     <ClInclude Include="utils\krv_import.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
@@ -298,6 +301,7 @@
     <ClCompile Include="tests\test_curves.cpp" />
     <ClCompile Include="tests\tex_test.cpp" />
     <ClCompile Include="utils\animation_handler.cpp" />
+    <ClCompile Include="utils\empty_scene.cpp" />
     <ClCompile Include="utils\materials.cpp" />
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />

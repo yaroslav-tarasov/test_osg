@@ -1,13 +1,33 @@
 #include "stdafx.h"
 #include <btBulletDynamicsCommon.h>
+#include "bullet_helpers.h"
 #include "static_convex.h"
 #include "rigid_body_info.h"
+#include "phys/phys_sys.h"
 
+using namespace phys;
 
-inline bt_collision_shape_ptr get_sensor_convex(sensor_ptr s)
+FIXME(Не то и не там)
+
+inline bt_collision_shape_ptr get_sensor_convex( sensor_ptr s )
 {
-    assert(false);
-    return bt_collision_shape_ptr();
+	btAlignedObjectArray<btVector3> points;
+
+	//for (size_t i = 0; i < s->chunks_count(); ++i)
+	//{
+	//	for (size_t j = 0; j < s->triangles_count(i); ++j)
+	//	{
+	//		cg::triangle_3f tr = s->triangle(i, j);
+	//		for (size_t k = 0; k < 3; ++k) 
+	//		{
+	//			if (cg::norm(tr[k]) > 50)
+	//				continue;
+	//			points.push_back(to_bullet_vector3(tr[k]));
+	//		}
+	//	}
+	//}
+
+	return bt_collision_shape_ptr(new btConvexHullShape((btScalar *)&points[0], points.size()));
 }
 
 namespace phys
