@@ -139,7 +139,7 @@ namespace sync_fsm
         {
             if (traj_->cur_len() < traj_->length())
             {
-                phys_aircraft_->set_prediction(/*15.*/30.); 
+                phys_aircraft_->set_prediction(5./*30.*/); 
                 phys_aircraft_->freeze(false);
                 const double  cur_len = traj_->cur_len();
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);

@@ -339,7 +339,7 @@ namespace bi
 
             aircraft::settings_t as;
             as.kind = "KA27";
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
         }
 
         fms::trajectory::keypoints_t  kpts;
@@ -374,8 +374,8 @@ namespace bi
 
             aircraft::settings_t as;
             as.kind = "A319";
-            auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-            aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
+            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
+            //aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
         }
         
         {
@@ -954,14 +954,22 @@ namespace bi
                 // Физику обновляем через моделирующую 
                 if(_time_delta_mod_sys >= cfg().model_params.msys_step)
                 {
+                    {
+                        force_log fl;
+
+                        LOG_ODS_MSG("Update-------------------------" << "  _time_delta_mod_sys=  " << _time_delta_mod_sys << "--------------------------------\n");
+                    }
+
                     _d->_msys->update(view->getFrameStamp()->getSimulationTime());
                     _time_delta_mod_sys = dt_sys;
+
+
+
                 }
                 else
                     _time_delta_mod_sys += dt_sys;
 
-                LOG_ODS_MSG("Update-------------------------" << "  dt=  " << dt << "--------------------------------\n");
-                
+
 
 
                 //if(_time_delta_vis_sys >= cfg().model_params.vsys_step)

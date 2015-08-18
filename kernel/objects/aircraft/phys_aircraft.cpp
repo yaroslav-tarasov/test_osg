@@ -240,6 +240,7 @@ namespace aircraft
         has_malfunction_ = malfunction;
     }
 
+
     void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
 #ifndef SIMEX_MOD
