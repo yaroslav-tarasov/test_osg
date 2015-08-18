@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "network/msg_base.h"
+using network::gen_msg;
 
 namespace net_layer
 {
@@ -11,6 +12,7 @@ namespace net_layer
         {
             id_setup            ,
             id_run              ,
+            id_create           ,
         };
 
 
@@ -50,6 +52,27 @@ namespace net_layer
             REFL_ENTRY(srv_time )
         REFL_END()
 
+        struct create
+            : network::msg_id<id_create>
+        {
+            create(double lat = 0., double lon = 0., double course = 0.)
+                : lat    (lat)
+                , lon    (lon )
+                , course (course)
+            {
+            }
+
+            double  lat;
+            double  lon;
+            double  course;
+        };
+
+        REFL_STRUCT(create)
+            REFL_ENTRY(lat)
+            REFL_ENTRY(lon )
+            REFL_ENTRY(course )
+        REFL_END()
+        
     }
 
 

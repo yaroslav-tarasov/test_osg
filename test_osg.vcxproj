@@ -141,6 +141,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="trajectory_drawer.h" />
     <ClInclude Include="callbacks.h" />
+    <ClInclude Include="utils\krv_import.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +181,7 @@
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
+    <ClCompile Include="av\test_objects1.cpp" />
     <ClCompile Include="av\test_systems.cpp" />
     <ClCompile Include="av\Utils.cpp" />
     <ClCompile Include="av\Visual.cpp" />

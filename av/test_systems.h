@@ -13,4 +13,4 @@ struct creator
 
 typedef shared_ptr<creator>  creator_ptr;
 
-creator_ptr create_systems();
+creator_ptr sys_creator();

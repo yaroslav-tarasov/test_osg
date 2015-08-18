@@ -34,11 +34,7 @@
 
 #include "av/DebugRenderer.h"
 
-
-FIXME("kernel/systems.h")
-#include "kernel/systems.h"
-
-
+#include "utils/krv_import.h"
 #include "av/test_systems.h"
 
 // FIXME
@@ -51,101 +47,6 @@ namespace vehicle
 namespace aircraft
 {
     kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
-};
-
-namespace
-{
-    struct krv_data
-    {
-        float x;
-        float y; 
-        float h;
-        float fi;
-        float fiw;
-        float kr;
-        float v;
-        float w; 
-        float vb;
-        float tg;
-        float time;
-    };
-
-    std::ostream &operator <<(std::ostream &os, const krv_data &kp) {
-        using namespace std;
-
-        for(size_t i = 0 ; i < sizeof(kp)/sizeof(float); ++i)
-            os << *((float*)(&kp) + i*sizeof(float))  << "  ";
-        return os;
-    }
-
-    struct value_getter
-    {
-        value_getter(std::string const& line)
-        {
-            boost::split(values_, line, boost::is_any_of(" \t="), boost::token_compress_on);
-        }
-
-        template <class T>
-        T get(size_t index)
-        {
-            return boost::lexical_cast<T>(values_[index]);
-        }
-
-        bool valid()
-        {
-            return values_.size()>0;
-        }
-
-    private:
-        std::vector<std::string> values_;
-    };
-
-    
-
-    struct  krv_data_getter
-    {
-        std::vector<krv_data>    kd_;
-        std::vector<cg::point_3> kp_;
-
-        krv_data_getter(const std::string& file_name = std::string("log_AFL319.txt") )
-        {
-            std::ifstream ifs(file_name);
-
-            int num =0;
-            while (ifs.good())
-            {
-                char buf[0x400] = {};
-                ifs.getline(buf, 0x400);
-
-                std::string line = buf;
-                value_getter items(line);
-                krv_data kd;
-                
-                if(items.valid())
-                {
-                    kd.x = items.get<float>(1);
-                    kd.y = items.get<float>(3); 
-                    kd.h = items.get<float>(5);
-                    //kd.fi = items.get<float>(7);
-                    kd.fiw = items.get<float>(7);
-                    kd.kr  = items.get<float>(9);
-                    //kd.v  = items.get<float>(13);
-                    //kd.w  = items.get<float>(15); 
-                    //kd.vb = items.get<float>(17);
-                    kd.tg   = items.get<float>(15);
-                    kd.time = items.get<float>(17);
-
-                    kd_.push_back(kd);
-                    kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
-                }
-
-
-                // std::cout << line;
-            } 
-
-
-        }
-    };
 };
 
 
@@ -168,45 +69,10 @@ namespace bi
 				kernel::system_ptr                                     _vsys;
                 kernel::system_ptr                                     _csys;
                 kernel::msg_service                             msg_service_;
-                krv_data_getter                             _krv_data_getter;
+                krv::data_getter                            _krv_data_getter;
 	};
 
-    void create_auto_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
-    {
-        using namespace kernel;
 
-        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(sys)->object_classes() ;
-
-        kernel::object_class_ptr class_ptr ;
-
-        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
-        {
-            if (class_name == (*it)->name())
-                class_ptr = *it ;
-            std::string n = (*it)->name();
-        }
-
-        auto obj = kernel::fake_objects_factory_ptr(sys)->create_object(class_ptr, unique_name); 
-
-    }
-    
-    kernel::object_info_ptr create_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
-    {
-        using namespace kernel;
-
-        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(sys)->object_classes() ;
-
-        kernel::object_class_ptr class_ptr ;
-
-        for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
-        {
-            if (class_name == (*it)->name())
-                class_ptr = *it ;
-            std::string n = (*it)->name();
-        }
-
-        return kernel::fake_objects_factory_ptr(sys)->create_object(class_ptr, unique_name); 
-    }
 
 	RigidUpdater::RigidUpdater( osg::Group* root, on_collision_f on_collision ) 
 		: _root        (root)
@@ -216,208 +82,15 @@ namespace bi
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(new _private)
-        , _time_delta_mod_sys (0)
-        , _time_delta_vis_sys (0)
-        , _time_delta_ctrl_sys(0)
 		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
 	{
         using namespace kernel;
+        
+        // Только получение без создания  
+        _d->_csys = sys_creator()->get_control_sys();
+        _d->_msys = sys_creator()->get_model_sys();
 
         
-        //vis_sys_props props_;
-        //props_.base_point = ::get_base();
-        
-        // _d->_csys = create_ctrl_system(_d->msg_service_);
-		// _d->_vsys = create_visual_system(_d->msg_service_, props_);
-        // _d->_msys = create_model_system(_d->msg_service_,"script should  be placed here");
-        _d->_csys = create_systems()->get_control_sys();
-        _d->_msys = create_systems()->get_model_sys();
-
-        create_auto_object(_d->_msys,"phys_sys","phys_sys");
-        create_auto_object(_d->_msys,"airports_manager","aiports_manager");
-        create_auto_object(_d->_msys,"ada","ada");
-        create_auto_object(_d->_msys,"meteo_proxy","meteo_proxy");
-        create_auto_object(_d->_msys,"airport","aiport_0");
-        
-
-        if(false)
-        {
-            std::string class_name = "aircraft";
-            std::string unique_name = "aircraft_0";
-            std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_d->_msys)->object_classes() ;
-
-            kernel::object_class_ptr class_ptr ;
-
-            for (auto it = classes.begin(), end = classes.end(); it != end; ++it)
-            {
-                if (class_name == (*it)->name())
-                    class_ptr = *it ;
-                std::string n = (*it)->name();
-            }
-
-            auto obj = kernel::fake_objects_factory_ptr(_d->_msys)->create_object(class_ptr, unique_name); 
-			nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(obj);
-			manager->set_model(aircraft::get_model("A319"));
-        }
-
-        {
-            cg::geo_point_3 apos(0.0,0.0005,0.0);
-            aircraft::settings_t as;
-            as.kind = "A319";
-            geo_position agp(apos,quaternion(cpr(30,0,0)));
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-        {
-
-            cg::geo_point_3 apos(-0.0006,-0.0005,0.0);
-            aircraft::settings_t as;
-            as.kind = "SB20";
-            geo_position agp(apos,quaternion(cpr(0,0,0)));
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            cg::geo_point_3 apos(0.0,0.0009,0.0);
-            aircraft::settings_t as;
-            as.kind = "A321";
-            geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            cg::geo_point_3 apos(0.0,0.0018,0.0);
-            aircraft::settings_t as;
-            as.kind = "B737";
-            geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            cg::geo_point_3 apos(0.0,0.0027,0.0);
-            aircraft::settings_t as;
-            as.kind = "B744";
-            geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            cg::geo_point_3 apos(0.0,0.0036,0.0);
-            aircraft::settings_t as;
-            as.kind = "B763";
-            geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
-            cg::point_3 vpos(350,650,0);
-            decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-            geo_position agp(target_pos, ::get_base());
-
-            aircraft::settings_t as;
-            as.kind = "AN26";//"A333";
-            //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-        
-        {
-            // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
-            cg::point_3 vpos(300,600,0);
-            decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-            geo_position agp(target_pos, ::get_base());
-
-            aircraft::settings_t as;
-            as.kind = "A319";//"A333";
-            //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        {
-            cg::point_3 vpos(250,650,0);
-            decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-            geo_position agp(target_pos, ::get_base());
-
-            aircraft::settings_t as;
-            as.kind = "KA27";
-            //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-        }
-
-        fms::trajectory::keypoints_t  kpts;
-        fms::trajectory::curses_t      crs;
-        fms::trajectory::velocities_t vls ;
-
-        const unsigned start_idx = 400;
-        cg::point_2 prev(_d->_krv_data_getter.kd_[start_idx].x,_d->_krv_data_getter.kd_[start_idx].y);
-        double tlength = 0;
-        for(auto it = _d->_krv_data_getter.kd_.begin() + start_idx; it!= _d->_krv_data_getter.kd_.end();++it )
-        {
-            auto p = cg::point_2(it->x,it->y);
-            auto dist = cg::distance(prev,p);
-            tlength += dist;
-            crs.insert(std::make_pair(tlength,cpr(it->fiw,it->tg, it->kr )));
-            kpts.insert(std::make_pair(tlength,cg::point_3(p,it->h)));
-
-            auto pit = std::prev(it);
-            if(pit!=it)
-                vls.insert(std::make_pair(tlength,dist/(it->time - pit->time)/* + 20*/));
-                // vel.push_back(dist/(it->time - pit->time));
-            prev = p;
-        }
-        
-
-        {
-            cg::point_3 vpos(_d->_krv_data_getter.kp_[start_idx]);
-            decart_position target_pos(vpos,cpr(/*180 -*/ _d->_krv_data_getter.kd_[start_idx].fiw,0,0));
-            geo_position agp(target_pos, ::get_base());
-            
-            agp.orien = cpr( _d->_krv_data_getter.kd_[start_idx].fiw /*- 45*/,0,0);
-
-            aircraft::settings_t as;
-            as.kind = "A319";
-            //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-            //aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
-        }
-        
-        {
-            // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
-            cg::point_3 vpos(350,650,0);
-            decart_position target_pos(vpos,cg::quaternion(cg::cpr(_d->_krv_data_getter.kd_[start_idx].fiw , 0, 0)));
-            geo_position agp(target_pos, ::get_base());
-            
-            aircraft::settings_t as;
-            as.kind = "A319";//"A333";
-            //geo_position agp(apos,quaternion(cpr(60,0,0)));
-            auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),as,agp);
-            //aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
-        }
-
-        vehicle::settings_t vs;
-        vs.model = "buksir";//"niva_chevrolet";//
-        
-        //cg::point_3 vpos(330,750,00);
-        //cg::point_3 vpos(572,032,0);
-        //decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-        //geo_position vgp(target_pos, ::get_base());
-        
-        cg::geo_point_3 vpos(0.0006,0.0009,0.0);
-        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
-        
-        auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),vs,vgp);
-
-
-        //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
-        //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");
-		//auto nm = find_first_child<nodes_management::manager_ptr>(vvv);
-		//uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
-		//uint32_t vv_id = kernel::object_info_ptr(vvv)->object_id();
-
-        // auto sr_obj = create_object(_d->_csys,"simple_route","simple_route_0");
-        
-        simple_route::settings_t srs;
-        srs.speed = 6;
-        auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_d->_csys).get()),srs,vgp.pos);
-
-
         _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
       
     }
@@ -942,45 +615,6 @@ namespace bi
 
                 const double dt_sys = dt; 
 
-                if(_time_delta_ctrl_sys >= cfg().model_params.csys_step)
-                {
-                    _d->_csys->update(view->getFrameStamp()->getSimulationTime());
-                    _time_delta_ctrl_sys = dt_sys;
-                }
-                else
-                    _time_delta_ctrl_sys += dt_sys;
-
-
-                // Физику обновляем через моделирующую 
-                if(_time_delta_mod_sys >= cfg().model_params.msys_step)
-                {
-                    {
-                        force_log fl;
-
-                        LOG_ODS_MSG("Update-------------------------" << "  _time_delta_mod_sys=  " << _time_delta_mod_sys << "--------------------------------\n");
-                    }
-
-                    _d->_msys->update(view->getFrameStamp()->getSimulationTime());
-                    _time_delta_mod_sys = dt_sys;
-
-
-
-                }
-                else
-                    _time_delta_mod_sys += dt_sys;
-
-
-
-
-                //if(_time_delta_vis_sys >= cfg().model_params.vsys_step)
-                {
-                    if(_d->_vsys)
-                       _d->_vsys->update(view->getFrameStamp()->getSimulationTime());
-                    _time_delta_vis_sys = dt_sys;
-                }
-                //else
-                //    _time_delta_vis_sys += dt_sys;
-             
                 
                 
 #ifdef DEPRECATED

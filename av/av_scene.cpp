@@ -34,31 +34,73 @@ namespace
         LogError("Error happened: " << err);
         __main_srvc__->stop();
     }
+
+    struct updater
+    {
+       updater(kernel::system_ptr  sys,double period = 0.01)
+          : period_(period)
+          , old_val(0)
+          , sys_(sys)
+       {
+
+       }
+
+       __forceinline void update(double time)
+       {
+           if(time - old_val >=period_)
+           {
+               sys_->update(time);
+               old_val = time;
+           }
+       }
+
+       __forceinline void reset()
+       {
+           sys_.reset();
+       }
+
+
+    private:
+       double                                                   period_; 
+       double                                                   old_val;
+       kernel::system_ptr                                          sys_;
+    };
+
 }
 
-struct server
+struct visapp
 {
-    server(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-        : acc_      (peer, boost::bind(&server::on_accepted, this, _1, _2), tcp_error)
+    visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
+        : acc_      (peer, boost::bind(&visapp::on_accepted, this, _1, _2), tcp_error)
         , period_   (0.01)
-        , osg_vis   (CreateVisual())
+        , osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
-        , timer_    (boost::bind(&server::update, this))
+        , ctrl_sys_ (sys_creator()->get_control_sys(),cfg().model_params.csys_step)
+        , mod_sys_  (sys_creator()->get_model_sys(),cfg().model_params.msys_step)
+        , timer_    (boost::bind(&visapp::update, this))
         
     {   
 
         disp_
-            .add<setup                 >(boost::bind(&server::on_setup        , this, _1))
-            .add<run                   >(boost::bind(&server::on_run        , this, _1))
+            .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
+            .add<run                   >(boost::bind(&visapp::on_run        , this, _1))
+            .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
         
+        FIXME( Arguments );
         
-        osg_vis->Initialize(argc,argv);
+        osg_vis_->Initialize(argc,argv);
+        
+        FIXME(Splash screen and scene with properties) 
+//      Сначала сцена потом автообъекты
+
+        create_objects();
+
 
         update();
     }
 
-    ~server()
+    ~visapp()
     {
        vis_sys_.reset();
     }
@@ -66,7 +108,7 @@ struct server
 private:
     void update()
     {   
-        double sim_time = osg_vis->GetInternalTime();
+        double sim_time = osg_vis_->GetInternalTime();
         if(sim_time  < 0)
         {
            timer_.cancel();
@@ -76,8 +118,12 @@ private:
         else
            timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
 
-        kernel::system_ptr(vis_sys_)->update(sim_time);
-        osg_vis->Render();
+        
+        mod_sys_.update(sim_time);
+        ctrl_sys_.update(sim_time);
+        vis_sys_.update(sim_time);
+        osg_vis_->Render();
+
     }
 
     void on_accepted(network::tcp::socket& sock, endpoint const& peer)
@@ -87,8 +133,8 @@ private:
         uint32_t id = next_id();
         sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, id),
-            boost::bind(&server::on_disconnected, this, _1, id),
-            boost::bind(&server::on_error, this, _1, id)));        
+            boost::bind(&visapp::on_disconnected, this, _1, id),
+            boost::bind(&visapp::on_error, this, _1, id)));        
         
         LogInfo("Client " << peer << " accepted");
     }
@@ -122,10 +168,32 @@ private:
         LogInfo("Got run message: " << msg.srv_time << " : " << msg.task_time );
     }
 
+    void on_create(create const& msg)
+    {
+        auto fp = fn_reg::function<void(create const&)>("create_aircraft");
+        if(fp)
+            fp(msg);
+
+        LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
+    }
+
+
     uint32_t next_id()
     {
         static uint32_t id = 0;
         return id++;
+    }
+
+    void create_objects()
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        sys_creator()->create_auto_objects();
+
+        auto fp = fn_reg::function<void(void)>("create_objects");
+        if(fp)
+            fp();
     }
 
     kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
@@ -135,7 +203,7 @@ private:
 
         //systems_factory_ptr sys_fab = nfi::function<systems_factory_ptr()>("systems", "create_system_factory")();
         auto ptr = // /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
-                   create_systems()->get_visual_sys();
+                   sys_creator()->get_visual_sys();
         //dict_t dic;
         //binary::unwrap(bytes, dic);
 
@@ -153,8 +221,10 @@ private:
     //kernel::msg_service                                         msg_service_;
 
 private:
-    kernel::visual_system_ptr                                   vis_sys_;
-    IVisual*                                                    osg_vis;
+    updater                                                     mod_sys_;
+    updater                                                    ctrl_sys_;
+    updater                                                     vis_sys_;
+    IVisual*                                                    osg_vis_;
 
 private:
     async_timer                                                 timer_; 
@@ -184,7 +254,7 @@ int av_scene( int argc, char** argv )
         kernel::vis_sys_props props_;
         props_.base_point = ::get_base();
 
-        server s(peer, props_ , argc, argv);
+        visapp s(peer, props_ , argc, argv);
         
         __main_srvc__->run();
 

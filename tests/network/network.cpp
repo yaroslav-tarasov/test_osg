@@ -36,6 +36,7 @@ struct client
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
         , timer_  (boost::bind(&client::update, this))
+        , ac_counter_(0)
     {
         LogInfo("Connecting to " << peer);
     }
@@ -85,13 +86,19 @@ private:
         binary::bytes_t bts =  std::move(wrap_msg(run(1111,2222)));
         send(&bts[0], bts.size());
 
-        //if(!on_timer_( 0 ))
-        //{
-        //    timer_.cancel();
-        //    __main_srvc__->stop();
-        //}
-        //else
-            timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
+        if(ac_counter_++==15)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(create(0,0,90)));
+            send(&bts[0], bts.size());
+        }
+
+        if(ac_counter_==20)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(create(0,0.005,0)));
+            send(&bts[0], bts.size());
+        }
+
+        timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
     }
 
 private:
@@ -102,6 +109,9 @@ private:
     optional<tcp_socket>    srv_;
 
     bytes_t                 partial_msg_;
+
+private:
+    uint32_t                  ac_counter_;
 };
 
 
