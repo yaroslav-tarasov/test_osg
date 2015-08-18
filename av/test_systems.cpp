@@ -36,7 +36,7 @@ namespace
 
 
     class impl : public creator,
-                    public boost::enable_shared_from_this<creator>
+                 public boost::enable_shared_from_this<impl>
     {
     public:
         impl()
