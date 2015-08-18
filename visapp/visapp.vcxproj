@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AC36F021-16FE-4C48-8989-AF578E2A015C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>visapp</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\env_vars.props" />
+    <Import Project="..\common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\env_vars.props" />
+    <Import Project="..\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>pugixmld.lib;meteo.lib;logger.lib;fms.lib;alloc.lib;async_services.lib;tinyxml2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>pugixml.lib;meteo.lib;logger.lib;fms.lib;alloc.lib;async_services.lib;tinyxml2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\misc\shaders\grass.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\grass.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\headers\fog.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\headers\scene_params.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\headers\spot_lights.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\headers\utils.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess.geo">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess.vs">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess_quad.tcs">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess_quad.tes">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess_tri.tcs">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\misc\shaders\tess_tri.tes">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\IVisual.h" />
+    <ClInclude Include="..\av\test_systems.h" />
+    <ClInclude Include="..\av\Utils.h" />
+    <ClInclude Include="..\kernel\fms\trajectory.h" />
+    <ClInclude Include="..\kernel\objects\aircraft\aircraft_msg.h" />
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h" />
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
+    <ClInclude Include="..\utils\krv_import.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ShadowedScene.cpp" />
+    <ClCompile Include="..\av\avShadows\ShadowMap.cpp" />
+    <ClCompile Include="..\av\avShadows\ShadowSettings.cpp" />
+    <ClCompile Include="..\av\avShadows\ShadowTechnique.cpp" />
+    <ClCompile Include="..\av\avShadows\ViewDependentShadowMap.cpp" />
+    <ClCompile Include="..\av\avSky\CelestialBodies.cpp" />
+    <ClCompile Include="..\av\avSky\DateTime.cpp" />
+    <ClCompile Include="..\av\avSky\EphemerisEngine.cpp" />
+    <ClCompile Include="..\av\avSky\EphemerisModel.cpp" />
+    <ClCompile Include="..\av\avSky\Moon.cpp" />
+    <ClCompile Include="..\av\avSky\Sky.cpp" />
+    <ClCompile Include="..\av\avSky\SkyDome.cpp" />
+    <ClCompile Include="..\av\avSky\StarField.cpp" />
+    <ClCompile Include="..\av\CloudLayer.cpp" />
+    <ClCompile Include="..\av\Database.cpp" />
+    <ClCompile Include="..\av\DebugRenderer.cpp" />
+    <ClCompile Include="..\av\Environment.cpp" />
+    <ClCompile Include="..\av\EnvRenderer.cpp" />
+    <ClCompile Include="..\av\Ephemeris.cpp" />
+    <ClCompile Include="..\av\FogLayer.cpp" />
+    <ClCompile Include="..\av\Grass.cpp" />
+    <ClCompile Include="..\av\Grass2.cpp" />
+    <ClCompile Include="..\av\LightManager.cpp" />
+    <ClCompile Include="..\av\Lights.cpp" />
+    <ClCompile Include="..\av\LOD.cpp" />
+    <ClCompile Include="..\av\NavigationalLight.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\av\Object.cpp" />
+    <ClCompile Include="..\av\PreRender.cpp" />
+    <ClCompile Include="..\av\Scene.cpp" />
+    <ClCompile Include="..\av\scn_parser.cpp" />
+    <ClCompile Include="..\av\shaders.cpp" />
+    <ClCompile Include="..\av\Terrain.cpp" />
+    <ClCompile Include="..\av\test_objects1.cpp" />
+    <ClCompile Include="..\av\test_systems.cpp" />
+    <ClCompile Include="..\av\Utils.cpp" />
+    <ClCompile Include="..\av\Visual.cpp" />
+    <ClCompile Include="..\core\config\config.cpp" />
+    <ClCompile Include="..\core\nfi\lib_loader.cpp" />
+    <ClCompile Include="..\ext\spark\explosion_effect.cpp" />
+    <ClCompile Include="..\ext\spark\fire_effect.cpp" />
+    <ClCompile Include="..\ext\spark\osgspark.cpp" />
+    <ClCompile Include="..\ext\spark\rain_effect.cpp" />
+    <ClCompile Include="..\ext\spark\simple_effect.cpp" />
+    <ClCompile Include="..\ext\spark\SparkDrawable.cpp" />
+    <ClCompile Include="..\ext\spark\SparkUpdatingHandler.cpp" />
+    <ClCompile Include="..\ext\spark\test_effect.cpp" />
+    <ClCompile Include="..\hmi\gui_vis\main_window_impl.cpp" />
+    <ClCompile Include="..\hmi\gui_vis\menu_impl.cpp" />
+    <ClCompile Include="..\hmi\gui_vis\panels\vis_settings_panel_impl.cpp" />
+    <ClCompile Include="..\kernel\fms\dubins.cpp" />
+    <ClCompile Include="..\kernel\fms\trajectory.cpp" />
+    <ClCompile Include="..\kernel\objects\ada\ada_view.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_ctrl.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_model.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_rotors_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_shassis_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_view.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_visual.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\phys_aircraft.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_fsm.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_none_state.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_fms\aircraft_fms_model.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_fms\aircraft_fms_view.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_model.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_view.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
+    <ClCompile Include="..\kernel\objects\airports_manager\airports_manager_view.cpp" />
+    <ClCompile Include="..\kernel\objects\airport\airport_model.cpp" />
+    <ClCompile Include="..\kernel\objects\airport\airport_view.cpp" />
+    <ClCompile Include="..\kernel\objects\common\object_creators.cpp" />
+    <ClCompile Include="..\kernel\objects\conditions\meteo_proxy_view.cpp" />
+    <ClCompile Include="..\kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
+    <ClCompile Include="..\kernel\objects\dubin_route\dubin_route_view.cpp" />
+    <ClCompile Include="..\kernel\objects\nm\nodes_management.cpp" />
+    <ClCompile Include="..\kernel\objects\nm\nodes_manager.cpp" />
+    <ClCompile Include="..\kernel\objects\nm\node_osg_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\mod_node_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\nodes_manager_view.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\nodes_manager_visual.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\node_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\node_tree_iterator.cpp" />
+    <ClCompile Include="..\kernel\objects\nodes_manager\vis_node_impl.cpp" />
+    <ClCompile Include="..\kernel\objects\phys_sys_object\phys_sys_object_model.cpp" />
+    <ClCompile Include="..\kernel\objects\phys_sys_object\phys_sys_object_view.cpp" />
+    <ClCompile Include="..\kernel\objects\simple_route\simple_route_ctrl.cpp" />
+    <ClCompile Include="..\kernel\objects\simple_route\simple_route_view.cpp" />
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_ctrl.cpp" />
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_model.cpp" />
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_model_states.cpp" />
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_view.cpp" />
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_visual.cpp" />
+    <ClCompile Include="..\kernel\phys\aircraft_phys.cpp" />
+    <ClCompile Include="..\kernel\phys\BulletInterface.cpp" />
+    <ClCompile Include="..\kernel\phys\BulletMTInterface.cpp" />
+    <ClCompile Include="..\kernel\phys\bvh_static_mesh.cpp" />
+    <ClCompile Include="..\kernel\phys\GLDebugDrawer.cpp" />
+    <ClCompile Include="..\kernel\phys\ray_cast_vehicle.cpp" />
+    <ClCompile Include="..\kernel\phys\RigidUpdater.cpp" />
+    <ClCompile Include="..\kernel\phys\static_convex.cpp" />
+    <ClCompile Include="..\kernel\systems\common\object_class_impl.cpp" />
+    <ClCompile Include="..\kernel\systems\objects_base\base_view.cpp" />
+    <ClCompile Include="..\kernel\systems\system_base\fake_system.cpp" />
+    <ClCompile Include="..\kernel\systems\visual_system\visual_object_impl.cpp" />
+    <ClCompile Include="..\tests\cegui\CEGUIDrawable.cpp" />
+    <ClCompile Include="..\tests\cegui\cegui_main.cpp" />
+    <ClCompile Include="..\tests\common\CommonFunctions.cpp" />
+    <ClCompile Include="..\utils\animation_handler.cpp" />
+    <ClCompile Include="..\utils\empty_scene.cpp" />
+    <ClCompile Include="..\utils\materials.cpp" />
+    <ClCompile Include="..\utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="..\_include\bada\bada_import.cpp" />
+    <ClCompile Include="..\_include\objects\bullet_importer.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="visapp.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
