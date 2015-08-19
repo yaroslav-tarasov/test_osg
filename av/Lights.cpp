@@ -179,11 +179,11 @@ void Lights::cull(osg::NodeVisitor * nv)
 
 
 //
-// Then handler, which can be placed in cutom cull code
+// Then handler, which can be placed in custom cull code
 //
 
 
-// lights states pack strcuture
+// lights states pack structure
 LightNodeHandler::LightsPackStateSet::LightsPackStateSet()
 {
     // create state-set
@@ -191,11 +191,11 @@ LightNodeHandler::LightsPackStateSet::LightsPackStateSet()
     pStateSet->setDataVariance(osg::Object::DYNAMIC);
     pStateSet->setNestRenderBins(false);
     // create uniforms array
-    LightsActiveNum = new osg::Uniform(osg::Uniform::INT, "LightsActiveNum");
-    LightVSPosAmbRatio = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightVSPosAmbRatio", nMaxLights);
+    LightsActiveNum     = new osg::Uniform(osg::Uniform::INT,        "LightsActiveNum");
+    LightVSPosAmbRatio  = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightVSPosAmbRatio", nMaxLights);
     LightVSDirSpecRatio = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightVSDirSpecRatio", nMaxLights);
-    LightAttenuation = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightAttenuation", nMaxLights);
-    LightDiffuse = new osg::Uniform(osg::Uniform::FLOAT_VEC3, "LightDiffuse", nMaxLights);
+    LightAttenuation    = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightAttenuation", nMaxLights);
+    LightDiffuse        = new osg::Uniform(osg::Uniform::FLOAT_VEC3, "LightDiffuse", nMaxLights);
     // add uniforms
     pStateSet->addUniform(LightsActiveNum.get());
     pStateSet->addUniform(LightVSPosAmbRatio.get());

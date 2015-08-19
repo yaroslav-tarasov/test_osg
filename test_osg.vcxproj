@@ -123,6 +123,7 @@
     <ClInclude Include="animation_handler.h" />
     <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
+    <ClInclude Include="av\Logo.h" />
     <ClInclude Include="av\test_systems.h" />
     <ClInclude Include="av\Utils.h" />
     <ClInclude Include="av\Visual.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="av\LightManager.cpp" />
     <ClCompile Include="av\Lights.cpp" />
     <ClCompile Include="av\LOD.cpp" />
+    <ClCompile Include="av\Logo.cpp" />
     <ClCompile Include="av\NavigationalLight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -227,6 +229,7 @@
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
+    <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
     <ClCompile Include="kernel\objects\common\object_creators.cpp" />

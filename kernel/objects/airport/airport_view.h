@@ -9,7 +9,17 @@ namespace airport
 {
 
 struct port_data
-{
+{   
+    port_data()
+    {
+    }
+
+    port_data(settings_t const& settings, atc::airport::data_t const& data)
+        : settings_(settings)
+        , data_    (data  )
+        {
+        }
+
 protected:
     settings_t           settings_;
     atc::airport::data_t data_;

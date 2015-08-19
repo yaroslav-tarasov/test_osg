@@ -167,6 +167,7 @@ namespace python {
 
 #include "aircraft/aircraft_common.h"
 #include "vehicle/vehicle_common.h"
+#include "airport/airport_common.h"
 
 namespace vehicle
 {
