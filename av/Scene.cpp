@@ -115,60 +115,6 @@ namespace {
 
 namespace {
 
-    inline osg::Vec3f lights_offset(std::string name)
-    {
-        if (name == "sheremetyevo")
-            return osg::Vec3f(18, 17, .2f);
-        else if (name == "adler")
-            return osg::Vec3f(0 , 0 , .2f);
-        else if (name == "minsk")
-            return osg::Vec3f(0 , 0 , .5f);
-
-        return osg::Vec3f();
-    }
-
-    inline std::string lights_file(std::string name)
-    {
-        if (name == "sheremetyevo")
-            return "sheremetyevo.txt";
-        else if (name == "adler")
-            return "sochi.scn";
-        else if (name == "minsk")
-            return "minsk.scn";
-
-        return "";
-    }
-
-    struct value_getter
-    {
-        value_getter(std::string const& line)
-        {
-            boost::split(values_, line, boost::is_any_of(" \t"), boost::token_compress_on);
-        }
-
-        template <class T>
-        T get(size_t index)
-        {
-            return boost::lexical_cast<T>(values_[index]);
-        }
-
-        bool valid()
-        {
-            return values_.size()>0;
-        }
-
-    private:
-        std::vector<std::string> values_;
-    };
-
-template<typename S> 
-inline osg::Vec3f polar_point_2(S range, S course )
-{
-    return osg::Vec3( (S)range * sin(cg::grad2rad(course)),
-        (S)range * cos(cg::grad2rad(course)),0);
-}
-
-typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
 
 osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)
 {
@@ -204,128 +150,6 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
     return  colors [fcolor];
 };
 
-void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
-{
-    if (!boost::filesystem::is_regular_file(file))
-        LogWarn("No lights for airport found: " << file);
-
-    const bool usePointSprites = true;
-    osg::Texture2D *tex;
-    if(usePointSprites)
-    {
-        tex = new osg::Texture2D();
-        tex->setImage(osgDB::readImageFile("Images/particle.rgb"));
-    }
-
-    
-
-    std::ifstream ifs(file);
-
-    for (auto it = cur_lamps.begin(); it != cur_lamps.end(); ++it)
-        parent->removeChild(it->get());
-    cur_lamps.clear();
-
-    navaid_group_node_ptr navid_node_ptr = nullptr;
-
-    bool group_ready = false;
-
-    while (ifs.good())
-    {
-        char buf[0x400] = {};
-        ifs.getline(buf, 0x400);
-
-        std::string line = buf;
-        boost::trim(line);
-
-        // skip comments
-
-        if (line.size()==0) continue;
-
-        if (boost::starts_with(line, "//"))
-        {
-            boost::erase_all(line," ");
-            if (boost::starts_with(line, "//#"))
-            {
-                boost::trim_if(line, boost::is_any_of("/#"));
-                //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
-                navid_node_ptr.release();
-                navid_node_ptr = new osgSim::LightPointNode;
-                navid_node_ptr->setName(line);
-                                //
-                osg::StateSet* set = navid_node_ptr->getOrCreateStateSet();
-
-                if (usePointSprites)
-                {
-                    navid_node_ptr->setPointSprite();
-
-                    // Set point sprite texture in LightPointNode StateSet.
-
-                    set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
-#if 0                    
-                    osg::ref_ptr<osg::Program> cLightPointProg = creators::createProgram("simlight").program; 
-                    cLightPointProg->setName("LightLayerShader");
-                    set->setAttribute(cLightPointProg.get());
-#endif
-                }
-
-                group_ready = true;
-            }
-            else
-                continue;
-        }
-
-        value_getter items(line);
-
-        if (items.get<std::string>(0) == "FireLine:" || items.get<std::string>(0) == "FireLineHa:")
-        {
-            size_t ofs = items.get<std::string>(0) == "FireLineHa:" ? 3 : 0;
-
-            osg::Vec3f pos (items.get<float>(ofs + 2), items.get<float>(ofs + 4), items.get<float>(ofs + 3));
-            osg::Vec3f dir (polar_point_2(1.f, items.get<float>(ofs + 5)));
-            float      len   = items.get<float>(ofs + 6);
-            float      step  = items.get<float>(ofs + 7);
-            osg::Vec4f clr (items.get<float>(ofs + 8), items.get<float>(ofs + 9), items.get<float>(ofs + 10),1.0f); 
-
-            size_t count = 0;
-            if (!cg::eq_zero(step) && !cg::eq_zero(len))
-            {
-                count = size_t(cg::ceil(len / step));
-
-                if (step > 2)
-                    ++count;
-            }
-
-            for (size_t i = 0; i < count; ++i)
-            {
-                osg::Vec3f p = pos + dir * step * i  + offset;
-               
-                osgSim::LightPoint pnt;
-
-                pnt._position.set(p.x(),p.y(),p.z());
-                pnt._color = clr;
-                if (!usePointSprites)
-                    pnt._radius = 0.3f;
-                else
-                    pnt._radius = 0.6f;
-
-                navid_node_ptr->addLightPoint(pnt);
-                
-           }
-        }
-        
-        if(navid_node_ptr && group_ready)
-        {
-            cur_lamps.push_back(navid_node_ptr);
-            parent->addChild(navid_node_ptr);
-            group_ready = false;
-        }
-
-    }
-
-
-    //cur_lamps.push_back(navid_group);
-    //parent->add(navid_group);
-}
 
 }
 
@@ -497,11 +321,11 @@ osg::ref_ptr<Scene>	 Scene::_scenePtr;
 std::string          Scene::zone_to_reload_;
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Create( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr )
+bool Scene::Create( osgViewer::Viewer* vw )
 {
     _scenePtr = new Scene();
 
-    if ( _scenePtr->Initialize( cArgs, cTraitsPtr/*, cTraitsPtr.valid() ? cTraitsPtr->width : 0, cTraitsPtr.valid() ? cTraitsPtr->height : 0*/ ) == false )
+    if ( ! _scenePtr->Initialize( vw ))
     {
         OSG_FATAL << "Failed to initialize scene" ;
         _scenePtr = NULL;
@@ -572,55 +396,14 @@ Scene::~Scene()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Scene::Initialize( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
+bool Scene::Initialize( osgViewer::Viewer* vw)
 {
     osg::StateSet* pGlobalStateSet = getOrCreateStateSet();
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
     
-    const int nAntialiasing = 8;
-    
-    if ( cTraitsPtr.valid())
-    {
-        cTraitsPtr->samples = nAntialiasing;
-    }
-    else 
-    {
-        osg::DisplaySettings::instance()->setNumMultiSamples( nAntialiasing );
-    }
-
-    osg::ArgumentParser  args(cArgs);
-    // Create viewer and 
-    _viewerPtr = new osgViewer::Viewer( args );
-     
-    _viewerPtr->apply(new osgViewer::SingleScreen(1));
-
-    // Set up camera
-    if ( cTraitsPtr.valid() == true )
-    {
-        osg::ref_ptr<osg::GraphicsContext> cGraphicsContextPtr = osg::GraphicsContext::createGraphicsContext( cTraitsPtr.get() );
-
-        _viewerPtr->getCamera()->setGraphicsContext(cGraphicsContextPtr.get());
-        _viewerPtr->getCamera()->setViewport(new osg::Viewport(0, 0, cTraitsPtr->width, cTraitsPtr->height ));
-    } 
-    else if (getenv("OSG_SCREEN") == NULL)
-    {
-        //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
-    }
-
-    _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
-    //FIXME TODO //setProjectionMatrixFromConfig();
-
-    _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
-    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
+    _viewerPtr = vw;
 
     _viewerPtr->setSceneData( this );
-    //_viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-
-    // TODO: enabled this for instructor tab, need implement special setting
-    //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
-
-    // disable ESC key
-    _viewerPtr->setKeyEventSetsDone(0);
 
     //
     // Set up the camera manipulators.
@@ -727,23 +510,18 @@ bool Scene::Initialize( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::Grap
     // Create terrain / shadowed scene
     //
 
-    createTerrainRoot();
+    _terrainRoot = createTerrainRoot();
+    addChild(_terrainRoot);
     
-    std::string scene_name("minsk"); // "empty","adler" ,"sheremetyevo"
+    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
 
-    _terrainNode =  new avTerrain::Terrain (_terrainRoot);
-    _terrainNode->create(scene_name);
+    //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
+    //_terrainNode->create(scene_name);
 
-#if 1
-    fill_navids(
-        lights_file(scene_name), 
-        _lamps, 
-        this, 
-        lights_offset(scene_name) ); 
-#endif
+
 
        
-    osg::Node* ct =  findFirstNode(_terrainNode,"camera_tower");
+    osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
 
     if(ct) 
     {
@@ -826,20 +604,9 @@ bool Scene::Initialize( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::Grap
     //
     _lights = new Lights();
     _environmentNode->addChild(_lights.get());
-    /*_commonNode*/this->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
 
-    auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
-
-    for (auto it = light_masts.begin();it != light_masts.end();++it)
-    {   
-        if((*it)->asTransform())
-        {
-            std::string node_name((*it)->getName());
-            std::string mast_index = node_name.substr(node_name.find("_")+1);
-            LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
-        }
-    }
-
+   
+    
     //
     // Create weather
     //
@@ -889,19 +656,20 @@ bool Scene::Initialize( const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::Grap
 }
 
 
-void  Scene::createTerrainRoot()
+osg::Group*  Scene::createTerrainRoot()
 {
 
 #if defined(TEST_SHADOWS_FROM_OSG)
 
     const int fbo_tex_size = 1024*4;
+    osg::Group* tr;
 
     _st = new avShadow::ViewDependentShadowMap;
 
-     _terrainRoot
+     tr
         = new avShadow::ShadowedScene(_st.get());  
 
-    avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(_terrainRoot.get())->getShadowSettings();
+    avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
 
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
@@ -915,10 +683,10 @@ void  Scene::createTerrainRoot()
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 
 #else
-    _terrainRoot = new osg::Group;
+    tr = new osg::Group;
 #endif     
+    return tr;
 
-     addChild(_terrainRoot);
 }
 
 void Scene::createObjects()
@@ -931,6 +699,7 @@ void Scene::createObjects()
                 spark::spark_pair_t sp =  spark::create(spark::FIRE,mt);
                 sp.first->setName("fire");
                 mt->addChild(sp.first);
+                this->_viewerPtr->addEventHandler(sp.second);
             }
     }
     );
@@ -1187,6 +956,32 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         _viewerPtr->addEventHandler(sp3.second);
         return mt/*.release()*/;
+    }
+
+    if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
+    {
+        assert(_terrainRoot->removeChild(_terrainNode));
+        _terrainNode.release();
+        _terrainNode =  new avTerrain::Terrain (this);
+        _terrainNode->create(path);
+        
+        _terrainRoot->asGroup()->addChild(_terrainNode);
+
+         /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
+
+        auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
+
+        for (auto it = light_masts.begin();it != light_masts.end();++it)
+        {   
+            if((*it)->asTransform())
+            {
+                std::string node_name((*it)->getName());
+                std::string mast_index = node_name.substr(node_name.find("_")+1);
+                LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
+            }
+        }
+
+        return _terrainNode;
     }
 
     osg::Node* obj = creators::createObject(path);

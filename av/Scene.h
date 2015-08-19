@@ -48,7 +48,7 @@ namespace avScene {
     class Scene : public osg::Group
     {
     public:
-        static bool                                 Create( const osg::ArgumentParser& cArgs ,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr = NULL );
+        static bool                                 Create( osgViewer::Viewer* vw );
         static void                                 Release();
         static Scene*                               GetInstance();
         
@@ -59,6 +59,7 @@ namespace avScene {
         inline osg::Group*                          getCommonNode();
         inline osg::Camera*                         getCamera();
         inline avScene::Lights *                    getLights();
+        std::vector<osg::ref_ptr<osg::Node>>&       getLamps();
 
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
 
@@ -67,8 +68,8 @@ namespace avScene {
 
         Scene();
         virtual									    ~Scene();
-        bool									    Initialize( const osg::ArgumentParser& cArgs,osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
-        void                                        createTerrainRoot();
+        bool									    Initialize( osgViewer::Viewer* vw );
+        osg::Group*                                 createTerrainRoot();
         void                                        createObjects();
         void                                        createRTT();
     private:
@@ -104,11 +105,11 @@ namespace avScene {
 
     };
 
-    inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr; }
+    inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr.get(); }
     inline osg::Camera*                         Scene::getCamera() {  return _viewerPtr->getCamera(); }
     inline osg::Group*                          Scene::getCommonNode() { return _commonNode.get(); }  
-    avScene::Lights*                            Scene::getLights() { return _lights.get(); }
-
+    inline avScene::Lights*                            Scene::getLights() { return _lights.get(); }
+    inline std::vector<osg::ref_ptr<osg::Node>>&       Scene::getLamps() { return _lamps; }
 
     inline Scene* GetScene()
     {

@@ -7,12 +7,10 @@
 
 #include "aircraft/aircraft_view.h"
 #include "aircraft_fms/aircraft_fms_view.h"
-
 #include "aircraft_physless/aircraft_physless_view.h"
-
 #include "vehicle/vehicle_view.h"
-
 #include "simple_route/simple_route_view.h"
+#include "airport/airport_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
@@ -87,6 +85,28 @@ namespace aircraft_physless
         const std::string unique_name = sys->generate_unique_name(class_name);
         aircraft::state_t s(init_pos.pos,init_pos.orien);
         obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s)));
+
+        ocd
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+            ;
+
+        return sys->create_object(ocd);	
+    }
+
+}
+
+
+namespace airport
+{
+
+    using namespace kernel;
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    {
+        const std::string class_name = "airport";
+        const std::string unique_name = sys->generate_unique_name(class_name);
+        atc::airport::data_t  data;
+        obj_create_data ocd(class_name, unique_name, dict::wrap(airport::port_data(sett,data)));
 
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))

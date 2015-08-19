@@ -17,10 +17,14 @@ public:
 private:
     Visual();
     virtual  ~Visual();
-
+    
+    void InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
 
 private:
     bool            m_bInitialized;
     static Visual * m_pInstance;
+
+private:
+    osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
 
 };

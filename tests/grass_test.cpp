@@ -43,7 +43,8 @@ int main_grass_test( int argc, char** argv )
 
     osg::ref_ptr<avTerrain::Terrain> _terrainNode =  new avTerrain::Terrain (root);
     _terrainNode->create(scene_name);
-   
+    
+    root->addChild(_terrainNode);
     root->addChild(plane[0]);
     root->addChild(sub_model.get());
 

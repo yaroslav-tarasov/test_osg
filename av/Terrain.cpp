@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Scene.h"
 #include "Terrain.h"
 
 #include "visitors/find_tex_visitor.h"
@@ -24,6 +25,191 @@
 
 #include "utils/empty_scene.h"
 
+namespace
+{
+    typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
+
+    template<typename S> 
+    inline osg::Vec3f polar_point_2(S range, S course )
+    {
+        return osg::Vec3( (S)range * sin(cg::grad2rad(course)),
+            (S)range * cos(cg::grad2rad(course)),0);
+    }
+
+    inline osg::Vec3f lights_offset(std::string name)
+    {
+        if (name == "sheremetyevo")
+            return osg::Vec3f(18, 17, .2f);
+        else if (name == "adler")
+            return osg::Vec3f(0 , 0 , .2f);
+        else if (name == "minsk")
+            return osg::Vec3f(0 , 0 , .5f);
+
+        return osg::Vec3f();
+    }
+
+    inline std::string lights_file(std::string name)
+    {
+        if (name == "sheremetyevo")
+            return "sheremetyevo.txt";
+        else if (name == "adler")
+            return "sochi.scn";
+        else if (name == "minsk")
+            return "minsk.scn";
+
+        return "";
+    }
+
+    struct value_getter
+    {
+        value_getter(std::string const& line)
+        {
+            boost::split(values_, line, boost::is_any_of(" \t"), boost::token_compress_on);
+        }
+
+        template <class T>
+        T get(size_t index)
+        {
+            return boost::lexical_cast<T>(values_[index]);
+        }
+
+        bool valid()
+        {
+            return values_.size()>0;
+        }
+
+    private:
+        std::vector<std::string> values_;
+    };
+
+    void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset)
+    {
+        if (!boost::filesystem::is_regular_file(file))
+            LogWarn("No lights for airport found: " << file);
+
+        const bool usePointSprites = true;
+        osg::Texture2D *tex;
+        if(usePointSprites)
+        {
+            tex = new osg::Texture2D();
+            tex->setImage(osgDB::readImageFile("Images/particle.rgb"));
+        }
+
+
+
+        std::ifstream ifs(file);
+
+        for (auto it = cur_lamps.begin(); it != cur_lamps.end(); ++it)
+            parent->removeChild(it->get());
+        cur_lamps.clear();
+
+        navaid_group_node_ptr navid_node_ptr = nullptr;
+
+        bool group_ready = false;
+
+        while (ifs.good())
+        {
+            char buf[0x400] = {};
+            ifs.getline(buf, 0x400);
+
+            std::string line = buf;
+            boost::trim(line);
+
+            // skip comments
+
+            if (line.size()==0) continue;
+
+            if (boost::starts_with(line, "//"))
+            {
+                boost::erase_all(line," ");
+                if (boost::starts_with(line, "//#"))
+                {
+                    boost::trim_if(line, boost::is_any_of("/#"));
+                    //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
+                    navid_node_ptr.release();
+                    navid_node_ptr = new osgSim::LightPointNode;
+                    navid_node_ptr->setName(line);
+                    //
+                    osg::StateSet* set = navid_node_ptr->getOrCreateStateSet();
+
+                    if (usePointSprites)
+                    {
+                        navid_node_ptr->setPointSprite();
+
+                        // Set point sprite texture in LightPointNode StateSet.
+
+                        set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
+#if 0                    
+                        osg::ref_ptr<osg::Program> cLightPointProg = creators::createProgram("simlight").program; 
+                        cLightPointProg->setName("LightLayerShader");
+                        set->setAttribute(cLightPointProg.get());
+#endif
+                    }
+
+                    group_ready = true;
+                }
+                else
+                    continue;
+            }
+
+            value_getter items(line);
+
+            if (items.get<std::string>(0) == "FireLine:" || items.get<std::string>(0) == "FireLineHa:")
+            {
+                size_t ofs = items.get<std::string>(0) == "FireLineHa:" ? 3 : 0;
+
+                osg::Vec3f pos (items.get<float>(ofs + 2), items.get<float>(ofs + 4), items.get<float>(ofs + 3));
+                osg::Vec3f dir (polar_point_2(1.f, items.get<float>(ofs + 5)));
+                float      len   = items.get<float>(ofs + 6);
+                float      step  = items.get<float>(ofs + 7);
+                osg::Vec4f clr (items.get<float>(ofs + 8), items.get<float>(ofs + 9), items.get<float>(ofs + 10),1.0f); 
+
+                size_t count = 0;
+                if (!cg::eq_zero(step) && !cg::eq_zero(len))
+                {
+                    count = size_t(cg::ceil(len / step));
+
+                    if (step > 2)
+                        ++count;
+                }
+
+                for (size_t i = 0; i < count; ++i)
+                {
+                    osg::Vec3f p = pos + dir * step * i  + offset;
+
+                    osgSim::LightPoint pnt;
+
+                    pnt._position.set(p.x(),p.y(),p.z());
+                    pnt._color = clr;
+                    if (!usePointSprites)
+                        pnt._radius = 0.3f;
+                    else
+                        pnt._radius = 0.6f;
+
+                    navid_node_ptr->addLightPoint(pnt);
+
+                }
+            }
+
+            if(navid_node_ptr && group_ready)
+            {
+                cur_lamps.push_back(navid_node_ptr);
+                parent->addChild(navid_node_ptr);
+                group_ready = false;
+            }
+
+        }
+
+
+        //cur_lamps.push_back(navid_group);
+        //parent->add(navid_group);
+    }
+
+
+
+}
+
+
 namespace avTerrain
 {
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
@@ -32,12 +218,11 @@ namespace avTerrain
 
 
 Terrain::Terrain (osg::Group* sceneRoot)
-    : _sceneRoot(sceneRoot)
-    , _lightsHandler(avScene::GlobalInfluence)
+    : _lightsHandler(avScene::GlobalInfluence)
+    , _sceneRoot (sceneRoot)
 {
     setNodeMask( PICK_NODE_MASK );
 
-    sceneRoot->addChild(this);
     //
     // Callbacks
     //
@@ -152,6 +337,14 @@ void  Terrain::create( std::string name )
 #endif
 
     OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.get_delta() << "\n";
+
+
+    fill_navids(
+        lights_file(name), 
+        /*_lamps*/avScene::Scene::GetInstance()->getLamps(), 
+        _sceneRoot, 
+        lights_offset(name) ); 
+
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 

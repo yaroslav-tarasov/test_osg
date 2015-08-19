@@ -26,30 +26,20 @@ void create_objects()
 {
     krv::data_getter              _krv_data_getter("log_minsk.txt");
 
-
-    //vis_sys_props props_;
-    //props_.base_point = ::get_base();
-
-    // _csys = create_ctrl_system(msg_service_);
-    // _vsys = create_visual_system(msg_service_, props_);
-    // _msys = create_model_system(msg_service_,"script should  be placed here");
-
     // Только получение без контроля  
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
-    kernel::system_ptr _msys = sys_creator()->get_model_sys();
-
-    //create_auto_object(_msys,"phys_sys","phys_sys");
-    //create_auto_object(_msys,"airports_manager","aiports_manager");
-    //create_auto_object(_msys,"ada","ada");
-    //create_auto_object(_msys,"meteo_proxy","meteo_proxy");
-    //create_auto_object(_msys,"airport","aiport_0");
-
+    
+    {
+        airport::settings_t as;
+        as.icao_code = "URSS";
+        auto obj_airport = airport::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as);
+    }
 
     if(false)
     {
         std::string class_name = "aircraft";
         std::string unique_name = "aircraft_0";
-        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_msys)->object_classes() ;
+        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_csys)->object_classes() ;
 
         kernel::object_class_ptr class_ptr ;
 
@@ -60,7 +50,7 @@ void create_objects()
             std::string n = (*it)->name();
         }
 
-        auto obj = kernel::fake_objects_factory_ptr(_msys)->create_object(class_ptr, unique_name); 
+        auto obj = kernel::fake_objects_factory_ptr(_csys)->create_object(class_ptr, unique_name); 
         nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(obj);
         manager->set_model(aircraft::get_model("A319"));
     }

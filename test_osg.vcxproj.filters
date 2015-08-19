@@ -231,6 +231,9 @@
     <ClInclude Include="utils\empty_scene.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="av\Logo.h">
+      <Filter>Source Files\av</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -661,6 +664,12 @@
     </ClCompile>
     <ClCompile Include="utils\empty_scene.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\Logo.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
