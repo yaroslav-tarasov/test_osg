@@ -13,6 +13,7 @@ public:
     virtual void  Render()                          override;
 
     virtual double GetInternalTime()                override;
+    virtual void   CreateScene()                    override;
 
 private:
     Visual();

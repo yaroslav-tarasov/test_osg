@@ -20,6 +20,8 @@ using network::async_connector;
 using network::tcp_socket;
 using network::error_code;
 
+typedef boost::system::error_code       error_code_t;
+
 using network::msg_dispatcher;
 using network::tcp_fragment_wrapper;
 
@@ -91,10 +93,7 @@ struct visapp
         
         osg_vis_->Initialize(argc,argv);
         
-        FIXME(Splash screen and scene with properties) 
-//      Сначала сцена потом автообъекты
-
-        create_objects();
+        // create_objects();
 
 
         update();
@@ -160,6 +159,12 @@ private:
     
     void on_setup(setup const& msg)
     {
+         osg_vis_->CreateScene();
+         create_objects();
+
+         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
+         send(0, &bts[0], bts.size());
+
          LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
 
@@ -182,6 +187,26 @@ private:
     {
         static uint32_t id = 0;
         return id++;
+    }
+
+    // from struct tcp_connection
+    void send(int id,void const* data, uint32_t size)
+    {
+        error_code_t ec;
+        sockets_[id]->send(&size, sizeof(uint32_t));
+        if (ec)
+        {
+            LogError("TCP send error: " << ec.message());
+            return;
+        }
+
+        sockets_[id]->send(data, size);
+        if (ec)
+        {
+            LogError("TCP send error: " << ec.message());
+            return;
+        }
+
     }
 
     void create_objects()

@@ -61,6 +61,21 @@ Grass::Grass ()
 	this->addChild(_create());
 }
 
+// copy constructor
+Grass::Grass( const Grass & rhs, const osg::CopyOp & copyop )
+    : osg::Group(rhs, copyop)
+    , _instances(rhs._instances)
+    , _spacing(rhs._spacing)
+    , _heightAdjust(rhs._heightAdjust)
+    , _grassStretch(rhs._grassStretch)
+    , _windFactor(rhs._windFactor)
+    , _width(rhs._width)
+    , _height(rhs._height)
+{
+
+    this->addChild(_create());
+}
+
 void Grass::setWindFactor(float wf)
 {
 	_windFactor = wf;

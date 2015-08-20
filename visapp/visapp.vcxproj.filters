@@ -180,6 +180,9 @@
     <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
+    <ClInclude Include="..\av\Logo.h">
+      <Filter>Source Files\av</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -547,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="..\utils\empty_scene.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\av\Logo.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

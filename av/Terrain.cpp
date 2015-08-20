@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "Terrain.h"
+#include "LightManager.h"
 
 #include "visitors/find_tex_visitor.h"
 #include "visitors/find_animation.h"
@@ -209,6 +210,33 @@ namespace
 
 }
 
+namespace details
+{
+    // Use a thread to call osgDB::readNodeFile.
+    struct  LoadNodeThread : public OpenThreads::Thread
+    {
+        typedef boost::function<void ()> on_work_f  ; 
+
+        LoadNodeThread( on_work_f work )
+            : _work( work )
+            , _node(nullptr)
+        {
+            startThread();
+        }
+
+        ~LoadNodeThread()
+        {}
+
+        void run()
+        {
+            if( _work )
+                _work();
+        }
+
+        on_work_f                 _work;
+        osg::ref_ptr< osg::Node > _node;
+    };
+}
 
 namespace avTerrain
 {
@@ -216,6 +244,9 @@ namespace avTerrain
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
+    const osg::Quat quat1(osg::inDegrees(90.0f), osg::X_AXIS,                      
+        osg::inDegrees(0.f)  , osg::Y_AXIS,
+        osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 Terrain::Terrain (osg::Group* sceneRoot)
     : _lightsHandler(avScene::GlobalInfluence)
@@ -232,14 +263,20 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 }
 
-void  Terrain::create( std::string name )
+void  Terrain::create( const std::string& name )
 {
+    _sceneName = name;
+
+    auto wf =  [this]() {
+
+    const std::string& name = _sceneName;
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
     high_res_timer                _hr_timer;
     osg::MatrixTransform*         baseModel = new osg::MatrixTransform;
 
     float baseHeight = 0.0f; 
+
     if(name != "empty" && !name.empty() )
     {
 
@@ -262,9 +299,10 @@ void  Terrain::create( std::string name )
         mat_file_name = "minsk.dae.mat.xml"; 
 	}
 
+ 
 
     osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
-    
+
     // Здесь был Минск
     //osg::PositionAttitudeTransform* pat = scene->asTransform()->asPositionAttitudeTransform();
     //pat->setAttitude( osg::Quat(osg::inDegrees(90.0),osg::X_AXIS,osg::inDegrees(/*-49.0 - 33.0*/0.0),osg::Y_AXIS,osg::inDegrees(0.0),osg::Z_AXIS));
@@ -274,7 +312,7 @@ void  Terrain::create( std::string name )
     auto lod3 =  findFirstNode(scene,"lod3");
 
     if(lod3) 
-        lod3->setNodeMask(0); // Убираем нафиг Lod3 
+        lod3->setNodeMask(0); 
 
     baseModel = new osg::MatrixTransform;
     baseModel->setMatrix(osg::Matrix::rotate(quat0));
@@ -301,33 +339,26 @@ void  Terrain::create( std::string name )
     pCommonStateSet->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
     pCommonStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
 
-    // Scene 
-    //Add backface culling to the whole bunch
-    //  osg::StateSet * pSS = adler->getOrCreateStateSet();
-    //pCommonStateSet->setNestRenderBins(false);
-    //pCommonStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    //// disable alpha writes for whole bunch
-    //pCommonStateSet->setAttribute(new osg::ColorMask(true, true, true, false));
-    
    }
    else
    {  
        baseModel->addChild( creators::createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3));
    }
+
     baseModel->setDataVariance(osg::Object::STATIC);
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
 
-    addChild(baseModel);
-    baseModel->setName("baseModel");
-	
     Grass* grass = new Grass();
     grass->setWindFactor(1.0);
     addChild(grass);
     _grass = grass;
+    
+    //blender::Grass* grass2 = new blender::Grass();
+    //addChild(grass2);
 
-	//blender::Grass* grass2 = new blender::Grass();
-	//addChild(grass2);
+    addChild(baseModel);
+    baseModel->setName("baseModel");
 
 #if 0
     auto ret_array  = creators::createMovingModel(center,radius*0.8f);
@@ -337,16 +368,30 @@ void  Terrain::create( std::string name )
 #endif
 
     OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.get_delta() << "\n";
+    
+    auto light_masts = findNodes(baseModel,"lightmast_",findNodeVisitor::not_exact);
 
+    for (auto it = light_masts.begin();it != light_masts.end();++it)
+    {   
+        if((*it)->asTransform())
+        {
+            std::string node_name((*it)->getName());
+            std::string mast_index = node_name.substr(node_name.find("_")+1);
+            avScene::LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
+        }
+    }
+
+    };
+
+    _lnt =   new details::LoadNodeThread ( wf );
+
+    // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
     fill_navids(
         lights_file(name), 
         /*_lamps*/avScene::Scene::GetInstance()->getLamps(), 
         _sceneRoot, 
         lights_offset(name) ); 
-
-
-    // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
 }
 

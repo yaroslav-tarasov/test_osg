@@ -7,6 +7,11 @@ namespace avTerrain
 	{
 	public:
 		Grass ();
+        Grass( const Grass & other, const osg::CopyOp & copyop = osg::CopyOp::SHALLOW_COPY );
+
+        // OSG stuff
+        META_Node(avTerrain, Grass);
+
 		void setWindFactor(float wf);
 		void setGrassMapFactor(float val);
 	private:

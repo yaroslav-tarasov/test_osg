@@ -97,8 +97,8 @@ void Visual::Initialize(int argc, char** argv)
 
     InitializeViewer( arguments, pTraits);
     
-    //avScene::Logo::Create(_viewerPtr.get());
-    avScene::Scene::Create(_viewerPtr.get());
+    avScene::Logo::Create(_viewerPtr.get());
+    
 
     m_bInitialized = true;
 }
@@ -160,6 +160,10 @@ void Visual::InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg
 
 }
 
+void Visual::CreateScene()
+{
+      avScene::Scene::Create(_viewerPtr.get());
+}
 
 void  Visual::Update()
 {

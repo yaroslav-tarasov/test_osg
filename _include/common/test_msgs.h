@@ -13,6 +13,7 @@ namespace net_layer
             id_setup            ,
             id_run              ,
             id_create           ,
+            id_ready            ,
         };
 
 
@@ -72,7 +73,8 @@ namespace net_layer
             REFL_ENTRY(lon )
             REFL_ENTRY(course )
         REFL_END()
-        
+
+        typedef gen_msg<id_ready, uint16_t> ready_msg;
     }
 
 

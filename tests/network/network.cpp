@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include "async_services/async_services.h"
+#include "network/msg_dispatcher.h"
 #include "logger/logger.hpp"
 #include "common/test_msgs.h"
 
@@ -13,9 +14,12 @@ using network::async_connector;
 using network::tcp_socket;
 using network::error_code;
 
+using network::msg_dispatcher;
+
 typedef boost::system::error_code       error_code_t;
 
 using namespace net_layer::test_msg;
+using network::tcp_fragment_wrapper;
 
 namespace
 {
@@ -31,7 +35,7 @@ namespace
 struct client
 {
 
-    DECL_LOGGER("visa_client");
+    DECL_LOGGER("visa_control");
 
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
@@ -39,6 +43,10 @@ struct client
         , ac_counter_(0)
     {
         LogInfo("Connecting to " << peer);
+
+        disp_
+            .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
+            ;
     }
 
     // from struct tcp_connection
@@ -58,27 +66,35 @@ struct client
             LogError("TCP send error: " << ec.message());
             return;
         }
+
     }
 
 private:
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
     {
         LogInfo("Connected to " << peer);
-        srv_ = in_place(boost::ref(sock), boost::bind(&client::on_receive, this, _1, _2), &tcp_error, &tcp_error);
+        // srv_ = in_place(boost::ref(sock), boost::bind(&msg_dispatcher<network::endpoint>::dispatch, disp_, _1, _2, peer), &tcp_error, &tcp_error);
         
+        srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
+            sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
+
         binary::bytes_t bts =  std::move(wrap_msg(setup(1111,2222)));
         send(&bts[0], bts.size());
 
-        start_send();
     }
 
-    void on_receive(const void* msg, size_t size)
-    {
-    }
+    //void on_receive(const void* msg, size_t size)
+    //{
+    //}
 
     inline void start_send()
     {
         update();
+    }
+
+    void on_remote_ready(uint16_t value)
+    {
+        start_send();
     }
 
     void update()
@@ -86,13 +102,13 @@ private:
         binary::bytes_t bts =  std::move(wrap_msg(run(1111,2222)));
         send(&bts[0], bts.size());
 
-        if(ac_counter_++==15)
+        if(ac_counter_++==40)
         {
             binary::bytes_t bts =  std::move(wrap_msg(create(0,0,90)));
             send(&bts[0], bts.size());
         }
 
-        if(ac_counter_==20)
+        if(ac_counter_==45)
         {
             binary::bytes_t bts =  std::move(wrap_msg(create(0,0.005,0)));
             send(&bts[0], bts.size());
@@ -106,9 +122,10 @@ private:
 
 private:
     async_connector         con_;
-    optional<tcp_socket>    srv_;
+    // optional<tcp_socket>    srv_;
+    std::shared_ptr<tcp_fragment_wrapper>  srv_;
 
-    bytes_t                 partial_msg_;
+    msg_dispatcher<network::endpoint>                                    disp_;
 
 private:
     uint32_t                  ac_counter_;

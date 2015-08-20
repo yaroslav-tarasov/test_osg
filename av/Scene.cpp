@@ -960,26 +960,14 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
     {
-        assert(_terrainRoot->removeChild(_terrainNode));
-        _terrainNode.release();
+        //assert(_terrainRoot->removeChild(_terrainNode));
+        //_terrainNode.release();
         _terrainNode =  new avTerrain::Terrain (this);
         _terrainNode->create(path);
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
-
-        auto light_masts = findNodes(_terrainNode,"lightmast_",findNodeVisitor::not_exact);
-
-        for (auto it = light_masts.begin();it != light_masts.end();++it)
-        {   
-            if((*it)->asTransform())
-            {
-                std::string node_name((*it)->getName());
-                std::string mast_index = node_name.substr(node_name.find("_")+1);
-                LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
-            }
-        }
 
         return _terrainNode;
     }

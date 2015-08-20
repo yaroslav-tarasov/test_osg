@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\av\IVisual.h" />
+    <ClInclude Include="..\av\Logo.h" />
     <ClInclude Include="..\av\test_systems.h" />
     <ClInclude Include="..\av\Utils.h" />
     <ClInclude Include="..\kernel\fms\trajectory.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="..\av\LightManager.cpp" />
     <ClCompile Include="..\av\Lights.cpp" />
     <ClCompile Include="..\av\LOD.cpp" />
+    <ClCompile Include="..\av\Logo.cpp" />
     <ClCompile Include="..\av\NavigationalLight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>

@@ -9,6 +9,8 @@ struct IVisual
     virtual void  Render() = 0;
 
     virtual double GetInternalTime() = 0;
+
+    virtual void CreateScene() = 0; 
 };
 
 IVisual *  CreateVisual();
