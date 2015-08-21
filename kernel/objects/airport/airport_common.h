@@ -343,7 +343,8 @@ inline bool valid_icao(string icao_code)
 {
     return icao_code == "UUEE" || 
            icao_code == "URSS" ||
-           icao_code == "UHWW"
+           icao_code == "UHWW" ||
+           icao_code == "UMMS"
            ;     
 }
 
@@ -354,6 +355,8 @@ inline point_3f lights_offset(string icao_code)
         return point_3f(18, 17, .2f);
     else if (icao_code == "URSS")
         return point_3f(0 , 0 , .2f);
+    else if (icao_code == "UMMS")
+        return point_3f();
 
     return point_3f();
 }
