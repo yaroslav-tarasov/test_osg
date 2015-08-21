@@ -21,17 +21,33 @@ using namespace kernel;
 
 namespace 
 {
+    inline std::string data_file(std::string icao_code)
+    {
+        if (icao_code == "UUEE")
+            return "sheremetyevo.txt";
+        else if (icao_code == "URSS")
+            return "log_sochi_4.txt";
+        else if (icao_code == "UMMS")
+            return "log_minsk.txt";
+
+        return "";
+    }
 
 void create_objects()
 {
-    krv::data_getter              _krv_data_getter("log_minsk.txt");
+
+
+
+    const std::string icao_code = "URSS"; 
+
+    krv::data_getter              _krv_data_getter(data_file(icao_code));
 
     // Только получение без контроля  
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
     
     {
         airport::settings_t as;
-        as.icao_code = "URSS";
+        as.icao_code = icao_code;
         auto obj_airport = airport::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as);
     }
 
