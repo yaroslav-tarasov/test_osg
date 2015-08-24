@@ -91,9 +91,6 @@ struct visapp
 
         osg_vis_->Initialize(argc,argv);
 
-        // create_objects();
-
-
         update();
     }
 

@@ -36,6 +36,12 @@ namespace bi
     class RigidUpdater;
 }
 
+namespace utils
+{
+    struct  LoadNodeThread;
+}
+
+
 class PickHandler;
 
 
@@ -103,6 +109,11 @@ namespace avScene {
 
         static std::string                           zone_to_reload_;
 
+    private:
+        utils::LoadNodeThread*             _lnt;
+        std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
+    public:
+        DECLARE_EVENT(object_loaded, (uint32_t)) ;
     };
 
     inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr.get(); }
@@ -115,5 +126,6 @@ namespace avScene {
     {
         return Scene::GetInstance();
     }
+
 
 } // end namespace

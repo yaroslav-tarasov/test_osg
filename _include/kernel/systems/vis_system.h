@@ -15,6 +15,7 @@ struct visual_object
     virtual osg::ref_ptr<osg::Node> root() const = 0;
 
     virtual void set_visible(bool visible) = 0;
+    DECLARE_EVENT(object_loaded, (uint32_t) );
 };
 
 struct visual_system

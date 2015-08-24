@@ -43,6 +43,8 @@
 #include "tests/common/CommonFunctions"
 #include "tests/creators.h"
 
+#include "utils/async_load.h"
+
 //
 //  ext
 //
@@ -936,11 +938,15 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 {
     using namespace creators;
 
-    osg::ref_ptr<osg::MatrixTransform> mt = nullptr ;
+    // osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform; // nullptr ;
+    
+    mt_.push_back(new osg::MatrixTransform); 
+    
+    LogInfo("Scene::load enter " << path);
 
     if( path == "sfx//smoke.scg" )
     {
-        mt = new osg::MatrixTransform;
+        // mt = new osg::MatrixTransform;
 
         //bool got_phys_node=false;
         //while(0 != parent->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(parent->getName())))
@@ -950,12 +956,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,parent?parent->asTransform():nullptr);
         sp3.first->setName("fire");
-        mt->addChild(sp3.first);
+        mt_.back()->addChild(sp3.first);
         
-        addChild(mt);
+        addChild(mt_.back());
 
         _viewerPtr->addEventHandler(sp3.second);
-        return mt/*.release()*/;
+        return mt_.back()/*.release()*/;
     }
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
@@ -972,11 +978,18 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         return _terrainNode;
     }
 
+    auto  wf =  [this,&seed](std::string path, osg::MatrixTransform* mt) {
+    
+   /* osg::ref_ptr<osg::MatrixTransform> mt = mt_;*/
+
+    using namespace creators;
+    
     osg::Node* obj = creators::createObject(path);
+    
 
     if(obj)
     {
-        mt = new osg::MatrixTransform;
+        // mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
         mt->setUserValue("id",seed);
 
@@ -985,9 +998,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         osg::Node* root =  findFirstNode(obj,"root"); 
         root->setUserValue("id",seed);
 
-        _terrainRoot->asGroup()->addChild(mt);
+
         
-        if(mt)
+        if(mt!=nullptr)
         {
             
             osg::Node* sl =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
@@ -1015,7 +1028,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 const float heading = osg::DegreesToRadians(0.f);
                 const float pitch = osg::DegreesToRadians(2.f);
 
-                data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                 data.active = true;
 
@@ -1092,7 +1105,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
-                    data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                     data.active = true;
 
@@ -1127,7 +1140,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
-                    data.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                     data.active = true;
 
@@ -1164,10 +1177,17 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         }
 
+        _terrainRoot->asGroup()->addChild(mt);
 
-    }
+        object_loaded_signal_(seed);
 
-    return mt;
+    } };
+
+    _lnt =   new utils::LoadNodeThread ( boost::bind<void>(wf,path,mt_.back().get()) );
+    
+    LogInfo("Scene::load exit " << path);
+
+    return mt_.back();
 }
 
 void   Scene::onSetMap(float val)

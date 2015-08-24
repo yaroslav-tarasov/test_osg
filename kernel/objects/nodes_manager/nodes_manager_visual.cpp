@@ -39,13 +39,22 @@ void visual::apply_model(string const& model)
 void visual::apply_vis_model()
 {
     if (!settings_.model.empty())
+    {
         visual_object_ = sys_->create_visual_object(settings_.model /*+ "//" + settings_.model + ".scg"*/, object_id()) ;
+        visual_object_->subscribe_object_loaded(boost::bind(&visual::object_loaded,this,_1));
+    }
     else 
         visual_object_.reset();
 
-    for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
-        vis_node_impl_ptr(*it)->on_visual_object_created();
+//    for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
+//        vis_node_impl_ptr(*it)->on_visual_object_created();
 
+}
+
+void visual::object_loaded( uint32_t seed )
+{
+    for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
+          vis_node_impl_ptr(*it)->on_visual_object_created();
 }
 
 } // nodes_management

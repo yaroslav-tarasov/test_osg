@@ -25,6 +25,7 @@
 #include "av/Grass2.h"
 
 #include "utils/empty_scene.h"
+#include "utils/async_load.h"
 
 namespace
 {
@@ -210,34 +211,6 @@ namespace
 
 }
 
-namespace details
-{
-    // Use a thread to call osgDB::readNodeFile.
-    struct  LoadNodeThread : public OpenThreads::Thread
-    {
-        typedef boost::function<void ()> on_work_f  ; 
-
-        LoadNodeThread( on_work_f work )
-            : _work( work )
-            , _node(nullptr)
-        {
-            startThread();
-        }
-
-        ~LoadNodeThread()
-        {}
-
-        void run()
-        {
-            if( _work )
-                _work();
-        }
-
-        on_work_f                 _work;
-        osg::ref_ptr< osg::Node > _node;
-    };
-}
-
 namespace avTerrain
 {
     const osg::Quat quat0(osg::inDegrees(-90.0f), osg::X_AXIS,                      
@@ -383,7 +356,7 @@ void  Terrain::create( const std::string& name )
 
     };
 
-    _lnt =   new details::LoadNodeThread ( wf );
+    _lnt =   new utils::LoadNodeThread ( wf );
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 

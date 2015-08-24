@@ -13,7 +13,7 @@ struct visual_object_impl
     : visual_object
 {
     visual_object_impl( std::string const & res, uint32_t seed );
-    visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed );
+    visual_object_impl( nm::node_control_ptr parent, std::string const & res, uint32_t seed );
    
    ~visual_object_impl();
 
@@ -22,11 +22,16 @@ struct visual_object_impl
     void set_visible(bool visible);
 
 private:
+    void object_loaded( uint32_t seed );
+
+private:
     osg::observer_ptr<avScene::Scene> scene_;
     osg::ref_ptr<osg::Node>           node_;
     osg::ref_ptr<osg::Node>           root_;
 
-    nm::node_control_ptr         parent_;
+    nm::node_control_ptr              parent_;
+    uint32_t                          seed_;
+    bool                              loaded_;
 };
 
 } // kernel

@@ -70,6 +70,50 @@ namespace
 
 }
 
+struct worker
+{
+    worker()
+    {
+        _workerService = std::make_shared<boost::asio::io_service>();
+        
+        _work = std::make_shared<boost::asio::io_service::work>(*_workerService);
+        _threadStarted = false;
+        Start();
+    }
+
+    ~worker()
+    {
+         _workerService->post(boost::bind(&boost::asio::io_service::stop, _workerService.get()));
+         _workerThread.join();
+    }
+
+    void Start()
+    {
+        if (_threadStarted) return;
+
+        _workerThread = boost::thread(&worker::WorkerMain, this);
+        _threadStarted = true;
+    }
+
+    boost::asio::io_service* GetService()
+    {
+       return _workerService.get();
+    }
+
+private:
+    void WorkerMain()
+    {
+        // _workerService->poll();
+        _workerService->run();
+    }
+
+private:
+    std::shared_ptr<boost::asio::io_service>                    _workerService;
+    boost::thread                                               _workerThread;
+    bool                                                        _threadStarted;
+    std::shared_ptr<boost::asio::io_service::work>              _work;
+};
+
 struct visapp
 {
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
@@ -93,9 +137,6 @@ struct visapp
         
         osg_vis_->Initialize(argc,argv);
         
-        // create_objects();
-
-
         update();
     }
 
@@ -108,6 +149,7 @@ private:
     void update()
     {   
         double sim_time = osg_vis_->GetInternalTime();
+
         if(sim_time  < 0)
         {
            timer_.cancel();
@@ -170,7 +212,14 @@ private:
 
     void on_run(run const& msg)
     {
+        w_.GetService()->post(boost::bind(&visapp::async_run, this,  boost::ref(msg)));
+
         LogInfo("Got run message: " << msg.srv_time << " : " << msg.task_time );
+    }
+    
+    void async_run(run const& msg)
+    {
+        LogInfo("async_run got run message: " << msg.srv_time << " : " << msg.task_time );
     }
 
     void on_create(create const& msg)
@@ -256,6 +305,10 @@ private:
     double                                                      period_;
 
 private:
+    worker                                                      w_;
+
+
+private:
     randgen<> rng_;
 };
 
@@ -264,6 +317,8 @@ int av_scene( int argc, char** argv )
 {
     
     logger::need_to_log(/*true*/);
+    
+    
 
     async_services_initializer asi(false);
     

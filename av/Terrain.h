@@ -2,7 +2,7 @@
 
 #include "Lights.h"
 
-namespace details
+namespace utils
 {
     struct  LoadNodeThread;
 }
@@ -23,7 +23,7 @@ namespace details
          void cull( osg::NodeVisitor * pNV );
      private:
          osg::Group*                    _sceneRoot;
-         details::LoadNodeThread*       _lnt;
+         utils::LoadNodeThread*         _lnt;
          // Dynamic lights handler
          avScene::LightNodeHandler      _lightsHandler;
          osg::ref_ptr<osg::Group>       _grass;

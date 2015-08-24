@@ -23,6 +23,10 @@ private:
     void apply_model(string const& model);
     void apply_vis_model();
 
+
+private:
+    void object_loaded( uint32_t seed );
+
 private:
     kernel::visual_system * sys_;
     visual_object_ptr visual_object_;
