@@ -217,7 +217,7 @@ void  Visual::Render()
 
         if (!viewer->done())
         {
-            frame_limiter fr(0);
+            //frame_limiter fr(0);
 
             viewer->frame();
         }

@@ -238,11 +238,9 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 void  Terrain::create( const std::string& name )
 {
-    _sceneName = name;
 
-    auto wf =  [this]() {
-
-    const std::string& name = _sceneName;
+    auto wf =  [this](std::string name) {
+ 
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
     high_res_timer                _hr_timer;
@@ -356,8 +354,11 @@ void  Terrain::create( const std::string& name )
 
     };
 
-    _lnt =   new utils::LoadNodeThread ( wf );
-
+#ifdef ASYNC_OBJECT_LOADING
+    _lnt =   new utils::LoadNodeThread ( boost::bind<void>(wf, path) );
+#else
+    wf(name);
+#endif
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
     fill_navids(

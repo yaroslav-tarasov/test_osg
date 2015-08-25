@@ -83,35 +83,37 @@ private:
 
     }
 
-    //void on_receive(const void* msg, size_t size)
-    //{
-    //}
-
-    inline void start_send()
-    {
-        update();
-    }
-
     void on_remote_ready(uint16_t value)
     {
         start_send();
+    }
+    
+    inline void start_send()
+    {
+        update();
     }
 
     void update()
     {   
         binary::bytes_t bts =  std::move(wrap_msg(run(1111,2222)));
         send(&bts[0], bts.size());
+        
+        LogInfo("update() send run " );
 
         if(ac_counter_++==40)
         {
             binary::bytes_t bts =  std::move(wrap_msg(create(0,0,90)));
             send(&bts[0], bts.size());
+
+            LogInfo("update() send create " );
         }
 
         if(ac_counter_==45)
         {
             binary::bytes_t bts =  std::move(wrap_msg(create(0,0.005,0)));
             send(&bts[0], bts.size());
+
+            LogInfo("update() send create " );
         }
 
         timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
@@ -142,7 +144,7 @@ int _tmain(int argc, _TCHAR* argv[])
     
     try
     {
-        endpoint peer(std::string("127.0.0.1:30000"));
+        endpoint peer(std::string("192.9.206.246:30000"));
         client c(peer);              
         __main_srvc__->run();
     }

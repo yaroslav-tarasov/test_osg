@@ -27,7 +27,7 @@ namespace utils
          // Dynamic lights handler
          avScene::LightNodeHandler      _lightsHandler;
          osg::ref_ptr<osg::Group>       _grass;
-         std::string                    _sceneName;
+         
      };
 
  }

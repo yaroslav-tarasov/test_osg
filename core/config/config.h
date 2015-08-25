@@ -74,13 +74,14 @@ REFL_STRUCT(cfg_t::debug_t)
     REFL_ENTRY(debug_drawer)
 REFL_END()
 
+REFL_STRUCT(cfg_t::network_t)
+    REFL_ENTRY(local_address)
+REFL_END()
+
 REFL_STRUCT(cfg_t)
     REFL_ENTRY(path)
     REFL_ENTRY(model_params)
     REFL_ENTRY(debug)
-REFL_END()
-
-REFL_STRUCT(cfg_t::network_t)
     REFL_ENTRY(network)
 REFL_END()
 
