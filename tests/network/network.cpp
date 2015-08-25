@@ -144,7 +144,7 @@ int _tmain(int argc, _TCHAR* argv[])
     
     try
     {
-        endpoint peer(std::string("192.9.206.246:30000"));
+        endpoint peer(std::string("127.0.0.1:30000"));
         client c(peer);              
         __main_srvc__->run();
     }

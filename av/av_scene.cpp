@@ -76,7 +76,7 @@ struct net_worker
      typedef boost::function<void(double time)>                     on_update_f;     
 
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update)
-         : period_     (0.01)
+         : period_     (0.02)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
          , _peer       (peer)
@@ -191,8 +191,6 @@ private:
      void on_recieve(const void* data, size_t size, uint32_t id)
      {
           __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
-          
-          LogInfo("on_recieve ");
      }
      
      void do_receive(binary::bytes_ptr data/*, endpoint const& peer*/) 
@@ -299,7 +297,7 @@ private:
         vis_sys_.update(sim_time);
         osg_vis_->Render();
 
-        LogInfo("on_recieve ");
+        // LogInfo("update ");
     }
 
    
