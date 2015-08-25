@@ -1183,8 +1183,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     } };
 
+#ifdef ASYNC_OBJECT_LOADING
     _lnt =   new utils::LoadNodeThread ( boost::bind<void>(wf,path,mt_.back().get()) );
-    
+#else
+    wf(path,mt_.back().get());
+#endif
+
     LogInfo("Scene::load exit " << path);
 
     return mt_.back();

@@ -682,7 +682,7 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
 
     auto ownd_data = dict.find("own_data");
 
-    object_info_ptr object = kernel::create_object(oc , dict_copt(ownd_data, *ownd_data));
+    object_info_ptr object = kernel::create_object(oc , dict_copt(ownd_data!=nullptr, *ownd_data));
 
     if (object == nullptr)
     {

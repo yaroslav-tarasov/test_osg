@@ -13,10 +13,14 @@ namespace kernel
         : scene_( avScene::GetScene() )
         , loaded_(false)
     {
+#ifdef ASYNC_OBJECT_LOADING
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
         node_ = scene_->load(res, nullptr, seed);
-
-        // root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+#else
+        node_ = scene_->load(res, nullptr, seed);
+        root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+        loaded_ = true;
+#endif
 
         // node_->setNodeMask(0);
     }
@@ -26,12 +30,16 @@ namespace kernel
                         , parent_(parent)
                         , loaded_(false)
     {
-         
+#if ASYNC_OBJECT_LOADING           
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
+#endif
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
         node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed);
-        // root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+
+#ifndef ASYNC_OBJECT_LOADING           
+        root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+#endif
     }
 
     visual_object_impl::~visual_object_impl()
@@ -40,7 +48,8 @@ namespace kernel
 
         // scene_->get_objects()->remove(node_.get());
     }
-    
+
+#if ASYNC_OBJECT_LOADING    
     void visual_object_impl::object_loaded( uint32_t seed )
     {
          if(seed_==seed)
@@ -50,6 +59,7 @@ namespace kernel
            object_loaded_signal_(seed);
          }
     }
+#endif
 
     osg::ref_ptr<osg::Node> visual_object_impl::node() const
     {

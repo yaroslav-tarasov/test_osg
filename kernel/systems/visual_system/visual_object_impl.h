@@ -21,8 +21,12 @@ struct visual_object_impl
     osg::ref_ptr<osg::Node> root() const override;
     void set_visible(bool visible);
 
+#if ASYNC_OBJECT_LOADING
 private:
     void object_loaded( uint32_t seed );
+    uint32_t                          seed_;
+#endif
+    bool                              loaded_;
 
 private:
     osg::observer_ptr<avScene::Scene> scene_;
@@ -30,8 +34,7 @@ private:
     osg::ref_ptr<osg::Node>           root_;
 
     nm::node_control_ptr              parent_;
-    uint32_t                          seed_;
-    bool                              loaded_;
+
 };
 
 } // kernel
