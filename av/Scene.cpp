@@ -472,22 +472,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _viewerPtr->realize();
     addChild(_pickHandler->getOrCreateSelectionBox()); 
     
-
-    FIXME(140 shaders version needed);
-
-#if GLSL_VERSION > 130
-    osgViewer::Viewer::Windows windows;
-    _viewerPtr->getWindows(windows);
-    for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
-        itr != windows.end();
-        ++itr)
-    {
-        osg::State *s=(*itr)->getState();
-        s->setUseModelViewAndProjectionUniforms(true);
-        s->setUseVertexAttributeAliasing(true);
-    }
-#endif 
-
     //
     // Initialize particle engine
     // 
@@ -646,6 +630,22 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
 
     //light_map->AddSpotLight(data);
+    
+    FIXME(140 shaders version needed);
+
+#if GLSL_VERSION > 150
+    osgViewer::Viewer::Windows windows;
+    _viewerPtr->getWindows(windows);
+    for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
+        itr != windows.end();
+        ++itr)
+    {
+        osg::State *s=(*itr)->getState();
+        s->setUseModelViewAndProjectionUniforms(true);
+        s->setUseVertexAttributeAliasing(true);
+    }
+#endif 
+
 
 
     return true;
@@ -669,13 +669,13 @@ osg::Group*  Scene::createTerrainRoot()
 
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
-    settings->setMinimumShadowMapNearFarRatio(.5);
+    settings->setMinimumShadowMapNearFarRatio(0.05/*.5*/);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
-    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
-    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
+    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
+    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
-    settings->setMaximumShadowMapDistance(1500);
+    settings->setMaximumShadowMapDistance(1500/*150*/);
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 
 #else

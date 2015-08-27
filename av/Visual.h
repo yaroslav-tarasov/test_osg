@@ -6,7 +6,7 @@ class Visual : public IVisual
 public:
     static Visual * CreateInstance();
 
-    virtual void  Initialize(int argc, char** argv) override;
+    virtual void  Initialize() override;
     virtual void  Deinitialize()                    override;
 
     virtual void  Update()                          override;
@@ -19,7 +19,7 @@ private:
     Visual();
     virtual  ~Visual();
     
-    void InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
+    void InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
 
 private:
     bool            m_bInitialized;

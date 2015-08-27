@@ -60,13 +60,19 @@ Visual * Visual::CreateInstance()
         return m_pInstance;
 }
     
-void Visual::Initialize(int argc, char** argv)
+void Visual::Initialize()
 {
     avAssert(!m_bInitialized);
 
     // OSG graphics context
-    osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = nullptr;//new osg::GraphicsContext::Traits();
+    osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = nullptr; //new osg::GraphicsContext::Traits();
+   
+    float width = osg::DisplaySettings::instance()->getScreenWidth();
+    float height = osg::DisplaySettings::instance()->getScreenHeight();
+    float distance = osg::DisplaySettings::instance()->getScreenDistance();
 #if 0
+    const std::string version( "4.3" );
+    pTraits = new osg::GraphicsContext::Traits();
     //pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
     pTraits->alpha                         = 8;
     pTraits->setInheritedWindowPixelFormat = true;
@@ -75,17 +81,16 @@ void Visual::Initialize(int argc, char** argv)
     pTraits->sharedContext                 = NULL;
     pTraits->supportsResize                = true;
     pTraits->vsync                         = true;
-
+    pTraits->useMultiThreadedOpenGLEngine  = true;
+    pTraits->glContextVersion = version;
     //RECT rect;
     //::GetWindowRect(hWnd, &rect);
-    pTraits->x = 0;
+    pTraits->x = 1920;
     pTraits->y = 0;
     pTraits->width = 1920;//rect.right - rect.left + 1;
     pTraits->height = 1200;//rect.bottom - rect.top + 1;
 #endif    
 
-    osg::ArgumentParser arguments(&argc,argv);
-    
     database::initDataPaths();
 
 	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
@@ -94,8 +99,9 @@ void Visual::Initialize(int argc, char** argv)
 	osg::notify(osg::INFO) << "Start Visual \n";
 
 	osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); 
-
-    InitializeViewer( arguments, pTraits);
+    
+    
+    InitializeViewer( pTraits);
     
     avScene::Logo::Create(_viewerPtr.get());
     
@@ -111,7 +117,7 @@ void  Visual::Deinitialize()
     }
 }
 
-void Visual::InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
+void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr)
 {
     const int nAntialiasing = 8;
 
@@ -124,9 +130,10 @@ void Visual::InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg
         osg::DisplaySettings::instance()->setNumMultiSamples( nAntialiasing );
     }
 
-    osg::ArgumentParser  args(cArgs);
+    
+
     // Create viewer and 
-    _viewerPtr = new osgViewer::Viewer( args );
+    _viewerPtr = new osgViewer::Viewer();
 
     _viewerPtr->apply(new osgViewer::SingleScreen(1));
 
@@ -140,7 +147,7 @@ void Visual::InitializeViewer(const osg::ArgumentParser& cArgs, osg::ref_ptr<osg
     } 
     else if (getenv("OSG_SCREEN") == NULL)
     {
-        //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
+       //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
     }
 
     _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
@@ -228,7 +235,7 @@ FIXME("I'm wrong")
 double Visual::GetInternalTime()
 {
     auto viewer = _viewerPtr;
-    if (!viewer->done())
+    if (viewer && !viewer->done())
     {
         return viewer->getFrameStamp()->getSimulationTime();
     }
@@ -239,5 +246,7 @@ double Visual::GetInternalTime()
 
 IVisual *  CreateVisual()
 {
-    return Visual::CreateInstance();
+    IVisual * iv = Visual::CreateInstance();
+    iv->Initialize();
+    return iv;
 }

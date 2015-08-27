@@ -8,8 +8,12 @@
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 #include "common/test_msgs.h"
+#include "common/locks.h"
+#include "common/time_counter.h"
 
 #include "kernel/systems/vis_system.h"
+
+#include "utils/high_res_timer.h"
 
 #include "av/Visual.h"
 #include "av/test_systems.h"
@@ -39,7 +43,7 @@ namespace
 
     struct updater
     {
-       updater(kernel::system_ptr  sys,double period = 0.01)
+       updater(kernel::system_ptr  sys,double period = 0.001)
           : period_(period)
           , old_val(0)
           , sys_(sys)
@@ -70,16 +74,221 @@ namespace
 
 }
 
+struct time_control
+{
+    time_control(double initial_time = 0.);
+
+    void   set_factor(double factor, optional<double> ext_time = boost::none);
+    double get_factor() const;
+    double time      () const;
+
+private:
+    double          last_time_;
+    double          time_factor_;
+    time_counter    time_flow_;
+};
+
+/////////////////////////////////////////////////////////
+// time_control implementation
+inline time_control::time_control(double initial_time)
+    : last_time_    (initial_time)
+    , time_factor_  (0)
+{
+}
+
+inline void time_control::set_factor(double factor, optional<double> ext_time)
+{
+    last_time_   = ext_time ? *ext_time : time();    
+    time_factor_ = factor;
+    time_flow_.reset();
+}
+
+inline double time_control::get_factor() const
+{
+    return time_factor_;
+}
+
+inline double time_control::time() const
+{
+    return last_time_ + time_counter::to_double(time_flow_.time()) * time_factor_;
+}
+
+namespace details
+{
+    struct timer_holder { virtual ~timer_holder(){} };
+
+    struct session {
+        
+        session ( double initial_time )
+            : time_(initial_time)
+        {
+            time_.set_factor(1.0);
+        }
+        
+        double time() const
+        {
+           return time_.time();
+        }
+
+        void stop()
+        {
+            time_reset_signal_(/*ses_time*/time(), 0);
+        }
+
+        time_control time_;
+
+        DECLARE_EVENT(time_reset    , (double /*time*/, double /*factor*/));
+    };
+
+} // details
+
+struct session_timer 
+    : details::timer_holder
+{
+    typedef boost::shared_ptr<details::timer_holder> connection;
+
+    typedef boost::function<void (double /*time*/)> on_timer_f;
+
+    typedef boost::function<void()>                         timer_callback_f;
+    typedef boost::function<void(timer_callback_f const&)>  deferred_call_f;
+    
+    static connection create (details::session* ses,double period_sec, on_timer_f const& on_timer, bool adjust_time_factor, bool terminal = false)
+    {
+        return connection(
+            new session_timer(
+            ses, 
+            on_timer, 
+            period_sec, 
+            1/*time_.get_factor()*/, 
+            adjust_time_factor, 
+            /*terminal ? dfrd_call_ :*/ deferred_call_f()));
+    }
+
+    session_timer( details::session* session, on_timer_f const& on_timer, double period, double factor, bool adjust_time_factor, deferred_call_f const& def_call)
+        : session_  (session)
+        , on_timer_ (on_timer)
+        , period_   (period)
+        , factor_   (factor)
+
+        , last_time_point_   (session->time())
+        , adjust_time_factor_(adjust_time_factor)
+        , timer_             (bind(&session_timer::on_timer, this))
+        , deferred_call_     (def_call)
+    {
+        Assert(!cg::eq_zero(period_));
+
+        changing_time_factor_   = session_->subscribe_time_reset     (bind(&session_timer::set_factor, this, _2));
+        //stopped_session_        = session_->subscribe_session_stopped(bind(&session_timer::session_stopped, this));
+
+        set_next_time_point();
+    }
+
+private:
+    void set_factor(double factor)
+    {
+        factor_ = factor;
+        set_next_time_point();
+    }
+
+    void session_stopped()
+    {
+        session_ = nullptr; // just for check, on_timer must not be invoked after timer_ cancellation 
+        timer_.cancel();
+    }
+
+private:
+    void on_timer()
+    {
+        static bool inside_timer = false;
+
+        optional<double> on_timer_time;
+
+        if (cg::eq_zero(factor_)) 
+        {
+            Assert(!adjust_time_factor_);
+            on_timer_time = std::floor(session_->time() / period_) * period_;
+        }
+        else
+        {
+            double period     = adjust_time_factor_ ? period_ : period_ * factor_;
+            double time_point = std::floor(session_->time() / period) * period;
+
+            if (!cg::eq(time_point, last_time_point_))
+            {
+                on_timer_time    = time_point;
+                last_time_point_ = time_point;
+            }
+        }
+
+        set_next_time_point();
+
+        // must be the last call (!) on timer callback
+        if (!inside_timer && on_timer_time)
+        {
+            locks::bool_lock bl(inside_timer); 
+
+            if (deferred_call_) // terminal timer 
+            {
+                timer_.cancel();
+                deferred_call_(boost::bind(on_timer_, *on_timer_time));
+            }
+            else 
+                on_timer_(*on_timer_time);
+        }
+    }
+
+    void set_next_time_point() 
+    {
+        if (cg::eq_zero(factor_)) 
+        {
+            if (!adjust_time_factor_)
+                timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
+            else
+                timer_.cancel(); // paused
+
+            return;
+        }
+
+        double period          = adjust_time_factor_ ? period_ : period_ * factor_;
+        double next_time_point = (std::floor(session_->time() / period) + 1) * period;
+        double real_delta      = (next_time_point - session_->time()) / factor_;
+
+        timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * real_delta)));
+    }
+
+private:
+    details::session*   session_;
+    on_timer_f          on_timer_;
+    double              period_;
+    double              factor_;
+    double              last_time_point_;
+    bool                adjust_time_factor_;
+    async_timer         timer_;
+
+private:
+    scoped_connection   changing_time_factor_;
+    scoped_connection   stopped_session_;
+
+private:
+    deferred_call_f     deferred_call_;
+
+
+};
+
+
+
 struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
 
-     net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update)
-         : period_     (0.02)
+     net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
+         : period_     (cfg().model_params.msys_step)
+         , ses_        (new details::session(0))
+         , _peer       (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
-         , _peer       (peer)
+         , on_render_  (on_render)
          , timer_      (boost::bind(&net_worker::on_timer, this))
          , done_       (false)
      {
@@ -109,15 +318,27 @@ struct net_worker
 
      }
 
+     void start_timer()
+     {
+         on_timer();
+     }
+
 private:
      void run()
      {
          async_services_initializer asi(false);
+
          acc_.reset(new  async_acceptor (_peer, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
-         _workerService = &(asi.get_service());
-         boost::asio::io_service::work skwark(asi.get_service());
          
+         _workerService = &(asi.get_service());
+         
+         boost::asio::io_service::work skwark(asi.get_service());
+
          start_timer();
+         render_timer_ = session_timer::create (ses_, 1/60.f,  [&](double time)
+                                                             {
+                                                                 __main_srvc__->post(boost::bind(on_render_,time));
+                                                             } , 1, false);
 
          boost::system::error_code ec;
          size_t ret = _workerService->run(ec);
@@ -154,10 +375,7 @@ private:
 
      }
 
-     void start_timer()
-     {
-         on_timer();
-     }
+
 
 private:
 
@@ -167,6 +385,7 @@ private:
 
          if(done_)
          {
+             ses_->stop();
              timer_.cancel();
              return;
          }
@@ -176,6 +395,7 @@ private:
          __main_srvc__->post(boost::bind(on_update_, time ));
 
      }
+     
 
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
@@ -218,10 +438,6 @@ private:
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
      }
 
-     void on_setup(setup const& msg)
-     {
-         LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
-     }
 
 private:
     boost::scoped_ptr<async_acceptor>                           acc_   ;
@@ -230,21 +446,27 @@ private:
     boost::thread                                               _workerThread;
     boost::asio::io_service*                                    _workerService;
     std::shared_ptr<boost::asio::io_service::work>              _work;
-    const  endpoint &                                           _peer;
+    const  endpoint                                             _peer;
 
 
 private:
     on_receive_f                                                on_receive_;
     on_update_f                                                 on_update_;
+    on_update_f                                                 on_render_;
 
 private:
-    // std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
     async_timer                                                   timer_; 
 
     bool                                                          done_;
 
 private:
     double                                                       period_;
+
+private:
+    session_timer::connection                                 render_timer_;
+    session_timer::connection                                 calc_timer_ ;
+    session_timer::connection                                 ctrl_timer_;
+    details::session*                                         ses_;
 };
 
 
@@ -253,13 +475,9 @@ struct visapp
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
         : osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
-        , ctrl_sys_ (sys_creator()->get_control_sys(),cfg().model_params.csys_step)
-        , mod_sys_  (sys_creator()->get_model_sys(),cfg().model_params.msys_step)
-        , w_ ( peer 
-             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
-             , boost::bind(&visapp::update, this, _1)
-             )
-        
+        , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
+        , mod_sys_  (sys_creator()->get_model_sys(),0.03/*cfg().model_params.msys_step*/)
+       
     {   
 
         disp_
@@ -268,10 +486,11 @@ struct visapp
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
         
-        FIXME( Arguments );
-        
-        osg_vis_->Initialize(argc,argv);
-
+        w_.reset (new net_worker( peer 
+            , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
+            , boost::bind(&visapp::update, this, _1)
+            , boost::bind(&visapp::on_render, this, _1)
+            ));
     }
 
     ~visapp()
@@ -280,34 +499,47 @@ struct visapp
     }
 
 private:
+    
+    void on_render(double time)
+    {   
+        high_res_timer                _hr_timer;
+        vis_sys_.update(time);
+        osg_vis_->Render();
+        //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
+
+    }
+                              
     void update(double time)
     {   
         double sim_time = osg_vis_->GetInternalTime();
 
         if(sim_time  < 0)
         {
-            w_.done();
+            w_->done();
            __main_srvc__->stop();
            return;
         }
+        else
+        {
+           mod_sys_.update(sim_time);
+           ctrl_sys_.update(sim_time);
 
-        
-        mod_sys_.update(sim_time);
-        ctrl_sys_.update(sim_time);
-        vis_sys_.update(sim_time);
-        osg_vis_->Render();
+        }
 
-        // LogInfo("update ");
+
+        //LogInfo("update ");
     }
-
+    
    
     void on_setup(setup const& msg)
     {
          osg_vis_->CreateScene();
          create_objects();
          
+         w_->start_timer();
+
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
-         w_.send(&bts[0], bts.size());
+         w_->send(&bts[0], bts.size());
 
          LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
@@ -367,10 +599,6 @@ private:
         return ptr;
     }
 
-
-private:
-    net_worker                                                        w_;
-
 private:
     msg_dispatcher<uint32_t>                                       disp_;
 
@@ -379,6 +607,9 @@ private:
     updater                                                    ctrl_sys_;
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
+
+private:
+    boost::scoped_ptr<net_worker>                                     w_;
 };
 
 

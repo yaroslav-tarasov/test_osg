@@ -491,9 +491,6 @@
     <ClCompile Include="kernel\fms\dubins.cpp">
       <Filter>Source Files\fms</Filter>
     </ClCompile>
-    <ClCompile Include="av\shaders.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
@@ -670,6 +667,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
       <Filter>Source Files\objects\airport</Filter>
+    </ClCompile>
+    <ClCompile Include="av\shaders.cpp">
+      <Filter>Source Files\shaders</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

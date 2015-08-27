@@ -77,7 +77,9 @@ private:
         
         srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
-
+        
+        start_send();
+        
         binary::bytes_t bts =  std::move(wrap_msg(setup(1111,2222)));
         send(&bts[0], bts.size());
 
@@ -85,7 +87,7 @@ private:
 
     void on_remote_ready(uint16_t value)
     {
-        start_send();
+        //start_send();
     }
     
     inline void start_send()
@@ -144,7 +146,7 @@ int _tmain(int argc, _TCHAR* argv[])
     
     try
     {
-        endpoint peer(std::string("127.0.0.1:30000"));
+        endpoint peer(std::string("127.0.0.1:45001"));
         client c(peer);              
         __main_srvc__->run();
     }

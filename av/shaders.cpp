@@ -571,7 +571,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
                 //vec4  light_vec_view = vec4(lightDir,1);
                 // viewworld_matrix = gl_ModelViewMatrixInverse;
@@ -693,7 +693,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                //#define GET_SHADOW(viewpos, in_frag) 
                float shadow = 1.0; 
                if(ambient.a > 0.35)
-                   shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                   shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
 
                //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
@@ -870,7 +870,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1056,7 +1056,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 /// shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1193,6 +1193,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 lightmap_coord;
             } f_in;
             
+            //subroutine vec4 color_t();
+
+            //subroutine uniform color_t Color;
+
+            //subroutine(color_t)
+            //    vec4 ColorRed()
+            //{
+            //    return vec4(1, 0, 0, 1);
+            //}
+
             out vec4  aFragColor;
 
             void main (void)
@@ -1201,7 +1211,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
 \n                ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);
@@ -1399,7 +1409,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //#define GET_SHADOW(viewpos, in_frag) 
                   float shadow = 1.0; 
                   if(ambient.a > 0.35)
-                      shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                      shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
                   //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
                   // color *= mix( colorAmbientEmissive * (1 - illum), gl_Color , f_in.shadow_view ); 
 \n                //bvec4 split_test = lessThanEqual(vec4(-viewpos.z), shadow_split_borders); 
@@ -1822,7 +1832,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //#define GET_SHADOW(viewpos, in_frag) 
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4E(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
                 //float shadow = shadow2DProj(shadowTexture0, f_in.shadow_view);
 
                 ///shadow = shadow2DProj(ShadowSplit0, f_in.shadow_view);

@@ -424,6 +424,7 @@ osg::Node* CreateLogo(const std::string& filename, const std::string& label, con
 bool Create( osgViewer::Viewer* vw )
 {
      osg::ref_ptr<osg::Node> scene =  CreateLogo("", "Place your ad here" , "Yea baby");
+     
      if (!scene.valid())
      {
          return false;

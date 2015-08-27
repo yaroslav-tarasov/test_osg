@@ -309,7 +309,7 @@ public:
             
             if(GetShader(shaders::VS,mat_name))
             {
-                std::string prog = "#version " + boost::lexical_cast<string>(version) + "\n " + osg_modification(version,*GetShader(shaders::VS,mat_name));
+                std::string prog = "#version " + boost::lexical_cast<string>(version)  + "\n " + osg_modification(version,*GetShader(shaders::VS,mat_name));
                 auto vs = new osg::Shader( osg::Shader::VERTEX, prog );
                 p.program->addShader( vs );
 
@@ -317,7 +317,7 @@ public:
 
             if(GetShader(shaders::FS,mat_name))
             {
-                std::string prog = "#version " + boost::lexical_cast<string>(version) + "\n " + osg_modification(version,*GetShader(shaders::FS,mat_name));
+                std::string prog = "#version " + boost::lexical_cast<string>(version)  +"\n " + osg_modification(version,*GetShader(shaders::FS,mat_name));
                 auto fs = new osg::Shader(osg::Shader::FRAGMENT, prog);
                 p.program->addShader( fs );
                 
