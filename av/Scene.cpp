@@ -527,7 +527,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //                                                                       
     _ephemerisNode = new avSky::Ephemeris( this
                                           , _terrainNode.get()
-                                          ,[=](float illum){ if(_st!=0) _st->setNightMode(illum < .35);} //  FIXME magic night value    
+                                          ,[=](float illum){ if(_st!=0) _st->setNightMode(illum < 0.8);} //  FIXME magic night value    
                                           ,[this](float fog_vr){
                                             BOOST_FOREACH( auto g, this->_lamps)
                                             {
@@ -654,25 +654,24 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 osg::Group*  Scene::createTerrainRoot()
 {
-
+    osg::Group* tr;
+//#undef TEST_SHADOWS_FROM_OSG
 #if defined(TEST_SHADOWS_FROM_OSG)
 
     const int fbo_tex_size = 1024*4;
-    osg::Group* tr;
 
     _st = new avShadow::ViewDependentShadowMap;
 
-     tr
-        = new avShadow::ShadowedScene(_st.get());  
+     tr = new avShadow::ShadowedScene(_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
 
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
-    settings->setMinimumShadowMapNearFarRatio(0.05/*.5*/);
+    settings->setMinimumShadowMapNearFarRatio(0.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
-    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
-    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
+    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
+    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
     settings->setMaximumShadowMapDistance(1500/*150*/);

@@ -11,6 +11,8 @@
 #include "common/locks.h"
 #include "common/time_counter.h"
 
+#include "net_layer/net_server.h"
+
 #include "kernel/systems/vis_system.h"
 
 #include "utils/high_res_timer.h"
@@ -113,11 +115,12 @@ inline double time_control::time() const
     return last_time_ + time_counter::to_double(time_flow_.time()) * time_factor_;
 }
 
+    
 namespace details
 {
     struct timer_holder { virtual ~timer_holder(){} };
 
-    struct session {
+    struct session /*: net_layer::ses_srv*/ {
         
         session ( double initial_time )
             : time_(initial_time)
@@ -134,10 +137,46 @@ namespace details
         {
             time_reset_signal_(/*ses_time*/time(), 0);
         }
+        
+        void set_factor(double factor)
+        {
+        }
+        
+        void send(binary::bytes_cref bytes, bool sure)
+        {
+            //Assert(send_);
+            //send_(*network::wrap(data_msg(bytes)), sure);
+        }
 
-        time_control time_;
+        void reset_time(double new_time)
+        {
+        }
+
+        bool local() const
+        {
+            return true/*control_*/;
+        }
+        
+        void session_data_loaded()
+        {
+        }
+
+        //net_layer::timer_connection create_timer(double period_sec, on_timer_f const& on_timer, bool adjust_time_factor, bool terminal)
+        //{
+        //        return net_layer::timer_connection();
+        //}
+
+        //net_layer::net_srv&            net_server  () const 
+        //{
+        //       return net_layer::net_srv();
+        //}
 
         DECLARE_EVENT(time_reset    , (double /*time*/, double /*factor*/));
+
+    private:
+        time_control time_;
+
+
     };
 
 } // details
