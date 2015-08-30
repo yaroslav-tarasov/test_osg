@@ -676,6 +676,8 @@ osg::Group*  Scene::createTerrainRoot()
     //settings->setLightNum(2);
     settings->setMaximumShadowMapDistance(1500/*150*/);
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
+	//settings->setCastsShadowTraversalMask(cCastsShadowTraversalMask);
+	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
 
 #else
     tr = new osg::Group;
@@ -958,9 +960,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         mt_.back()->addChild(sp3.first);
         
         addChild(mt_.back());
+		
+		//mt_.back()->setNodeMask(  cCastsShadowTraversalMask );
 
         _viewerPtr->addEventHandler(sp3.second);
         return mt_.back()/*.release()*/;
+
+
     }
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
@@ -1177,6 +1183,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         }
 
         _terrainRoot->asGroup()->addChild(mt);
+		
+		//mt->setNodeMask(  cCastsShadowTraversalMask | cReceivesShadowTraversalMask );
 
         object_loaded_signal_(seed);
 

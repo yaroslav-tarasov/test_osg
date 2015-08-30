@@ -322,7 +322,7 @@ struct net_worker
      typedef boost::function<void(double time)>                     on_update_f;     
 
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
-         : period_     (cfg().model_params.msys_step)
+         : period_     (/*cfg().model_params.msys_step*/0.05)
          , ses_        (new details::session(0))
          , _peer       (peer)
          , on_receive_ (on_recv)
@@ -373,13 +373,15 @@ private:
          
          boost::asio::io_service::work skwark(asi.get_service());
 
-         start_timer();
+         
          render_timer_ = session_timer::create (ses_, 1/60.f,  [&](double time)
                                                              {
                                                                  __main_srvc__->post(boost::bind(on_render_,time));
                                                              } , 1, false);
 
-         boost::system::error_code ec;
+		 start_timer();
+         
+		 boost::system::error_code ec;
          size_t ret = _workerService->run(ec);
          
          timer_.cancel();

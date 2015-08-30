@@ -101,6 +101,9 @@ enum masks_t{
     NODE_STARFIELD_MASK                 = 0x2
 };
 
+const uint32_t cCastsShadowTraversalMask = 8;
+const uint32_t cReceivesShadowTraversalMask = 16;
+
 namespace avSky
 {
     enum cloud_type
