@@ -77,7 +77,7 @@ class LightChangeHandler : public osgGA::GUIEventHandler
 public:
     LightChangeHandler(osg::LightSource *ls) : ls_(ls) {}
 
-    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& /*aa*/)
     {
         if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
         {

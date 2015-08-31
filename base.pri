@@ -130,7 +130,7 @@ win32{
 
     QMAKE_CXXFLAGS += /MP8
     QMAKE_CXXFLAGS -= -Zm200
-    QMAKE_CXXFLAGS *= -Zm400
+    QMAKE_CXXFLAGS *= -Zm512
 
     LIBS += /NODEFAULTLIB:libcmt.lib
 }
@@ -151,17 +151,17 @@ INCLUDEPATH += $$PWD/ext/pugixml-1.4/src                      \
 #############
 # lib paths
 
+LIBS += -L$$(BULLET_DIR)/lib
+win32:LIBS += -L$$(BULLET_DIR)/build/lib/$$PATH_SUFFIX
 LIBS += -L$$EXT_LIB/boost
 LIBS += -L$$EXT_LIB/qt/$$PATH_SUFFIX
 LIBS += -L$$(OSG_DIR)/OpenSceneGraph-3.2.1/build/lib
 LIBS += -L$$BINS/$$PATH_SUFFIX
-win32:LIBS += -L$$(BULLET_DIR)/build/lib/$$PATH_SUFFIX
 LIBS += -L$$PWD/ext/pugixml-1.4/scripts/vs2010/$$TARGETX
 LIBS += -L$$(OSG_DIR)/SPARK-1.5.5/lib/vc2008/static
 LIBS += -L$$(OSG_DIR)/3rdparty/lib
-LIBS += -L$$(BULLET_DIR)/lib
-LIBS += -L$$(SIMEX_DIR)/ext/lib/tinyxml2/$$PATH_SUFFIX
-LIBS += -L$$(SIMEX_DIR)/bin/$$PATH_SUFFIX
+LIBS += -L$$SIMEX_DIR_FULL/ext/lib/tinyxml2/$$PATH_SUFFIX
+LIBS += -L$$SIMEX_DIR_FULL/bin/$$PATH_SUFFIX
 
 CONFIG(debug,debug|release){
    LIBS += -lpugixmld -ltinyxml2 -lnet_layer -lfms -llogger -lasync_services -lalloc -lmeteo

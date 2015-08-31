@@ -5,7 +5,7 @@
 using namespace std;
 #include "geometry/curve.h"
 
-int printConfiguration(double q[3], double x, void* user_data) {
+int printConfiguration(double q[3], double x, void* /*user_data*/) {
 	printf("%f, %f, %f, %f\n", q[0], q[1], q[2], x);
 	return 0;
 }
@@ -22,7 +22,7 @@ static int fill(keypoints_t& kp,double q[3], double x, void* user_data)
 
 
 
-int main_dubins(int argc, char** argv )
+int main_dubins(int /*argc*/, char** /*argv*/ )
 {
 	keypoints_t  sample_points;
 	

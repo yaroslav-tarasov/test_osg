@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+#include <QtGui>
+#include <QtCore>
+#include <QApplication>
+
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
@@ -28,6 +32,11 @@ using namespace net_layer::test_msg;
 namespace
 {
     boost::asio::io_service* __main_srvc__ = 0;
+
+    void stop_request()
+    {
+        QCoreApplication::instance()->exit(0);
+    }
 
     void tcp_error(error_code const& err)
     {
@@ -106,7 +115,8 @@ private:
         if(sim_time  < 0)
         {
             timer_.cancel();
-            __main_srvc__->stop();
+            __main_srvc__->stop(); 
+            stop_request();
             return;
         }
         else
@@ -234,38 +244,49 @@ private:
 
 int main( int argc, char** argv )
 {
+ 	logger::need_to_log(/*true*/);
 
-	logger::need_to_log(/*true*/);
+    QApplication app (argc, argv);
+    app.setQuitOnLastWindowClosed(false);
+    async_services_initializer init(true);
+    
+    __main_srvc__ = &init.get_service();
 
-	async_services_initializer asi(false);
+    logging::add_console_writer();
+    logging::add_default_file_writer();
 
-	logging::add_console_writer();
 
-	__main_srvc__ = &(asi.get_service());
+    //cmd_line::arg_map am;
+    //if (!am.parse(cmd_line::naive_parser().add_arg("task_id", true), argc, argv))
+    //{
+    //    LogError("Invalid command line");
+    //    return 1;
+    //}
 
-	try
-	{
+    //optional<binary::size_type> task_id;
+    //if (am.contains("task_id")) 
+    //    task_id = am.extract<binary::size_type>("task_id");
 
-		endpoint peer(cfg().network.local_address);
+    try
+    {
+        endpoint peer(cfg().network.local_address);
 
-		kernel::vis_sys_props props_;
-		props_.base_point = ::get_base();
+        kernel::vis_sys_props props_;
+        props_.base_point = ::get_base();
 
-		visapp s(peer, props_ , argc, argv);
+        visapp s(peer, props_ , argc, argv);
 
-		__main_srvc__->run();
+        //tray_icon tricon(":/resources/projector.png", &app);
+        //app.connect(&tricon, SIGNAL(menu_exit()), &app, SLOT(quit()));    
+        //tricon.show();
 
-	}
-	catch(verify_error const&)
-	{
-		return -1;
-	}
-	catch(std::exception const& err)
-	{
-		std::string errror (err.what()); 
-		LogError("Exception caught: " << err.what());
-		return -1;
-	}
+        return app.exec();
+    }
+    catch(const boost::filesystem::filesystem_error& e)
+    {
+        auto c = e.code().message();
+        LogError(c);
+    }
 
 	return 0; 
 

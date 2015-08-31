@@ -612,11 +612,6 @@ namespace bi
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();
 
-
-                const double dt_sys = dt; 
-
-                
-                
 #ifdef DEPRECATED
                 for(auto it = _model_aircrafts.begin();it!=_model_aircrafts.end();++it)
                 {   

@@ -15,6 +15,8 @@
 #include "common/stl.h"
 
 #include "common/osg_inc.h"
+#include "common/bullet.h"
+
 
 #define BASE_SHADOW_TEXTURE_UNIT 6
 #define GLSL_VERSION             130
@@ -84,7 +86,12 @@ namespace cg
 
 #define Assert(x) if(x){};
 #define avAssert(x) assert(x)
-#define avError(x)  assert(x)
+#define avError(x,y) {           \
+     char buff [1024];           \
+     sprintf(buff,x,y);          \
+     OutputDebugString(buff);    \
+     assert(false);              \
+ }
 
 enum render_order_t {
     RENDER_BIN_SCENE                    =  0,

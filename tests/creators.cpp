@@ -294,7 +294,7 @@ namespace effects
 
     void insertParticle(osg::Group* root,osg::Node* rootModel, const osg::Vec3& center, float radius)
     {
-        bool handleMovingModels = false;
+        //bool handleMovingModels = false;
 
         osg::Vec3 position = center + 
             osg::Vec3( radius * (((float)rand() / (float)RAND_MAX)-0.5)*2.0,

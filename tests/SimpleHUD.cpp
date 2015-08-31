@@ -117,6 +117,7 @@ int main_hud( int argc, char** argv )
    HUDStateSet->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
    HUDStateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
    HUDStateSet->setTextureAttributeAndModes(0,HUDTexture,osg::StateAttribute::ON);
+
    osgUtil::RenderBin* HUDBin = 
       new osgUtil::RenderBin(osgUtil::RenderBin::SORT_BACK_TO_FRONT);
  

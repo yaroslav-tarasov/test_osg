@@ -200,7 +200,7 @@ public:
 
 private:
 
-    osg::BoundingBox computeBound( const osg::Drawable & drawable) const
+    osg::BoundingBox computeBound( const osg::Drawable & /*drawable*/) const
     {
         return refBB;
     }

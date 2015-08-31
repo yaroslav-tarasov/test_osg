@@ -314,6 +314,8 @@ private:
 
 };
 
+namespace
+{
 
 
 struct net_worker
@@ -653,6 +655,8 @@ private:
     boost::scoped_ptr<net_worker>                                     w_;
 };
 
+
+}
 
 int av_scene( int argc, char** argv )
 {

@@ -118,11 +118,6 @@
 #pragma comment(lib, "osgUtild.lib")
 #pragma comment(lib, "osgSimd.lib")
 #pragma comment(lib, "osgParticled.lib")
-#pragma comment(lib, "BulletCollision_Debug.lib")
-#pragma comment(lib, "LinearMath_Debug.lib")
-#pragma comment(lib, "BulletDynamics_Debug.lib")
-#pragma comment(lib, "BulletWorldImporter_Debug.lib")
-#pragma comment(lib, "BulletFileLoader_Debug.lib")
 #else
 #ifdef OSG_USE_MINREL
 #pragma comment(lib, "osgTexts.lib")
@@ -138,11 +133,6 @@
 #pragma comment(lib, "osgUtils.lib")
 #pragma comment(lib, "osgSims.lib")
 #pragma comment(lib, "osgParticles.lib")
-#pragma comment(lib, "BulletCollision.lib")
-#pragma comment(lib, "LinearMath.lib")
-#pragma comment(lib, "BulletDynamics.lib")   
-#pragma comment(lib, "BulletWorldImporter.lib")
-#pragma comment(lib, "BulletFileLoader.lib")
 #else
 #pragma comment(lib, "osgText.lib")
 #pragma comment(lib, "osgShadow.lib")

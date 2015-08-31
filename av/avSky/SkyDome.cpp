@@ -33,7 +33,7 @@ public:
 private:
     SkyDome* m_pSkyDome;
 
-    virtual void operator()( osg::Uniform* uniform, osg::NodeVisitor* nv )
+    virtual void operator()( osg::Uniform* uniform, osg::NodeVisitor* /*nv*/ )
     {
       
         float fDensity = avCore::GetEnvironment()->GetWeatherParameters().CloudDensity; 
