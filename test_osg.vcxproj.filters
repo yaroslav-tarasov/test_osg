@@ -105,9 +105,6 @@
     <Filter Include="Source Files\av\sm">
       <UniqueIdentifier>{55691b10-34af-40ef-afd2-5b2a722c94d7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\av">
-      <UniqueIdentifier>{5432feb9-0aed-4910-ad9c-66587ec1a6e9}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -152,11 +149,50 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="creators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="light_maps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pickhandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_math.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="animation_handler.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="osg_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="callbacks.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="materials.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trajectory_drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_include\objects\object_creators.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\fms\trajectory.h">
+      <Filter>Source Files\fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h">
+      <Filter>Source Files\objects\aircraft</Filter>
     </ClInclude>
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
@@ -170,32 +206,29 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
-    <ClInclude Include="av\Visual.h">
-      <Filter>Header Files\av</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\krv_import.h">
-      <Filter>Header Files\utils</Filter>
+    <ClInclude Include="av\Utils.h">
+      <Filter>Source Files\av</Filter>
     </ClInclude>
     <ClInclude Include="av\Grass.h">
-      <Filter>Header Files\av</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\empty_scene.h">
-      <Filter>Header Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="av\test_systems.h">
-      <Filter>Header Files\av</Filter>
-    </ClInclude>
-    <ClInclude Include="av\Logo.h">
-      <Filter>Header Files\av</Filter>
+    <ClInclude Include="av\Visual.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="av\IVisual.h">
-      <Filter>Header Files\av</Filter>
+      <Filter>Source Files\av</Filter>
     </ClInclude>
-    <ClInclude Include="av\Utils.h">
-      <Filter>Header Files\av</Filter>
+    <ClInclude Include="av\test_systems.h">
+      <Filter>Source Files\av</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\fms\trajectory.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="utils\krv_import.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\empty_scene.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="av\Logo.h">
+      <Filter>Source Files\av</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
