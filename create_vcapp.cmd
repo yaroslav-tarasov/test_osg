@@ -1,0 +1,1 @@
+qmake.exe qmake.exe -tp vc -r  visapp.pro -spec win32-msvc2010

@@ -36,6 +36,5 @@ int main( int argc, char** argv )
     if(fp)
         return fp(argc, argv);
 
-	BOOST_TYPEOF(fp) func;
     return 0;
 }

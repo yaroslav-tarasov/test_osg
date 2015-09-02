@@ -68,6 +68,8 @@ osg::Matrix computeTargetToWorldMatrix( osg::Node* node ) // const
 }
 
 
+
+
 void AddLight( osg::ref_ptr<osg::MatrixTransform> rootnode ) 
 {
 

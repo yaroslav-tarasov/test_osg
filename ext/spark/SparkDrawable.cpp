@@ -1,6 +1,102 @@
 #include "stdafx.h"
+#ifndef Q_MOC_RUN
+#include <SPK.h>
+#include <SPK_GL.h>
+#endif
 #include "SparkDrawable.h"
 #include <algorithm>
+#include <iostream>
+
+typedef std::map<std::string, SparkDrawable::ImageAttribute> TextureObjMap;
+typedef std::vector<SPK::System*>             ParticleSystemList;
+
+
+struct SparkDrawable::_private
+{
+       _private(SparkDrawable* parent)
+       : _baseSystemCreator(NULL)
+       , _baseSystemID(SPK::NO_ID)
+       , _protoSystem(NULL)
+       , _parent(parent)
+       {}
+
+    SPK::System* createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle );
+
+    TextureObjMap           _textureObjMap;
+    ParticleSystemList      _particleSystems;
+    CreateBaseSystemFunc    _baseSystemCreator;
+    mutable SPK::SPK_ID     _baseSystemID;
+
+    mutable SPK::System*    _protoSystem;
+
+    SparkDrawable*          _parent;
+};
+
+class SparkDrawable::DeferredSystemHandler : public osg::Drawable::UpdateCallback
+{
+public:
+    virtual void update( osg::NodeVisitor* nv, osg::Drawable* drawable );
+
+    struct PosAndRotate
+    {
+        SPK::Vector3D position;
+        SPK::Vector3D rotationAxis;
+        float rotationAngle;
+    };
+
+    std::vector<PosAndRotate> _newSystemsToAdd;
+};
+
+
+struct SparkDrawable::SortParticlesOperator
+{
+    SortParticlesOperator( const osg::Vec3d& eye )
+    { _eye.x = eye.x(); _eye.y = eye.y(); _eye.z = eye.z(); }
+
+    virtual bool operator()( SPK::System* lhs, SPK::System* rhs )
+    {
+        return SPK::getSqrDist(lhs->getWorldTransformPos(), _eye) >
+            SPK::getSqrDist(rhs->getWorldTransformPos(), _eye);
+    }
+
+    SPK::Vector3D _eye;
+};
+
+
+bool SparkDrawable::isValid() const 
+{
+    return getBaseSystemID()!=SPK::NO_ID && _d->_protoSystem!=NULL; 
+}
+
+void SparkDrawable::setBaseSystemID( SPK::SPK_ID id ) { _d->_baseSystemID = id; }
+SPK::SPK_ID SparkDrawable::getBaseSystemID() const { return _d->_baseSystemID; }
+
+void SparkDrawable::setSortParticles( bool b ) { _sortParticles = b; }
+bool SparkDrawable::getSortParticles() const { return _sortParticles; }
+
+void SparkDrawable::setAutoUpdateBound( bool b ) { _autoUpdateBound = b; }
+bool SparkDrawable::getAutoUpdateBound() const { return _autoUpdateBound; }
+
+SPK::System* SparkDrawable::getProtoSystem() { return _d->_protoSystem; }
+const SPK::System* SparkDrawable::getProtoSystem() const { return _d->_protoSystem; }
+
+SPK::System* SparkDrawable::getParticleSystem( unsigned int i ) { return _d->_particleSystems[i]; }
+const SPK::System* SparkDrawable::getParticleSystem( unsigned int i ) const { return _d->_particleSystems[i]; }
+unsigned int SparkDrawable::getNumParticleSystems() const { return _d->_particleSystems.size(); }
+
+void SparkDrawable::addExternalParticleSystem( SPK::System* system )
+{
+    if (system)
+        _d->_particleSystems.push_back(system);
+}
+
+void SparkDrawable::setBaseSystemCreator( CreateBaseSystemFunc func, bool useProtoSystem )
+{
+    _d->_baseSystemCreator = func;
+    _useProtoSystem = useProtoSystem;
+    _dirty = true;
+}
+
 
 /* SparkDrawable::DeferredSystemHandler */
 
@@ -14,7 +110,7 @@ void SparkDrawable::DeferredSystemHandler::update( osg::NodeVisitor* nv, osg::Dr
         for ( unsigned int i=0; i<_newSystemsToAdd.size(); ++i )
         {
             const PosAndRotate& pr = _newSystemsToAdd[i];
-            spark->createParticleSystem( pr.position, pr.rotationAxis, pr.rotationAngle );
+            spark->_d->createParticleSystem( pr.position, pr.rotationAxis, pr.rotationAngle );
         }
         _newSystemsToAdd.clear();
     }
@@ -23,9 +119,12 @@ void SparkDrawable::DeferredSystemHandler::update( osg::NodeVisitor* nv, osg::Dr
 /* SparkDrawable */
 
 SparkDrawable::SparkDrawable()
-:   _baseSystemCreator(NULL), _baseSystemID(SPK::NO_ID), _protoSystem(NULL),
-    _lastTime(-1.0), _sortParticles(false), _useProtoSystem(true),
-    _autoUpdateBound(true), _dirty(true)
+    :   _lastTime(-1.0)
+    , _sortParticles(false)
+    , _useProtoSystem(true)
+    , _autoUpdateBound(true)
+    , _dirty(true)
+    , _d (new _private(this))
 {
     _activeContextID = 0;
     setUpdateCallback( new DeferredSystemHandler );
@@ -35,32 +134,44 @@ SparkDrawable::SparkDrawable()
     
 SparkDrawable::SparkDrawable( const SparkDrawable& copy,const osg::CopyOp& copyop )
 :   osg::Drawable(copy, copyop),
-    _textureObjMap(copy._textureObjMap), _particleSystems(copy._particleSystems),
-    _baseSystemCreator(copy._baseSystemCreator), _baseSystemID(copy._baseSystemID),
-    _protoSystem(copy._protoSystem), _activeContextID(copy._activeContextID),
+    _activeContextID(copy._activeContextID),
     _lastTime(copy._lastTime), _sortParticles(copy._sortParticles),
     _useProtoSystem(copy._useProtoSystem), _autoUpdateBound(copy._autoUpdateBound),
     _dirty(copy._dirty)
+    ,_d (copy._d)
 {}
 
 SparkDrawable::~SparkDrawable()
 {
-    for ( ParticleSystemList::const_iterator itr=_particleSystems.begin();
-          itr!=_particleSystems.end(); ++itr )
+    for ( ParticleSystemList::const_iterator itr=_d->_particleSystems.begin();
+          itr!=_d->_particleSystems.end(); ++itr )
     {
         destroyParticleSystem( *itr, false );
     }
-    if ( _protoSystem )
-        destroyParticleSystem( _protoSystem, false );
+    if ( _d->_protoSystem )
+        destroyParticleSystem( _d->_protoSystem, false );
+
+    delete _d;
+}
+
+void SparkDrawable::destroyParticleSystem( SPK::System* system, bool removeFromList )
+{
+    if (system) SPK_Destroy(system);
+    if (removeFromList)
+    {
+        unsigned int i = 0, size = _d->_particleSystems.size();
+        for (; i<size; ++i) { if (_d->_particleSystems[i]==system) break; }
+        if (i<size) _d->_particleSystems.erase(_d->_particleSystems.begin() + i);
+    }
 }
 
 unsigned int SparkDrawable::getNumParticles() const
 {
     unsigned int count = 0;
-    if ( _useProtoSystem && _protoSystem )
-        count += _protoSystem->getNbParticles();
-    for ( ParticleSystemList::const_iterator itr=_particleSystems.begin();
-          itr!=_particleSystems.end(); ++itr )
+    if ( _useProtoSystem && _d->_protoSystem )
+        count += _d->_protoSystem->getNbParticles();
+    for ( ParticleSystemList::const_iterator itr=_d->_particleSystems.begin();
+          itr!=_d->_particleSystems.end(); ++itr )
     {
         count += (*itr)->getNbParticles();
     }
@@ -76,10 +187,10 @@ void SparkDrawable::setGlobalTransformMatrix( const osg::Matrix& matrix, bool us
     
     SPK::Vector3D pos(trans.x(), trans.y(), trans.z());
     SPK::Vector3D rot(axis.x(), axis.y(), axis.z());
-    if ( _useProtoSystem && _protoSystem )
-        setTransformMatrix( _protoSystem, pos, rot, angle, useOffset );
-    for ( ParticleSystemList::const_iterator itr=_particleSystems.begin();
-          itr!=_particleSystems.end(); ++itr )
+    if ( _useProtoSystem && _d->_protoSystem )
+        setTransformMatrix( _d->_protoSystem, pos, rot, angle, useOffset );
+    for ( ParticleSystemList::const_iterator itr=_d->_particleSystems.begin();
+          itr!=_d->_particleSystems.end(); ++itr )
     {
         setTransformMatrix( *itr, pos, rot, angle, useOffset );
     }
@@ -115,7 +226,7 @@ unsigned int SparkDrawable::addParticleSystem( const osg::Vec3& p, const osg::Qu
         pr.rotationAngle = angle;
         updater->_newSystemsToAdd.push_back( pr );
     }
-    return _particleSystems.size() + updater->_newSystemsToAdd.size() - 1;
+    return _d->_particleSystems.size() + updater->_newSystemsToAdd.size() - 1;
 }
 
 void SparkDrawable::addImage( const std::string& name, osg::Image* image, GLuint type, GLuint clamp )
@@ -126,7 +237,7 @@ void SparkDrawable::addImage( const std::string& name, osg::Image* image, GLuint
         attr.image = image;
         attr.type = type;
         attr.clamp = clamp;
-        _textureObjMap[name] = attr;
+        _d->_textureObjMap[name] = attr;
     }
 }
 
@@ -136,24 +247,24 @@ bool SparkDrawable::update( double currentTime, const osg::Vec3d& eye )
     if ( _lastTime>0.0 )
     {
         if ( _sortParticles )
-            std::sort( _particleSystems.begin(), _particleSystems.end(), SortParticlesOperator(eye) );
+            std::sort( _d->_particleSystems.begin(), _d->_particleSystems.end(), SortParticlesOperator(eye) );
         
         double deltaTime = currentTime - _lastTime;
         SPK::Vector3D eyePos(eye.x(), eye.y(), eye.z());
-        if ( _useProtoSystem && _protoSystem )
+        if ( _useProtoSystem && _d->_protoSystem )
         {
-            _protoSystem->setCameraPosition( eyePos );
-            active = _protoSystem->update(deltaTime);
+            _d->_protoSystem->setCameraPosition( eyePos );
+            active = _d->_protoSystem->update(deltaTime);
         }
         
-        ParticleSystemList::iterator itr = _particleSystems.begin();
-        while( itr!=_particleSystems.end() )
+        ParticleSystemList::iterator itr = _d->_particleSystems.begin();
+        while( itr!=_d->_particleSystems.end() )
         {
             (*itr)->setCameraPosition( eyePos );
             if ( !(*itr)->update(deltaTime) )
             {
                 destroyParticleSystem( *itr, false );
-                itr = _particleSystems.erase( itr );
+                itr = _d->_particleSystems.erase( itr );
             }
             else
             {
@@ -176,18 +287,18 @@ osg::BoundingBox SparkDrawable::computeBound() const
 {
     osg::BoundingBox bb;
     SPK::Vector3D min, max;
-    if ( _useProtoSystem && _protoSystem )
+    if ( _useProtoSystem && _d->_protoSystem )
     {
-        if ( _protoSystem->isAABBComputingEnabled() )
+        if ( _d->_protoSystem->isAABBComputingEnabled() )
         {
-            _protoSystem->computeAABB();
-            min = _protoSystem->getAABBMin(); bb.expandBy( osg::Vec3(min.x, min.y, min.z) );
-            max = _protoSystem->getAABBMax(); bb.expandBy( osg::Vec3(max.x, max.y, max.z) );
+            _d->_protoSystem->computeAABB();
+            min = _d->_protoSystem->getAABBMin(); bb.expandBy( osg::Vec3(min.x, min.y, min.z) );
+            max = _d->_protoSystem->getAABBMax(); bb.expandBy( osg::Vec3(max.x, max.y, max.z) );
         }
     }
     
-    for ( ParticleSystemList::const_iterator itr=_particleSystems.begin();
-          itr!=_particleSystems.end(); ++itr )
+    for ( ParticleSystemList::const_iterator itr=_d->_particleSystems.begin();
+          itr!=_d->_particleSystems.end(); ++itr )
     {
         SPK::System* system = *itr;
         if ( system->isAABBComputingEnabled() )
@@ -205,18 +316,18 @@ void SparkDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
     unsigned int contextID = renderInfo.getContextID();
     if ( _dirty )
     {
-        if ( _baseSystemCreator )
+        if ( _d->_baseSystemCreator )
         {
             TextureIDMap textureIDMap;
-            for ( TextureObjMap::const_iterator itr=_textureObjMap.begin();
-                  itr!=_textureObjMap.end(); ++itr )
+            for ( TextureObjMap::const_iterator itr=_d->_textureObjMap.begin();
+                  itr!=_d->_textureObjMap.end(); ++itr )
             {
                 const ImageAttribute& attr = itr->second;
                 textureIDMap[itr->first] =
                     compileInternalTexture(attr.image.get(), attr.type, attr.clamp);
             }
-            _baseSystemID = (*_baseSystemCreator)( textureIDMap, 800, 600 );
-            _protoSystem = SPK_Get( SPK::System, _baseSystemID );
+            _d->_baseSystemID = (*_d->_baseSystemCreator)( textureIDMap, 800, 600 );
+            _d->_protoSystem = SPK_Get( SPK::System, _d->_baseSystemID );
         }
         
         _activeContextID = contextID;
@@ -231,21 +342,21 @@ void SparkDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
     state->setActiveTextureUnit( 0 );
     
     SPK::GL::GLRenderer::saveGLStates();
-    if ( _useProtoSystem && _protoSystem )
-        _protoSystem->render();
-    for ( ParticleSystemList::const_iterator itr=_particleSystems.begin();
-          itr!=_particleSystems.end(); ++itr )
+    if ( _useProtoSystem && _d->_protoSystem )
+        _d->_protoSystem->render();
+    for ( ParticleSystemList::const_iterator itr=_d->_particleSystems.begin();
+          itr!=_d->_particleSystems.end(); ++itr )
     {
         (*itr)->render();
     }
     SPK::GL::GLRenderer::restoreGLStates();
 }
 
-SPK::System* SparkDrawable::createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle )
+SPK::System* SparkDrawable::_private::createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle )
 {
     SPK::System* system = SPK_Copy( SPK::System, _baseSystemID );
     if ( !system ) return NULL;
-    else setTransformMatrix( system, pos, rot, angle );
+    else _parent->setTransformMatrix( system, pos, rot, angle );
     
     _particleSystems.push_back( system );
     return system;

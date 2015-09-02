@@ -221,10 +221,6 @@ template<class T, class U> T safe_cast(U p)
 #define svReleaseMem( val ) if ( val != NULL ) { delete val; val = NULL; }
 #define svReleaseMemBuffer( val ) if ( val != NULL ) { delete[] val; val = NULL; }
 
-#define foreach(Iter, Container)\
-    for ( auto Iter = Container.begin(); Iter != Container.end(); ++Iter )
-
-
 namespace utils
 {
     bool replace(std::string& str, const std::string& from, const std::string& to);

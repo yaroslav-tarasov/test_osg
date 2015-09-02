@@ -177,7 +177,7 @@ void EphemerisModel::cull( osg::NodeVisitor * pNV )
 
     // cull down
     
-    FIXME(Хорошее место, но есть лучше);
+    FIXME("Хорошее место, но есть лучше");
     FrameCall();
     pNV->traverse(*this);
 

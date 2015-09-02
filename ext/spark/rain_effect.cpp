@@ -1,5 +1,10 @@
 #include "stdafx.h"
+#ifndef Q_MOC_RUN
+#include <SPK.h>
+#include <SPK_GL.h>
+#endif
 #include "SparkDrawable.h"
+
 
 #define GET_TEXTURE_ID( name, var ) \
     GLuint var = 0; itr = textureIDMap.find(name); \
@@ -9,8 +14,8 @@
 template<class T> T RAIN_PARAM( T min, T max )
 { return static_cast<T>(min + RAIN_RATIO * (max - min)); }
 
-SPK::Group* g_splashGroup = NULL;
-SPK::Group* g_dropGroup = NULL;
+SPK::Group*   g_splashGroup = NULL;
+SPK::Group*   g_dropGroup = NULL;
 SPK::Emitter* g_dropEmitter = NULL;
 
 bool killRain( SPK::Particle& particle, float deltaTime )

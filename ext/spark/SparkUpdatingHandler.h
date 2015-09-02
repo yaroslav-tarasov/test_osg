@@ -1,10 +1,6 @@
 #ifndef H_SPARKUPDATINGHANDLER
 #define H_SPARKUPDATINGHANDLER
 
-#include <osg/Transform>
-#include <osgGA/GUIEventHandler>
-#include "SparkDrawable.h"
-
 /** The spark updater which record all SparkDrawables and update them */
 class SparkUpdatingHandler : public osgGA::GUIEventHandler
 {

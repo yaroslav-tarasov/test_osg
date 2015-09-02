@@ -24,42 +24,5 @@
 #endif
 
 
-//////////////////////////
-// Macroses used in a code
 
-// use this macro for private functions of exported class when you want to preserve them from beeing added to libs export-table
-#define API_HDN __HELPER_DL_LOCAL
 
-// ATTENTION: define macroses for your lib like here
-// NOTE: macros <PROJECT>_LIB will be defined automatically for your project
-
-/*
-#ifdef <PROJECT>_LIB
-# define <PROJECT>_API __HELPER_DL_EXPORT
-#else
-# define <PROJECT>_API __HELPER_DL_IMPORT
-#endif
-*/
-
-//////////
-// sample:
-
-/*
-//functions:
-
-<PROJECT>_API void my_func();
-
-void my_func()
-{
-}
-
-// classes
-struct <PROJECT>_API my_class
-{
-    my_class();
-
-private:
-    API_HDN void my_private_class();
-}
-
-*//////////

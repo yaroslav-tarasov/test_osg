@@ -17,6 +17,9 @@
 #include "common/osg_inc.h"
 #include "common/bullet.h"
 
+#ifdef QT
+#include "common/qt.h"
+#endif
 
 #define BASE_SHADOW_TEXTURE_UNIT 6
 #define GLSL_VERSION             130
@@ -120,8 +123,9 @@ namespace avSky
         cirrus,
         overcast,
         clouds_types_num
-    } clouds_type;
+    } ;
 }
+
 
 #include "common/points.h"
 #include "common/util.h"

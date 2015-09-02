@@ -1,4 +1,8 @@
 #include "stdafx.h"
+#ifndef Q_MOC_RUN
+#include <SPK.h>
+#include <SPK_GL.h>
+#endif
 #include "SparkDrawable.h"
 
 #define GET_TEXTURE_ID( name, var ) \

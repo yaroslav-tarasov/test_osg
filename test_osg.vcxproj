@@ -120,30 +120,18 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="animation_handler.h" />
     <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
     <ClInclude Include="av\Logo.h" />
     <ClInclude Include="av\test_systems.h" />
     <ClInclude Include="av\Utils.h" />
     <ClInclude Include="av\Visual.h" />
-    <ClInclude Include="cg_math.h" />
-    <ClInclude Include="creators.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
-    <ClInclude Include="kernel\objects\aircraft\aircraft_msg.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
-    <ClInclude Include="light_maps.h" />
-    <ClInclude Include="materials.h" />
-    <ClInclude Include="osg_helpers.h" />
-    <ClInclude Include="pickhandler.h" />
-    <ClInclude Include="shaders.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="trajectory_drawer.h" />
-    <ClInclude Include="callbacks.h" />
     <ClInclude Include="utils\empty_scene.h" />
     <ClInclude Include="utils\krv_import.h" />
     <ClInclude Include="_include\objects\object_creators.h" />

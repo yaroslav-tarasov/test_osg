@@ -10,6 +10,10 @@
 
 using namespace utils;
 
+#undef foreach
+
+#define foreach(Iter, Container)\
+    for ( auto Iter = Container.begin(); Iter != Container.end(); ++Iter )
 
 //////////////////////////////////////////////////////////////////////////
 static bool s_bMouseShowed = true;

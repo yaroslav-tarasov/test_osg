@@ -1,6 +1,11 @@
 #include "stdafx.h"
+
+#ifndef Q_MOC_RUN
+#include <SPK.h>
+#include <SPK_GL.h>
+#endif
+#include "SparkDrawable.h"
 #include "SparkUpdatingHandler.h"
-#include <osgViewer/View>
 
 bool SparkUpdatingHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
 {

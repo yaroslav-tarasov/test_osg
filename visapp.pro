@@ -38,6 +38,8 @@ DEFINES -= UNICODE
 DEFINES += DISABLE_ROBUST_COMPUTATIONS
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += CG_PRIMITIVES
+DEFINES += QT_NO_EMIT
+DEFINES += QT
 }
 
 
@@ -50,12 +52,19 @@ SOURCES += \
 
 SOURCES -= $$PWD/test_osg.cpp       
 SOURCES += $$PWD/vis_app.cpp
+SOURCES += $$PWD/tests/visapp/visapp1.cpp
+SOURCES += $$PWD/tests/visapp/visapp2.cpp
+SOURCES += $$PWD/tests/visapp/visapp3.cpp
 
-HEADERS += \
-		tests/qt/QtOSG.h \
-		tests/qt/MainWindow.h 			
+HEADERS += $$SIMEX_DIR_FULL/src/_Include/ui/tray_icon.h
+HEADERS += ./tests/qt/MainWindow.h
 			
 LIBS += -losgqtwidget
-			
+
+RESOURCES += \
+    visapp_resources.qrc
+
+OTHER_FILES += \
+    resources/projector.png		
 
 

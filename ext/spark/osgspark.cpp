@@ -2,6 +2,10 @@
 
 #include "osgspark.h"
 #include <GL/glut.h>
+#ifndef Q_MOC_RUN
+#include <SPK.h>
+#include <SPK_GL.h>
+#endif
 #include "SparkDrawable.h"
 #include "SparkUpdatingHandler.h"
 
@@ -14,12 +18,12 @@
 #endif
 
 
-extern SPK::SPK_ID createSimpleSystem( const SparkDrawable::TextureIDMap&, int, int );
-extern SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap&, int, int );
-extern SPK::SPK_ID createExplosion( const SparkDrawable::TextureIDMap&, int, int );
-extern SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap&, int, int , float);
-extern SPK::SPK_ID createRain( const SparkDrawable::TextureIDMap&, int, int );
-extern SPK::SPK_ID createTest( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createSimpleSystem ( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createSmoke        ( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createExplosion    ( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createFire         ( const SparkDrawable::TextureIDMap&, int, int , float);
+extern SPK::SPK_ID createRain         ( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createTest         ( const SparkDrawable::TextureIDMap&, int, int );
 
 namespace {
 osg::AnimationPath* createAnimationPath( float radius, float time )
