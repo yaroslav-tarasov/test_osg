@@ -1,17 +1,15 @@
+import os
 from xml.dom import minidom
 xmldoc = minidom.parse('env_vars.props')
 
 macros = xmldoc.getElementsByTagName("PropertyGroup")
 
-#print(len(macros))
-print(macros[0].attributes['Label'].value)
-print(macros[0].nodeName)
-print(macros[0].childNodes[1].childNodes[0])
+#print(macros[0].attributes['Label'].value)
 
-#for node in macros[0].childNodes:
-#    if node.nodeType == node.TEXT_NODE:
-#	    if node.childNodes.length >0:
-#				print(node.childNodes[0])
-			
-#for s in macros:
-#    print(s.childNodes[0].nodeValue)
+for node in macros[0].childNodes:
+	if node.childNodes.length >0:
+		if node.childNodes[0].nodeType == node.TEXT_NODE:
+					os.putenv(node.nodeName, node.childNodes[0].nodeValue)
+					print(node.nodeName + '  ' + node.childNodes[0].nodeValue)
+
+print(os.getenv('SIMEX_DIR','NOT_SET'))
