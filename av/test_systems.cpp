@@ -31,7 +31,7 @@ namespace
 
     }
 
-    FIXME(Не используется)
+    FIXME("Не используется")
     kernel::object_info_ptr create_object(kernel::system_ptr sys, std::string class_name, std::string unique_name)
     {
         using namespace kernel;
@@ -100,7 +100,6 @@ namespace
             create_auto_object(_msys,"airports_manager","aiports_manager");
             create_auto_object(_msys,"ada","ada");
             create_auto_object(_msys,"meteo_proxy","meteo_proxy");
-            //create_auto_object(_msys,"airport","aiport_0");
         }
 
 

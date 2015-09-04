@@ -35,9 +35,6 @@ namespace
 
 void create_objects()
 {
-
-
-
     const std::string icao_code = "URSS"; 
 
     krv::data_getter              _krv_data_getter(data_file(icao_code));

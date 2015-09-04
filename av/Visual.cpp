@@ -51,6 +51,10 @@ Visual::~Visual()
     m_pInstance = nullptr;
 }
 
+osgViewer::Viewer* Visual::GetViewer() const
+{
+    return  _viewerPtr.get();
+}
 
 Visual * Visual::CreateInstance()
 {
@@ -83,6 +87,7 @@ void Visual::Initialize()
     pTraits->vsync                         = true;
     pTraits->useMultiThreadedOpenGLEngine  = true;
     pTraits->glContextVersion = version;
+
     //RECT rect;
     //::GetWindowRect(hWnd, &rect);
     pTraits->x = 1920;
@@ -103,7 +108,7 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    avScene::Logo::Create(_viewerPtr.get());
+    //avScene::Logo::Create(_viewerPtr.get());
     
 
     m_bInitialized = true;
@@ -170,6 +175,11 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
 void Visual::CreateScene()
 {
       avScene::Scene::Create(_viewerPtr.get());
+}
+
+void Visual::EndSceneCreation()
+{
+    _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
 }
 
 void  Visual::Update()

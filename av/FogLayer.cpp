@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "av/precompiled.h"
+
 #include "FogLayer.h"
 #include "utils/materials.h"
 

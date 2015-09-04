@@ -102,8 +102,8 @@ void model::on_object_destroying(object_info_ptr object)
 
 system_ptr model::get_system(size_t zone)
 {
-    FIXME(Тоже магия)
-    zone = 0;
+    //FIXME(Тоже магия)
+    //zone = 0;
     
     return zones_[zone].sys;
 }
@@ -112,8 +112,8 @@ optional<size_t> model::get_zone(geo_point_3 const & pos) const
 {
     optional<size_t> zone;
     
-    FIXME(Магическое число)  
-        return 1;
+    //FIXME(Магическое число)  
+    //    return 1;
 
     for (auto it = zones_.begin(); it != zones_.end(); ++it)
     {
@@ -129,8 +129,8 @@ optional<size_t> model::get_zone(geo_point_3 const & pos) const
 
 optional<size_t> model::get_zone(std::string const& airport) const
 {
-    FIXME(Магическое число)  
-        return 1;
+    //FIXME(Магическое число)  
+    //    return 1;
 
     auto it = std::find_if(zones_.begin(), zones_.end(), airport_zone_predicate(airport));
     return it != zones_.end() ? optional<size_t>(std::distance(zones_.begin(), it)) : boost::none;

@@ -42,8 +42,8 @@ namespace phys
         virtual void update( double dt ) = 0;
         //virtual void set_debug_renderer(victory::debug_render_ptr debug_render = victory::debug_render_ptr()) = 0;
 
-        //virtual static_mesh_ptr            create_static_mesh       ( sensor_ptr s ) = 0;
-        //virtual static_convex_ptr          create_static_convex     ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) = 0;
+        virtual static_mesh_ptr            create_static_mesh       ( sensor_ptr s ) = 0;
+        virtual static_convex_ptr          create_static_convex     ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) = 0;
         virtual ray_cast_vehicle::info_ptr create_ray_cast_vehicle  ( double mass, /*sensor_ptr s*/compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual aircraft::info_ptr         create_aircraft          ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
     };

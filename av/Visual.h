@@ -6,7 +6,7 @@ class Visual : public IVisual
 public:
     static Visual * CreateInstance();
 
-    virtual void  Initialize() override;
+    virtual void  Initialize()                      override;
     virtual void  Deinitialize()                    override;
 
     virtual void  Update()                          override;
@@ -14,6 +14,9 @@ public:
 
     virtual double GetInternalTime()                override;
     virtual void   CreateScene()                    override;
+    virtual void   EndSceneCreation()               override;
+
+    virtual osgViewer::Viewer* GetViewer() const    override;
 
 private:
     Visual();

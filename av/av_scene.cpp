@@ -578,7 +578,8 @@ private:
     {
          osg_vis_->CreateScene();
          create_objects();
-         
+         osg_vis_->EndSceneCreation();
+
          w_->start_timer();
 
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));

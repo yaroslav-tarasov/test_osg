@@ -20,6 +20,8 @@
 
 #include "utils/high_res_timer.h"
 
+#include "tests/osg_widget/OSGWidget.h"
+
 #include "av/Visual.h"
 #include "av/test_systems.h"
 
@@ -370,7 +372,6 @@ namespace
         {
             acc_.reset(new  async_acceptor (_peer, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
 
-            // start_timer();
             render_timer_ = session_timer::create (ses_, 0.01f,  boost::bind(on_render_,_1) , 1, false);
             calc_timer_   = session_timer::create (ses_, period_,  boost::bind(on_update_,_1) , 1, false); 
 
@@ -439,25 +440,28 @@ namespace
         on_update_f                                                 on_render_;
 
     private:
-        double                                                       period_;
+        double                                                      period_;
 
     private:
-        session_timer::connection                                 render_timer_;
-        session_timer::connection                                 calc_timer_ ;
-        session_timer::connection                                 ctrl_timer_;
-        details::session*                                         ses_;
+        session_timer::connection                                   render_timer_;
+        session_timer::connection                                   calc_timer_ ;
+        session_timer::connection                                   ctrl_timer_;
+        details::session*                                           ses_;
     };
 
 
     struct visapp
     {
         visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-            : osg_vis_  (CreateVisual())
+            :  vw_(new OSGWidget( /*this*/ ))
+            // osg_vis_  (CreateVisual())
             , vis_sys_  (create_vis(props/*, bytes*/))
             , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
             , mod_sys_  (sys_creator()->get_model_sys(),0.03/*cfg().model_params.msys_step*/)
+            , loading(false)
 
         {   
+            vw_->show();
 
             disp_
                 .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
@@ -484,14 +488,16 @@ namespace
         {   
             high_res_timer                _hr_timer;
             vis_sys_.update(time);
-            osg_vis_->Render();
+            if(!loading) vw_->redraw();
+
+            // osg_vis_->Render();
             //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
 
         }
 
         void update(double time)
         {   
-            double sim_time = osg_vis_->GetInternalTime();
+            double sim_time = 0; // osg_vis_->GetInternalTime();
 
             if(sim_time  < 0)
             {
@@ -513,9 +519,13 @@ namespace
 
         void on_setup(setup const& msg)
         {
-            osg_vis_->CreateScene();
+            // osg_vis_->CreateScene();
+            loading = true;
+            vw_->createScene();
             create_objects();
-            
+            vw_->endSceneCreation();
+            loading = false;
+
             binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
             w_->send(&bts[0], bts.size());
 
@@ -584,10 +594,13 @@ namespace
         updater                                                     mod_sys_;
         updater                                                    ctrl_sys_;
         updater                                                     vis_sys_;
-        IVisual*                                                    osg_vis_;
+        //IVisual*                                                    osg_vis_;
+        OSGWidget*                                                       vw_;
 
     private:
         boost::scoped_ptr<net_worker>                                     w_;
+
+        bool   loading;
     };
 
 }

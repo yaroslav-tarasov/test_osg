@@ -1,10 +1,12 @@
 ﻿#include "stdafx.h"
+#include "av/precompiled.h"
 
 #include "utils/high_res_timer.h"
 #include "utils/pickhandler.h"
 
-//#include "phys/BulletInterface.h"
+#ifndef OSGWIDGET_EXPORTS
 #include "phys/RigidUpdater.h"
+#endif
 
 #include <osg/GLObjects>
 
@@ -346,8 +348,9 @@ void Scene::Release()
         
         gui::releaseCEGUI();
 
+#ifndef OSGWIDGET_EXPORTS
         _scenePtr->_rigidUpdater->stopSession();
-
+#endif
         // Release scene
         _scenePtr = NULL;
 
@@ -405,7 +408,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     
     _viewerPtr = vw;
 
-    _viewerPtr->setSceneData( this );
+
 
     //
     // Set up the camera manipulators.
@@ -646,6 +649,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
 #endif 
 
+//    _viewerPtr->setSceneData( this );
 
 
     return true;
@@ -688,7 +692,8 @@ osg::Group*  Scene::createTerrainRoot()
 
 void Scene::createObjects()
 {
- 
+
+#ifndef OSGWIDGET_EXPORTS
     _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
             if(!findFirstNode(mt,"fire"))
@@ -700,13 +705,14 @@ void Scene::createObjects()
             }
     }
     );
+#endif
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);
 
 
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
+    //if(_rigidUpdater.valid())
+    //    _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
     const std::string name = "a_319";
 
@@ -921,7 +927,7 @@ void Scene::createObjects()
     {
         
     }
-
+#ifndef OSGWIDGET_EXPORTS
     if(_rigidUpdater.valid())
     {
         _viewerPtr->addEventHandler( _rigidUpdater);
@@ -932,6 +938,7 @@ void Scene::createObjects()
         conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
         _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
     }
+#endif
 
 }
 
@@ -1025,7 +1032,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
 
-                FIXME(Смещение мать его)
+                FIXME( " Смещение мать его " )
                 // cg::transform_4 tr = get_relative_transform(sl);
                 data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                                                   + offset);
@@ -1098,11 +1105,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
                     
-                    FIXME(Нормализовать)
+                    FIXME( Нормализовать )
 
                     data.color  *= 0.01;
 
-                    FIXME(Смещение мать его)
+                    FIXME( Смещение мать его )
                         // cg::transform_4 tr = get_relative_transform(sl);
                         data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);
@@ -1134,10 +1141,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
 
-                    FIXME(Нормализовать)
+                    FIXME( Нормализовать )
                     data.color  *= 0.01;
                     
-                    FIXME(Смещение мать его)
+                    FIXME( Смещение мать его )
                         // cg::transform_4 tr = get_relative_transform(sl);
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);

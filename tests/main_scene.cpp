@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "av/precompiled.h"
 #include "creators.h"
 #include "animation_handler.h"
 #include "visitors/info_visitor.h"

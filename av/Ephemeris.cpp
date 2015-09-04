@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include "av/precompiled.h"
+
 #include "Ephemeris.h" 
 
 #include "av/FogLayer.h"

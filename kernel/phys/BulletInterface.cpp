@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 #include "utils/high_res_timer.h"
 #include "aircraft_phys.h"
 #include "sensor.h"
@@ -11,23 +10,27 @@
 
 #include "BulletInterface.h"
 
+#include "bvh_static_mesh.h"
+#include "static_convex.h"
+
 #include "ray_cast_vehicle.h"
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
-
-#include "kernel/systems/systems_base.h"
-#include "kernel/systems/fake_system.h"
-#include "kernel/object_class.h"
-
 #include "GLDebugDrawer.h"
 
 bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
 
-#include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
+#ifdef DEPRECATED
+    #include "kernel/systems/systems_base.h"
+    #include "kernel/systems/fake_system.h"
+    #include "kernel/object_class.h"
 
-FIXME(Неправильное использование node_impl)
-#include "nm/node_impl.h"
+    #include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
+
+    FIXME(Неправильное использование node_impl)
+    #include "nm/node_impl.h"
+#endif
 
 FIXME("deprecated")
 #include "osgbullet_helpers.h"
@@ -89,8 +92,9 @@ namespace
 
 namespace aircraft
 {
-	void fill_cs(const std::string& model_name, osg::Node* node, wheels_info_t& wi,phys::aircraft::params_t& p, compound_sensor_impl& cs )
-    {  
+	void fill_cs(const std::string& model_name, /*osg::Node* node,*/ wheels_info_t& wi,phys::aircraft::params_t& p, compound_sensor_impl& cs )
+    { 
+#ifdef DEPRECATED
         if(model_name.empty())
         {
 			osg::ComputeBoundsVisitor cbv;
@@ -156,6 +160,7 @@ namespace aircraft
 			    cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
 		}
 		else
+#endif
 		{
 		   bool loaded = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
            if(loaded)
@@ -172,8 +177,9 @@ namespace aircraft
 
 namespace ray_cast_vehicle
 {
-    void fill_cs(const std::string& model_name, osg::Node* node, wheels_info_t& wi, compound_sensor_impl& cs )
-    {          
+    void fill_cs(const std::string& model_name, /*osg::Node* node,*/ wheels_info_t& wi, compound_sensor_impl& cs )
+    {
+#ifdef DEPRECATED
         if(model_name.empty())
         {
             osg::Node* lod3 =  findFirstNode(node,"Lod3");
@@ -218,6 +224,7 @@ namespace ray_cast_vehicle
             cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
         }
         else
+#endif
         {
             bool loaded = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
             if(loaded)
@@ -246,7 +253,7 @@ namespace phys
             compound_sensor_impl cs;
 			const std::string model_name = manager->get_model();
 
-            ::aircraft::fill_cs(model_name, nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,p,cs);
+            ::aircraft::fill_cs(model_name, /*nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),*/wi,p,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -261,7 +268,7 @@ namespace phys
             compound_sensor_impl cs;
             const std::string model_name = manager->get_model();
 
-            ::ray_cast_vehicle::fill_cs(model_name, nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),wi,cs);
+            ::ray_cast_vehicle::fill_cs(model_name, /*nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),*/wi,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -346,8 +353,19 @@ BulletInterface::BulletInterface()
     d_->_dispatcher = new btCollisionDispatcher( d_->_configuration );
     d_->_overlappingPairCache = new btDbvtBroadphase;
     d_->_solver = new btSequentialImpulseConstraintSolver;
-    
-    
+
+    d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+    d_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
+
+    d_->_dw->getSolverInfo().m_numIterations = 20;
+    d_->_dw->getSolverInfo().m_damping = 1.;
+    d_->_dw->getSolverInfo().m_splitImpulse = false;
+    d_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
+
+    d_->_dw->setInternalTickCallback(internal_tick_callback);    
+
+
+    d_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*d_->_dw));
 }
 
 BulletInterface::~BulletInterface()
@@ -387,17 +405,18 @@ void  BulletInterface::debugDrawWorld()
      d_->_dw->debugDrawWorld();
 }
 
+#ifdef DEPRECATED
 void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gravity, on_collision_f on_collision )
 {
-    d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
-    d_->_dw->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
+ //   d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+ //   d_->_dw->setGravity( btVector3(gravity[0], gravity[1], gravity[2]) );
 
-	d_->_dw->getSolverInfo().m_numIterations = 20;
-	d_->_dw->getSolverInfo().m_damping = 1.;
-	d_->_dw->getSolverInfo().m_splitImpulse = false;
-	d_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
-	
-	d_->_dw->setInternalTickCallback(internal_tick_callback);
+	//d_->_dw->getSolverInfo().m_numIterations = 20;
+	//d_->_dw->getSolverInfo().m_damping = 1.;
+	//d_->_dw->getSolverInfo().m_splitImpulse = false;
+	//d_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
+	//
+	//d_->_dw->setInternalTickCallback(internal_tick_callback);
     
     FIXME(Использование глобальных коллбеков не приветствуется даешь альтернативу)
     // gContactAddedCallback = contact_added_callback;
@@ -417,12 +436,11 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     body->setUserPointer(new rigid_body_user_info_t(rb_terrain));
 
     on_collision_ = on_collision;
-	
-
 
 	d_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*d_->_dw));
 
 }
+#endif
 
 void BulletInterface::createBox( int id, const osg::Vec3& dim, double mass )
 {
@@ -462,6 +480,8 @@ void BulletInterface::createSphere( int id, double radius, double mass )
     d_->_actors[id]._type  = SPHERE;
 }
 
+
+#ifdef DEPRECATED
 static inline void add_wheel(btRaycastVehicle* v, osg::Vec3 connection_point, const double radius, btRaycastVehicle::btVehicleTuning tuning_, const bool is_front)
 {
 	btWheelInfo& wi = v->addWheel(phys::osg_helpers::to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 0.0f,btScalar(radius),tuning_,!is_front);
@@ -535,6 +555,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	//chassis->setRestitution(0.1f);
 	d_->_actors[id]._body  = chassis;
 }
+#endif
 
 aircraft::params_t fill_params( ada::data_t const & fsettings)
 {
@@ -565,7 +586,7 @@ aircraft::params_t fill_params( ada::data_t const & fsettings)
     return params;
 }
 
-
+#ifdef DEPRECATED
 aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double mass)
 {
 	wheels_info_t wi;
@@ -612,7 +633,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
 
     return info;
 }
-
+#endif
 
 void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
 {
@@ -787,21 +808,25 @@ void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
     FIXME("Нету удаления, а надо бы особенно для сомолей")
 }
 
+static_mesh_ptr BulletInterface::create_static_mesh( sensor_ptr s )
+{
+    return boost::make_shared<bvh_static_mesh>(shared_from_this(), s);
+}
+
+static_convex_ptr BulletInterface::create_static_convex( sensor_ptr s, point_3 const& pos, quaternion const& orien )
+{
+    return boost::make_shared<static_convex_impl>(shared_from_this(), s, pos, orien);
+}
+
 aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
     aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,pos);
-    // FIXME TODO
-    // _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
-
     return ctrl;
 }
 
 ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,phys::compound_sensor_ptr s,const decart_position & pos)
 {    	
     ray_cast_vehicle::control_ptr ctrl = boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,s,pos);
-    // FIXME TODO
-    // _actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
-
     return ctrl;
 }
 

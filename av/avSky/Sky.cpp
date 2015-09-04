@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <osg/Depth>
+#include "av/precompiled.h"
 #include "Sky.h"
 #include "EphemerisModel.h"
 #include "av/CloudLayer.h"

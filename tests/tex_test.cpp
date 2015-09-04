@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+#include "av/precompiled.h"
 #include "visitors/info_visitor.h"
 #include "visitors/find_tex_visitor.h"
 #include "creators.h"

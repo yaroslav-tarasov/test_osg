@@ -26,13 +26,24 @@ namespace phys
         btMatrix3x3 m;
         m.setIdentity();
 
-
-        shape_ = boost::shared_ptr<btCollisionShape>(new btBvhTriangleMeshShape(&mesh_, true));
+        FIXME(Need btBvhTriangleMeshShape shape)
+        //shape_ = boost::shared_ptr<btCollisionShape>(new btBvhTriangleMeshShape(&mesh_, true));
 
         //shape_ = shared_ptr<btCollisionShape>(new btStaticPlaneShape(btVector3(0, 0, 1), 0));
 
+        ////////////////////////////
+        //      Stub for the ground
+        // osg::Vec3 norm = plane.getNormal();
+        btCollisionShape* groundShape = new btStaticPlaneShape( btVector3(0.0, 0.0, 1.0), 0 );
+        btTransform groundTransform;
+        groundTransform.setIdentity();
 
-        body_  = boost::make_shared<btRigidBody>(btScalar(0), nullptr, &*shape_);
+        btDefaultMotionState* motionState = new btDefaultMotionState(groundTransform);
+        btRigidBody::btRigidBodyConstructionInfo rigidInfo( 0.0, motionState, groundShape, btVector3(0.0, 0.0, 0.0) );
+        body_ = shared_ptr<btRigidBody>(new btRigidBody(rigidInfo)); 
+        ////////////////////////////
+
+        // body_  = shared_ptr<btRigidBody>(new btRigidBody(0, 0, &*shape_));
         body_->setRestitution(0.1f);
         body_->setCenterOfMassTransform(btTransform(m, to_bullet_vector3(cg::point_3())));
         body_->setFriction(0.99f);

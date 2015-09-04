@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "av/precompiled.h"
+
 #include "av/Scene.h"
 
 #include "EphemerisModel.h"
@@ -425,6 +427,7 @@ void EphemerisModel::updateUnderWaterColor( const osg::Vec3f & cWaterColor )
 bool EphemerisModel::FrameCall()
 {
     // Set position
+    FIXME(Hardcode)
     auto cOrigin = ::get_base();
     cOrigin.lat = 43.44444;
     cOrigin.lon = 39.94694;

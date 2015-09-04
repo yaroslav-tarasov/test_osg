@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "av/precompiled.h"
 // #include <math/sincos.h>
 
 #include "utils/lut.h"

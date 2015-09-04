@@ -14,10 +14,8 @@ contains(QMAKE_TARGET.arch, x86_64):{
 	 CONFIG += target_x86
 }
 }
-
-INCLUDE_PATH = $$DEV_ROOT/src/_Include
-
-
+                   
+               
 #paths
 INCLUDE_PATH = $$DEV_ROOT/src/_Include
 EXTS         = $$DEV_ROOT/ext
@@ -81,6 +79,7 @@ DEFINES -= UNICODE
 DEFINES += DISABLE_ROBUST_COMPUTATIONS
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += CG_PRIMITIVES
+DEFINES += QT
 }
 
 MISC_PATH = $$BUILD_PATH/$$PROJECT_NAME
@@ -125,6 +124,9 @@ win32{
     QMAKE_CXXFLAGS += /wd4251
     # ... 'this' : used in base member initializer list
     QMAKE_CXXFLAGS += /wd4355
+    
+    QMAKE_CXXFLAGS += /wd4996
+    
 
     QMAKE_CXXFLAGS += -DNOMINMAX
 
@@ -139,14 +141,18 @@ win32{
 # include paths
 
 INCLUDEPATH += ./
-INCLUDEPATH += $$PWD/ext/pugixml-1.4/src                      \
+INCLUDEPATH += $$SOLUTION_ROOT/ext/pugixml-1.4/src            \
                $$(OSG_DIR)/3rdparty/include                   \
                $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
                $$(OSG_DIR)/OpenSceneGraph-3.2.1/include       \
-               $$PWD/utils                                    \
-               $$PWD/_include                                 \
-               $$PWD/_include/objects                         \
-			   
+
+INCLUDEPATH += \
+               $$SOLUTION_ROOT/utils                          \
+               $$SOLUTION_ROOT/_include                       \
+               $$SOLUTION_ROOT/_include/objects               \
+               $$SOLUTION_ROOT/ext                            \
+               $$SOLUTION_ROOT/core                           \
+               $$SOLUTION_ROOT/objects   			   
 			   
 #############
 # lib paths

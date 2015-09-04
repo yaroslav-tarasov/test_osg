@@ -87,10 +87,6 @@ struct visapp
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
 
-        FIXME( Arguments );
-
-        osg_vis_->Initialize();
-
         update();
     }
 

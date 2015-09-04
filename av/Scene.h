@@ -6,6 +6,16 @@
 
 #include "tests/light_maps.h"
 
+#ifdef NON_DLL
+# define VISUAL_API
+#else
+#ifdef OSGWIDGET_EXPORTS
+# define VISUAL_API __declspec(dllexport)
+#else
+# define VISUAL_API __declspec(dllimport)
+#endif
+#endif
+
 //
 //  Forwards
 //
@@ -50,8 +60,10 @@ namespace avScene {
     //
     // Scene class itself
     //
+    
+    
 
-    class Scene : public osg::Group
+    class VISUAL_API Scene : public osg::Group
     {
     public:
         static bool                                 Create( osgViewer::Viewer* vw );
@@ -97,7 +109,9 @@ namespace avScene {
         osg::ref_ptr<osg::LightSource>              _ls;
         osg::ref_ptr<osg::Group>                    _terrainRoot;
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
+#ifndef OSGWIDGET_EXPORTS
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
+#endif
         osg::ref_ptr<PickHandler>                   _pickHandler; 
         std::vector<osg::ref_ptr<osg::Node>>        _lamps;
          osg::ref_ptr<Lights>                       _lights;                                            

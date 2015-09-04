@@ -14,18 +14,10 @@ include(test_osg.pri)
 
 INCLUDEPATH += ./
 INCLUDEPATH += \
-               $$PWD/utils                                    \
-               $$PWD/_include                                 \
-               $$PWD/_include/objects                         \
-               $$PWD/objects                                  \
                $$(SIMEX_DIR_FULL)/src/_Include                \
                $$(SIMEX_DIR_FULL)/src/_Include/network        \
-               $$PWD/ext/pugixml-1.4/src                      \
-               $$(OSG_DIR)/3rdparty/include                   \
-               $$(OSG_DIR)/OpenSceneGraph-3.2.1/build/include \
-               $$(OSG_DIR)/OpenSceneGraph-3.2.1/include       \
-               $$(BULLET_DIR)/src                             \
                $$(OSG_DIR)/SPARK-1.5.5/include                \
+               $$(BULLET_DIR)/src                             \
                $$PWD/common                                   \
                $$PWD/bada
 INCLUDEPATH += $$INCLUDE_PATH

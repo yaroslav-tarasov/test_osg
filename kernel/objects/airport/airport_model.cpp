@@ -56,14 +56,18 @@ void model::create_phys()
     if (!phys_)
          return;
     FIXME(физика аэропорта настаивает на реализации)
-#if 0
+
     optional<size_t> zone = phys_->get_zone(settings_.icao_code);
     if (zone)
     {
+
         auto psys = phys_->get_system(*zone);
         geo_base_3 base = phys_->get_base(*zone);
 
         nm::node_info_ptr all_node = nodes_manager_->find_node("all");
+
+        mesh_ = psys->create_static_mesh(phys::sensor_ptr());
+#if 0
         if (all_node)
         {
             phys::sensor_ptr s = phys::get_sensor(*all_node->get_collision());
@@ -89,9 +93,10 @@ void model::create_phys()
                 return true;
             });
         }
+#endif
     }
 
-#endif
+
 }
 
 } // end of airport

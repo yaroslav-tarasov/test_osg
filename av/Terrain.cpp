@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "av/precompiled.h"
+
 #include "Scene.h"
 #include "Terrain.h"
 #include "LightManager.h"
@@ -14,12 +16,6 @@
 #include "utils/high_res_timer.h"
 #include "utils/callbacks.h"
 #include "utils/materials.h"
-
-//#include <osgwTools/AbsoluteModelTransform.h>
-//#include "phys/BulletInterface.h"
-//#include "phys/BulletMTInterface.h"
-//#include "phys/RigidMTUpdater.h"
-
 
 #include "av/Grass.h"
 #include "av/Grass2.h"

@@ -16,6 +16,7 @@
 
 #include "common/osg_inc.h"
 #include "common/bullet.h"
+#include "common/debug.h"
 
 #ifdef QT
 #include "common/qt.h"
@@ -87,45 +88,6 @@ namespace cg
 }
 
 
-#define Assert(x) if(x){};
-#define avAssert(x) assert(x)
-#define avError(x,y) {           \
-     char buff [1024];           \
-     sprintf(buff,x,y);          \
-     OutputDebugString(buff);    \
-     assert(false);              \
- }
-
-enum render_order_t {
-    RENDER_BIN_SCENE                    =  0,
-    // rendered first - sky-dome, stars, clouds, etc...
-    RENDER_BIN_SKYDOME                  = -5, // global sky dome
-    RENDER_BIN_STARS                    = -4, // stars
-    RENDER_BIN_SUN_MOON                 = -3, // sun. moon and other planet
-    RENDER_BIN_CLOUDS                   = -2, // sky clouds
-    RENDER_BIN_SKYFOG                   = -1, // global sky fog layer
-
-};
-
-enum masks_t{
-    NODE_STARFIELD_MASK                 = 0x2
-};
-
-const uint32_t cCastsShadowTraversalMask = 8;
-const uint32_t cReceivesShadowTraversalMask = 16;
-
-namespace avSky
-{
-    enum cloud_type
-    {
-        none,
-        cloudy,
-        cirrus,
-        overcast,
-        clouds_types_num
-    } ;
-}
-
 
 #include "common/points.h"
 #include "common/util.h"
@@ -160,7 +122,7 @@ inline cg::geo_base_3 get_base()
 #include "kernel/systems/mod_system.h"
 
 #include "osg_helpers.h"
-#include "visitors/find_node_visitor.h"
+
 
 namespace boost {
 namespace python {
@@ -210,46 +172,10 @@ namespace aircraft
     inline static   double                 step()       {return 2.0;}; 
 }
 
-#define STRINGIFY(x) #x 
-
-#define STR(x) STRINGIFY(x)
-#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ));
-
 #include <tinyxml2/tinyxml2.h>
 #include "xml/tixml_xinclude.h"
 
 #include "config/config.h"
-
-class logger:
-    public boost::noncopyable
-{
-public:
-
-    static bool need_to_log(boost::optional<bool> ntl = boost::none)
-    {
-        static bool blog(false);
-        if(ntl)
-            blog=*ntl;
-        return blog;
-    };
-private:
-    logger() {}
-};
-
-struct force_log
-{
-   force_log() {logger::need_to_log(true);}
-   ~force_log(){logger::need_to_log(false);}
-};
-
-#define LOG_ODS_MSG( msg )                                                                \
-    do {                                                                                  \
-    if(logger::need_to_log()) {                                                     \
-    std::stringstream logger__str;                                                        \
-    logger__str << std::setprecision(8) << msg ;                                          \
-    OutputDebugString(logger__str.str().c_str());                                         \
-    }                                                                                     \
-    } while(0)
 
 
 template<typename T>
@@ -266,13 +192,7 @@ enum objects_t{
 };
 
 #include "av/Database.h"
-
-namespace avSky
-{
-
-    typedef std::function<void(float&)> on_visible_range_change_f;
-}
-
+#include "visitors/find_node_visitor.h"
 
 #endif // precompile_header
 

@@ -124,12 +124,14 @@ namespace bi
 
     void RigidUpdater::addGround( const osg::Vec3& gravity )
     {
+        FIXME(Debug drawer)
+#ifdef DEPRECATED
         _d->_sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
             [&](int id){
                 if(_on_collision)
                     _on_collision(_physicsNodes[id].get());   
         } );
-
+#endif
         //const bool debug( arguments.read( "--debug" ) );
         if( _debug )
         {

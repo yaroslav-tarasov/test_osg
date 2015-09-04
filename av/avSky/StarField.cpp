@@ -1,8 +1,6 @@
 #include "stdafx.h"
 
-#include <osg/BlendEquation>
-#include <osg/Geometry>
-#include <osg/Geode>
+#include "av/precompiled.h"
 
 #include "StarField.h"
 #include "star_data.h"
