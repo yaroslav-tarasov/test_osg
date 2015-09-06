@@ -408,7 +408,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     
     _viewerPtr = vw;
 
-
+    _viewerPtr->setSceneData( this );
 
     //
     // Set up the camera manipulators.
@@ -466,15 +466,17 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
             }
         } )
     );
-     
+
+
     _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
     _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
     _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
     _viewerPtr->addEventHandler( _pickHandler );    
     _viewerPtr->addEventHandler( avGUI::makeGUIEventHandlerImpl(this, &Scene::onEvent));
     _viewerPtr->realize();
+	
     addChild(_pickHandler->getOrCreateSelectionBox()); 
-    
+   
     //
     // Initialize particle engine
     // 
@@ -649,7 +651,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
 #endif 
 
-//    _viewerPtr->setSceneData( this );
+
 
 
     return true;

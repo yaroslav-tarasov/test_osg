@@ -164,7 +164,7 @@ OSGWidget::OSGWidget( QWidget* parent,
 {
 
   d_->osg_vis_ = CreateVisual();
-  d_->viewer_  = d_->osg_vis_->GetViewer(); // createView(this->width(),this->height(),createScene(),d_->graphicsWindow_);
+  d_->viewer_  = d_->osg_vis_->GetViewer(); //createView(this->width(),this->height(),::createScene(),d_->graphicsWindow_);
   osgViewer::ViewerBase::Cameras cams_;
   d_->viewer_->getCameras(cams_,true);
   cams_[0]->setGraphicsContext( d_->graphicsWindow_.get() );
@@ -211,7 +211,13 @@ void OSGWidget::paintEvent( QPaintEvent* /* paintEvent */ )
 
 void OSGWidget::paintGL()
 {
-  d_->viewer_->frame();
+	//if (!d_->viewer_->done())
+	//{
+	//	d_->viewer_->frame();
+	//}
+
+	d_->osg_vis_->Update();
+	d_->osg_vis_->Render();
 }
 
 void OSGWidget::resizeGL( int width, int height )
@@ -384,6 +390,7 @@ void OSGWidget::wheelEvent( QWheelEvent* event )
   d_->getEventQueue()->mouseScroll( motion );
 }
 
+
 bool OSGWidget::event( QEvent* event )
 {
   bool handled = QOpenGLWidget::event( event );
@@ -402,7 +409,9 @@ bool OSGWidget::event( QEvent* event )
   case QEvent::Wheel:
     this->update();
     break;
-
+  case QEvent::Close:
+	d_->osg_vis_->GetViewer()->setDone(true);
+	break;
   default:
     break;
   }

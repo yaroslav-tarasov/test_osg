@@ -63,7 +63,35 @@ Visual * Visual::CreateInstance()
     else
         return m_pInstance;
 }
-    
+
+namespace {
+	osg::Node * createScene()
+	{
+		osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+		osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
+		sd->setColor( osg::Vec4( 1.f, 0.f, 0.f, 1.f ) );
+		sd->setName( "A nice sphere" );
+
+		osg::Geode* geode = new osg::Geode;
+		geode->addDrawable( sd );
+
+		// Set material for basic lighting and enable depth tests. Else, the sphere
+		// will suffer from rendering errors.
+		{
+			osg::StateSet* stateSet = geode->getOrCreateStateSet();
+			osg::Material* material = new osg::Material;
+
+			material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );	
+
+			stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
+			stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+		}
+
+		return geode;
+	}
+}
+
+
 void Visual::Initialize()
 {
     avAssert(!m_bInitialized);
@@ -98,7 +126,7 @@ void Visual::Initialize()
 
     database::initDataPaths();
 
-	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
+	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -108,8 +136,8 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    //avScene::Logo::Create(_viewerPtr.get());
-    
+    // avScene::Logo::Create(_viewerPtr.get());
+	CreateScene();
 
     m_bInitialized = true;
 }
@@ -140,7 +168,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer();
 
-    _viewerPtr->apply(new osgViewer::SingleScreen(1));
+    //_viewerPtr->apply(new osgViewer::SingleScreen(1));
 
     // Set up camera
     if ( cTraitsPtr.valid() == true )
@@ -162,7 +190,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
 
     //_viewerPtr->setSceneData( this );
-    //_viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
     // TODO: enabled this for instructor tab, need implement special setting
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 
@@ -177,9 +205,12 @@ void Visual::CreateScene()
       avScene::Scene::Create(_viewerPtr.get());
 }
 
+
+
 void Visual::EndSceneCreation()
 {
-    _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
+   // _viewerPtr->setSceneData( nullptr /*createScene()*//*avScene::Scene::GetInstance()*/ );
+
 }
 
 void  Visual::Update()

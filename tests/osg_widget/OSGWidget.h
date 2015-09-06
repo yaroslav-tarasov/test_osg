@@ -30,15 +30,15 @@ protected:
   virtual void paintGL		    ();
   virtual void resizeGL         ( int width, int height );
 
-  virtual void keyPressEvent    ( QKeyEvent* event );
-  virtual void keyReleaseEvent  ( QKeyEvent* event );
+  virtual void keyPressEvent    ( QKeyEvent* event ) override;
+  virtual void keyReleaseEvent  ( QKeyEvent* event ) override;
 
-  virtual void mouseMoveEvent   ( QMouseEvent* event );
-  virtual void mousePressEvent  ( QMouseEvent* event );
-  virtual void mouseReleaseEvent( QMouseEvent* event );
-  virtual void wheelEvent       ( QWheelEvent* event );
+  virtual void mouseMoveEvent   ( QMouseEvent* event ) override;
+  virtual void mousePressEvent  ( QMouseEvent* event ) override;
+  virtual void mouseReleaseEvent( QMouseEvent* event ) override;
+  virtual void wheelEvent       ( QWheelEvent* event ) override;
 
-  virtual bool event            ( QEvent* event );
+  virtual bool event            ( QEvent* event ) override;
 
 private:
 
