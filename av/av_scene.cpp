@@ -170,8 +170,14 @@ namespace details
         //{
         //       return net_layer::net_srv();
         //}
+        
+        ~session()
+        {
+            session_stopped_signal_();
+        }
 
         DECLARE_EVENT(time_reset    , (double /*time*/, double /*factor*/));
+        DECLARE_EVENT(session_stopped   ,   ());
 
     private:
         time_control time_;
@@ -217,7 +223,7 @@ struct session_timer
         Assert(!cg::eq_zero(period_));
 
         changing_time_factor_   = session_->subscribe_time_reset     (bind(&session_timer::set_factor, this, _2));
-        //stopped_session_        = session_->subscribe_session_stopped(bind(&session_timer::session_stopped, this));
+        stopped_session_        = session_->subscribe_session_stopped(bind(&session_timer::session_stopped, this));
 
         set_next_time_point();
     }
@@ -330,7 +336,7 @@ struct net_worker
          , on_receive_ (on_recv)
          , on_update_  (on_update)
          , on_render_  (on_render)
-         , timer_      (boost::bind(&net_worker::on_timer, this))
+         // , timer_      (boost::bind(&net_worker::on_timer, this))
          , done_       (false)
      {
           _workerThread = boost::thread(&net_worker::run, this);
@@ -338,7 +344,7 @@ struct net_worker
      
      ~net_worker()
      {
-         
+          delete  ses_;
          _workerService->post(boost::bind(&boost::asio::io_service::stop, _workerService));
          _workerThread.join();
      }
@@ -359,10 +365,10 @@ struct net_worker
 
      }
 
-     void start_timer()
-     {
-         on_timer();
-     }
+     //void start_timer()
+     //{
+     //    on_timer();
+     //}
 
 private:
      void run()
@@ -381,12 +387,14 @@ private:
                                                                  __main_srvc__->post(boost::bind(on_render_,time));
                                                              } , 1, false);
 
-		 start_timer();
+         calc_timer_   = session_timer::create (ses_, 0.05f, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
+
+		 // start_timer();
          
 		 boost::system::error_code ec;
          size_t ret = _workerService->run(ec);
          
-         timer_.cancel();
+         //timer_.cancel();
          acc_.reset();
          sockets_.clear();
      }
@@ -422,20 +430,19 @@ private:
 
 private:
 
-     void on_timer()
+     void on_timer(double time)
      {
-         double time = 0;
-
          if(done_)
          {
              ses_->stop();
-             timer_.cancel();
+             //timer_.cancel();
              return;
          }
-         else
-             timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
+         //else
+         //    timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
 
-         __main_srvc__->post(boost::bind(on_update_, time ));
+         on_update_(time);
+         // __main_srvc__->post(boost::bind(on_update_, time ));
 
      }
      
@@ -498,7 +505,7 @@ private:
     on_update_f                                                 on_render_;
 
 private:
-    async_timer                                                   timer_; 
+    //async_timer                                                   timer_; 
 
     bool                                                          done_;
 
@@ -564,8 +571,8 @@ private:
         }
         else
         {
-           mod_sys_.update(sim_time);
-           ctrl_sys_.update(sim_time);
+           mod_sys_.update(time);
+           ctrl_sys_.update(time);
 
         }
 
@@ -580,7 +587,7 @@ private:
          create_objects();
          osg_vis_->EndSceneCreation();
 
-         w_->start_timer();
+         // w_->start_timer();
 
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
          w_->send(&bts[0], bts.size());

@@ -473,7 +473,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
     _viewerPtr->addEventHandler( _pickHandler );    
     _viewerPtr->addEventHandler( avGUI::makeGUIEventHandlerImpl(this, &Scene::onEvent));
-    _viewerPtr->realize();
+    //_viewerPtr->realize();
 	
     addChild(_pickHandler->getOrCreateSelectionBox()); 
    
@@ -504,12 +504,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _terrainRoot = createTerrainRoot();
     addChild(_terrainRoot);
     
-    std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
-
+    //std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
     //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
     //_terrainNode->create(scene_name);
-
-
 
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");

@@ -98,14 +98,14 @@ void Visual::Initialize()
 
     // OSG graphics context
     osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = nullptr; //new osg::GraphicsContext::Traits();
-   
+
     float width = osg::DisplaySettings::instance()->getScreenWidth();
     float height = osg::DisplaySettings::instance()->getScreenHeight();
     float distance = osg::DisplaySettings::instance()->getScreenDistance();
 #if 0
     const std::string version( "4.3" );
     pTraits = new osg::GraphicsContext::Traits();
-    //pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
+    pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
     pTraits->alpha                         = 8;
     pTraits->setInheritedWindowPixelFormat = true;
     pTraits->doubleBuffer                  = true;
@@ -137,7 +137,7 @@ void Visual::Initialize()
     InitializeViewer( pTraits);
     
     // avScene::Logo::Create(_viewerPtr.get());
-	CreateScene();
+	// CreateScene();
 
     m_bInitialized = true;
 }
@@ -183,7 +183,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
        //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
     }
 
-    _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
+    _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.15f, 0.15f, 0.15f, 1.f));
     //FIXME TODO //setProjectionMatrixFromConfig();
 
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
@@ -209,7 +209,7 @@ void Visual::CreateScene()
 
 void Visual::EndSceneCreation()
 {
-   // _viewerPtr->setSceneData( nullptr /*createScene()*//*avScene::Scene::GetInstance()*/ );
+   _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
 
 }
 
@@ -245,21 +245,19 @@ void  Visual::Render()
 {
     static bool run_once = false;
     
-    if(!run_once)
-    {
-        osgViewer::Viewer& viewer =  *_viewerPtr.get(); 
-
-        viewer.setReleaseContextAtEndOfFrameHint(false);
-
-        viewer.realize();
-
-        run_once = true;
-
-    }
-
-    
     if (m_bInitialized )
     {
+        if(!run_once)
+        {
+            osgViewer::Viewer& viewer =  *_viewerPtr.get(); 
+
+            viewer.setReleaseContextAtEndOfFrameHint(false);
+
+            viewer.realize();
+
+            run_once = true;
+
+        }
 
         auto viewer =  _viewerPtr;
 

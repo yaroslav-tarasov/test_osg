@@ -164,10 +164,21 @@ OSGWidget::OSGWidget( QWidget* parent,
 {
 
   d_->osg_vis_ = CreateVisual();
-  d_->viewer_  = d_->osg_vis_->GetViewer(); //createView(this->width(),this->height(),::createScene(),d_->graphicsWindow_);
+  d_->viewer_  = d_->osg_vis_->GetViewer(); // createView(this->width(),this->height(),::createScene(),d_->graphicsWindow_);
+  
   osgViewer::ViewerBase::Cameras cams_;
-  d_->viewer_->getCameras(cams_,true);
+  d_->viewer_->getCameras(cams_,false);
+  osgViewer::Viewer* v = dynamic_cast<osgViewer::Viewer*>(d_->viewer_.get());
   cams_[0]->setGraphicsContext( d_->graphicsWindow_.get() );
+  cams_[0]->setViewport(new osg::Viewport(0, 0, this->width(), this->height() ));
+  
+  osgGA::TrackballManipulator* manipulator = new osgGA::TrackballManipulator;
+  manipulator->setAllowThrow( false );
+
+  v->setCameraManipulator( manipulator );
+
+  v->setSceneData(::createScene());
+  //OSGWidget::createScene();
 
   // This ensures that the widget will receive keyboard events. This focus
   // policy is not set by default. The default, Qt::NoFocus, will result in
@@ -179,6 +190,8 @@ OSGWidget::OSGWidget( QWidget* parent,
   // mouse button has been pressed. We require this in order to let the
   // graphics window switch viewports properly.
   this->setMouseTracking( true );
+
+
 }
 
 OSGWidget::~OSGWidget()
@@ -211,13 +224,13 @@ void OSGWidget::paintEvent( QPaintEvent* /* paintEvent */ )
 
 void OSGWidget::paintGL()
 {
-	//if (!d_->viewer_->done())
-	//{
-	//	d_->viewer_->frame();
-	//}
+    //if (!d_->viewer_->done())
+    //{
+    //    d_->viewer_->frame();
+    //}
 
-	d_->osg_vis_->Update();
-	d_->osg_vis_->Render();
+    d_->osg_vis_->Update();
+    d_->osg_vis_->Render();
 }
 
 void OSGWidget::resizeGL( int width, int height )
@@ -443,7 +456,7 @@ void OSGWidget::onResize( int width, int height )
       cameras[0]->setViewport( 0, 0, this->width() / 2, this->height() );
       cameras[1]->setViewport( this->width() / 2, 0, this->width() / 2, this->height() );
   }
-  else
+  else   if(cameras.size()==1)
   {
       cameras[0]->setViewport( 0, 0, this->width(), this->height() );
   }

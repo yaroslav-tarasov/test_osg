@@ -454,14 +454,13 @@ namespace
     {
         visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
             :  vw_(new OSGWidget( /*this*/ ))
-            // osg_vis_  (CreateVisual())
             , vis_sys_  (create_vis(props/*, bytes*/))
             , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
             , mod_sys_  (sys_creator()->get_model_sys(),0.03/*cfg().model_params.msys_step*/)
 
         {   
             
-		    vw_->show();
+		    
 
             disp_
                 .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
@@ -475,7 +474,8 @@ namespace
                 , boost::bind(&visapp::on_render, this, _1)
                 ));
 #endif
-
+          
+            vw_->show();
         }
 
         ~visapp()
@@ -491,7 +491,6 @@ namespace
             vis_sys_.update(time);
 			vw_->redraw();
 
-            // osg_vis_->Render();
             //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
 
         }
@@ -520,11 +519,9 @@ namespace
 
         void on_setup(setup const& msg)
         {
-            // osg_vis_->CreateScene();
             // vw_->createScene();
             create_objects();
-            //vw_->endSceneCreation();
-
+            vw_->endSceneCreation();
 
             binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
             w_->send(&bts[0], bts.size());
@@ -594,7 +591,6 @@ namespace
         updater                                                     mod_sys_;
         updater                                                    ctrl_sys_;
         updater                                                     vis_sys_;
-        //IVisual*                                                    osg_vis_;
         OSGWidget*                                                       vw_;
 
     private:
