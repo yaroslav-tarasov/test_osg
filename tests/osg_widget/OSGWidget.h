@@ -21,6 +21,8 @@ public:
 
   virtual ~OSGWidget();
 
+//   visual_widget impl
+public: 
   void         createScene();
   void         endSceneCreation();
   void         redraw();

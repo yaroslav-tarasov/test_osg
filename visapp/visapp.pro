@@ -3,11 +3,11 @@ win32:TEMPLATE = vcapp
 
 SIMEX_DIR_FULL = $$(SIMEX_DIR)_qt5
 DEV_ROOT = $$SIMEX_DIR_FULL
-SOLUTION_ROOT = .
+SOLUTION_ROOT = ..
 
 include($$SOLUTION_ROOT/base.pri)
 
-include(test_osg.pri)
+include($$SOLUTION_ROOT/test_osg.pri)
 
 #############
 # include paths
@@ -43,20 +43,16 @@ CONFIG(debug,debug|release){
 CONFIG += qt
 QT += core gui widgets
 
-SOURCES += \
-		tests/qt/QtOSG.cpp \
-		tests/qt/MainWindow.cpp 	
 
-SOURCES -= $$PWD/test_osg.cpp       
+SOURCES -= $$SOLUTION_ROOT/test_osg.cpp       
 SOURCES += $$PWD/vis_app.cpp
-SOURCES += $$PWD/tests/visapp/visapp1.cpp
-SOURCES += $$PWD/tests/visapp/visapp2.cpp
-SOURCES += $$PWD/tests/visapp/visapp3.cpp
+SOURCES += $$SOLUTION_ROOT/tests/visapp/visapp1.cpp
+SOURCES += $$SOLUTION_ROOT/tests/visapp/visapp2.cpp
+SOURCES += $$SOLUTION_ROOT/tests/visapp/visapp3.cpp
 
-HEADERS += $$SIMEX_DIR_FULL/src/_Include/ui/tray_icon.h
-HEADERS += ./tests/qt/MainWindow.h
+HEADERS += $$SOLUTION_ROOT/_Include/ui/tray_icon.h
 			
-LIBS += -losgqtwidget
+LIBS += -losg_widget
 
 RESOURCES += \
     visapp_resources.qrc

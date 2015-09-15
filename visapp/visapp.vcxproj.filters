@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\_include" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\_include\bada" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\_include\bada\bada_import.cpp">
+      <Filter>Source Files\..\_include\bada</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\_include\objects" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\_include\objects\bullet_importer.cpp">
+      <Filter>Source Files\..\_include\objects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\DebugRenderer.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\LightManager.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\Lights.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\shaders.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\test_objects1.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\test_systems.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\core\config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\core\config\config.cpp">
+      <Filter>Source Files\..\core\config</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\core\nfi" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\core\nfi\lib_loader.cpp">
+      <Filter>Source Files\..\core\nfi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\ext" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\ext\spark" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\SparkDrawable.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\SparkUpdatingHandler.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\explosion_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\fire_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\osgspark.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\rain_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\simple_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\test_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\fms" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\fms\dubins.cpp">
+      <Filter>Source Files\..\kernel\fms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\fms\trajectory.cpp">
+      <Filter>Source Files\..\kernel\fms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\ada" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\ada\ada_view.cpp">
+      <Filter>Source Files\..\kernel\objects\ada</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aircraft" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aircraft\sync_fsm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_fsm.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_none_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_model.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_rotors_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_shassis_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_view.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\aircraft_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft\phys_aircraft.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aircraft_fms" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_fms\aircraft_fms_model.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_fms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_fms\aircraft_fms_view.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_fms</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aircraft_physless" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aircraft_physless\sync_fsm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_model.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_view.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\airport" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\airport\airport_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\airport</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\airport\airport_model.cpp">
+      <Filter>Source Files\..\kernel\objects\airport</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\airport\airport_view.cpp">
+      <Filter>Source Files\..\kernel\objects\airport</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\airports_manager" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\airports_manager\airports_manager_view.cpp">
+      <Filter>Source Files\..\kernel\objects\airports_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\common" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\common\object_creators.cpp">
+      <Filter>Source Files\..\kernel\objects\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\conditions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\conditions\meteo_proxy_view.cpp">
+      <Filter>Source Files\..\kernel\objects\conditions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\dubin_route" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\dubin_route\dubin_route_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\dubin_route</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\dubin_route\dubin_route_view.cpp">
+      <Filter>Source Files\..\kernel\objects\dubin_route</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\nm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nm\node_osg_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nm\nodes_management.cpp">
+      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nm\nodes_manager.cpp">
+      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\nodes_manager" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\mod_node_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\node_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\node_tree_iterator.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\nodes_manager_view.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\nodes_manager_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\nodes_manager\vis_node_impl.cpp">
+      <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\phys_sys_object" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\phys_sys_object\phys_sys_object_model.cpp">
+      <Filter>Source Files\..\kernel\objects\phys_sys_object</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\phys_sys_object\phys_sys_object_view.cpp">
+      <Filter>Source Files\..\kernel\objects\phys_sys_object</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\simple_route" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\simple_route\simple_route_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\simple_route</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\simple_route\simple_route_view.cpp">
+      <Filter>Source Files\..\kernel\objects\simple_route</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\vehicle" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\vehicle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_model.cpp">
+      <Filter>Source Files\..\kernel\objects\vehicle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_model_states.cpp">
+      <Filter>Source Files\..\kernel\objects\vehicle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_view.cpp">
+      <Filter>Source Files\..\kernel\objects\vehicle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\vehicle\vehicle_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\vehicle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\phys" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\BulletInterface.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\BulletMTInterface.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\GLDebugDrawer.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\RigidUpdater.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\aircraft_phys.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\bvh_static_mesh.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\ray_cast_vehicle.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\static_convex.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\systems" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\systems\common" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\systems\common\object_class_impl.cpp">
+      <Filter>Source Files\..\kernel\systems\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\systems\objects_base" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\systems\objects_base\base_view.cpp">
+      <Filter>Source Files\..\kernel\systems\objects_base</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\systems\system_base" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\systems\system_base\fake_system.cpp">
+      <Filter>Source Files\..\kernel\systems\system_base</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\systems\visual_system" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\systems\visual_system\visual_object_impl.cpp">
+      <Filter>Source Files\..\kernel\systems\visual_system</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\tests\visapp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\visapp\visapp1.cpp">
+      <Filter>Source Files\..\tests\visapp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\visapp\visapp2.cpp">
+      <Filter>Source Files\..\tests\visapp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\visapp\visapp3.cpp">
+      <Filter>Source Files\..\tests\visapp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\utils" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\utils\visitors" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files\..\utils\visitors</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\animation_handler.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\empty_scene.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\stdafx.cpp">
+      <Filter>Source Files\..</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\test_osg.cpp">
+      <Filter>Source Files\..</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="vis_app.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\_Include" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\_Include\ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\_Include\ui\tray_icon.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\_include" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\_include\objects" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\_include\objects\object_creators.h">
+      <Filter>Header Files\..\_include\objects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\Grass.h">
+      <Filter>Header Files\..\av</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\Visual.h">
+      <Filter>Header Files\..\av</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\targetver.h">
+      <Filter>Header Files\..</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="precompiled.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\.." />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5\bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5\bin\debug" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5\bin\debug\visapp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\moc_tray_icon.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\qrc_visapp_resources.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5\bin\release" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files\..\..\..\..\simex_qt5\bin\release\visapp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\moc_tray_icon.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\qrc_visapp_resources.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="precompiled.h.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resource Files\resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\projector.png">
+      <Filter>Resource Files\resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="visapp_resources.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

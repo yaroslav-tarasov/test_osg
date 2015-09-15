@@ -58,7 +58,7 @@ namespace core {
             fmt.setStencilBufferSize(8);
             fmt.setSamples(8);
             fmt.setSwapBehavior( QSurfaceFormat::DoubleBuffer );
-            fmt.setMajorVersion(attrs[1]);  // дебилизм, связанный с совмесимостью с предыдущим кодом
+            fmt.setMajorVersion(attrs[1]);  
             fmt.setMinorVersion(attrs[3]);
             //fmt.setProfile()
             context.setFormat(fmt);

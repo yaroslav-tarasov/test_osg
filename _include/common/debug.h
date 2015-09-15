@@ -8,10 +8,11 @@
 
 #define Assert(x) if(x){};
 #define avAssert(x) assert(x)
-#define avError(x,y) {           \
-    char buff [1024];           \
-    sprintf(buff,x,y);          \
-    OutputDebugString(buff);    \
+#define avError(x,y) {          \
+    char buff [1024];          \
+    sprintf(buff,x,y);        \
+                                \
+    OutputDebugStringA(buff);    \
     assert(false);              \
 }
 
@@ -43,6 +44,6 @@ struct force_log
     if(logger::need_to_log()) {                                                     \
     std::stringstream logger__str;                                                        \
     logger__str << std::setprecision(8) << msg ;                                          \
-    OutputDebugString(logger__str.str().c_str());                                         \
+    OutputDebugStringA(logger__str.str().c_str());                                         \
     }                                                                                     \
     } while(0)

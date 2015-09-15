@@ -295,7 +295,7 @@ bool utils::IsPowerOf2( unsigned int nValue )
 //////////////////////////////////////////////////////////////////////////
 bool utils::CheckIfAFileExists( const std::string& cAbsolutePath )
 {
-    return ( GetFileAttributes( cAbsolutePath.c_str() ) != INVALID_FILE_ATTRIBUTES );
+    return ( GetFileAttributesA( cAbsolutePath.c_str() ) != INVALID_FILE_ATTRIBUTES );
 }
 
 /////////////////////////////////////////////////////////////////////

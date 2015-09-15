@@ -31,7 +31,7 @@ private:
             uniform->set( osg::Vec4( 5000.0, clamp( (fCloudsDensity-0.666f) * 3.333f, 0.0f, 1.0f ), 3, -3 ) );
             break;
         default:
-            avError( "Unknown clouds layer" );
+            avError( _T("Unknown clouds layer") );
             break;
         }
     }
@@ -154,7 +154,7 @@ bool Clouds::FrameCall()
 		vParams[ 3 ] = fTime * 0.04f;
 		break;
 	default:
-		avError( "Unknown clouds type" );
+		avError( _T("Unknown clouds type") );
 		break;
 	}
 

@@ -25,9 +25,7 @@ struct Widget::WidgetPImpl
 
         context_ = core::create_context();
         
-        WId hwnd = WId(context_->createCompatibleWindow(Window(widget_base->winId())));
-        widget_base->reattach_to_window(hwnd);
-
+        widget_base->reattach_to_window(WId(context_->createCompatibleWindow(Window(widget_base->winId()))));
 
         // OSG graphics context
         osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = new osg::GraphicsContext::Traits();
@@ -52,7 +50,7 @@ struct Widget::WidgetPImpl
 
         //scene_ = new engine::Scene();
         
-        //graphicsWindow_ = new osgViewer::GraphicsWindowEmbedded( pTraits/*x, y, width, height*/);
+        // graphicsWindow_ = new osgViewer::GraphicsWindowEmbedded( pTraits/*x, y, width, height*/);
         
         osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(pTraits.get());
         if (!gc)
@@ -72,11 +70,6 @@ struct Widget::WidgetPImpl
         v->getCameras(cams_,false);
         cams_[0]->setGraphicsContext( gc.get() );
         cams_[0]->setViewport(new osg::Viewport(0, 0, width, height ));
-
-        osgGA::TrackballManipulator* manipulator = new osgGA::TrackballManipulator;
-        manipulator->setAllowThrow( false );
-
-        v->setCameraManipulator( manipulator );
  
     }
     

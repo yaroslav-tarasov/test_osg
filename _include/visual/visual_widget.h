@@ -6,7 +6,7 @@
 
 namespace visual
 {
-    enum visual_type {QOGL_WIDGET, CUSTOM_GL_WIDGET};
+    enum visual_type {QOGL_WIDGET, CUSTOM_GL_WIDGET, CUSTOM_GL_WIDGET1, CUSTOM_GL_WIDGET2, CUSTOM_GL_WIDGET3 };
 
     struct visual_widget 
     {

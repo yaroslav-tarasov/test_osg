@@ -19,6 +19,8 @@ INCLUDEPATH += $$EXT_INCLUDE
 INCLUDEPATH += $$_PRO_FILE_PWD_
 INCLUDEPATH += $$SOLUTION_ROOT/tests/widget
 
+INCLUDEPATH += $$SOLUTION_ROOT/tests/openglwindow
+INCLUDEPATH += $$SOLUTION_ROOT/tests/osg_widget2
 
 LIBS += -L$$SIMEX_DIR_FULL/ext/lib/gl/$$PATH_SUFFIX
  
@@ -48,16 +50,37 @@ PRECOMPILED_HEADER = precompiled.h
 
 HEADERS += \
     stdafx.h \
-    OSGWidget.h \
+    OSGWidget.h
+    
+HEADERS += \    
+    $$SOLUTION_ROOT\tests\osg_widget2\OSGWidget2.h \  
+    $$SOLUTION_ROOT\tests\osg_widget2\OSGWidget3.h \ 
+    $$SOLUTION_ROOT\tests\osg_widget2\TriangleWindow.h  
+     
+HEADERS += \
     $$SOLUTION_ROOT\tests\widget\widget.h \
     $$SOLUTION_ROOT\tests\widget\core\core.h \
     $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.h
 
+HEADERS += \
+    $$SOLUTION_ROOT\tests\openglwindow\openglwindow.h   
+    
 SOURCES += \
     OSGWidget.cpp \
+    fabrik.cpp
+    
+    
+SOURCES += \    
+    $$SOLUTION_ROOT\tests\osg_widget2\OSGWidget2.cpp  \
+    $$SOLUTION_ROOT\tests\osg_widget2\OSGWidget3.cpp  \    
+    $$SOLUTION_ROOT\tests\osg_widget2\TriangleWindow.cpp  
+        
+SOURCES += \    
     $$SOLUTION_ROOT\tests\widget\widget.cpp \
     $$SOLUTION_ROOT\tests\widget\core\core.cpp \
     $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.cpp
     
+SOURCES += \    
+    $$SOLUTION_ROOT\tests\openglwindow\openglwindow.cpp
 
  

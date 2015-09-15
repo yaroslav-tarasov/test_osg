@@ -1,5 +1,11 @@
 #pragma once
 #include "targetver.h"
+
+#ifdef UNICODE
+#define _UNICODE 
+#endif 
+
+
 //////////////////////////////////
 //    common ext headers
 //

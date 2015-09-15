@@ -454,8 +454,7 @@ namespace
     struct visapp
     {
         visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-            // :  vw_(new visual::OSGWidget( /*this*/ ))
-            : vw_   (visual::create_widget( CUSTOM_GL_WIDGET ))
+            : vw_   (visual::create_widget( CUSTOM_GL_WIDGET3 ))
             , qvw_  (dynamic_cast<QWidget*>(vw_.get()))
             , vis_sys_  (create_vis(props/*, bytes*/))
             , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
@@ -478,7 +477,8 @@ namespace
                 ));
 #endif
           
-            qvw_->show();
+            if(qvw_) 
+                qvw_->show();
         }
 
         ~visapp()
@@ -591,12 +591,13 @@ namespace
         msg_dispatcher<uint32_t>                                       disp_;
 
     private:
-        updater                                                     mod_sys_;
-        updater                                                    ctrl_sys_;
-        updater                                                     vis_sys_;
         // visual::OSGWidget*                                            vw_;
         visual::visual_widget_ptr                                        vw_;
         QWidget*                                                        qvw_;
+        updater                                                     mod_sys_;
+        updater                                                    ctrl_sys_;
+        updater                                                     vis_sys_;
+
 
     private:
         boost::scoped_ptr<net_worker>                                     w_;

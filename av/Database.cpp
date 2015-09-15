@@ -20,7 +20,9 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
 
     if (file.bad())
     {
-        avError("Failed to load shader '%s'.", fileName.c_str());
+
+        avError(/*_T*/("Failed to load shader '%s'."), fileName.c_str());
+
         return false;
     }
 
@@ -46,7 +48,8 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
 
             if (beginFileName == NULL || endFileName == NULL || beginFileName == endFileName)
             {
-                avError("#include directive error in shader '%s' shader.", fileName.c_str());
+                avError(/*_T*/("#include directive error in shader '%s' shader."), fileName.c_str());
+
                 continue;
             }
 
@@ -57,14 +60,16 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
             {
                 if (!LoadShaderInternal(includeFullFileName, text))
                 {
-                    avError("Failed to load shader '%s'.", fileName.c_str());
+                    avError(/*_T*/("Failed to load shader '%s'."), fileName.c_str());
+
                     return false;
                 }
             }
             else
             {
-                avError("Failed to find shader include '%s'.", includeFileName.c_str());
-                avError("Failed to load shader '%s'.", fileName.c_str());
+                avError(/*_T*/("Failed to find shader include '%s'."), includeFileName.c_str());
+                avError(/*_T*/("Failed to load shader '%s'."), fileName.c_str());
+
                 return false;
             }
         }
