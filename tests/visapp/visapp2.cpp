@@ -449,11 +449,14 @@ namespace
         details::session*                                           ses_;
     };
 
+    using namespace visual;
 
     struct visapp
     {
         visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-            :  vw_(new OSGWidget( /*this*/ ))
+            // :  vw_(new visual::OSGWidget( /*this*/ ))
+            : vw_   (visual::create_widget( CUSTOM_GL_WIDGET ))
+            , qvw_  (dynamic_cast<QWidget*>(vw_.get()))
             , vis_sys_  (create_vis(props/*, bytes*/))
             , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
             , mod_sys_  (sys_creator()->get_model_sys(),0.03/*cfg().model_params.msys_step*/)
@@ -475,7 +478,7 @@ namespace
                 ));
 #endif
           
-            vw_->show();
+            qvw_->show();
         }
 
         ~visapp()
@@ -591,7 +594,9 @@ namespace
         updater                                                     mod_sys_;
         updater                                                    ctrl_sys_;
         updater                                                     vis_sys_;
-        OSGWidget*                                                       vw_;
+        // visual::OSGWidget*                                            vw_;
+        visual::visual_widget_ptr                                        vw_;
+        QWidget*                                                        qvw_;
 
     private:
         boost::scoped_ptr<net_worker>                                     w_;

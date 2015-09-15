@@ -1,16 +1,17 @@
 #ifndef OSGWidget_h__
 #define OSGWidget_h__
 
+#include "visual/visual_widget.h"
+
 #include <QPoint>
 #include <QOpenGLWidget>
 
-#ifdef OSGWIDGET_EXPORTS
-# define OSGWIDGET_API __declspec(dllexport)
-#else
-# define OSGWIDGET_API __declspec(dllimport)
-#endif
+namespace visual
+{
 
-class OSGWIDGET_API OSGWidget : public QOpenGLWidget
+class VISUAL_API OSGWidget 
+    : public QOpenGLWidget
+    , public visual_widget 
 {
   Q_OBJECT
 
@@ -59,5 +60,10 @@ private :
 
 
 };
+
+
+}
+
+
 
 #endif

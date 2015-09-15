@@ -55,7 +55,7 @@ SkyDome::SkyDome()
     , _sunAzimuth(-1.0)
     , _sunAltitude(-1.0)
 {
-     setNodeMask( DO_NOT_PICK_NODE_MASK );
+     //setNodeMask( DO_NOT_PICK_NODE_MASK );
     
     _updateDistributionCoefficients();
 

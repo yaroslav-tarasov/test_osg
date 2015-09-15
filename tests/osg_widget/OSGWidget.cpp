@@ -15,6 +15,8 @@
 
 #include "av/Visual.h"
 
+namespace visual
+{
 
 struct OSGWidget::osg_private
 {
@@ -166,9 +168,10 @@ OSGWidget::OSGWidget( QWidget* parent,
   d_->osg_vis_ = CreateVisual();
   d_->viewer_  = d_->osg_vis_->GetViewer(); // createView(this->width(),this->height(),::createScene(),d_->graphicsWindow_);
   
-  osgViewer::ViewerBase::Cameras cams_;
-  d_->viewer_->getCameras(cams_,false);
+
   osgViewer::Viewer* v = dynamic_cast<osgViewer::Viewer*>(d_->viewer_.get());
+  osgViewer::ViewerBase::Cameras cams_;
+  v->getCameras(cams_,false);
   cams_[0]->setGraphicsContext( d_->graphicsWindow_.get() );
   cams_[0]->setViewport(new osg::Viewport(0, 0, this->width(), this->height() ));
   
@@ -177,8 +180,9 @@ OSGWidget::OSGWidget( QWidget* parent,
 
   v->setCameraManipulator( manipulator );
 
-  v->setSceneData(::createScene());
+  //v->setSceneData(::createScene());
   //OSGWidget::createScene();
+
 
   // This ensures that the widget will receive keyboard events. This focus
   // policy is not set by default. The default, Qt::NoFocus, will result in
@@ -228,7 +232,7 @@ void OSGWidget::paintGL()
     //{
     //    d_->viewer_->frame();
     //}
-
+    QOpenGLContext::currentContext()->functions()->glUseProgram(0);
     d_->osg_vis_->Update();
     d_->osg_vis_->Render();
 }
@@ -527,4 +531,7 @@ void OSGWidget::processSelection()
       qDebug() << "Selected a drawable:" << QString::fromStdString( intersection.drawable->getName() );
   }
 #endif
+}
+
+
 }

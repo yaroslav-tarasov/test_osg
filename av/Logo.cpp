@@ -352,7 +352,7 @@ osg:: Node* createBackdrop(const osg::Vec3& corner,const osg::Vec3& top,const os
     return geode;
 }
 
-osg::Node* CreateLogo(const std::string& filename, const std::string& label, const std::string& subscript)
+osg::Node* Create(const std::string& filename, const std::string& label, const std::string& subscript)
 {
     osg::BoundingBox bb(osg::Vec3(0.0f,0.0f,0.0f),osg::Vec3(100.0f,100.0f,100.0f));
     float chordRatio = 0.5f;
@@ -423,7 +423,7 @@ osg::Node* CreateLogo(const std::string& filename, const std::string& label, con
   
 bool Create( osgViewer::Viewer* vw )
 {
-     osg::ref_ptr<osg::Node> scene =  CreateLogo("", "Place your ad here" , "Yea baby");
+     osg::ref_ptr<osg::Node> scene =  Create("", "Place your ad here" , "Yea baby");
      
      if (!scene.valid())
      {

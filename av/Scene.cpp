@@ -4,9 +4,11 @@
 #include "utils/high_res_timer.h"
 #include "utils/pickhandler.h"
 
-#ifndef OSGWIDGET_EXPORTS
+#if !defined(VISUAL_EXPORTS)
 #include "phys/RigidUpdater.h"
 #endif
+
+#include "Logo.h"
 
 #include <osg/GLObjects>
 
@@ -348,7 +350,7 @@ void Scene::Release()
         
         gui::releaseCEGUI();
 
-#ifndef OSGWIDGET_EXPORTS
+#if !defined(VISUAL_EXPORTS)
         _scenePtr->_rigidUpdater->stopSession();
 #endif
         // Release scene
@@ -393,6 +395,7 @@ Scene::Scene()
     // disable alpha writes for whole bunch
     pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
 
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -400,20 +403,70 @@ Scene::~Scene()
 {
 }
 
+namespace
+{
+
+osg::Node * createScene()
+{
+    osg::Group* root = new osg::Group;
+    // global sky state-set
+    osg::StateSet * pSkyStateSet = root->getOrCreateStateSet();
+
+    pSkyStateSet->setNestRenderBins(false);
+
+    // disable back face culling
+    pSkyStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+
+    // disable writing to depth buffer
+    osg::Depth * pDepth = new osg::Depth;
+    //pDepth->setWriteMask(false);
+    pSkyStateSet->setAttribute(pDepth);
+
+    osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+    osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
+    sd->setColor( osg::Vec4( 1.f, 0.f, 0.f, 1.f ) );
+    sd->setName( "A nice sphere" );
+
+    osg::Geode* geode = new osg::Geode;
+    geode->addDrawable( sd );
+
+    // Set material for basic lighting and enable depth tests. Else, the sphere
+    // will suffer from rendering errors.
+    {
+        osg::StateSet* stateSet = geode->getOrCreateStateSet();
+        osg::Material* material = new osg::Material;
+
+        material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );	
+
+        stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
+        stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+    }
+    
+    root->addChild(geode);
+    root->setCullingActive(false);
+
+    return root;
+}
+
+}
+
+#define MANIPS
+
 //////////////////////////////////////////////////////////////////////////
 bool Scene::Initialize( osgViewer::Viewer* vw)
 {
     osg::StateSet* pGlobalStateSet = getOrCreateStateSet();
     osg::StateSet* pCommonStateSet = getCommonNode()->getOrCreateStateSet();
     
-    _viewerPtr = vw;
+    _viewerPtr = vw;            
 
     _viewerPtr->setSceneData( this );
-
+   
     //
     // Set up the camera manipulators.
     //
 
+#ifdef MANIPS
     // Use a default camera manipulator
     osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
      //new osgGA::DriveManipulator()
@@ -476,7 +529,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //_viewerPtr->realize();
 	
     addChild(_pickHandler->getOrCreateSelectionBox()); 
-   
+#endif
+
+
     //
     // Initialize particle engine
     // 
@@ -503,14 +558,18 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     _terrainRoot = createTerrainRoot();
     addChild(_terrainRoot);
-    
+  
     //std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
     //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
     //_terrainNode->create(scene_name);
 
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
+    
+    
 
+#if 1
+#ifdef MANIPS
     if(ct) 
     {
         osg::Vec3 c = ct->asTransform()->asMatrixTransform()->getMatrix().getTrans();
@@ -522,7 +581,12 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 	    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
         manip->home(0);
 	}
-    
+#endif
+#endif
+
+#if 1 
+
+
 #ifdef ORIG_EPHEMERIS
     //
     // Create ephemeris
@@ -559,16 +623,20 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     addChild( _ephemerisNode.get() );
 
+
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
+   
+
+
 #else  
 
     avCore::Environment::Create();
-
+  
     // Create sky
     //
     _Sky = new avSky::Sky( this );
     /*_environmentNode->*/addChild( _Sky.get() );
-    
+  
     if( _Sky->getSunLightSource())
     {
         _ls =_Sky->getSunLightSource();  
@@ -576,7 +644,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
 
     _viewerPtr->addEventHandler(new EnvHandler(_Sky));
+
 #endif
+
 
     LightManager::Create();
 
@@ -648,6 +718,27 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
 #endif 
 
+#else
+    _ls = new osg::LightSource;
+    // _ls->getLight()->setLightNum(0);
+    if(_terrainRoot)
+        _terrainRoot->addChild(_ls.get());
+    
+    osg::Vec4f lightPosition2 (osg::Vec4f(-200.0,-100.0,-300.0,0.0f));
+    osg::ref_ptr<osg::Light> myLight2 = new osg::Light;
+    
+    myLight2->setAmbient(osg::Vec4(0.5f,0.5f,0.5f,1.0f));
+    myLight2->setDiffuse(osg::Vec4(0.9f,0.9f,0.85f,1.0f));
+    myLight2->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+    myLight2->setConstantAttenuation(1.0f);
+
+    myLight2->setLightNum(0);
+    myLight2->setPosition(lightPosition2);
+    _ls->setLight(myLight2.get());
+    _ls->setLocalStateSetModes(osg::StateAttribute::ON); 
+
+    /*_terrainRoot->*/addChild(::createScene());
+#endif
 
 
 
@@ -692,7 +783,7 @@ osg::Group*  Scene::createTerrainRoot()
 void Scene::createObjects()
 {
 
-#ifndef OSGWIDGET_EXPORTS
+#if !defined(VISUAL_EXPORTS)
     _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
             if(!findFirstNode(mt,"fire"))
@@ -926,7 +1017,7 @@ void Scene::createObjects()
     {
         
     }
-#ifndef OSGWIDGET_EXPORTS
+#if !defined(VISUAL_EXPORTS)
     if(_rigidUpdater.valid())
     {
         _viewerPtr->addEventHandler( _rigidUpdater);
@@ -1214,8 +1305,11 @@ void   Scene::onSetMap(float val)
 
 void   Scene::onSetLights(bool on)
 {
-	_lights->setNodeMask(on?0xffffffff:0);
-    LightManager::GetInstance()->setNodeMask(on?0xffffffff:0);
+	if (_lights.valid())
+    {
+        _lights->setNodeMask(on?0xffffffff:0);
+        LightManager::GetInstance()->setNodeMask(on?0xffffffff:0);
+    }
 }
 
 void   Scene::onZoneChanged(int zone)

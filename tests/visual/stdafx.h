@@ -6,7 +6,13 @@
 #include "common/boost.h"
 #include "common/stl.h"
 
+#include "common/osg_inc.h"
+#include "common/bullet.h"
 #include "common/debug.h"
+
+#ifdef QT
+#include "common/qt.h"
+#endif
 
 /////////////////////////////////////
 //        local osg graphics
@@ -100,6 +106,10 @@ enum objects_t{
     VEHICLE_TYPE
 };
 
+#include "av/Database.h"
+#include "visitors/find_node_visitor.h"
+#include "osg_helpers.h"
+
 
 namespace sp = std::placeholders;
 
@@ -108,22 +118,10 @@ inline cg::geo_base_3 get_base()
     return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
 }
 
-namespace core {
-    class CoreWidget;
-}
 
-#include "common/ref_counter.h"
-#include "../widget/core/core.h"
-
- #include "common/bullet.h"
-#include "common/osg_inc.h"
-
-#include "av/Database.h"
-#include "visitors/find_node_visitor.h"
-#include "osg_helpers.h"
-
-
-#ifdef QT
-#include "common/qt.h"
+#ifdef VISUAL_EXPORTS
+# define VISIAL_API __declspec(dllexport)
+#else
+# define VISIAL_API __declspec(dllimport)
 #endif
 

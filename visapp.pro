@@ -34,6 +34,11 @@ DEFINES += QT_NO_EMIT
 DEFINES += QT
 }
 
+CONFIG(debug,debug|release){
+   LIBS += -lvisual
+} else {
+   LIBS += -lvisual
+}
 
 CONFIG += qt
 QT += core gui widgets

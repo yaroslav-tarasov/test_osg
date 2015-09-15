@@ -336,7 +336,6 @@ struct net_worker
          , on_receive_ (on_recv)
          , on_update_  (on_update)
          , on_render_  (on_render)
-         // , timer_      (boost::bind(&net_worker::on_timer, this))
          , done_       (false)
      {
           _workerThread = boost::thread(&net_worker::run, this);
@@ -389,12 +388,10 @@ private:
 
          calc_timer_   = session_timer::create (ses_, 0.05f, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
-		 // start_timer();
          
 		 boost::system::error_code ec;
          size_t ret = _workerService->run(ec);
-         
-         //timer_.cancel();
+
          acc_.reset();
          sockets_.clear();
      }
@@ -435,15 +432,10 @@ private:
          if(done_)
          {
              ses_->stop();
-             //timer_.cancel();
              return;
          }
-         //else
-         //    timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
 
          on_update_(time);
-         // __main_srvc__->post(boost::bind(on_update_, time ));
-
      }
      
 
@@ -535,12 +527,16 @@ struct visapp
             .add<run                   >(boost::bind(&visapp::on_run        , this, _1))
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
-        
+       
+
+
         w_.reset (new net_worker( peer 
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
             , boost::bind(&visapp::update, this, _1)
             , boost::bind(&visapp::on_render, this, _1)
             ));
+
+
     }
 
     ~visapp()
@@ -583,11 +579,9 @@ private:
    
     void on_setup(setup const& msg)
     {
-         osg_vis_->CreateScene();
+
          create_objects();
          osg_vis_->EndSceneCreation();
-
-         // w_->start_timer();
 
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
          w_->send(&bts[0], bts.size());
@@ -597,8 +591,6 @@ private:
 
     void on_run(run const& msg)
     {
-        // w_.GetService()->post(boost::bind(&visapp::async_run, this,  msg));  // И никаких ref
-
         LogInfo("Got run message: " << msg.srv_time << " : " << msg.task_time );
     }
     

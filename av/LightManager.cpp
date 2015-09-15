@@ -13,7 +13,7 @@ namespace avScene
 {
 
 
-osg::ref_ptr<LightManager> LightManager::g_Instance;
+osg::ref_ptr<LightManager> LightManager::g_Instance = nullptr;
 
 
 enum LightManagerMessage

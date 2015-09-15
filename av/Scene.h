@@ -9,7 +9,7 @@
 #ifdef NON_DLL
 # define VISUAL_API
 #else
-#ifdef OSGWIDGET_EXPORTS
+#ifdef VISUAL_EXPORTS
 # define VISUAL_API __declspec(dllexport)
 #else
 # define VISUAL_API __declspec(dllimport)
@@ -109,7 +109,7 @@ namespace avScene {
         osg::ref_ptr<osg::LightSource>              _ls;
         osg::ref_ptr<osg::Group>                    _terrainRoot;
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
-#ifndef OSGWIDGET_EXPORTS
+#if !defined(VISUAL_EXPORTS)
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
 #endif
         osg::ref_ptr<PickHandler>                   _pickHandler; 
@@ -124,17 +124,20 @@ namespace avScene {
         static std::string                           zone_to_reload_;
 
     private:
+        osg::ref_ptr<osg::Node>                      _logo;
+
+    private:
         utils::LoadNodeThread*             _lnt;
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
     public:
         DECLARE_EVENT(object_loaded, (uint32_t)) ;
     };
 
-    inline osgViewer::Viewer*                   Scene::GetViewer() {  return _viewerPtr.get(); }
-    inline osg::Camera*                         Scene::getCamera() {  return _viewerPtr->getCamera(); }
-    inline osg::Group*                          Scene::getCommonNode() { return _commonNode.get(); }  
-    inline avScene::Lights*                            Scene::getLights() { return _lights.get(); }
-    inline std::vector<osg::ref_ptr<osg::Node>>&       Scene::getLamps() { return _lamps; }
+    inline osgViewer::Viewer*                           Scene::GetViewer()     {  return _viewerPtr.get(); }
+    inline osg::Camera*                                 Scene::getCamera()     {  return _viewerPtr->getCamera(); }
+    inline osg::Group*                                  Scene::getCommonNode() { return _commonNode.get(); }  
+    inline avScene::Lights*                             Scene::getLights()     { return _lights.get(); }
+    inline std::vector<osg::ref_ptr<osg::Node>>&        Scene::getLamps()      { return _lamps; }
 
     inline Scene* GetScene()
     {

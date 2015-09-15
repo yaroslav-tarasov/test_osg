@@ -64,7 +64,6 @@ CONFIG(debug,debug|release){
     RELEASE_CFG = True
     PATH_SUFFIX = release
 
-
     unix:QMAKE_CXXFLAGS += -O2
     win32:QMAKE_CXXFLAGS += -Ob2 -Oi -Ot /Oy- -fp:fast -fp:except-
 
@@ -75,7 +74,7 @@ CONFIG(debug,debug|release){
 }
 
 win32:{
-DEFINES -= UNICODE
+#DEFINES -= UNICODE
 DEFINES += DISABLE_ROBUST_COMPUTATIONS
 DEFINES += BOOST_ALL_NO_LIB
 DEFINES += CG_PRIMITIVES
@@ -168,6 +167,7 @@ LIBS += -L$$(OSG_DIR)/SPARK-1.5.5/lib/vc2008/static
 LIBS += -L$$(OSG_DIR)/3rdparty/lib
 LIBS += -L$$SIMEX_DIR_FULL/ext/lib/tinyxml2/$$PATH_SUFFIX
 LIBS += -L$$SIMEX_DIR_FULL/bin/$$PATH_SUFFIX
+
 
 CONFIG(debug,debug|release){
    LIBS += -lpugixmld -ltinyxml2 -lnet_layer -lfms -llogger -lasync_services -lalloc -lmeteo

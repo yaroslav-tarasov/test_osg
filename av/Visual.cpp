@@ -102,6 +102,7 @@ void Visual::Initialize()
     float width = osg::DisplaySettings::instance()->getScreenWidth();
     float height = osg::DisplaySettings::instance()->getScreenHeight();
     float distance = osg::DisplaySettings::instance()->getScreenDistance();
+
 #if 0
     const std::string version( "4.3" );
     pTraits = new osg::GraphicsContext::Traits();
@@ -136,8 +137,8 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    // avScene::Logo::Create(_viewerPtr.get());
-	// CreateScene();
+    //avScene::Logo::Create(_viewerPtr.get());
+	CreateScene();
 
     m_bInitialized = true;
 }
@@ -163,12 +164,12 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
         osg::DisplaySettings::instance()->setNumMultiSamples( nAntialiasing );
     }
 
-    
-
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer();
 
-    //_viewerPtr->apply(new osgViewer::SingleScreen(1));
+#ifdef NON_DLL
+    _viewerPtr->apply(new osgViewer::SingleScreen(1));
+#endif
 
     // Set up camera
     if ( cTraitsPtr.valid() == true )
@@ -198,6 +199,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // disable ESC key
     _viewerPtr->setKeyEventSetsDone(0);
 
+    _viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
 }
 
 void Visual::CreateScene()

@@ -1,7 +1,9 @@
 #pragma once 
 #include "IVisual.h"
 
-class Visual : public IVisual
+
+
+class  Visual : public IVisual
 {
 public:
     static Visual * CreateInstance();
