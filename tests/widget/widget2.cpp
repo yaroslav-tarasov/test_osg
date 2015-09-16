@@ -44,6 +44,12 @@ namespace {
                     QApplication::sendEvent(w, &event);
                 }
                 break;
+
+            case WM_DESTROY:
+                {
+                    getObjects().erase(getObjects().find(hwnd));
+                }
+                break;
             }    
 
             return  CallWindowProc(getObjects()[hwnd].wpOrigEditProc, hwnd, uMsg, 
@@ -93,7 +99,6 @@ struct Widget2::WidgetPImpl
 
         // OSG graphics context
         osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = new osg::GraphicsContext::Traits();
-        // pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData((HWND)widget_base->winId());
         pTraits->alpha                         = 8;
         pTraits->setInheritedWindowPixelFormat = true;
         pTraits->doubleBuffer                  = true;
@@ -134,6 +139,15 @@ struct Widget2::WidgetPImpl
         v->getCameras(cams_,false);
         cams_[0]->setGraphicsContext( graphicsWindow_.get() );
         cams_[0]->setViewport(new osg::Viewport(0, 0, width, height ));
+
+
+        widget_base->setLayout(new QBoxLayout(QBoxLayout::LeftToRight));
+        widget_base->layout()->setContentsMargins(0, 0, 0, 0);
+        widget_base->layout()->addWidget(native_wdgt_);
+
+        widget_base->setFocusProxy(native_wdgt_);
+        widget_base->setFocusPolicy( Qt::StrongFocus );
+        widget_base->setMouseTracking( true );
  
     }
     
@@ -220,17 +234,6 @@ Widget2::Widget2()
         this->y(),
         this->width(),
         this->height());
-
-    setLayout(new QBoxLayout(QBoxLayout::LeftToRight));
-    
-    layout()->setContentsMargins(0, 0, 0, 0);
-    layout()->addWidget(impl_->native_wdgt_);
-    
-    setFocusProxy(impl_->native_wdgt_);
-
-    this->setFocusPolicy( Qt::StrongFocus );
-
-    this->setMouseTracking( true );
 }
 
 // dtor
