@@ -6,7 +6,6 @@ CoreWidget::CoreWidget()
     : QWidget(nullptr, Qt::MSWindowsOwnDC)
 {
     setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_LayoutOnEntireRect);
     setAutoFillBackground(false);

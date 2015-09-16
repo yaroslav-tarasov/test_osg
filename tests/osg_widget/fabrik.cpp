@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "widget.h"
+#include "widget2.h"
 #include "OSGWidget.h"
 #include "OSGWidget2.h"
 #include "OSGWidget3.h"
@@ -13,6 +14,9 @@ namespace visual
     {
         if(v == CUSTOM_GL_WIDGET)
             return boost::make_shared<Widget>();
+        else  
+        if(v == CUSTOM_GL_WIDGET4)
+            return boost::make_shared<Widget2>();
         else  
         if(v == CUSTOM_GL_WIDGET3)
             return boost::make_shared<OSGWidget3>();

@@ -11,11 +11,13 @@ struct ContextLocker
     ContextLocker( context_ptr cont_ptr, CoreWidget const * widget = nullptr )
         : context_(cont_ptr)
     {
-        context_->makeCurrent(widget);
+        if(context_)
+            context_->makeCurrent(widget);
     }
     ~ContextLocker()
     {
-        context_->doneCurrent();
+        if(context_)
+            context_->doneCurrent();
     }
 
 private:

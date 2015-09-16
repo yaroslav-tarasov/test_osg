@@ -1,12 +1,80 @@
-// #include "engine/scene/scene.h"
+#include "widget2.h"
 
-//@ собственная glchart-реализация виджета, не входит в Синтез (хотя файлы есть)
-//@ 
-
-#include "widget.h"
+#include <QBoxLayout>
 
 #include "av/Visual.h"
 #include <osgViewer/api/Win32/GraphicsWindowWin32>
+
+namespace workaround
+{
+    void setCallBack(Window w, QObject* obj );
+}
+
+namespace {
+
+#if defined _WIN32 || defined __CYGWIN__
+
+    struct win_wnd
+    {
+        struct data
+        {
+            QObject* obj;
+            WNDPROC  wpOrigEditProc;
+        };
+
+        typedef std::map< Window, data>  obj_map_t;
+        typedef	std::set< std::pair<WPARAM,LPARAM> >  lock_pairs_t;
+        friend void workaround::setCallBack(Window w, QObject* obj );
+
+        static LRESULT CALLBACK vWndProc(HWND hwnd,   UINT uMsg,   WPARAM wParam,  LPARAM lParam)
+        {
+            uint16_t xPos = LOWORD(lParam);
+            uint16_t yPos = HIWORD(lParam);
+            static HCURSOR arrowCursor = LoadCursor(NULL, IDC_ARROW);
+            static  lock_pairs_t lock_;
+
+            auto w = getObjects()[hwnd].obj;
+            switch (uMsg)
+            {
+
+            case WM_KILLFOCUS  :
+                {
+                    // Workaround для проблемы с потерей фокуса при при сворачивании окна
+                    QEvent event(QEvent::WindowActivate);
+                    QApplication::sendEvent(w, &event);
+                }
+                break;
+            }    
+
+            return  CallWindowProc(getObjects()[hwnd].wpOrigEditProc, hwnd, uMsg, 
+                wParam, lParam);     
+        };
+
+    private:
+        static obj_map_t& getObjects()
+        {
+            static obj_map_t obj_map; 
+            return obj_map;
+        }
+    };
+#endif
+
+
+}
+
+namespace workaround
+{
+    void setCallBack(Window w, QObject* obj )
+    {
+#if defined _WIN32 || defined __CYGWIN__
+        win_wnd::data d;
+
+        d.wpOrigEditProc = (WNDPROC)SetWindowLong(static_cast<HWND>(w), GWL_WNDPROC, (LONG)win_wnd::vWndProc);
+        d.obj = obj;
+        win_wnd::getObjects().insert(std::make_pair<Window,win_wnd::data>(w,d));
+#endif
+    }
+}
 
 namespace visual
 {
@@ -15,7 +83,7 @@ namespace visual
 // Base widget
 //
 
-struct Widget::WidgetPImpl
+struct Widget2::WidgetPImpl
 {
     WidgetPImpl( CoreWidget * widget_base, int x, int y, int width, int height )
         : selectionActive_(false)
@@ -23,13 +91,9 @@ struct Widget::WidgetPImpl
     {
         render_active_ = false;
 
-        //context_ = core::create_context();
-        
-        //widget_base->reattach_to_window(WId(context_->createCompatibleWindow(Window(widget_base->winId()))));
-
         // OSG graphics context
         osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = new osg::GraphicsContext::Traits();
-        pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData((HWND)widget_base->winId());
+        // pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData((HWND)widget_base->winId());
         pTraits->alpha                         = 8;
         pTraits->setInheritedWindowPixelFormat = true;
         pTraits->doubleBuffer                  = true;
@@ -47,10 +111,6 @@ struct Widget::WidgetPImpl
         pTraits->y = y;
         pTraits->width = width;
         pTraits->height = height;
-
-        //scene_ = new engine::Scene();
-        
-        // graphicsWindow_ = new osgViewer::GraphicsWindowEmbedded( pTraits/*x, y, width, height*/);
         
         osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(pTraits.get());
         if (!gc)
@@ -59,11 +119,14 @@ struct Widget::WidgetPImpl
             return;
         }
 
-
         graphicsWindow_ = dynamic_cast<osgViewer::GraphicsWindow*>(gc.get());
 
-        widget_base->reattach_to_window((WId)dynamic_cast<osgViewer::GraphicsHandleWin32*>(graphicsWindow_.get())->getHWND());
-              
+        QWindow* native_wnd  = QWindow::fromWinId((WId)dynamic_cast<osgViewer::GraphicsHandleWin32*>(graphicsWindow_.get())->getHWND());
+        
+        native_wdgt_  = QWidget::createWindowContainer(native_wnd, widget_base);
+        
+        workaround::setCallBack(dynamic_cast<osgViewer::GraphicsHandleWin32*>(graphicsWindow_.get())->getHWND(), widget_base);
+
         engine_ = CreateVisual();
 
         osgViewer::Viewer* v = dynamic_cast<osgViewer::Viewer*>(engine_->GetViewer());
@@ -135,7 +198,6 @@ struct Widget::WidgetPImpl
 
     bool                render_active_;
     IVisual*            engine_;
-    core::context_ptr   context_;
     
     osg::ref_ptr<osgViewer::GraphicsWindow>			    graphicsWindow_;
 
@@ -144,10 +206,14 @@ struct Widget::WidgetPImpl
 
     bool			selectionActive_;
     bool			selectionFinished_;
+
+    QWidget*        native_wdgt_;
 };
 
+
+
 // ctor
-Widget::Widget()
+Widget2::Widget2()
 {
     impl_ = new WidgetPImpl(this,
         this->x(),
@@ -155,13 +221,20 @@ Widget::Widget()
         this->width(),
         this->height());
 
+    setLayout(new QBoxLayout(QBoxLayout::LeftToRight));
+    
+    layout()->setContentsMargins(0, 0, 0, 0);
+    layout()->addWidget(impl_->native_wdgt_);
+    
+    setFocusProxy(impl_->native_wdgt_);
+
     this->setFocusPolicy( Qt::StrongFocus );
 
     this->setMouseTracking( true );
 }
 
 // dtor
-Widget::~Widget()
+Widget2::~Widget2()
 {
     delete impl_;
 }
@@ -170,22 +243,18 @@ Widget::~Widget()
 // visual_widget
 //
 
-//scene_view * Widget::view() const
-//{
-//    return impl_->scene_.get();
-//}
 
-void Widget::createScene()
+void Widget2::createScene()
 {
 
 }
 
-void Widget::endSceneCreation()
+void Widget2::endSceneCreation()
 {
 
 }
 
-void Widget::redraw()
+void Widget2::redraw()
 {
     QWidget::repaint();
 }
@@ -194,7 +263,7 @@ void Widget::redraw()
 // Main overloaded events
 //
 
-void Widget::paintEvent( QPaintEvent * event )
+void Widget2::paintEvent( QPaintEvent * event )
 {
     Q_UNUSED(event)
 
@@ -203,32 +272,26 @@ void Widget::paintEvent( QPaintEvent * event )
     {
         // render in
         impl_->render_active_ = true;
-
-        core::ContextLocker cl(impl_->context_, this);
-        // static_cast<engine::Scene *>(impl_->scene_.get())->doPaint();
-
         impl_->engine_->Update();
         impl_->engine_->Render();
-        //impl_->context_->swapBuffers(this);
 
     }
     // render out
     impl_->render_active_ = false;
 }
 
-void Widget::resizeEvent( QResizeEvent * event )
+void Widget2::resizeEvent( QResizeEvent * event )
 {
-    // static_cast<engine::Scene *>(impl_->scene_.get())->setViewport(event->size().width(), event->size().height());
     impl_->resizeGL( 0, 0, event->size().width(), event->size().height() );
 }
 
-void Widget::changeEvent( QEvent * event )
+void Widget2::changeEvent( QEvent * event )
 {
     switch (event->type())
     {
     case QEvent::ParentChange:
         LogWarn("Widget::QEvent::ParentChange");
-        reattach_to_window(WId(impl_->context_->createCompatibleWindow(Window(winId()))));
+        // reattach_to_window(WId(impl_->context_->createCompatibleWindow(Window(winId()))));
         break;
     default:
         break;
@@ -236,7 +299,7 @@ void Widget::changeEvent( QEvent * event )
 }
 
 
-void Widget::keyPressEvent( QKeyEvent* event )
+void Widget2::keyPressEvent( QKeyEvent* event )
 {
 #if 0
     QString keyString   = event->text();
@@ -262,7 +325,7 @@ void Widget::keyPressEvent( QKeyEvent* event )
 #endif
 }
 
-void Widget::keyReleaseEvent( QKeyEvent* event )
+void Widget2::keyReleaseEvent( QKeyEvent* event )
 {
 #if 0
     QString keyString   = event->text();
@@ -273,7 +336,7 @@ void Widget::keyReleaseEvent( QKeyEvent* event )
 #endif
 }
 
-void Widget::mouseMoveEvent( QMouseEvent* event )
+void Widget2::mouseMoveEvent( QMouseEvent* event )
 {
 #if 0
     // Note that we have to check the buttons mask in order to see whether the
@@ -296,7 +359,7 @@ void Widget::mouseMoveEvent( QMouseEvent* event )
 #endif
 }
 
-void Widget::mousePressEvent( QMouseEvent* event )
+void Widget2::mousePressEvent( QMouseEvent* event )
 {
 #if 0
     // Selection processing
@@ -342,7 +405,7 @@ void Widget::mousePressEvent( QMouseEvent* event )
 #endif
 }
 
-void Widget::mouseReleaseEvent(QMouseEvent* event)
+void Widget2::mouseReleaseEvent(QMouseEvent* event)
 {
 #if 0
     // Selection processing: Store end position and obtain selected objects
@@ -391,7 +454,7 @@ void Widget::mouseReleaseEvent(QMouseEvent* event)
 #endif
 }
 
-void Widget::wheelEvent( QWheelEvent* event )
+void Widget2::wheelEvent( QWheelEvent* event )
 {
     // Ignore wheel events as long as the selection is active.
     if( impl_->selectionActive_ )
@@ -407,7 +470,7 @@ void Widget::wheelEvent( QWheelEvent* event )
         impl_->getEventQueue()->mouseScroll( motion );
 }
 
-bool Widget::event( QEvent* event )
+bool Widget2::event( QEvent* event )
 {
     bool handled = QWidget::event( event );
 
@@ -425,6 +488,9 @@ bool Widget::event( QEvent* event )
     case QEvent::Wheel:
         this->update();
         break;
+    case QEvent::WindowActivate:
+        impl_->native_wdgt_->setFocus();
+        break;
     case QEvent::Close:
         impl_->engine_->GetViewer()->setDone(true);
         break;
@@ -438,7 +504,6 @@ bool Widget::event( QEvent* event )
 
     return handled;
 }
-
 
 
 } // namespace visual

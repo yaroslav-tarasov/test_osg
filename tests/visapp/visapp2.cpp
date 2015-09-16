@@ -454,7 +454,7 @@ namespace
     struct visapp
     {
         visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-            : vw_   (visual::create_widget( CUSTOM_GL_WIDGET3 ))
+            : vw_   (visual::create_widget( CUSTOM_GL_WIDGET4 ))
             , qvw_  (dynamic_cast<QWidget*>(vw_.get()))
             , vis_sys_  (create_vis(props/*, bytes*/))
             , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
@@ -494,8 +494,8 @@ namespace
             vis_sys_.update(time);
 			vw_->redraw();
 
-            //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
-
+            //force_log fl;
+            //LOG_ODS_MSG( "on_render(double time)" << _hr_timer.get_delta() << "\n");
         }
 
         void update(double time)

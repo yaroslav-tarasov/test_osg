@@ -112,8 +112,8 @@ protected:
     {
         static const int ctxAttribList[] =
         {
-            GL_(CONTEXT_MAJOR_VERSION_ARB), 4,
-            GL_(CONTEXT_MINOR_VERSION_ARB), 4,
+            GL_(CONTEXT_MAJOR_VERSION_ARB), 3,
+            GL_(CONTEXT_MINOR_VERSION_ARB), 3,
             GL_(CONTEXT_PROFILE_MASK_ARB), GL_(CONTEXT_CORE_PROFILE_BIT_ARB),
             //GL_(CONTEXT_FLAGS_ARB), GL_(CONTEXT_DEBUG_BIT_ARB),
             0,

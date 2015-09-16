@@ -60,8 +60,9 @@ HEADERS += \
 HEADERS += \
     $$SOLUTION_ROOT\tests\widget\widget.h \
     $$SOLUTION_ROOT\tests\widget\core\core.h \
-    $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.h
-
+    $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.h \
+    $$SOLUTION_ROOT\tests\widget\widget2.h
+    
 HEADERS += \
     $$SOLUTION_ROOT\tests\openglwindow\openglwindow.h   
     
@@ -78,7 +79,8 @@ SOURCES += \
 SOURCES += \    
     $$SOLUTION_ROOT\tests\widget\widget.cpp \
     $$SOLUTION_ROOT\tests\widget\core\core.cpp \
-    $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.cpp
+    $$SOLUTION_ROOT\tests\widget\core\widget\core_widget.cpp \
+    $$SOLUTION_ROOT\tests\widget\widget2.cpp
     
 SOURCES += \    
     $$SOLUTION_ROOT\tests\openglwindow\openglwindow.cpp

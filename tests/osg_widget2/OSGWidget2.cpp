@@ -19,7 +19,8 @@ namespace visual
 {
 
     OSGWidget2::OSGWidget2()
-    {
+    {    
+        initialize();
     }
                                                     
     void OSGWidget2::initialize()
@@ -39,13 +40,11 @@ namespace visual
         pTraits->red                           = 8;
         pTraits->green                         = 8;
         pTraits->stencil                       = 8;
-        pTraits->samples                       = 4;
+        pTraits->samples                       = 8;
         pTraits->x = x();
         pTraits->y = y();
         pTraits->width = width();
         pTraits->height = height();
-
-        engine_ = CreateVisual();
         
         osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(pTraits.get());
         if (!gc)
@@ -53,6 +52,8 @@ namespace visual
             osg::notify(osg::NOTICE)<<"GraphicsWindow has not been created successfully."<<std::endl;
             return;
         }
+
+        engine_ = CreateVisual();
 
         osgViewer::Viewer* v = dynamic_cast<osgViewer::Viewer*>(engine_->GetViewer());
         osgViewer::ViewerBase::Cameras cams_;
@@ -79,5 +80,6 @@ namespace visual
     void  OSGWidget2::redraw()
     {
          QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+         //this->update();
     }
 }

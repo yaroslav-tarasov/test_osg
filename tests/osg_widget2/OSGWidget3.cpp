@@ -85,7 +85,7 @@ namespace visual
     void  OSGWidget3::redraw()
     {
         QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
-        force_log fl;
+        //force_log fl;
         LOG_ODS_MSG( "redraw()" << _hr_timer.get_delta() << "\n" );
     }
 
