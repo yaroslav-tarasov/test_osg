@@ -43,9 +43,12 @@ void Prerender::init(int width, int height)
 
 #ifdef K_ORIGIN  
     // set clear the color and depth buffer
+
+#if 1
     setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    setClearColor(osg::Vec4(0,0,0,0));
+    setClearColor(osg::Vec4(0,0,0,1.0));
     setClearDepth(1.0);
+#endif
 
     // just inherit the main cameras view
     setReferenceFrame(osg::Transform::ABSOLUTE_RF);

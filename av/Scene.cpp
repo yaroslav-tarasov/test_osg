@@ -683,26 +683,29 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     createObjects();
 
-    //createRTT();
-    //
-    //light_map = createLightMapRenderer();
-    //addChild( light_map );
-
-    //
-    //LightMapRenderer::SpotData  data;
-
-    //data.angle_falloff = cg::range_2f();
-    //data.dist_falloff = cg::range_2f(1.5f, 13.f);
-
-    //data.spot_color = cg::colorf(1.,0.,0.);
-
-    //const float heading = osg::DegreesToRadians(0.f);
-    //const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
-
-    //data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
-
-    //light_map->AddSpotLight(data);
+#if 1 
+    createRTT();
     
+    light_map = createLightMapRenderer();
+    addChild( light_map );
+
+    
+    LightMapRenderer::SpotData  data;
+
+    data.angle_falloff = cg::range_2f();
+    data.dist_falloff = cg::range_2f(1.5f, 13.f);
+
+    data.spot_color = cg::colorf(1.,0.,0.);
+
+    const float heading = osg::DegreesToRadians(0.f);
+    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+
+    data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
+
+    light_map->AddSpotLight(data);
+
+#endif
+
     FIXME(140 shaders version needed);
 
 #if GLSL_VERSION > 150

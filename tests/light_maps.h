@@ -32,8 +32,8 @@ struct LightMapRenderer : osg::Group
     virtual ITexture * UpdateTexture( bool enabled ) = 0;
 
 private:
-    class LightMapRenderer_priv;
-    std::shared_ptr<LightMapRenderer_priv>  _impl; 
+    class _private;
+    std::shared_ptr<_private>  _impl; 
 };
 
 typedef osg::ref_ptr<LightMapRenderer> ILightMapRendererPtr;

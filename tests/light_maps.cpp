@@ -6,33 +6,63 @@
 
 #include "av/Prerender.h"
 
+//"uniform vec4 coeff; \n"
+//"attribute vec3 from_l : ATTR2; \n"
+//"attribute vec3 l_dir : ATTR3; \n"
+//"attribute vec3 l_color : ATTR4; \n"
+//"attribute vec2 dist_falloff : ATTR5; \n"
+//"attribute vec2 cone_falloff : ATTR6; \n"
+
 #define GL_RGBA16F 0x881A
 char vertexShaderSource_simple[] = 
+    "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform vec4 coeff; \n"
-    "attribute vec3 from_l : ATTR2; \n"
-    "attribute vec3 l_dir : ATTR3; \n"
-    "attribute vec3 l_color : ATTR4; \n"
-    "attribute vec2 dist_falloff : ATTR5; \n"
-    "attribute vec2 cone_falloff : ATTR6; \n"
+    "attribute vec3 from_l ; \n"
+    "attribute vec3 l_dir ; \n"
+    "attribute vec3 l_color ; \n"
+    "attribute vec2 dist_falloff ; \n"
+    "attribute vec2 cone_falloff ; \n"
+    "out block  \n"
+    "{          \n"
+    "    vec3 from_l;              \n"
+    "    flat vec3 l_dir;          \n"
+    "    flat vec3 l_color;        \n"
+    "    flat vec2 dist_falloff;   \n"
+    "    flat vec2 cone_falloff;   \n"
+    "} v_out;                      \n"
     "\n"
     "void main(void) \n"
     "{ \n"
     "\n"
     "    gl_TexCoord[0] = gl_Vertex; \n"
     "    vec4 vert = gl_Vertex; \n"
-    "    gl_Position = gl_ModelViewProjectionMatrix * vert;\n"
+    "    v_out.from_l = from_l; \n"
+    "    v_out.l_dir = l_dir; \n"
+    "    v_out.l_color = l_color; \n"
+    "    v_out.dist_falloff = dist_falloff; \n"
+    "    v_out.cone_falloff = cone_falloff; \n"
+    "    gl_Position =  gl_ModelViewProjectionMatrix * vert;\n"
     "}\n";
 
 
 char fragmentShaderSource[] = 
+    "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform sampler2D baseTexture; \n"
+    "in block  \n"
+    "{          \n"
+    "    vec3 from_l;              \n"
+    "    flat vec3 l_dir;          \n"
+    "    flat vec3 l_color;        \n"
+    "    flat vec2 dist_falloff;   \n"
+    "    flat vec2 cone_falloff;   \n"
+    "} v_in;                      \n"
     "\n"
     "void main(void) \n"
     "{ \n"
-    "    gl_FragColor = texture2D( baseTexture, gl_TexCoord[0].xy); \n"
+    "    gl_FragColor = vec4(vec3(v_in.cone_falloff,0.5),1.0);/*texture2D( baseTexture, gl_TexCoord[0].xy);*/ \n"
     "}\n";
 
-class LightMapRenderer_priv : public LightMapRenderer
+class _private : public LightMapRenderer
 {
  
     friend ILightMapRendererPtr createLightMapRenderer();
@@ -66,10 +96,11 @@ public: // ILightMapRenderer
         cg::point_2f                    cone_falloff;
     };
 
+    osg::Geometry * _private::_createGeometry();
 
 protected:
 
-    LightMapRenderer_priv();
+    _private();
 
 protected:
     unsigned                             tex_dim_;
@@ -96,7 +127,7 @@ protected:
 // create
 ILightMapRendererPtr createLightMapRenderer()
 {
-    return new LightMapRenderer_priv();
+    return new _private();
 }
 
 // intersection points
@@ -204,45 +235,98 @@ class LightMapCullCallback : public osg::NodeCallback
     }
 };
 
+osg::Geometry * _private::_createGeometry()
+{
+    // dummy bounding box callback
+    osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
+
+    // create OSG geode with 1 drawable node
+    setCullingActive(false);
+    setDataVariance(osg::Object::STATIC);
+
+    // create tetrahedron around viewer (just to fill the whole volume)
+    osg::Geometry * box_geometry = new osg::Geometry;
+    box_geometry->setUseDisplayList(true);
+    box_geometry->setDataVariance(osg::Object::STATIC);
+    box_geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
+
+    const float fSqrt3 = sqrtf(3.0f);
+
+    // create its' vertex
+    osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
+    paBoxPointsPos->resize(4);
+    paBoxPointsPos->at(0).set(0.f, 0.f, +2.f);
+    paBoxPointsPos->at(1).set(-2.0f * fSqrt3, 0.f, -1.0f);
+    paBoxPointsPos->at(2).set(fSqrt3, -3.0f, -1.0f);
+    paBoxPointsPos->at(3).set(fSqrt3, +3.0f, -1.0f);
+    // set vertex array
+    paBoxPointsPos->setDataVariance(osg::Object::STATIC);
+    box_geometry->setVertexArray(paBoxPointsPos);
+
+    // draw elements command, that would be executed
+    // volume is made looking inside
+    osg::DrawElementsUShort * paBoxDrawElem = new osg::DrawElementsUShort(GL_TRIANGLES, 12);
+    paBoxDrawElem->at(0)  = 0;
+    paBoxDrawElem->at(1)  = 2;
+    paBoxDrawElem->at(2)  = 1;
+    paBoxDrawElem->at(3)  = 0;
+    paBoxDrawElem->at(4)  = 3;
+    paBoxDrawElem->at(5)  = 2;
+    paBoxDrawElem->at(6)  = 0;
+    paBoxDrawElem->at(7)  = 1;
+    paBoxDrawElem->at(8)  = 3;
+    paBoxDrawElem->at(9)  = 1;
+    paBoxDrawElem->at(10) = 2;
+    paBoxDrawElem->at(11) = 3;
+
+    paBoxDrawElem->setDataVariance(osg::Object::STATIC);
+    box_geometry->addPrimitiveSet(paBoxDrawElem);
+
+    return box_geometry;
+}
+
 // ctor
-LightMapRenderer_priv::LightMapRenderer_priv()
+_private::_private()
     : tex_dim_(0)
     , we_see_smth_(false)
     , lightmap_clipper_(cg::matrix_4f())
 {
     osg::Geode* geode = new osg::Geode;
 
-    osg::ref_ptr<osg::Geometry> vao_ = new osg::Geometry();
-    vao_->setUseDisplayList(false);
-    vao_->setUseVertexBufferObjects(true);
-    vao_->setDataVariance(osg::Object::DYNAMIC);
-    geode->addDrawable(vao_.get());
+    osg::ref_ptr<osg::Geometry> geom = _createGeometry()/*new osg::Geometry()*/;
+    geom->setUseDisplayList(false);
+    geom->setUseVertexBufferObjects(true);
+    geom->setDataVariance(osg::Object::DYNAMIC);
+    geode->addDrawable(geom.get());
 
-    osg::StateSet* stateset = vao_->getOrCreateStateSet();
+    osg::StateSet* stateset = geom->getOrCreateStateSet();
 
-    //osg::Program* program = new osg::Program;
-    //stateset->setAttribute(program);
+    osg::Program* program = new osg::Program;
 
 
-    //{
-    //    osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource_simple);
-    //    program->addShader(vertex_shader);
 
-    //    //osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
+    {
+        osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource_simple);
+        program->addShader(vertex_shader);
 
-    //    //stateset->addUniform(coeff);
+        //osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
 
-    //    //if (dynamic)
-    //    //{
-    //    //    coeff->setUpdateCallback(new UniformVarying);
-    //    //    coeff->setDataVariance(osg::Object::DYNAMIC);
-    //    //    stateset->setDataVariance(osg::Object::DYNAMIC);
-    //    //}
+        //stateset->addUniform(coeff);
 
-    //}
-    //
-    //osg::Shader* fragment_shader = new osg::Shader(osg::Shader::FRAGMENT, fragmentShaderSource);
-    //program->addShader(fragment_shader);
+        //if (dynamic)
+        //{
+        //    coeff->setUpdateCallback(new UniformVarying);
+        //    coeff->setDataVariance(osg::Object::DYNAMIC);
+        //    stateset->setDataVariance(osg::Object::DYNAMIC);
+        //}
+
+    }
+    
+    osg::Shader* fragment_shader = new osg::Shader(osg::Shader::FRAGMENT, fragmentShaderSource);
+    program->addShader(fragment_shader);
+    program->setName("LightMap");
+
+    stateset->setAttribute(program);
 
     //osg::Texture2D* texture = new osg::Texture2D(osgDB::readImageFile(textureFileName));
     //stateset->setTextureAttributeAndModes(0,texture);
@@ -251,29 +335,48 @@ LightMapRenderer_priv::LightMapRenderer_priv()
     stateset->addUniform(baseTextureSampler);
 
     // create its' vertices
-    osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array();
-    v->setDataVariance(osg::Object::DYNAMIC);
-    vao_->setVertexArray(v);
+    //osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array();
+    //v->setDataVariance(osg::Object::DYNAMIC);
+    //geom->setVertexArray(v);
 
     //osg::ref_ptr<osg::Vec2Array> pMoonTexCoords = new osg::Vec2Array();
     //pMoonTexCoords->setDataVariance(osg::Object::STATIC);
     //vao_->setTexCoordArray(0, pMoonTexCoords);
 
     osg::ref_ptr<osg::Vec3Array> from_l = new osg::Vec3Array();
-    //vao_->setVertexAttribBinding(2, osg::Geometry::BIND_PER_VERTEX);
-    vao_->setVertexAttribArray(2, from_l.get(),osg::Array::BIND_PER_VERTEX);
+    //vao_->setVertexAttribBinding(1, osg::Geometry::BIND_PER_VERTEX);
+    geom->setVertexAttribArray(1, from_l.get(),osg::Array::BIND_PER_VERTEX);
+    geom->setVertexAttribNormalize(1, false);
     osg::ref_ptr<osg::Vec3Array> ldir = new osg::Vec3Array();
-    //vao_->setVertexAttribBinding(3, osg::Geometry::BIND_PER_VERTEX);
-    vao_->setVertexAttribArray(3, ldir.get(),osg::Array::BIND_PER_VERTEX);
+    //vao_->setVertexAttribBinding(2, osg::Geometry::BIND_PER_VERTEX);
+    geom->setVertexAttribArray(2, ldir.get(),osg::Array::BIND_PER_VERTEX);
+    geom->setVertexAttribNormalize(2, false);
     osg::ref_ptr<osg::Vec3Array> lcolor = new osg::Vec3Array();
-    //vao_->setVertexAttribBinding(4, osg::Geometry::BIND_PER_VERTEX);
-    vao_->setVertexAttribArray(4, lcolor.get(),osg::Array::BIND_PER_VERTEX);
+    //vao_->setVertexAttribBinding(3, osg::Geometry::BIND_PER_VERTEX);
+    geom->setVertexAttribArray(3, lcolor.get(),osg::Array::BIND_PER_VERTEX);
+    geom->setVertexAttribNormalize(3, false);
     osg::ref_ptr<osg::Vec2Array> dist_falloff = new osg::Vec2Array();
-    //vao_->setVertexAttribBinding(5, osg::Geometry::BIND_PER_VERTEX);
-    vao_->setVertexAttribArray(5, dist_falloff.get(),osg::Array::BIND_PER_VERTEX);
+    //vao_->setVertexAttribBinding(4, osg::Geometry::BIND_PER_VERTEX);
+    geom->setVertexAttribArray(4, dist_falloff.get(),osg::Array::BIND_PER_VERTEX);
+    geom->setVertexAttribNormalize(4, false);
     osg::ref_ptr<osg::Vec2Array> cone_falloff = new osg::Vec2Array();
-    //vao_->setVertexAttribBinding(6, osg::Geometry::BIND_PER_VERTEX);
-    vao_->setVertexAttribArray(6, cone_falloff.get(),osg::Array::BIND_PER_VERTEX);
+    //vao_->setVertexAttribBinding(5, osg::Geometry::BIND_PER_VERTEX);
+    geom->setVertexAttribArray(5, cone_falloff.get(),osg::Array::BIND_PER_VERTEX);
+    geom->setVertexAttribNormalize(5, false);
+    
+    from_l->setPreserveDataType(true);
+    ldir->setPreserveDataType(true);
+    dist_falloff->setPreserveDataType(true);
+    cone_falloff->setPreserveDataType(true);
+    lcolor->setPreserveDataType(true);
+
+
+    size_t s = geom->getVertexArray()->getNumElements();
+    from_l->assign( s, osg::Vec3(0.1,0.1,0.1) );
+    ldir->assign( s, osg::Vec3(0.2,0.2,0.2) );
+    dist_falloff->assign( s, osg::Vec2(0.3,0.3) );
+    cone_falloff->assign( s, osg::Vec2(0.4,0.4) );
+    lcolor->assign( s, osg::Vec3(0.5,0.5,0.5) );
 
     addChild(geode);
 
@@ -292,16 +395,18 @@ LightMapRenderer_priv::LightMapRenderer_priv()
     static const int
         g_nWidth = 512,
         g_nHeight = 512;
-    osg::ref_ptr<Prerender> pReflFBOGroup = new Prerender(g_nWidth, g_nHeight);
-    // m_groupMainReflection = pReflFBOGroup.get();
-    addChild(pReflFBOGroup); 
-    //pReflFBOGroup->addChild(geode);
+    osg::ref_ptr<Prerender> pFBOGroup = new Prerender(g_nWidth, g_nHeight);
+    // m_groupMainReflection = pFBOGroup.get();
+    addChild(pFBOGroup); 
+    pFBOGroup->addChild(geode);
+    
+    // ss->setAttribute( program, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 
     //setCullCallback(new LightMapCullCallback());
 }
 
 // reserves textures, setups FBO, etc
-void LightMapRenderer_priv::InitializeTexture( unsigned tex_dim )
+void _private::InitializeTexture( unsigned tex_dim )
 {
     if (tex_dim_ != tex_dim)
     {
@@ -323,7 +428,7 @@ void LightMapRenderer_priv::InitializeTexture( unsigned tex_dim )
 }
 
 // add spot on cull pass
-void LightMapRenderer_priv::AddSpotLight( SpotData const & spot )
+void _private::AddSpotLight( SpotData const & spot )
 {
     // check visibility
     const cg::point_3f world_light_pos = mv_.treat_point(spot.view_pos, false);
@@ -347,7 +452,7 @@ void LightMapRenderer_priv::AddSpotLight( SpotData const & spot )
 }
 
 // set camera frustum and calculate all transformations
-void LightMapRenderer_priv::SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode )
+void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode )
 {
     // clear vertex buffer
     vertices_.resize(0);
@@ -378,7 +483,7 @@ void LightMapRenderer_priv::SetupProjection( cg::frustum_f const & view_frustum,
 }
 
 // render lightmap
-ITexture * LightMapRenderer_priv::UpdateTexture( bool enabled )
+ITexture * _private::UpdateTexture( bool enabled )
 {
 #if 0
     if (enabled && we_see_smth_ && !vertices_.empty())
@@ -422,13 +527,13 @@ ITexture * LightMapRenderer_priv::UpdateTexture( bool enabled )
 }
 
 // texture matrix for specific split
-cg::matrix_4f const & LightMapRenderer_priv::GetViewTextureMatrix() const
+cg::matrix_4f const & _private::GetViewTextureMatrix() const
 {
     return tex_matr_;
 }
 
 // get night mode
-bool LightMapRenderer_priv::GetNightMode() const
+bool _private::GetNightMode() const
 {
     return we_see_smth_;
 }
@@ -437,7 +542,7 @@ bool LightMapRenderer_priv::GetNightMode() const
 // Impl
 //
 
-void LightMapRenderer_priv::add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
+void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
 {
     // convert angular falloffs
     cg::point_2f dot_falloff(0, 1);
