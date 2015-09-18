@@ -5,6 +5,7 @@
 #include "geometry/lispsm_matrix.h"
 
 #include "av/Prerender.h"
+#include "av/Scene.h"
 
 //"uniform vec4 coeff; \n"
 //"attribute vec3 from_l : ATTR2; \n"
@@ -16,7 +17,7 @@
 #define GL_RGBA16F 0x881A
 char vertexShaderSource_simple[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
-    "uniform vec4 coeff; \n"
+    "uniform mat4 mvp_matrix; \n"
     "attribute vec3 from_l ; \n"
     "attribute vec3 l_dir ; \n"
     "attribute vec3 l_color ; \n"
@@ -34,18 +35,16 @@ char vertexShaderSource_simple[] =
     "void main(void) \n"
     "{ \n"
     "\n"
-    "    gl_TexCoord[0] = gl_Vertex; \n"
-    "    vec4 vert = gl_Vertex; \n"
     "    v_out.from_l = from_l; \n"
     "    v_out.l_dir = l_dir; \n"
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =  gl_ModelViewProjectionMatrix * vert;\n"
+    "    gl_Position =  mvp_matrix * gl_Vertex;\n"
     "}\n";
 
 
-char fragmentShaderSource[] = 
+char fragmentShaderSource_test[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform sampler2D baseTexture; \n"
     "in block  \n"
@@ -61,6 +60,130 @@ char fragmentShaderSource[] =
     "{ \n"
     "    gl_FragColor = vec4(vec3(v_in.cone_falloff,0.5),1.0);/*texture2D( baseTexture, gl_TexCoord[0].xy);*/ \n"
     "}\n";
+
+char fragmentShaderSource[] =  {
+    "#version 430 compatibility \n"
+    "#extension GL_ARB_gpu_shader5 : enable \n"
+
+
+    STRINGIFY(
+    in block                                                                                                       \n
+    {                                                                                                              \n
+        vec3 from_l;                                                                                               \n
+        flat vec3 l_dir;                                                                                           \n
+        flat vec3 l_color;                                                                                         \n
+        flat vec2 dist_falloff;                                                                                    \n
+        flat vec2 cone_falloff;                                                                                    \n
+    } f_in;                                                                                                        \n
+                                                                                                                   \n
+    out vec4 FragColor;                                                                                            \n
+                                                                                                                   \n
+    void main()                                                                                                    \n
+    {                                                                                                              \n
+        // get dist falloff                                                                                        \n
+\n      const float dist_rcp = inversesqrt(dot(f_in.from_l, f_in.from_l));                                         \n
+        const vec3 from_l_nrm = dist_rcp * f_in.from_l;                                                            \n
+        const float dist_atten = clamp(fma(dist_rcp, f_in.dist_falloff.x, f_in.dist_falloff.y), 0.0, 1.0);         \n
+        // get conical falloff                                                                                     \n
+\n      const float angle_dot = dot(from_l_nrm, f_in.l_dir);                                                       \n
+        const float angle_atten = clamp(fma(angle_dot, f_in.cone_falloff.x, f_in.cone_falloff.y), 0.0, 1.0);       \n
+        // diffuse-like term for planar surfaces                                                                   \n
+        //const float ndotl = clamp(fma(-from_l_nrm.z, 0.35, 0.65), 0.0, 1.0);                                     \n
+        // write color                                                                                             \n
+\n      const float height_packed = -f_in.from_l.z;                                                                \n
+        const float angledist_atten = angle_atten * dist_atten;                                                    \n
+        const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
+        FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
+    }                                                                                                              \n
+    )                                                                                                             
+};
+
+
+char geometryShaderSource[] = {
+    "#version 430 compatibility \n"
+
+    "#extension GL_EXT_geometry_shader4 : enable\n"
+    "#extension GL_ARB_gpu_shader5 : enable\n"
+
+    STRINGIFY(
+    layout(points) in;                                                                              \n
+    layout(triangle_strip, max_vertices = 4) out;                                                   \n
+                                                                                                    \n
+    in mat4 projection_matrix;                                                                      \n
+                                                                                                    \n
+    in block                                                                                        \n
+    {                                                                                               \n
+        vec4 color;                                                                                 \n
+        vec3 size_pixel_vert;                                                                       \n
+    } g_in[1];                                                                                      \n
+                                                                                                    \n
+    out block                                                                                       \n
+    {                                                                                               \n
+        centroid vec2 tex;                                                                          \n
+        vec4 color;                                                                                 \n
+    } g_out;                                                                                        \n
+                                                                                                    \n
+    const vec2 g_ParticleCoords[4] = vec2[]                                                         \n
+    (                                                                                               \n
+        vec2(-1.0, -g_in[0].size_pixel_vert.z),                                                     \n
+        vec2(+1.0, -g_in[0].size_pixel_vert.z),                                                     \n
+        vec2(-1.0, +1.0),                                                                           \n
+        vec2(+1.0, +1.0)                                                                            \n
+        );                                                                                          \n
+                                                                                                    \n
+    const vec2 g_ParticleTexCoords[4] = vec2[]                                                      \n
+    (                                                                                               \n
+        vec2(-1.0, -1.0),                                                                           \n
+        vec2(+1.0, -1.0),                                                                           \n
+        vec2(-1.0, +1.0),                                                                           \n
+        vec2(+1.0, +1.0)                                                                            \n
+        );                                                                                          \n
+                                                                                                    \n
+    void main(void)                                                                                 \n
+    {                                                                                               \n
+        const vec3 vViewPosition = gl_in[0].gl_Position.xyz;                                        \n
+        const float fSize = g_in[0].size_pixel_vert.x + abs(vViewPosition.z) * g_in[0].size_pixel_vert.y; \n
+                                                                                                    \n
+        vec2 vOffset;                                                                               \n
+        vec4 vViewPos;                                                                              \n
+                                                                                                    \n
+        g_out.color = g_in[0].color;                                                                \n
+        if (g_out.color.a >= 0.002)                                                                 \n
+        {                                                                                           \n
+            // lower-left                                                                           
+\n          vOffset = fSize * g_ParticleCoords[0];                                                  \n
+            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
+            gl_Position = projection_matrix * vViewPos;                                             \n
+            g_out.tex = g_ParticleTexCoords[0];                                                     \n
+            EmitVertex();                                                                           \n
+                                                                                                    \n
+            // lower-right                                                                          
+\n          vOffset = fSize * g_ParticleCoords[1];                                                  \n
+            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
+            gl_Position = projection_matrix * vViewPos;                                             \n
+            g_out.tex = g_ParticleTexCoords[1];                                                     \n
+            EmitVertex();                                                                           \n
+                                                                                                    \n
+            // upper-left                                                                           \n
+\n          vOffset = fSize * g_ParticleCoords[2];                                                  \n
+            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
+            gl_Position = projection_matrix * vViewPos;                                             \n
+            g_out.tex = g_ParticleTexCoords[2];                                                     \n
+            EmitVertex();                                                                           \n
+                                                                                                    \n
+            // upper-right                                                                          \n
+\n          vOffset = fSize * g_ParticleCoords[3];                                                  \n
+            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
+            gl_Position = projection_matrix * vViewPos;                                             \n
+            g_out.tex = g_ParticleTexCoords[3];                                                     \n
+            EmitVertex();                                                                           \n
+                                                                                                    \n
+            //EndPrimitive();                                                                       \n
+        }
+    }
+
+    )
+};
 
 class _private : public LightMapRenderer
 {
@@ -96,11 +219,15 @@ public: // ILightMapRenderer
         cg::point_2f                    cone_falloff;
     };
 
-    osg::Geometry * _private::_createGeometry();
+
+    void                                setMVP(const osg::Matrixf& mvp);
 
 protected:
 
     _private();
+    
+    osg::Geometry *                     _createGeometry();
+
 
 protected:
     unsigned                             tex_dim_;
@@ -121,7 +248,14 @@ protected:
     std::vector<SpotRenderVertex>        vertices_;
 
     void add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
-
+    
+    osg::ref_ptr<osg::Uniform>     uni_mvp_   ;
+    osg::ref_ptr<osg::Geometry>     geom_         ;
+    osg::ref_ptr<osg::Vec3Array>    from_l_       ;
+    osg::ref_ptr<osg::Vec3Array>    ldir_         ;
+    osg::ref_ptr<osg::Vec3Array>    lcolor_       ;
+    osg::ref_ptr<osg::Vec2Array>    dist_falloff_ ;
+    osg::ref_ptr<osg::Vec2Array>    cone_falloff_ ;
 };
 
 // create
@@ -210,30 +344,72 @@ static inter_points_array make_intersection( const cg::point_3f & world_light_po
     return res;
 }
 
-class LightMapCullCallback : public osg::NodeCallback
+struct LightMapCullCallback : public osg::NodeCallback
 {
+    LightMapCullCallback(_private * p)
+        : p_(p)
+    {
+
+    }
+
     virtual void operator()( osg::Node * pNode, osg::NodeVisitor * pNV )
     {
+
         osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
         osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
         avAssert(pCV && pNodeAsGroup);
 
-        Prerender * pPrerenderNode = static_cast<Prerender *>(pNodeAsGroup->getChild(0));
+        Prerender * pPrerenderNode = /*static_cast*/dynamic_cast<Prerender *>(pNodeAsGroup->getChild(0));
         avAssert(pPrerenderNode);
+        
+        const  osg::Camera* cam = avScene::GetScene()->getCamera();
+
+        double  m_fLeft(-1.0f)
+            , m_fRight(+1.0f)
+            , m_fBottom(-1.0f)
+            , m_fTop(+1.0f)
+            , m_fNear(1.0f)
+            , m_fFar(1000.0f);
+        
+        cam->getProjectionMatrixAsFrustum(m_fLeft, m_fRight, m_fBottom, m_fTop, m_fNear, m_fFar);
+        
+        osg::Vec3f eye, center, up;
+        cam->getViewMatrixAsLookAt(eye, center, up);
+        
+        const cg::point_3f  vPosition(from_osg_vector3(pNV->getViewPoint()));
+        auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(eye - center));
+        const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,dir.range);
+
+        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+        frustum_.camera() = cg::camera_f(vPosition, rOrientation);
+
+        p_->SetupProjection(frustum_, 3300.f, true/*night_mode*/);
 
         const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
-        osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * utils::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
+        // osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * utils::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
         osg::Matrixd mModelView = *pCV->getModelViewMatrix();
 
-        osg::Matrixd InvMVP = osg::Matrixd::inverse(mModelView * mProjection);
-
+        // osg::Matrixd InvMVP = osg::Matrixd::inverse(mModelView * mProjection);
+        
+        p_->UpdateTexture(true);
+#if 0
         pPrerenderNode->setProjectionMatrix(mProjection);
         pPrerenderNode->setViewMatrix(mModelView);
+#endif
 
         // go down
         pNV->traverse(*pNode);
     }
+private:
+
+    _private*           p_;
+
 };
+
+void            _private::setMVP(const osg::Matrixf& mvp)
+{
+     uni_mvp_->set(mvp);
+}
 
 osg::Geometry * _private::_createGeometry()
 {
@@ -255,13 +431,20 @@ osg::Geometry * _private::_createGeometry()
     // create its' vertex
     osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
     paBoxPointsPos->resize(4);
-    paBoxPointsPos->at(0).set(0.f, 0.f, +2.f);
-    paBoxPointsPos->at(1).set(-2.0f * fSqrt3, 0.f, -1.0f);
-    paBoxPointsPos->at(2).set(fSqrt3, -3.0f, -1.0f);
-    paBoxPointsPos->at(3).set(fSqrt3, +3.0f, -1.0f);
+    //paBoxPointsPos->at(0).set(0.f, 0.f, +2.f);
+    //paBoxPointsPos->at(1).set(-2.0f * fSqrt3, 0.f, -1.0f);
+    //paBoxPointsPos->at(2).set(fSqrt3, -3.0f, -1.0f);
+    //paBoxPointsPos->at(3).set(fSqrt3, +3.0f, -1.0f);
+
+    paBoxPointsPos->at(0).set(0.f, 0.f, +1.f);
+    paBoxPointsPos->at(1).set(-1, 0.f, -1.0f);
+    paBoxPointsPos->at(2).set(1, -1.0f, -1.0f);
+    paBoxPointsPos->at(3).set(1, +1.0f, -1.0f);
     // set vertex array
-    paBoxPointsPos->setDataVariance(osg::Object::STATIC);
+    paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
+#if 0
     box_geometry->setVertexArray(paBoxPointsPos);
+#endif
 
     // draw elements command, that would be executed
     // volume is made looking inside
@@ -279,8 +462,10 @@ osg::Geometry * _private::_createGeometry()
     paBoxDrawElem->at(10) = 2;
     paBoxDrawElem->at(11) = 3;
 
-    paBoxDrawElem->setDataVariance(osg::Object::STATIC);
+    paBoxDrawElem->setDataVariance(osg::Object::DYNAMIC);
+#if 0    
     box_geometry->addPrimitiveSet(paBoxDrawElem);
+#endif
 
     return box_geometry;
 }
@@ -293,27 +478,25 @@ _private::_private()
 {
     osg::Geode* geode = new osg::Geode;
 
-    osg::ref_ptr<osg::Geometry> geom = _createGeometry()/*new osg::Geometry()*/;
-    geom->setUseDisplayList(false);
-    geom->setUseVertexBufferObjects(true);
-    geom->setDataVariance(osg::Object::DYNAMIC);
-    geode->addDrawable(geom.get());
+    geom_ = _createGeometry()/*new osg::Geometry()*/;
+    geom_->setUseDisplayList(false);
+    geom_->setUseVertexBufferObjects(true);
+    geom_->setDataVariance(osg::Object::DYNAMIC);
+    geode->addDrawable(geom_.get());
 
-    osg::StateSet* stateset = geom->getOrCreateStateSet();
+    osg::StateSet* stateset = geom_->getOrCreateStateSet();
 
     osg::Program* program = new osg::Program;
-
-
 
     {
         osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource_simple);
         program->addShader(vertex_shader);
 
-        //osg::Uniform* coeff = new osg::Uniform("coeff",osg::Vec4(1.0,-1.0f,-1.0f,1.0f));
+        uni_mvp_ = new osg::Uniform("mvp_matrix",osg::Matrixf());
 
-        //stateset->addUniform(coeff);
+        stateset->addUniform(uni_mvp_);
 
-        //if (dynamic)
+        //if (true)
         //{
         //    coeff->setUpdateCallback(new UniformVarying);
         //    coeff->setDataVariance(osg::Object::DYNAMIC);
@@ -324,15 +507,16 @@ _private::_private()
     
     osg::Shader* fragment_shader = new osg::Shader(osg::Shader::FRAGMENT, fragmentShaderSource);
     program->addShader(fragment_shader);
-    program->setName("LightMap");
 
+
+    program->setName("LightMap");
     stateset->setAttribute(program);
 
     //osg::Texture2D* texture = new osg::Texture2D(osgDB::readImageFile(textureFileName));
     //stateset->setTextureAttributeAndModes(0,texture);
 
-    osg::Uniform* baseTextureSampler = new osg::Uniform("baseTexture",0);
-    stateset->addUniform(baseTextureSampler);
+    //osg::Uniform* baseTextureSampler = new osg::Uniform("baseTexture",0);
+    //stateset->addUniform(baseTextureSampler);
 
     // create its' vertices
     //osg::ref_ptr<osg::Vec3Array> v = new osg::Vec3Array();
@@ -343,42 +527,45 @@ _private::_private()
     //pMoonTexCoords->setDataVariance(osg::Object::STATIC);
     //vao_->setTexCoordArray(0, pMoonTexCoords);
 
-    osg::ref_ptr<osg::Vec3Array> from_l = new osg::Vec3Array();
+    from_l_ = new osg::Vec3Array();
     //vao_->setVertexAttribBinding(1, osg::Geometry::BIND_PER_VERTEX);
-    geom->setVertexAttribArray(1, from_l.get(),osg::Array::BIND_PER_VERTEX);
-    geom->setVertexAttribNormalize(1, false);
-    osg::ref_ptr<osg::Vec3Array> ldir = new osg::Vec3Array();
+    geom_->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(1, false);
+    ldir_ = new osg::Vec3Array();
     //vao_->setVertexAttribBinding(2, osg::Geometry::BIND_PER_VERTEX);
-    geom->setVertexAttribArray(2, ldir.get(),osg::Array::BIND_PER_VERTEX);
-    geom->setVertexAttribNormalize(2, false);
-    osg::ref_ptr<osg::Vec3Array> lcolor = new osg::Vec3Array();
+    geom_->setVertexAttribArray(2, ldir_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(2, false);
+    lcolor_ = new osg::Vec3Array();
     //vao_->setVertexAttribBinding(3, osg::Geometry::BIND_PER_VERTEX);
-    geom->setVertexAttribArray(3, lcolor.get(),osg::Array::BIND_PER_VERTEX);
-    geom->setVertexAttribNormalize(3, false);
-    osg::ref_ptr<osg::Vec2Array> dist_falloff = new osg::Vec2Array();
+    geom_->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(3, false);
+    dist_falloff_ = new osg::Vec2Array();
     //vao_->setVertexAttribBinding(4, osg::Geometry::BIND_PER_VERTEX);
-    geom->setVertexAttribArray(4, dist_falloff.get(),osg::Array::BIND_PER_VERTEX);
-    geom->setVertexAttribNormalize(4, false);
-    osg::ref_ptr<osg::Vec2Array> cone_falloff = new osg::Vec2Array();
+    geom_->setVertexAttribArray(4, dist_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(4, false);
+    cone_falloff_ = new osg::Vec2Array();
     //vao_->setVertexAttribBinding(5, osg::Geometry::BIND_PER_VERTEX);
-    geom->setVertexAttribArray(5, cone_falloff.get(),osg::Array::BIND_PER_VERTEX);
-    geom->setVertexAttribNormalize(5, false);
+    geom_->setVertexAttribArray(5, cone_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(5, false);
     
-    from_l->setPreserveDataType(true);
-    ldir->setPreserveDataType(true);
-    dist_falloff->setPreserveDataType(true);
-    cone_falloff->setPreserveDataType(true);
-    lcolor->setPreserveDataType(true);
+    from_l_->setPreserveDataType(true);
+    ldir_->setPreserveDataType(true);
+    dist_falloff_->setPreserveDataType(true);
+    cone_falloff_->setPreserveDataType(true);
+    lcolor_->setPreserveDataType(true);
 
 
-    size_t s = geom->getVertexArray()->getNumElements();
-    from_l->assign( s, osg::Vec3(0.1,0.1,0.1) );
-    ldir->assign( s, osg::Vec3(0.2,0.2,0.2) );
-    dist_falloff->assign( s, osg::Vec2(0.3,0.3) );
-    cone_falloff->assign( s, osg::Vec2(0.4,0.4) );
-    lcolor->assign( s, osg::Vec3(0.5,0.5,0.5) );
+    if(geom_->getVertexArray())
+    {
+        size_t s = geom_->getVertexArray()->getNumElements();
+        from_l_->assign( s, osg::Vec3(0.1,0.1,0.1) );
+        ldir_->assign( s, osg::Vec3(0.2,0.2,0.2) );
+        dist_falloff_->assign( s, osg::Vec2(0.3,0.3) );
+        cone_falloff_->assign( s, osg::Vec2(0.4,0.4) );
+        lcolor_->assign( s, osg::Vec3(0.5,0.5,0.5) );
+    }
 
-    addChild(geode);
+    // addChild(geode);
 
     //// fake texture
     static const unsigned fake_tex_size_ = 2;
@@ -396,13 +583,11 @@ _private::_private()
         g_nWidth = 512,
         g_nHeight = 512;
     osg::ref_ptr<Prerender> pFBOGroup = new Prerender(g_nWidth, g_nHeight);
-    // m_groupMainReflection = pFBOGroup.get();
     addChild(pFBOGroup); 
     pFBOGroup->addChild(geode);
-    
-    // ss->setAttribute( program, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+    color_buf_ = pFBOGroup->getTexture();
 
-    //setCullCallback(new LightMapCullCallback());
+    setCullCallback(new LightMapCullCallback(this));
 }
 
 // reserves textures, setups FBO, etc
@@ -485,9 +670,11 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_m
 // render lightmap
 ITexture * _private::UpdateTexture( bool enabled )
 {
-#if 0
-    if (enabled && we_see_smth_ && !vertices_.empty())
+    FIXME( vertices_ )                        
+    if (enabled && we_see_smth_ /*&& !vertices_.empty()*/)
     {
+
+#if 0
         IGraphicDevice * pGD = vtGlobal::pGD;
 
         // bind and clear fbo
@@ -518,9 +705,13 @@ ITexture * _private::UpdateTexture( bool enabled )
 
         // build mips
         color_buf_->GenerateMipmaps();
+
+#else
+         uni_mvp_->set(to_osg_matrix(proj_matr_));
+#endif
         return color_buf_.get();
     }
-#endif
+
 
     // empty tex
     return empty_tex_.get();
@@ -583,4 +774,76 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
     }
     // append them
     vertices_.insert(vertices_.end(), new_spot.begin(), new_spot.end());
+
+    // create its' vertex
+    osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
+    paBoxPointsPos->resize(vertices_.size());
+    
+    from_l_->resize(vertices_.size());
+    ldir_->resize(vertices_.size());
+    dist_falloff_->resize(vertices_.size());
+    cone_falloff_->resize(vertices_.size());
+    lcolor_->resize(vertices_.size());
+
+    for (unsigned i = 0; i < vertices_.size(); ++i)
+    {
+        SpotRenderVertex & cur_v = vertices_[i];
+        paBoxPointsPos->at(i).set(cur_v.v.x, cur_v.v.y, cur_v.v.z);
+        from_l_->at(i).set( cur_v.from_l.x, cur_v.from_l.y,cur_v.from_l.z );
+        ldir_->at(i).set( cur_v.ldir.x, cur_v.ldir.y, cur_v.ldir.z );
+        dist_falloff_->at(i).set( cur_v.dist_falloff.x, cur_v.dist_falloff.y  );
+        cone_falloff_->at(i).set( cur_v.cone_falloff.x, cur_v.cone_falloff.y );
+        lcolor_->at(i).set(  cur_v.lcolor.r, cur_v.lcolor.g, cur_v.lcolor.b  );
+    }
+
+    // set vertex array
+    paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
+    geom_->setVertexArray(paBoxPointsPos);
+
+#if 0
+    const float fSqrt3 = sqrtf(3.0f);
+
+    // create its' vertex
+    // osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
+    paBoxPointsPos->resize(4);
+    paBoxPointsPos->at(0).set(0.f, 0.f, +1.f);
+    paBoxPointsPos->at(1).set(-1, 0.f, -1.0f);
+    paBoxPointsPos->at(2).set(1, -1.0f, -1.0f);
+    paBoxPointsPos->at(3).set(1, +1.0f, -1.0f);
+    // set vertex array
+    paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
+
+    geom_->setVertexArray(paBoxPointsPos);
+
+
+    // draw elements command, that would be executed
+    // volume is made looking inside
+    osg::DrawElementsUShort * paBoxDrawElem = new osg::DrawElementsUShort(GL_TRIANGLES, 12);
+    paBoxDrawElem->at(0)  = 0;
+    paBoxDrawElem->at(1)  = 2;
+    paBoxDrawElem->at(2)  = 1;
+    paBoxDrawElem->at(3)  = 0;
+    paBoxDrawElem->at(4)  = 3;
+    paBoxDrawElem->at(5)  = 2;
+    paBoxDrawElem->at(6)  = 0;
+    paBoxDrawElem->at(7)  = 1;
+    paBoxDrawElem->at(8)  = 3;
+    paBoxDrawElem->at(9)  = 1;
+    paBoxDrawElem->at(10) = 2;
+    paBoxDrawElem->at(11) = 3;
+
+    paBoxDrawElem->setDataVariance(osg::Object::DYNAMIC);
+ 
+    geom_->addPrimitiveSet(paBoxDrawElem);
+
+    if(geom_->getVertexArray())
+    {
+        size_t s = geom_->getVertexArray()->getNumElements();
+        from_l_->assign( s, osg::Vec3(0.1,0.1,0.1) );
+        ldir_->assign( s, osg::Vec3(0.2,0.2,0.2) );
+        dist_falloff_->assign( s, osg::Vec2(0.3,0.3) );
+        cone_falloff_->assign( s, osg::Vec2(0.4,0.4) );
+        lcolor_->assign( s, osg::Vec3(0.5,0.5,0.5) );
+    }
+#endif
 }
