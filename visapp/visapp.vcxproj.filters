@@ -111,52 +111,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source Files\..\ext" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Source Files\..\ext\spark" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\SparkDrawable.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\SparkUpdatingHandler.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\explosion_effect.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\fire_effect.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\osgspark.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\rain_effect.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\simple_effect.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ext\spark\test_effect.cpp">
-      <Filter>Source Files\..\ext\spark</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Source Files\..\kernel" />
   </ItemGroup>
   <ItemGroup>
@@ -614,7 +568,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\_Include\ui\tray_icon.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\..\_Include\ui</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -677,12 +631,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\moc_tray_icon.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\debug\visapp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\qrc_visapp_resources.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\debug\visapp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -693,12 +647,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\moc_tray_icon.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\release\visapp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\qrc_visapp_resources.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\release\visapp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
