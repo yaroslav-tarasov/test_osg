@@ -40,7 +40,7 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =  mvp_matrix*  gl_Vertex;\n"
+    "    gl_Position =  /* mvp_matrix* */  gl_Vertex;\n"
     "}\n";
 
 
@@ -94,7 +94,7 @@ char fragmentShaderSource[] =  {
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
-		FragColor = vec4(1.0,1.0,0.0,0.0 );
+		FragColor = vec4(1.0,1.0,0.0,1.0 );
     }                                                                                                              \n
     )                                                                                                             
 };
@@ -222,7 +222,7 @@ public: // ILightMapRenderer
 
 
     void                                setMVP(const osg::Matrixf& mvp);
-
+    osg::Matrix                         getProjectionMatrix() {return to_osg_matrix(proj_matr_);};
 protected:
 
     _private();
@@ -360,7 +360,7 @@ struct LightMapCullCallback : public osg::NodeCallback
         osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
         avAssert(pCV && pNodeAsGroup);
 
-        Prerender * pPrerenderNode = /*static_cast*/dynamic_cast<Prerender *>(pNodeAsGroup->getChild(0));
+        Prerender * pPrerenderNode = static_cast<Prerender *>(pNodeAsGroup->getChild(0));
         avAssert(pPrerenderNode);
         
         const  osg::Camera* cam = avScene::GetScene()->getCamera();
@@ -378,24 +378,23 @@ struct LightMapCullCallback : public osg::NodeCallback
         cam->getViewMatrixAsLookAt(eye, center, up);
         
         const cg::point_3f  vPosition(from_osg_vector3(pNV->getViewPoint()));
-        auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(eye - center));
+        auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(center - eye));
         const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
-        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
         frustum_.camera() = cg::camera_f(vPosition, rOrientation);
 
         p_->SetupProjection(frustum_, 3300.f, true/*night_mode*/);
 
         const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
-        // osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * utils::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
         osg::Matrixd mModelView = *pCV->getModelViewMatrix();
 
-        // osg::Matrixd InvMVP = osg::Matrixd::inverse(mModelView * mProjection);
         
+
         p_->UpdateTexture(true);
 #if 0
-        pPrerenderNode->setProjectionMatrix(mProjection);
-        pPrerenderNode->setViewMatrix(mModelView);
+        pPrerenderNode->setProjectionMatrix(/*mProjection*/osg::Matrix());
+        pPrerenderNode->setViewMatrix(/*mModelView*/p_->getProjectionMatrix());
 #endif
 
         // go down
@@ -566,8 +565,6 @@ _private::_private()
         lcolor_->assign( s, osg::Vec3(0.5,0.5,0.5) );
     }
 
-    // addChild(geode);
-
     //// fake texture
     static const unsigned fake_tex_size_ = 2;
     empty_tex_ = new osg::Texture2D;
@@ -712,7 +709,7 @@ ITexture * _private::UpdateTexture( bool enabled )
 		for (unsigned i = 0; i < vertices_.size(); ++i)
 		{
 			SpotRenderVertex & cur_v = vertices_[i];
-			point_4f vv = proj_matr_ * point_4f (cur_v.v , 1.0); 
+			point_4f vv = proj_matr_ * point_4f (cur_v.v , 0.0); 
 
 			force_log fl;
 			
@@ -810,7 +807,9 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
     // set vertex array
     paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
     geom_->setVertexArray(paBoxPointsPos);
+
 	geom_->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
+
 #if 0
     const float fSqrt3 = sqrtf(3.0f);
 
