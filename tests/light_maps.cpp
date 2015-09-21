@@ -40,7 +40,7 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =  mvp_matrix * gl_Vertex;\n"
+    "    gl_Position =  mvp_matrix*  gl_Vertex;\n"
     "}\n";
 
 
@@ -94,6 +94,7 @@ char fragmentShaderSource[] =  {
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
+		FragColor = vec4(1.0,1.0,0.0,0.0 );
     }                                                                                                              \n
     )                                                                                                             
 };
@@ -378,7 +379,7 @@ struct LightMapCullCallback : public osg::NodeCallback
         
         const cg::point_3f  vPosition(from_osg_vector3(pNV->getViewPoint()));
         auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(eye - center));
-        const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,dir.range);
+        const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
         cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
         frustum_.camera() = cg::camera_f(vPosition, rOrientation);
@@ -640,7 +641,7 @@ void _private::AddSpotLight( SpotData const & spot )
 void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode )
 {
     // clear vertex buffer
-    vertices_.resize(0);
+    // vertices_.resize(0);
     we_see_smth_ = false;
     if (!night_mode)
         return;
@@ -707,6 +708,16 @@ ITexture * _private::UpdateTexture( bool enabled )
         color_buf_->GenerateMipmaps();
 
 #else
+
+		for (unsigned i = 0; i < vertices_.size(); ++i)
+		{
+			SpotRenderVertex & cur_v = vertices_[i];
+			point_4f vv = proj_matr_ * point_4f (cur_v.v , 1.0); 
+
+			force_log fl;
+			
+			LOG_ODS_MSG ( "SpotRenderVertex:  "  << vv.x << "  " << vv.y << " " << vv.z << " " << vv.w << "\n");
+		}
          uni_mvp_->set(to_osg_matrix(proj_matr_));
 #endif
         return color_buf_.get();
@@ -799,7 +810,7 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
     // set vertex array
     paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
     geom_->setVertexArray(paBoxPointsPos);
-
+	geom_->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
 #if 0
     const float fSqrt3 = sqrtf(3.0f);
 
