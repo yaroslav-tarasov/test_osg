@@ -249,7 +249,7 @@ protected:
 
     void add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
     
-    osg::ref_ptr<osg::Uniform>     uni_mvp_   ;
+    osg::ref_ptr<osg::Uniform>      uni_mvp_      ;
     osg::ref_ptr<osg::Geometry>     geom_         ;
     osg::ref_ptr<osg::Vec3Array>    from_l_       ;
     osg::ref_ptr<osg::Vec3Array>    ldir_         ;
