@@ -40,7 +40,7 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =  /* mvp_matrix* */  gl_Vertex;\n"
+    "    gl_Position =  mvp_matrix*  gl_Vertex;\n"
     "}\n";
 
 
@@ -94,7 +94,7 @@ char fragmentShaderSource[] =  {
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
-		FragColor = vec4(1.0,1.0,0.0,1.0 );
+		/*FragColor = vec4(1.0,1.0,0.0,1.0 );*/
     }                                                                                                              \n
     )                                                                                                             
 };
@@ -381,7 +381,7 @@ struct LightMapCullCallback : public osg::NodeCallback
         auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(center - eye));
         const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
-        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), /*2.0f **/ 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), /*2.0f **/ 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
         frustum_.camera() = cg::camera_f(vPosition, rOrientation);
 
         p_->SetupProjection(frustum_, 3300.f, true/*night_mode*/);
@@ -389,12 +389,10 @@ struct LightMapCullCallback : public osg::NodeCallback
         const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
         osg::Matrixd mModelView = *pCV->getModelViewMatrix();
 
-        
-
         p_->UpdateTexture(true);
 #if 0
-        pPrerenderNode->setProjectionMatrix(/*mProjection*/osg::Matrix());
-        pPrerenderNode->setViewMatrix(/*mModelView*/p_->getProjectionMatrix());
+        pPrerenderNode->setProjectionMatrix(mProjection/*p_->getProjectionMatrix()*/);
+        pPrerenderNode->setViewMatrix(mModelView/*osg::Matrix()*/);
 #endif
 
         // go down
@@ -478,10 +476,21 @@ _private::_private()
 {
     osg::Geode* geode = new osg::Geode;
 
-    geom_ = _createGeometry()/*new osg::Geometry()*/;
+    geom_ = _createGeometry();
     geom_->setUseDisplayList(false);
     geom_->setUseVertexBufferObjects(true);
     geom_->setDataVariance(osg::Object::DYNAMIC);
+
+    osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::ALPHA_MAX);
+    geom_->getOrCreateStateSet()->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+    geom_->getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
+    
+    //osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
+    //geom_->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+
+    //// disable cull-face just for the case
+    //geom_->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+
     geode->addDrawable(geom_.get());
 
     osg::StateSet* stateset = geom_->getOrCreateStateSet();
@@ -711,11 +720,12 @@ ITexture * _private::UpdateTexture( bool enabled )
 			SpotRenderVertex & cur_v = vertices_[i];
 			point_4f vv = proj_matr_ * point_4f (cur_v.v , 0.0); 
 
-			force_log fl;
+			// force_log fl;
 			
 			LOG_ODS_MSG ( "SpotRenderVertex:  "  << vv.x << "  " << vv.y << " " << vv.z << " " << vv.w << "\n");
 		}
-         uni_mvp_->set(to_osg_matrix(proj_matr_));
+
+        uni_mvp_->set(to_osg_matrix(proj_matr_));
 #endif
         return color_buf_.get();
     }
@@ -787,11 +797,20 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
     osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
     paBoxPointsPos->resize(vertices_.size());
     
+    from_l_->clear();
+    ldir_->clear();
+    dist_falloff_->clear();
+    cone_falloff_->clear();
+    lcolor_->clear();
+
     from_l_->resize(vertices_.size());
     ldir_->resize(vertices_.size());
     dist_falloff_->resize(vertices_.size());
     cone_falloff_->resize(vertices_.size());
     lcolor_->resize(vertices_.size());
+
+    if(int s = geom_->getNumPrimitiveSets()>0)
+        geom_->removePrimitiveSet(0,s);
 
     for (unsigned i = 0; i < vertices_.size(); ++i)
     {

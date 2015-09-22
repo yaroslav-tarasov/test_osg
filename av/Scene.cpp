@@ -684,25 +684,39 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     createObjects();
 
 #if 1 
-    createRTT();
+
+    // createRTT();
     
     light_map = createLightMapRenderer();
     addChild( light_map );
 
     
     LightMapRenderer::SpotData  data;
+    
+    //data.view_pos =  cg::point_3f(0.0,0.0,0.0);
+    //data.angle_falloff = cg::range_2f(15.f, 32.f);
+    data.dist_falloff = cg::range_2f(1.5f, 200.f);
 
-    data.angle_falloff = cg::range_2f();
-    data.dist_falloff = cg::range_2f(1.5f, 13.f);
-
-    data.spot_color = cg::colorf(1.,0.,0.);
+    data.spot_color = cg::colorf(1.,1.,0.);
+    data.view_pos =  cg::point_3f();
 
     const float heading = osg::DegreesToRadians(0.f);
-    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+    const float pitch   = osg::DegreesToRadians(0.f);
 
     data.view_dir = cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) );
 
     light_map->AddSpotLight(data);
+
+    data.view_pos =  cg::point_3f(0.5,0.5,0.5);
+    data.spot_color = cg::colorf(1.,0.,0.);
+
+    light_map->AddSpotLight(data);
+
+    data.view_pos =  cg::point_3f(-1.0,-1.0,0.0);
+    data.spot_color = cg::colorf(0.,0.,1.);
+
+    light_map->AddSpotLight(data);
+
 
 #endif
 
