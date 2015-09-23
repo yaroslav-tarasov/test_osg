@@ -31,6 +31,7 @@ char vertexShaderSource_simple[] =
     "    flat vec2 dist_falloff;   \n"
     "    flat vec2 cone_falloff;   \n"
     "} v_out;                      \n"
+    "varying vec2 MCPosition; \n"
     "\n"
     "void main(void) \n"
     "{ \n"
@@ -40,26 +41,9 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =  mvp_matrix*  gl_Vertex;\n"
+    "    gl_Position =    mvp_matrix*gl_Vertex;\n"
     "}\n";
 
-
-char fragmentShaderSource_test[] = 
-    "#extension GL_ARB_gpu_shader5 : enable \n"
-    "uniform sampler2D baseTexture; \n"
-    "in block  \n"
-    "{          \n"
-    "    vec3 from_l;              \n"
-    "    flat vec3 l_dir;          \n"
-    "    flat vec3 l_color;        \n"
-    "    flat vec2 dist_falloff;   \n"
-    "    flat vec2 cone_falloff;   \n"
-    "} v_in;                      \n"
-    "\n"
-    "void main(void) \n"
-    "{ \n"
-    "    gl_FragColor = vec4(vec3(v_in.cone_falloff,0.5),1.0);/*texture2D( baseTexture, gl_TexCoord[0].xy);*/ \n"
-    "}\n";
 
 char fragmentShaderSource[] =  {
     "#version 430 compatibility \n"
@@ -67,6 +51,7 @@ char fragmentShaderSource[] =  {
 
 
     STRINGIFY(
+
     in block                                                                                                       \n
     {                                                                                                              \n
         vec3 from_l;                                                                                               \n
@@ -75,7 +60,7 @@ char fragmentShaderSource[] =  {
         flat vec2 dist_falloff;                                                                                    \n
         flat vec2 cone_falloff;                                                                                    \n
     } f_in;                                                                                                        \n
-                                                                                                                   \n
+    \n
     out vec4 FragColor;                                                                                            \n
                                                                                                                    \n
     void main()                                                                                                    \n
@@ -94,11 +79,27 @@ char fragmentShaderSource[] =  {
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
-		/*FragColor = vec4(1.0,1.0,0.0,1.0 );*/
-    }                                                                                                              \n
+        
+    }                                                                                                             
     )                                                                                                             
 };
 
+char fragmentShaderSource_test[] = 
+    "#extension GL_ARB_gpu_shader5 : enable \n"
+    "uniform sampler2D baseTexture; \n"
+    "in block  \n"
+    "{          \n"
+    "    vec3 from_l;              \n"
+    "    flat vec3 l_dir;          \n"
+    "    flat vec3 l_color;        \n"
+    "    flat vec2 dist_falloff;   \n"
+    "    flat vec2 cone_falloff;   \n"
+    "} v_in;                      \n"
+    "\n"
+    "void main(void) \n"
+    "{ \n"
+    "    gl_FragColor = vec4(vec3(v_in.cone_falloff,0.5),1.0); \n"
+    "}\n";
 
 char geometryShaderSource[] = {
     "#version 430 compatibility \n"
@@ -485,11 +486,11 @@ _private::_private()
     geom_->getOrCreateStateSet()->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
     geom_->getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
     
-    //osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
-    //geom_->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+    FIXME(Do not have clamp)
+    osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, true /*false*/);
+    geom_->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
-    //// disable cull-face just for the case
-    //geom_->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+    geom_->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     geode->addDrawable(geom_.get());
 
@@ -587,8 +588,8 @@ _private::_private()
     empty_tex_->setBorderColor(osg::Vec4d(0,0,0,0));
     
     static const int
-        g_nWidth = 512,
-        g_nHeight = 512;
+        g_nWidth = 2048/*512*/,
+        g_nHeight = 2048/*512*/;
     osg::ref_ptr<Prerender> pFBOGroup = new Prerender(g_nWidth, g_nHeight);
     addChild(pFBOGroup); 
     pFBOGroup->addChild(geode);
