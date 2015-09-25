@@ -187,6 +187,31 @@ char geometryShaderSource[] = {
     )
 };
 
+class CameraCullCallback : public osg::NodeCallback
+{
+    bool &_NeedToReset;
+public:
+
+    CameraCullCallback  ( bool &NeedToReset ) :
+      _NeedToReset ( NeedToReset )
+      {}
+
+      virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+      {
+          if ( _NeedToReset )
+          { osgUtil::CullVisitor *cv = dynamic_cast < osgUtil::CullVisitor * > ( nv );
+          if ( cv )
+          { _NeedToReset = false;
+          osgUtil::RenderStage* cur_stage = cv->getCurrentRenderBin()->getStage();
+          cur_stage->setCameraRequiresSetUp(true);
+          cur_stage->setFrameBufferObject(0);
+          }
+          }
+          nv->traverse(*node);
+      }
+
+};
+
 class _private : public LightMapRenderer
 {
  
@@ -210,6 +235,8 @@ public: // ILightMapRenderer
 
     // render lightmap
     virtual ITexture*           UpdateTexture( bool enabled );
+
+    virtual void traverse(osg::NodeVisitor& nv);    
     
     struct SpotRenderVertex
     {
@@ -221,14 +248,16 @@ public: // ILightMapRenderer
         cg::point_2f                    cone_falloff;
     };
 
-
     void                                setMVP(const osg::Matrixf& mvp);
     osg::Matrix                         getProjectionMatrix() {return to_osg_matrix(proj_matr_);};
+
 protected:
 
     _private();
     
     osg::Geometry *                     _createGeometry();
+
+    void add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
 
 
 protected:
@@ -244,20 +273,23 @@ protected:
     cg::frustum_clipper                  lightmap_clipper_;
 
     ITexturePtr                          color_buf_;
-    // osg::ref_ptr<osg::FrameBufferObject> fbo_;
-    unsigned                             _tex_dim;
+     unsigned                            _tex_dim;
     
     std::vector<SpotRenderVertex>        vertices_;
 
-    void add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
+     osg::ref_ptr<Prerender>             _camera;
     
-    osg::ref_ptr<osg::Uniform>      uni_mvp_      ;
-    osg::ref_ptr<osg::Geometry>     geom_         ;
-    osg::ref_ptr<osg::Vec3Array>    from_l_       ;
-    osg::ref_ptr<osg::Vec3Array>    ldir_         ;
-    osg::ref_ptr<osg::Vec3Array>    lcolor_       ;
-    osg::ref_ptr<osg::Vec2Array>    dist_falloff_ ;
-    osg::ref_ptr<osg::Vec2Array>    cone_falloff_ ;
+    osg::ref_ptr<osg::Uniform>           uni_mvp_      ;
+    osg::ref_ptr<osg::Geometry>          geom_         ;
+    osg::ref_ptr<osg::Vec3Array>         from_l_       ;
+    osg::ref_ptr<osg::Vec3Array>         ldir_         ;
+    osg::ref_ptr<osg::Vec3Array>         lcolor_       ;
+    osg::ref_ptr<osg::Vec2Array>         dist_falloff_ ;
+    osg::ref_ptr<osg::Vec2Array>         cone_falloff_ ;
+
+private:
+    bool                            _NeedToUpdateFBO;
+
 };
 
 // create
@@ -405,6 +437,24 @@ private:
 
 };
 
+void _private::traverse(osg::NodeVisitor& nv)
+{
+    if (nv.getVisitorType() != osg::NodeVisitor::CULL_VISITOR /*&& !_pFrustumCalculator*/)
+    {
+        Group::traverse(nv);
+        return;
+    }
+
+    osgUtil::CullVisitor * cv = static_cast<osgUtil::CullVisitor*>(&nv);
+
+    // set matrices from frustum calculator to camera
+    //_camera->setViewMatrix(_pFrustumCalculator->getCameraView());
+    //_camera->setProjectionMatrix(_pFrustumCalculator->getCameraProj());
+
+    // go farther
+    _camera->accept(*cv);
+}
+
 void            _private::setMVP(const osg::Matrixf& mvp)
 {
      uni_mvp_->set(mvp);
@@ -474,6 +524,7 @@ _private::_private()
     : tex_dim_(0)
     , we_see_smth_(false)
     , lightmap_clipper_(cg::matrix_4f())
+    , _NeedToUpdateFBO(false)
 {
     osg::Geode* geode = new osg::Geode;
 
@@ -487,8 +538,8 @@ _private::_private()
     geom_->getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
     
     FIXME(Do not have clamp)
-    osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, true /*false*/);
-    geom_->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+    //osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, true /*false*/);
+    //geom_->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     geom_->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
@@ -590,13 +641,24 @@ _private::_private()
     static const int
         g_nWidth = 2048/*512*/,
         g_nHeight = 2048/*512*/;
-    osg::ref_ptr<Prerender> pFBOGroup = new Prerender(g_nWidth, g_nHeight);
-    addChild(pFBOGroup); 
-    pFBOGroup->addChild(geode);
-    color_buf_ = pFBOGroup->getTexture();
+    
+    _camera = new Prerender(g_nWidth, g_nHeight);
+    
+    _camera->setCullCallback ( new CameraCullCallback ( _NeedToUpdateFBO ) );
+    osg::StateSet * pSS = _camera->getOrCreateStateSet();
+    pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+    pSS->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+    pSS->setMode(0x864F/*GL_DEPTH_CLAMP_NV*/, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+    pSS->setMode(0x809E/*GL_SAMPLE_ALPHA_TO_COVERAGE_ARB*/, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+
+
+    addChild(_camera); 
+    _camera->addChild(geode);
+    color_buf_ = _camera->getTexture();
 
     setCullCallback(new LightMapCullCallback(this));
 }
+ 
 
 // reserves textures, setups FBO, etc
 void _private::InitializeTexture( unsigned tex_dim )
