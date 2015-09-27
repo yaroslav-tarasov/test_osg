@@ -3,6 +3,7 @@
 #include "light_maps.h"
 
 #include "geometry/lispsm_matrix.h"
+#include "geometry/custom_matrix.h"
 
 #include "av/Prerender.h"
 #include "av/Scene.h"
@@ -41,7 +42,7 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =    mvp_matrix*gl_Vertex;\n"
+    "    gl_Position =    /*mvp_matrix*/gl_ModelViewProjectionMatrix*gl_Vertex;\n"
     "}\n";
 
 
@@ -79,7 +80,7 @@ char fragmentShaderSource[] =  {
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
-        
+        /*FragColor = vec4(f_in.l_color , height_packed * angledist_atten_ramped); */
     }                                                                                                             
     )                                                                                                             
 };
@@ -273,7 +274,7 @@ protected:
     cg::frustum_clipper                  lightmap_clipper_;
 
     ITexturePtr                          color_buf_;
-     unsigned                            _tex_dim;
+    unsigned                             _tex_dim;
     
     std::vector<SpotRenderVertex>        vertices_;
 
@@ -288,8 +289,8 @@ protected:
     osg::ref_ptr<osg::Vec2Array>         cone_falloff_ ;
 
 private:
-    bool                            _NeedToUpdateFBO;
-
+    bool                                            _NeedToUpdateFBO;
+	boost::optional<std::pair<matrix_4f,matrix_4f>> jlpt_mat_;
 };
 
 // create
@@ -450,6 +451,11 @@ void _private::traverse(osg::NodeVisitor& nv)
     // set matrices from frustum calculator to camera
     //_camera->setViewMatrix(_pFrustumCalculator->getCameraView());
     //_camera->setProjectionMatrix(_pFrustumCalculator->getCameraProj());
+	if(jlpt_mat_)
+	{
+		_camera->setViewMatrix(to_osg_matrix(jlpt_mat_->first));
+		_camera->setProjectionMatrix(to_osg_matrix(jlpt_mat_->second));
+	}
 
     // go farther
     _camera->accept(*cv);
@@ -723,14 +729,15 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_m
     frustum_split->set_clipping(cg::range_2f(view_frustum.clipping_near(), dist_max));
 
     // get projection matrix
-    boost::optional<matrix_4f> jlpt_mat = cg::jlpt_matrix(*frustum_split, dist_max * 0.75f, cg::range_2f(0.f, 40.f));
-    we_see_smth_ = jlpt_mat;
+    jlpt_mat_ = cg::clpt_matrix(*frustum_split, dist_max * 0.75f, cg::range_2f(0.f, 40.f));
+	
+    we_see_smth_ = jlpt_mat_;
     if (!we_see_smth_)
         return;
 
     // ok, we see smth
     we_see_smth_ = true;
-    proj_matr_ = *jlpt_mat;
+    proj_matr_ = (*jlpt_mat_).second * (*jlpt_mat_).first;
     // frustum
     lightmap_clipper_ = cg::frustum_clipper(proj_matr_);
     // texture matrix
