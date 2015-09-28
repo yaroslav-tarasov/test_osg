@@ -449,7 +449,7 @@ private:
 
 void _private::traverse(osg::NodeVisitor& nv)
 {
-    if (nv.getVisitorType() != osg::NodeVisitor::CULL_VISITOR /*&& !_pFrustumCalculator*/)
+    if (nv.getVisitorType() != osg::NodeVisitor::CULL_VISITOR )
     {
         Group::traverse(nv);
         return;
@@ -490,8 +490,6 @@ void _private::traverse(osg::NodeVisitor& nv)
 #endif
 
     // set matrices from frustum calculator to camera
-    //_camera->setViewMatrix(_pFrustumCalculator->getCameraView());
-    //_camera->setProjectionMatrix(_pFrustumCalculator->getCameraProj());
     if(clpt_mat_)
     {
         _camera->setViewMatrix(to_osg_matrix(clpt_mat_->first.transpose()));
@@ -597,15 +595,6 @@ _private::_private(osg::Group * sceneRoot)
     lcolor_->setPreserveDataType(true);
 
 
-    if(geom_->getVertexArray())
-    {
-        size_t s = geom_->getVertexArray()->getNumElements();
-        from_l_->assign( s, osg::Vec3(0.1,0.1,0.1) );
-        ldir_->assign( s, osg::Vec3(0.2,0.2,0.2) );
-        dist_falloff_->assign( s, osg::Vec2(0.3,0.3) );
-        cone_falloff_->assign( s, osg::Vec2(0.4,0.4) );
-        lcolor_->assign( s, osg::Vec3(0.5,0.5,0.5) );
-    }
 
     //// fake texture
     static const unsigned fake_tex_size_ = 2;
@@ -876,8 +865,13 @@ void _private::cull( osg::NodeVisitor * nv )
     for (auto it = lei.begin();it!=lei.end();++it,++it_p)
     {
         SpotData spot;
-        spot.view_dir =  cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
-        spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
+
+		cg::transform_4f tr(cg::as_translation(cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z())));
+        spot.view_dir =  /*tr.treat_vector(cg::point_3f(0, 1, 0));*/cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
+        
+		// const osg::Vec3f vLightVSDir = osg::Matrixd::transform3x3(osg::Vec3(vWorldDir.x, vWorldDir.y, vWorldDir.z), mWorldToView);
+
+		spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
         spot.spot_color    = it->cDiffuse;
         spot.dist_falloff  = it->rDistAtt;
         spot.angle_falloff = it->rConeAtt;

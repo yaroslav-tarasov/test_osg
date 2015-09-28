@@ -1104,8 +1104,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                 data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
                 data.distanceFalloff = cg::range_2f(75.f, 140.f);
-
-                data.color.r = 0.92f;
+                
+				data.color.r = 0.92f;
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
 
@@ -1115,7 +1115,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                                                   + offset);
 
                 const float heading = osg::DegreesToRadians(0.f);
-                const float pitch = osg::DegreesToRadians(2.f);
+                const float pitch = osg::DegreesToRadians(/*2.f*/0.f);
 
                 data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
