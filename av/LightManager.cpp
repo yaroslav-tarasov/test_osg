@@ -251,4 +251,4 @@ void LightManager::update( osg::NodeVisitor * nv )
 }
 
 
-} // namespace svScene
+} // namespace avScene

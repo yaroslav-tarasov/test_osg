@@ -19,30 +19,32 @@ using namespace avScene;
 // Helpful lights classes
 //
 
-// light external info struct
-struct avScene::LightExternalInfo
-{
-    unsigned     uPriority;
-    cg::point_3f vPosWorld;
-    cg::vector_3 vDirWorld;
-    cg::range_2f rDistAtt, rConeAtt;
-    cg::colorf   cDiffuse;
-    float        fAmbRatio, fSpecRatio; 
+//// light processed info struct
+//struct avScene::LightProcessedInfo
+//{
+//    osg::Vec4f lightVSPosAmbRatio;
+//    osg::Vec4f lightVSDirSpecRatio;
+//    osg::Vec4f lightAttenuation;
+//    osg::Vec3f lightDiffuse;
+//};
 
-    bool operator< ( const LightExternalInfo & second ) const
-    {
-        return uPriority < second.uPriority;
-    }
-};
+//// light external info struct
+//struct avScene::LightExternalInfo
+//{
+//    unsigned     uPriority;
+//    cg::point_3f vPosWorld;
+//    cg::vector_3 vDirWorld;
+//    cg::range_2f rDistAtt, rConeAtt;
+//    cg::colorf   cDiffuse;
+//    float        fAmbRatio, fSpecRatio; 
+//
+//    bool operator< ( const LightExternalInfo & second ) const
+//    {
+//        return uPriority < second.uPriority;
+//    }
+//};
 
-// light processed info struct
-struct avScene::LightProcessedInfo
-{
-    osg::Vec4f lightVSPosAmbRatio;
-    osg::Vec4f lightVSDirSpecRatio;
-    osg::Vec4f lightAttenuation;
-    osg::Vec3f lightDiffuse;
-};
+
 
 
 //

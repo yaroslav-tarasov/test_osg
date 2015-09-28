@@ -31,6 +31,24 @@ namespace creators
 
 class texturesHolder  : public texturesHolder_base
 {
+    osg::Texture2D *createLMTexture(int width, int height)
+    {
+        osg::Texture2D* texture = new osg::Texture2D;
+        texture->setTextureSize(width,height);
+        texture->setInternalFormat(/*GL_RGBA*/GL_RGBA16F);
+        texture->setSourceFormat(GL_RGBA);
+        texture->setSourceType(GL_UNSIGNED_BYTE);
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        texture->setBorderColor(osg::Vec4d(0,0,0,0));
+        // texture->setUseHardwareMipMapGeneration(false);
+        texture->setNumMipmapLevels(4);
+
+        return texture;
+    }
+
 public:
     struct textures_t
     {
@@ -40,6 +58,7 @@ public:
         osg::ref_ptr<osg::Texture2D>      detailsTex;
         osg::ref_ptr<osg::TextureCubeMap> envTex;
         osg::ref_ptr<osg::Texture2D>      decalTex;
+        osg::ref_ptr<osg::Texture2D>      lmTex;
     };
 
 public:
@@ -64,14 +83,19 @@ public:
         return texCreator(mats,"default",model_name);
     }
 
-    osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()
+    osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()   override
     {
         return   envTex;
     }
 
-    osg::ref_ptr<osg::Texture2D>   getDecalTexture()
+    osg::ref_ptr<osg::Texture2D>   getDecalTexture() override
     {
         return   decalTex;
+    }
+    
+    osg::ref_ptr<osg::Texture2D>   getLightMapTexture()  override
+    {
+        return   lmTex;
     }
 
     friend texturesHolder_base&   getTextureHolder();
@@ -82,6 +106,7 @@ private:
     osg::ref_ptr<osg::Texture2D>      emptyTex;
     osg::ref_ptr<osg::TextureCubeMap> envTex;
     osg::ref_ptr<osg::Texture2D>      decalTex;
+    osg::ref_ptr<osg::Texture2D>      lmTex;
 
     texturesHolder()
     {          
@@ -157,6 +182,7 @@ FIXME(Все теже кривые плоскости)
 #endif
 #endif
 
+        lmTex = createLMTexture(1024, 1024);
     }
 
 
@@ -173,12 +199,15 @@ FIXME(Все теже кривые плоскости)
 
         if(GetTextures().find(mat_name)==GetTextures().end())
         {
-            textures_t  t; 
+            FIXME(test it);
+
+            textures_t  t /*= th*/; 
             t.colorTex = new osg::Texture2D;
             t.nightTex = new osg::Texture2D;
             t.normalTex  = new osg::Texture2D;
             t.detailsTex = th.detailsTex;
             t.envTex = th.envTex;
+            t.lmTex  = th.lmTex;
 
             auto range = mats.equal_range(mat_name);
 
@@ -430,12 +459,13 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
         // pcp->apply(*(itr->second.first));
     }    
 
-    stateset->addUniform( new osg::Uniform("colorTex"      , 0) );
-    stateset->addUniform( new osg::Uniform("normalTex"     , 1) ); 
-    stateset->addUniform( new osg::Uniform("nightTex"      , 2) );
-    stateset->addUniform( new osg::Uniform("detailTex"     , 3) ); 
-    stateset->addUniform( new osg::Uniform("envTex"        , 4) ); 
-    stateset->addUniform( new osg::Uniform("ViewDecalMap"  , 5) );
+    stateset->addUniform( new osg::Uniform("colorTex"      , BASE_COLOR_TEXTURE_UNIT) );
+    stateset->addUniform( new osg::Uniform("normalTex"     , BASE_NORMAL_TEXTURE_UNIT) ); 
+    stateset->addUniform( new osg::Uniform("nightTex"      , BASE_NIGHT_TEXTURE_UNIT) );
+    stateset->addUniform( new osg::Uniform("detailTex"     , BASE_DETAILS_TEXTURE_UNIT) ); 
+    stateset->addUniform( new osg::Uniform("envTex"        , BASE_ENV_TEXTURE_UNIT) ); 
+    stateset->addUniform( new osg::Uniform("ViewDecalMap"  , BASE_DECAL_TEXTURE_UNIT) );
+    stateset->addUniform( new osg::Uniform("ViewLightMap"  , BASE_LM_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
 
 
@@ -457,13 +487,15 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
     }
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-    stateset->setTextureAttributeAndModes( 0, t.colorTex.get(), value );
-    stateset->setTextureAttributeAndModes( 1, t.normalTex.get(), value );
-    stateset->setTextureAttributeAndModes( 2, t.nightTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_COLOR_TEXTURE_UNIT, t.colorTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_NORMAL_TEXTURE_UNIT, t.normalTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_NIGHT_TEXTURE_UNIT, t.nightTex.get(), value );
 
-    stateset->setTextureAttributeAndModes( 3, t.detailsTex.get(), value );
-    stateset->setTextureAttributeAndModes( 4, t.envTex.get(), value );
-    stateset->setTextureAttributeAndModes( 5, getTextureHolder().getDecalTexture().get()/*GetShadowMap()->getTexture()*/, value ); 
+    stateset->setTextureAttributeAndModes( BASE_DETAILS_TEXTURE_UNIT, t.detailsTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_ENV_TEXTURE_UNIT, t.envTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_DECAL_TEXTURE_UNIT, getTextureHolder().getDecalTexture().get(), value ); 
+    stateset->setTextureAttributeAndModes( BASE_LM_TEXTURE_UNIT, getTextureHolder().getLightMapTexture().get(), value ); 
+    
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 

@@ -33,6 +33,7 @@ namespace creators
     public:
         virtual osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture() = 0;
         virtual osg::ref_ptr<osg::Texture2D>        getDecalTexture() =0;
+        virtual osg::ref_ptr<osg::Texture2D>        getLightMapTexture() =0;
     };    
 
     texturesHolder_base&             getTextureHolder();

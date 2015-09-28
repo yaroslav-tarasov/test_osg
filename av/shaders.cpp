@@ -100,7 +100,6 @@ namespace shaders
 \n        return dot(col,crt);                                                                         \
 \n    }                                                                                                \
 \n                                                                                                     \
-\n      uniform mat4      shadow0_matrix;                                                              \
 \n                                                                                                     \
 \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
 \n            float result = 0.0;                                                                      \
@@ -128,12 +127,14 @@ namespace shaders
     }                                                                                                  \
       const ivec2 pcf_size = ivec2(1,1);                                                               \
                                                                                                        \
-                                                                                                        \
-     uniform sampler2D baseTexture;                                                                     \
-     uniform int baseTextureUnit;                                                                       \
-     uniform sampler2DShadow shadowTexture0;                                                            \
-     uniform int shadowTextureUnit0;                                                                    \
-     uniform mat4            shadowMatrix;                                                              \
+                                                                                                       \
+     uniform sampler2D       baseTexture;                                                              \
+     uniform int             baseTextureUnit;                                                          \
+     uniform sampler2DShadow shadowTexture0;                                                           \
+     uniform int             shadowTextureUnit0;                                                       \
+     uniform mat4            shadowMatrix;                                                             \
+     uniform mat4            lightmap_matrix;                                                          \
+\n   uniform mat4            shadow0_matrix;                                                           \
      )
 
 /*vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
@@ -316,13 +317,12 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         void main()
         {
             vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-            // mat3 rotation = mat3(tangent, binormal, normal);
             vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-            // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
-            // lightDir = normalize(rotation * normalize(lightDir));
-            //lightDir = vec3(gl_LightSource[0].position.xyz);
+            
+            viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
+            //viewworld_matrix = inverse(gl_ModelViewMatrix); 
 
-            gl_Position    = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+            gl_Position    = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
 
             v_out.tangent   = tangent;
@@ -336,8 +336,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
             //illum = luminance_crt(gl_LightSource[0].ambient + gl_LightSource[0].diffuse); // FIXME Этот расчет должен быть в основной программе, а не для каждого фрагмента
             
-            viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
-            //viewworld_matrix = inverse(gl_ModelViewMatrix); 
+
         }
     )
     };
@@ -408,9 +407,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             //vec4  light_vec_view = vec4(lightDir,1);
             
-            //viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0)); 
-            //viewworld_matrix = gl_ModelViewMatrixInverse; 
-            // 
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
             vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
             //vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;
@@ -514,8 +510,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-                //lightDir = vec3(gl_LightSource[0].position.xyz);;
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -524,7 +520,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };
@@ -572,10 +568,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
                     shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
-
-                //vec4  light_vec_view = vec4(lightDir,1);
-                // viewworld_matrix = gl_ModelViewMatrixInverse;
-
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -629,10 +621,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                mat3 rotation = mat3(tangent, binormal, normal);
                vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-               // lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
-               // lightDir = normalize(rotation * normalize(lightDir));
-               //lightDir = vec3(gl_LightSource[0].position.xyz);
-               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+               viewworld_matrix = inverse(gl_ModelViewMatrix);
+               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                v_out.tangent   = tangent;
                v_out.binormal  = binormal;
@@ -643,7 +633,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                mat4 EyePlane =  transpose(shadowMatrix); 
                v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-               viewworld_matrix = inverse(gl_ModelViewMatrix);
+
            }       
        )
        };
@@ -706,9 +696,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                //else if (split_test.z) 
                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-               //vec4  light_vec_view = vec4(lightDir,1);
-
-               //viewworld_matrix = gl_ModelViewMatrixInverse;
                vec4 base = texture2D(colorTex, f_in.texcoord);
                vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
                //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
@@ -808,12 +795,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-                //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
-                //lightDir = normalize(rotation * normalize(lightDir));
-                //lightDir = vec3(gl_LightSource[0].position.xyz);;
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -822,7 +806,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };
@@ -881,11 +865,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //    shadow = textureProj(ShadowSplit1, shadow1_matrix * in_frag.shadow_view); 
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
-
-                //vec4  light_vec_view = vec4(lightDir,1);
-
-                //viewworld_matrix = gl_ModelViewMatrixInverse;
-         
 
                 // get dist to point and normalized to-eye vector
                 float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
@@ -996,11 +975,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-                //lightDir = vec3(gl_LightSource[0].position.xyz - vertexInEye.xyz);
-                //lightDir = normalize(rotation * normalize(lightDir));
-                //lightDir = vec3(gl_LightSource[0].position.xyz);;
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
                 gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
@@ -1010,7 +987,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };
@@ -1068,9 +1045,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //else if (split_test.z) 
                 //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 
-               //vec4  light_vec_view = vec4(lightDir,1);
-                //viewworld_matrix = gl_ModelViewMatrixInverse;
-
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -1126,7 +1100,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
                 gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 
@@ -1147,7 +1121,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };
@@ -1223,8 +1197,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //else if (split_test.z) 
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
-\n                // vec4  light_vec_view = vec4(lightDir,1);
-\n                //viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                // specular.a = 0; // it's not rainy day hallelujah
 \n
@@ -1314,7 +1286,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            //varying   vec3 lightDir;
             out mat4 viewworld_matrix;
 
             mat4 decal_matrix;
@@ -1336,11 +1307,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
-
-                //lightDir = vec3(gl_LightSource[0].position.xyz);
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
+                
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -1352,13 +1322,17 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.detail_uv = gl_Vertex.xy * 0.045; // FIXME dont no how
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 
+                //SAVE_LIGHTMAP_VARYINGS_VP
+                v_out.lightmap_coord.xyw = (lightmap_matrix * vertexInEye).xyw; 
+                v_out.lightmap_coord.z   = (viewworld_matrix * vertexInEye).z;
+
                 // SAVE_DECAL_VARYINGS_VP
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };
@@ -1421,8 +1395,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                //    shadow = textureProj(ShadowSplit2, shadow2_matrix * in_frag.shadow_view);
 \n
 \n
-\n                //vec4  light_vec_view = vec4(lightDir,1);
-\n                //viewworld_matrix = gl_ModelViewMatrixInverse;
 \n                // FIXME dummy code
 \n                //specular.a = 0; // it's not rainy day hallelujah
 \n
@@ -1464,54 +1436,19 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), fma(rainy_value, 5.0, 1.5)) * fma(rainy_value, 0.9, 0.7);
 \n                vec3 specular_color = specular_val * specular.rgb;
 \n
-\n                  // Apply spot lights
-\n                  vec3 vLightsAddOn;
-\n                  vec3 vLightsSpecAddOn;
-\n                  //ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, f_in.normal, vLightsAddOn, vLightsSpecAddOn);
-\n                  //result += vLightsAddOn;//vLightsAddOn ;//* saturate(0.85 - 0.55 * saturate(FresnelDamping));
-\n                  // SpecColor += vLightsSpecAddOn;
-
-//\n                  float PI = 3.14159265358979323846264;
-//\n                  vec4 curVSPosAmbRatio  = LightVSPosAmbRatio [0];
-//\n                  vec4 curVSDirSpecRatio = LightVSDirSpecRatio[0];
-//\n                  vec4 curAttenuation    = LightAttenuation   [0];
-//\n                  vec3 curDiffuse        = LightDiffuse       [0];
-//\n 
-//\n                  float intensity = 0.0;
-//\n                  vec4 spec = vec4(0.0);
-//\n                  vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);
-//
-//\n                  vec3 ld = normalize(curVSPosAmbRatio.xyz - f_in.viewpos.xyz);
-//\n                  vec3 sd = normalize(vec3(-curVSDirSpecRatio.xyz));  
-//\n
-//\n                  // inside the cone?
-//\n                 if (dot(ld,sd) > cos(PI/5)/*l_spotCutOff*/) {
-//\n 
-//\n                     vec3 n = f_in.normal;
-//\n                     intensity = max(dot(n,ld), 0.0);
-//\n 
-//\n                     if (intensity > 0.0) {
-//\n                          vec3 eye = normalize(f_in.viewpos);
-//\n                          vec3 h = normalize(ld + eye);
-//\n                          float intSpec = max(dot(h,n), 0.0);
-//\n                          spec = specular_ * pow(intSpec, 0.1/*shininess*/);
-//\n                      }
-//\n                  }
-//\n                  
-//\n                vec3  light_res = intensity * curDiffuse + spec.rgb;// max(intensity * curDiffuse + spec.rgb, ambient.rgb);
+\n                // Apply spot lights
+\n                vec3 vLightsSpecAddOn;
+                  vec3 light_res;  
                   
-                  vec3  light_res;  
-                  
-                  ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+                  // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n                // vec3 lightmap_color = light_res ; 
 
 \n                // GET_LIGHTMAP(f_in.viewpos, f_in);
-\n                // #define GET_LIGHTMAP(viewpos, in_frag) 
-\n                // float height_world_lm      = in_frag.lightmap_coord.z; 
-\n                // vec4  lightmap_data        = textureProj(ViewLightMap, in_frag.lightmap_coord).rgba; 
-\n                // float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
-\n                // vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
+\n                float height_world_lm      = f_in.lightmap_coord.z; 
+\n                vec4  lightmap_data        = textureProj(ViewLightMap, f_in.lightmap_coord).rgba; 
+\n                float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); 
+\n                vec3  lightmap_color       = lightmap_data.rgb * lightmap_height_fade;  
 
- \n               vec3 lightmap_color = light_res ; // FIXME dummy code
  \n
  \n               // FIXME
  \n               // LIGHTMAP_SHADOW_TRICK(shadow);
@@ -1529,9 +1466,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
  \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
  \n               }
  \n
-                  // result += light_res;
-
-
  \n 
                  aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
               }
@@ -1756,7 +1690,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             STRINGIFY ( 
             attribute vec3 tangent;
             attribute vec3 binormal;
-            //varying   vec3 lightDir;
             out mat4 viewworld_matrix;
 
             out block
@@ -1772,10 +1705,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main()
             {
                 vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                // mat3 rotation = mat3(tangent, binormal, normal);
                 vec4 vertexInEye = gl_ModelViewMatrix * gl_Vertex;
+                viewworld_matrix = inverse(gl_ModelViewMatrix);
 
-                //lightDir = vec3(gl_LightSource[0].position.xyz);
                 gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
 
                 v_out.normal    = normal;
@@ -1785,7 +1717,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //v_out.shadow_view = get_shadow_coords(vertexInEye, shadowTextureUnit0);
                 mat4 EyePlane =  transpose(shadowMatrix); 
                 v_out.shadow_view = vec4(dot( vertexInEye, EyePlane[0]),dot( vertexInEye, EyePlane[1] ),dot( vertexInEye, EyePlane[2]),dot( vertexInEye, EyePlane[3] ) );
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
+
             }       
             )
         };

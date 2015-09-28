@@ -40,4 +40,4 @@ typedef osg::ref_ptr<LightMapRenderer> ILightMapRendererPtr;
 
 
 // create method
-ILightMapRendererPtr createLightMapRenderer();
+ILightMapRendererPtr createLightMapRenderer(osg::Group * sceneRoot);

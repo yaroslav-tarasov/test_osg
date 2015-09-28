@@ -22,11 +22,20 @@
 #include "common/qt.h"
 #endif
 
-#define BASE_SHADOW_TEXTURE_UNIT 6
+#define BASE_COLOR_TEXTURE_UNIT   0
+#define BASE_NORMAL_TEXTURE_UNIT  1
+#define BASE_NIGHT_TEXTURE_UNIT   2
+#define BASE_DETAILS_TEXTURE_UNIT 3
+#define BASE_ENV_TEXTURE_UNIT     4
+#define BASE_DECAL_TEXTURE_UNIT   5
+#define BASE_LM_TEXTURE_UNIT      6
+#define BASE_SHADOW_TEXTURE_UNIT  7
+
 #define GLSL_VERSION             130
 #define ORIG_EPHEMERIS
 #define PICK_NODE_MASK          0x1
 #define DO_NOT_PICK_NODE_MASK   0x2
+
 
 
 #ifndef _DEBUG

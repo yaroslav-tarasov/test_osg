@@ -103,6 +103,8 @@
 #define GL_SAMPLE_ALPHA_TO_COVERAGE      0x809E
 #define GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB 0x884F
 
+#define GL_RGBA16F 0x881A
+#define GL_RGBA32F 0x8814
 
 #ifdef _DEBUG
 #pragma comment(lib, "osgTextd.lib")

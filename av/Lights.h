@@ -43,6 +43,31 @@ namespace avScene
     // light external and processed info struct
     struct LightExternalInfo;
     struct LightProcessedInfo;
+    
+    // light processed info struct
+    struct LightProcessedInfo
+    {
+        osg::Vec4f lightVSPosAmbRatio;
+        osg::Vec4f lightVSDirSpecRatio;
+        osg::Vec4f lightAttenuation;
+        osg::Vec3f lightDiffuse;
+    };
+    
+    // light external info struct
+    struct LightExternalInfo
+    {
+        unsigned     uPriority;
+        cg::point_3f vPosWorld;
+        cg::vector_3 vDirWorld;
+        cg::range_2f rDistAtt, rConeAtt;
+        cg::colorf   cDiffuse;
+        float        fAmbRatio, fSpecRatio; 
+
+        bool operator< ( const LightExternalInfo & second ) const
+        {
+            return uPriority < second.uPriority;
+        }
+    };
 
     //
     // Lights manager class
@@ -81,6 +106,9 @@ namespace avScene
         bool         isSameKindAs(const osg::Object * obj) const { return static_cast<const Lights *>(obj) != NULL; }
         const char * className   ()                        const { return "Lights"; }
         const char * libraryName ()                        const { return "svScene"; }
+
+        const std::vector<LightProcessedInfo>&  GetProcessedLights() {return m_aMainProcessedLights;}
+        const std::vector<LightExternalInfo>&  GetVisibleLights()    {return m_aMainVisibleLights;}
 
     private:
 

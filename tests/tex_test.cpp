@@ -220,7 +220,7 @@ int main_tex_test( int argc, char** argv )
     root->addChild(airplane/*effet.get()*/);
     root->addChild(sub_model.get());
 
-#if 1
+#if 0
     // add creation of main reflection texture
     static const int
         g_nReflectionWidth = 512,
