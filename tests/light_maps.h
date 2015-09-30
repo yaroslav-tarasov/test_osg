@@ -6,8 +6,6 @@ typedef osg::ref_ptr<osg::Texture2D> ITexturePtr;
 
 struct LightMapRenderer : osg::Group
 {
-    // reserves textures, setups FBO, etc
-    virtual void InitializeTexture( unsigned tex_dim ) = 0;
     // set camera frustum and calculate all transformations
     virtual void SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode ) = 0;
 
@@ -27,9 +25,6 @@ struct LightMapRenderer : osg::Group
     };
 
     virtual void AddSpotLight( SpotData const & spot ) = 0;
-
-    // render lightmap
-    virtual ITexture * UpdateTexture( bool enabled ) = 0;
 
 private:
     class _private;

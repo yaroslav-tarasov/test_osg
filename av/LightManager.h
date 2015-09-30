@@ -17,14 +17,14 @@ public:
     {
         osg::Transform * transform;
 
-        cg::range_2f spotFalloff;
-        cg::range_2f distanceFalloff;
-        cg::colorf color;
+        cg::range_2f     spotFalloff;
+        cg::range_2f     distanceFalloff;
+        cg::colorf       color;
 
-        cg::point_3f position;
-        cg::vector_3f direction;
+        cg::point_3f     position;
+        cg::vector_3f    direction;
 
-        bool active;
+        bool             active;
 
         inline Light() : transform(NULL), active(false) { }
     };
@@ -47,8 +47,8 @@ private:
 
     static osg::ref_ptr<LightManager> g_Instance;
 
-    typedef std::map<unsigned,Light> LightsMap;
-    LightsMap                        m_LightsMap;
+    typedef std::map<unsigned,Light>  LightsMap;
+    LightsMap                         m_LightsMap;
 
 };
 

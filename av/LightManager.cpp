@@ -146,6 +146,8 @@ void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStr
 }
 #endif
 
+
+FIXME(Deprecated light)
 void  LightManager::addLight(/*uint32_t id,*/ osg::MatrixTransform* mt )
 {
     const unsigned lightID = m_LightsMap.size()/*id*/;
@@ -216,7 +218,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         {
            osg::Node* parent = light.transform->getParent(0);
            if(parent->asTransform())
-                matrix =  light.transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
+                matrix =  parent->asTransform()->asMatrixTransform()->getMatrix() * light.transform->asMatrixTransform()->getMatrix() ;
            else
                 matrix =  light.transform->asMatrixTransform()->getMatrix() ;
         }
@@ -229,7 +231,8 @@ void LightManager::update( osg::NodeVisitor * nv )
         
         cg::range_2f spotFalloff = light.spotFalloff;
 
-#if 1
+        FIXME(radians degrees)
+#if 0
         //const cg::point_3f world_light_dir = mv_.treat_vector(spot.view_dir, false);
         //// angle corrected
         //auto corrected_spot = spot;

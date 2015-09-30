@@ -89,7 +89,6 @@ namespace avScene {
         bool									    Initialize( osgViewer::Viewer* vw );
         osg::Group*                                 createTerrainRoot();
         void                                        createObjects();
-        void                                        createRTT();
     private:
         void                                        onZoneChanged( int zone );
 		void										onSetLights  ( bool on  );

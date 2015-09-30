@@ -1104,24 +1104,28 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                 data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
                 data.distanceFalloff = cg::range_2f(75.f, 140.f);
-                
+
 				data.color.r = 0.92f;
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
 
-                FIXME( " Смещение мать его " )
-                // cg::transform_4 tr = get_relative_transform(sl);
+                FIXME(  Damned offset  );
+                //cg::transform_4 tr = get_relative_transform(sl);
                 data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                                                   + offset);
 
+                osg::Quat      rot   = sl->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+                cg::quaternion orien = from_osg_quat(rot);
+                cg::cpr        cr    = orien.cpr(); 
+
                 const float heading = osg::DegreesToRadians(0.f);
-                const float pitch = osg::DegreesToRadians(/*2.f*/0.f);
+                const float pitch = osg::DegreesToRadians(2.f);
 
                 data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                 data.active = true;
 
-                avScene::LightManager::GetInstance()->addLight(/*1000,*/ data);
+                avScene::LightManager::GetInstance()->addLight( data);
             }
 
 
@@ -1182,13 +1186,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
                     
-                    FIXME( Нормализовать )
+                    FIXME( Need to be normalized )
 
                     data.color  *= 0.01;
 
-                    FIXME( Смещение мать его )
-                        // cg::transform_4 tr = get_relative_transform(sl);
-                        data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
+                    FIXME( Damned offset )
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
@@ -1218,10 +1221,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.color.g = pnt._color.g();
                     data.color.b = pnt._color.b();
 
-                    FIXME( Нормализовать )
+                    FIXME( Need to be normalized )
                     data.color  *= 0.01;
                     
-                    FIXME( Смещение мать его )
+                    FIXME( Damned offset )
                         // cg::transform_4 tr = get_relative_transform(sl);
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);
@@ -1327,34 +1330,6 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
     }
 
     return false;
-}
-
-
-#include "tests/teapot.h"
-
-void Scene::createRTT()
-{
-    int tex_width = 1024, tex_height = 1024;
-
-
-    osg::ref_ptr<osg::Texture2D> textureFBO = new osg::Texture2D;
-    textureFBO->setTextureSize( tex_width, tex_height );
-    textureFBO->setInternalFormat( GL_RGBA );
-    textureFBO->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR );
-    textureFBO->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
-    textureFBO->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_BORDER);
-    textureFBO->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_BORDER);
-
-    osg::ref_ptr<osg::Camera> rttCamera = osgCookBook::createRTTCamera(osg::Camera::COLOR_BUFFER0, textureFBO,true);
-
-    addChild(rttCamera);
-
-    //rttCamera->addChild(LightManager::GetInstance());
-
-    osg::ref_ptr<osg::Geode> tn = new osg::Geode;
-    tn->addDrawable( new TeapotDrawable(1.0f) );
-    rttCamera->addChild(tn);
-    rttCamera->setViewMatrix(osg::Matrixd::scale(1,1,-1)); // Flip Z axis
 }
 
 void Scene::onExit()

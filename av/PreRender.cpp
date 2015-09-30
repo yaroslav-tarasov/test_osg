@@ -25,10 +25,9 @@ void Prerender::traverse(osg::NodeVisitor& nv)
 
 void Prerender::init()
 {
-    _texture = creators::getTextureHolder().getLightMapTexture();//createTexture(width,height);
+    _texture = creators::getTextureHolder().getLightMapTexture();
 
     setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    //setClearColor(osg::Vec4(0.0,0.0,0.0,1.0));
     setClearDepth(1.0);
     
     setClearColor(osg::Vec4(0.0,0.0,0.0,0.0));

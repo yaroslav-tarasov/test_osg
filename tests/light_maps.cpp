@@ -5,19 +5,12 @@
 #include "geometry/lispsm_matrix.h"
 #include "geometry/custom_matrix.h"
 
-#include "av/Prerender.h"
-#include "av/Scene.h"
 
+#include "utils/materials.h"
+#include "av/Scene.h"
 #include "av/Lights.h"
 
-//"uniform vec4 coeff; \n"
-//"attribute vec3 from_l : ATTR2; \n"
-//"attribute vec3 l_dir : ATTR3; \n"
-//"attribute vec3 l_color : ATTR4; \n"
-//"attribute vec2 dist_falloff : ATTR5; \n"
-//"attribute vec2 cone_falloff : ATTR6; \n"
 
-#define GL_RGBA16F 0x881A
 char vertexShaderSource_simple[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform mat4 mvp_matrix; \n"
@@ -44,7 +37,7 @@ char vertexShaderSource_simple[] =
     "    v_out.l_color = l_color; \n"
     "    v_out.dist_falloff = dist_falloff; \n"
     "    v_out.cone_falloff = cone_falloff; \n"
-    "    gl_Position =    /*mvp_matrix*/gl_ModelViewProjectionMatrix *gl_Vertex;\n"
+    "    gl_Position =   gl_ModelViewProjectionMatrix *gl_Vertex;\n"
     "}\n";
 
 
@@ -54,7 +47,14 @@ char fragmentShaderSource[] =  {
 
 
     STRINGIFY(
-
+    
+\n    subroutine vec4 LightFunc(vec3);
+\n
+\n    subroutine (LightFunc) vec4 ambient_aa(vec3 n) 
+\n    {
+\n        return vec4(1.0,1.0,1.0,1.0);
+\n    }
+\n
     in block                                                                                                       \n
     {                                                                                                              \n
         vec3 from_l;                                                                                               \n
@@ -63,7 +63,7 @@ char fragmentShaderSource[] =  {
         flat vec2 dist_falloff;                                                                                    \n
         flat vec2 cone_falloff;                                                                                    \n
     } f_in;                                                                                                        \n
-    \n
+                                                                                                                   \n
     out vec4 FragColor;                                                                                            \n
                                                                                                                    \n
     void main()                                                                                                    \n
@@ -87,108 +87,6 @@ char fragmentShaderSource[] =  {
     )                                                                                                             
 };
 
-char fragmentShaderSource_test[] = 
-    "#extension GL_ARB_gpu_shader5 : enable \n"
-    "uniform sampler2D baseTexture; \n"
-    "in block  \n"
-    "{          \n"
-    "    vec3 from_l;              \n"
-    "    flat vec3 l_dir;          \n"
-    "    flat vec3 l_color;        \n"
-    "    flat vec2 dist_falloff;   \n"
-    "    flat vec2 cone_falloff;   \n"
-    "} v_in;                      \n"
-    "\n"
-    "void main(void) \n"
-    "{ \n"
-    "    gl_FragColor = vec4(vec3(v_in.cone_falloff,0.5),1.0); \n"
-    "}\n";
-
-char geometryShaderSource[] = {
-    "#version 430 compatibility \n"
-
-    "#extension GL_EXT_geometry_shader4 : enable\n"
-    "#extension GL_ARB_gpu_shader5 : enable\n"
-
-    STRINGIFY(
-    layout(points) in;                                                                              \n
-    layout(triangle_strip, max_vertices = 4) out;                                                   \n
-                                                                                                    \n
-    in mat4 projection_matrix;                                                                      \n
-                                                                                                    \n
-    in block                                                                                        \n
-    {                                                                                               \n
-        vec4 color;                                                                                 \n
-        vec3 size_pixel_vert;                                                                       \n
-    } g_in[1];                                                                                      \n
-                                                                                                    \n
-    out block                                                                                       \n
-    {                                                                                               \n
-        centroid vec2 tex;                                                                          \n
-        vec4 color;                                                                                 \n
-    } g_out;                                                                                        \n
-                                                                                                    \n
-    const vec2 g_ParticleCoords[4] = vec2[]                                                         \n
-    (                                                                                               \n
-        vec2(-1.0, -g_in[0].size_pixel_vert.z),                                                     \n
-        vec2(+1.0, -g_in[0].size_pixel_vert.z),                                                     \n
-        vec2(-1.0, +1.0),                                                                           \n
-        vec2(+1.0, +1.0)                                                                            \n
-        );                                                                                          \n
-                                                                                                    \n
-    const vec2 g_ParticleTexCoords[4] = vec2[]                                                      \n
-    (                                                                                               \n
-        vec2(-1.0, -1.0),                                                                           \n
-        vec2(+1.0, -1.0),                                                                           \n
-        vec2(-1.0, +1.0),                                                                           \n
-        vec2(+1.0, +1.0)                                                                            \n
-        );                                                                                          \n
-                                                                                                    \n
-    void main(void)                                                                                 \n
-    {                                                                                               \n
-        const vec3 vViewPosition = gl_in[0].gl_Position.xyz;                                        \n
-        const float fSize = g_in[0].size_pixel_vert.x + abs(vViewPosition.z) * g_in[0].size_pixel_vert.y; \n
-                                                                                                    \n
-        vec2 vOffset;                                                                               \n
-        vec4 vViewPos;                                                                              \n
-                                                                                                    \n
-        g_out.color = g_in[0].color;                                                                \n
-        if (g_out.color.a >= 0.002)                                                                 \n
-        {                                                                                           \n
-            // lower-left                                                                           
-\n          vOffset = fSize * g_ParticleCoords[0];                                                  \n
-            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
-            gl_Position = projection_matrix * vViewPos;                                             \n
-            g_out.tex = g_ParticleTexCoords[0];                                                     \n
-            EmitVertex();                                                                           \n
-                                                                                                    \n
-            // lower-right                                                                          
-\n          vOffset = fSize * g_ParticleCoords[1];                                                  \n
-            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
-            gl_Position = projection_matrix * vViewPos;                                             \n
-            g_out.tex = g_ParticleTexCoords[1];                                                     \n
-            EmitVertex();                                                                           \n
-                                                                                                    \n
-            // upper-left                                                                           \n
-\n          vOffset = fSize * g_ParticleCoords[2];                                                  \n
-            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
-            gl_Position = projection_matrix * vViewPos;                                             \n
-            g_out.tex = g_ParticleTexCoords[2];                                                     \n
-            EmitVertex();                                                                           \n
-                                                                                                    \n
-            // upper-right                                                                          \n
-\n          vOffset = fSize * g_ParticleCoords[3];                                                  \n
-            vViewPos = vec4(gl_in[0].gl_Position.xyz + vec3(vOffset, 0.0), 1.0);                    \n
-            gl_Position = projection_matrix * vViewPos;                                             \n
-            g_out.tex = g_ParticleTexCoords[3];                                                     \n
-            EmitVertex();                                                                           \n
-                                                                                                    \n
-            //EndPrimitive();                                                                       \n
-        }
-    }
-
-    )
-};
 
 class CameraCullCallback : public osg::NodeCallback
 {
@@ -215,14 +113,68 @@ public:
 
 };
 
+class LightMapCamera : public osg::CameraNode
+{
+public:
+
+    LightMapCamera()
+    {
+        init();
+    };
+
+    osg::Texture2D        * getTexture() const { return _texture.get(); }
+
+protected:
+
+    void init()
+    {
+        _texture = creators::getTextureHolder().getLightMapTexture();
+
+        setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        setClearDepth(1.0);
+
+        setClearColor(osg::Vec4(0.0,0.0,0.0,0.0));
+        setColorMask(true, true, true, true);
+
+        // just inherit the main cameras view
+        setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+        setProjectionMatrix(osg::Matrixd::identity());
+        setViewMatrix(osg::Matrixd::identity());
+
+        // set viewport
+        setViewport(0,0,_texture->getTextureWidth(),_texture->getTextureHeight());
+
+        // set the camera to render before the main camera.
+        setRenderTargetImplementation(osg::CameraNode::FRAME_BUFFER_OBJECT);
+        setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+        setRenderOrder(osg::CameraNode::PRE_RENDER);
+
+        // attach the texture and use it as the color buffer.
+        attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, true, 0, 0);
+
+        osg::StateSet * pSS = /*_camera->*/getOrCreateStateSet();
+        pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        pSS->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        pSS->setMode(GL_DEPTH_CLAMP_NV, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        pSS->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+    }
+
+    void traverse(osg::NodeVisitor& nv)
+    {
+        if (nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
+            osg::Group::traverse(nv);
+    }
+
+    osg::ref_ptr<osg::Texture2D>         _texture;
+};
+
+
 class _private : public LightMapRenderer
 {
  
     friend ILightMapRendererPtr createLightMapRenderer(osg::Group * sceneRoot);
 
 public: // ILightMapRenderer
-    // reserves textures, setups FBO, etc
-    virtual void                InitializeTexture( unsigned tex_dim );
 
     // set camera frustum and calculate all transformations
     // also clear collected lights
@@ -236,10 +188,10 @@ public: // ILightMapRenderer
     // add spot on cull pass
     virtual void                AddSpotLight( SpotData const & spot );
 
-    // render lightmap
-    virtual ITexture*           UpdateTexture( bool enabled );
+    // update uniforms
+    void                        UpdateTextureMatrix( bool enabled );
 
-    virtual void traverse(osg::NodeVisitor& nv);    
+    virtual void                traverse(osg::NodeVisitor& nv);    
     
     struct SpotRenderVertex
     {
@@ -257,7 +209,10 @@ public: // ILightMapRenderer
 protected:
 
     _private(osg::Group * sceneRoot);
-    
+
+    void _createArrays();
+
+
     osg::Geometry *                     _createGeometry();
     void                                _clearArrays();
     void                                _commitLights();
@@ -269,7 +224,6 @@ protected:
 protected:
     unsigned                             tex_dim_;
     bool                                 we_see_smth_;
-    ITexturePtr                          empty_tex_;
 
     cg::transform_4f                     mv_;
 
@@ -283,7 +237,7 @@ protected:
     
     std::vector<SpotRenderVertex>        vertices_;
 
-    osg::ref_ptr<Prerender>             _camera;
+    osg::ref_ptr<LightMapCamera>         _camera;
     
     osg::ref_ptr<osg::Uniform>           _lightmapMatrix;
 
@@ -457,9 +411,6 @@ void _private::traverse(osg::NodeVisitor& nv)
 
     osgUtil::CullVisitor * cv = static_cast<osgUtil::CullVisitor*>(&nv);
     
-
-
-#if 1
     const  osg::Camera* cam = avScene::GetScene()->getCamera();
 
     double  m_fLeft(-1.0f)
@@ -485,9 +436,7 @@ void _private::traverse(osg::NodeVisitor& nv)
 
     cull( cv );
     
-    UpdateTexture(true);
-
-#endif
+    UpdateTextureMatrix(true);
 
     // set matrices from frustum calculator to camera
     if(clpt_mat_)
@@ -526,13 +475,10 @@ osg::Geometry * _private::_createGeometry()
     geom->setUseVertexBufferObjects(true);
     geom->setDataVariance(osg::Object::DYNAMIC);
 
+    FIXME(To camera node?)
     osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::ALPHA_MAX);
     geom->getOrCreateStateSet()->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
     geom->getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
-
-    FIXME(Do not have clamp)
-    //osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, true /*false*/);
-    //geom->getOrCreateStateSet()->setAttribute(pDepth,osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     geom->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
     
@@ -572,81 +518,19 @@ _private::_private(osg::Group * sceneRoot)
     program->setName("LightMap");
     stateset->setAttribute(program);
 
-    from_l_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(1, false);
-    ldir_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(2, ldir_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(2, false);
-    lcolor_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(3, false);
-    dist_falloff_ = new osg::Vec2Array();
-    geom_->setVertexAttribArray(4, dist_falloff_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(4, false);
-    cone_falloff_ = new osg::Vec2Array();
-    geom_->setVertexAttribArray(5, cone_falloff_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(5, false);
-    
-    from_l_->setPreserveDataType(true);
-    ldir_->setPreserveDataType(true);
-    dist_falloff_->setPreserveDataType(true);
-    cone_falloff_->setPreserveDataType(true);
-    lcolor_->setPreserveDataType(true);
+    _createArrays();
 
-
-
-    //// fake texture
-    static const unsigned fake_tex_size_ = 2;
-    empty_tex_ = new osg::Texture2D;
-    empty_tex_->setTextureSize( fake_tex_size_, fake_tex_size_ );
-    empty_tex_->setInternalFormat( /*GL_RGBA*/GL_RGBA16F );
-    empty_tex_->setNumMipmapLevels(4);
-    empty_tex_->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR_MIPMAP_LINEAR );
-    empty_tex_->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR ); 
-    empty_tex_->setWrap(osg::Texture::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-    empty_tex_->setWrap(osg::Texture::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
-    empty_tex_->setBorderColor(osg::Vec4d(0,0,0,0));
     
-    _camera = new Prerender();
-    
+    _camera = new LightMapCamera();
     _camera->setCullCallback ( new CameraCullCallback ( _NeedToUpdateFBO ) );
-    osg::StateSet * pSS = _camera->getOrCreateStateSet();
-    pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
-    pSS->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
-    pSS->setMode(0x864F/*GL_DEPTH_CLAMP_NV*/, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
-    pSS->setMode(0x809E/*GL_SAMPLE_ALPHA_TO_COVERAGE_ARB*/, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
 
 
-    // addChild(_camera); 
     _camera->addChild(geode);
     color_buf_ = _camera->getTexture();
 
     //setCullCallback(new LightMapCullCallback(this));
 }
  
-
-// reserves textures, setups FBO, etc
-void _private::InitializeTexture( unsigned tex_dim )
-{
-    if (tex_dim_ != tex_dim)
-    {
-        //IGraphicDevice * pGD = vtGlobal::pGD;
-        tex_dim_ = tex_dim;
-         
-        color_buf_ = new osg::Texture2D;
-        color_buf_->setTextureSize( tex_dim_, tex_dim_ );
-        color_buf_->setInternalFormat( /*GL_RGBA*/GL_RGBA16F );
-        color_buf_->setNumMipmapLevels(4);
-        color_buf_->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR_MIPMAP_LINEAR );
-        color_buf_->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR ); 
-        color_buf_->setWrap(osg::Texture::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-        color_buf_->setWrap(osg::Texture::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
-        color_buf_->setBorderColor(osg::Vec4d(0,0,0,0));
-        
-        //Assert(fbo_->IsComplete());
-    }
-}
 
 // add spot on cull pass
 void _private::AddSpotLight( SpotData const & spot )
@@ -704,17 +588,13 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_m
     tex_matr_ = cg::xyzw_to_strq_remap_matrix(1.0f, 1.0f) * (proj_matr_ * mv_.inverse_matrix());
 }
 
-// render lightmap
-ITexture * _private::UpdateTexture( bool enabled )
+// update uniform
+void _private::UpdateTextureMatrix( bool enabled )
 {
     if (enabled && we_see_smth_ && !vertices_.empty())
     {
         _lightmapMatrix->set(to_osg_matrix(tex_matr_.transpose()));
-        return color_buf_.get();
     }
-
-    // empty tex
-    return empty_tex_.get();
 }
 
 // texture matrix for specific split
@@ -727,6 +607,31 @@ cg::matrix_4f const & _private::GetViewTextureMatrix() const
 bool _private::GetNightMode() const
 {
     return we_see_smth_;
+}
+
+void _private::_createArrays()
+{
+    from_l_ = new osg::Vec3Array();
+    geom_->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(1, false);
+    ldir_ = new osg::Vec3Array();
+    geom_->setVertexAttribArray(2, ldir_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(2, false);
+    lcolor_ = new osg::Vec3Array();
+    geom_->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(3, false);
+    dist_falloff_ = new osg::Vec2Array();
+    geom_->setVertexAttribArray(4, dist_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(4, false);
+    cone_falloff_ = new osg::Vec2Array();
+    geom_->setVertexAttribArray(5, cone_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    geom_->setVertexAttribNormalize(5, false);
+
+    from_l_->setPreserveDataType(true);
+    ldir_->setPreserveDataType(true);
+    dist_falloff_->setPreserveDataType(true);
+    cone_falloff_->setPreserveDataType(true);
+    lcolor_->setPreserveDataType(true);
 }
 
 void _private::_clearArrays()
@@ -834,6 +739,11 @@ void _private::cull( osg::NodeVisitor * nv )
 {
     using namespace avScene;
 
+    osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(nv);
+    avAssert(pCV);
+
+    const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
+
     avScene::Scene * scene = GetScene();
 
     if (scene == NULL)
@@ -847,34 +757,19 @@ void _private::cull( osg::NodeVisitor * nv )
     const std::vector<LightProcessedInfo>& lpi = lights->GetProcessedLights();
     const std::vector<LightExternalInfo>&  lei = lights->GetVisibleLights();
 
-    //for (auto it = lpi.begin();it!=lpi.end();++it)
-    //{
-    //    SpotData spot;
-    //    spot.view_dir =  cg::point_3f(it->lightVSDirSpecRatio.x(),it->lightVSDirSpecRatio.y(),it->lightVSDirSpecRatio.z());
-    //    spot.view_pos =  cg::point_3f(it->lightVSPosAmbRatio.x(),it->lightVSPosAmbRatio.y(),it->lightVSPosAmbRatio.z());
-    //    spot.spot_color = cg::colorf(it->lightDiffuse.x(),it->lightDiffuse.y(),it->lightDiffuse.z());
-    //    spot.dist_falloff = cg::range_2f(80.f, 220.f);
-    //    spot.angle_falloff = cg::range_2f(15.f, 45.f);
-
-    //    AddSpotLight( spot );
-    //}
-
-    //nv->getViewPoint()
-    
     auto it_p = lpi.begin();
     for (auto it = lei.begin();it!=lei.end();++it,++it_p)
     {
         SpotData spot;
-
-		cg::transform_4f tr(cg::as_translation(cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z())));
-        spot.view_dir =  /*tr.treat_vector(cg::point_3f(0, 1, 0));*/cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
+        cg::transform_4f tr = from_osg_matrix(mWorldToView);
         
-		// const osg::Vec3f vLightVSDir = osg::Matrixd::transform3x3(osg::Vec3(vWorldDir.x, vWorldDir.y, vWorldDir.z), mWorldToView);
-
-		spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
+        //spot.view_dir =cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
+        spot.view_dir =  tr.treat_vector(it->vDirWorld,false);
+ 
+        spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
         spot.spot_color    = it->cDiffuse;
         spot.dist_falloff  = it->rDistAtt;
-        spot.angle_falloff = it->rConeAtt;
+        spot.angle_falloff = (!it->rConeAtt.empty())?cg::rad2grad()*it->rConeAtt:it->rConeAtt ;
 
         AddSpotLight( spot );
     }

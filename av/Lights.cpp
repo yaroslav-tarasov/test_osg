@@ -274,11 +274,13 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
             }
         }
 
+#if LIGHTS_TURN_ON
         // okey, so we can add
         curStatePack.LightVSPosAmbRatio->setElement(uLightsAdded, uniformData.lightVSPosAmbRatio);
         curStatePack.LightVSDirSpecRatio->setElement(uLightsAdded, uniformData.lightVSDirSpecRatio);
         curStatePack.LightAttenuation->setElement(uLightsAdded, uniformData.lightAttenuation);
         curStatePack.LightDiffuse->setElement(uLightsAdded, uniformData.lightDiffuse);
+#endif
         uLightsAdded++;
     }
 
