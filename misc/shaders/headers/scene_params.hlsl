@@ -17,7 +17,7 @@
     uniform int              baseTextureUnit;                                                                       
     uniform sampler2DShadow  shadowTexture0;                                                            
     uniform int              shadowTextureUnit0;                                                                    
-    uniform mat4             shadowMatrix;                                                                                                                                                                    
+    uniform mat4             shadowMatrix0;                                                                                                                                                                    
 
                                                                                                      
     uniform mat4             shadow0_matrix;

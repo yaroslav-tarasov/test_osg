@@ -622,7 +622,25 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
 
     addChild( _ephemerisNode.get() );
+//////////////////////////////////////////////////////    
+    FIXME(Many light sources)
+#if 0
+    osg::ref_ptr<osg::LightSource> ls = new osg::LightSource;
 
+    osg::Vec4f lightPosition2 (osg::Vec4f(200.0,100.0,50.0,0.0f));
+    osg::ref_ptr<osg::Light> myLight2 = new osg::Light;
+
+    myLight2->setAmbient(osg::Vec4(0.5f,0.5f,0.5f,1.0f));
+    myLight2->setDiffuse(osg::Vec4(0.9f,0.9f,0.85f,1.0f));
+    myLight2->setSpecular(osg::Vec4(0.2f,0.2f,0.2f,1.0f));
+    myLight2->setConstantAttenuation(1.0f);
+
+    myLight2->setLightNum(2);
+    myLight2->setPosition(lightPosition2);
+    ls->setLight(myLight2.get());
+    if(_terrainRoot) _terrainRoot->addChild(ls.get());
+#endif
+/////////////////////////////////////////////////////////////////
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
    
@@ -1119,7 +1137,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 cg::cpr        cr    = orien.cpr(); 
 
                 const float heading = osg::DegreesToRadians(0.f);
-                const float pitch = osg::DegreesToRadians(2.f);
+                const float pitch = osg::DegreesToRadians(10.f);
 
                 data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 

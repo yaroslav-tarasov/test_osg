@@ -155,7 +155,7 @@ namespace shaders
      uniform int             baseTextureUnit;                                                          \
      uniform sampler2DShadow shadowTexture0;                                                           \
      uniform int             shadowTextureUnit0;                                                       \
-     uniform mat4            shadowMatrix;                                                             \
+     uniform mat4            shadowMatrix0;                                                            \
      uniform mat4            lightmap_matrix;                                                          \
 \n   uniform mat4            shadow0_matrix;                                                           \
      )
@@ -360,7 +360,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             v_out.viewpos   = viewpos.xyz;
             v_out.texcoord  = gl_MultiTexCoord1.xy;
             //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-            mat4 EyePlane =  transpose(shadowMatrix); 
+            mat4 EyePlane =  transpose(shadowMatrix0); 
             v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
 
             SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -528,7 +528,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
 
             }       
@@ -641,7 +641,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                v_out.viewpos   = viewpos.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
                //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-               mat4 EyePlane =  transpose(shadowMatrix); 
+               mat4 EyePlane =  transpose(shadowMatrix0); 
                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                
                SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -802,7 +802,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -968,7 +968,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
 
             }       
@@ -1091,7 +1091,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //vec4 EyePlane_P = shadowMatrix[2] * refMatrix;
                 //vec4 EyePlane_Q = shadowMatrix[3] * refMatrix;
                 
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -1275,7 +1275,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -1537,7 +1537,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_VS
 
             STRINGIFY ( 
-            uniform mat4  shadowMatrix;                                \n 
+            uniform mat4  shadowMatrix0;                                \n 
             uniform mat4  refMatrix;
 
             void main (void)
@@ -1555,7 +1555,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                
                gl_TexCoord[1] = get_shadow_coords(posEye, 5);
 
-               //gl_TexCoord[1] =   shadowMatrix * refMatrix * gl_Vertex  ;   //  shadowMatrix * gl_ModelViewMatrix *  refMatrix
+               //gl_TexCoord[1] =   shadowMatrix0 * refMatrix * gl_Vertex  ;   //  shadowMatrix * gl_ModelViewMatrix *  refMatrix
                
             }
             )
@@ -1647,7 +1647,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix); 
+                mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);

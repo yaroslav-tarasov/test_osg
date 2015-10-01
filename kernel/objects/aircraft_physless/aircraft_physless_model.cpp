@@ -61,7 +61,7 @@ void model::update( double time )
     //    aircraft_fms::model_control_ptr(get_fms_info())->activate();
         
     FIXME(init_shassi_anim)
-    init_shassi_anim();
+    // init_shassi_anim();
 
     double dt = time - (last_update_ ? *last_update_ : 0);
     if (cg::eq_zero(dt))

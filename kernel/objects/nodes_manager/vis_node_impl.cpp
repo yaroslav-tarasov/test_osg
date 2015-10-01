@@ -91,6 +91,8 @@ void vis_node_impl::pre_update(double time)
 
 void vis_node_impl::on_animation(msg::node_animation const& anim)
 {
+    LOG_ODS_MSG("vis_node_impl::on_animation: " << anim.name << "\n" );
+
     nm::visit_sub_tree(manager_->get_node_tree_iterator(node_id()), [this](nm::node_info_ptr n)->bool
     {
         dynamic_cast<vis_node_impl *>(n.get())->sync_position();
@@ -153,6 +155,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)
 {
+    LOG_ODS_MSG( name() << "vis_node_impl::on_visibility: " << m.visible << "\n" );
     user_visible_ = m.visible;
     need_update_ = true;
 }

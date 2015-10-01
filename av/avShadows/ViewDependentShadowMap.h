@@ -190,8 +190,7 @@ protected:
         mutable OpenThreads::Mutex              _accessUnfiromsAndProgramMutex;
         Uniforms                                _uniforms;
         osg::ref_ptr<osg::Program>              _program;
-        osg::ref_ptr<osg::Uniform>              _shadowMatrix;
-        //osg::ref_ptr<osg::Uniform>              _refMatrix;
+        Uniforms                                _shadowMatrices;
 
 };
 

@@ -127,7 +127,7 @@ void Visual::Initialize()
 
     database::initDataPaths();
 
-	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*/
+	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -183,12 +183,31 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     {
        //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
     }
+    
+    float left, right, bottom, top;
+
+
 
     _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.15f, 0.15f, 0.15f, 1.f));
     //FIXME TODO //setProjectionMatrixFromConfig();
 
+#if 0     
+    float fVertAspect = float(1980) / float(1200);
+    float m_fLeft   = -1 ;
+    float m_fRight  = +1 ;
+    float m_fBottom = -1 ;
+    float m_fTop    = +1 ;
+    float m_fHalfTanH = 0.5f * (m_fRight - m_fLeft);
+    m_fLeft   = -m_fHalfTanH;
+    m_fRight  = +m_fHalfTanH;
+    m_fBottom = -m_fHalfTanH * fVertAspect;
+    m_fTop    = +m_fHalfTanH * fVertAspect;
+    _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(m_fLeft,m_fRight,m_fBottom,m_fTop,4.0,7000.0);
+#endif
+
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
-    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(10.0F);
+    _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
+
 
     //_viewerPtr->setSceneData( this );
     _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded);

@@ -90,8 +90,9 @@ namespace bi
         _d->_csys = sys_creator()->get_control_sys();
         _d->_msys = sys_creator()->get_model_sys();
 
-        
+#if 0
         _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
+#endif        
       
     }
 

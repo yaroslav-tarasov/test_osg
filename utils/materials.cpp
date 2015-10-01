@@ -466,7 +466,8 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
     stateset->addUniform( new osg::Uniform("envTex"        , BASE_ENV_TEXTURE_UNIT) ); 
     stateset->addUniform( new osg::Uniform("ViewDecalMap"  , BASE_DECAL_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("ViewLightMap"  , BASE_LM_TEXTURE_UNIT) );
-    stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
+    // Добавляется в VDS Map
+    //stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
 
 
     stateset->setAttributeAndModes( p.program.get() );
