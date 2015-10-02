@@ -159,6 +159,10 @@ osg::Geode* CreateLight (const osg::Vec4& fcolor,const std::string& name,osg::No
     return  colors [fcolor];
 };
 
+inline cg::vector_3f set_direction(const float pitch, const float heading)
+{
+	return cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+}
 
 }
 
@@ -1040,6 +1044,8 @@ void Scene::createObjects()
 
 }
 
+
+
 osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 {
     using namespace creators;
@@ -1052,22 +1058,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     if( path == "sfx//smoke.scg" )
     {
-        // mt = new osg::MatrixTransform;
-
-        //bool got_phys_node=false;
-        //while(0 != parent->getNumParents() && (got_phys_node = "phys_ctrl" != boost::to_lower_copy(parent->getName())))
-        //{                  
-        //    parent = parent->getParent(0);
-        //}
-
         spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,parent?parent->asTransform():nullptr);
         sp3.first->setName("fire");
         mt_.back()->addChild(sp3.first);
         
         addChild(mt_.back());
 		
-		//mt_.back()->setNodeMask(  cCastsShadowTraversalMask );
-
         _viewerPtr->addEventHandler(sp3.second);
         return mt_.back()/*.release()*/;
 
@@ -1099,7 +1095,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     if(obj)
     {
-        // mt = new osg::MatrixTransform;
         mt->setName("phys_ctrl");
         mt->setUserValue("id",seed);
 
@@ -1107,8 +1102,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         osg::Node* root =  findFirstNode(obj,"root"); 
         root->setUserValue("id",seed);
-
-
         
         if(mt!=nullptr)
         {
@@ -1137,7 +1130,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 const float heading = osg::DegreesToRadians(cr.course);
                 const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
 
-                data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                data.direction = set_direction(pitch, heading);
                 data.active = true;
 
                 avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(), data);
@@ -1146,8 +1139,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
 
             findNodeVisitor::nodeNamesList list_name;
-
-            //osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
             NavAidGroup*  obj_light  =  new NavAidGroup; 
 
             const char* names[] =
@@ -1201,9 +1192,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+                    const float pitch   = osg::DegreesToRadians(0.f);
 
-                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+					data.direction = set_direction(pitch, heading);
+
                     data.active = true;
 
                 }
@@ -1221,9 +1213,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset); 
 
                     const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+                    const float pitch   = osg::DegreesToRadians(0.f);
 
-                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                    data.direction = set_direction(pitch, heading);
                     data.active = true;
                 }
 
@@ -1251,9 +1243,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+                    const float pitch   = osg::DegreesToRadians(0.f);
 
-                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+                    data.direction = set_direction(pitch, heading);
                     data.active = true;
                 }
 
@@ -1273,8 +1265,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
         _terrainRoot->asGroup()->addChild(mt);
 		
-		//mt->setNodeMask(  cCastsShadowTraversalMask | cReceivesShadowTraversalMask );
-
         object_loaded_signal_(seed);
 
     } };
@@ -1337,4 +1327,7 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
 void Scene::onExit()
 {
     _viewerPtr->setDone(true);
+
+
+
 }

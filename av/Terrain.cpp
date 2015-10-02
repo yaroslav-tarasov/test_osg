@@ -193,8 +193,7 @@ namespace
 					data.position =  from_osg_vector3(p);
      				const float heading = osg::DegreesToRadians(0.f);
 					const float pitch   = osg::DegreesToRadians(0.f);
-					// const cg::point_3f down_view_dir = cur_mv.treat_vector(cg::point_3f(0, 0, -1));
-					data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+				    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
 					data.active = true;
 
