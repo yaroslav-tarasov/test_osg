@@ -193,10 +193,10 @@ osg::Node* createObject(std::string name, bool fclone)
              {
                  pnt._color  = white_color;
                  pnt._blinkSequence = new osgSim::BlinkSequence;
-                 pnt._blinkSequence->addPulse( 0.2,
+                 pnt._blinkSequence->addPulse( 0.05,
                      osg::Vec4( 1., 1., 1., 1. ) );
 
-                 pnt._blinkSequence->addPulse( 1.0,
+                 pnt._blinkSequence->addPulse( 1.5,
                      osg::Vec4( 0., 0., 0., 0. ) );
 
                  pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));

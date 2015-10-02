@@ -146,11 +146,23 @@ void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStr
 }
 #endif
 
+uint32_t  LightManager::genUID()
+{
+      uint32_t uid = 0;
+      
+      while (uid==0 || m_LightsMap.find(uid)!=m_LightsMap.end())
+      {
+          uid = cg::rand(cg::range_2(1, std::numeric_limits<uint32_t>::max()));
+      };
+
+      return uid;
+}
+
 
 FIXME(Deprecated light)
-void  LightManager::addLight(/*uint32_t id,*/ osg::MatrixTransform* mt )
+void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
 {
-    const unsigned lightID = m_LightsMap.size()/*id*/;
+    const unsigned lightID = /*m_LightsMap.size()*/id;
     
     Light & light = m_LightsMap[lightID];
 
@@ -178,9 +190,9 @@ void  LightManager::addLight(/*uint32_t id,*/ osg::MatrixTransform* mt )
 
 }
 
-void LightManager::addLight(/*uint32_t id,*/ const Light& data)
+void LightManager::addLight(uint32_t id, const Light& data)
 {
-    const unsigned lightID = m_LightsMap.size()/*id*/;
+    const unsigned lightID = /*m_LightsMap.size()*/id;
 
     Light & light = m_LightsMap[lightID];
 

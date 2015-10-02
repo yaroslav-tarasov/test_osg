@@ -10,6 +10,7 @@
 
 #include "Logo.h"
 
+
 #include <osg/GLObjects>
 
 //Degree precision versus length
@@ -39,6 +40,8 @@
 #include "Environment.h"
 #include "Ephemeris.h"
 #include "Object.h"
+#include "NavAid.h"
+
 
 #include "application/panels/vis_settings_panel.h"
 #include "application/main_window.h"
@@ -1136,20 +1139,22 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 cg::quaternion orien = from_osg_quat(rot);
                 cg::cpr        cr    = orien.cpr(); 
 
-                const float heading = osg::DegreesToRadians(0.f);
-                const float pitch = osg::DegreesToRadians(10.f);
+                const float heading = osg::DegreesToRadians(cr.course);
+                const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
 
                 data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                 data.active = true;
 
-                avScene::LightManager::GetInstance()->addLight( data);
+                avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(), data);
+
             }
 
 
             findNodeVisitor::nodeNamesList list_name;
 
-            osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
+            //osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
+            NavAidGroup*  obj_light  =  new NavAidGroup; 
 
             const char* names[] =
             {
@@ -1200,12 +1205,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
                     
-                    data.color.r = pnt._color.r();
-                    data.color.g = pnt._color.g();
-                    data.color.b = pnt._color.b();
-                    
-                    FIXME( Need to be normalized )
-
                     data.color  *= 0.01;
 
                     FIXME( Damned offset )
@@ -1219,8 +1218,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.active = true;
 
-                    avScene::LightManager::GetInstance()->addLight(data);
-
+                    //avScene::LightManager::GetInstance()->addLight(data);
 
                 }
 
@@ -1234,16 +1232,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
-
-                    data.color.r = pnt._color.r();
-                    data.color.g = pnt._color.g();
-                    data.color.b = pnt._color.b();
-
-                    FIXME( Need to be normalized )
-                    data.color  *= 0.01;
                     
                     FIXME( Damned offset )
-                        // cg::transform_4 tr = get_relative_transform(sl);
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
                         + offset);
 
@@ -1253,9 +1243,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
                     data.active = true;
-
-                    avScene::LightManager::GetInstance()->addLight(data);
-
                 }
 
 
@@ -1263,22 +1250,46 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 {
                     pnt._color  = white_color;
                     pnt._blinkSequence = new osgSim::BlinkSequence;
-                    pnt._blinkSequence->addPulse( 0.2,
+                    pnt._blinkSequence->addPulse( 0.05,
                         osg::Vec4( 1., 1., 1., 1. ) );
 
-                    pnt._blinkSequence->addPulse( 1.0,
+                    pnt._blinkSequence->addPulse( 1.5,
                         osg::Vec4( 0., 0., 0., 0. ) );
 
                     pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
 
                     pnt._blinkSequence->setPhaseShift(shift_phase);
                     need_to_add     = true;
+
+                    data.transform  = mt;  
+                    data.spotFalloff = cg::range_2f();
+                    data.distanceFalloff = cg::range_2f(3.5f, 15.f);//cg::range_2f(3.5f, 40.f);
+
+                    FIXME( Damned offset )
+                        data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
+                        + offset);
+
+                    const float heading = osg::DegreesToRadians(0.f);
+                    const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
+
+                    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+                    data.active = true;
                 }
 
                 pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
                 pnt._radius = 0.2f;
                 if(need_to_add)
-                    obj_light->addLightPoint(pnt);
+                {
+                    data.color.r = pnt._color.r();
+                    data.color.g = pnt._color.g();
+                    data.color.b = pnt._color.b();
+
+                    FIXME( Need to be normalized )
+                        data.color  *= 0.01;
+
+                    obj_light->addLight(pnt, data);
+                }
             }
 
             if(wln_list.size()>0)

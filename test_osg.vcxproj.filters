@@ -194,6 +194,9 @@
     <ClInclude Include="av\Logo.h">
       <Filter>Source Files\av</Filter>
     </ClInclude>
+    <ClInclude Include="av\NavAid.h">
+      <Filter>Source Files\av</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -630,6 +633,9 @@
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="av\NavAid.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

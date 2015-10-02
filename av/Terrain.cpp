@@ -344,7 +344,7 @@ void  Terrain::create( const std::string& name )
         {
             std::string node_name((*it)->getName());
             std::string mast_index = node_name.substr(node_name.find("_")+1);
-            avScene::LightManager::GetInstance()->addLight(/*boost::lexical_cast<int>(mast_index),*/(*it)->asTransform()->asMatrixTransform());
+            avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(),(*it)->asTransform()->asMatrixTransform());
         }
     }
 
