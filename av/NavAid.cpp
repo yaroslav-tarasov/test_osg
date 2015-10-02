@@ -23,7 +23,16 @@ namespace avScene
         const uint32_t ind = addLightPoint(pnt);
         const uint32_t uid = avScene::LightManager::GetInstance()->genUID();
         lm_.insert(std::make_pair(ind,uid));
-        avScene::LightManager::GetInstance()->addLight(uid, data);
+		
+		LightManager::Light d = data;
+
+		d.color.r = pnt._color.r();
+		d.color.g = pnt._color.g();
+		d.color.b = pnt._color.b();
+		
+		assert(d.color.r <= 1.0 && d.color.g <= 1.0 && d.color.b <= 1.0);
+
+        avScene::LightManager::GetInstance()->addLight(uid, d);
     }
 
     void NavAidGroup::traverse(osg::NodeVisitor& nv)

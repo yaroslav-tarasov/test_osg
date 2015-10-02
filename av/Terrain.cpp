@@ -19,13 +19,15 @@
 
 #include "av/Grass.h"
 #include "av/Grass2.h"
+#include "av/NavAid.h"
 
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"
 
 namespace
 {
-    typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
+    //typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
+	typedef osg::ref_ptr<avScene::NavAidGroup> navaid_group_node_ptr;
 
     template<typename S> 
     inline osg::Vec3f polar_point_2(S range, S course )
@@ -101,7 +103,7 @@ namespace
             parent->removeChild(it->get());
         cur_lamps.clear();
 
-        navaid_group_node_ptr navid_node_ptr = nullptr;
+        navaid_group_node_ptr navid_node = nullptr;
 
         bool group_ready = false;
 
@@ -124,15 +126,15 @@ namespace
                 {
                     boost::trim_if(line, boost::is_any_of("/#"));
                     //navid_node_ptr.reset(static_cast<victory::navaid_group_node *>(fabric->create(victory::node::NT_NavAidGroup).get()));
-                    navid_node_ptr.release();
-                    navid_node_ptr = new osgSim::LightPointNode;
-                    navid_node_ptr->setName(line);
+                    navid_node.release();
+                    navid_node = new avScene::NavAidGroup;
+                    navid_node->setName(line);
                     //
-                    osg::StateSet* set = navid_node_ptr->getOrCreateStateSet();
+                    osg::StateSet* set = navid_node->getOrCreateStateSet();
 
                     if (usePointSprites)
                     {
-                        navid_node_ptr->setPointSprite();
+                        navid_node->setPointSprite();
 
                         // Set point sprite texture in LightPointNode StateSet.
 
@@ -184,15 +186,28 @@ namespace
                     else
                         pnt._radius = 0.6f;
 
-                    navid_node_ptr->addLightPoint(pnt);
+					avScene::LightManager::Light data;
+					data.transform  = nullptr;  
+					data.spotFalloff = cg::range_2f();
+					data.distanceFalloff = cg::range_2f(0.9f, 15.0f);
+					data.position =  from_osg_vector3(p);
+     				const float heading = osg::DegreesToRadians(0.f);
+					const float pitch   = osg::DegreesToRadians(0.f);
+					// const cg::point_3f down_view_dir = cur_mv.treat_vector(cg::point_3f(0, 0, -1));
+					data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+					data.active = true;
+
+					navid_node->addLight(pnt,data);
+                    //navid_node->addLightPoint(pnt);
 
                 }
             }
 
-            if(navid_node_ptr && group_ready)
+            if(navid_node && group_ready)
             {
-                cur_lamps.push_back(navid_node_ptr);
-                parent->addChild(navid_node_ptr);
+                cur_lamps.push_back(navid_node);
+                parent->addChild(navid_node);
                 group_ready = false;
             }
 

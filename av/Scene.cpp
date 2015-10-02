@@ -1122,18 +1122,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
             {
                 avScene::LightManager::Light data;
                 data.transform  = mt;  
-
                 data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
                 data.distanceFalloff = cg::range_2f(75.f, 140.f);
-
 				data.color.r = 0.92f;
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
-
                 FIXME(  Damned offset  );
-                //cg::transform_4 tr = get_relative_transform(sl);
-                data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
-                                                  + offset);
+                data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
                 osg::Quat      rot   = sl->asTransform()->asMatrixTransform()->getMatrix().getRotate();
                 cg::quaternion orien = from_osg_quat(rot);
@@ -1143,7 +1138,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
 
                 data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
                 data.active = true;
 
                 avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(), data);
@@ -1190,65 +1184,53 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                 if((*it)->getName() == "tail")
                 { 
-                    pnt._color      = creators::white_color;
+                    pnt._color      = creators::white_color * 0.01f;
                     need_to_add     = true;
                 }
 
                 if((*it)->getName() == "port")
                 {   
-                    pnt._color      = green_color;
+                    pnt._color      = green_color * 0.01f;
                     need_to_add     = true;
                     pnt._sector = sector;
 
                     data.transform  = mt;  
-
                     data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
-                    
-                    data.color  *= 0.01;
-
                     FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
-                        + offset);
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
                     data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
                     data.active = true;
-
-                    //avScene::LightManager::GetInstance()->addLight(data);
 
                 }
 
                 if((*it)->getName() == "starboard") 
                 {
-                    pnt._color = red_color;
+                    pnt._color = red_color * 0.01f ;
                     need_to_add     = true;
                     pnt._sector = sector;
 
                     data.transform  = mt;  
-
                     data.spotFalloff = cg::range_2f();
                     data.distanceFalloff = cg::range_2f(1.5f, 13.f);
-                    
                     FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
-                        + offset);
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset); 
 
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
                     data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
                     data.active = true;
                 }
 
 
                 if(boost::starts_with((*it)->getName(), "strobe_")) 
                 {
-                    pnt._color  = white_color;
+                    pnt._color  = white_color * 0.01f;
                     pnt._blinkSequence = new osgSim::BlinkSequence;
                     pnt._blinkSequence->addPulse( 0.05,
                         osg::Vec4( 1., 1., 1., 1. ) );
@@ -1266,14 +1248,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     data.distanceFalloff = cg::range_2f(3.5f, 15.f);//cg::range_2f(3.5f, 40.f);
 
                     FIXME( Damned offset )
-                        data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() 
-                        + offset);
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f/*-90.f*/);
 
                     data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
                     data.active = true;
                 }
 
@@ -1281,13 +1261,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 pnt._radius = 0.2f;
                 if(need_to_add)
                 {
-                    data.color.r = pnt._color.r();
-                    data.color.g = pnt._color.g();
-                    data.color.b = pnt._color.b();
-
-                    FIXME( Need to be normalized )
-                        data.color  *= 0.01;
-
                     obj_light->addLight(pnt, data);
                 }
             }

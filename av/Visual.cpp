@@ -188,7 +188,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
 
 
 
-    _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.15f, 0.15f, 0.15f, 1.f));
+    _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
     //FIXME TODO //setProjectionMatrixFromConfig();
 
 #if 0     
@@ -206,7 +206,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
 #endif
 
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
-    _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
+   // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
 
 
     //_viewerPtr->setSceneData( this );
@@ -218,7 +218,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // disable ESC key
     _viewerPtr->setKeyEventSetsDone(0);
 
-    _viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
+    //_viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
 }
 
 void Visual::CreateScene()

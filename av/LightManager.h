@@ -26,7 +26,7 @@ public:
 
         bool             active;
 
-        inline Light() : transform(NULL), active(false) { }
+        inline Light() : transform(nullptr), active(false) { }
     };
 
 public:
