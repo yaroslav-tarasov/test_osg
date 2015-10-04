@@ -9,7 +9,7 @@ public:
 
     struct WeatherParameters
     {
-        avSky::cloud_type CloudType;
+        int   CloudType;
         float CloudDensity;
 
         float FogDensity;
@@ -23,7 +23,7 @@ public:
         bool LocalHailBanksEnabled;
 
         WeatherParameters()
-            : CloudType(avSky::cirrus)
+            : CloudType(0) // 2
             , CloudDensity(0.0f)
             , FogDensity(0.0f)
             , RainDensity(0.0f)
@@ -55,15 +55,15 @@ public:
 
     struct EnvironmentParameters
     {
-        float AirTemperature;
-        float AirHumidity;
-        float WindDirection;
-        float WindSpeed;
+        float         AirTemperature;
+        float         AirHumidity;
+        cg::point_3f  WindDirection;
+        float         WindSpeed;
 
         EnvironmentParameters()
             : AirTemperature(280.0f)
             , AirHumidity(0.0f)
-            , WindDirection(0.1f)
+            , WindDirection(0,0,0)
             , WindSpeed(0.1f)
         {
         }
@@ -79,7 +79,7 @@ public:
         unsigned Second;
 
         TimeParameters()
-            : Year(2010)
+            : Year(2015)
             , Month(1)
             , Day(1)
             , Hour(12)

@@ -7,12 +7,18 @@
 #endif
 
 #include "SparkDrawable.h"
+#include "av/Environment.h"
 
+struct SmokeNode::SafeEnvironment
+{
+	avCore::Environment::EnvironmentParameters env;
+};
 
 /* SmokeNode */
 
 SmokeNode::SmokeNode()
 	: gravity_(boost::none)
+	, env_    (new SafeEnvironment)
 {
 }
     
@@ -54,8 +60,17 @@ void SmokeNode::setGravity (const osg::Vec3f& g)
 
 void  SmokeNode::traverse(osg::NodeVisitor& nv)
 {
-	 if(gravity_)
-		 setGravity (*gravity_);
+	if (nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
+	{
+		const avCore::Environment::EnvironmentParameters & cEnvironmentParameters = avCore::GetEnvironment()->GetEnvironmentParameters(); 
+	    if (env_->env.WindDirection != cEnvironmentParameters.WindDirection )
+			gravity_ = to_osg_vector3(env_->env.WindSpeed * env_->env.WindDirection);
+		
+	    env_->env = cEnvironmentParameters;
+
+		if(gravity_)
+			 setGravity (*gravity_);
+	}
 
      osg::Geode::traverse(nv);
 } 

@@ -254,6 +254,18 @@ public:
                             return true;
                         }
                         else
+						if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Page_Up)
+						{
+							avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection += cg::point_3f(0,.1,0);
+							return true;
+						}
+						else
+						if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_Page_Down)
+						{
+							avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection -= cg::point_3f(0,.1,0);
+							return true;
+						}
+						else
                         if (ea.getKey() == osgGA::GUIEventAdapter::KEY_O)
                         {
                             //osgEphemeris::EphemerisData* data = ephem->getEphemerisData();
@@ -593,6 +605,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #if 1 
 
+    avCore::Environment::Create();
 
 #ifdef ORIG_EPHEMERIS
     //
@@ -630,7 +643,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     addChild( _ephemerisNode.get() );
 //////////////////////////////////////////////////////    
-    FIXME(Many light sources)
+    FIXME(Many light sources sm)
 #if 0
     osg::ref_ptr<osg::LightSource> ls = new osg::LightSource;
 
@@ -655,7 +668,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #else  
 
-    avCore::Environment::Create();
+
   
     // Create sky
     //
@@ -1061,8 +1074,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,parent?parent->asTransform():nullptr);
         sp3.first->setName("fire");
         mt_.back()->addChild(sp3.first);
+
         
-        addChild(mt_.back());
+        
+		addChild(mt_.back());
 		
 		sp3.first->getOrCreateStateSet()->setRenderBinDetails( 9, "DepthSortedBin" );
 

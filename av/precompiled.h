@@ -3,14 +3,14 @@
 
 namespace avSky
 {
-    enum cloud_type
-    {
-        none,
-        cloudy,
-        cirrus,
-        overcast,
-        clouds_types_num
-    } ;
+	enum cloud_type
+	{
+		none,
+		cloudy,
+		cirrus,
+		overcast,
+		clouds_types_num
+	} ;
 }
 
 namespace avSky

@@ -7,6 +7,7 @@
 #include "av/FogLayer.h"
 #include "av/CloudLayer.h"
 #include "av/EnvRenderer.h"
+#include "av/Environment.h"
 
 #include <osgEphemeris/EphemerisModel.h>  
 
@@ -283,7 +284,18 @@ namespace avSky
 
                         return true;
                     }
-
+					else
+					if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Page_Up)
+					{
+						avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection += cg::point_3f(0,.5,0);
+						return true;
+					}
+					else
+					if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_Page_Down)
+					{
+						avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection -= cg::point_3f(0,.5,0);
+						return true;
+					}
                 }
                 return false;
             } 

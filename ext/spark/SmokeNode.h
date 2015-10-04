@@ -16,7 +16,8 @@ protected:
 
 private:
     boost::optional<osg::Vec3f> 		 gravity_;
-
+	struct SafeEnvironment;
+	boost::scoped_ptr<SafeEnvironment>   env_;
 };
 
 
