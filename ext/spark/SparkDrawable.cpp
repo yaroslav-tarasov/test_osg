@@ -133,12 +133,12 @@ SparkDrawable::SparkDrawable()
 }
     
 SparkDrawable::SparkDrawable( const SparkDrawable& copy,const osg::CopyOp& copyop )
-:   osg::Drawable(copy, copyop),
-    _activeContextID(copy._activeContextID),
-    _lastTime(copy._lastTime), _sortParticles(copy._sortParticles),
-    _useProtoSystem(copy._useProtoSystem), _autoUpdateBound(copy._autoUpdateBound),
-    _dirty(copy._dirty)
-    ,_d (copy._d)
+    : osg::Drawable(copy, copyop)
+    , _activeContextID(copy._activeContextID)
+    , _lastTime(copy._lastTime), _sortParticles(copy._sortParticles)
+    , _useProtoSystem(copy._useProtoSystem), _autoUpdateBound(copy._autoUpdateBound)
+    , _dirty(copy._dirty)
+    , _d (copy._d)
 {}
 
 SparkDrawable::~SparkDrawable()

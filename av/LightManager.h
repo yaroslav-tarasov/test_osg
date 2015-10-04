@@ -39,14 +39,17 @@ public:
 
 public:
 
-    void     update  ( osg::NodeVisitor * nv );
-    void     addLight(uint32_t id, osg::MatrixTransform* mt);
-    void     addLight(uint32_t id, const Light& light);
-    uint32_t genUID();
+    void      update  ( osg::NodeVisitor * nv );
+    uint32_t  addLight( osg::MatrixTransform* mt);
+    uint32_t  addLight( const Light& light);
+
 
     FIXME(Check before return);
     
     Light&   getLight(uint32_t id) {return m_LightsMap[id];};
+
+private:
+	uint32_t genUID();
 
 private:
 

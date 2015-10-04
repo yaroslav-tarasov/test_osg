@@ -8,6 +8,7 @@
 #endif
 #include "SparkDrawable.h"
 #include "SparkUpdatingHandler.h"
+#include "SmokeNode.h"
 
 #ifndef _DEBUG
 #pragma comment(lib, "SPARK_GL.lib")
@@ -80,6 +81,8 @@ namespace spark
     {
         static int count = 0; 
         osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;
+		osg::ref_ptr<osg::Geode>    geode = nullptr;
+
         bool trackingModel = false;
         fire_creator fc(2.0);
         switch ( effectType )
@@ -93,39 +96,46 @@ namespace spark
             spark->addImage( "spark1", osgDB::readImageFile("data/spark1.bmp"), GL_RGB );
             spark->addImage( "spark2", osgDB::readImageFile("data/point.bmp"), GL_ALPHA );
             spark->addImage( "wave", osgDB::readImageFile("data/wave.bmp"), GL_RGBA );
+			geode = new osg::Geode;
             break;
         case FIRE:  // Fire
             spark->setBaseSystemCreator( /*&createFire*/&fc.createFire );
             spark->addParticleSystem();
             spark->addImage( "fire", osgDB::readImageFile("data/fire2.bmp"), GL_ALPHA );
             spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
+			geode = new osg::Geode;
             break;
         case RAIN:  // Rain
             spark->setBaseSystemCreator( &createRain, true );  // Must use the proto type directly
             spark->addImage( "waterdrops", osgDB::readImageFile("data/waterdrops.bmp"), GL_ALPHA );
+			geode = new osg::Geode;
             break;
         case SMOKE:  // Smoke
             spark->setBaseSystemCreator( &createSmoke );
             spark->addParticleSystem();
-            spark->addImage( "smoke", osgDB::readImageFile("data/smoke.png"), GL_RGBA );
+            spark->addImage( "smoke", osgDB::readImageFile("data/smoke_black.png"), GL_RGBA );
             //spark->addImage( "smoke", osgDB::readImageFile("data/fire2.bmp"), GL_RGBA );
+			geode = new SmokeNode;
+			dynamic_cast<SmokeNode*>(geode.get())->setGravity(osg::Vec3f(1.0,1.0,0.05));
             trackingModel = true;
             break;
         case TEST:
             spark->setBaseSystemCreator( &createTest );
             spark->addParticleSystem();
-
+			geode = new osg::Geode;
         default:  // Simple
             spark->setBaseSystemCreator( &createSimpleSystem );
             spark->addParticleSystem();
             spark->addImage( "flare", osgDB::readImageFile("data/flare.bmp"), GL_ALPHA );
+			geode = new osg::Geode;
             break;
         }
 
-        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
         geode->addDrawable( spark.get() );
         geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
         geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+		geode->getOrCreateStateSet()->setRenderBinDetails( /*RENDER_BIN_SCENE*/-5, "DepthSortedBin" );
+		geode->getOrCreateStateSet()->setNestRenderBins(false);
 
         static osg::ref_ptr<SparkUpdatingHandler> handler = new SparkUpdatingHandler;
         handler->addSpark( spark.get() );
@@ -140,7 +150,7 @@ namespace spark
         return spark_pair_t(geode.release(),handler.get());
     }
 
-
+		
 }
 
 
@@ -162,7 +172,9 @@ int main_spark( int argc, char** argv )
     spark::init();
 
     osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;
-    switch ( effectType )
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+
+	switch ( effectType )
     {
     case 1:  // Explosion
         spark->setBaseSystemCreator( &createExplosion );
@@ -183,6 +195,7 @@ int main_spark( int argc, char** argv )
     case 3:  // Rain
         spark->setBaseSystemCreator( &createRain, true );  // Must use the proto type directly
         spark->addImage( "waterdrops", osgDB::readImageFile("data/waterdrops.bmp"), GL_ALPHA );
+		geode = new osg::Geode;
         break;
     case 4:  // Smoke
         spark->setBaseSystemCreator( &createSmoke );
@@ -197,7 +210,6 @@ int main_spark( int argc, char** argv )
         break;
     }
     
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable( spark.get() );
     geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
     geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );

@@ -541,6 +541,7 @@ struct visapp
 
     ~visapp()
     {
+	   w_.reset();
        vis_sys_.reset();
     }
 

@@ -194,8 +194,11 @@
     <ClInclude Include="av\Logo.h">
       <Filter>Source Files\av</Filter>
     </ClInclude>
+    <ClInclude Include="ext\spark\SmokeNode.h">
+      <Filter>Source Files\spark</Filter>
+    </ClInclude>
     <ClInclude Include="av\NavAid.h">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\av\lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -607,9 +610,6 @@
     <ClCompile Include="tests\creators.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="tests\light_maps.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\DebugRenderer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
@@ -634,8 +634,14 @@
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="tests\light_maps.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\spark\SmokeNode.cpp">
+      <Filter>Source Files\spark</Filter>
+    </ClCompile>
     <ClCompile Include="av\NavAid.cpp">
-      <Filter>Source Files\av</Filter>
+      <Filter>Source Files\av\lights</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

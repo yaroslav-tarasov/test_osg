@@ -66,86 +66,6 @@ LightManager * LightManager::GetInstance()
 }
 
 
-#if 0
-void LightManager::OnEvent( const char * name, utils::MessageManager::MessageStream & stream )
-{
-    avAssert(name != NULL);
-
-    const LightManagerMessageMap::const_iterator it = g_MessageMap.find(name);
-
-    if (it == g_MessageMap.end())
-    {
-        avError("Unknown event");
-        return;
-    }
-
-    const LightManagerMessage message = it->second;
-
-    switch (message)
-    {
-    case CreateDynamicLight:
-        {
-            const unsigned lightID = stream.get<utils::uint32_t>();
-
-            Light & light = m_LightsMap[lightID];
-
-            const unsigned objectID = stream.get<utils::uint32_t>();
-            svDynamicObject::VisualDynamicObject * dynamicObject = utils::ObjectManager::GetInstance()->GetObjectByID<svDynamicObject::VisualDynamicObject>(utils::ObjectBase::OBJECT_DYNAMIC, objectID);
-            avAssert(dynamicObject != NULL);
-            light.transform = dynamicObject->GetVisualModel();
-
-            const float spotFalloff0 = osg::DegreesToRadians(stream.get<float>());
-            const float spotFalloff1 = osg::DegreesToRadians(stream.get<float>());
-            light.spotFalloff = cg::range_2f(spotFalloff0, spotFalloff1);
-
-            const float distanceFalloff0 = stream.get<float>();
-            const float distanceFalloff1 = stream.get<float>();
-            light.distanceFalloff = cg::range_2f(distanceFalloff0, distanceFalloff1);
-
-            light.color.r = stream.get<float>();
-            light.color.g = stream.get<float>();
-            light.color.b = stream.get<float>();
-        }
-        break;
-
-    case DeleteDynamicLight:
-        {
-            const unsigned lightID = stream.get<utils::uint32_t>();
-
-            LightsMap::const_iterator it = m_LightsMap.find(lightID);
-            avAssert(it != m_LightsMap.end());
-
-            m_LightsMap.erase(it);
-        }
-        break;
-
-    case UpdateDynamicLight:
-        {
-            const unsigned lightID = stream.get<utils::uint32_t>();
-            avAssert(m_LightsMap.find(lightID) != m_LightsMap.end());
-
-            Light & light = m_LightsMap[lightID];
-
-            light.position.x = stream.get<double>();
-            light.position.y = stream.get<double>();
-            light.position.z = stream.get<double>();
-            std::swap(light.position.x, light.position.y);
-
-            const float heading = osg::DegreesToRadians(stream.get<float>());
-            const float pitch = osg::DegreesToRadians(stream.get<float>());
-            light.direction = cg::vector_3(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch));
-
-            light.active = stream.get<bool>();
-        }
-        break;
-
-    default:
-        avError("message not handled");
-        break;
-    }
-}
-#endif
-
 uint32_t  LightManager::genUID()
 {
       uint32_t uid = 0;
@@ -160,17 +80,15 @@ uint32_t  LightManager::genUID()
 
 
 FIXME(Deprecated light)
-void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
+uint32_t  LightManager::addLight(osg::MatrixTransform* mt )
 {
-    const unsigned lightID = /*m_LightsMap.size()*/id;
+    const unsigned lightID = genUID();
     
     Light & light = m_LightsMap[lightID];
 
     light.transform = mt;
 
-    const float spotFalloff0 = osg::DegreesToRadians(15.f);
-    const float spotFalloff1 = osg::DegreesToRadians(45.f);
-    light.spotFalloff = cg::range_2f(spotFalloff0, spotFalloff1);
+    light.spotFalloff = cg::range_2f(cg::grad2rad(15.f), cg::grad2rad(45.f));
 
     const float distanceFalloff0 = 80.f;
     const float distanceFalloff1 = 220.f;
@@ -183,20 +101,25 @@ void  LightManager::addLight(uint32_t id, osg::MatrixTransform* mt )
     light.position = cg::point_3f(0,0,0);
 
     const float heading = osg::DegreesToRadians(0.f);
-    const float pitch = osg::DegreesToRadians(0.f);
+    const float pitch = osg::DegreesToRadians(-90.f);
     light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
     light.active = true;
 
+	return lightID;
 }
 
-void LightManager::addLight(uint32_t id, const Light& data)
+uint32_t LightManager::addLight(const Light& data)
 {
-    const unsigned lightID = /*m_LightsMap.size()*/id;
+    const unsigned lightID = genUID();
 
     Light & light = m_LightsMap[lightID];
 
     light = data;
+    
+	light.active = true;
+
+	return lightID;
 }
 
 void LightManager::update( osg::NodeVisitor * nv )
@@ -230,7 +153,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         {
            osg::Node* parent = light.transform->getParent(0);
            if(parent->asTransform())
-                matrix =  parent->asTransform()->asMatrixTransform()->getMatrix() * light.transform->asMatrixTransform()->getMatrix() ;
+                matrix =  light.transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
            else
                 matrix =  light.transform->asMatrixTransform()->getMatrix() ;
         }

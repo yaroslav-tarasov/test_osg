@@ -484,7 +484,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     manip->setAcceleration(0);
     manip->setMaxVelocity(1);
-    manip->setWheelMovement(10,true);
+    manip->setWheelMovement(0.001,true);
     //manip->setWheelMovement(0.001,true);
     _viewerPtr->setCameraManipulator(manip);
     //manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
@@ -1064,10 +1064,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         
         addChild(mt_.back());
 		
+		sp3.first->getOrCreateStateSet()->setRenderBinDetails( 9, "DepthSortedBin" );
+
         _viewerPtr->addEventHandler(sp3.second);
-        return mt_.back()/*.release()*/;
-
-
+        return mt_.back();
     }
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
@@ -1099,8 +1099,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         mt->setUserValue("id",seed);
 
         mt->addChild( obj );
-
-        osg::Node* root =  findFirstNode(obj,"root"); 
+	    
+		mt->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
+        
+		osg::Node* root =  findFirstNode(obj,"root"); 
         root->setUserValue("id",seed);
         
         if(mt!=nullptr)
@@ -1133,7 +1135,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
 
-                avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(), data);
+                avScene::LightManager::GetInstance()->addLight(data);
 
             }
 
@@ -1187,7 +1189,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(1.5f, 13.f);
+                    data.distanceFalloff = cg::range_2f(1.5f, 10.f);
                     FIXME( Damned offset )
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
@@ -1195,8 +1197,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     const float pitch   = osg::DegreesToRadians(0.f);
 
 					data.direction = set_direction(pitch, heading);
-
-                    data.active = true;
 
                 }
 
@@ -1208,7 +1208,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(1.5f, 13.f);
+                    data.distanceFalloff = cg::range_2f(1.5f, 10.f);
                     FIXME( Damned offset )
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset); 
 
@@ -1216,7 +1216,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     const float pitch   = osg::DegreesToRadians(0.f);
 
                     data.direction = set_direction(pitch, heading);
-                    data.active = true;
                 }
 
 
@@ -1246,7 +1245,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                     const float pitch   = osg::DegreesToRadians(0.f);
 
                     data.direction = set_direction(pitch, heading);
-                    data.active = true;
                 }
 
                 pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();

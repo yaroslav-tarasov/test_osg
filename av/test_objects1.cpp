@@ -24,7 +24,7 @@ namespace
     inline std::string data_file(std::string icao_code)
     {
         if (icao_code == "UUEE")
-            return "sheremetyevo.txt";
+            return "log_sochi_4.txt";
         else if (icao_code == "URSS")
             return "log_sochi_4.txt";
         else if (icao_code == "UMMS")
@@ -35,7 +35,7 @@ namespace
 
 void create_objects()
 {
-    const std::string icao_code = "URSS"; 
+    const std::string icao_code = "UUEE"; 
 
     krv::data_getter              _krv_data_getter(data_file(icao_code));
 

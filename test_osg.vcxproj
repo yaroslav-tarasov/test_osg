@@ -127,6 +127,7 @@
     <ClInclude Include="av\test_systems.h" />
     <ClInclude Include="av\Utils.h" />
     <ClInclude Include="av\Visual.h" />
+    <ClInclude Include="ext\spark\SmokeNode.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="ext\spark\osgspark.cpp" />
     <ClCompile Include="ext\spark\rain_effect.cpp" />
     <ClCompile Include="ext\spark\simple_effect.cpp" />
+    <ClCompile Include="ext\spark\SmokeNode.cpp" />
     <ClCompile Include="ext\spark\SparkDrawable.cpp" />
     <ClCompile Include="ext\spark\SparkUpdatingHandler.cpp" />
     <ClCompile Include="ext\spark\test_effect.cpp" />

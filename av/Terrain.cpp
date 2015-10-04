@@ -358,7 +358,20 @@ void  Terrain::create( const std::string& name )
         {
             std::string node_name((*it)->getName());
             std::string mast_index = node_name.substr(node_name.find("_")+1);
-            avScene::LightManager::GetInstance()->addLight(avScene::LightManager::GetInstance()->genUID(),(*it)->asTransform()->asMatrixTransform());
+			
+			avScene::LightManager::Light data;
+			data.transform = (*it)->asTransform()->asMatrixTransform();
+
+			data.spotFalloff = cg::range_2f(cg::grad2rad(15.f), cg::grad2rad(45.f));
+			data.distanceFalloff = cg::range_2f(80.f, 220.f);
+			data.color = cg::colorf(0.99,0.99,0.99);
+			data.position = cg::point_3f(0,0,0);
+
+			const float heading = osg::DegreesToRadians(0.f);
+			const float pitch = osg::DegreesToRadians(-90.f);
+			data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
+
+            avScene::LightManager::GetInstance()->addLight(data);
         }
     }
 

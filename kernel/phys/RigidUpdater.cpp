@@ -504,7 +504,7 @@ namespace bi
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
 
-                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 1");
+                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 0");
                 if(vvv)
                 {
                       aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true); 

@@ -22,11 +22,9 @@ namespace avScene
 {
 
     // maximum number of visible dynamic lights per object
-    static const unsigned nMaxLights = 124;
+    static const unsigned nMaxLights = 1000;
 
     // light affect type
-    // local - means it doesn't affect sea and may be other ships (but do affect other dynamic objects forsure)
-    // global - it affects anything and is always on top of the list
     enum LightInfluence
     {
         GlobalInfluence = 0,
@@ -105,7 +103,7 @@ namespace avScene
         // META_Node realization
         bool         isSameKindAs(const osg::Object * obj) const { return static_cast<const Lights *>(obj) != NULL; }
         const char * className   ()                        const { return "Lights"; }
-        const char * libraryName ()                        const { return "svScene"; }
+        const char * libraryName ()                        const { return "avScene"; }
 
         const std::vector<LightProcessedInfo>&  GetProcessedLights() {return m_aMainProcessedLights;}
         const std::vector<LightExternalInfo>&  GetVisibleLights()    {return m_aMainVisibleLights;}
