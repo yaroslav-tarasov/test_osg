@@ -186,7 +186,6 @@ FIXME(Все теже кривые плоскости)
     }
 
 
-
     static texturesHolder& getTextureHolder()
     {
         static texturesHolder th;

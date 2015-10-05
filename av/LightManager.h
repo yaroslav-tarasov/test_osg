@@ -40,7 +40,9 @@ public:
 public:
 
     void      update  ( osg::NodeVisitor * nv );
+#if 0
     uint32_t  addLight( osg::MatrixTransform* mt);
+#endif
     uint32_t  addLight( const Light& light);
 
 

@@ -333,6 +333,8 @@ inline string get_model(string icao_code)
         return "sheremetyevo";
     else if (icao_code == "URSS")
         return "adler";
+    else if (icao_code == "UMMS")
+        return "minsk";
 
     return "";
 }

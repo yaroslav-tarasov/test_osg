@@ -1147,7 +1147,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // GET_SHADOW(f_in.viewpos, f_in);
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
 \n
 \n                // FIXME dummy code
 \n                // specular.a = 0; // it's not rainy day hallelujah
@@ -1331,7 +1331,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                // GET_SHADOW(f_in.viewpos, f_in);
                   float shadow = 1.0; 
                   if(ambient.a > 0.35)
-                      shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                      shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
 \n
 \n                // FIXME dummy code
 \n                //specular.a = 0; // it's not rainy day hallelujah

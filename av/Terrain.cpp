@@ -88,14 +88,6 @@ namespace
             LogWarn("No lights for airport found: " << file);
 
         const bool usePointSprites = true;
-        osg::Texture2D *tex;
-        if(usePointSprites)
-        {
-            tex = new osg::Texture2D();
-            tex->setImage(osgDB::readImageFile("Images/particle.rgb"));
-        }
-
-
 
         std::ifstream ifs(file);
 
@@ -129,23 +121,6 @@ namespace
                     navid_node.release();
                     navid_node = new avScene::NavAidGroup;
                     navid_node->setName(line);
-                    //
-                    osg::StateSet* set = navid_node->getOrCreateStateSet();
-
-                    if (usePointSprites)
-                    {
-                        navid_node->setPointSprite();
-
-                        // Set point sprite texture in LightPointNode StateSet.
-
-                        set->setTextureAttributeAndModes(0, tex, osg::StateAttribute::ON);
-#if 0                    
-                        osg::ref_ptr<osg::Program> cLightPointProg = creators::createProgram("simlight").program; 
-                        cLightPointProg->setName("LightLayerShader");
-                        set->setAttribute(cLightPointProg.get());
-#endif
-                    }
-
                     group_ready = true;
                 }
                 else
@@ -368,7 +343,7 @@ void  Terrain::create( const std::string& name )
 			data.position = cg::point_3f(0,0,0);
 
 			const float heading = osg::DegreesToRadians(0.f);
-			const float pitch = osg::DegreesToRadians(-90.f);
+			const float pitch = osg::DegreesToRadians(0.f/*-90.f*/);
 			data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
             avScene::LightManager::GetInstance()->addLight(data);

@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 
+#include "common/cmd_line.h"
+
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "logger/logger.hpp"
@@ -30,6 +32,8 @@ namespace
         LogError("Error happened: " << err);
         __main_srvc__->stop();
     }
+
+    std::string              g_icao_code = "URSS";
 }
 
 struct client
@@ -73,14 +77,11 @@ private:
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
     {
         LogInfo("Connected to " << peer);
-        // srv_ = in_place(boost::ref(sock), boost::bind(&msg_dispatcher<network::endpoint>::dispatch, disp_, _1, _2, peer), &tcp_error, &tcp_error);
         
         srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
-        
-        //start_send();
-        
-        binary::bytes_t bts =  std::move(wrap_msg(setup(1111,2222)));
+      
+        binary::bytes_t bts =  std::move(wrap_msg(setup(0,0,g_icao_code)));
         send(&bts[0], bts.size());
 
     }
@@ -126,7 +127,6 @@ private:
 
 private:
     async_connector         con_;
-    // optional<tcp_socket>    srv_;
     std::shared_ptr<tcp_fragment_wrapper>  srv_;
 
     msg_dispatcher<network::endpoint>                                    disp_;
@@ -144,6 +144,15 @@ int _tmain(int argc, _TCHAR* argv[])
 
     __main_srvc__ = &(asi.get_service());
     
+    cmd_line::arg_map am;
+    if (!am.parse(cmd_line::naive_parser().add_arg("icao_code", true), argc, argv))
+    {
+        LogError("Invalid command line");
+        return 1;
+    }
+    
+    g_icao_code = am.extract<string>("icao_code"    , "URSS");
+
     try
     {
         endpoint peer(std::string("127.0.0.1:45001"));

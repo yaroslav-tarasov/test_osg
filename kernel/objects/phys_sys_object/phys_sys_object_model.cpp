@@ -3,6 +3,7 @@
 
 #include "phys_sys_object_model.h"
 
+#include "utils/high_res_timer.h"
 
 namespace phys
 {
@@ -31,7 +32,7 @@ void model::update( double time )
     double const calc_step = /*0.1*//*0.01*/cfg().model_params.bullet_step;
     size_t count = cg::max(1, cg::floor(dt / calc_step));
     double real_calc_step = dt / count;
-
+    
 FIXME(Ну очень интересная физика)
 #if 1
     for (size_t i = 0; i < count; ++i)
@@ -43,6 +44,7 @@ FIXME(Ну очень интересная физика)
     for (auto it = zones_.begin(); it != zones_.end(); ++it)
         (*it).sys->update(dt);
 #endif
+
 
     last_time_ = time;
 }

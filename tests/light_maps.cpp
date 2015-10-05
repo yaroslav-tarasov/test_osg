@@ -157,6 +157,14 @@ protected:
         pSS->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         pSS->setMode(GL_DEPTH_CLAMP_NV, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         pSS->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        
+        FIXME( invalid operation after BlendEquation)
+        osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::ALPHA_MAX);
+        //pSS->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+        pSS->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
+
+        pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+
     }
 
     void traverse(osg::NodeVisitor& nv)
@@ -475,13 +483,6 @@ osg::Geometry * _private::_createGeometry()
     geom->setUseVertexBufferObjects(true);
     geom->setDataVariance(osg::Object::DYNAMIC);
 
-    FIXME(To camera node?)
-    osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::ALPHA_MAX);
-    geom->getOrCreateStateSet()->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-    geom->getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
-
-    geom->getOrCreateStateSet()->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-    
     return geom;
 }
 
@@ -632,6 +633,8 @@ void _private::_createArrays()
     dist_falloff_->setPreserveDataType(true);
     cone_falloff_->setPreserveDataType(true);
     lcolor_->setPreserveDataType(true);
+
+    geom_->addPrimitiveSet(new osg::DrawArrays() );
 }
 
 void _private::_clearArrays()
@@ -695,26 +698,19 @@ void _private::_commitLights()
 {
     if(vertices_.empty())
         return;
-
-    // create its' vertex
-    // osg::Vec3Array * paBoxPointsPos = new osg::Vec3Array;
-    //paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
-    
-    geom_array_ = new osg::Vec3Array;
-    geom_array_->setDataVariance(osg::Object::DYNAMIC);
-    
-    geom_array_->resize(vertices_.size());
+#if 1
+    geom_array_ = static_cast<osg::Vec3Array *>(geom_->getVertexArray());
+    geom_array_->resize(0);
 
     _clearArrays();
+    
+    geom_array_->resize(vertices_.size());
 
     from_l_->resize(vertices_.size());
     ldir_->resize(vertices_.size());
     dist_falloff_->resize(vertices_.size());
     cone_falloff_->resize(vertices_.size());
     lcolor_->resize(vertices_.size());
-
-    if(int s = geom_->getNumPrimitiveSets()>0)
-        geom_->removePrimitiveSet(0,s);
 
     for (unsigned i = 0; i < vertices_.size(); ++i)
     {
@@ -727,10 +723,16 @@ void _private::_commitLights()
         lcolor_->at(i).set(  cur_v.lcolor.r, cur_v.lcolor.g, cur_v.lcolor.b  );
     }
 
-    // set vertex array
+    geom_->setPrimitiveSet(0, new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
+    
+    geom_array_->dirty();
+    from_l_->dirty();
+    ldir_->dirty();
+    dist_falloff_->dirty();
+    cone_falloff_->dirty();
+    lcolor_->dirty();
 
-    geom_->setVertexArray(geom_array_);
-    geom_->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
+#endif
 }
 
 

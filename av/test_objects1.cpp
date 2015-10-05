@@ -33,9 +33,9 @@ namespace
         return "";
     }
 
-void create_objects()
+void create_objects(const std::string & airport)
 {
-    const std::string icao_code = "UUEE"; 
+    const std::string icao_code = airport; 
 
     krv::data_getter              _krv_data_getter(data_file(icao_code));
 

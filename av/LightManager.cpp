@@ -79,7 +79,7 @@ uint32_t  LightManager::genUID()
 }
 
 
-FIXME(Deprecated light)
+#if 0
 uint32_t  LightManager::addLight(osg::MatrixTransform* mt )
 {
     const unsigned lightID = genUID();
@@ -101,13 +101,15 @@ uint32_t  LightManager::addLight(osg::MatrixTransform* mt )
     light.position = cg::point_3f(0,0,0);
 
     const float heading = osg::DegreesToRadians(0.f);
-    const float pitch = osg::DegreesToRadians(-90.f);
+    const float pitch = osg::DegreesToRadians(/*-90.f*/0.);
     light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
     light.active = true;
 
 	return lightID;
 }
+#endif 
+
 
 uint32_t LightManager::addLight(const Light& data)
 {

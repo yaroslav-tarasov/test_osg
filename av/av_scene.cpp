@@ -580,8 +580,7 @@ private:
    
     void on_setup(setup const& msg)
     {
-
-         create_objects();
+         create_objects(msg.icao_code);
          osg_vis_->EndSceneCreation();
 
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
@@ -616,16 +615,16 @@ private:
         return id++;
     }
 
-    void create_objects()
+    void create_objects(const std::string& airport)
     {
         using namespace binary;
         using namespace kernel;
 
         sys_creator()->create_auto_objects();
 
-        auto fp = fn_reg::function<void(void)>("create_objects");
+        auto fp = fn_reg::function<void(const std::string&)>("create_objects");
         if(fp)
-            fp();
+            fp(airport);
     }
 
     kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)

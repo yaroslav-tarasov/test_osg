@@ -21,6 +21,8 @@ namespace avSky
 
 
 enum render_order_t {
+    RENDER_BIN_SMOKE                    =  9,
+    RENDER_BIN_LIGHTS                   =  8,
     RENDER_BIN_SCENE                    =  0,
     // rendered first - sky-dome, stars, clouds, etc...
     RENDER_BIN_SKYDOME                  = -5, // global sky dome

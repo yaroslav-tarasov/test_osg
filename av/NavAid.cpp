@@ -1,6 +1,8 @@
 #include "stdafx.h"
-#include "NavAid.h"
+#include "precompiled.h"
 
+
+#include "NavAid.h"
 
 //
 // Module namespace
@@ -8,13 +10,25 @@
 
 namespace avScene
 {
-    NavAidGroup::NavAidGroup ()
+    osg::ref_ptr<osg::Texture2D>  NavAidGroup::tex_;
+
+    NavAidGroup::NavAidGroup (bool usePointSprites)
+        : usePointSprites_(usePointSprites)
     {
+       if(usePointSprites_ && !tex_.valid())
+       {
+           tex_ = new osg::Texture2D();
+           tex_->setImage(osgDB::readImageFile("Images/particle.rgb"));
+       }
+
+       _createStateSet();
     }
 
     // copy constructor
     NavAidGroup::NavAidGroup( const NavAidGroup & rhs, const osg::CopyOp & copyop )
         : osgSim::LightPointNode(rhs, copyop)
+        , lm_(rhs.lm_)
+        , usePointSprites_(rhs.usePointSprites_)
     {
     }
     
@@ -76,11 +90,33 @@ namespace avScene
                 }
             }
 
-
-
         }
 
  
     }
+    
+    void NavAidGroup::_createStateSet()
+    {
+        //
+        osg::StateSet* set = getOrCreateStateSet();
 
+        if (usePointSprites_)
+        {
+            setPointSprite();
+
+            // Set point sprite texture in LightPointNode StateSet.
+
+            set->setTextureAttributeAndModes(0, tex_, osg::StateAttribute::ON);
+#if 0                    
+            osg::ref_ptr<osg::Program> cLightPointProg = creators::createProgram("simlight").program; 
+            cLightPointProg->setName("LightLayerShader");
+            set->setAttribute(cLightPointProg.get());
+#endif
+        }
+
+
+        // set render bin
+        set->setRenderBinDetails(RENDER_BIN_LIGHTS, "RenderBin");
+        set->setNestRenderBins(false);
+    }
 }

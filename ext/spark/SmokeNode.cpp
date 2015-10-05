@@ -24,7 +24,8 @@ SmokeNode::SmokeNode()
     
 SmokeNode::SmokeNode( const SmokeNode& copy,const osg::CopyOp& copyop )
 	: osg::Geode(copy, copyop)
-
+    , gravity_  (copy.gravity_)
+    , env_      (new SafeEnvironment)
 {}
 
 SmokeNode::~SmokeNode()

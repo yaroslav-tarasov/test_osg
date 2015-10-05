@@ -730,7 +730,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     FIXME(140 shaders version needed);
 
-#if GLSL_VERSION > 150
+
     osgViewer::Viewer::Windows windows;
     _viewerPtr->getWindows(windows);
     for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
@@ -738,10 +738,12 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         ++itr)
     {
         osg::State *s=(*itr)->getState();
+#if GLSL_VERSION > 150
         s->setUseModelViewAndProjectionUniforms(true);
         s->setUseVertexAttributeAliasing(true);
-    }
 #endif 
+        s->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
+    }
 
 #else
     _ls = new osg::LightSource;
@@ -1079,7 +1081,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         
 		addChild(mt_.back());
 		
-		sp3.first->getOrCreateStateSet()->setRenderBinDetails( 9, "DepthSortedBin" );
+		sp3.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SMOKE, "DepthSortedBin" );
 
         _viewerPtr->addEventHandler(sp3.second);
         return mt_.back();

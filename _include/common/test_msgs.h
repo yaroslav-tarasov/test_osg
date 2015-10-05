@@ -20,19 +20,22 @@ namespace net_layer
         struct setup
             : network::msg_id<id_setup>
         {
-            setup(double task_time = 0., double srv_time = 0.)
+            setup(double task_time = 0., double srv_time = 0.,std::string icao_code = "URSS")
                 : task_time (task_time)
                 , srv_time  (srv_time )
+                , icao_code (icao_code)
             {
             }
 
-            double  task_time;
-            double  srv_time;
+            double      task_time;
+            double      srv_time;
+            std::string icao_code;
         };
         
         REFL_STRUCT(setup)
             REFL_ENTRY(task_time)
             REFL_ENTRY(srv_time )
+            REFL_ENTRY(icao_code )
         REFL_END()
 
         struct run
