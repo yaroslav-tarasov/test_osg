@@ -203,6 +203,8 @@ enum objects_t{
 #include "av/Database.h"
 #include "visitors/find_node_visitor.h"
 
+#include "utils/high_res_timer.h"
+
 #endif // precompile_header
 
 

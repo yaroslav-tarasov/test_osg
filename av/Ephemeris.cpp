@@ -83,6 +83,7 @@ namespace avSky
             // recalc illumination based on new foggy values
             const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
             auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+            
             _ephem->setIllumination(illumination);
             // FIXME Надо передавать в программы скорректированые значения освещения 
 
@@ -457,5 +458,13 @@ namespace avSky
 
         pNV->traverse(*this);
 
+    }
+
+    void Ephemeris::setIllumination(float illum)
+    { 
+        if(_ic) 
+            _ic(illum);
+        _illum = illum;
+        avCore::GetEnvironment()->m_IlluminationParameters.Illumination  = illum;   
     }
 }

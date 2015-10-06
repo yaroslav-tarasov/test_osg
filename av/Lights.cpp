@@ -173,8 +173,6 @@ void Lights::cull(osg::NodeVisitor * nv)
         aCullProcessedLights.back().lightDiffuse = osg::Vec3f(cDiffuse.r, cDiffuse.g, cDiffuse.b);
     }
 
-
-
     // done!
     return;
 }

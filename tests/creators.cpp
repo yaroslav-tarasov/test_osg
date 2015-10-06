@@ -46,7 +46,7 @@ namespace
 {
 
 
-    char vertexShaderSource_simple[] =  STRINGIFY ( 
+    char vertexShaderSource[] =  STRINGIFY ( 
         uniform vec4 coeff;
         void main(void)
         {

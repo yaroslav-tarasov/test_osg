@@ -24,7 +24,7 @@ namespace avSky
     protected:      
        void                    setTime();
        void                    setSummerTime();
-       inline  void            setIllumination(float illum) { if(_ic) _ic(illum); _illum = illum; }
+       void                    setIllumination(float illum);
        void                    setStarFieldMask(osg::Node::NodeMask nm);  
        void                    cull( osg::NodeVisitor * pNV );
        osg::Matrixd            getModelViewMatrix() {return _mv; };         

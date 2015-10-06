@@ -135,7 +135,7 @@ void LightManager::update( osg::NodeVisitor * nv )
 
     if (lights == NULL)
         return;
-
+     
     for (LightsMap::const_iterator it = m_LightsMap.cbegin(); it != m_LightsMap.cend(); ++it)
     {
         const Light & light = it->second;
@@ -187,6 +187,7 @@ void LightManager::update( osg::NodeVisitor * nv )
             position, direction, light.distanceFalloff, spotFalloff, 
             light.color, 0.60f, 0.35f);
     }
+
 
 }
 
