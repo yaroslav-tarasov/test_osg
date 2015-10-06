@@ -11,7 +11,8 @@
 #include "av/Lights.h"
 
 
-char vertexShaderSource_simple[] = 
+
+char vertexShaderSource[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform mat4 mvp_matrix; \n"
     "attribute vec3 from_l ; \n"
@@ -176,10 +177,14 @@ protected:
     osg::ref_ptr<osg::Texture2D>         _texture;
 };
 
+// intersection points
+typedef std::vector<cg::point_2f>  inter_points_vector;
+typedef std::array<cg::point_2f,4> inter_points_array_4;
 
 class _private : public LightMapRenderer
 {
  
+    friend struct LightMapCullCallback;
     friend ILightMapRendererPtr createLightMapRenderer(osg::Group * sceneRoot);
 
 public: // ILightMapRenderer
@@ -224,8 +229,9 @@ protected:
     osg::Geometry *                     _createGeometry();
     void                                _clearArrays();
     void                                _commitLights();
-
-    void add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
+    
+    template <typename T >
+    void add_light( T const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot );
     
     void cull( osg::NodeVisitor * nv );
 
@@ -268,13 +274,13 @@ ILightMapRendererPtr createLightMapRenderer(osg::Group * sceneRoot)
     return new _private(sceneRoot);
 }
 
-// intersection points
-typedef std::vector<cg::point_2f> inter_points_array;
+
 
 // cone
-static inter_points_array make_intersection( const cg::point_3f & world_light_pos, const cg::point_3f & world_light_dir, float half_angle_max, float dist_max )
+static inter_points_vector make_intersection( const cg::point_3f & world_light_pos, const cg::point_3f & world_light_dir, float half_angle_max, float dist_max )
 {
-    inter_points_array res;
+    inter_points_vector res;
+    res.reserve(15);
 
     // alpha-cut
     if (fabs(world_light_pos.z) < dist_max)
@@ -309,6 +315,7 @@ static inter_points_array make_intersection( const cg::point_3f & world_light_po
 
         // test all 8 lines
         std::vector<cg::point_2> int_pts;
+        int_pts.reserve(20);
         for (unsigned i = 0; i < edges.size(); ++i)
         {
             const float & z1 = world_pts[edges[i].first].z;
@@ -329,15 +336,16 @@ static inter_points_array make_intersection( const cg::point_3f & world_light_po
     return res;
 }
 // sphere
-static inter_points_array make_intersection( const cg::point_3f & world_light_pos, float dist_max )
+__forceinline static inter_points_vector make_intersection( const cg::point_3f & world_light_pos, float dist_max )
 {
-    inter_points_array res;
+    inter_points_vector res;
+    res.reserve(4);
 
     // alpha-cut
     if (fabs(world_light_pos.z) < dist_max)
     {
         // intersect sphere
-        const cg::point_2f sph_center = world_light_pos;
+        const cg::point_2f& sph_center = world_light_pos;
         const float sph_rad = sqrt(cg::sqr(dist_max) - cg::sqr(world_light_pos.z));
         res.emplace_back(sph_center + cg::point_2f(-sph_rad, -sph_rad));
         res.emplace_back(sph_center + cg::point_2f(+sph_rad, -sph_rad));
@@ -348,7 +356,40 @@ static inter_points_array make_intersection( const cg::point_3f & world_light_po
     return res;
 }
 
-#if 0
+__forceinline static void make_intersection(inter_points_vector& ipa, const cg::point_3f & world_light_pos, float dist_max )
+{
+    ipa.reserve(4);
+    // alpha-cut
+    if (fabs(world_light_pos.z) < dist_max)
+    {
+        // intersect sphere
+        const cg::point_2f& sph_center = world_light_pos;
+        const float sph_rad = sqrt(cg::sqr(dist_max) - cg::sqr(world_light_pos.z));
+        ipa.emplace_back(sph_center + cg::point_2f(-sph_rad, -sph_rad));
+        ipa.emplace_back(sph_center + cg::point_2f(+sph_rad, -sph_rad));
+        ipa.emplace_back(sph_center + cg::point_2f(+sph_rad, +sph_rad));
+        ipa.emplace_back(sph_center + cg::point_2f(-sph_rad, +sph_rad));
+    }
+}
+
+__forceinline static void make_intersection(inter_points_array_4& ipa, const cg::point_3f & world_light_pos, float dist_max )
+{
+    // alpha-cut
+    if (fabs(world_light_pos.z) < dist_max)
+    {
+        // intersect sphere
+        const cg::point_2f& sph_center = world_light_pos;
+        const float sph_rad = sqrt(cg::sqr(dist_max) - cg::sqr(world_light_pos.z));
+        ipa[0] = (sph_center + cg::point_2f(-sph_rad, -sph_rad));
+        ipa[1] = (sph_center + cg::point_2f(+sph_rad, -sph_rad));
+        ipa[2] = (sph_center + cg::point_2f(+sph_rad, +sph_rad));
+        ipa[3] = (sph_center + cg::point_2f(-sph_rad, +sph_rad));
+    }
+}
+
+
+
+#if 1
 struct LightMapCullCallback : public osg::NodeCallback
 {
     LightMapCullCallback(_private * p)
@@ -364,9 +405,6 @@ struct LightMapCullCallback : public osg::NodeCallback
         osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
         avAssert(pCV && pNodeAsGroup);
 
-        Prerender * pPrerenderNode = static_cast<Prerender *>(pNodeAsGroup->getChild(0));
-        avAssert(pPrerenderNode);
-        
         const  osg::Camera* cam = avScene::GetScene()->getCamera();
 
         double  m_fLeft(-1.0f)
@@ -375,29 +413,23 @@ struct LightMapCullCallback : public osg::NodeCallback
             , m_fTop(+1.0f)
             , m_fNear(1.0f)
             , m_fFar(1000.0f);
-        
+
         cam->getProjectionMatrixAsFrustum(m_fLeft, m_fRight, m_fBottom, m_fTop, m_fNear, m_fFar);
-        
+
         osg::Vec3f eye, center, up;
         cam->getViewMatrixAsLookAt(eye, center, up);
-        
-        const cg::point_3f  vPosition(from_osg_vector3(pNV->getViewPoint()));
-        auto dir = cg::polar_point_3f(/*target_pos.pos - begin_pos.pos*/from_osg_vector3(center - eye));
+
+        const cg::point_3f  vPosition(from_osg_vector3(pCV->getViewPoint()));
+        auto dir = cg::polar_point_3f(from_osg_vector3(center - eye));
         const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
-        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), /*2.0f **/ 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), /*2.0f **/ 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
         frustum_.camera() = cg::camera_f(vPosition, rOrientation);
 
         p_->SetupProjection(frustum_, 3300.f, true/*night_mode*/);
 
-        const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
-        osg::Matrixd mModelView = *pCV->getModelViewMatrix();
-
-        p_->UpdateTexture(true);
-#if 0
-        pPrerenderNode->setProjectionMatrix(mProjection/*p_->getProjectionMatrix()*/);
-        pPrerenderNode->setViewMatrix(mModelView/*osg::Matrix()*/);
-#endif
+        p_->cull( pCV );
+        p_->UpdateTextureMatrix(true);
 
         // go down
         pNV->traverse(*pNode);
@@ -417,8 +449,9 @@ void _private::traverse(osg::NodeVisitor& nv)
         return;
     }
 
+
     osgUtil::CullVisitor * cv = static_cast<osgUtil::CullVisitor*>(&nv);
-    
+#if 1    
     const  osg::Camera* cam = avScene::GetScene()->getCamera();
 
     double  m_fLeft(-1.0f)
@@ -445,6 +478,7 @@ void _private::traverse(osg::NodeVisitor& nv)
     cull( cv );
     
     UpdateTextureMatrix(true);
+#endif
 
     // set matrices from frustum calculator to camera
     if(clpt_mat_)
@@ -453,8 +487,10 @@ void _private::traverse(osg::NodeVisitor& nv)
         _camera->setProjectionMatrix(to_osg_matrix(clpt_mat_->second.transpose()));
     }
 
+
     // go farther
     _camera->accept(*cv);
+
 }
 
 osg::Geometry * _private::_createGeometry()
@@ -508,7 +544,7 @@ _private::_private(osg::Group * sceneRoot)
 
     osg::Program* program = new osg::Program;
 
-    osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource_simple);
+    osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource);
     program->addShader(vertex_shader);
 
     
@@ -541,19 +577,42 @@ void _private::AddSpotLight( SpotData const & spot )
     if (fabs(world_light_pos.z) < spot.dist_falloff.hi())
     {
         const cg::point_3f world_light_dir = mv_.treat_vector(spot.view_dir, false);
+       
         // angle corrected
         auto corrected_spot = spot;
         if (!corrected_spot.angle_falloff.empty())
             corrected_spot.angle_falloff |= cg::lerp01(spot.angle_falloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
+
+        high_res_timer                _hr_timer;
+
         // get light intersection
-        inter_points_array spot_plane;
+        inter_points_vector spot_plane;
+        
         if (!corrected_spot.angle_falloff.empty())
+        {
             spot_plane = std::move(make_intersection(world_light_pos, world_light_dir, cg::grad2rad(corrected_spot.angle_falloff.hi()), corrected_spot.dist_falloff.hi()));
+            if (spot_plane.size() > 2)
+                add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
+        }
         else
-            spot_plane = std::move(make_intersection(world_light_pos, corrected_spot.dist_falloff.hi()));
+        {
+            //spot_plane = std::move(make_intersection(world_light_pos, corrected_spot.dist_falloff.hi()));
+            inter_points_array_4  spot_plane;
+            make_intersection(spot_plane,world_light_pos, corrected_spot.dist_falloff.hi());
+            if (spot_plane.size() > 2)
+                add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
+            
+
+        }
+
         // add it
-        if (spot_plane.size() > 2)
-            add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
+        
+        //force_log fl;
+        //LOG_ODS_MSG( "make_intersection " << _hr_timer.get_delta() << "\n");
+
+        //if (spot_plane.size() > 2)
+        //    add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
+
     }
 }
 
@@ -650,7 +709,8 @@ void _private::_clearArrays()
 // Impl
 //
 
-void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
+template <typename T >
+void _private::add_light( T const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
 {
     // convert angular falloffs
     cg::point_2f dot_falloff(0, 1);
@@ -672,6 +732,7 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
     new_v.dist_falloff = rcp_falloff;
     new_v.cone_falloff = dot_falloff;
 
+
     // add points (3 for each triangle)
     std::vector<SpotRenderVertex> new_spot(3 * (light_contour.size() - 2), new_v);
     for (unsigned i = 0; i < light_contour.size() - 2; ++i)
@@ -689,6 +750,7 @@ void _private::add_light( std::vector<cg::point_2f> const & light_contour, cg::p
         cur_v2.v = cg::point_3f(light_contour[i + 2]);
         cur_v2.from_l = cur_v2.v - world_lightpos;
     }
+
     // append them
     vertices_.insert(vertices_.end(), new_spot.begin(), new_spot.end());
 }
@@ -698,7 +760,7 @@ void _private::_commitLights()
 {
     if(vertices_.empty())
         return;
-#if 1
+
     geom_array_ = static_cast<osg::Vec3Array *>(geom_->getVertexArray());
     geom_array_->resize(0);
 
@@ -712,6 +774,7 @@ void _private::_commitLights()
     cone_falloff_->resize(vertices_.size());
     lcolor_->resize(vertices_.size());
 
+
     for (unsigned i = 0; i < vertices_.size(); ++i)
     {
         SpotRenderVertex & cur_v = vertices_[i];
@@ -723,8 +786,9 @@ void _private::_commitLights()
         lcolor_->at(i).set(  cur_v.lcolor.r, cur_v.lcolor.g, cur_v.lcolor.b  );
     }
 
+
     geom_->setPrimitiveSet(0, new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
-    
+  
     geom_array_->dirty();
     from_l_->dirty();
     ldir_->dirty();
@@ -732,7 +796,6 @@ void _private::_commitLights()
     cone_falloff_->dirty();
     lcolor_->dirty();
 
-#endif
 }
 
 
@@ -759,14 +822,18 @@ void _private::cull( osg::NodeVisitor * nv )
     const std::vector<LightProcessedInfo>& lpi = lights->GetProcessedLights();
     const std::vector<LightExternalInfo>&  lei = lights->GetVisibleLights();
 
+    //high_res_timer                _hr_timer;
+
+
     auto it_p = lpi.begin();
-    for (auto it = lei.begin();it!=lei.end();++it,++it_p)
+    auto const it_end = lei.end();
+    for (auto it = lei.begin();it!=it_end;++it,++it_p)
     {
         SpotData spot;
         cg::transform_4f tr = from_osg_matrix(mWorldToView);
         
-        //spot.view_dir =cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
-        spot.view_dir =  tr.treat_vector(it->vDirWorld,false);
+        spot.view_dir =cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
+        // spot.view_dir =  tr.treat_vector(it->vDirWorld,false);
  
         spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
         spot.spot_color    = it->cDiffuse;
@@ -774,7 +841,12 @@ void _private::cull( osg::NodeVisitor * nv )
         spot.angle_falloff = (!it->rConeAtt.empty())?cg::rad2grad()*it->rConeAtt:it->rConeAtt ;
 
         AddSpotLight( spot );
+
     }
+
+    //force_log fl;
+    //LOG_ODS_MSG( "_private::cull  " << _hr_timer.get_delta() << "\n");
+
 
     _commitLights();
 
