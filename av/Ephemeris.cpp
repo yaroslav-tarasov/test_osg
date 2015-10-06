@@ -7,7 +7,7 @@
 #include "av/FogLayer.h"
 #include "av/CloudLayer.h"
 #include "av/EnvRenderer.h"
-#include "av/Environment.h"
+
 
 #include <osgEphemeris/EphemerisModel.h>  
 
@@ -330,7 +330,7 @@ namespace avSky
         _diffuseUniform = new osg::Uniform("diffuse", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
         pSceneSS->addUniform(_diffuseUniform.get());
 
-        // FIXME TODO secular.a wanna rain
+        // FIXME TODO specular.a wanna rain
         _specularUniform = new osg::Uniform("specular", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
         pSceneSS->addUniform(_specularUniform.get());
         

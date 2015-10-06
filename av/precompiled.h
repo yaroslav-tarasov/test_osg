@@ -40,4 +40,4 @@ enum masks_t{
 const uint32_t cCastsShadowTraversalMask = 8;
 const uint32_t cReceivesShadowTraversalMask = 16;
 
-
+#include "av/Environment.h"

@@ -35,7 +35,7 @@
 #include "av/DebugRenderer.h"
 
 #include "utils/krv_import.h"
-#include "av/test_systems.h"
+#include "tests/systems/test_systems.h"
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")

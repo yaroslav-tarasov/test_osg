@@ -5,7 +5,6 @@
 #include "av/Scene.h"
 
 #include "EphemerisModel.h"
-#include "av/Environment.h"
 
 #include "av/CloudLayer.h"
 

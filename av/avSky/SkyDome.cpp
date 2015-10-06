@@ -8,7 +8,7 @@
 #include "SkyDome.h"
 
 #include "av/Utils.h"
-#include "av/Environment.h"
+
 //
 // Global namespaces
 //

@@ -37,7 +37,6 @@
 #include "Lights.h"
 #include "LightManager.h"
 #include "Terrain.h"
-#include "Environment.h"
 #include "Ephemeris.h"
 #include "Object.h"
 #include "NavAid.h"

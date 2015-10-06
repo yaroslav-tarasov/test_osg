@@ -1,10 +1,8 @@
 #include "stdafx.h"
-
-
+#include "av/precompiled.h"
 
 #include "geometry/lispsm_matrix.h"
 #include "geometry/custom_matrix.h"
-
 
 #include "utils/materials.h"
 #include "Scene.h"
@@ -472,8 +470,9 @@ void _private::traverse(osg::NodeVisitor& nv)
 
     cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
     frustum_.camera() = cg::camera_f(vPosition, rOrientation);
-
-    SetupProjection(frustum_, 3300.f, true/*night_mode*/);
+    
+    const avCore::Environment::IlluminationParameters & cIlluminationParameters = avCore::GetEnvironment()->GetIlluminationParameters();
+    SetupProjection(frustum_, 3300.f, cIlluminationParameters.Illumination < 0.8/*night_mode*/);
 
     cull( cv );
     
@@ -621,6 +620,7 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_m
 {
     // clear vertex buffer
     vertices_.resize(0);
+    clpt_mat_.reset();
     we_see_smth_ = false;
     if (!night_mode)
         return;
@@ -758,8 +758,8 @@ void _private::add_light( T const & light_contour, cg::point_3f const & world_li
 
 void _private::_commitLights()
 {
-    if(vertices_.empty())
-        return;
+    //if(vertices_.empty())
+    //    return;
 
     geom_array_ = static_cast<osg::Vec3Array *>(geom_->getVertexArray());
     geom_array_->resize(0);
@@ -824,24 +824,26 @@ void _private::cull( osg::NodeVisitor * nv )
 
     //high_res_timer                _hr_timer;
 
-
-    auto it_p = lpi.begin();
-    auto const it_end = lei.end();
-    for (auto it = lei.begin();it!=it_end;++it,++it_p)
+    if(clpt_mat_)
     {
-        SpotData spot;
-        cg::transform_4f tr = from_osg_matrix(mWorldToView);
+        auto it_p = lpi.begin();
+        auto const it_end = lei.end();
+        for (auto it = lei.begin();it!=it_end;++it,++it_p)
+        {
+            SpotData spot;
+            cg::transform_4f tr = from_osg_matrix(mWorldToView);
         
-        spot.view_dir =cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
-        // spot.view_dir =  tr.treat_vector(it->vDirWorld,false);
+            spot.view_dir =cg::point_3f(it_p->lightVSDirSpecRatio.x(),it_p->lightVSDirSpecRatio.y(),it_p->lightVSDirSpecRatio.z());
+            // spot.view_dir =  tr.treat_vector(it->vDirWorld,false);
  
-        spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
-        spot.spot_color    = it->cDiffuse;
-        spot.dist_falloff  = it->rDistAtt;
-        spot.angle_falloff = (!it->rConeAtt.empty())?cg::rad2grad()*it->rConeAtt:it->rConeAtt ;
+            spot.view_pos =  cg::point_3f(it_p->lightVSPosAmbRatio.x(),it_p->lightVSPosAmbRatio.y(),it_p->lightVSPosAmbRatio.z());
+            spot.spot_color    = it->cDiffuse;
+            spot.dist_falloff  = it->rDistAtt;
+            spot.angle_falloff = (!it->rConeAtt.empty())?cg::rad2grad()*it->rConeAtt:it->rConeAtt ;
 
-        AddSpotLight( spot );
+            AddSpotLight( spot );
 
+        }
     }
 
     //force_log fl;

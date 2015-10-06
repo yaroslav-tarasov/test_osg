@@ -2,10 +2,7 @@
 
 #include "av/precompiled.h"
 
-#include "Utils.h"
-
-#include "Environment.h"
-
+#include "av/Utils.h"
 #include "av/Scene.h"
 
 

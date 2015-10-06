@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "av/precompiled.h"
 
 #include "Scene.h"
 #include "Lights.h"
