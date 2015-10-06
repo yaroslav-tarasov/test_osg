@@ -105,6 +105,9 @@
     <Filter Include="Source Files\av\sm">
       <UniqueIdentifier>{55691b10-34af-40ef-afd2-5b2a722c94d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\systems">
+      <UniqueIdentifier>{e1698b0f-b4da-408b-b68c-7e246d70df37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -182,9 +185,6 @@
     <ClInclude Include="av\IVisual.h">
       <Filter>Source Files\av</Filter>
     </ClInclude>
-    <ClInclude Include="av\test_systems.h">
-      <Filter>Source Files\av</Filter>
-    </ClInclude>
     <ClInclude Include="utils\krv_import.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
@@ -199,6 +199,12 @@
     </ClInclude>
     <ClInclude Include="av\NavAid.h">
       <Filter>Source Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\LightMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\systems\test_systems.h">
+      <Filter>Source Files\tests\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -616,12 +622,6 @@
     <ClCompile Include="av\Visual.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="av\test_systems.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\test_objects1.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="utils\empty_scene.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -634,14 +634,20 @@
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="tests\light_maps.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="ext\spark\SmokeNode.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
     <ClCompile Include="av\NavAid.cpp">
       <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\LightMaps.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\test_objects1.cpp">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\test_systems.cpp">
+      <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

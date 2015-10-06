@@ -18,7 +18,7 @@
 #include "utils/high_res_timer.h"
 
 #include "av/Visual.h"
-#include "av/test_systems.h"
+#include "tests/systems/test_systems.h"
 
 using network::endpoint;
 using network::async_acceptor;

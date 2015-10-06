@@ -1,15 +1,15 @@
 #include "stdafx.h"
 
-#include "light_maps.h"
+
 
 #include "geometry/lispsm_matrix.h"
 #include "geometry/custom_matrix.h"
 
 
 #include "utils/materials.h"
-#include "av/Scene.h"
-#include "av/Lights.h"
-
+#include "Scene.h"
+#include "Lights.h"
+#include "LightMaps.h"
 
 
 char vertexShaderSource[] = 

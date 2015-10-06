@@ -4,7 +4,7 @@
 #include "application/application_fwd.h"
 #include "application/panels_fwd.h"
 
-#include "tests/light_maps.h"
+#include "LightMaps.h"
 
 #ifdef NON_DLL
 # define VISUAL_API

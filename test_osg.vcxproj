@@ -122,9 +122,9 @@
   <ItemGroup>
     <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
+    <ClInclude Include="av\LightMaps.h" />
     <ClInclude Include="av\Logo.h" />
     <ClInclude Include="av\NavAid.h" />
-    <ClInclude Include="av\test_systems.h" />
     <ClInclude Include="av\Utils.h" />
     <ClInclude Include="av\Visual.h" />
     <ClInclude Include="ext\spark\SmokeNode.h" />
@@ -134,6 +134,7 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="tests\systems\test_systems.h" />
     <ClInclude Include="utils\empty_scene.h" />
     <ClInclude Include="utils\krv_import.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="av\Grass.cpp" />
     <ClCompile Include="av\Grass2.cpp" />
     <ClCompile Include="av\LightManager.cpp" />
+    <ClCompile Include="av\LightMaps.cpp" />
     <ClCompile Include="av\Lights.cpp" />
     <ClCompile Include="av\LOD.cpp" />
     <ClCompile Include="av\Logo.cpp" />
@@ -177,8 +179,6 @@
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
-    <ClCompile Include="av\test_objects1.cpp" />
-    <ClCompile Include="av\test_systems.cpp" />
     <ClCompile Include="av\Utils.cpp" />
     <ClCompile Include="av\Visual.cpp" />
     <ClCompile Include="core\config\config.cpp" />
@@ -266,7 +266,6 @@
     <ClCompile Include="tests\dubins_test.cpp" />
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
-    <ClCompile Include="tests\light_maps.cpp" />
     <ClCompile Include="tests\main_scene.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -285,6 +284,8 @@
     <ClCompile Include="tests\shadow_map.cpp" />
     <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\SkyBox.cpp" />
+    <ClCompile Include="tests\systems\test_objects1.cpp" />
+    <ClCompile Include="tests\systems\test_systems.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
     <ClCompile Include="tests\test_curves.cpp" />
