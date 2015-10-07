@@ -137,6 +137,7 @@ void Lights::cull(osg::NodeVisitor * nv)
     for (unsigned i = 0; i < m_aFrameActiveLights.size(); ++i)
     {
         // XXX: if 0 priority - add always
+        FIXME(priority);
         if (m_aFrameActiveLights[i].uPriority > 0)
         {
             // test sphere for visibility

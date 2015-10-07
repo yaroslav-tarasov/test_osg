@@ -640,14 +640,14 @@
     <ClCompile Include="av\NavAid.cpp">
       <Filter>Source Files\av\lights</Filter>
     </ClCompile>
-    <ClCompile Include="av\LightMaps.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="tests\systems\test_objects1.cpp">
       <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
     <ClCompile Include="tests\systems\test_systems.cpp">
       <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="av\LightMaps.cpp">
+      <Filter>Source Files\av\lights</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

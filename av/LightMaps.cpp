@@ -280,6 +280,8 @@ static inter_points_vector make_intersection( const cg::point_3f & world_light_p
     inter_points_vector res;
     res.reserve(15);
 
+    //high_res_timer _hr_timer;
+
     // alpha-cut
     if (fabs(world_light_pos.z) < dist_max)
     {
@@ -331,6 +333,9 @@ static inter_points_vector make_intersection( const cg::point_3f & world_light_p
             cg::point_set_convex_hull_envelope(&int_pts.front(), int_pts.size(), std::back_inserter(res));
     }
 
+    //double dt = _hr_timer.get_delta();
+    //LOG_ODS_MSG("make_intersection" << dt << "\n");
+    
     return res;
 }
 // sphere
@@ -357,6 +362,7 @@ __forceinline static inter_points_vector make_intersection( const cg::point_3f &
 __forceinline static void make_intersection(inter_points_vector& ipa, const cg::point_3f & world_light_pos, float dist_max )
 {
     ipa.reserve(4);
+
     // alpha-cut
     if (fabs(world_light_pos.z) < dist_max)
     {
@@ -378,10 +384,13 @@ __forceinline static void make_intersection(inter_points_array_4& ipa, const cg:
         // intersect sphere
         const cg::point_2f& sph_center = world_light_pos;
         const float sph_rad = sqrt(cg::sqr(dist_max) - cg::sqr(world_light_pos.z));
+
         ipa[0] = (sph_center + cg::point_2f(-sph_rad, -sph_rad));
         ipa[1] = (sph_center + cg::point_2f(+sph_rad, -sph_rad));
         ipa[2] = (sph_center + cg::point_2f(+sph_rad, +sph_rad));
         ipa[3] = (sph_center + cg::point_2f(-sph_rad, +sph_rad));
+
+
     }
 }
 
@@ -582,35 +591,30 @@ void _private::AddSpotLight( SpotData const & spot )
         if (!corrected_spot.angle_falloff.empty())
             corrected_spot.angle_falloff |= cg::lerp01(spot.angle_falloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
 
-        high_res_timer                _hr_timer;
-
         // get light intersection
         inter_points_vector spot_plane;
         
         if (!corrected_spot.angle_falloff.empty())
         {
             spot_plane = std::move(make_intersection(world_light_pos, world_light_dir, cg::grad2rad(corrected_spot.angle_falloff.hi()), corrected_spot.dist_falloff.hi()));
+            
+            // add it
+
             if (spot_plane.size() > 2)
                 add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
         }
         else
         {
-            //spot_plane = std::move(make_intersection(world_light_pos, corrected_spot.dist_falloff.hi()));
+            //spot_plane = std::move(make_intersec  tion(world_light_pos, corrected_spot.dist_falloff.hi()));
             inter_points_array_4  spot_plane;
             make_intersection(spot_plane,world_light_pos, corrected_spot.dist_falloff.hi());
+            
+            // add it
             if (spot_plane.size() > 2)
                 add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
             
 
         }
-
-        // add it
-        
-        //force_log fl;
-        //LOG_ODS_MSG( "make_intersection " << _hr_timer.get_delta() << "\n");
-
-        //if (spot_plane.size() > 2)
-        //    add_light(spot_plane, world_light_pos, world_light_dir, corrected_spot);
 
     }
 }
@@ -822,8 +826,6 @@ void _private::cull( osg::NodeVisitor * nv )
     const std::vector<LightProcessedInfo>& lpi = lights->GetProcessedLights();
     const std::vector<LightExternalInfo>&  lei = lights->GetVisibleLights();
 
-    //high_res_timer                _hr_timer;
-
     if(clpt_mat_)
     {
         auto it_p = lpi.begin();
@@ -842,13 +844,11 @@ void _private::cull( osg::NodeVisitor * nv )
             spot.angle_falloff = (!it->rConeAtt.empty())?cg::rad2grad()*it->rConeAtt:it->rConeAtt ;
 
             AddSpotLight( spot );
-
         }
     }
 
     //force_log fl;
-    //LOG_ODS_MSG( "_private::cull  " << _hr_timer.get_delta() << "\n");
-
+    // LOG_ODS_MSG( "_private::cull  " << _hr_timer.get_delta() << "\n");
 
     _commitLights();
 

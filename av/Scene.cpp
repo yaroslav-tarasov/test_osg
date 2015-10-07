@@ -306,10 +306,47 @@ private:
 
 };
 
-
-
-
 namespace avGUI {
+
+class  CustomManipulator : public osgGA::FirstPersonManipulator
+{
+
+protected:
+    virtual bool handleKeyDown( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& us )
+    {
+        if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Left)
+        {
+            moveRight(-5);
+            us.requestRedraw();
+            return true;
+        }
+        else
+        if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_Up)
+        {
+            moveForward(5);
+            us.requestRedraw();
+            return true;
+        }
+        else
+        if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Right)
+        {
+            moveRight(5);
+            us.requestRedraw();
+            return true;
+        }
+        else
+        if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_Down)
+        {
+            moveForward(-5);
+            us.requestRedraw();
+            return true;
+        }
+
+        return osgGA::FirstPersonManipulator::handleKeyDown(  ea,  us );
+    }
+};
+
+
 
     template <class T>
     class GUIEventHandlerImpl : public osgGA::GUIEventHandler
@@ -486,16 +523,18 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #ifdef MANIPS
     // Use a default camera manipulator
-    osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
+    //osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
      //new osgGA::DriveManipulator()
      //new osgGA::TerrainManipulator() 
      //new osgGA::OrbitManipulator() 
      //new osgGA::FirstPersonManipulator() 
      //new osgGA::SphericalManipulator() 
 
+    avGUI::CustomManipulator* manip = new avGUI::CustomManipulator;
+
     manip->setAcceleration(0);
     manip->setMaxVelocity(1);
-    manip->setWheelMovement(0.001,true);
+    manip->setWheelMovement(10,false);
     //manip->setWheelMovement(0.001,true);
     _viewerPtr->setCameraManipulator(manip);
     //manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
@@ -1095,7 +1134,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 
-         /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(GlobalInfluence));
+         /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
         return _terrainNode;
     }

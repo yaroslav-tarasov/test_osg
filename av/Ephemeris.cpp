@@ -303,7 +303,7 @@ namespace avSky
 
         private:
             osg::ref_ptr<Ephemeris>                           _ephem;
-            avSky::cloud_type                    _currCloud;
+            avSky::cloud_type                                 _currCloud;
             float                                             _intensivity;
         };
 

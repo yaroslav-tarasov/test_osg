@@ -207,7 +207,7 @@ namespace avTerrain
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 Terrain::Terrain (osg::Group* sceneRoot)
-    : _lightsHandler(avScene::GlobalInfluence)
+    : _lightsHandler(avScene::/*GlobalInfluence*/LocalInfluence)
     , _sceneRoot (sceneRoot)
 {
     setNodeMask( PICK_NODE_MASK /*| cReceivesShadowTraversalMask*/ );

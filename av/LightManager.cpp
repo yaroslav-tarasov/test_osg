@@ -184,7 +184,7 @@ void LightManager::update( osg::NodeVisitor * nv )
             spotFalloff |= cg::lerp01(spotFalloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
 #endif
 
-        lights->AddLight(avScene::GlobalInfluence, avScene::ConicalLight,
+        lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight,
             position, direction, light.distanceFalloff, spotFalloff, 
             light.color, 0.60f, 0.35f);
     }
