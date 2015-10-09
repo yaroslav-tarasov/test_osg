@@ -37,7 +37,11 @@ void create_objects(const std::string & airport)
 {
     const std::string icao_code = airport; 
 
+
+
     krv::data_getter              _krv_data_getter(data_file(icao_code));
+    
+    high_res_timer hr_timer;
 
     // Только получение без контроля  
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
@@ -47,6 +51,9 @@ void create_objects(const std::string & airport)
         as.icao_code = icao_code;
         auto obj_airport = airport::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as);
     }
+    
+    force_log fl5;       
+    LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.get_delta() << "\n");
 
     if(false)
     {
@@ -140,6 +147,9 @@ void create_objects(const std::string & airport)
         auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
     }
 
+    force_log fl2;       
+    LOG_ODS_MSG( "create_objects(const std::string& airport): aircraft::create " << hr_timer.get_delta() << "\n");
+
     {
         cg::point_3 vpos(250,650,0);
         decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
@@ -172,6 +182,8 @@ void create_objects(const std::string & airport)
         prev = p;
     }
 
+    force_log fl3;       
+    LOG_ODS_MSG( "create_objects(const std::string& airport): fms::trajectory::velocities " << hr_timer.get_delta() << "\n");
 
     {
         cg::point_3 vpos(_krv_data_getter.kp_[start_idx]);
@@ -212,6 +224,8 @@ void create_objects(const std::string & airport)
 
     auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 
+    force_log fl9;       
+    LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.get_delta() << "\n");
 
     //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_csys.get());
     //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");
@@ -225,6 +239,8 @@ void create_objects(const std::string & airport)
     srs.speed = 6;
     auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),srs,vgp.pos);
 
+    force_log fl6;       
+    LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.get_delta() << "\n");
 
 }
 

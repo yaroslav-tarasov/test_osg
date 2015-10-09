@@ -11,8 +11,6 @@
 #include "common/locks.h"
 #include "common/time_counter.h"
 
-#include "net_layer/net_server.h"
-
 #include "kernel/systems/vis_system.h"
 
 #include "utils/high_res_timer.h"
@@ -364,11 +362,6 @@ struct net_worker
 
      }
 
-     //void start_timer()
-     //{
-     //    on_timer();
-     //}
-
 private:
      void run()
      {
@@ -620,11 +613,19 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        sys_creator()->create_auto_objects();
+        high_res_timer hr_timer;
 
+        sys_creator()->create_auto_objects();
+        
+        force_log fl;       
+        LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.get_delta() << "\n");
+        
         auto fp = fn_reg::function<void(const std::string&)>("create_objects");
         if(fp)
             fp(airport);
+
+        force_log fl2;  
+        LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.get_delta() << "\n");
     }
 
     kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)

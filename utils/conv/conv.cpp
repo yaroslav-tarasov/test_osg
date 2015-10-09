@@ -10,7 +10,7 @@
 #include "atc/model_structure.h"
 #include "osg_helpers.h"
 #include "visitors/heil_visitor.h"
-
+#include "utils/materials.h"
 
 
 typedef std::vector<std::string> FileNameList;
@@ -857,6 +857,31 @@ int main( int argc, char **argv )
 
         if( do_convert )
             root = oc.convert( root.get() );
+
+        FIXME(Without textures useless)
+#if 0 
+        const std::string name = pathFileOut.stem().string();
+
+        osgDB::FilePathList fpl_;
+        fpl_.push_back(pathFileOut.parent_path().string() + "/");
+        std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", /*fpl.*/fpl_,osgDB::CASE_INSENSITIVE);
+
+        MaterialVisitor::namesList nl;
+        nl.push_back("building");
+        nl.push_back("default");
+        nl.push_back("tree");
+        nl.push_back("ground"); 
+        nl.push_back("concrete");
+        nl.push_back("mountain");
+        nl.push_back("sea");
+        nl.push_back("railing");
+        nl.push_back("panorama");
+        nl.push_back("plane");
+        //nl.push_back("rotor"); /// Õללללללללללללל נאסךמלוםעאנטעü ט הטםאלטקוסךטי ףבתועסÿ
+
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(mat_file_name));
+        root->accept(mv);
+#endif
 
         if (internalFormatMode != osg::Texture::USE_IMAGE_DATA_FORMAT)
         {

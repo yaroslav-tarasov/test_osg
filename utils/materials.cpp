@@ -499,6 +499,24 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
 }
 
+
+void createMaterialLite(osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
+{
+    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
+   
+    osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+    stateset->setTextureAttributeAndModes( BASE_COLOR_TEXTURE_UNIT , t.colorTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_NORMAL_TEXTURE_UNIT, t.normalTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_NIGHT_TEXTURE_UNIT , t.nightTex.get(), value );
+
+    stateset->setTextureAttributeAndModes( BASE_DETAILS_TEXTURE_UNIT, t.detailsTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_ENV_TEXTURE_UNIT    , t.envTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_DECAL_TEXTURE_UNIT  , getTextureHolder().getDecalTexture().get(), value ); 
+    stateset->setTextureAttributeAndModes( BASE_LM_TEXTURE_UNIT     , getTextureHolder().getLightMapTexture().get(), value ); 
+
+    stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
+}
+
 } //namespace creators 
 
 

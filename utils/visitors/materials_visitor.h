@@ -34,8 +34,8 @@ public:
     {
         if(findTexture( &node, node.getStateSet() ))
         {   
-            _cm(&node,_found_mat_name);
-            _cr(node.getStateSet(),_found_mat_name,_mats);
+            if(_cm) _cm(&node,_found_mat_name);
+            if(_cr) _cr(node.getStateSet(),_found_mat_name,_mats);
         }
 
         traverse( node );
@@ -53,7 +53,7 @@ public:
                 _cr(geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
         }
 
-        if(ret)
+        if(ret && _cm)
             _cm(&geode,_found_mat_name);
 
 

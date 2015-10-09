@@ -150,10 +150,5 @@
 #pragma comment(lib, "osgUtil.lib")
 #pragma comment(lib, "osgSim.lib")
 #pragma comment(lib, "osgParticle.lib")
-#pragma comment(lib, "BulletCollision.lib")
-#pragma comment(lib, "LinearMath.lib")
-#pragma comment(lib, "BulletDynamics.lib")   
-#pragma comment(lib, "BulletWorldImporter.lib")
-#pragma comment(lib, "BulletFileLoader.lib")
 #endif
 #endif
