@@ -36,13 +36,12 @@ struct view
 private:
     optional<data_t const&> get_data(string const& aircraft_kind) const override;
 
-//protected:
-//    void save_preset(string const& path);
-//    void load_preset(string const& path);
+protected:
+    void save_preset(string const& path);
+    void load_preset(string const& path);
 
 protected:
     // transliterator_t transliterator_;
-    FIXME(И опять костыль)
     mutable std::map<string, data_t> aircrafts_;
 };
 

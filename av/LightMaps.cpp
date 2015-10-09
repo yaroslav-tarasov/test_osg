@@ -762,14 +762,17 @@ void _private::add_light( T const & light_contour, cg::point_3f const & world_li
 
 void _private::_commitLights()
 {
-    //if(vertices_.empty())
-    //    return;
-
     geom_array_ = static_cast<osg::Vec3Array *>(geom_->getVertexArray());
     geom_array_->resize(0);
-
-    _clearArrays();
     
+    _clearArrays();
+
+    if(vertices_.empty())
+    {
+        geom_->setPrimitiveSet(0, new osg::DrawArrays() );
+        return;
+    }
+
     geom_array_->resize(vertices_.size());
 
     from_l_->resize(vertices_.size());
@@ -792,14 +795,13 @@ void _private::_commitLights()
 
 
     geom_->setPrimitiveSet(0, new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
-  
-    geom_array_->dirty();
+
     from_l_->dirty();
     ldir_->dirty();
     dist_falloff_->dirty();
     cone_falloff_->dirty();
     lcolor_->dirty();
-
+    geom_array_->dirty();
 }
 
 

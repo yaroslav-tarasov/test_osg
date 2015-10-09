@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visapp", "visapp.vcxproj", "{216E2A12-7874-3236-A169-0175BA49CEA0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "visapp", "visapp.vcxproj", "{AC36F021-16FE-4C48-8989-AF578E2A015C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0921A4A2-9895-395F-A571-659FA64EA1CF} = {0921A4A2-9895-395F-A571-659FA64EA1CF}
 	EndProjectSection
@@ -16,10 +16,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{216E2A12-7874-3236-A169-0175BA49CEA0}.Debug|Win32.ActiveCfg = Debug|Win32
-		{216E2A12-7874-3236-A169-0175BA49CEA0}.Debug|Win32.Build.0 = Debug|Win32
-		{216E2A12-7874-3236-A169-0175BA49CEA0}.Release|Win32.ActiveCfg = Release|Win32
-		{216E2A12-7874-3236-A169-0175BA49CEA0}.Release|Win32.Build.0 = Release|Win32
+		{AC36F021-16FE-4C48-8989-AF578E2A015C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AC36F021-16FE-4C48-8989-AF578E2A015C}.Debug|Win32.Build.0 = Debug|Win32
+		{AC36F021-16FE-4C48-8989-AF578E2A015C}.Release|Win32.ActiveCfg = Release|Win32
+		{AC36F021-16FE-4C48-8989-AF578E2A015C}.Release|Win32.Build.0 = Release|Win32
 		{0921A4A2-9895-395F-A571-659FA64EA1CF}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0921A4A2-9895-395F-A571-659FA64EA1CF}.Debug|Win32.Build.0 = Debug|Win32
 		{0921A4A2-9895-395F-A571-659FA64EA1CF}.Release|Win32.ActiveCfg = Release|Win32

@@ -347,8 +347,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
             vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
             
-            viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
-            //viewworld_matrix = inverse(gl_ModelViewMatrix); 
+            //viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
+            viewworld_matrix = inverse(gl_ModelViewMatrix); 
 
             gl_Position    = gl_ModelViewProjectionMatrix *  gl_Vertex;
 

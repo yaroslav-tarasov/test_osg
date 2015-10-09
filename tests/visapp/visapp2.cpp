@@ -14,7 +14,6 @@
 #include "common/locks.h"
 #include "common/time_counter.h"
 
-#include "net_layer/net_server.h"
 
 #include "kernel/systems/vis_system.h"
 

@@ -56,6 +56,13 @@
 //
 #include "spark/osgspark.h"
 
+// #define PPU_TEST
+#ifdef PPU_TEST
+#include "tests/simple.h"
+#include <osgPPU/UnitText.h>
+#pragma comment(lib, "osgPPU.lib")
+#endif
+
 namespace gui 
 { 
     osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler);
@@ -615,7 +622,29 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     _terrainRoot = createTerrainRoot();
     addChild(_terrainRoot);
-  
+
+#ifdef PPU_TEST
+    auto const vp = getCamera()->getViewport();
+    // setup an osgPPU pipeline to render the results
+    osgPPU::Unit* lastUnit = NULL;
+    osgPPU::Processor* ppu = SimpleSSAO::createPipeline(vp->width(), vp->height(), getCamera(), lastUnit, /*showAOMap*/false);
+    // create a text unit, which will just print some info
+    
+    if (lastUnit)
+    {
+        // OUTPUT ppu
+        osgPPU::UnitOut* ppuout = new osgPPU::UnitOut();
+        ppuout->setName("PipelineResult");
+        ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
+        
+
+        ppuout->setViewport(new osg::Viewport(0,0,vp->width(), vp->height()));
+        lastUnit->addChild(ppuout);
+    }
+
+    addChild(ppu);
+#endif
+
     //std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
     //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
     //_terrainNode->create(scene_name);

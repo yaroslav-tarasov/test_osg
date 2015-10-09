@@ -12,20 +12,21 @@
 #include "common/boost.h"
 #include "common/stl.h"
 #include "common/osg_inc.h"
+#include "common/misc.h"
+#include "common/bullet.h"
 
 #include "cg_math.h"
-
-#define Assert(x) if(x){};
 
 #include "common/points.h"
 
 #include "common/util.h"
+#include "common/debug.h"
 
 #include "geometry/xmath.h"
 
-#define STRINGIFY(x) #x 
-
-#define STR(x) STRINGIFY(x)
-#define FIXME(x) __pragma(message(__FILE__ "(" STR(__LINE__) "): " "fixme: " STRINGIFY(x) ))
-
 bool generateBulletFile(std::string name, osg::Node* body, cg::point_3& offset);
+
+
+#include "core/nfi/fn_reg.h"
+
+namespace sp = std::placeholders;

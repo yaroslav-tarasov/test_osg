@@ -232,6 +232,8 @@ void  Terrain::create( const std::string& name )
     osg::MatrixTransform*         baseModel = new osg::MatrixTransform;
 
     float baseHeight = 0.0f; 
+    
+    high_res_timer hr_timer;
 
     if(name != "empty" && !name.empty() )
     {
@@ -274,6 +276,9 @@ void  Terrain::create( const std::string& name )
     baseModel->setMatrix(osg::Matrix::rotate(quat0));
     baseModel->addChild(scene);
 
+
+
+
     MaterialVisitor::namesList nl;
     nl.push_back("building");
     nl.push_back("tree");
@@ -287,6 +292,7 @@ void  Terrain::create( const std::string& name )
 
     MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);
+
 
     // All solid objects
     osg::StateSet * pCommonStateSet = scene->getOrCreateStateSet();
@@ -350,6 +356,9 @@ void  Terrain::create( const std::string& name )
         }
     }
 
+    force_log fl;
+    LOG_ODS_MSG( "Terrain::create  " << hr_timer.get_delta() << "\n");
+
     };
 
 #ifdef ASYNC_OBJECT_LOADING
@@ -364,6 +373,8 @@ void  Terrain::create( const std::string& name )
         /*_lamps*/avScene::Scene::GetInstance()->getLamps(), 
         _sceneRoot, 
         lights_offset(name) ); 
+
+
 
 }
 
