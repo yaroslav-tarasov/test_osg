@@ -4,8 +4,7 @@
 
 #include "StarField.h"
 #include "star_data.h"
-#include "utils/random.h"
-#include "av/Utils.h"
+#include "av/avCore/Utils.h"
 
 using namespace avSky;
 
@@ -68,7 +67,7 @@ void StarField::_buildGeometry()
     pStarsGeom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
     // fill them
-    utils::RandomNumber rndGen;
+    avCore::RandomNumber rndGen;
     pStarsVerts->resize(m_aStars.size());
     pStarsColors->resize(m_aStars.size());
     for (unsigned i = 0; i < m_aStars.size(); ++i)

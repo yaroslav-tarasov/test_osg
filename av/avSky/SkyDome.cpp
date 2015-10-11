@@ -7,7 +7,7 @@
 
 #include "SkyDome.h"
 
-#include "av/Utils.h"
+#include "av/avCore/Utils.h"
 
 //
 // Global namespaces

@@ -883,7 +883,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 \n              // Apply spot lights
 \n              vec3 vLightsSpecAddOn;
-                vec3 light_res;  
+                vec3 light_res = vec3(0.0);  
                   
                 // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n              // vec3 lightmap_color = light_res ; 

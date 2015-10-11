@@ -32,7 +32,7 @@
 
 #include "aircraft_physless.h"
 
-#include "av/DebugRenderer.h"
+#include "av/avCore/DebugRenderer.h"
 
 #include "utils/krv_import.h"
 #include "tests/systems/test_systems.h"

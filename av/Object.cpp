@@ -1,29 +1,28 @@
 #include "stdafx.h"
 #include "Object.h"
-#include "LOD.h"
-#include "Lights.h"
-#include "LightManager.h"
+#include "avCore/LOD.h"
+#include "avLights/Lights.h"
+#include "avLights/LightManager.h"
+#include "avCore/Utils.h"
 
 #include "visitors/materials_visitor.h"
 #include "materials.h"
 
-namespace {
-
-struct fpl_wrap 
-{
-	fpl_wrap(const std::string& name)
-	{
-		fpl_.push_back(cfg().path.data + "/models/" + name + "/");
-		fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
-	};
-
-	osgDB::FilePathList fpl_;
-};
-
-}
-
 namespace creators
 {
+
+	struct fpl_wrap 
+	{
+		fpl_wrap(const std::string& name)
+		{
+			fpl_.push_back(cfg().path.data + "/models/" + name + "/");
+			fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
+		};
+
+		osgDB::FilePathList fpl_;
+	};
+
+
 
 typedef std::map< std::string, osg::ref_ptr<osg::Node> > nodesMap;  
 

@@ -86,6 +86,12 @@ namespace cg
     {
         return (T(3) - T(2) * x) * x * x;
     };
+
+	template<class T>
+	__forceinline T clamp01( const T x )
+	{
+		return (x < 0) ? 0 : (x > 1) ? 1 : x;
+	}
 }
 
 
@@ -192,7 +198,7 @@ enum objects_t{
     VEHICLE_TYPE
 };
 
-#include "av/Database.h"
+#include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
 
 #include "utils/high_res_timer.h"

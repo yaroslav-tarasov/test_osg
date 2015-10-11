@@ -2,9 +2,9 @@
 
 #include "av/precompiled.h"
 
-#include "Scene.h"
+#include "avScene/Scene.h"
 #include "Terrain.h"
-#include "LightManager.h"
+#include "avLights/LightManager.h"
 
 #include "visitors/find_tex_visitor.h"
 #include "visitors/find_animation.h"
@@ -19,7 +19,7 @@
 
 #include "av/Grass.h"
 #include "av/Grass2.h"
-#include "av/NavAid.h"
+#include "avLights/NavAid.h"
 
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"

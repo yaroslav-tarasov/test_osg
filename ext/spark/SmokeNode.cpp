@@ -7,7 +7,7 @@
 #endif
 
 #include "SparkDrawable.h"
-#include "av/Environment.h"
+#include "av/avCore/Environment.h"
 
 struct SmokeNode::SafeEnvironment
 {

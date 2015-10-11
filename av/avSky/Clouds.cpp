@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <osg/BlendFunc>
 #include "Clouds.h"
-#include "svScene/Scene.h"
+#include "avScene/Scene.h"
 
 using namespace avSky;
 
@@ -160,7 +160,7 @@ bool Clouds::FrameCall()
 
 	_cCloudsParamsPtr->set( vParams );
 	_cCloudsMaskPtr->set( vMask );
-    const float fSunInt = svScene::GetScene()->getSky() ? svScene::GetScene()->getSky()->GetSunIntensity() : 1.0f;
+    const float fSunInt = avScene::GetScene()->getSky() ? avScene::GetScene()->getSky()->GetSunIntensity() : 1.0f;
 	_cCloudsColorPtr->set( vColor * fSunInt );
 
 	return true;

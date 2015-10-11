@@ -59,7 +59,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -120,12 +120,21 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="av\avCore\Database.h" />
+    <ClInclude Include="av\avCore\DebugRenderer.h" />
+    <ClInclude Include="av\avCore\Environment.h" />
+    <ClInclude Include="av\avCore\Global.h" />
+    <ClInclude Include="av\avCore\HalfTypeHeader.h" />
+    <ClInclude Include="av\avCore\LOD.h" />
+    <ClInclude Include="av\avCore\Logo.h" />
+    <ClInclude Include="av\avCore\Utils.h" />
+    <ClInclude Include="av\avLights\LightManager.h" />
+    <ClInclude Include="av\avLights\LightMaps.h" />
+    <ClInclude Include="av\avLights\Lights.h" />
+    <ClInclude Include="av\avLights\NavAid.h" />
+    <ClInclude Include="av\avScene\Scene.h" />
     <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
-    <ClInclude Include="av\LightMaps.h" />
-    <ClInclude Include="av\Logo.h" />
-    <ClInclude Include="av\NavAid.h" />
-    <ClInclude Include="av\Utils.h" />
     <ClInclude Include="av\Visual.h" />
     <ClInclude Include="ext\spark\SmokeNode.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
@@ -140,6 +149,19 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="av\avCore\Database.cpp" />
+    <ClCompile Include="av\avCore\DebugRenderer.cpp" />
+    <ClCompile Include="av\avCore\Environment.cpp" />
+    <ClCompile Include="av\avCore\LOD.cpp" />
+    <ClCompile Include="av\avCore\Logo.cpp" />
+    <ClCompile Include="av\avCore\Timer.cpp" />
+    <ClCompile Include="av\avCore\Utils.cpp" />
+    <ClCompile Include="av\avLights\LightManager.cpp" />
+    <ClCompile Include="av\avLights\LightMaps.cpp" />
+    <ClCompile Include="av\avLights\Lights.cpp" />
+    <ClCompile Include="av\avLights\NavAid.cpp" />
+    <ClCompile Include="av\avScene\av_scene.cpp" />
+    <ClCompile Include="av\avScene\Scene.cpp" />
     <ClCompile Include="av\avShadows\ShadowedScene.cpp" />
     <ClCompile Include="av\avShadows\ShadowMap.cpp" />
     <ClCompile Include="av\avShadows\ShadowSettings.cpp" />
@@ -153,33 +175,21 @@
     <ClCompile Include="av\avSky\Sky.cpp" />
     <ClCompile Include="av\avSky\SkyDome.cpp" />
     <ClCompile Include="av\avSky\StarField.cpp" />
-    <ClCompile Include="av\av_scene.cpp" />
+    <ClCompile Include="av\avWeather\Cloud.cpp" />
+    <ClCompile Include="av\avWeather\LocalWeather.cpp" />
+    <ClCompile Include="av\avWeather\PrecipitationBase.cpp" />
+    <ClCompile Include="av\avWeather\Weather.cpp" />
     <ClCompile Include="av\CloudLayer.cpp" />
-    <ClCompile Include="av\Database.cpp" />
-    <ClCompile Include="av\DebugRenderer.cpp" />
-    <ClCompile Include="av\Environment.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\Ephemeris.cpp" />
     <ClCompile Include="av\FogLayer.cpp" />
     <ClCompile Include="av\Grass.cpp" />
     <ClCompile Include="av\Grass2.cpp" />
-    <ClCompile Include="av\LightManager.cpp" />
-    <ClCompile Include="av\LightMaps.cpp" />
-    <ClCompile Include="av\Lights.cpp" />
-    <ClCompile Include="av\LOD.cpp" />
-    <ClCompile Include="av\Logo.cpp" />
-    <ClCompile Include="av\NavAid.cpp" />
-    <ClCompile Include="av\NavigationalLight.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="av\Object.cpp" />
     <ClCompile Include="av\PreRender.cpp" />
-    <ClCompile Include="av\Scene.cpp" />
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
-    <ClCompile Include="av\Utils.cpp" />
     <ClCompile Include="av\Visual.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />

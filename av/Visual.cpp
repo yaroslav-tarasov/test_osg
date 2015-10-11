@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include  "Visual.h"
 
-#include "Scene.h"
-#include "Logo.h"
+#include "avScene/Scene.h"
+#include "avCore/Logo.h"
 
 namespace
 {
@@ -125,7 +125,8 @@ void Visual::Initialize()
     pTraits->height = 1200;//rect.bottom - rect.top + 1;
 #endif    
 
-    database::initDataPaths();
+    Database::initDataPaths();
+	avCore::Database::Create();
 
 	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );

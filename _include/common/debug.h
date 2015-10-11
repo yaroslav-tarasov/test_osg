@@ -8,12 +8,12 @@
 
 #define Assert(x) if(x){};
 #define avAssert(x) assert(x)
-#define avError(x,y) {          \
-    char buff [1024];          \
-    sprintf(buff,x,y);        \
-                                \
-    OutputDebugStringA(buff);    \
-    assert(false);              \
+#define avError(message, ...) {             \
+    char buff [1024];						\
+    sprintf(buff, message, __VA_ARGS__);    \
+                                            \
+    OutputDebugStringA(buff);               \
+    assert(false);                          \
 }
 
 

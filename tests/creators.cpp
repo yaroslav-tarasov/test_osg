@@ -11,7 +11,7 @@
 #include "av/avShadows/ShadowedScene.h"
 #include "av/avShadows/ShadowMap.h"
 #include "av/avShadows/ViewDependentShadowMap.h"
-#include "av/LOD.h"
+#include "av/avCore/LOD.h"
 
 #include "tests/shadow_map.h"
 

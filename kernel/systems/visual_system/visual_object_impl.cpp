@@ -3,7 +3,7 @@
 #include "kernel/systems/vis_system.h"
 
 #include "visual_object_impl.h"
-#include "av/Scene.h"
+#include "av/avScene/Scene.h"
 
 
 namespace kernel

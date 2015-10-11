@@ -15,9 +15,6 @@
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\utils">
-      <UniqueIdentifier>{aee982bd-2830-4184-9a57-25ddf09d060b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\nfi">
       <UniqueIdentifier>{ac4ce2b3-ce67-487c-90c5-91e58e87d521}</UniqueIdentifier>
     </Filter>
@@ -108,6 +105,27 @@
     <Filter Include="Source Files\tests\systems">
       <UniqueIdentifier>{e1698b0f-b4da-408b-b68c-7e246d70df37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\weather">
+      <UniqueIdentifier>{75dffff0-efeb-4772-b05d-1a0ef73f0ff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av">
+      <UniqueIdentifier>{d1d3695c-6132-4e85-acb5-c194265d9274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\core">
+      <UniqueIdentifier>{5441e8c4-762c-4bc7-8858-3710cb7480f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\lights">
+      <UniqueIdentifier>{00d957d5-9439-4a28-a9f8-02ee118baf7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\core">
+      <UniqueIdentifier>{85f765eb-f10b-4d12-be74-a7be0fa510fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\scene">
+      <UniqueIdentifier>{e353f16b-67ff-45e5-ad35-0fb4d3516043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\scene">
+      <UniqueIdentifier>{5e30ecf6-0ae6-49dc-a71b-d5bbfec8682f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -173,17 +191,11 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
-    <ClInclude Include="av\Utils.h">
-      <Filter>Source Files\av</Filter>
-    </ClInclude>
     <ClInclude Include="av\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="av\Visual.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="av\IVisual.h">
-      <Filter>Source Files\av</Filter>
     </ClInclude>
     <ClInclude Include="utils\krv_import.h">
       <Filter>Source Files\utils</Filter>
@@ -191,20 +203,53 @@
     <ClInclude Include="utils\empty_scene.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="av\Logo.h">
-      <Filter>Source Files\av</Filter>
-    </ClInclude>
     <ClInclude Include="ext\spark\SmokeNode.h">
       <Filter>Source Files\spark</Filter>
     </ClInclude>
-    <ClInclude Include="av\NavAid.h">
-      <Filter>Source Files\av\lights</Filter>
-    </ClInclude>
-    <ClInclude Include="av\LightMaps.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tests\systems\test_systems.h">
       <Filter>Source Files\tests\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\NavAid.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\LightManager.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\LightMaps.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\Lights.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Global.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Utils.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\HalfTypeHeader.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\IVisual.h">
+      <Filter>Header Files\av</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\LOD.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Logo.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\DebugRenderer.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Environment.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avScene\Scene.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Database.h">
+      <Filter>Header Files\av\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -223,16 +268,10 @@
     <ClCompile Include="av\Ephemeris.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="av\LOD.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="av\Object.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\PreRender.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Scene.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Terrain.cpp">
@@ -457,9 +496,6 @@
     <ClCompile Include="kernel\phys\aircraft_phys.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
-    <ClCompile Include="av\av_scene.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\fms\dubins.cpp">
       <Filter>Source Files\fms</Filter>
     </ClCompile>
@@ -535,15 +571,6 @@
     <ClCompile Include="av\scn_parser.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="av\NavigationalLight.cpp">
-      <Filter>Source Files\av\lights</Filter>
-    </ClCompile>
-    <ClCompile Include="av\LightManager.cpp">
-      <Filter>Source Files\av\lights</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Lights.cpp">
-      <Filter>Source Files\av\lights</Filter>
-    </ClCompile>
     <ClCompile Include="hmi\gui_vis\main_window_impl.cpp">
       <Filter>Source Files\hmi</Filter>
     </ClCompile>
@@ -552,9 +579,6 @@
     </ClCompile>
     <ClCompile Include="tests\render_points.cpp">
       <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Utils.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\FogLayer.cpp">
       <Filter>Source Files\av</Filter>
@@ -583,9 +607,6 @@
     <ClCompile Include="av\avSky\StarField.cpp">
       <Filter>Source Files\av\sky</Filter>
     </ClCompile>
-    <ClCompile Include="av\Environment.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="av\Grass.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
@@ -610,23 +631,14 @@
     <ClCompile Include="av\avShadows\ViewDependentShadowMap.cpp">
       <Filter>Source Files\av\sm</Filter>
     </ClCompile>
-    <ClCompile Include="av\Database.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="tests\creators.cpp">
       <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="av\DebugRenderer.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Visual.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="utils\empty_scene.cpp">
       <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Logo.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
       <Filter>Source Files\objects\airport</Filter>
@@ -637,17 +649,62 @@
     <ClCompile Include="ext\spark\SmokeNode.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
-    <ClCompile Include="av\NavAid.cpp">
-      <Filter>Source Files\av\lights</Filter>
-    </ClCompile>
     <ClCompile Include="tests\systems\test_objects1.cpp">
       <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
     <ClCompile Include="tests\systems\test_systems.cpp">
       <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
-    <ClCompile Include="av\LightMaps.cpp">
+    <ClCompile Include="av\avLights\LightManager.cpp">
       <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\LightMaps.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\Lights.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\NavAid.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Utils.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\LOD.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Logo.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avWeather\Cloud.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\DebugRenderer.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Environment.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avScene\av_scene.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avScene\Scene.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Database.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avWeather\Weather.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avWeather\PrecipitationBase.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Timer.cpp">
+      <Filter>Header Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avWeather\LocalWeather.cpp">
+      <Filter>Source Files\av\weather</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

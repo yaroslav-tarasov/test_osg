@@ -98,17 +98,17 @@ osg::Node*  Grass::_create()
 
 void   Grass::_buildStateSet(osg::Node* node)
 {
-    std::string grass_vert = database::LoadShader("blender/grass/grass.vert");     
+    std::string grass_vert = Database::LoadShader("blender/grass/grass.vert");     
     
     if (grass_vert.empty())
         return;
 	
-	std::string grass_geom = database::LoadShader("blender/grass/grass.geom");     
+	std::string grass_geom = Database::LoadShader("blender/grass/grass.geom");     
 
 	if (grass_geom.empty())
 		return;
 
-    std::string grass_frag = database::LoadShader("blender/grass/grass.frag");     
+    std::string grass_frag = Database::LoadShader("blender/grass/grass.frag");     
 
     if (grass_frag.empty())
         return;
