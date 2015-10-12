@@ -133,6 +133,8 @@
     <ClInclude Include="av\avLights\Lights.h" />
     <ClInclude Include="av\avLights\NavAid.h" />
     <ClInclude Include="av\avScene\Scene.h" />
+    <ClInclude Include="av\avScene\ScreenTexture.h" />
+    <ClInclude Include="av\avScene\ScreenTextureManager.h" />
     <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
     <ClInclude Include="av\Visual.h" />
@@ -162,6 +164,8 @@
     <ClCompile Include="av\avLights\NavAid.cpp" />
     <ClCompile Include="av\avScene\av_scene.cpp" />
     <ClCompile Include="av\avScene\Scene.cpp" />
+    <ClCompile Include="av\avScene\ScreenTexture.cpp" />
+    <ClCompile Include="av\avScene\ScreenTextureManager.cpp" />
     <ClCompile Include="av\avShadows\ShadowedScene.cpp" />
     <ClCompile Include="av\avShadows\ShadowMap.cpp" />
     <ClCompile Include="av\avShadows\ShadowSettings.cpp" />
@@ -176,6 +180,7 @@
     <ClCompile Include="av\avSky\SkyDome.cpp" />
     <ClCompile Include="av\avSky\StarField.cpp" />
     <ClCompile Include="av\avWeather\Cloud.cpp" />
+    <ClCompile Include="av\avWeather\FogBank.cpp" />
     <ClCompile Include="av\avWeather\LocalWeather.cpp" />
     <ClCompile Include="av\avWeather\PrecipitationBase.cpp" />
     <ClCompile Include="av\avWeather\Weather.cpp" />

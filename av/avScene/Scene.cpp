@@ -41,7 +41,7 @@
 #include "av/Ephemeris.h"
 #include "av/Object.h"
 #include "av/avWeather/Weather.h" 
-
+#include "av/avScene/ScreenTextureManager.h"
 
 #include "application/panels/vis_settings_panel.h"
 #include "application/main_window.h"
@@ -73,8 +73,7 @@ namespace gui
 
 using namespace avScene;
 
-
-// Useless
+    // Useless
 #if 0
 namespace {
     cg::transform_4 get_relative_transform( osg::Node* node, osg::Node* rel=nullptr )
@@ -467,6 +466,15 @@ Scene::~Scene()
 {
 }
 
+avSky::ISky*  Scene::getSky()
+{ 
+#ifdef ORIG_EPHEMERIS
+    return static_cast<avSky::ISky*>(_ephemerisNode.get()); 
+#else    
+    return static_cast<avSky::ISky*>(_Sky.get());
+#endif
+}
+
 namespace
 {
 
@@ -597,20 +605,14 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     // 
 
     spark::init();
-    
-    //
-    // And some fire
-    //
 
-    //spark::spark_pair_t sp =   spark::create(spark::FIRE);
-    //spark::spark_pair_t sp2 =  spark::create(spark::EXPLOSION);
-
-    //osg::MatrixTransform* posed = new osg::MatrixTransform(osg::Matrix::translate(osg::Vec3(400.0,400.0,50.0)));
-    //posed->addChild(sp.first);
-    //posed->addChild(sp2.first);
-    //_viewerPtr->addEventHandler(sp.second);
-    //_viewerPtr->addEventHandler(sp2.second);
-    //addChild(posed);
+#ifdef SCREEN_TEXTURE    
+    //
+    // Screen textures manager node
+    //
+    _screenTextureManager = new ScreenTextureManager();
+    addChild(_screenTextureManager.get());
+#endif
 
     //
     // Create terrain / shadowed scene
@@ -641,10 +643,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     addChild(ppu);
 #endif
-
-    //std::string scene_name("empty"); // "empty","adler" ,"sheremetyevo"
-    //_terrainNode =  new avTerrain::Terrain (_terrainRoot);
-    //_terrainNode->create(scene_name);
 
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
@@ -844,13 +842,13 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
 	const double dLatitude = 0;
 	const double dLongitude = 0;
-	const float fHeading = 45;
-	const float fEllipseRadX = 40;
-	const float fEllipseRadY = 50;
-	const float fHeight = 100;
-	const avWeather::PrecipitationType ptType = avWeather::PrecipitationType::PrecipitationSnow;
-	const float fIntensity = 50;
-	const float fCentralPortion = 5;
+	const float fHeading = 0;
+	const float fEllipseRadX = 1000;
+	const float fEllipseRadY = 1000;
+	const float fHeight = 50;
+	const avWeather::PrecipitationType ptType = avWeather::PrecipitationRain;
+	const float fIntensity = 0.5;
+	const float fCentralPortion = 1;
 
 	pWeatherNode->UpdateLocalWeatherBank(nID, 
 		dLatitude, dLongitude, fHeading, 

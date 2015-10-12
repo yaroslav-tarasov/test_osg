@@ -6,6 +6,8 @@
 
 #include "av/avWeather/Weather.h"
 
+#define GOT_FOG
+
 //
 // Local namespaces
 //

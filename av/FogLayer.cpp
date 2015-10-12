@@ -52,9 +52,10 @@ static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
 
 // constructor
 FogLayer::FogLayer(osg::Group * pScene,on_visible_range_change_f vc)
-    : m_fRealVisDist(30000.0f)
-    , m_realExp2Density(0.f)
-    , m_fogDensity (0.f)
+    : m_fRealVisDist    (30000.0f)
+    , m_realExp2Density (0.f)
+    , m_fogDensity      (0.f)
+    , _vFogColor        (osg::Vec3f(1.0,1.0,1.0))
     , _vc(vc)
 {
     // create fog uniform for the whole scene
@@ -73,6 +74,8 @@ FogLayer::FogLayer(osg::Group * pScene,on_visible_range_change_f vc)
 void FogLayer::setFogParams( const osg::Vec3f & vFogColor, float fFogDensity )
 {
     m_fogDensity =  fFogDensity;
+    
+    _vFogColor   =  vFogColor;
 
     // for sky
     _skyFogUniform->set(osg::Vec4f(vFogColor, fFogDensity));
@@ -104,7 +107,7 @@ void FogLayer::_buildStateSet()
     sset->setNestRenderBins(false);
 
     // create clarity shader
-    osg::ref_ptr<osg::Program> cFogLayerProg = creators::createProgram("sky").program; //new osg::Program();
+    osg::ref_ptr<osg::Program> cFogLayerProg = creators::createProgram("sky").program; 
     cFogLayerProg->setName("FogLayerShader");
     sset->setAttribute(cFogLayerProg.get());
 

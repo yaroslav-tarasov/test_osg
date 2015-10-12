@@ -95,9 +95,10 @@ namespace avWeather
 
         // reflection stateset (some tricks with depth texture)
         osg::ref_ptr<osg::StateSet> m_ssReflectionSubstitute;
-
+#ifdef SCREEN_TEXTURE
         // screen depth texture
         osg::ref_ptr<avScene::ScreenTexture> m_texDepth;
+#endif
     };
 
 }

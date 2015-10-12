@@ -37,7 +37,7 @@ private:
                     ~Timer();
 
 public:
-    virtual bool    FrameCall();
+    virtual bool    PreUpdate();
 
     void            SetTimerMode( TimerMode timerMode );
     TimerMode       GetTimerMode() const;

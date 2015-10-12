@@ -109,7 +109,7 @@ bool Clouds::Initialize()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Clouds::FrameCall()
+bool Clouds::PreUpdate()
 {
     int iCloudType = utils::GetEnvironment()->GetWeatherParameters().CloudType;
     float fCloudsDensity = utils::GetEnvironment()->GetWeatherParameters().CloudDensity;

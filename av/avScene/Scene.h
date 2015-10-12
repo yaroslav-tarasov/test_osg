@@ -5,6 +5,7 @@
 #include "application/panels_fwd.h"
 
 #include "av/avLights/LightMaps.h"
+#include "av/ISky.h"
 
 #ifdef NON_DLL
 # define VISUAL_API
@@ -61,6 +62,9 @@ class PickHandler;
 
 
 namespace avScene {
+    
+    // forward declaration
+    class ScreenTextureManager;
 
     //
     // Scene class itself
@@ -75,7 +79,7 @@ namespace avScene {
         static void                                 Release();
         static Scene*                               GetInstance();
         
-        //FIXME TODO // virtual bool                FrameCall();
+        //FIXME TODO // virtual bool                PreUpdate();
 
         inline osgViewer::Viewer*                   GetViewer();
         inline osg::Group*                          getEphemerisNode();
@@ -83,8 +87,9 @@ namespace avScene {
         inline osg::Camera*                         getCamera();
         inline avScene::Lights *                    getLights();
         std::vector<osg::ref_ptr<osg::Node>>&       getLamps();
-		avSky::Sky*                                 getSky();   
-		avWeather::Weather*                         getWeather();
+		avSky::ISky*                                getSky();   
+		inline avWeather::Weather*                  getWeather();
+        inline ScreenTextureManager*                getScreenTextureManager() const;
 
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
 
@@ -117,6 +122,7 @@ namespace avScene {
         osg::ref_ptr<osg::LightSource>              _ls;
         osg::ref_ptr<osg::Group>                    _terrainRoot;
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
+        osg::ref_ptr<ScreenTextureManager>          _screenTextureManager;
 
 #if !defined(VISUAL_EXPORTS)
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
@@ -144,17 +150,7 @@ namespace avScene {
         DECLARE_EVENT(object_loaded, (uint32_t)) ;
     };
 
-    inline osgViewer::Viewer*                           Scene::GetViewer()     {  return _viewerPtr.get(); }
-    inline osg::Camera*                                 Scene::getCamera()     {  return _viewerPtr->getCamera(); }
-    inline osg::Group*                                  Scene::getCommonNode() { return _commonNode.get(); }  
-    inline avScene::Lights*                             Scene::getLights()     { return _lights.get(); }
-    inline std::vector<osg::ref_ptr<osg::Node>>&        Scene::getLamps()      { return _lamps; }
-	inline avSky::Sky*                                  Scene::getSky()        { return _Sky.get();     }
-	inline avWeather::Weather *                         Scene::getWeather()    { return _Weather.get(); }
-    inline Scene* GetScene()
-    {
-        return Scene::GetInstance();
-    }
-
-
 } // end namespace
+
+
+#include "Scene.inl"

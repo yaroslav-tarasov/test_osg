@@ -36,7 +36,7 @@ Timer::~Timer()
 
 
 //////////////////////////////////////////////////////////////////////////
-bool Timer::FrameCall()
+bool Timer::PreUpdate()
 {
     if (m_TimerMode == TM_LOCAL)
     {

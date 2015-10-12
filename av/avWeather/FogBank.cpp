@@ -1,12 +1,14 @@
 #include <stdafx.h>
+#include "av/precompiled.h"
 
-#include <osg/BlendFunc>
-#include <osg/Depth>
+
 
 #include "av/avCore/avCore.h"
 
 #include "av/avScene/Scene.h"
+#ifdef SCREEN_TEXTURE
 #include "av/avScene/ScreenTextureManager.h"
+#endif
 
 #include "av/avWeather/FogBank.h"
 
@@ -84,13 +86,15 @@ LocalFogBank::LocalFogBank()
     m_uniformColor = new osg::Uniform("Color", osg::Vec3f());
     pCurStateSet->addUniform(m_uniformColor.get());
 
+#ifdef SCREEN_TEXTURE
     // depth texture
     avScene::ScreenTextureManager * pScrTexManager = avScene::Scene::GetInstance()->getScreenTextureManager();
-    m_texDepth = pScrTexManager->request(RENDER_BIN_AFTER_MODELS_AND_SEA, avScene::ScreenTexture::DEPTH_TEXTURE);
+    m_texDepth = pScrTexManager->request(RENDER_BIN_AFTER_MODELS, avScene::ScreenTexture::DEPTH_TEXTURE);
     static const int g_nDepthTexUnit = 0;
     pCurStateSet->setTextureAttribute(g_nDepthTexUnit, m_texDepth->getTexture());
     pCurStateSet->addUniform(new osg::Uniform("DepthTexture", g_nDepthTexUnit));
     pCurStateSet->addUniform(m_texDepth->getSettings());
+#endif
 
     // reflection stateset
     m_ssReflectionSubstitute = new osg::StateSet();
@@ -165,7 +169,7 @@ LocalFogBank::LocalFogBank()
 void LocalFogBank::SetEllipse( float fRadX, float fRadY, float fMaxH )
 {
     // set radii and height
-    if (!eq(m_fRadX, fRadX) || !eq(m_fRadY, fRadY) || !eq(m_fMaxH, fMaxH))
+    if (!cg::eq(m_fRadX, fRadX) || !cg::eq(m_fRadY, fRadY) || !cg::eq(m_fMaxH, fMaxH))
     {
         // save new values
         m_fRadX = fRadX;
@@ -184,7 +188,7 @@ void LocalFogBank::SetPrecipitationDensityPortion( PrecipitationType ptType, flo
     m_ptType = ptType;
 
     // set radii
-    if (!eq(m_fDensity, fInnerInt) || !eq(m_fPortion, fPortion))
+    if (!cg::eq(m_fDensity, fInnerInt) || !cg::eq(m_fPortion, fPortion))
     {
         // save new values
         m_fDensity = fInnerInt;
@@ -208,9 +212,11 @@ void LocalFogBank::cull( osgUtil::CullVisitor * pCV )
     // calculate color
     m_uniformColor->set(GetPrecipitationColor(m_ptType));
 
+#ifdef SCREEN_TEXTURE
     // validate depth matrix
     if (!bMagicReflPath)
         m_texDepth->validate();
+#endif
 
     // save view to local
     m_mViewToLocal = osg::Matrix::inverse(*pCV->getModelViewMatrix());
@@ -239,14 +245,14 @@ void LocalFogBank::drawImplementation( osg::RenderInfo & renderInfo ) const
     // set up tricky blend
     osg::GL2Extensions * gl2e = osg::GL2Extensions::Get(renderInfo.getState()->getContextID(), true);
     if (gl2e)
-        gl2e->glBlendEquationSeparate(0x8006/*GL_FUNC_ADD*/, 0x8008/*GL_MAX*/);
+        gl2e->glBlendEquationSeparate(/*0x8006*/GL_FUNC_ADD, /*0x8008*/GL_MAX);    
 
     // call what we have to
     osg::Geometry::drawImplementation(renderInfo);
 
     // restore defaults
     if (gl2e)
-        gl2e->glBlendEquationSeparate(0x8006/*GL_FUNC_ADD*/, 0x8006/*GL_FUNC_ADD*/);
+        gl2e->glBlendEquationSeparate(/*0x8006*/GL_FUNC_ADD, /*0x8006*/GL_FUNC_ADD);
 }
 
 //

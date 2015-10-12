@@ -110,7 +110,7 @@ PrecipitationBase::PrecipitationBase(const char * szMaterialName, size_t nPartic
 
     FIXME(GetDatabase());
 
-	osg::Texture2D * pPrecTex = new osg::Texture2D(osgDB::readImageFile(std::string(szMaterialName).append(".dds").c_str(),new osgDB::Options("")));
+	osg::Texture2D * pPrecTex = new osg::Texture2D(osgDB::readImageFile(std::string(szMaterialName).append(".dds").c_str(),new osgDB::Options("dds_dxt1_rgba")));
 
 	if (pPrecTex)
 	{

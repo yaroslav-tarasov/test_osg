@@ -179,7 +179,7 @@ void EphemerisModel::cull( osg::NodeVisitor * pNV )
     // cull down
     
     FIXME("Хорошее место, но есть лучше");
-    FrameCall();
+    PreUpdate();
     pNV->traverse(*this);
 
 }
@@ -423,7 +423,7 @@ void EphemerisModel::updateUnderWaterColor( const osg::Vec3f & cWaterColor )
 }
 
 // called once before everything
-bool EphemerisModel::FrameCall()
+bool EphemerisModel::PreUpdate()
 {
     // Set position
     FIXME(Hardcode)

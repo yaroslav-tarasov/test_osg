@@ -121,8 +121,8 @@ void Lights::cull(osg::NodeVisitor * nv)
 
     // illumination factor
     FIXME(Sun Intensity студию)
-    // const float fDarkness = 1.f - (GetScene()->getSky() ? GetScene()->getSky()->GetSunIntensity() : 0.f);
-    const float fDarkness = 1.f -  0.0f;
+    const float fDarkness = 1.f - (GetScene()->getSky() ? GetScene()->getSky()->GetSunIntensity() : 0.f);
+    //const float fDarkness = 1.f -  0.0f;
     const float fIllumFactor = cg::lerp01(0.25f, 1.0f,fDarkness * (2.0f - fDarkness));
 
     // sort lights

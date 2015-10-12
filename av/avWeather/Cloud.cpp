@@ -90,20 +90,20 @@ Cloud::Cloud(size_t nID)
     // textures
 
 
-	osg::Texture2D * pCloudTex = new osg::Texture2D(osgDB::readImageFile("CloudsAtlasGrey.dds",new osgDB::Options("")));
-	
-	if (pCloudTex)
-	{
-		pCloudTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE );
-		pCloudTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE );
-		pCloudTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE );
+	//osg::Texture2D * pCloudTex = new osg::Texture2D(osgDB::readImageFile("CloudsAtlasGrey.dds",new osgDB::Options("dds_dxt1_rgba")));
+	//
+	//if (pCloudTex)
+	//{
+	//	pCloudTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE );
+	//	pCloudTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE );
+	//	pCloudTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE );
 
-		pCloudTex->setMaxAnisotropy(16.0f);
-		pCurStateSet->setTextureAttribute(0, pCloudTex);
-	}
+	//	pCloudTex->setMaxAnisotropy(16.0f);
+	//	pCurStateSet->setTextureAttribute(0, pCloudTex);
+	//}
 
     // setup texture for point quads
-    // pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("CloudsAtlasGrey.dds", osg::Texture::CLAMP_TO_EDGE));
+    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("CloudsAtlasGrey.dds", osg::Texture::CLAMP_TO_EDGE));
 
     //
     // Construct geometry
@@ -291,7 +291,7 @@ void Cloud::cull(osgUtil::CullVisitor * pCV)
     // calculate cloud transparency
     const float
         fCloudTranspLow  = cg::lerp01( 0.05f, 1.0f, m_fDensity),
-        fCloudTranspHigh = cg::lerp01(  0.0f, 1.0f, m_fDensity * m_fDensity * (2.0f - m_fDensity));
+        fCloudTranspHigh = cg::lerp01( 0.0f, 1.0f, m_fDensity * m_fDensity * (2.0f - m_fDensity));
 
     // calculate bottom-top cloud colors
     const osg::Vec3f cPrepColor = GetPrecipitationColor(m_ptType);

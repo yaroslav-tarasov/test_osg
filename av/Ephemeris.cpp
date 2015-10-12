@@ -38,7 +38,7 @@ namespace avSky
         {
             const osg::Light* sls = _ephem->_d->_ephemerisModel->getSunLightSource()->getLight();
 
-            osg::ref_ptr<FogLayer> _fogLayer =   _ephem->_d->_fogLayer;
+            osg::ref_ptr<FogLayer>    _fogLayer  = _ephem->_d->_fogLayer;
             osg::ref_ptr<CloudsLayer> _skyClouds = _ephem->_d->_cloudsLayer;
 
             if(!_fogLayer || !_skyClouds)
@@ -130,7 +130,7 @@ namespace avSky
             handler(Ephemeris *ephem) 
                 : _ephem(ephem) 
                 , _currCloud  (avSky::cirrus)
-                , _intensivity(0.1)
+                , _intensity(0.1)
             {}
 
             virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
@@ -139,7 +139,7 @@ namespace avSky
                 auto _fogLayer =   _ephem->_d->_fogLayer;
                 auto _skyClouds  = _ephem->_d->_cloudsLayer;
                 auto ephem       = _ephem->_d->_ephemerisModel;
-                const osg::Vec3f _color = osg::Vec3f(1.0,1.0,1.0);   // FIXME Whats color?
+                const osg::Vec3f _color = _fogLayer->getFogColor();    
                 
                 if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
                 {
@@ -178,16 +178,6 @@ namespace avSky
                         // to invalid dates / times...
 
                         // Модификация Дельты не имеет общих данных  
-                        //osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
-                        //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
-                        //    data->dateTime.setHour( data->dateTime.getHour() + 1 );
-                        //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Increment by one day
-                        //    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() + 1 );
-                        //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Increment by one month
-                        //    data->dateTime.setMonth( data->dateTime.getMonth() + 1 );
-                        //else                                                                    // Increment by one minute
-                        //    data->dateTime.setMinute( data->dateTime.getMinute() + 1 );
-
                         osgEphemeris::DateTime dt = ephem->getDateTime();
 
                         if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Increment by one hour
@@ -220,17 +210,6 @@ namespace avSky
                     else if (ea.getKey() == osgGA::GUIEventAdapter::KEY_KP_Subtract)
                     {
                         // Decrement time
-                        // Hopefully the DateTime will wrap around correctly if we get 
-                        // to invalid dates / times...
-                        //osgEphemeris::EphemerisData* data = m_ephem->getEphemerisData();
-                        //if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Decrement by one hour
-                        //    data->dateTime.setHour( data->dateTime.getHour() - 1 );
-                        //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_ALT)       // Decrement by one day
-                        //    data->dateTime.setDayOfMonth( data->dateTime.getDayOfMonth() - 1 );
-                        //else if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_CTRL)      // Decrement by one month
-                        //    data->dateTime.setMonth( data->dateTime.getMonth() - 1 );
-                        //else                                                                    // Decrement by one minute
-                        //    data->dateTime.setMinute( data->dateTime.getMinute() - 1 );
                         osgEphemeris::DateTime dt = ephem->getDateTime();
                         if (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)          // Decrement by one hour
                             dt.setHour( dt.getHour() - 1 );
@@ -267,21 +246,21 @@ namespace avSky
                     else
                     if (ea.getKey()==osgGA::GUIEventAdapter::KEY_Rightbracket )
                     { 
-                        _intensivity += 0.1;
-                        if(_intensivity > 1.0)
-                            _intensivity = 1.0;
+                        _intensity += 0.1;
+                        if(_intensity > 1.0)
+                            _intensity = 1.0;
                         else
-                            _fogLayer->setFogParams(_color,_intensivity);
+                            _fogLayer->setFogParams(_color,_intensity);
 
                         return true;
                     } else
                     if (ea.getKey()== osgGA::GUIEventAdapter::KEY_Leftbracket)
                     { 
-                        _intensivity -= 0.1;
-                        if(_intensivity < 0.0) 
-                            _intensivity = 0.0;
+                        _intensity -= 0.1;
+                        if(_intensity < 0.0) 
+                            _intensity = 0.0;
                         else
-                           _fogLayer->setFogParams(_color,_intensivity);
+                           _fogLayer->setFogParams(_color,_intensity);
 
                         return true;
                     }
@@ -304,7 +283,7 @@ namespace avSky
         private:
             osg::ref_ptr<Ephemeris>                           _ephem;
             avSky::cloud_type                                 _currCloud;
-            float                                             _intensivity;
+            float                                             _intensity;
         };
 
     private:
@@ -466,5 +445,18 @@ namespace avSky
             _ic(illum);
         _illum = illum;
         avCore::GetEnvironment()->m_IlluminationParameters.Illumination  = illum;   
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////
+    float Ephemeris::GetSunIntensity() const
+    {
+        return /*_cSkydomePtr->getIllumination()*/_illum;
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    const osg::Vec3f & Ephemeris::GetFogColor() const
+    {
+        return /*_cSkydomePtr->getFogColor()*/_d->_fogLayer->getFogColor();
     }
 }

@@ -10,7 +10,7 @@ class Clouds : public osg::Group
 public:
 								Clouds();
 	virtual bool				Initialize();
-	virtual bool				FrameCall();
+	virtual bool				PreUpdate();
 
 private:
 	osg::ref_ptr<osg::Uniform>	_cCloudsParamsPtr;

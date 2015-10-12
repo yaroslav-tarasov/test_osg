@@ -1,11 +1,12 @@
 #pragma once
 
+#include   "av/ISky.h"
 
 namespace avSky
 {
 
 
-    class Ephemeris : public osg::Group
+    class Ephemeris : public osg::Group , public ISky
     {
        friend class EphemerisDataUpdateCallback;
     public:       
@@ -20,6 +21,13 @@ namespace avSky
        osg::LightSource*       getSunLightSource();
        osgGA::GUIEventHandler* getEventHandler();
        inline  float           getIllumination() const {return _illum;};
+    
+    //
+    //  ISky
+    //
+    public:
+       float                   GetSunIntensity() const override;
+       const osg::Vec3f &      GetFogColor    () const override;
 
     protected:      
        void                    setTime();

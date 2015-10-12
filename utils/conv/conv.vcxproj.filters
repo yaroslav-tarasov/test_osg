@@ -59,7 +59,7 @@
     <ClCompile Include="..\..\av\shaders.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\av\Utils.cpp">
+    <ClCompile Include="..\..\av\avCore\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

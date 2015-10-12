@@ -70,7 +70,7 @@ namespace avCore
 		bool                    FindFile( PathType ePathType, const std::string& cFileName, std::string* pFullPath = NULL ) const;
 		__time64_t              GetFileModificationTime( const char* szFullFileName ) const;
 
-		virtual bool            FrameCall();
+		virtual bool            PreUpdate();
 
 	private:
 

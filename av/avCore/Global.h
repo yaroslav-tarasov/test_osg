@@ -12,6 +12,9 @@ enum RenderBinOrder
     // rendered next - solid models 
     RENDER_BIN_SCENE                    = 0,  
 
+    // rendered next - special bin for depth obtaining
+    RENDER_BIN_AFTER_MODELS             = 6,  // special bin for depth texture to obtain actual depth
+    
     // rendered next - local weather, particles effects, global weather
     RENDER_BIN_LOCAL_WEATHER            = 7,  // local fog and local bank cloud
 	RENDER_BIN_LIGHTS                   = 8,

@@ -27,7 +27,7 @@
 #define ORIG_EPHEMERIS
 #define PICK_NODE_MASK          0x1
 #define DO_NOT_PICK_NODE_MASK   0x2
-
+//#define  SCREEN_TEXTURE
 
 
 #ifndef _DEBUG

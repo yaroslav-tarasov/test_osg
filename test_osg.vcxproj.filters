@@ -251,6 +251,12 @@
     <ClInclude Include="av\avCore\Database.h">
       <Filter>Header Files\av\core</Filter>
     </ClInclude>
+    <ClInclude Include="av\avScene\ScreenTexture.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avScene\ScreenTextureManager.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -705,6 +711,15 @@
     </ClCompile>
     <ClCompile Include="av\avWeather\LocalWeather.cpp">
       <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avWeather\FogBank.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avScene\ScreenTextureManager.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avScene\ScreenTexture.cpp">
+      <Filter>Source Files\av\scene</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

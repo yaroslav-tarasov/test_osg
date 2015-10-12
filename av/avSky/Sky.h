@@ -1,5 +1,7 @@
 #pragma once
 
+#include   "av/ISky.h"
+
 //namespace avSky
 //{
 //   class CloudsLayer;
@@ -12,7 +14,7 @@ namespace avSky
 class EphemerisModel;
 
 
-class Sky : public osg::Group
+class Sky : public osg::Group , public ISky
 {
 public:
     Sky( osg::Group* pScene );
@@ -20,8 +22,8 @@ public:
     inline EphemerisModel * GetSkydome() { return _cSkydomePtr.get(); }
     //inline avSky::CloudsLayer *         GetClouds () { return _cCloudsPtr.get(); }
 
-    float              GetSunIntensity() const;
-    const osg::Vec3f & GetFogColor    () const;
+    float              GetSunIntensity() const override;
+    const osg::Vec3f & GetFogColor    () const override;
 
     void SetWaterColor( const osg::Vec3f & cWaterColor );
     osg::LightSource* getSunLightSource();

@@ -668,6 +668,7 @@ int av_scene( int argc, char** argv )
     boost::asio::io_service  service_;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
     work_ptr dummy_work(new boost::asio::io_service::work(service_));
+    
 
     __main_srvc__ = &service_;
 

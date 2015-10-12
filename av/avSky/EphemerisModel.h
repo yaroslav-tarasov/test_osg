@@ -144,7 +144,7 @@ public:
     // force update underwater color
     void updateUnderWaterColor( const osg::Vec3f & cWaterColor );
 
-    bool FrameCall();
+    bool PreUpdate();
 
 private:
 

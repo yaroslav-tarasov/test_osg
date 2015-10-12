@@ -99,8 +99,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\av\avCore\Utils.cpp" />
     <ClCompile Include="..\..\av\shaders.cpp" />
-    <ClCompile Include="..\..\av\Utils.cpp" />
     <ClCompile Include="..\materials.cpp" />
     <ClCompile Include="..\visitors\find_node_visitor.cpp" />
     <ClCompile Include="bullet_exporter.cpp" />

@@ -191,7 +191,7 @@ osg::Image* Database::LoadImage( const char* szFileName )
 
     if ( FindFile( PATH_TEXTURE, szFileName, &cFullFilePath ) == true )
     {
-        pImage = osgDB::readImageFile( cFullFilePath.c_str() );
+        pImage = osgDB::readImageFile( cFullFilePath.c_str(), new osgDB::Options(""));
         if ( pImage )
         {
             pImage->setDataVariance(osg::Object::STATIC);
@@ -649,7 +649,7 @@ __time64_t Database::GetFileModificationTime( const char* szFullFileName ) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool Database::FrameCall()
+bool Database::PreUpdate()
 {
     #define UPDATE_SHADERS_TIME 1.0
     static double s_dbTimeLeftToUpdateShaders = UPDATE_SHADERS_TIME;

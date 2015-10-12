@@ -95,6 +95,9 @@ public:
     // get fog density
     float getFogDensity() const { return m_fogDensity; }
 
+    // get fog density
+    const osg::Vec3f& getFogColor() const { return _vFogColor; }
+
 private: 
     // create geometry
     void _createGeometry();
@@ -114,13 +117,13 @@ private:
     osg::ref_ptr<osg::Uniform> _skyFogUniform;
 
     // real vis distance
-    float m_fRealVisDist;
-    float m_realExp2Density;
-    float m_fogDensity;
-    
+    float                      m_fRealVisDist;
+    float                      m_realExp2Density;
+    float                      m_fogDensity;
+
+    osg::Vec3f                 _vFogColor;
+
     on_visible_range_change_f _vc;
-
-
 
 
 };
