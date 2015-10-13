@@ -33,8 +33,8 @@ namespace
 
 // Default constructor - initialize searchForName to "" and    
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor(match_type_t m) 
-    : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+findNodeVisitor::findNodeVisitor(match_type_t m, osg::NodeVisitor::TraversalMode tm ) 
+    : osg::NodeVisitor(tm)
     , searchForName()
     , m_(m) 
 {    
@@ -43,15 +43,15 @@ findNodeVisitor::findNodeVisitor(match_type_t m)
 // Constructor that accepts string argument   
 // Initializes searchForName to user string   
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor(const std::string &searchName, match_type_t m) 
-    : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)    
+findNodeVisitor::findNodeVisitor(const std::string &searchName, match_type_t m,osg::NodeVisitor::TraversalMode tm ) 
+    : osg::NodeVisitor(tm)    
     , m_(m)
 {    
     searchForName.push_back(boost::to_lower_copy(searchName));
 }    
 
-findNodeVisitor::findNodeVisitor(const std::list<std::string> &searchNames, match_type_t m) 
-    : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)    
+findNodeVisitor::findNodeVisitor(const std::list<std::string> &searchNames, match_type_t m, osg::NodeVisitor::TraversalMode tm) 
+    : osg::NodeVisitor(tm)    
     , searchForName(searchNames)
     , m_(m)
 {    

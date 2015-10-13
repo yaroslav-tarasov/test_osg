@@ -76,14 +76,15 @@ namespace spark
         SPK::System::useAdaptiveStep( 0.001f, 0.01f );
     }
 
-    FIXME("Возвращаем handler каждый раз, а нужно только один раз добавить к вьюверу")
+    FIXME("Возвращаем handler каждый раз, а нужно только один раз добавить к вьюверу");
+
     spark_pair_t create(spark_t effectType,osg::Transform* model)
     {
         static int count = 0; 
         osg::ref_ptr<SparkDrawable> spark = new SparkDrawable;
 		osg::ref_ptr<osg::Geode>    geode = nullptr;
 
-        bool trackingModel = false;
+        // bool trackingModel = false;
         fire_creator fc(2.0);
         switch ( effectType )
         {
@@ -97,6 +98,7 @@ namespace spark
             spark->addImage( "spark2", osgDB::readImageFile("data/point.bmp"), GL_ALPHA );
             spark->addImage( "wave", osgDB::readImageFile("data/wave.bmp"), GL_RGBA );
 			geode = new osg::Geode;
+            geode->setName("fxExplosion");
             break;
         case FIRE:  // Fire
             spark->setBaseSystemCreator( /*&createFire*/&fc.createFire );
@@ -104,11 +106,13 @@ namespace spark
             spark->addImage( "fire", osgDB::readImageFile("data/fire2.bmp"), GL_ALPHA );
             spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
 			geode = new osg::Geode;
+            geode->setName("fxFire");
             break;
         case RAIN:  // Rain
             spark->setBaseSystemCreator( &createRain, true );  // Must use the proto type directly
             spark->addImage( "waterdrops", osgDB::readImageFile("data/waterdrops.bmp"), GL_ALPHA );
 			geode = new osg::Geode;
+            geode->setName("fxRain");
             break;
         case SMOKE:  // Smoke
             spark->setBaseSystemCreator( &createSmoke );
@@ -117,17 +121,20 @@ namespace spark
             //spark->addImage( "smoke", osgDB::readImageFile("data/fire2.bmp"), GL_RGBA );
 			geode = new SmokeNode;
 			dynamic_cast<SmokeNode*>(geode.get())->setGravity(osg::Vec3f(1.0,1.0,0.05));
-            trackingModel = true;
+            geode->setName("fxSmoke");
+            ///trackingModel = true;
             break;
         case TEST:
             spark->setBaseSystemCreator( &createTest );
             spark->addParticleSystem();
 			geode = new osg::Geode;
+            geode->setName("fxTest");
         default:  // Simple
             spark->setBaseSystemCreator( &createSimpleSystem );
             spark->addParticleSystem();
             spark->addImage( "flare", osgDB::readImageFile("data/flare.bmp"), GL_ALPHA );
 			geode = new osg::Geode;
+            geode->setName("fxFlare");
             break;
         }
 
@@ -140,7 +147,7 @@ namespace spark
         static osg::ref_ptr<SparkUpdatingHandler> handler = new SparkUpdatingHandler;
         handler->addSpark( spark.get() );
         
-        if ( trackingModel )
+        if ( /*trackingModel*/model != nullptr )
         {
             handler->setTrackee( count, model );
         }

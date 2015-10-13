@@ -337,10 +337,13 @@ void SparkDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
     osg::State* state = renderInfo.getState();
     state->disableAllVertexArrays();
     
+    auto tex_unit = state->getActiveTextureUnit();
+
     // Make sure the client unit and active unit are unified
     state->setClientActiveTextureUnit( 0 );
     state->setActiveTextureUnit( 0 );
-    
+
+
     SPK::GL::GLRenderer::saveGLStates();
     if ( _useProtoSystem && _d->_protoSystem )
         _d->_protoSystem->render();
@@ -350,6 +353,8 @@ void SparkDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         (*itr)->render();
     }
     SPK::GL::GLRenderer::restoreGLStates();
+
+    state->setActiveTextureUnit( tex_unit );
 }
 
 SPK::System* SparkDrawable::_private::createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle )

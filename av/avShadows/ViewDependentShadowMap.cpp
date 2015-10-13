@@ -278,6 +278,9 @@ public:
 
     void apply(osg::Geode& node)
     {
+        force_log fl;
+        LOG_ODS_MSG( "void apply(osg::Geode& node)  " << node.getName() << "\n");
+
         if (isCulled(node)) return;
 
         // push the culling mode.
@@ -423,6 +426,19 @@ void ViewDependentShadowMap::LightData::setLightData(osg::RefMatrix* lm, const o
     }
 }
 
+inline void setUpTexture(osg::Texture2D* texture)
+{
+    texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+    texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+
+    // the shadow comparison should fail if object is outside the texture
+    texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
+    texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
+    texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+    //_texture->setBorderColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f)); 
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // ShadowData
@@ -442,8 +458,14 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
     // set up the texture
     _texture = new osg::Texture2D;
 
+
     osg::Vec2s textureSize = debug ? osg::Vec2s(512,512) : settings->getTextureSize();
     _texture->setTextureSize(textureSize.x(), textureSize.y());
+
+#ifdef EXPERIMENTAL_RGB_CAM    
+    _textureRGB  = new osg::Texture2D;
+    _textureRGB->setTextureSize(512,512);
+#endif
 
     if (debug)
     {
@@ -454,16 +476,17 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
         _texture->setInternalFormat(GL_DEPTH_COMPONENT);
         _texture->setShadowComparison(true);
         _texture->setShadowTextureMode(osg::Texture2D::LUMINANCE);
+
+#ifdef EXPERIMENTAL_RGB_CAM         
+        _textureRGB->setInternalFormat(GL_RGB);
+#endif
     }
 
-    _texture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
-    _texture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+    setUpTexture(_texture);
 
-    // the shadow comparison should fail if object is outside the texture
-    _texture->setWrap(osg::Texture2D::WRAP_S,osg::Texture2D::CLAMP_TO_BORDER);
-    _texture->setWrap(osg::Texture2D::WRAP_T,osg::Texture2D::CLAMP_TO_BORDER);
-    _texture->setBorderColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
-    //_texture->setBorderColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+#ifdef EXPERIMENTAL_RGB_CAM 
+    setUpTexture(_textureRGB);
+#endif
 
     // set up the camera
     _camera = new osg::Camera;
@@ -481,6 +504,23 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
 
     // set viewport
     _camera->setViewport(0,0,textureSize.x(),textureSize.y());
+
+#ifdef EXPERIMENTAL_RGB_CAM
+    // set up the camera
+    _cameraRGB = new osg::Camera;
+    _cameraRGB->setName("RGBShadowCamera");
+    _cameraRGB->setReferenceFrame(osg::Camera::ABSOLUTE_RF_INHERIT_VIEWPOINT);
+
+    _cameraRGB->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+    _cameraRGB->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
+
+    // switch off small feature culling as this can cull out geometry that will still be large enough once perspective correction takes effect.
+    _cameraRGB->setCullingMode(_cameraRGB->getCullingMode() & ~osg::CullSettings::SMALL_FEATURE_CULLING);
+
+    // set viewport
+    _cameraRGB->setViewport(0,0,512,512);
+#endif 
+
 
 
     if (debug)
@@ -509,6 +549,17 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
         // attach the texture and use it as the color buffer.
         _camera->attach(osg::Camera::DEPTH_BUFFER, _texture.get());
         //_camera->attach(osg::Camera::COLOR_BUFFER, _texture.get());
+
+#ifdef EXPERIMENTAL_RGB_CAM 
+        // clear just the depth buffer
+        _cameraRGB->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        // render after the main camera
+        _cameraRGB->setRenderOrder(osg::Camera::PRE_RENDER);
+
+        // attach the texture and use it as the color buffer.
+        _cameraRGB->attach(osg::Camera::COLOR_BUFFER, _textureRGB.get());
+#endif
     }
 }
 
@@ -517,6 +568,12 @@ void ViewDependentShadowMap::ShadowData::releaseGLObjects(osg::State* state) con
     OSG_INFO<<"ViewDependentShadowMap::ShadowData::releaseGLObjects"<<std::endl;
     _texture->releaseGLObjects(state);
     _camera->releaseGLObjects(state);
+
+#ifdef EXPERIMENTAL_RGB_CAM 
+    _cameraRGB->releaseGLObjects(state);
+    _textureRGB->releaseGLObjects(state);
+#endif
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -975,6 +1032,15 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             camera->setProjectionMatrix(projectionMatrix);
             camera->setViewMatrix(viewMatrix);
 
+ #ifdef EXPERIMENTAL_RGB_CAM 
+            osg::ref_ptr<osg::Camera> cameraRGB = sd->_cameraRGB;
+
+            cameraRGB->setProjectionMatrix(projectionMatrix);
+            cameraRGB->setViewMatrix(viewMatrix);
+            cameraRGB->getViewport()->x() = pos_x;
+            pos_x += cameraRGB->getViewport()->width() + 40;
+#endif
+
             if (settings->getDebugDraw())
             {
                 camera->getViewport()->x() = pos_x;
@@ -1051,11 +1117,23 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                     osg::Matrixd::translate(osg::Vec3d(0.0,-mid_r,0.0)) *
                     osg::Matrixd::scale(osg::Vec3d(1.0,2.0/range_r,1.0)));
 
+ #ifdef EXPERIMENTAL_RGB_CAM 
+                cameraRGB->setProjectionMatrix(
+                    cameraRGB->getProjectionMatrix() *
+                    osg::Matrixd::translate(osg::Vec3d(0.0,-mid_r,0.0)) *
+                    osg::Matrixd::scale(osg::Vec3d(1.0,2.0/range_r,1.0)));
+#endif
+
             }
 
 
             osg::ref_ptr<VDSMCameraCullCallback> vdsmCallback = new VDSMCameraCullCallback(this, local_polytope);
             camera->setCullCallback(vdsmCallback.get());
+
+#ifdef EXPERIMENTAL_RGB_CAM             
+            osg::ref_ptr<VDSMCameraCullCallback> vdsmCallbackRGB = new VDSMCameraCullCallback(this, local_polytope);
+            cameraRGB->setCullCallback(vdsmCallbackRGB.get());
+#endif
 
             // 4.3 traverse RTT camera
             //
@@ -1063,6 +1141,10 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             cv.pushStateSet(_shadowCastingStateSet.get());
 
             cullShadowCastingScene(&cv, camera.get());
+
+#ifdef EXPERIMENTAL_RGB_CAM
+            cullShadowCastingScene(&cv, cameraRGB.get());
+#endif
 
             cv.popStateSet();
 
@@ -1075,6 +1157,16 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                 }
             }
 
+#ifdef EXPERIMENTAL_RGB_CAM            
+            if (!orthographicViewFrustum && settings->getShadowMapProjectionHint()==ShadowSettings::PERSPECTIVE_SHADOW_MAP)
+            {
+                adjustPerspectiveShadowMapCameraSettings(vdsmCallbackRGB->getRenderStage(), frustum, pl, cameraRGB.get());
+                if (vdsmCallbackRGB->getProjectionMatrix())
+                {
+                    vdsmCallbackRGB->getProjectionMatrix()->set(cameraRGB->getProjectionMatrix());
+                }
+            }
+#endif
             // 4.4 compute main scene graph TexGen + uniform settings + setup state
             //
             assignTexGenSettings(&cv, camera.get(), textureUnit, sd->_texgen.get());
@@ -2430,6 +2522,8 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
         OSG_INFO<<"   ShadowData for "<<sd._textureUnit<<std::endl;
 
         stateset->setTextureAttributeAndModes(sd._textureUnit, sd._texture.get(), shadowMapModeValue);
+        FIXME(Ну тут чета бред);
+        stateset->setTextureAttributeAndModes(sd._textureUnit + 1, sd._texture.get(), shadowMapModeValue);
 
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);

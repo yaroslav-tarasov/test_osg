@@ -747,12 +747,13 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
+#if 0
 	//
 	// Create weather
 	//
 	_Weather = new avWeather::Weather();
 	_environmentNode->addChild( _Weather.get() );
-
+#endif
 
     LightManager::Create();
 
@@ -770,7 +771,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _environmentNode->addChild(_lights.get());
 
    
-    
+#if 0    
     //
     // Create weather
     //
@@ -781,7 +782,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     _weatherNode->addChild( precipitationEffect.get() );
     addChild( _weatherNode.get() );
-
+#endif
 
     //
     // Init physic updater
@@ -836,7 +837,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
 
-#if 1
+#if 0
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
@@ -854,6 +855,8 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 		dLatitude, dLongitude, fHeading, 
 		fEllipseRadX, fEllipseRadY, fHeight, 
 		ptType, fIntensity, fCentralPortion);
+
+    avCore::GetEnvironment()->m_WeatherParameters.RainDensity = fIntensity;
 #endif
 
     return true;
@@ -869,11 +872,12 @@ osg::Group*  Scene::createTerrainRoot()
     const int fbo_tex_size = 1024*4;
 
     _st = new avShadow::ViewDependentShadowMap;
-
      tr = new avShadow::ShadowedScene(_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
-
+    
+    //settings->setDebugDraw(true);
+    
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
     settings->setMinimumShadowMapNearFarRatio(0.5);
@@ -1160,17 +1164,32 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     if( path == "sfx//smoke.scg" )
     {
-        spark::spark_pair_t sp3 =  spark::create(spark::SMOKE,parent?parent->asTransform():nullptr);
-        sp3.first->setName("fire");
-        mt_.back()->addChild(sp3.first);
-
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+       
+        osg::Matrix mat; 
+        mat.setTrans(-offset/2);
         
+        auto mt_offset = new osg::MatrixTransform(mat);
+        parent?parent->asGroup()->addChild(mt_offset):nullptr;
         
-		addChild(mt_.back());
-		
-		sp3.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+        spark::spark_pair_t sp_fire =  spark::create(spark::FIRE,parent?mt_offset->asTransform():nullptr);
+        sp_fire.first->setName("fire");
+        mt_.back()->addChild(sp_fire.first);
 
-        _viewerPtr->addEventHandler(sp3.second);
+        spark::spark_pair_t sp_smoke =  spark::create(spark::SMOKE,parent?mt_offset->asTransform():nullptr);
+        sp_smoke.first->setName("smoke");
+        mt_.back()->addChild(sp_smoke.first);
+        
+		//addChild(mt_.back());
+		_terrainRoot->asGroup()->addChild(mt_.back());
+
+		sp_smoke.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+        sp_fire.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+
+        _viewerPtr->addEventHandler(sp_smoke.second);
+        _viewerPtr->addEventHandler(sp_fire.second);
+
         return mt_.back();
     }
 

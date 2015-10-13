@@ -12,14 +12,14 @@ public:
 
     // Default constructor - initialize searchForName to "" and 
     // set the traversal mode to TRAVERSE_ALL_CHILDREN
-    explicit findNodeVisitor(match_type_t m = exact); 
+    explicit findNodeVisitor(match_type_t m = exact, osg::NodeVisitor::TraversalMode tm = osg::NodeVisitor::TRAVERSE_ALL_CHILDREN); 
 
     // Constructor that accepts string argument
     // Initializes searchForName to user string
     // set the traversal mode to TRAVERSE_ALL_CHILDREN
-    findNodeVisitor(const std::string &searchName, match_type_t m=exact);
+    findNodeVisitor(const std::string &searchName, match_type_t m=exact ,osg::NodeVisitor::TraversalMode tm = osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
-    findNodeVisitor(const nodeNamesList &searchNames, match_type_t m=exact);
+    findNodeVisitor(const nodeNamesList &searchNames, match_type_t m=exact, osg::NodeVisitor::TraversalMode tm = osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
     // The 'apply' method for 'node' type instances.
     // Compare the 'searchForName' data member against the node's name.
@@ -63,8 +63,8 @@ public:
 
     typedef T nodeType; 
 
-    findNodeByType()
-        : osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+    findNodeByType(osg::NodeVisitor::TraversalMode tm = TRAVERSE_ALL_CHILDREN)
+        : osg::NodeVisitor(tm)
     {    
     }  
 
@@ -106,16 +106,16 @@ private:
 
 };
 
-inline static osg::Node * findFirstNode(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact)
+inline static osg::Node * findFirstNode(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact , osg::NodeVisitor::TraversalMode tm = osg::NodeVisitor::TRAVERSE_ALL_CHILDREN )
 {
-    findNodeVisitor findVis(searchName,m); 
+    findNodeVisitor findVis(searchName,m,tm); 
     root->accept(findVis);
     return findVis.getFirst();
 }
 
-inline static findNodeVisitor::nodeListType findNodes(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact)
+inline static findNodeVisitor::nodeListType findNodes(osg::Node* root,const std::string &searchName, findNodeVisitor::match_type_t m=findNodeVisitor::exact, osg::NodeVisitor::TraversalMode tm = osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
 {
-    findNodeVisitor findVis(searchName,m); 
+    findNodeVisitor findVis(searchName,m,tm); 
     root->accept(findVis);
     return findVis.getNodeList();
 }

@@ -18,8 +18,8 @@ enum RenderBinOrder
     // rendered next - local weather, particles effects, global weather
     RENDER_BIN_LOCAL_WEATHER            = 7,  // local fog and local bank cloud
 	RENDER_BIN_LIGHTS                   = 8,
-	RENDER_BIN_PARTICLE_EFFECTS         = 9,  // any particle effect (must take local fog into account)
-    RENDER_BIN_GLOBAL_WEATHER           = 10,  // global rain/snow/hail around viewer
+	RENDER_BIN_PARTICLE_EFFECTS         = 11,  // any particle effect (must take local fog into account)
+    RENDER_BIN_GLOBAL_WEATHER           = 17,  // global rain/snow/hail around viewer
 
     // GUI at last
     RENDER_BIN_GUI                      = 21, // GUI

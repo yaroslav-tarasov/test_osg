@@ -13,15 +13,11 @@
  * OpenSceneGraph Public License for more details.
 */
 
-
-
-//#include <osg/Camera>
-//#include <osg/Material>
-//#include <osg/MatrixTransform>
-//#include <osg/LightSource>
 #include <osg/PolygonOffset>
 
 #include "ShadowTechnique.h"
+
+#define EXPERIMENTAL_RGB_CAM
 
 namespace avShadow {
 
@@ -114,8 +110,13 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechn
 
             unsigned int                        _textureUnit;
             osg::ref_ptr<osg::Texture2D>        _texture;
+
             osg::ref_ptr<osg::TexGen>           _texgen;
             osg::ref_ptr<osg::Camera>           _camera;
+#ifdef EXPERIMENTAL_RGB_CAM
+            osg::ref_ptr<osg::Camera>           _cameraRGB;
+            osg::ref_ptr<osg::Texture2D>        _textureRGB;
+#endif
         };
 
         typedef std::list< osg::ref_ptr<ShadowData> > ShadowDataList;
