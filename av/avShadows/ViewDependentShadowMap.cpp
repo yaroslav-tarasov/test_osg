@@ -557,6 +557,9 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
         // render after the main camera
         _cameraRGB->setRenderOrder(osg::Camera::PRE_RENDER);
 
+		// tell the camera to use OpenGL frame buffer object where supported.
+		_cameraRGB->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+
         // attach the texture and use it as the color buffer.
         _cameraRGB->attach(osg::Camera::COLOR_BUFFER, _textureRGB.get());
 #endif
@@ -1037,8 +1040,8 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
             cameraRGB->setProjectionMatrix(projectionMatrix);
             cameraRGB->setViewMatrix(viewMatrix);
-            cameraRGB->getViewport()->x() = pos_x;
-            pos_x += cameraRGB->getViewport()->width() + 40;
+            //cameraRGB->getViewport()->x() = pos_x;
+            //pos_x += cameraRGB->getViewport()->width() + 40;
 #endif
 
             if (settings->getDebugDraw())
@@ -1142,11 +1145,11 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
             cullShadowCastingScene(&cv, camera.get());
 
-#ifdef EXPERIMENTAL_RGB_CAM
-            cullShadowCastingScene(&cv, cameraRGB.get());
-#endif
-
             cv.popStateSet();
+
+#ifdef EXPERIMENTAL_RGB_CAM
+			cullShadowCastingScene(&cv, cameraRGB.get());
+#endif
 
             if (!orthographicViewFrustum && settings->getShadowMapProjectionHint()==ShadowSettings::PERSPECTIVE_SHADOW_MAP)
             {
@@ -2523,7 +2526,7 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
 
         stateset->setTextureAttributeAndModes(sd._textureUnit, sd._texture.get(), shadowMapModeValue);
         FIXME(Ну тут чета бред);
-        stateset->setTextureAttributeAndModes(sd._textureUnit + 1, sd._texture.get(), shadowMapModeValue);
+        stateset->setTextureAttributeAndModes(sd._textureUnit + 1, sd._textureRGB.get(), shadowMapModeValue);
 
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);
