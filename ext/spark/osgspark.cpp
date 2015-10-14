@@ -143,9 +143,10 @@ namespace spark
         geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
 		// geode->getOrCreateStateSet()->setRenderBinDetails( /*RENDER_BIN_SCENE*/-5, "DepthSortedBin" );
 		geode->getOrCreateStateSet()->setNestRenderBins(false);
-        
-        geode->getOrCreateStateSet()->setAttribute( new osg::CullFace( osg::CullFace::BACK ),
-            osg::StateAttribute::ON | osg::StateAttribute::PROTECTED | osg::StateAttribute::OVERRIDE);
+//#define REFLECTION_CULL_MASK 0x00010000
+        //geode->setNodeMask(~REFLECTION_CULL_MASK);
+        //geode->getOrCreateStateSet()->setAttribute( new osg::CullFace( osg::CullFace::BACK ),
+        //    osg::StateAttribute::ON | osg::StateAttribute::PROTECTED | osg::StateAttribute::OVERRIDE);
 
         static osg::ref_ptr<SparkUpdatingHandler> handler = new SparkUpdatingHandler;
         handler->addSpark( spark.get() );

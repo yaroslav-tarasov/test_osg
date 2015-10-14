@@ -212,6 +212,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
 {
     setNodeMask( PICK_NODE_MASK /*| cReceivesShadowTraversalMask*/ );
 
+
     //
     // Callbacks
     //

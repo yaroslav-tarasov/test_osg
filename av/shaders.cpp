@@ -151,15 +151,54 @@ namespace shaders
       const ivec2 pcf_size = ivec2(1,1);                                                               \
                                                                                                        \
                                                                                                        \
-     uniform sampler2D       baseTexture;                                                              \
-     uniform int             baseTextureUnit;                                                          \
-     uniform sampler2DShadow shadowTexture0;                                                           \
-     uniform int             shadowTextureUnit0;                                                       \
-     uniform sampler2DShadow shadowTextureRGB;                                                         \
-     uniform mat4            shadowMatrix0;                                                            \
-     uniform mat4            lightmap_matrix;                                                          \
-\n   uniform mat4            shadow0_matrix;                                                           \
+\n     uniform sampler2D       baseTexture;                                                            \
+\n     uniform int             baseTextureUnit;                                                        \
+\n     uniform sampler2DShadow shadowTexture0;                                                         \
+\n     uniform int             shadowTextureUnit0;                                                     \
+\n     uniform sampler2DShadow shadowTextureRGB;                                                       \
+\n     uniform mat4            shadowMatrix0;                                                          \
+\n     uniform mat4            lightmap_matrix;                                                        \
+\n     uniform mat4            shadow0_matrix;                                                         \
      )
+
+
+
+#ifdef EXPERIMENTAL_RGB_CAM 
+#define INCLUDE_VS_EXT                                                                                     \
+	STRINGIFY (                                                                                            \
+	\n                                                                                                     \
+	\n                                                                                                     \
+	\n        float PCF4E_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                 \
+	\n            return min(PCF4E(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;  \
+	\n	}                                                                                                  \
+	\n	                                                                                                   \
+	\n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                  \
+	\n            return min(PCF4(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;   \
+	}                                                                                                      \
+	\
+	\n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
+	\n            return min(PCF(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;    \
+	}                                                                                                      \
+	)
+#else
+#define INCLUDE_VS_EXT                                                                                     \
+	STRINGIFY (                                                                                            \
+	\n                                                                                                     \
+	\n                                                                                                     \
+	\n        float PCF4E_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                 \
+	\n            return PCF4E(depths, stpq, pcf_size) * aa * 0.4;                                         \
+	\n	}                                                                                                  \
+	\n	                                                                                                   \
+		\n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                              \
+		\n            return PCF4(depths, stpq, pcf_size) * aa * 0.4;                                      \
+	}                                                                                                      \
+	                                                                                                       \
+	\n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
+	\n            return PCF(depths, stpq, pcf_size) * aa * 0.4;                                           \
+	}                                                                                                      \
+	)
+#endif
+
 
 /*vec4  get_shadow_coords(vec4 posEye, int index)                                                   \
 {                                                                                                 \
@@ -320,7 +359,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
         INCLUDE_VS
-        
+        INCLUDE_VS_EXT
         INCLUDE_COMPABILITY
         "\n"       
         LIGHT_MAPS
@@ -386,6 +425,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         INCLUDE_FUNCS
         INCLUDE_FOG_FUNCS
         INCLUDE_VS
+		INCLUDE_VS_EXT
         INCLUDE_DL
         INCLUDE_DL2
         INCLUDE_SCENE_PARAM
@@ -420,7 +460,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             //#define GET_SHADOW(viewpos, in_frag)   
             float shadow = 1.0; 
             //if(ambient.a > 0.35)
-               shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+               shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
 
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
             vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
@@ -499,7 +539,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-            
+            INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
 
             STRINGIFY ( 
@@ -553,7 +593,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
-
+			INCLUDE_VS_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -577,7 +617,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             {
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -606,6 +646,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
            "#extension GL_ARB_gpu_shader5 : enable \n"
 
            INCLUDE_VS
+		   INCLUDE_VS_EXT
            INCLUDE_COMPABILITY
            "\n"       
            LIGHT_MAPS
@@ -665,6 +706,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
        INCLUDE_FUNCS
        INCLUDE_FOG_FUNCS
        INCLUDE_VS
+	   INCLUDE_VS_EXT
        INCLUDE_DL
        INCLUDE_DL2
        INCLUDE_SCENE_PARAM
@@ -695,7 +737,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                // GET_SHADOW(f_in.viewpos, f_in);
                float shadow = 1.0; 
                if(ambient.a > 0.35)
-                   shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                   shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
 
                vec4 base = texture2D(colorTex, f_in.texcoord);
                vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
@@ -772,6 +814,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             
             "\n"       
@@ -826,6 +869,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
@@ -854,7 +898,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // GET_SHADOW(f_in.viewpos, f_in);
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
 
                 // get dist to point and normalized to-eye vector
                 float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
@@ -939,6 +983,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
 
             STRINGIFY ( 
@@ -991,6 +1036,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -1015,7 +1061,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // GET_SHADOW(f_in.viewpos, f_in);
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -1042,9 +1088,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         const char* vs = {
 			
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             INCLUDE_UNIFORMS
             "\n"       
@@ -1115,6 +1161,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
@@ -1148,7 +1195,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // GET_SHADOW(f_in.viewpos, f_in);
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
+                    shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a); 
 \n
 \n                float rainy_value = 0.666 * specular.a;
 \n
@@ -1226,6 +1273,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             "\n"       
             LIGHT_MAPS
@@ -1298,6 +1346,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
               INCLUDE_FUNCS
               INCLUDE_FOG_FUNCS
               INCLUDE_VS
+			  INCLUDE_VS_EXT
               INCLUDE_SCENE_PARAM
               INCLUDE_DL
               INCLUDE_DL2
@@ -1330,8 +1379,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                   float shadow = 1.0; 
                   if(ambient.a > 0.35)
                   {
-                      // shadow = (min(PCF4(shadowTexture0, f_in.shadow_view,pcf_size),PCF(shadowTextureRGB, f_in.shadow_view * .125,pcf_size))) * ambient.a * 0.4;
-                      shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                      shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
                   }
 \n                
 \n
@@ -1534,7 +1582,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         
         const char* vs_test2 = { 
             INCLUDE_VS
-
+			INCLUDE_VS_EXT
             STRINGIFY ( 
             uniform mat4  shadowMatrix0;                                \n 
             uniform mat4  refMatrix;
@@ -1613,6 +1661,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
 
             "\n"       
@@ -1669,6 +1718,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
@@ -1697,8 +1747,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
                 {
-                    //shadow = (PCF(shadowTexture0, f_in.shadow_view,pcf_size) +  PCF(shadowTextureRGB, f_in.shadow_view * .125,pcf_size)  ) * ambient.a * 0.4;  
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
                 }
 
                 vec3 normal = normalize(f_in.normal);
@@ -1796,7 +1845,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
-
+			INCLUDE_VS_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -2021,6 +2070,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         const char* vs = { 
             INCLUDE_VS
+			INCLUDE_VS_EXT
             INCLUDE_UNIFORMS
             INCLUDE_COMPABILITY
             INCLUDE_FUNCS
@@ -2086,6 +2136,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         const char* fs = { 
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
 
             STRINGIFY ( 
             // uniform sampler2D texCulturalLight;
@@ -2113,6 +2164,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
 
             INCLUDE_UNIFORMS
             
@@ -2157,6 +2209,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
+			INCLUDE_VS_EXT
 
             STRINGIFY ( 
 

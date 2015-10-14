@@ -47,6 +47,7 @@
 
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
+#define EXPERIMENTAL_RGB_CAM
 
 #include "nfi/fn_reg.h"
 

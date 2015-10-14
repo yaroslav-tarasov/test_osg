@@ -511,7 +511,7 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
     _cameraRGB->setName("RGBShadowCamera");
     _cameraRGB->setReferenceFrame(osg::Camera::ABSOLUTE_RF_INHERIT_VIEWPOINT);
 
-    _cameraRGB->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+    _cameraRGB->setClearColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
     _cameraRGB->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
 
     // switch off small feature culling as this can cull out geometry that will still be large enough once perspective correction takes effect.

@@ -17,8 +17,6 @@
 
 #include "ShadowTechnique.h"
 
-//#define EXPERIMENTAL_RGB_CAM
-
 #ifdef EXPERIMENTAL_RGB_CAM 
 #      define RGB_TEXTURE_NUM  10
 #endif
