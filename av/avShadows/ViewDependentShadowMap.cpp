@@ -1325,6 +1325,11 @@ void ViewDependentShadowMap::createShaders()
         }
     }
     
+#ifdef EXPERIMENTAL_RGB_CAM 
+    osg::ref_ptr<osg::Uniform> shadowTextureSamplerRGB = new osg::Uniform("shadowTextureRGB",(int)(settings->getBaseShadowTextureUnit()+RGB_TEXTURE_NUM));
+    _uniforms.push_back(shadowTextureSamplerRGB.get());
+#endif
+
     for(int st_i =0;st_i<4;++st_i)
     {
         std::stringstream sstr;
@@ -2525,8 +2530,10 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
         OSG_INFO<<"   ShadowData for "<<sd._textureUnit<<std::endl;
 
         stateset->setTextureAttributeAndModes(sd._textureUnit, sd._texture.get(), shadowMapModeValue);
-        FIXME(Ну тут чета бред);
-        stateset->setTextureAttributeAndModes(sd._textureUnit + 1, sd._textureRGB.get(), shadowMapModeValue);
+
+#ifdef EXPERIMENTAL_RGB_CAM
+        stateset->setTextureAttributeAndModes(sd._textureUnit + RGB_TEXTURE_NUM, sd._textureRGB.get(), shadowMapModeValue);
+#endif
 
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);

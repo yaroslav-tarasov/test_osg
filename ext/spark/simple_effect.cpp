@@ -94,7 +94,14 @@ SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int sc
     particleRenderer->setScale( 0.05f*scale_coeff, 0.05f*scale_coeff );
     particleRenderer->setBlending( /*SPK::BLENDING_ADD*/SPK::BLENDING_ALPHA );
     particleRenderer->enableRenderingHint( SPK::DEPTH_WRITE, false );
-    
+
+               
+#if 0 // Ёффект рваной горелой бумаги
+    particleRenderer->enableRenderingHint( SPK::DEPTH_WRITE, true );
+    particleRenderer->enableRenderingHint(SPK::ALPHA_TEST,true);
+    particleRenderer->setAlphaTestThreshold(0.8f);
+#endif
+
     // Model
     SPK::Model* particleModel = SPK::Model::create(
         SPK::FLAG_RED | SPK::FLAG_GREEN | SPK::FLAG_BLUE | SPK::FLAG_SIZE | SPK::FLAG_ALPHA | SPK::FLAG_TEXTURE_INDEX | SPK::FLAG_ANGLE,

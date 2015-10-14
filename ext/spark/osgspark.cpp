@@ -141,8 +141,11 @@ namespace spark
         geode->addDrawable( spark.get() );
         geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
         geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
-		geode->getOrCreateStateSet()->setRenderBinDetails( /*RENDER_BIN_SCENE*/-5, "DepthSortedBin" );
+		// geode->getOrCreateStateSet()->setRenderBinDetails( /*RENDER_BIN_SCENE*/-5, "DepthSortedBin" );
 		geode->getOrCreateStateSet()->setNestRenderBins(false);
+        
+        geode->getOrCreateStateSet()->setAttribute( new osg::CullFace( osg::CullFace::BACK ),
+            osg::StateAttribute::ON | osg::StateAttribute::PROTECTED | osg::StateAttribute::OVERRIDE);
 
         static osg::ref_ptr<SparkUpdatingHandler> handler = new SparkUpdatingHandler;
         handler->addSpark( spark.get() );

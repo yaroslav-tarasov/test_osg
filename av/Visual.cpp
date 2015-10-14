@@ -187,8 +187,13 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     
     float left, right, bottom, top;
 
+    //osg::ref_ptr<osgViewer::DepthPartitionSettings> dps = new osgViewer::DepthPartitionSettings(osgViewer::DepthPartitionSettings::FIXED_RANGE);
+    // dps->_zFar = 7000;
+    // dps->_zMid = 5000;
+    // dps->_zNear = 4;
 
-
+    //_viewerPtr->setUpDepthPartition(dps);
+    
     _viewerPtr->getCamera()->setClearColor(osg::Vec4(0.f, 0.f, 0.f, 1.f));
     //FIXME TODO //setProjectionMatrixFromConfig();
 
@@ -211,7 +216,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
 
 
     //_viewerPtr->setSceneData( this );
-    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded /*ThreadPerCamera*/);
+    _viewerPtr->setThreadingModel(osgViewer::Viewer::AutomaticSelection/*SingleThreaded*/ /*ThreadPerCamera*/);
 
     // TODO: enabled this for instructor tab, need implement special setting
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 

@@ -643,7 +643,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     addChild(ppu);
 #endif
-
+    
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
     

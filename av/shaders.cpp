@@ -155,6 +155,7 @@ namespace shaders
      uniform int             baseTextureUnit;                                                          \
      uniform sampler2DShadow shadowTexture0;                                                           \
      uniform int             shadowTextureUnit0;                                                       \
+     uniform sampler2DShadow shadowTextureRGB;                                                         \
      uniform mat4            shadowMatrix0;                                                            \
      uniform mat4            lightmap_matrix;                                                          \
 \n   uniform mat4            shadow0_matrix;                                                           \
@@ -1149,9 +1150,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 if(ambient.a > 0.35)
                     shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
 \n
-\n                // FIXME dummy code
-\n                // specular.a = 0; // it's not rainy day hallelujah
-\n
 \n                float rainy_value = 0.666 * specular.a;
 \n
 \n                // test for 
@@ -1331,10 +1329,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                // GET_SHADOW(f_in.viewpos, f_in);
                   float shadow = 1.0; 
                   if(ambient.a > 0.35)
-                      shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4; 
-\n
-\n                // FIXME dummy code
-\n                //specular.a = 0; // it's not rainy day hallelujah
+                  {
+                      // shadow = (min(PCF4(shadowTexture0, f_in.shadow_view,pcf_size),PCF(shadowTextureRGB, f_in.shadow_view * .125,pcf_size))) * ambient.a * 0.4;
+                      shadow = PCF4(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                  }
+\n                
 \n
 \n                float rainy_value = specular.a;
 \n
@@ -1640,7 +1639,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
                 viewworld_matrix = inverse(gl_ModelViewMatrix);
 
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -1697,7 +1696,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 // GET_SHADOW(f_in.viewpos, f_in);
                 float shadow = 1.0; 
                 if(ambient.a > 0.35)
-                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;  
+                {
+                    //shadow = (PCF(shadowTexture0, f_in.shadow_view,pcf_size) +  PCF(shadowTextureRGB, f_in.shadow_view * .125,pcf_size)  ) * ambient.a * 0.4;  
+                    shadow = PCF(shadowTexture0, f_in.shadow_view,pcf_size) * ambient.a * 0.4;
+                }
 
                 vec3 normal = normalize(f_in.normal);
                 float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.6, 0.4));
