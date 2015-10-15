@@ -747,7 +747,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
-#if 0
+#if 1
 	//
 	// Create weather
 	//
@@ -769,6 +769,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
     _lights = new Lights();
     _environmentNode->addChild(_lights.get());
+
 
    
 #if 0    
@@ -837,7 +838,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
 
-#if 0
+#if 1
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
@@ -1177,17 +1178,17 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         sp_fire.first->setName("fire");
         mt_.back()->addChild(sp_fire.first);
 
-        spark::spark_pair_t sp_smoke =  spark::create(spark::SMOKE,parent?mt_offset->asTransform():nullptr);
-        sp_smoke.first->setName("smoke");
-        mt_.back()->addChild(sp_smoke.first);
+        //spark::spark_pair_t sp_smoke =  spark::create(spark::SMOKE,parent?mt_offset->asTransform():nullptr);
+        //sp_smoke.first->setName("smoke");
+        //mt_.back()->addChild(sp_smoke.first);
         
 		//addChild(mt_.back());
 		_terrainRoot->asGroup()->addChild(mt_.back());
 
-		sp_smoke.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+		//sp_smoke.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
         sp_fire.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
 
-        _viewerPtr->addEventHandler(sp_smoke.second);
+        //_viewerPtr->addEventHandler(sp_smoke.second);
         _viewerPtr->addEventHandler(sp_fire.second);
 
         return mt_.back();

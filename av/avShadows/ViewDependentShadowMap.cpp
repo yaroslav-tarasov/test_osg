@@ -278,9 +278,6 @@ public:
 
     void apply(osg::Geode& node)
     {
-        force_log fl;
-        LOG_ODS_MSG( "void apply(osg::Geode& node)  " << node.getName() << "\n");
-
         if (isCulled(node)) return;
 
         // push the culling mode.
@@ -800,7 +797,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
         _shadowedScene->osg::Group::traverse(cv);
         return;
     }
-
+    
     ViewDependentData* vdd = getViewDependentData(&cv);
 
     if (!vdd)
@@ -1140,6 +1137,8 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
             // 4.3 traverse RTT camera
             //
+            
+
 
             cv.pushStateSet(_shadowCastingStateSet.get());
 
@@ -1269,6 +1268,7 @@ void ViewDependentShadowMap::createShaders()
     _shadowCastingStateSet = new osg::StateSet;
 
     ShadowSettings* settings = getShadowedScene()->getShadowSettings();
+    
 
     if (!settings->getDebugDraw())
     {
@@ -1287,6 +1287,8 @@ void ViewDependentShadowMap::createShaders()
         // we assume that if object has cull face attribute set to back
         // it will also set cull face mode ON so no need for override
         _shadowCastingStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::OFF );
+
+
     }
 
 #if 1
@@ -1299,7 +1301,6 @@ void ViewDependentShadowMap::createShaders()
     _polygonOffset = new osg::PolygonOffset(factor, units);
     _shadowCastingStateSet->setAttribute(_polygonOffset.get(), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
     _shadowCastingStateSet->setMode(GL_POLYGON_OFFSET_FILL, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-
 
     _uniforms.clear();
     osg::ref_ptr<osg::Uniform> baseTextureSampler = new osg::Uniform("baseTexture",(int)_baseTextureUnit);
@@ -1338,7 +1339,6 @@ void ViewDependentShadowMap::createShaders()
         _uniforms.push_back(_shadowMatrices.back().get());
     }
 
-    
     switch(settings->getShaderHint())
     {
         case(ShadowSettings::NO_SHADERS):

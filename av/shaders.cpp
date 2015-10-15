@@ -456,6 +456,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         void main (void)
         {
+
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag)   
             float shadow = 1.0; 
@@ -517,7 +518,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             vec3  day_result = mix(composed_lighting * dif_tex_col.rgb, cube_color, fresnel) + (1.0 - spec_compose_fraction) * pure_spec_color;
             float night_factor = step(ambient.a, 0.35);
             vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
-  
 
             aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
             
@@ -1007,7 +1007,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
                 viewworld_matrix = inverse(gl_ModelViewMatrix);
 
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;//ftransform();
+                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -1375,7 +1375,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 \n            void main (void)
 \n            {
-\n                // GET_SHADOW(f_in.viewpos, f_in);
+                     
+    
+                // GET_SHADOW(f_in.viewpos, f_in);
                   float shadow = 1.0; 
                   if(ambient.a > 0.35)
                   {
@@ -1444,7 +1446,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
 \n               }
 \n
-\n 
+\n               
                  aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
               }
             )

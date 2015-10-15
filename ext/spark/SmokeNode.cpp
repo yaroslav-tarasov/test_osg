@@ -44,10 +44,16 @@ void SmokeNode::setGravity (const osg::Vec3f& g)
 		if(sys && sys_num>0 && sys->getGroups().size()>0  )
 		{
 			SPK::System*  sys     = d->getParticleSystem( 0 ) ;
-			SPK::Group*   group   = sys->getGroup(0);
 
-			group->setGravity( SPK::Vector3D(g.x(), g.y(), g.z()) );
-			if(gravity_)
+			const size_t ng = sys->getNbGroups();
+
+            for(size_t i = 0; i < ng; ++i )
+            {   
+                SPK::Group*   group   = sys->getGroup(i);
+			    group->setGravity( SPK::Vector3D(g.x(), g.y(), g.z()) );
+            }
+
+            if(gravity_)
 				gravity_.reset();
 		}
 	}

@@ -25,6 +25,8 @@ extern SPK::SPK_ID createExplosion    ( const SparkDrawable::TextureIDMap&, int,
 extern SPK::SPK_ID createFire         ( const SparkDrawable::TextureIDMap&, int, int , float);
 extern SPK::SPK_ID createRain         ( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createTest         ( const SparkDrawable::TextureIDMap&, int, int );
+extern SPK::SPK_ID createFireSmoke    ( const SparkDrawable::TextureIDMap&, int, int , float);
+
 
 namespace {
 osg::AnimationPath* createAnimationPath( float radius, float time )
@@ -56,6 +58,12 @@ struct fire_creator
     {
         return ::createFire(textureIDMap,screenWidth,screenHeight,scale_coeff());
     }
+
+    static SPK::SPK_ID createFireSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
+    {
+        return ::createFireSmoke(textureIDMap,screenWidth,screenHeight,scale_coeff());
+    }
+
 private:
     static inline float scale_coeff(float sc = 1.0f)
     {
@@ -93,19 +101,21 @@ namespace spark
             spark->addParticleSystem();
             spark->setSortParticles( true );
             spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
-            spark->addImage( "flash", osgDB::readImageFile("data/flash.bmp"), GL_RGB );
-            spark->addImage( "spark1", osgDB::readImageFile("data/spark1.bmp"), GL_RGB );
-            spark->addImage( "spark2", osgDB::readImageFile("data/point.bmp"), GL_ALPHA );
-            spark->addImage( "wave", osgDB::readImageFile("data/wave.bmp"), GL_RGBA );
+            spark->addImage( "flash"    , osgDB::readImageFile("data/flash.bmp")    , GL_RGB   );
+            spark->addImage( "spark1"   , osgDB::readImageFile("data/spark1.bmp")   , GL_RGB   );
+            spark->addImage( "spark2"   , osgDB::readImageFile("data/point.bmp")    , GL_ALPHA );
+            spark->addImage( "wave"     , osgDB::readImageFile("data/wave.bmp")     , GL_RGBA  );
 			geode = new osg::Geode;
             geode->setName("fxExplosion");
             break;
         case FIRE:  // Fire
-            spark->setBaseSystemCreator( /*&createFire*/&fc.createFire );
+            spark->setBaseSystemCreator( &fc.createFireSmoke );
             spark->addParticleSystem();
-            spark->addImage( "fire", osgDB::readImageFile("data/fire2.bmp"), GL_ALPHA );
+            spark->addImage( "fire"     , osgDB::readImageFile("data/fire2.bmp")    , GL_ALPHA );
             spark->addImage( "explosion", osgDB::readImageFile("data/explosion.bmp"), GL_ALPHA );
-			geode = new osg::Geode;
+            spark->addImage( "smoke"    , osgDB::readImageFile("data/smoke_black.png"), GL_RGBA );
+            geode = new SmokeNode;
+            dynamic_cast<SmokeNode*>(geode.get())->setGravity(osg::Vec3f(1.0,1.0,0.05));
             geode->setName("fxFire");
             break;
         case RAIN:  // Rain
