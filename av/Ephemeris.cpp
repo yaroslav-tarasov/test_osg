@@ -6,6 +6,7 @@
 
 #include "av/FogLayer.h"
 #include "av/CloudLayer.h"
+#include "av/LightningLayer.h"
 #include "av/EnvRenderer.h"
 
 
@@ -21,6 +22,8 @@ namespace avSky
         data():Referenced() {}
         osg::ref_ptr<FogLayer>                     _fogLayer;
         osg::ref_ptr<CloudsLayer>                  _cloudsLayer;
+		osg::ref_ptr<LightningLayer>               _lightningLayer;
+		
         osg::ref_ptr<osgEphemeris::EphemerisModel> _ephemerisModel;
         osg::ref_ptr<EphemerisDataUpdateCallback>  _eCallback;
     };
@@ -138,6 +141,8 @@ namespace avSky
 
                 auto _fogLayer =   _ephem->_d->_fogLayer;
                 auto _skyClouds  = _ephem->_d->_cloudsLayer;
+				auto _skyLightning  = _ephem->_d->_lightningLayer;
+
                 auto ephem       = _ephem->_d->_ephemerisModel;
                 const osg::Vec3f _color = _fogLayer->getFogColor();    
                 
@@ -352,7 +357,11 @@ namespace avSky
         _d->_cloudsLayer = new avSky::CloudsLayer(_sceneRoot->asGroup());
         _d->_ephemerisModel->asGroup()->addChild(_d->_cloudsLayer.get());
         _d->_cloudsLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
-        
+		
+		_d->_lightningLayer = new avSky::LightningLayer(_sceneRoot->asGroup());
+		_d->_ephemerisModel->asGroup()->addChild(_d->_lightningLayer.get());
+		_d->_lightningLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );
 

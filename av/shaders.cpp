@@ -2067,6 +2067,90 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
     }  // ns clouds_mat
 
+
+	namespace lightning_mat 
+	{
+		const char* vs = {  
+			"#extension GL_ARB_gpu_shader5 : enable \n"
+
+			INCLUDE_COMPABILITY
+
+			STRINGIFY ( 
+			uniform mat4 MVP;
+			out block
+			{
+				vec3 pos;
+			} v_out;
+
+			void main()
+			{
+				v_out.pos = gl_Vertex.xyz;
+				mat4 im = inverse(gl_ModelViewMatrix * MVP);
+				vec3 vLocalSpaceCamPos = im[3].xyz;//gl_ModelViewMatrixInverse[3].xyz;
+
+				// gl_Position = gl_ModelViewProjectionMatrix   * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+				gl_Position =  gl_ModelViewProjectionMatrix * MVP * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+				gl_Position.z = 0.0;
+				//gl_Position.z = gl_Position.w;
+			}       
+			)
+		};
+
+
+		const char* fs = {
+
+			"#extension GL_ARB_gpu_shader5 : enable  \n"
+
+			STRINGIFY ( 
+
+			uniform sampler2D Lightning;
+
+			// uniforms for sundisc and sunrays
+			uniform vec3  frontColor;
+			uniform vec3  backColor;
+			uniform float density;
+
+
+			)
+
+			STRINGIFY ( 
+
+
+		    const float fOneOver2Pi = 20 * 0.5 / 3.141593;
+			const float fTwoOverPi = 2.0 / 3.141593;   
+
+			in block                                    
+			{                                           
+				vec3 pos;                               
+			} f_in;                                     
+
+			out vec4  aFragColor;
+
+			void main (void)                              
+			{
+				// get point direction
+				vec3 vPnt = normalize(f_in.pos);
+
+				// calculate texel coords based on polar angles
+				vec2 vTexCoord = vec2(fOneOver2Pi * atan(vPnt.y, vPnt.x) + 0.5, 1.0 - fTwoOverPi * acos(abs(vPnt.z)));
+
+				// get clouds color
+				vec4 cl_color = textureLod(Lightning, vTexCoord, 0.0);
+
+				// make fogging
+				aFragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
+
+			}
+			)
+
+		};   
+
+		SHADERS_GETTER
+
+	    AUTO_REG_NAME(lightning, shaders::lightning_mat::get_shader)
+
+	}  // ns lightning_mat
+
     namespace  light_mat
     {
 

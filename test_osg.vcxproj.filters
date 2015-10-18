@@ -721,5 +721,8 @@
     <ClCompile Include="av\avScene\ScreenTexture.cpp">
       <Filter>Source Files\av\scene</Filter>
     </ClCompile>
+    <ClCompile Include="av\LightningLayer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

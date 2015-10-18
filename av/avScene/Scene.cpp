@@ -838,7 +838,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
 
-#if 1
+#if 0
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;

@@ -190,6 +190,7 @@
     <ClCompile Include="av\FogLayer.cpp" />
     <ClCompile Include="av\Grass.cpp" />
     <ClCompile Include="av\Grass2.cpp" />
+    <ClCompile Include="av\LightningLayer.cpp" />
     <ClCompile Include="av\Object.cpp" />
     <ClCompile Include="av\PreRender.cpp" />
     <ClCompile Include="av\scn_parser.cpp" />
