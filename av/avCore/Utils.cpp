@@ -716,14 +716,18 @@ namespace utils
         return true;
     }
 
-    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+    uint16_t replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        uint16_t  counter=0;
         if(from.empty())
-            return;
+            return 0;
         size_t start_pos = 0;
         while((start_pos = str.find(from, start_pos)) != std::string::npos) {
             str.replace(start_pos, from.length(), to);
             start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+            counter++;
         }
+
+        return counter;
     }
 
     std::string format( const char * str )

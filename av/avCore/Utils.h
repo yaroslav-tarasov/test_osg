@@ -222,8 +222,8 @@ template<class T, class U> T safe_cast(U p)
 
 namespace utils
 {
-    bool replace(std::string& str, const std::string& from, const std::string& to);
-    void replaceAll(std::string& str, const std::string& from, const std::string& to);
+    bool        replace(std::string& str, const std::string& from, const std::string& to);
+    uint16_t    replaceAll(std::string& str, const std::string& from, const std::string& to);
     std::string format( const char * str );
     std::string format( std::string const & str );
 }

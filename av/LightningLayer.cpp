@@ -23,24 +23,24 @@ LightningLayer::LightningLayer(osg::Group * pScene)
     // geometry creation
     _createGeometry();
     loadTextures();
-   setCloudsDensity(1.0);
+   setDensity(1.0);
 }
 
 // set clouds 2 color scheme
-void LightningLayer::setCloudsColors( const osg::Vec3f & vFrontColor, const osg::Vec3f & vBackColor )
+void LightningLayer::setColors( const osg::Vec3f & vFrontColor, const osg::Vec3f & vBackColor )
 {
-    _cloudsColorFrontUniform->set(osg::Vec3f(vFrontColor));
-    _cloudsColorBackUniform->set(osg::Vec3f(vBackColor));
+    _colorFrontUniform->set(osg::Vec3f(vFrontColor));
+    _colorBackUniform->set(osg::Vec3f(vBackColor));
 }
 
 // set density
-bool LightningLayer::setCloudsDensity( float density )
+bool LightningLayer::setDensity( float density )
 {
 
    if (!cg::eq(_clDensity, density, 0.01f))
    {
        _clDensity = density;
-       _cloudsDensityUniform->set(_clDensity);
+       _densityUniform->set(_clDensity);
        return true;
    }
    return false;
@@ -63,19 +63,6 @@ void LightningLayer::setRotationSiderealTime( float rot_deg )
     _mvpUniform ->set(_clRotation);
 }
 
-// get overcast coef for color modulation
-float LightningLayer::getOvercastCoef() const
-{
-    static const std::array<float, clouds_types_num> type_impact = {
-        0.f,
-        0.4f,
-        0.2f,
-        0.8f
-    };
-
-    return type_impact[_clType] * _clDensity;
-}
-
 
 bool LightningLayer::loadTextures()
 {
@@ -93,9 +80,9 @@ bool LightningLayer::loadTextures()
     cloudsTex->setImage( osgDB::readImageFile("images/lightning/FlashImgBranch2.png"/*tex_names[1]*/,new osgDB::Options("")) );
     cloudsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
     cloudsTex->setMaxAnisotropy(16.0f);
-    cloudsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE );
-    cloudsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE );
-    cloudsTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE );
+    cloudsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER );
+    cloudsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER );
+    cloudsTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER );
 
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED;
     sset->setTextureAttributeAndModes( 1, cloudsTex.get(), value );
@@ -128,7 +115,7 @@ void LightningLayer::_buildStateSet()
     pBlendFunc->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
     sset->setAttributeAndModes(pBlendFunc, osg::StateAttribute::OVERRIDE | osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
     
-    osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
+    osg::BlendEquation* blendEquation = new osg::BlendEquation(osg::BlendEquation::RGBA_MAX/*FUNC_ADD*/);
     blendEquation->setDataVariance(osg::Object::DYNAMIC);
     sset->setAttributeAndModes(blendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
@@ -141,15 +128,15 @@ void LightningLayer::_buildStateSet()
     sset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
 //#endif
 
-    _cloudsColorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
-    _cloudsColorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));
-    _cloudsDensityUniform    = new osg::Uniform("density",    _clDensity);
+    _colorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
+    _colorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));
+    _densityUniform    = new osg::Uniform("density",    _clDensity);
     _mvpUniform              = new osg::Uniform("MVP",        _clRotation);
 
     sset->addUniform( new osg::Uniform("Lightning", 1) );
-    sset->addUniform(_cloudsColorFrontUniform.get());
-    sset->addUniform(_cloudsColorBackUniform.get());
-    sset->addUniform(_cloudsDensityUniform.get());
+    sset->addUniform(_colorFrontUniform.get());
+    sset->addUniform(_colorBackUniform.get());
+    sset->addUniform(_densityUniform.get());
     sset->addUniform(_mvpUniform.get());
 
 

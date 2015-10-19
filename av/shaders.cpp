@@ -2080,18 +2080,21 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 			out block
 			{
 				vec3 pos;
+                vec4 cos_time;
 			} v_out;
 
+            uniform float osg_FrameTime;
+            const float fCoeffTime = 5;
 			void main()
 			{
 				v_out.pos = gl_Vertex.xyz;
 				mat4 im = inverse(gl_ModelViewMatrix * MVP);
-				vec3 vLocalSpaceCamPos = im[3].xyz;//gl_ModelViewMatrixInverse[3].xyz;
+				vec3 vLocalSpaceCamPos = im[3].xyz;
 
-				// gl_Position = gl_ModelViewProjectionMatrix   * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+                v_out.cos_time = cos( vec4( osg_FrameTime,  osg_FrameTime + 0.02,  osg_FrameTime + 0.1, osg_FrameTime + 0.12 ) * fCoeffTime );
+
 				gl_Position =  gl_ModelViewProjectionMatrix * MVP * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
 				gl_Position.z = 0.0;
-				//gl_Position.z = gl_Position.w;
 			}       
 			)
 		};
@@ -2102,6 +2105,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 			"#extension GL_ARB_gpu_shader5 : enable  \n"
 
 			STRINGIFY ( 
+            
+
 
 			uniform sampler2D Lightning;
 
@@ -2116,12 +2121,14 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 			STRINGIFY ( 
 
 
-		    const float fOneOver2Pi = 20 * 0.5 / 3.141593;
-			const float fTwoOverPi = 2.0 / 3.141593;   
+		    const float fOneOver2Pi = 0.5 / 3.141593;
+			const float fTwoOverPi  = 2.0 / 3.141593;   
+            const float fCoeff      = 20.0; 
 
 			in block                                    
 			{                                           
 				vec3 pos;                               
+                vec4 cos_time;
 			} f_in;                                     
 
 			out vec4  aFragColor;
@@ -2131,14 +2138,24 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 				// get point direction
 				vec3 vPnt = normalize(f_in.pos);
 
+                float fOneOver2PiMulAtan = fOneOver2Pi * atan(vPnt.y, vPnt.x);
+
 				// calculate texel coords based on polar angles
-				vec2 vTexCoord = vec2(fOneOver2Pi * atan(vPnt.y, vPnt.x) + 0.5, 1.0 - fTwoOverPi * acos(abs(vPnt.z)));
+				vec2 vTexCoord = vec2(fCoeff * fOneOver2PiMulAtan + 0.5, 1.0 - fTwoOverPi * acos(abs(vPnt.z)));
 
 				// get clouds color
 				vec4 cl_color = textureLod(Lightning, vTexCoord, 0.0);
 
 				// make fogging
-				aFragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density); 
+				// aFragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density);
+                
+                //step(abs(fOneOver2PiMulAtan) + 0.5, 1.0 )
+                float a = mix(1.0, 0.0, abs(0.5 * fOneOver2PiMulAtan) + 0.5);
+                float b = vec4(cl_color.rgb * frontColor, cl_color.a * density);
+
+                aFragColor = vec4( a * ( step (0.98, f_in.cos_time[0] ) + step (0.98, f_in.cos_time[2] )) ) 
+                                 + b * ( step (0.90, f_in.cos_time[1] ) + step (0.90, f_in.cos_time[3] ));
+                
 
 			}
 			)

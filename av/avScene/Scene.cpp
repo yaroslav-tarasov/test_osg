@@ -796,7 +796,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _light_map = createLightMapRenderer(this);
     addChild( _light_map );
 
-#endif
+#endif                                               ++++++
 
     FIXME(140 shaders version needed);
 
@@ -809,6 +809,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     {
         osg::State *s=(*itr)->getState();
 #if GLSL_VERSION > 150
+FIXME(Чудеса с Ephemeris)
         s->setUseModelViewAndProjectionUniforms(true);
         s->setUseVertexAttributeAliasing(true);
 #endif 
@@ -838,7 +839,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
 
-#if 0
+#if 1
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;

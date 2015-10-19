@@ -360,7 +360,8 @@ namespace avSky
 		
 		_d->_lightningLayer = new avSky::LightningLayer(_sceneRoot->asGroup());
 		_d->_ephemerisModel->asGroup()->addChild(_d->_lightningLayer.get());
-		_d->_lightningLayer->setCloudsColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+		_d->_lightningLayer->setColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
+        _d->_lightningLayer->setRotationSiderealTime(270);
 
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );

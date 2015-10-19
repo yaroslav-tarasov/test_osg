@@ -1,7 +1,7 @@
 #pragma once
 
 //
-// Post-applied fog sky dome layer
+// Lightning for sky dome layer
 //
 namespace avSky
 {
@@ -17,17 +17,16 @@ public:
     LightningLayer(osg::Group * sceneRoot);
 
     // set clouds 2 color scheme
-    void setCloudsColors( const osg::Vec3f & vFrontColor, const osg::Vec3f & vBackColor );
+    void setColors( const osg::Vec3f & vFrontColor, const osg::Vec3f & vBackColor );
 
 	// set density
-    bool setCloudsDensity( float density );
+    bool setDensity( float density );
 
     // set rotation by sidereal time
     void setRotationSiderealTime( float rot_deg );
 
     // get overcast coefficient
-    float getOvercastCoef()  const;
-    float getCloudsDensity() const {return _clDensity;} 
+    float getDensity() const {return _clDensity;} 
 
 private:
 	bool loadTextures();
@@ -38,9 +37,9 @@ private:
     osg::Group * _pScenePtr;
 
     osg::ref_ptr<osg::Uniform> _mvpUniform;
-    osg::ref_ptr<osg::Uniform> _cloudsColorFrontUniform;
-    osg::ref_ptr<osg::Uniform> _cloudsColorBackUniform;
-    osg::ref_ptr<osg::Uniform> _cloudsDensityUniform;
+    osg::ref_ptr<osg::Uniform> _colorFrontUniform;
+    osg::ref_ptr<osg::Uniform> _colorBackUniform;
+    osg::ref_ptr<osg::Uniform> _densityUniform;
     
     // create geometry
     void _createGeometry();
@@ -51,7 +50,6 @@ private:
 
     // input
     float        _clDensity;
-    cloud_type   _clType;
     osg::Matrixf _clRotation;
 
 };

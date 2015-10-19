@@ -294,28 +294,54 @@ texturesHolder_base&   getTextureHolder()
 
 std::string osg_modification(uint16_t version, const std::string& prog)
 {
-      std::string source(prog);
+      std::string source ( prog );
       if(version>130)
       {   
-          const char* header = {
+          const char* header_mat = {
           "uniform mat4 osg_ModelViewMatrix; \n"
           "uniform mat4 osg_ModelViewProjectionMatrix; \n"
+          "uniform mat4 osg_ProjectionMatrix; \n"
           "uniform mat3 osg_NormalMatrix; \n"
-          "in vec4 osg_Vertex;\n"
-          "in vec3 osg_Normal;\n"
-          "in vec4 osg_Color;\n"
-          "in vec2 osg_MultiTexCoord0; \n"
-          "in vec2 osg_MultiTexCoord1; \n"
+          };
+          
+          const char* header_attr[] = {
+              "in vec4 osg_Vertex;\n",
+              "in vec3 osg_Normal;\n",
+              "in vec4 osg_Color;\n",
+              "in vec4 osg_SecondaryColor; \n",
+              "in vec4 osg_FogCoord; \n",
+              "in vec2 osg_MultiTexCoord0; \n",
+              "in vec2 osg_MultiTexCoord1; \n",
+              "in vec2 osg_MultiTexCoord2; \n",
+              "in vec2 osg_MultiTexCoord3; \n",
+              "in vec2 osg_MultiTexCoord4; \n",
+              "in vec2 osg_MultiTexCoord5; \n",
+              "in vec2 osg_MultiTexCoord6; \n",
+              "in vec2 osg_MultiTexCoord7; \n"
           };
 
-          source = header + source;
+          uint16_t cattr = 13; 
+          cattr = utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"))>0?1:0;
+          cattr = utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"))>0?2:cattr;
+          cattr = utils::replaceAll(source,std::string("gl_Color"), std::string("osg_Color"))>0?3:cattr;
+          cattr = utils::replaceAll(source,std::string("gl_SecondaryColor"), std::string("osg_SecondaryColor"))>0?4:cattr;
+          cattr = utils::replaceAll(source,std::string("gl_FogCoord"), std::string("osg_FogCoord"))>0?5:cattr;
+          cattr = utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"))>0?8:cattr;
 
-          utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"));
-          utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"));
           utils::replaceAll(source,std::string("gl_ModelViewMatrix"), std::string("osg_ModelViewMatrix"));
           utils::replaceAll(source,std::string("gl_ModelViewProjectionMatrix"), std::string("osg_ModelViewProjectionMatrix"));
-          utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"));
+          utils::replaceAll(source,std::string("gl_ProjectionMatrix"), std::string("osg_ProjectionMatrix"));
           
+          std::string header;
+          for (uint16_t i =0;i< cattr; ++i )
+          {
+              header += header_attr[i];
+          }
+
+
+          source = std::string(header_mat) + header
+                                           + source;
+
       }
 
       return source;
@@ -328,7 +354,8 @@ public:
     static inline const program_t& Create(std::string mat_name)
     {
         const uint16_t version = GLSL_VERSION;
-        
+        const std::string  comp_str = GLSL_VERSION>400? " compatibility":"";
+
         if(GetPrograms().find(mat_name)==GetPrograms().end())
         {
             program_t p;
@@ -337,7 +364,8 @@ public:
             
             if(GetShader(shaders::VS,mat_name))
             {
-                std::string prog = "#version " + boost::lexical_cast<string>(version)  + "\n " + osg_modification(version,utils::format(*GetShader(shaders::VS,mat_name)));
+                std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
+                    + osg_modification(version,utils::format(*GetShader(shaders::VS,mat_name)));
                 auto vs = new osg::Shader( osg::Shader::VERTEX, prog );
                 p.program->addShader( vs );
 
@@ -345,7 +373,8 @@ public:
 
             if(GetShader(shaders::FS,mat_name))
             {
-                std::string prog = "#version " + boost::lexical_cast<string>(version)  +"\n " + osg_modification(version,utils::format(*GetShader(shaders::FS,mat_name)));
+                std::string prog = "#version " + boost::lexical_cast<string>(version)  +  comp_str +"\n "
+                    + osg_modification(version,utils::format(*GetShader(shaders::FS,mat_name)));
                 auto fs = new osg::Shader(osg::Shader::FRAGMENT, prog);
                 p.program->addShader( fs );
                 
