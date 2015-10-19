@@ -2151,7 +2151,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 
                 //step(abs(fOneOver2PiMulAtan) + 0.5, 1.0 )
                 float a = mix(1.0, 0.0, abs(0.5 * fOneOver2PiMulAtan) + 0.5);
-                float b = vec4(cl_color.rgb * frontColor, cl_color.a * density);
+                vec4  b = vec4(cl_color.rgb * frontColor, cl_color.a * density);
 
                 aFragColor = vec4( a * ( step (0.98, f_in.cos_time[0] ) + step (0.98, f_in.cos_time[2] )) ) 
                                  + b * ( step (0.90, f_in.cos_time[1] ) + step (0.90, f_in.cos_time[3] ));
