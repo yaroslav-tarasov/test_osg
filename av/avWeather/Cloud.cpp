@@ -13,6 +13,7 @@
 
 #include "av/avWeather/Cloud.h"
 
+#define ATTRIB_FACTORS_LOCATION 6
 
 //
 // Module namespaces
@@ -68,8 +69,13 @@ Cloud::Cloud(size_t nID)
     pCurProgram->setParameter(GL_GEOMETRY_VERTICES_OUT_EXT, 4);
     pCurProgram->setParameter(GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
     pCurProgram->setParameter(GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
+
+    pCurProgram->addBindAttribLocation( "Factors", ATTRIB_FACTORS_LOCATION );
+
     // bind shader
     pCurStateSet->setAttribute(pCurProgram);
+    
+
 
     // uniforms
 
@@ -88,19 +94,6 @@ Cloud::Cloud(size_t nID)
     pCurStateSet->addUniform(m_uniformColorTop.get());
 
     // textures
-
-
-	//osg::Texture2D * pCloudTex = new osg::Texture2D(osgDB::readImageFile("CloudsAtlasGrey.dds",new osgDB::Options("dds_dxt1_rgba")));
-	//
-	//if (pCloudTex)
-	//{
-	//	pCloudTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE );
-	//	pCloudTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE );
-	//	pCloudTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE );
-
-	//	pCloudTex->setMaxAnisotropy(16.0f);
-	//	pCurStateSet->setTextureAttribute(0, pCloudTex);
-	//}
 
     // setup texture for point quads
     pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("CloudsAtlasGrey.dds", osg::Texture::CLAMP_TO_EDGE));
@@ -187,7 +180,7 @@ Cloud::Cloud(size_t nID)
 
     // set factors array
     static const size_t
-        idxSpeedFactorsBinding = 5;
+        idxSpeedFactorsBinding = ATTRIB_FACTORS_LOCATION;
     paFactors->setDataVariance(osg::Object::STATIC);
     setVertexAttribBinding(idxSpeedFactorsBinding, osg::Geometry::BIND_PER_VERTEX);
     setVertexAttribNormalize(idxSpeedFactorsBinding, GL_TRUE);
@@ -219,9 +212,10 @@ void Cloud::SetEllipsoid(float fRadX, float fRadY, float fRadZ, float fHeight)
         m_fHeight = fHeight;
 
         // particle mean size
-        const float fPartSize = 0.20f * osg::maximum(fRadX, fRadY);
+        const float fPartSize = 0.45f * osg::maximum(fRadX, fRadY);
         // increase height by size just to make clouds not intersect local fog so much
-        m_fHeightCorrected = m_fHeight + 0.8f * fPartSize;
+        m_fHeightCorrected = m_fHeight + 0.75f * fPartSize;
+        
 
         // reset uniforms
         m_uniformRadiiHeight->set(osg::Vec4f(m_fRadX, m_fRadY, m_fRadZ, m_fHeightCorrected));

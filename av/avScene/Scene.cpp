@@ -673,18 +673,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
     // Create ephemeris
     //                                                                       
-    _ephemerisNode = new avSky::Ephemeris( this
-                                          , _terrainNode.get()
-                                          ,[=](float illum){ if(_st!=0) _st->setNightMode(illum < 0.8);} //  FIXME magic night value    
-                                          ,[this](float fog_vr){
-                                            BOOST_FOREACH( auto g, this->_lamps)
-                                            {
-                                                 dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
-                                            }
-                                          }
-    
-    );  
-
+    _ephemerisNode = new avSky::Ephemeris( this , _terrainNode.get() );  
 
     //
     //  Get or create sunlight
@@ -747,6 +736,18 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
+    avCore::GetEnvironment()->setCallBacks(
+        [=](float illum){ if(_st!=0) _st->setNightMode(illum < 0.8);}  //  FIXME magic night value
+        ,[this](float fog_vr) {
+        BOOST_FOREACH( auto g, this->_lamps)
+        {
+            dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
+        }
+    }
+    );
+
+
+
 #if 1
 	//
 	// Create weather
@@ -772,13 +773,13 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 
    
-#if 0    
+#if 0   
     //
     // Create weather
     //
     _weatherNode =  new osg::Group;
     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;		
-    precipitationEffect->snow(0.0);
+    precipitationEffect->rain(1.0);//snow(0.0);
     precipitationEffect->setWind(osg::Vec3(0.2f,0.2f,0.2f));
 
     _weatherNode->addChild( precipitationEffect.get() );
@@ -843,12 +844,12 @@ FIXME(Чудеса с Ephemeris)
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
-	const double dLatitude = 0;
-	const double dLongitude = 0;
-	const float fHeading = 0;
-	const float fEllipseRadX = 1000;
-	const float fEllipseRadY = 1000;
-	const float fHeight = 50;
+	const double dLatitude = 2000;
+	const double dLongitude = 2000;
+	const float fHeading = 45;
+	const float fEllipseRadX = 10000;
+	const float fEllipseRadY = 10000;
+	const float fHeight = 1000;
 	const avWeather::PrecipitationType ptType = avWeather::PrecipitationRain;
 	const float fIntensity = 0.5;
 	const float fCentralPortion = 1;
@@ -868,7 +869,7 @@ FIXME(Чудеса с Ephemeris)
 osg::Group*  Scene::createTerrainRoot()
 {
     osg::Group* tr;
-//#undef TEST_SHADOWS_FROM_OSG
+// #undef TEST_SHADOWS_FROM_OSG
 #if defined(TEST_SHADOWS_FROM_OSG)
 
     const int fbo_tex_size = 1024*4;

@@ -6,6 +6,9 @@ namespace avCore
 class Environment
 {
 public:
+    
+    typedef std::function<void(float)>  OnIlluminationChangeF;
+    typedef std::function<void(float&)> OnVisibleRangeChangeF;
 
     struct WeatherParameters
     {
@@ -102,22 +105,28 @@ public:
     static void          Create();
     static void          Release();
 
-    inline const WeatherParameters &      GetWeatherParameters() const      { return m_WeatherParameters;      }
+    inline const WeatherParameters &      GetWeatherParameters()      const { return m_WeatherParameters;      }
     inline const IlluminationParameters & GetIlluminationParameters() const { return m_IlluminationParameters; }
-    inline const EnvironmentParameters &  GetEnvironmentParameters() const  { return m_EnvironmentParameters;  }
-    inline const TimeParameters &         GetTimeParameters() const         { return m_TimeParameters;         }
-
-
+    inline const EnvironmentParameters &  GetEnvironmentParameters()  const { return m_EnvironmentParameters;  }
+    inline const TimeParameters &         GetTimeParameters()         const { return m_TimeParameters;         }
+    
+    void setIllumination (float Illumination)              { m_IlluminationParameters.Illumination = Illumination; if(ic_) ic_(Illumination); }
+    void setVisibleRange (float VisibleRange)              { if(vrc_)  vrc_(VisibleRange); }
+    void setCallBacks    (const OnIlluminationChangeF& ic, const OnVisibleRangeChangeF& vrc) {ic_ = ic; vrc_=vrc; } 
 public:
 
     WeatherParameters      m_WeatherParameters;
-    IlluminationParameters m_IlluminationParameters;
     EnvironmentParameters  m_EnvironmentParameters;
     TimeParameters         m_TimeParameters;
+
+private:
+    IlluminationParameters m_IlluminationParameters;
+    OnIlluminationChangeF  ic_;
+    OnVisibleRangeChangeF  vrc_;
 
     static Environment * m_pInstance;
 };
 
-#define GetEnvironment() Environment::GetInstance()
+__forceinline Environment * GetEnvironment() {return Environment::GetInstance();}
 
 }

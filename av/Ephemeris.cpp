@@ -111,7 +111,7 @@ namespace avSky
              osg::Vec4 specular = cFogSpec*1.8;     // sls->getSpecular();
              
              ambient.w() = illumination;
-             specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                    // FIXME power of rain here
+             specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                    
 
             _ephem->_specularUniform->set(specular);
             _ephem->_ambientUniform->set(ambient);
@@ -298,12 +298,10 @@ namespace avSky
     };
 
         
-    Ephemeris::Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode,on_illum_change_f ic, on_visible_range_change_f vc)
+    Ephemeris::Ephemeris(osg::Group * sceneRoot,osg::Group * terrainNode)
         : _d          (new data)
         , _sceneRoot  (sceneRoot)
         , _terrainNode(terrainNode)
-        , _ic         (ic)
-        , _vc         (vc)
     {
         Initialize();    
         
@@ -314,7 +312,6 @@ namespace avSky
         _diffuseUniform = new osg::Uniform("diffuse", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
         pSceneSS->addUniform(_diffuseUniform.get());
 
-        // FIXME TODO specular.a wanna rain
         _specularUniform = new osg::Uniform("specular", osg::Vec4f(1.f, 1.f, 1.f, 0.f));
         pSceneSS->addUniform(_specularUniform.get());
         
@@ -335,7 +332,7 @@ namespace avSky
         double latitude = 43.4444;                                  // Adler, RF
         double longitude = 39.9469;
         
-        double radius = 10000;                                      // Default radius in case no files were loaded above
+        double radius = 20000;                                      // Default radius in case no files were loaded above
         
         setSummerTime();
 
@@ -348,7 +345,7 @@ namespace avSky
         // Optionally, uncomment this if you want to move the Skydome, Moon, Planets and StarField with the mouse
         _d->_ephemerisModel->setMoveWithEyePoint (false);
 
-        _d->_fogLayer = new FogLayer(_sceneRoot->asGroup(),_vc);
+        _d->_fogLayer = new FogLayer(_sceneRoot->asGroup());
         _d->_ephemerisModel->asGroup()->addChild(_d->_fogLayer.get());
         auto fogColor = osg::Vec3f(1.0,1.0,1.0);
         _d->_fogLayer->setFogParams(fogColor,0.1);    // (начинаем с 0.1 до максимум 1.0)
@@ -451,10 +448,8 @@ namespace avSky
 
     void Ephemeris::setIllumination(float illum)
     { 
-        if(_ic) 
-            _ic(illum);
         _illum = illum;
-        avCore::GetEnvironment()->m_IlluminationParameters.Illumination  = illum;   
+        avCore::GetEnvironment()->setIllumination(illum);   
     }
 
 

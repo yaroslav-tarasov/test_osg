@@ -100,7 +100,7 @@ LocalFogBank::LocalFogBank()
     m_ssReflectionSubstitute = new osg::StateSet();
     m_ssReflectionSubstitute->setNestRenderBins(false);
     m_ssReflectionSubstitute->setRenderBinDetails(RENDER_BIN_LOCAL_WEATHER, "DepthSortedBin");
-    m_ssReflectionSubstitute->addUniform(new osg::Uniform("DepthTextureSettings", osg::Vec2(0.0, -0.0001)));
+    m_ssReflectionSubstitute->addUniform(new osg::Uniform("DepthTextureSettings", osg::Vec2f(0.0, -0.0001)));
 
     //
     // Construct geometry

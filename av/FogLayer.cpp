@@ -51,12 +51,11 @@ static float convertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
 
 
 // constructor
-FogLayer::FogLayer(osg::Group * pScene,on_visible_range_change_f vc)
+FogLayer::FogLayer(osg::Group * pScene)
     : m_fRealVisDist    (30000.0f)
     , m_realExp2Density (0.f)
     , m_fogDensity      (0.f)
     , _vFogColor        (osg::Vec3f(1.0,1.0,1.0))
-    , _vc(vc)
 {
     // create fog uniform for the whole scene
     osg::StateSet * pSceneSS = pScene->getOrCreateStateSet();
@@ -84,8 +83,8 @@ void FogLayer::setFogParams( const osg::Vec3f & vFogColor, float fFogDensity )
     // for scene                
     m_realExp2Density = convertTraineeDensityToExp2SceneFog(fFogDensity, &m_fRealVisDist);
     
-    if (_vc && fRealVisDist != m_fRealVisDist)
-                  _vc(m_fRealVisDist);
+    if ( fRealVisDist != m_fRealVisDist )
+         avCore::GetEnvironment()->setVisibleRange(m_fRealVisDist);
 
     // save uniform
     _sceneFogUniform->set(osg::Vec4f(vFogColor, m_realExp2Density));

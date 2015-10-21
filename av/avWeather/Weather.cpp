@@ -117,7 +117,7 @@ Weather::Weather()
     pWeatherStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
 
     // add boolean uniform for precipitations discarding
-    m_uniformDepthDiscardingEnabled = new osg::Uniform("DepthDiscardEnabled", bool());
+    m_uniformDepthDiscardingEnabled = new osg::Uniform("DepthDiscardEnabled", bool(false));
     pWeatherStateSet->addUniform(m_uniformDepthDiscardingEnabled.get());
     // add matrix uniform for precipitations discarding
     m_uniformWorld2ShipDepthTex = new osg::Uniform("World2ShipDepthTex", osg::Matrixf());

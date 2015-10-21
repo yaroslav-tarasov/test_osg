@@ -13,13 +13,6 @@ namespace avSky
 	} ;
 }
 
-namespace avSky
-{
-
-    typedef std::function<void(float&)> on_visible_range_change_f;
-}
-
-
 #include "avCore/Global.h"
 
 enum masks_t{

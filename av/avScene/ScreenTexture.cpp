@@ -133,7 +133,9 @@ void ScreenTexture::drawImplementation( osg::RenderInfo & renderInfo ) const
             zfar = projection(3, 2) / (1.0 + projection(2, 2));
         //double left, right, bottom, top, znear, zfar;
         //state.getProjectionMatrix().getFrustum(left, right, bottom, top, znear, zfar);
-        _settings->set(osg::Vec2f((zfar - znear) / (zfar * znear), -1.0 / znear));
+        
+        const osg::Vec2f settings = osg::Vec2f((zfar - znear) / (zfar * znear), -1.0 / znear);
+        _settings->set(settings);
     }
 
 #if defined(_SCREEN_TEXTURE_DEBUG_)

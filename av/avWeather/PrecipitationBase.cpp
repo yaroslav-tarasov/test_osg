@@ -70,6 +70,8 @@ PrecipitationBase::PrecipitationBase(const char * szMaterialName, size_t nPartic
     setUseVertexBufferObjects(true);
     setDataVariance(osg::Object::STATIC);
     setComputeBoundingBoxCallback(new osg::Drawable::ComputeBoundingBoxCallback());
+    
+
 
     //
     // create state set
@@ -108,22 +110,8 @@ PrecipitationBase::PrecipitationBase(const char * szMaterialName, size_t nPartic
     // bind shader
     pCurStateSet->setAttribute(pCurProgram);
 
-    FIXME(GetDatabase());
-
-	osg::Texture2D * pPrecTex = new osg::Texture2D(osgDB::readImageFile(std::string(szMaterialName).append(".dds").c_str(),new osgDB::Options("dds_dxt1_rgba")));
-
-	if (pPrecTex)
-	{
-		pPrecTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE );
-		pPrecTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE );
-		pPrecTex->setWrap(  osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE );
-
-		pPrecTex->setMaxAnisotropy(16.0f);
-		pCurStateSet->setTextureAttribute(0, pPrecTex);
-	}
-
     // setup texture for point quads
-    //pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture(std::string(szMaterialName).append(".dds").c_str(), osg::Texture::CLAMP_TO_EDGE));
+    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture(std::string(szMaterialName).append(".dds").c_str(), osg::Texture::CLAMP_TO_EDGE));
 
     // box position
     m_uniformScrollLBN = new osg::Uniform("ScrollLBN", osg::Vec3f());
@@ -255,12 +243,12 @@ void PrecipitationBase::SetViewerPos(const osg::Vec3f & vPos, const osg::Vec3f &
 	FIXME(GetCoordinateSystem);
 
     // also save current LTP offset in weather plane
-    osg::Vec2d vLTPOffsetInWP; // = avCore::GetCoordinateSystem()->GetLTPOffsetInWeatherPlane();
+    osg::Vec2d vLTPOffsetInWP(0.0f, 0.0f); // = avCore::GetCoordinateSystem()->GetLTPOffsetInWeatherPlane();
     // make it to be boxed
     vLTPOffsetInWP.x() = fmod(vLTPOffsetInWP.x(), 2.0 * m_vBoxHalf.x());
     vLTPOffsetInWP.y() = fmod(vLTPOffsetInWP.y(), 2.0 * m_vBoxHalf.y());
     // and save it
-    m_uniformWP2LTPBoxOffset->set(vLTPOffsetInWP);
+    m_uniformWP2LTPBoxOffset->set(osg::Vec2f(vLTPOffsetInWP));
 }
 
 // set camera speed

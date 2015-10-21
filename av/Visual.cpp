@@ -128,7 +128,7 @@ void Visual::Initialize()
     Database::initDataPaths();
 	avCore::Database::Create();
 
-	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
+	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -185,12 +185,13 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
        //_viewerPtr->setUpViewInWindow(20, 20, 820, 620);
     }
     
-    float left, right, bottom, top;
+    //float left, right, bottom, top;
 
     //osg::ref_ptr<osgViewer::DepthPartitionSettings> dps = new osgViewer::DepthPartitionSettings(osgViewer::DepthPartitionSettings::FIXED_RANGE);
-    // dps->_zFar = 7000;
-    // dps->_zMid = 5000;
-    // dps->_zNear = 4;
+    //dps->_zFar = 30000.0;
+    //dps->_zNear = 4.0;
+    //dps->_zMid = (dps->_zFar - dps->_zNear) * .5;
+
 
     //_viewerPtr->setUpDepthPartition(dps);
     
@@ -210,9 +211,11 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     m_fTop    = +m_fHalfTanH * fVertAspect;
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(m_fLeft,m_fRight,m_fBottom,m_fTop,4.0,7000.0);
 #endif
+    
 
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
+    
 
 
     //_viewerPtr->setSceneData( this );

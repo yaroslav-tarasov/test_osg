@@ -347,12 +347,13 @@ void EphemerisModel::_calculateIllumFactors()
     osg::Vec4 specular = osg::Vec4(cFogSpec/**1.6*/,1.0f);     // sls->getSpecular();
 
     ambient.w() = _illumination ;
-    specular.w() = 0;                    // FIXME power of rain here
+    specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                 
 
     _specularUniform->set(specular);
     _ambientUniform->set(ambient);
     _diffuseUniform->set(diffuse);
-
+    
+    avCore::GetEnvironment()->setIllumination(_illumination);
 
 }
 
