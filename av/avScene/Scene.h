@@ -21,6 +21,12 @@
 //  Forwards
 //
 
+namespace app
+{
+    struct settings_t;
+    struct cloud_params_t;
+}
+
 namespace avSky
 {
     class Ephemeris;
@@ -102,10 +108,12 @@ namespace avScene {
         osg::Group*                                 createTerrainRoot();
         void                                        createObjects();
     private:
-        void                                        onZoneChanged( int zone );
-		void										onSetLights  ( bool on  );
-		void										onSetMap     ( float val );
-        bool                                        onEvent      ( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
+        void                                        onZoneChanged   ( int zone );
+		void										onSetLights     ( bool on  );
+        void                                        onSetShadows(const optional<bool>& on, const optional<bool>& on_part );
+		void										onSetMap        ( float val );
+        void                                        onSetCloudParams( const app::cloud_params_t& s );
+        bool                                        onEvent         ( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
         void                                        onExit();
     
 	private:
@@ -145,6 +153,8 @@ namespace avScene {
         utils::LoadNodeThread*                          _lnt;
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
 
+    private:
+       app::settings_t*                                 settings_;
 
     public:
         DECLARE_EVENT(object_loaded, (uint32_t)) ;

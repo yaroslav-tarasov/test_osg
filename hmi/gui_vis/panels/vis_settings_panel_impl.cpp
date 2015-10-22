@@ -51,7 +51,21 @@ std::string getEditboxText(const CEGUI::String& editbox)
 	return "";
 }
 
-vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
+bool setEditboxText(const CEGUI::String& editbox, const CEGUI::String& text)
+{
+    GUIContext& context = System::getSingleton().getDefaultGUIContext();
+    CEGUI::Window* root = context.getRootWindow();
+    // Check
+    if (root->isChild(editbox))
+    {
+        Editbox* button = static_cast<Editbox*>(root->getChild(editbox));
+        button->setText(text);
+        return true;
+    }
+    return false;
+}
+
+vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, const app::settings_t& s )
 {
     GUIContext& context = System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
@@ -181,7 +195,81 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones )
 
 	}));
 
- 
+    subscribeEvent("FrameWindow/LightParams/chkShadows", ToggleButton::EventSelectStateChanged,
+        Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
+    {
+
+        bool wrap = isCheckboxSelected("FrameWindow/LightParams/chkShadows");
+        set_shadows_signal_(wrap); 
+        return true;
+
+    }));
+    
+    subscribeEvent("FrameWindow/LightParams/chkShadowsParticles", ToggleButton::EventSelectStateChanged,
+        Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
+    {
+
+        bool wrap = isCheckboxSelected("FrameWindow/LightParams/chkShadowsParticles");
+        set_shadows_part_signal_(wrap); 
+        return true;
+
+    }));
+
+    setEditboxText("FrameWindow/LightParams/edtRadX"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_x));
+    setEditboxText("FrameWindow/LightParams/edtRadY"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_y));
+    setEditboxText("FrameWindow/LightParams/edtX"       , boost::str(boost::format("%.2f") % s.clouds[0].x));
+    setEditboxText("FrameWindow/LightParams/edtY"       , boost::str(boost::format("%.2f") % s.clouds[0].y));
+    setEditboxText("FrameWindow/LightParams/edtHeight"  , boost::str(boost::format("%.2f") % s.clouds[0].height));
+    setEditboxText("FrameWindow/LightParams/edtIntesity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
+
+    auto cloud_settings_callback =
+    [=](const CEGUI::EventArgs& args)->bool 
+    {
+        app::cloud_params_t s;
+
+        std::string edtRadX = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtRadX"));
+        s.radius_x = boost::lexical_cast<float>(edtRadX.empty()?"0":edtRadX);
+
+        std::string edtRadY = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtRadY"));
+        s.radius_y = boost::lexical_cast<float>(edtRadY.empty()?"0":edtRadY);
+
+        std::string edtX = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtX"));
+        s.x = boost::lexical_cast<float>(edtX.empty()?"0":edtX);
+
+        std::string edtY = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtY"));
+        s.y = boost::lexical_cast<float>(edtY.empty()?"0":edtY);
+
+        std::string edtHeight = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtHeight"));
+        s.height = boost::lexical_cast<float>(edtHeight.empty()?"0":edtHeight);
+
+        std::string edtIntesity = boost::trim_copy(getEditboxText("FrameWindow/LightParams/edtIntesity"));
+        s.intensity = boost::lexical_cast<float>(edtIntesity.empty()?"0":edtIntesity);
+
+        s.p_type   = 1;
+
+        set_cloud_param_signal_(s); 
+        return true;
+
+    };
+
+    subscribeEvent("FrameWindow/LightParams/edtRadX", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback));
+
+    subscribeEvent("FrameWindow/LightParams/edtRadY", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback)); 
+
+    subscribeEvent("FrameWindow/LightParams/edtX", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback)); 
+
+    subscribeEvent("FrameWindow/LightParams/edtY", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback)); 
+    
+    subscribeEvent("FrameWindow/LightParams/edtHeight", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback)); 
+
+    subscribeEvent("FrameWindow/LightParams/edtIntesity", CEGUI::Editbox::EventTextAccepted,
+        Event::Subscriber(cloud_settings_callback)); 
+
 	//CEGUI::Menubar* menuBar = dynamic_cast<CEGUI::Menubar*>(CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Menubar", main_menu_name));
 	//if(menuBar)
 	//{     
@@ -274,8 +362,8 @@ void vis_settings_panel_impl::init_menu_bar(CEGUI::Menubar* menuBar)
 
 namespace app
 {
-    vis_settings_panel_ptr create_vis_settings_panel(const app::zones_t &zones )
+    vis_settings_panel_ptr create_vis_settings_panel(const app::zones_t &zones, const app::settings_t& s )
     {
-        return boost::make_shared<vis_settings_panel_impl>(  zones );
+        return boost::make_shared<vis_settings_panel_impl>(  zones, s );
     }
 }

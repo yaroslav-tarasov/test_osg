@@ -8,7 +8,7 @@ class vis_settings_panel_impl
 {
     
 public:
-    vis_settings_panel_impl (  const app::zones_t &zones );
+    vis_settings_panel_impl (  const app::zones_t &zones , const app::settings_t& s);
     ~vis_settings_panel_impl();
 
     void set_visible(bool visible) override;

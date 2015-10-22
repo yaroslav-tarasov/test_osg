@@ -556,7 +556,19 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
 
     _pickHandler = new PickHandler();
+    settings_ = new  app::settings_t;
     
+    settings_->shadow           = true;
+    settings_->shadow_for_smoke = true;
+
+    settings_->clouds[0].radius_x = 1000.0f;
+    settings_->clouds[0].radius_y = 1000.0f;
+    settings_->clouds[0].x = 1000.0f;
+    settings_->clouds[0].y = 1000.0f;
+    settings_->clouds[0].height = 100.0f;
+    settings_->clouds[0].p_type = avWeather::PrecipitationRain;
+    settings_->clouds[0].intensity = 0.5f;
+
     if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
         {
@@ -578,11 +590,15 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 				this->_mw->set_visible(false);
 
-				this->_vis_settings_panel = app::create_vis_settings_panel( zones_ );
-                this->_vis_settings_panel->subscribe_zone_changed(boost::bind(&Scene::onZoneChanged,this,_1));
-                this->_vis_settings_panel->subscribe_exit_app    (boost::bind(&Scene::onExit,this));
-				this->_vis_settings_panel->subscribe_set_lights(boost::bind(&Scene::onSetLights,this,_1));
-				this->_vis_settings_panel->subscribe_set_map(boost::bind(&Scene::onSetMap,this,_1));
+				this->_vis_settings_panel = app::create_vis_settings_panel( zones_, *this->settings_ );
+
+                this->_vis_settings_panel->subscribe_zone_changed     (boost::bind(&Scene::onZoneChanged,this,_1));
+                this->_vis_settings_panel->subscribe_exit_app         (boost::bind(&Scene::onExit,this));
+				this->_vis_settings_panel->subscribe_set_lights       (boost::bind(&Scene::onSetLights,this,_1));
+                this->_vis_settings_panel->subscribe_set_shadows      (boost::bind(&Scene::onSetShadows,this,_1, boost::none));
+                this->_vis_settings_panel->subscribe_set_shadows_part (boost::bind(&Scene::onSetShadows,this,boost::none,_1));
+				this->_vis_settings_panel->subscribe_set_map          (boost::bind(&Scene::onSetMap,this,_1));
+                this->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
                 this->_vis_settings_panel->set_light(true);
             }
         } )
@@ -844,14 +860,14 @@ FIXME(Чудеса с Ephemeris)
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
-	const double dLatitude = 2000;
-	const double dLongitude = 2000;
-	const float fHeading = 45;
-	const float fEllipseRadX = 10000;
-	const float fEllipseRadY = 10000;
-	const float fHeight = 1000;
-	const avWeather::PrecipitationType ptType = avWeather::PrecipitationRain;
-	const float fIntensity = 0.5;
+	const double dLatitude   = settings_->clouds[0].x;
+	const double dLongitude  = settings_->clouds[0].y;
+	const float fHeading     = 45;
+	const float fEllipseRadX = settings_->clouds[0].radius_x;
+	const float fEllipseRadY = settings_->clouds[0].radius_y;
+	const float fHeight      = settings_->clouds[0].height;
+	const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
+	const float fIntensity   = settings_->clouds[0].intensity;
 	const float fCentralPortion = 1;
 
 	pWeatherNode->UpdateLocalWeatherBank(nID, 
@@ -859,7 +875,7 @@ FIXME(Чудеса с Ephemeris)
 		fEllipseRadX, fEllipseRadY, fHeight, 
 		ptType, fIntensity, fCentralPortion);
 
-    avCore::GetEnvironment()->m_WeatherParameters.RainDensity = fIntensity;
+    // avCore::GetEnvironment()->m_WeatherParameters.RainDensity = fIntensity;
 #endif
 
     return true;
@@ -1409,12 +1425,31 @@ void   Scene::onSetMap(float val)
 	_terrainNode->setGrassMapFactor(val);
 }
 
+void   Scene::onSetCloudParams(const app::cloud_params_t& s)
+{
+    avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
+
+    pWeatherNode->UpdateLocalWeatherBank(666, 
+        s.x, s.y, /*fHeading*/0, 
+        s.radius_x, s.radius_y, s.height, 
+        /*ptType*/avWeather::PrecipitationRain , s.intensity, /*fCentralPortion*/1.0);
+}
+
+
 void   Scene::onSetLights(bool on)
 {
 	if (_lights.valid())
     {
         _lights->setNodeMask(on?0xffffffff:0);
         LightManager::GetInstance()->setNodeMask(on?0xffffffff:0);
+    }
+}
+
+void   Scene::onSetShadows(const optional<bool>& on, const optional<bool>& on_part )
+{
+    if (on != boost::none)
+    {
+       _st->setNightMode(true);
     }
 }
 

@@ -235,15 +235,14 @@ namespace avSky
 
                         osgEphemeris::EphemerisData* data = ephem->getEphemerisData();
 
-                        data->turbidity += 1 ;
-
+                       data->turbidity += 1 ;
+                        
                         return true;
                     }
                     else
                     if (ea.getKey() == osgGA::GUIEventAdapter::KEY_O)
                     {
                         osgEphemeris::EphemerisData* data = ephem->getEphemerisData();
-                        // Increment by one minute
                         data->turbidity -= 1 ;
 
                         return true;
