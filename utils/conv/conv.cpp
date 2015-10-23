@@ -831,7 +831,13 @@ int main( int argc, char **argv )
             optimizer.setPermissibleOptimizationsForObject(*it,0);
         }
 
-        optimizer.optimize(root.get());
+        optimizer.optimize(root.get(), 
+            osgUtil::Optimizer::FLATTEN_STATIC_TRANSFORMS |
+            osgUtil::Optimizer::REMOVE_REDUNDANT_NODES |
+            osgUtil::Optimizer::SHARE_DUPLICATE_STATE |
+            osgUtil::Optimizer::MERGE_GEOMETRY |
+            osgUtil::Optimizer::MERGE_GEODES |
+            osgUtil::Optimizer::STATIC_OBJECT_DETECTION );
 
         boost::filesystem::path pathFileOut(fileNameOut); 
         std::string base_file_name = pathFileOut.parent_path().string() + "/" + pathFileOut.stem().string();

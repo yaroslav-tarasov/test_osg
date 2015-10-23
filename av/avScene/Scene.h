@@ -112,6 +112,7 @@ namespace avScene {
 		void										onSetLights     ( bool on  );
         void                                        onSetShadows(const optional<bool>& on, const optional<bool>& on_part );
 		void										onSetMap        ( float val );
+        void										onSetGlobalIntensity ( float val );
         void                                        onSetCloudParams( const app::cloud_params_t& s );
         bool                                        onEvent         ( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
         void                                        onExit();

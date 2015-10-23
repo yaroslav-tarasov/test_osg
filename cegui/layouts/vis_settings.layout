@@ -2,87 +2,107 @@
 
 <GUILayout version="4" >
     <Window type="TaharezLook/FrameWindow" name="FrameWindow" >
-        <Property name="Area" value="{{0,52},{0,184},{0.3,142},{0.3,338}}" />
+        <Property name="Area" value="{{0,52},{0,184},{0.3,88},{0.3,557}}" />
         <Property name="Text" value="Параметры" />
-        <Window type="TaharezLook/GroupBox" name="LightParams" >
-            <Property name="Area" value="{{0,14},{0,14},{0.3,447},{0.3,264}}" />
+        <Window type="TaharezLook/GroupBox" name="LWeather" >
+            <Property name="Area" value="{{0,35},{0,219},{0.3,382},{0.3,425}}" />
+            <Property name="Text" value="Local Weather" />
             <Property name="MaxSize" value="{{1,0},{1,0}}" />
-            <Window type="TaharezLook/Checkbox" name="chkLights" >
-                <Property name="Area" value="{{0,26},{0,19},{0,154},{0,51}}" />
-                <Property name="Text" value="Огни" />
-            </Window>
             <Window type="TaharezLook/Label" name="Label" >
-                <Property name="Area" value="{{0,18},{0,304},{0,146},{0,336}}" />
+                <Property name="Area" value="{{0,28},{0,322},{0,156},{0,354}}" />
                 <Property name="Text" value="Grass map" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Editbox" name="edtGrassMap" >
-                <Property name="Area" value="{{0,174},{0,302},{0,302},{0,338}}" />
+                <Property name="Area" value="{{0,179},{0,320},{0,307},{0,356}}" />
                 <Property name="TextFormatting" value="RightAligned" />
                 <Property name="AutoRenderingSurface" value="true" />
             </Window>
             <Window type="TaharezLook/Button" name="btnApply" >
-                <Property name="Area" value="{{0,330},{0,303},{0,451},{0,335}}" />
+                <Property name="Area" value="{{0,336},{0,323},{0,457},{0,355}}" />
                 <Property name="Text" value="Apply" />
             </Window>
-            <Window type="TaharezLook/Checkbox" name="chkShadows" >
-                <Property name="Area" value="{{0,25},{0,78},{0,153},{0,110}}" />
-                <Property name="Text" value="Тени" />
-            </Window>
-            <Window type="TaharezLook/Checkbox" name="chkShadowsParticles" >
-                <Property name="Area" value="{{0,23},{0,129},{0,160},{0,161}}" />
-                <Property name="Text" value="Тени (дым)" />
-            </Window>
-            <Window type="TaharezLook/Checkbox" name="chkNoName" >
-                <Property name="Area" value="{{0,22},{0,185},{0,150},{0,217}}" />
-            </Window>
             <Window type="TaharezLook/Editbox" name="edtX" >
-                <Property name="Area" value="{{0,389},{0,6},{0,517},{0,38}}" />
+                <Property name="Area" value="{{0,180},{0,24},{0,308},{0,56}}" />
             </Window>
             <Window type="TaharezLook/Editbox" name="edtY" >
-                <Property name="Area" value="{{0,388},{0,52},{0,516},{0,84}}" />
+                <Property name="Area" value="{{0,179},{0,70},{0,307},{0,102}}" />
             </Window>
             <Window type="TaharezLook/Editbox" name="edtRadX" >
-                <Property name="Area" value="{{0,389},{0,97},{0,517},{0,129}}" />
+                <Property name="Area" value="{{0,180},{0,115},{0,308},{0,147}}" />
             </Window>
             <Window type="TaharezLook/Editbox" name="edtRadY" >
-                <Property name="Area" value="{{0,389},{0,143},{0,517},{0,175}}" />
+                <Property name="Area" value="{{0,180},{0,161},{0,308},{0,193}}" />
             </Window>
             <Window type="TaharezLook/Editbox" name="edtHeight" >
-                <Property name="Area" value="{{0,390},{0,190},{0,518},{0,222}}" />
+                <Property name="Area" value="{{0,181},{0,208},{0,309},{0,240}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label2" >
-                <Property name="Area" value="{{0,236},{0,6},{0,364},{0,38}}" />
+                <Property name="Area" value="{{0,25},{0,24},{0,153},{0,56}}" />
                 <Property name="Text" value="x" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label3" >
-                <Property name="Area" value="{{0,237},{0,53},{0,365},{0,85}}" />
+                <Property name="Area" value="{{0,25},{0,69},{0,153},{0,101}}" />
                 <Property name="Text" value="y" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label4" >
-                <Property name="Area" value="{{0,236},{0,97},{0,364},{0,129}}" />
+                <Property name="Area" value="{{0,26},{0,114},{0,154},{0,146}}" />
                 <Property name="Text" value="radius x" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label5" >
-                <Property name="Area" value="{{0,236},{0,145},{0,364},{0,177}}" />
+                <Property name="Area" value="{{0,27},{0,162},{0,155},{0,194}}" />
                 <Property name="Text" value="radius y" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label6" >
-                <Property name="Area" value="{{0,237},{0,191},{0,365},{0,223}}" />
+                <Property name="Area" value="{{0,27},{0,208},{0,155},{0,240}}" />
                 <Property name="Text" value="height" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
             <Window type="TaharezLook/Label" name="Label7" >
-                <Property name="Area" value="{{0,237},{0,239},{0,365},{0,271}}" />
-                <Property name="Text" value="intesity" />
+                <Property name="Area" value="{{0,28},{0,253},{0,156},{0,285}}" />
+                <Property name="Text" value="intensity" />
                 <Property name="MaxSize" value="{{1,0},{1,0}}" />
             </Window>
-            <Window type="TaharezLook/Editbox" name="edtIntesity" >
-                <Property name="Area" value="{{0,390},{0,237},{0,518},{0,269}}" />
+            <Window type="TaharezLook/Editbox" name="edtIntensity" >
+                <Property name="Area" value="{{0,181},{0,253},{0,309},{0,285}}" />
+            </Window>
+            <Window type="TaharezLook/GroupBox" name="GroupBox" >
+                <Property name="Area" value="{{0,23},{0,292},{0.3,309},{0.3,194}}" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+                <Property name="DragDropTarget" value="false" />
+            </Window>
+        </Window>
+        <Window type="TaharezLook/GroupBox" name="Settings" >
+            <Property name="Area" value="{{0,41},{0,-2},{0.3,45},{0.3,-5}}" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="TaharezLook/Checkbox" name="chkLights" >
+                <Property name="Area" value="{{0,18},{0,8},{0,146},{0,40}}" />
+                <Property name="Text" value="Огни" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="chkShadows" >
+                <Property name="Area" value="{{0,18},{0,64},{0,146},{0,96}}" />
+                <Property name="Text" value="Тени" />
+            </Window>
+            <Window type="TaharezLook/Checkbox" name="chkShadowsParticles" >
+                <Property name="Area" value="{{0,15},{0,116},{0,152},{0,148}}" />
+                <Property name="Text" value="Тени (дым)" />
+            </Window>
+        </Window>
+        <Window type="TaharezLook/GroupBox" name="GWeather" >
+            <Property name="Area" value="{{0,240},{0,-2},{0.3,382},{0.3,-3}}" />
+            <Property name="Text" value="Global Weather" />
+            <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            <Window type="TaharezLook/Label" name="Label" >
+                <Property name="Area" value="{{0,14},{0,20},{0,142},{0,52}}" />
+                <Property name="Text" value="intensity" />
+                <Property name="MaxSize" value="{{1,0},{1,0}}" />
+            </Window>
+            <Window type="TaharezLook/Editbox" name="edtIntensity" >
+                <Property name="Area" value="{{0,163},{0,19},{0,291},{0,51}}" />
             </Window>
         </Window>
     </Window>

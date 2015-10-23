@@ -36,6 +36,8 @@ ShadowTechnique::ShadowTechnique()
     : _shadowedScene(0)
     , _dirty(true)
     , _nightMode(false)
+    , _enableShadows(true)
+    , _enableParticleShadows(true)
 {
 }
 

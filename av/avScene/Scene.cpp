@@ -568,6 +568,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     settings_->clouds[0].height = 100.0f;
     settings_->clouds[0].p_type = avWeather::PrecipitationRain;
     settings_->clouds[0].intensity = 0.5f;
+    settings_->intensity = 0.0f;
 
     if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
@@ -599,6 +600,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
                 this->_vis_settings_panel->subscribe_set_shadows_part (boost::bind(&Scene::onSetShadows,this,boost::none,_1));
 				this->_vis_settings_panel->subscribe_set_map          (boost::bind(&Scene::onSetMap,this,_1));
                 this->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
+                this->_vis_settings_panel->subscribe_set_global_intensity       (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
                 this->_vis_settings_panel->set_light(true);
             }
         } )
@@ -875,7 +877,6 @@ FIXME(Чудеса с Ephemeris)
 		fEllipseRadX, fEllipseRadY, fHeight, 
 		ptType, fIntensity, fCentralPortion);
 
-    // avCore::GetEnvironment()->m_WeatherParameters.RainDensity = fIntensity;
 #endif
 
     return true;
@@ -902,10 +903,10 @@ osg::Group*  Scene::createTerrainRoot()
     settings->setMinimumShadowMapNearFarRatio(0.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
-    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
+    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
-    settings->setMaximumShadowMapDistance(1500/*150*/);
+    settings->setMaximumShadowMapDistance(1500);
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 	//settings->setCastsShadowTraversalMask(cCastsShadowTraversalMask);
 	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
@@ -1425,6 +1426,11 @@ void   Scene::onSetMap(float val)
 	_terrainNode->setGrassMapFactor(val);
 }
 
+void   Scene::onSetGlobalIntensity(float val)
+{
+    avCore::GetEnvironment()->m_WeatherParameters.RainDensity = val;
+}
+
 void   Scene::onSetCloudParams(const app::cloud_params_t& s)
 {
     avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
@@ -1449,8 +1455,14 @@ void   Scene::onSetShadows(const optional<bool>& on, const optional<bool>& on_pa
 {
     if (on != boost::none)
     {
-       _st->setNightMode(true);
+       _st->enableShadows(*on);
     }
+
+    if (on_part != boost::none)
+    {
+        _st->enableParticleShadows(*on_part);
+    }
+
 }
 
 void   Scene::onZoneChanged(int zone)

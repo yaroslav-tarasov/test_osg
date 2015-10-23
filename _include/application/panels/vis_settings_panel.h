@@ -28,6 +28,7 @@ struct settings_t
     bool        shadow;
     bool        shadow_for_smoke;
     std::array<cloud_params_t,2> clouds; 
+    float       intensity;
 };
 
 struct vis_settings_panel
@@ -46,7 +47,7 @@ struct vis_settings_panel
     DECLARE_EVENT(set_shadows_part, (bool) );
 	DECLARE_EVENT(set_map	      , (float) );
     DECLARE_EVENT(set_cloud_param , (cloud_params_t) );
-
+    DECLARE_EVENT(set_global_intensity , (float) );
 };
 
 /*BASAPPLIC_API*/ vis_settings_panel_ptr create_vis_settings_panel( const zones_t &zones, const app::settings_t& s);

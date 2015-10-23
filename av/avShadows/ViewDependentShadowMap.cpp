@@ -789,7 +789,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 {
     OSG_INFO<<std::endl<<std::endl<<"ViewDependentShadowMap::cull(osg::CullVisitor&"<<&cv<<")"<<std::endl;
 
-    if (!_shadowCastingStateSet || _nightMode)
+    if (!_shadowCastingStateSet || _nightMode || !_enableShadows)
     {
         if(!_nightMode )
             OSG_INFO<<"Warning, init() has not yet been called so ShadowCastingStateSet has not been setup yet, unable to create shadows."<<std::endl;
@@ -1033,12 +1033,14 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             camera->setViewMatrix(viewMatrix);
 
  #ifdef EXPERIMENTAL_RGB_CAM 
+            
             osg::ref_ptr<osg::Camera> cameraRGB = sd->_cameraRGB;
+            if(_enableParticleShadows)
+            {
+                cameraRGB->setProjectionMatrix(projectionMatrix);
+                cameraRGB->setViewMatrix(viewMatrix);
+            }
 
-            cameraRGB->setProjectionMatrix(projectionMatrix);
-            cameraRGB->setViewMatrix(viewMatrix);
-            //cameraRGB->getViewport()->x() = pos_x;
-            //pos_x += cameraRGB->getViewport()->width() + 40;
 #endif
 
             if (settings->getDebugDraw())
@@ -1118,10 +1120,13 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                     osg::Matrixd::scale(osg::Vec3d(1.0,2.0/range_r,1.0)));
 
  #ifdef EXPERIMENTAL_RGB_CAM 
+                if(_enableParticleShadows)
+                {
                 cameraRGB->setProjectionMatrix(
                     cameraRGB->getProjectionMatrix() *
                     osg::Matrixd::translate(osg::Vec3d(0.0,-mid_r,0.0)) *
                     osg::Matrixd::scale(osg::Vec3d(1.0,2.0/range_r,1.0)));
+                }
 #endif
 
             }
@@ -1130,9 +1135,12 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             osg::ref_ptr<VDSMCameraCullCallback> vdsmCallback = new VDSMCameraCullCallback(this, local_polytope);
             camera->setCullCallback(vdsmCallback.get());
 
-#ifdef EXPERIMENTAL_RGB_CAM             
+#ifdef EXPERIMENTAL_RGB_CAM   
             osg::ref_ptr<VDSMCameraCullCallback> vdsmCallbackRGB = new VDSMCameraCullCallback(this, local_polytope);
+            if(_enableParticleShadows)
+            {
             cameraRGB->setCullCallback(vdsmCallbackRGB.get());
+            }
 #endif
 
             // 4.3 traverse RTT camera
@@ -1147,7 +1155,10 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             cv.popStateSet();
 
 #ifdef EXPERIMENTAL_RGB_CAM
+            if(_enableParticleShadows)
+            {
 			cullShadowCastingScene(&cv, cameraRGB.get());
+            }
 #endif
 
             if (!orthographicViewFrustum && settings->getShadowMapProjectionHint()==ShadowSettings::PERSPECTIVE_SHADOW_MAP)
@@ -1159,7 +1170,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                 }
             }
 
-#ifdef EXPERIMENTAL_RGB_CAM            
+#ifdef EXPERIMENTAL_RGB_CAM   
+            if(_enableParticleShadows)
+            {
             if (!orthographicViewFrustum && settings->getShadowMapProjectionHint()==ShadowSettings::PERSPECTIVE_SHADOW_MAP)
             {
                 adjustPerspectiveShadowMapCameraSettings(vdsmCallbackRGB->getRenderStage(), frustum, pl, cameraRGB.get());
@@ -1167,6 +1180,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                 {
                     vdsmCallbackRGB->getProjectionMatrix()->set(cameraRGB->getProjectionMatrix());
                 }
+            }
             }
 #endif
             // 4.4 compute main scene graph TexGen + uniform settings + setup state
@@ -1329,6 +1343,7 @@ void ViewDependentShadowMap::createShaders()
 #ifdef EXPERIMENTAL_RGB_CAM 
     osg::ref_ptr<osg::Uniform> shadowTextureSamplerRGB = new osg::Uniform("shadowTextureRGB",(int)(settings->getBaseShadowTextureUnit()+RGB_TEXTURE_NUM));
     _uniforms.push_back(shadowTextureSamplerRGB.get());
+    
 #endif
 
     for(int st_i =0;st_i<4;++st_i)

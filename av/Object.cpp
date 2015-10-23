@@ -287,7 +287,7 @@ osg::Node* createObject(std::string name, bool fclone)
             pat->setPosition(osg::Vec3(0.,airplane?dy:0.f,0.)); // FIXME Дурацкое смещение и не понятно чего с ним делать
 
         }
-#if 1        
+        
         MaterialVisitor::namesList nl;
         nl.push_back("building");
         nl.push_back("default");
@@ -297,7 +297,7 @@ osg::Node* createObject(std::string name, bool fclone)
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,mat::reader::read(mat_file_name));
         pat->accept(mv);
 
-#endif
+
 
         pat->setName("pat");
         

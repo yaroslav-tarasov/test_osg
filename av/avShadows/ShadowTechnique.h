@@ -49,7 +49,9 @@ class /*OSGSHADOW_EXPORT*/ ShadowTechnique : public osg::Object
         virtual void dirty() { _dirty = true; }
                 
         void setNightMode(bool nightMode){ _nightMode = nightMode;}
-
+        void enableShadows(bool value)   { _enableShadows = value;}
+        void enableParticleShadows(bool value)   { _enableParticleShadows = value;}
+        
     protected :
 
         class /*OSGSHADOW_EXPORT*/ CameraCullCallback : public osg::NodeCallback
@@ -74,6 +76,8 @@ class /*OSGSHADOW_EXPORT*/ ShadowTechnique : public osg::Object
         ShadowedScene*  _shadowedScene;
         bool            _dirty;
         bool            _nightMode;
+        bool            _enableShadows;
+        bool            _enableParticleShadows;
 };
 
 }
