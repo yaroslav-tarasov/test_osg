@@ -31,6 +31,7 @@
 #include "av/avShadows/ShadowedScene.h"
 #include "av/avShadows/ShadowMap.h"
 #include "av/avShadows/ViewDependentShadowMap.h"
+#include "av/avShadows/ParallelSplitShadowMap.h"
 #include "av/avSky/Sky.h"
 
 #include "Scene.h"
@@ -891,7 +892,7 @@ osg::Group*  Scene::createTerrainRoot()
 
     const int fbo_tex_size = 1024*4;
 
-    _st = new avShadow::ViewDependentShadowMap;
+    _st = new avShadow::ViewDependentShadowMap; /*new avShadow::ParallelSplitShadowMap(NULL,1);*/
      tr = new avShadow::ShadowedScene(_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();

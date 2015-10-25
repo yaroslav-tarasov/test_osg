@@ -166,6 +166,7 @@
     <ClCompile Include="av\avScene\Scene.cpp" />
     <ClCompile Include="av\avScene\ScreenTexture.cpp" />
     <ClCompile Include="av\avScene\ScreenTextureManager.cpp" />
+    <ClCompile Include="av\avShadows\ParallelSplitShadowMap.cpp" />
     <ClCompile Include="av\avShadows\ShadowedScene.cpp" />
     <ClCompile Include="av\avShadows\ShadowMap.cpp" />
     <ClCompile Include="av\avShadows\ShadowSettings.cpp" />
@@ -300,6 +301,7 @@
     <ClCompile Include="tests\shadow_map.cpp" />
     <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\SkyBox.cpp" />
+    <ClCompile Include="tests\ssao\ffssao.cpp" />
     <ClCompile Include="tests\systems\test_objects1.cpp" />
     <ClCompile Include="tests\systems\test_systems.cpp" />
     <ClCompile Include="tests\teapot.cpp" />

@@ -724,5 +724,11 @@
     <ClCompile Include="av\LightningLayer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
+    <ClCompile Include="tests\ssao\ffssao.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avShadows\ParallelSplitShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
