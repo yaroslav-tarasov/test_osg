@@ -449,8 +449,10 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
 
     bool debug = settings->getDebugDraw();
 
+#ifdef DEPRECATED
     // set up texgen
     _texgen = new osg::TexGen;
+#endif 
 
     // set up the texture
     _texture = new osg::Texture2D;
@@ -1185,7 +1187,7 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 #endif
             // 4.4 compute main scene graph TexGen + uniform settings + setup state
             //
-            assignTexGenSettings(&cv, camera.get(), textureUnit, sd->_texgen.get());
+            assignTexGenSettings(&cv, camera.get(), textureUnit/*, sd->_texgen.get()*/);
 
             // mark the light as one that has active shadows and requires shaders
             pl.textureUnits.push_back(textureUnit);
@@ -2415,12 +2417,14 @@ bool ViewDependentShadowMap::adjustPerspectiveShadowMapCameraSettings(osgUtil::R
     return true;
 }
 
-bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int textureUnit, osg::TexGen* texgen)
+bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int textureUnit/*, osg::TexGen* texgen*/)
 {
+#ifdef DEPRECATED
     OSG_INFO<<"assignTexGenSettings() textureUnit="<<textureUnit<<" texgen="<<texgen<<std::endl;
 
     texgen->setMode(osg::TexGen::EYE_LINEAR);
-    
+#endif
+
     // compute the matrix which takes a vertex from local coords into tex coords
     // We actually use two matrices one used to define texgen
     // and second that will be used as modelview when appling to OpenGL    
@@ -2431,7 +2435,9 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
 
     FIXME (ѕри переходе на 1.4 можно сделать rowmajor в шейдере);
 
+#ifdef DEPRECATED
     texgen->setPlanesFromMatrix( planes );
+#endif
 
     // Place texgen with modelview which removes big offsets (making it float friendly)
     osg::ref_ptr<osg::RefMatrix> refMatrix =
@@ -2441,9 +2447,12 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
     unsigned int tu = (textureUnit - settings->getBaseShadowTextureUnit());
     if(_shadowMatrices.size() > tu &&  _shadowMatrices[tu].valid())
         _shadowMatrices[tu]->set(osg::Matrix::inverse((*refMatrix.get())) * planes );
-    
+
+#ifdef DEPRECATED    
     osgUtil::RenderStage* currentStage = cv->getCurrentRenderBin()->getStage();
     currentStage->getPositionalStateContainer()->addPositionedTextureAttribute( textureUnit, refMatrix.get(), texgen );
+#endif
+
     return true;
 }
 
@@ -2550,10 +2559,12 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
         stateset->setTextureAttributeAndModes(sd._textureUnit + RGB_TEXTURE_NUM, sd._textureRGB.get(), shadowMapModeValue);
 #endif
 
+#ifdef DEPRECATED
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_R,osg::StateAttribute::ON);
         stateset->setTextureMode(sd._textureUnit,GL_TEXTURE_GEN_Q,osg::StateAttribute::ON);
+#endif
     }
 
     return vdd.getStateSet();

@@ -112,8 +112,10 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechn
 
             unsigned int                        _textureUnit;
             osg::ref_ptr<osg::Texture2D>        _texture;
-
+#ifdef DEPRECATED
             osg::ref_ptr<osg::TexGen>           _texgen;
+#endif
+
             osg::ref_ptr<osg::Camera>           _camera;
 #ifdef EXPERIMENTAL_RGB_CAM
             osg::ref_ptr<osg::Camera>           _cameraRGB;
@@ -166,7 +168,7 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechn
 
         virtual bool adjustPerspectiveShadowMapCameraSettings(osgUtil::RenderStage* renderStage, Frustum& frustum, LightData& positionedLight, osg::Camera* camera);
 
-        virtual bool assignTexGenSettings(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int textureUnit, osg::TexGen* texgen);
+        virtual bool assignTexGenSettings(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int textureUnit/*, osg::TexGen* texgen*/);
 
         virtual void cullShadowReceivingScene(osgUtil::CullVisitor* cv) const;
 

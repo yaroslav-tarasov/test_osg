@@ -48,6 +48,9 @@ using namespace avShadow;
 #define SHADOW_TEXTURE_GLSL
 #endif
 
+FIXME( Сделать по человечески )
+#undef  SHADOW_TEXTURE_GLSL
+
 //////////////////////////////////////////////////////////////////////////
 // FragmentShaderGenerator
 std::string ParallelSplitShadowMap::FragmentShaderGenerator::generateGLSL_FragmentShader_BaseTex(
@@ -116,14 +119,6 @@ std::string ParallelSplitShadowMap::FragmentShaderGenerator::generateGLSL_Fragme
                     <<" + shadow2"    <<    i
                     <<" + shadow3"    <<    i
                     << ")/6.0;"<< std::endl;
-
-                //sstr << " shadow"    <<    i    <<" = shadow"    <<    i    <<" * step(0.025,shadow"    <<    i    <<");" << std::endl; // reduce shadow artefacts
-
-                //sstr << "    float shadow02"    <<    i    <<" = (shadow0"    <<    i    <<"+shadow2"    <<    i    <<")*0.5;"<< std::endl;
-                //sstr << "    float shadow13"    <<    i    <<" = (shadow1"    <<    i    <<"+shadow3"    <<    i    <<")*0.5;"<< std::endl;
-                //sstr << "    float shadowSoft"    <<    i    <<" = (shadow02"    <<    i    <<"+shadow13"    <<    i    <<")*0.5;"<< std::endl;
-                //sstr << "    float shadow"    <<    i    <<" = (shadowSoft"    <<    i    <<"+shadowOrg"    <<    i    <<")*0.5;"<< std::endl;
-                //sstr << " shadow"    <<    i    <<" = step(0.25,shadow"    <<    i    <<");" << std::endl; // reduce shadow artefacts
             }
         }
 
@@ -217,7 +212,7 @@ template<class Type> inline Type Clamp(Type A, Type Min, Type Max) {
 
 //////////////////////////////////////////////////////////////////////////
 ParallelSplitShadowMap::ParallelSplitShadowMap(osg::Geode** gr, int icountplanes) :
-    _textureUnitOffset(1),
+    _textureUnitOffset(BASE_SHADOW_TEXTURE_UNIT /*1*/),
     _debug_color_in_GLSL(false),
     _user_polgyonOffset_set(false),
     _resolution(TEXTURE_RESOLUTION),
@@ -383,14 +378,21 @@ void ParallelSplitShadowMap::init()
         {
             pssmShadowSplitTexture._stateset = sharedStateSet.get();//new osg::StateSet;
             pssmShadowSplitTexture._stateset->setTextureAttributeAndModes(pssmShadowSplitTexture._textureUnit,pssmShadowSplitTexture._texture.get(),osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+            
+            std::stringstream sstr;
+            sstr<<"shadowMatrix"<<pssmShadowSplitTexture._textureUnit - _textureUnitOffset;
+            _shadowMatrices.push_back(new osg::Uniform(sstr.str().c_str(),osg::Matrixf()));
+            pssmShadowSplitTexture._stateset->addUniform(_shadowMatrices.back());
+
+#ifdef DEPRECATED            
             pssmShadowSplitTexture._stateset->setTextureMode(pssmShadowSplitTexture._textureUnit,GL_TEXTURE_GEN_S,osg::StateAttribute::ON);
             pssmShadowSplitTexture._stateset->setTextureMode(pssmShadowSplitTexture._textureUnit,GL_TEXTURE_GEN_T,osg::StateAttribute::ON);
             pssmShadowSplitTexture._stateset->setTextureMode(pssmShadowSplitTexture._textureUnit,GL_TEXTURE_GEN_R,osg::StateAttribute::ON);
             pssmShadowSplitTexture._stateset->setTextureMode(pssmShadowSplitTexture._textureUnit,GL_TEXTURE_GEN_Q,osg::StateAttribute::ON);
 
-
             /// generate a TexGen object
             pssmShadowSplitTexture._texgen = new osg::TexGen;
+#endif
 
         }
 
@@ -414,7 +416,7 @@ void ParallelSplitShadowMap::init()
             ).c_str());
         program->addShader(fragment_shader);
 
-
+ #endif
         //////////////////////////////////////////////////////////////////////////
         // UNIFORMS
         std::stringstream strST; strST << "shadowTexture" << (pssmShadowSplitTexture._textureUnit-_textureUnitOffset);
@@ -446,7 +448,7 @@ void ParallelSplitShadowMap::init()
             pssmShadowSplitTexture._stateset->addUniform(enableBaseTexture);
         }
 
-        for (unsigned int textLoop(0);textLoop<_textureUnitOffset;textLoop++)
+        for (unsigned int textLoop(0);textLoop</*_textureUnitOffset*/1;textLoop++)
         {
             // fake texture for baseTexture, add a fake texture
             // we support by default at least one texture layer
@@ -479,7 +481,7 @@ void ParallelSplitShadowMap::init()
             pssmShadowSplitTexture._stateset->setTextureMode(textLoop,GL_TEXTURE_2D,osg::StateAttribute::ON);
             pssmShadowSplitTexture._stateset->setTextureMode(textLoop,GL_TEXTURE_3D,osg::StateAttribute::OFF);
         }
-#endif
+
 
 
         //////////////////////////////////////////////////////////////////////////
@@ -682,10 +684,21 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
                 pssmShadowSplitTexture._camera->getProjectionMatrix() *
                 osg::Matrix::translate(1.0,1.0,1.0) *
                 osg::Matrix::scale(0.5,0.5,0.5);
-
+#ifdef DEPRECATED
             pssmShadowSplitTexture._texgen->setMode(osg::TexGen::EYE_LINEAR);
             pssmShadowSplitTexture._texgen->setPlanesFromMatrix(MVPT);
+#endif
             //////////////////////////////////////////////////////////////////////////
+            
+            // Place texgen with modelview which removes big offsets (making it float friendly)
+            osg::ref_ptr<osg::RefMatrix> refMatrix =
+                new osg::RefMatrix( pssmShadowSplitTexture._camera->getInverseViewMatrix() * (*(cv.getModelViewMatrix())) );
+
+            FIXME( ведь есть settings->getBaseShadowTextureUnit() чего не используем? );
+            ShadowSettings* settings = getShadowedScene()->getShadowSettings();
+            unsigned int tu = (pssmShadowSplitTexture._textureUnit - _textureUnitOffset);
+            if(_shadowMatrices.size() > tu &&  _shadowMatrices[tu].valid())
+                _shadowMatrices[tu]->set(osg::Matrix::inverse((*refMatrix.get())) * MVPT );
 
 
             //////////////////////////////////////////////////////////////////////////
@@ -700,9 +713,9 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
                 pssmShadowSplitTexture._debug_camera->accept(cv);
             }
 
-
+#ifdef DEPRECATED
             orig_rs->getPositionalStateContainer()->addPositionedTextureAttribute(pssmShadowSplitTexture._textureUnit, cv.getModelViewMatrix(), pssmShadowSplitTexture._texgen.get());
-
+#endif
 
         }
     } // if light

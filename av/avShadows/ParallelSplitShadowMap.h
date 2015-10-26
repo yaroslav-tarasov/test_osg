@@ -136,7 +136,9 @@ class /*OSGSHADOW_EXPORT*/ ParallelSplitShadowMap :  public ShadowTechnique
         struct PSSMShadowSplitTexture {
             // RTT
             osg::ref_ptr<osg::Camera>       _camera;
+#ifdef DEPRECATED
             osg::ref_ptr<osg::TexGen>       _texgen;
+#endif
             osg::ref_ptr<osg::Texture2D>    _texture;
             osg::ref_ptr<osg::StateSet>     _stateset;
             unsigned int                    _textureUnit;
@@ -163,11 +165,11 @@ class /*OSGSHADOW_EXPORT*/ ParallelSplitShadowMap :  public ShadowTechnique
             unsigned int                      _splitID;
             unsigned int                      _resolution;
 
-            osg::Uniform*                    _farDistanceSplit;
+            osg::Uniform*                     _farDistanceSplit;
         };
 
         typedef std::map<unsigned int,PSSMShadowSplitTexture> PSSMShadowSplitTextureMap;
-        PSSMShadowSplitTextureMap _PSSMShadowSplitTextureMap;
+        PSSMShadowSplitTextureMap             _PSSMShadowSplitTextureMap;
 
 
     private:
@@ -176,35 +178,37 @@ class /*OSGSHADOW_EXPORT*/ ParallelSplitShadowMap :  public ShadowTechnique
         void calculateLightNearFarFormFrustum(PSSMShadowSplitTexture &pssmShadowSplitTexture,osg::Vec3d *frustumCorners);
         void calculateLightViewProjectionFormFrustum(PSSMShadowSplitTexture &pssmShadowSplitTexture,osg::Vec3d *frustumCorners);
 
-        osg::Geode** _displayTexturesGroupingNode;
+        osg::Geode**                          _displayTexturesGroupingNode;
 
-        unsigned int _textureUnitOffset;
+        unsigned int                          _textureUnitOffset;
 
-        unsigned int _number_of_splits;
+        unsigned int                          _number_of_splits;
 
-        bool _debug_color_in_GLSL;
+        bool                                  _debug_color_in_GLSL;
 
-        osg::Vec2 _polgyonOffset;
-        bool _user_polgyonOffset_set;
+        osg::Vec2                             _polgyonOffset;
+        bool                                  _user_polgyonOffset_set;
 
-        unsigned int _resolution;
+        unsigned int                          _resolution;
 
-        double _setMaxFarDistance;
-        bool _isSetMaxFarDistance;
+        double                                _setMaxFarDistance;
+        bool                                  _isSetMaxFarDistance;
 
-        double _split_min_near_dist;
+        double                                _split_min_near_dist;
 
-        double _move_vcam_behind_rcam_factor;
+        double                                _move_vcam_behind_rcam_factor;
 
-        osg::ref_ptr<osg::Light> _userLight;
+        osg::ref_ptr<osg::Light>              _userLight;
         osg::ref_ptr<FragmentShaderGenerator> _FragmentShaderGenerator;
 
-        bool            _GLSL_shadow_filtered;
-        SplitCalcMode   _SplitCalcMode;
+        bool                                  _GLSL_shadow_filtered;
+        SplitCalcMode                         _SplitCalcMode;
 
-        osg::Uniform*   _ambientBiasUniform;
-        osg::Vec2       _ambientBias;
+        osg::Uniform*                         _ambientBiasUniform;
+        osg::Vec2                             _ambientBias;
 
+        typedef std::vector< osg::ref_ptr<osg::Uniform> > Uniforms;        
+        Uniforms                              _shadowMatrices;
 };
 }
 

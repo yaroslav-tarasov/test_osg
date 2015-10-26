@@ -892,7 +892,7 @@ osg::Group*  Scene::createTerrainRoot()
 
     const int fbo_tex_size = 1024*4;
 
-    _st = new avShadow::ViewDependentShadowMap; /*new avShadow::ParallelSplitShadowMap(NULL,1);*/
+    _st = /*new avShadow::ViewDependentShadowMap;*/ new avShadow::ParallelSplitShadowMap(NULL,3);
      tr = new avShadow::ShadowedScene(_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
@@ -911,6 +911,8 @@ osg::Group*  Scene::createTerrainRoot()
     settings->setShaderHint(avShadow::ShadowSettings::NO_SHADERS);
 	//settings->setCastsShadowTraversalMask(cCastsShadowTraversalMask);
 	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
+   
+    //if ( lightSource ) pssm->setUserLight(lightSource->getLight());
 
 #else
     tr = new osg::Group;

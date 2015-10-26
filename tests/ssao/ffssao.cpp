@@ -154,12 +154,12 @@ public:
 					// 1 0 1
 					//
 					// / 6
-					sstr << "    float shadowOrg"    <<    i    <<" = shadow2DProj( shadowTexture"  <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4(0.0,0.0,fZOffSet,0.0) ).r;"   << std::endl;
+					sstr << "    float shadowOrg"  <<    i    <<" = shadow2DProj( shadowTexture"  <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4(0.0,0.0,fZOffSet,0.0) ).r;"   << std::endl;
 					sstr << "    float shadow0"    <<    i    <<" = shadow2DProj( shadowTexture"    <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4(-fTexelSize,-fTexelSize,fZOffSet,0.0) ).r;"   << std::endl;
 					sstr << "    float shadow1"    <<    i    <<" = shadow2DProj( shadowTexture"    <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4( fTexelSize,-fTexelSize,fZOffSet,0.0) ).r;"   << std::endl;
 					sstr << "    float shadow2"    <<    i    <<" = shadow2DProj( shadowTexture"    <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4( fTexelSize, fTexelSize,fZOffSet,0.0) ).r;"   << std::endl;
 					sstr << "    float shadow3"    <<    i    <<" = shadow2DProj( shadowTexture"    <<    i    <<",gl_TexCoord["    <<    (i+textureOffset)    <<"]+vec4(-fTexelSize, fTexelSize,fZOffSet,0.0) ).r;"   << std::endl;
-					sstr << "    float shadow"    <<    i    <<" = ( shadowOrg"    <<    i
+					sstr << "    float shadow"     <<    i    <<" = ( shadowOrg"    <<    i
 						<<" + shadow0"    <<    i
 						<<" + shadow1"    <<    i
 						<<" + shadow2"    <<    i
