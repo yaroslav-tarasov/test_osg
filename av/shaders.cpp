@@ -453,15 +453,27 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         } f_in;
 
         out vec4  aFragColor;
+        
+        uniform float zShadow0; 
 
         void main (void)
         {
+            float fTexelSize=0.00137695;
+            float fZOffSet  = -0.001954;
+            float testZ = gl_FragCoord.z*2.0-1.0;
+            float map0 = step(testZ, zShadow0);
+            float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+            float shadow0 = shadowOrg0;
+            float term0 = map0*(1.0-shadow0); 
+            float v = clamp(term0,0.0,1.0);
+            float shadow = 1 - v * 0.5;;
+
 
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag)   
-            float shadow = 1.0; 
+          //  float shadow = 1.0; 
             //if(ambient.a > 0.35)
-               shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
+          //     shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
 
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
             vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
@@ -1189,13 +1201,26 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             } f_in;
             
             out vec4  aFragColor;
+            uniform float zShadow0; 
 
             void main (void)
             {
+                float fTexelSize=0.00137695;
+                float fZOffSet  = -0.001954;
+                float testZ = gl_FragCoord.z*2.0-1.0;
+                float map0 = step(testZ, zShadow0);
+                float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+                float shadow0 = shadowOrg0;
+                float term0 = map0*(1.0-shadow0); 
+                float v = clamp(term0,0.0,1.0);
+                float shadow = 1 - v * 0.5;;
+
+
+
                 // GET_SHADOW(f_in.viewpos, f_in);
-                float shadow = 1.0; 
-                if(ambient.a > 0.35)
-                    shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a); 
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //    shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a); 
 \n
 \n                float rainy_value = 0.666 * specular.a;
 \n
@@ -1295,9 +1320,15 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec3 viewpos;
                 vec2 detail_uv;
                 vec4 shadow_view;
+                vec4 shadow_view1;
+                vec4 shadow_view2;
                 vec4 lightmap_coord;
                 vec4 decal_coord;
             } v_out;
+            
+                                                        
+            uniform mat4            shadowMatrix1;                                                          
+            uniform mat4            shadowMatrix2;  
 
             void main()
             {
@@ -1324,6 +1355,12 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 mat4 EyePlane =  transpose(shadowMatrix0); 
                 v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
+                mat4 EyePlane1 =  transpose(shadowMatrix1); 
+                v_out.shadow_view1 = vec4(dot( viewpos, EyePlane1[0]),dot( viewpos, EyePlane1[1] ),dot( viewpos, EyePlane1[2]),dot( viewpos, EyePlane1[3] ) );
+
+                mat4 EyePlane2 =  transpose(shadowMatrix2); 
+                v_out.shadow_view2 = vec4(dot( viewpos, EyePlane2[0]),dot( viewpos, EyePlane2[1] ),dot( viewpos, EyePlane2[2]),dot( viewpos, EyePlane2[3] ) );
+
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
             }       
             )
@@ -1367,22 +1404,64 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                vec3 viewpos;
 \n                vec2 detail_uv;
 \n                vec4 shadow_view;
+\n                vec4 shadow_view1;
+\n                vec4 shadow_view2;
 \n                vec4 lightmap_coord;
 \n                vec4 decal_coord;
 \n            } f_in;
 \n            
               out vec4  aFragColor;
+              
+              uniform float zShadow0; 
+              uniform float zShadow1; 
+              uniform float zShadow2; 
+              
+              uniform sampler2DShadow shadowTexture1; 
+              uniform sampler2DShadow shadowTexture2;
 
 \n            void main (void)
 \n            {
                      
-    
+                float testZ = gl_FragCoord.z*2.0-1.0;
+                float map0 = step(testZ, zShadow0);
+                float map1  = step(zShadow0,testZ)*step(testZ, zShadow1);
+                float map2  = step(zShadow1,testZ)*step(testZ, zShadow2);
+                float fTexelSize=0.00137695;
+                float fZOffSet  = -0.001954;
+
+                float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+                float shadow00 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow10 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow20 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow30 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow0 = ( 2.0*shadowOrg0 + shadow00 + shadow10 + shadow20 + shadow30)/6.0;
+                float shadowOrg1 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+                float shadow01 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow11 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow21 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow31 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow1 = ( 2.0*shadowOrg1 + shadow01 + shadow11 + shadow21 + shadow31)/6.0;
+                float shadowOrg2 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+                float shadow02 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow12 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+                float shadow22 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow32 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+                float shadow2 = ( 2.0*shadowOrg2 + shadow02 + shadow12 + shadow22 + shadow32)/6.0;
+
+                float term0 = map0*(1.0-shadow0); 
+                float term1 = map1*(1.0-shadow1);
+                float term2 = map2*(1.0-shadow2);
+
+                float v = clamp(term0+term1+term2,0.0,1.0);
+
+                float shadow = 1 - v * 0.5;
+
                 // GET_SHADOW(f_in.viewpos, f_in);
-                  float shadow = 1.0; 
-                  if(ambient.a > 0.35)
-                  {
-                      shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
-                  }
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //{
+                //     shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                //}
 \n                
 \n
 \n                float rainy_value = specular.a;

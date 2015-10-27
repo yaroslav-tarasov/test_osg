@@ -49,7 +49,7 @@ using namespace avShadow;
 #endif
 
 FIXME( Сделать по человечески )
-#undef  SHADOW_TEXTURE_GLSL
+//#undef  SHADOW_TEXTURE_GLSL
 
 //////////////////////////////////////////////////////////////////////////
 // FragmentShaderGenerator
@@ -448,7 +448,7 @@ void ParallelSplitShadowMap::init()
             pssmShadowSplitTexture._stateset->addUniform(enableBaseTexture);
         }
 
-        for (unsigned int textLoop(0);textLoop</*_textureUnitOffset*/1;textLoop++)
+        for (unsigned int textLoop(0);textLoop<_textureUnitOffset/*1*/;textLoop++)
         {
             // fake texture for baseTexture, add a fake texture
             // we support by default at least one texture layer
@@ -680,7 +680,7 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
             // compute the matrix which takes a vertex from local coords into tex coords
             // will use this later to specify osg::TexGen..
 
-            osg::Matrix MVPT = pssmShadowSplitTexture._camera->getViewMatrix() *
+            osg::Matrix MVPT =/* pssmShadowSplitTexture._camera->getViewMatrix() **/
                 pssmShadowSplitTexture._camera->getProjectionMatrix() *
                 osg::Matrix::translate(1.0,1.0,1.0) *
                 osg::Matrix::scale(0.5,0.5,0.5);
