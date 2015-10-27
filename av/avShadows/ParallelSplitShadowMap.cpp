@@ -448,7 +448,7 @@ void ParallelSplitShadowMap::init()
             pssmShadowSplitTexture._stateset->addUniform(enableBaseTexture);
         }
 
-        for (unsigned int textLoop(0);textLoop<_textureUnitOffset/*1*/;textLoop++)
+        for (unsigned int textLoop(0);textLoop</*_textureUnitOffset*/1;textLoop++)
         {
             // fake texture for baseTexture, add a fake texture
             // we support by default at least one texture layer
@@ -605,8 +605,17 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
                 else lightDirection = light->getDirection();
 
                 selectLight = light;
+
+				bool directionalLight = (selectLight->getPosition().w()== 0.0);
+				if(directionalLight)
+				{
+					lightDirection.set(-light->getPosition().x(), -light->getPosition().y(), -light->getPosition().z());
+					lightDirection = matrix? lightDirection * (*matrix):lightDirection;
+				}
             }
         }
+		
+
 
         osg::Matrix eyeToWorld;
         eyeToWorld.invert(*cv.getModelViewMatrix());

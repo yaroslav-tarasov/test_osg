@@ -712,8 +712,8 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     }
     
     
-    if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
-            pssm->setUserLight(_ls->getLight());
+    //if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
+    //        pssm->setUserLight(_ls->getLight());
 
     addChild( _ephemerisNode.get() );
 //////////////////////////////////////////////////////    
@@ -917,7 +917,7 @@ osg::Group*  Scene::createTerrainRoot()
 	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
     
     if(auto p = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
-        p->setMaxFarDistance(10000.0);
+        p->setMaxFarDistance(1024.0);
 
 #else
     tr = new osg::Group;
