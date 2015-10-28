@@ -2,7 +2,15 @@
 
 namespace shaders
 {
-    enum shader_t {VS,TES,TCS,GS,FS};
+    enum shader_t 
+    {
+      VS  = osg::Shader::VERTEX,
+      TCS = osg::Shader::TESSCONTROL,
+      TES = osg::Shader::TESSEVALUATION,
+      GS  = osg::Shader::GEOMETRY,
+      FS  = osg::Shader::FRAGMENT,
+      CU  = osg::Shader::COMPUTE
+    };
 
     namespace plane_mat
     {

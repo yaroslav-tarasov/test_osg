@@ -551,7 +551,7 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
     // record the traversal mask on entry so we can reapply it later.
     unsigned int traversalMask = cv.getTraversalMask();
     osgUtil::RenderStage* orig_rs = cv.getRenderStage();
-
+    
 #ifdef SHADOW_TEXTURE_GLSL
     PSSMShadowSplitTextureMap::iterator it=_PSSMShadowSplitTextureMap.begin();
 #else
@@ -612,6 +612,13 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
 					lightDirection.set(-light->getPosition().x(), -light->getPosition().y(), -light->getPosition().z());
 					lightDirection = matrix? lightDirection * (*matrix):lightDirection;
 				}
+
+                ////if ( _nightMode || !_enableShadows)
+                ////{
+                ////   lightDirection.set(0, 0, -1);
+                ////   lightDirection = matrix? lightDirection * (*matrix):lightDirection;
+                ////}
+                    
             }
         }
 		
@@ -629,6 +636,8 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
         selectLight = _userLight.get();
     }
 
+
+
     if (selectLight)
     {
 
@@ -639,6 +648,18 @@ void ParallelSplitShadowMap::cull(osgUtil::CullVisitor& cv){
         {
             PSSMShadowSplitTexture pssmShadowSplitTexture = it->second;
 
+            if ( _nightMode || !_enableShadows)
+            {
+                   if(pssmShadowSplitTexture._camera->getClearDepth() > 0.0f)
+                        pssmShadowSplitTexture._camera->setClearDepth(0);
+                   else
+                    return;
+            }
+            else
+            {
+                if(pssmShadowSplitTexture._camera->getClearDepth() < 1.0f)
+                   pssmShadowSplitTexture._camera->setClearDepth(1.0f);
+            }
 
             //////////////////////////////////////////////////////////////////////////
             // SETUP pssmShadowSplitTexture for rendering

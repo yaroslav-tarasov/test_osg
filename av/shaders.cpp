@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "shaders.h"
 
+#include "av/precompiled.h"
 
 namespace shaders
 {
@@ -42,17 +43,32 @@ namespace shaders
 "\n    lightmap_color *= clamp(fma(height_world_lm, -2.5, 1.25), 0.0, 1.0);\n                                    "
 
 
+#define  SHADOW_INCLUDE                                                                                                      \
+    "\n float shadow_fs_main (float illum );   "                                                                             \
+    "\n void  shadow_vs_main (vec4 viewpos);   "                                                                             \
+    "\n$define SAVE_SHADOWS_VARYINGS_VP(ind, out_vert, view_pos_4) \\"                                                       \
+    "\n    mat4 EyePlane##ind =  transpose(shadowMatrix##ind); \\"                                                           \
+    "\n    out_vert##ind = vec4(dot( view_pos_4, EyePlane##ind[0]),dot( view_pos_4, EyePlane##ind[1] ),dot( view_pos_4, EyePlane##ind[2]),dot( view_pos_4, EyePlane##ind[3] ) );                                            "   \
+    "\n           "  \
+"$define GENERATE_SHADOW(ind,shadow_view) \\" \
+    "\n  float shadowOrg##ind = shadow2D( shadowTexture##ind,shadow_view##ind .xyz+vec3(0.0,0.0,fZOffSet) ).r;                 \\" \
+    "\n  float shadow0##ind = shadow2D( shadowTexture##ind ,shadow_view##ind .xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;   \\" \
+    "\n  float shadow1##ind = shadow2D( shadowTexture##ind ,shadow_view##ind .xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;   \\" \
+    "\n  float shadow2##ind = shadow2D( shadowTexture##ind ,shadow_view##ind .xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;   \\" \
+    "\n  float shadow3##ind = shadow2D( shadowTexture##ind ,shadow_view##ind .xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;   \\" \
+    "\n  float shadow##ind = ( 2.0*shadowOrg##ind + shadow0##ind + shadow1##ind + shadow2##ind + shadow3##ind)/6.0;                    \\" \
+    "\n  float term##ind = map##ind*(1.0-shadow##ind);                                                                          \n\n     " 
 
-#define  SHADERS_GETTER                            \
-        const char* get_shader(shader_t t)         \
-        {                                          \
-            if(t==VS)                              \
-                return vs;                         \
-            else if(t==FS)                         \
-                return fs;                         \
-            else                                   \
-                return nullptr;                    \
-        }                                          \
+#define  SHADERS_GETTER(getter_name,vs_name, fs_name) \
+        const char* getter_name(shader_t t)           \
+        {                                             \
+            if(t==VS)                                 \
+                return vs_name;                       \
+            else if(t==FS)                            \
+                return fs_name;                       \
+            else                                      \
+                return nullptr;                       \
+        }                                             \
 
 
 #define INCLUDE_FUNCS                                                                                    \
@@ -124,39 +140,12 @@ namespace shaders
 \n    }                                                                                                \
 \n                                                                                                     \
 \n                                                                                                     \
-\n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
-\n            float result = 0.0;                                                                      \
-\n            int   count = 0;                                                                         \
-\n            for(int x=-size.x; x<=size.x; x++){                                                      \
-\n                for(int y=-size.y; y<=size.y; y++){                                                  \
-\n                    count++;                                                                         \
-\n                    result += textureProjOffset(depths, stpq, ivec2(x,y));/*.r;*/                    \
-\n                }                                                                                    \
-\n            }                                                                                        \
-\n            return result/count;                                                                     \
-        }                                                                                              \
-                                                                                                       \
-\n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
-\n            float result = 0.0;                                                                      \
-\n            result += textureProjOffset(depths, stpq, ivec2(0,-1));/*.r;*/                           \
-\n            result += textureProjOffset(depths, stpq, ivec2(0,1));/*.r;*/                            \
-\n            result += textureProjOffset(depths, stpq, ivec2(1,0));/*.r;*/                            \
-\n            result += textureProjOffset(depths, stpq, ivec2(-1,0));/*.r;*/                           \
-\n            return result*.25;                                                                       \
-    }                                                                                                  \
-                                                                                                       \
-\n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
-\n            return textureProj(depths, stpq);/*.r;*/                                                 \
-    }                                                                                                  \
-      const ivec2 pcf_size = ivec2(1,1);                                                               \
-                                                                                                       \
-                                                                                                       \
 \n     uniform sampler2D       baseTexture;                                                            \
 \n     uniform int             baseTextureUnit;                                                        \
-\n     uniform sampler2DShadow shadowTexture0;                                                         \
-\n     uniform int             shadowTextureUnit0;                                                     \
+\n     /*uniform sampler2DShadow shadowTexture0;*/                                                     \
+\n     /*uniform int             shadowTextureUnit0;*/                                                     \
 \n     uniform sampler2DShadow shadowTextureRGB;                                                       \
-\n     uniform mat4            shadowMatrix0;                                                          \
+\n     /*uniform mat4            shadowMatrix0;*/                                                      \
 \n     uniform mat4            lightmap_matrix;                                                        \
 \n     uniform mat4            shadow0_matrix;                                                         \
      )
@@ -164,33 +153,83 @@ namespace shaders
 
 
 #ifdef EXPERIMENTAL_RGB_CAM 
-#define INCLUDE_VS_EXT                                                                                     \
+#define INCLUDE_PCF_EXT                                                                                    \
 	STRINGIFY (                                                                                            \
+    \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
+    \n            float result = 0.0;                                                                      \
+    \n            int   count = 0;                                                                         \
+    \n            for(int x=-size.x; x<=size.x; x++){                                                      \
+    \n                for(int y=-size.y; y<=size.y; y++){                                                  \
+    \n                    count++;                                                                         \
+    \n                    result += textureProjOffset(depths, stpq, ivec2(x,y));/*.r;*/                    \
+    \n                }                                                                                    \
+    \n            }                                                                                        \
+    \n            return result/count;                                                                     \
+    }                                                                                                      \
+    \
+    \n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
+    \n            float result = 0.0;                                                                      \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,-1));/*.r;*/                           \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,1));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(1,0));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(-1,0));/*.r;*/                           \
+    \n            return result*.25;                                                                       \
+    }                                                                                                      \
+    \
+    \n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+    \n            return textureProj(depths, stpq);/*.r;*/                                                 \
+    }                                                                                                      \
+    const ivec2 pcf_size = ivec2(1,1);                                                                     \
 	\n                                                                                                     \
 	\n                                                                                                     \
 	\n        float PCF4E_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                 \
-	\n            return min(PCF4E(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;  \
+	\n            return min(PCF4E(depths, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;  \
 	\n	}                                                                                                  \
 	\n	                                                                                                   \
 	\n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                  \
-	\n            return min(PCF4(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;   \
+	\n            return min(PCF4(depths, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;   \
 	}                                                                                                      \
 	\
 	\n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
-	\n            return min(PCF(shadowTexture0, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;    \
+	\n            return min(PCF(depths, stpq, pcf_size),PCF(shadowTextureRGB, stpq * .125,pcf_size)) * aa * 0.4;    \
 	}                                                                                                      \
 	)
 #else
-#define INCLUDE_VS_EXT                                                                                     \
+#define INCLUDE_PCF_EXT                                                                                    \
 	STRINGIFY (                                                                                            \
-	\n                                                                                                     \
+    \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
+    \n            float result = 0.0;                                                                      \
+    \n            int   count = 0;                                                                         \
+    \n            for(int x=-size.x; x<=size.x; x++){                                                      \
+    \n                for(int y=-size.y; y<=size.y; y++){                                                  \
+    \n                    count++;                                                                         \
+    \n                    result += textureProjOffset(depths, stpq, ivec2(x,y));/*.r;*/                    \
+    \n                }                                                                                    \
+    \n            }                                                                                        \
+    \n            return result/count;                                                                     \
+    }                                                                                                      \
+    \
+    \n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
+    \n            float result = 0.0;                                                                      \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,-1));/*.r;*/                           \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,1));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(1,0));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(-1,0));/*.r;*/                           \
+    \n            return result*.25;                                                                       \
+    }                                                                                                      \
+    \
+    \n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+    \n            return textureProj(depths, stpq);/*.r;*/                                                 \
+    }                                                                                                      \
+    const ivec2 pcf_size = ivec2(1,1);                                                                     \
+    \n                                                                                                     \
 	\n                                                                                                     \
 	\n        float PCF4E_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                 \
 	\n            return PCF4E(depths, stpq, pcf_size) * aa * 0.4;                                         \
 	\n	}                                                                                                  \
 	\n	                                                                                                   \
-		\n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                              \
-		\n            return PCF4(depths, stpq, pcf_size) * aa * 0.4;                                      \
+    \n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                              \
+	\n            return PCF4(depths, stpq, pcf_size) * aa * 0.4;                                      \
 	}                                                                                                      \
 	                                                                                                       \
 	\n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
@@ -359,11 +398,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         "#extension GL_ARB_gpu_shader5 : enable \n"
         
         INCLUDE_VS
-        INCLUDE_VS_EXT
         INCLUDE_COMPABILITY
         "\n"       
         LIGHT_MAPS
-
+        SHADOW_INCLUDE
 
         STRINGIFY ( 
         attribute vec3 tangent;
@@ -392,7 +430,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             gl_Position    = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
-
             v_out.tangent   = tangent;
             v_out.binormal  = binormal;
             v_out.normal    = normal;
@@ -400,8 +437,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             v_out.viewpos   = viewpos.xyz;
             v_out.texcoord  = gl_MultiTexCoord1.xy;
             //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-            mat4 EyePlane =  transpose(shadowMatrix0); 
-            v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+            
+            //mat4 EyePlane =  transpose(shadowMatrix0); 
+            //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+            shadow_vs_main(viewpos);
 
             SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
         }
@@ -425,12 +464,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         INCLUDE_FUNCS
         INCLUDE_FOG_FUNCS
         INCLUDE_VS
-		INCLUDE_VS_EXT
+//		INCLUDE_PCF_EXT
         INCLUDE_DL
         INCLUDE_DL2
         INCLUDE_SCENE_PARAM
 "\n"       
         LIGHT_MAPS
+        SHADOW_INCLUDE
 
         STRINGIFY ( 
 
@@ -458,6 +498,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         void main (void)
         {
+$if 0
+\n
             float fTexelSize=0.00137695;
             float fZOffSet  = -0.001954;
             float testZ = gl_FragCoord.z*2.0-1.0;
@@ -467,13 +509,15 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             float term0 = map0*(1.0-shadow0); 
             float v = clamp(term0,0.0,1.0);
             float shadow = 1 - v * 0.5;;
-
-
+$endif
+\n
             // GET_SHADOW(f_in.viewpos, f_in);
             //#define GET_SHADOW(viewpos, in_frag)   
           //  float shadow = 1.0; 
             //if(ambient.a > 0.35)
           //     shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
+
+            float shadow =  shadow_fs_main(ambient.a);
 
             vec4 base = texture2D(colorTex, f_in.texcoord.xy);
             vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
@@ -538,7 +582,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
     };
 
-    SHADERS_GETTER
+    SHADERS_GETTER(get_shader,vs, fs)
 
      AUTO_REG_NAME(plane, shaders::plane_mat::get_shader)
 
@@ -551,7 +595,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-            INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
 
             STRINGIFY ( 
@@ -581,9 +624,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-
+                
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                shadow_vs_main(viewpos);
             }       
             )
         };
@@ -605,7 +649,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
+//			INCLUDE_PCF_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -627,9 +671,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)
             {
-                float shadow = 1.0; 
-                if(ambient.a > 0.35)
-                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                float shadow =  shadow_fs_main(ambient.a);
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -646,7 +691,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         };   
 
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(rotor, shaders::rotor_mat::get_shader)
 
@@ -658,10 +703,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
            "#extension GL_ARB_gpu_shader5 : enable \n"
 
            INCLUDE_VS
-		   INCLUDE_VS_EXT
            INCLUDE_COMPABILITY
            "\n"       
            LIGHT_MAPS
+           SHADOW_INCLUDE
 
            STRINGIFY ( 
 \n         attribute vec3 tangent;
@@ -695,9 +740,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                v_out.viewpos   = viewpos.xyz;
                v_out.texcoord  = gl_MultiTexCoord1.xy;
                //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-               mat4 EyePlane =  transpose(shadowMatrix0); 
-               v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-               
+               //mat4 EyePlane =  transpose(shadowMatrix0); 
+               //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+               shadow_vs_main(viewpos);
+
                SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
            }       
        )
@@ -718,12 +764,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
        INCLUDE_FUNCS
        INCLUDE_FOG_FUNCS
        INCLUDE_VS
-	   INCLUDE_VS_EXT
+//	   INCLUDE_PCF_EXT
        INCLUDE_DL
        INCLUDE_DL2
        INCLUDE_SCENE_PARAM
 "\n"      
        LIGHT_MAPS
+       SHADOW_INCLUDE
 
        STRINGIFY ( 
 \n
@@ -747,9 +794,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
            void main (void)
            {
                // GET_SHADOW(f_in.viewpos, f_in);
-               float shadow = 1.0; 
-               if(ambient.a > 0.35)
-                   shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+               //float shadow = 1.0; 
+               //if(ambient.a > 0.35)
+               //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+               
+               float shadow =  shadow_fs_main(ambient.a);
 
                vec4 base = texture2D(colorTex, f_in.texcoord);
                vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
@@ -813,7 +862,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
        };   
 
-       SHADERS_GETTER
+       SHADERS_GETTER(get_shader,vs, fs)
 
        AUTO_REG_NAME(default, shaders::default_mat::get_shader)
 
@@ -826,11 +875,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
             
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             
             "\n"       
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n            
@@ -858,9 +907,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-                
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                shadow_vs_main(viewpos);
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
             }       
             )
@@ -881,12 +930,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
-			INCLUDE_VS_EXT
+//			INCLUDE_PCF_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
 "\n"            
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n
@@ -908,9 +958,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main (void)
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
-                float shadow = 1.0; 
-                if(ambient.a > 0.35)
-                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                
+                float shadow =  shadow_fs_main(ambient.a);
 
                 // get dist to point and normalized to-eye vector
                 float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
@@ -980,7 +1032,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(building, shaders::building_mat::get_shader)
 
@@ -995,9 +1047,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
-
+            SHADOW_INCLUDE
             STRINGIFY ( 
 
             //varying   vec3  lightDir;
@@ -1026,9 +1077,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                shadow_vs_main(viewpos);
             }       
             )
         };
@@ -1039,7 +1090,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n "
             
             INCLUDE_UNIFORMS
-
+            
             STRINGIFY ( 
 
              in mat4 viewworld_matrix;
@@ -1048,9 +1099,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
-			INCLUDE_VS_EXT
+//			INCLUDE_PCF_EXT
             INCLUDE_SCENE_PARAM
-
+            SHADOW_INCLUDE
             STRINGIFY ( 
 
             uniform sampler2D       colorTex;
@@ -1071,9 +1122,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main (void)
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
-                float shadow = 1.0; 
-                if(ambient.a > 0.35)
-                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                
+                float shadow =  shadow_fs_main(ambient.a);
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
                 float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
@@ -1089,7 +1142,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(tree, shaders::tree_mat::get_shader)
 
@@ -1102,11 +1155,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             INCLUDE_UNIFORMS
             "\n"       
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n
@@ -1150,9 +1203,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 //vec4 EyePlane_P = shadowMatrix[2] * refMatrix;
                 //vec4 EyePlane_Q = shadowMatrix[3] * refMatrix;
                 
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-                
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                shadow_vs_main(viewpos);
+
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
             }       
             )
@@ -1173,12 +1227,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
-			INCLUDE_VS_EXT
+//			INCLUDE_PCF_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
 "\n"           
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n
@@ -1205,6 +1260,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
             void main (void)
             {
+$if 0 
+\n
                 float fTexelSize=0.00137695;
                 float fZOffSet  = -0.001954;
                 float testZ = gl_FragCoord.z*2.0-1.0;
@@ -1214,13 +1271,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 float term0 = map0*(1.0-shadow0); 
                 float v = clamp(term0,0.0,1.0);
                 float shadow = 1 - v * 0.5;;
-
-
+$endif
+\n
 
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //float shadow = 1.0; 
                 //if(ambient.a > 0.35)
                 //    shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a); 
+\n               
+                float shadow =  shadow_fs_main(ambient.a);
+
 \n
 \n                float rainy_value = 0.666 * specular.a;
 \n
@@ -1283,7 +1343,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(ground, shaders::ground_mat::get_shader)
         AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
@@ -1298,10 +1358,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
             "\n"       
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
             attribute vec3 tangent;
@@ -1320,8 +1380,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 vec3 viewpos;
                 vec2 detail_uv;
                 vec4 shadow_view;
-                vec4 shadow_view1;
-                vec4 shadow_view2;
+                //vec4 shadow_view1;
+                //vec4 shadow_view2;
                 vec4 lightmap_coord;
                 vec4 decal_coord;
             } v_out;
@@ -1352,14 +1412,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
 
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
-                mat4 EyePlane1 =  transpose(shadowMatrix1); 
-                v_out.shadow_view1 = vec4(dot( viewpos, EyePlane1[0]),dot( viewpos, EyePlane1[1] ),dot( viewpos, EyePlane1[2]),dot( viewpos, EyePlane1[3] ) );
+                //mat4 EyePlane1 =  transpose(shadowMatrix1); 
+                //v_out.shadow_view1 = vec4(dot( viewpos, EyePlane1[0]),dot( viewpos, EyePlane1[1] ),dot( viewpos, EyePlane1[2]),dot( viewpos, EyePlane1[3] ) );
 
-                mat4 EyePlane2 =  transpose(shadowMatrix2); 
-                v_out.shadow_view2 = vec4(dot( viewpos, EyePlane2[0]),dot( viewpos, EyePlane2[1] ),dot( viewpos, EyePlane2[2]),dot( viewpos, EyePlane2[3] ) );
+                //mat4 EyePlane2 =  transpose(shadowMatrix2); 
+                //v_out.shadow_view2 = vec4(dot( viewpos, EyePlane2[0]),dot( viewpos, EyePlane2[1] ),dot( viewpos, EyePlane2[2]),dot( viewpos, EyePlane2[3] ) );
+                
+                shadow_vs_main(viewpos);
 
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
             }       
@@ -1383,12 +1445,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
               INCLUDE_FUNCS
               INCLUDE_FOG_FUNCS
               INCLUDE_VS
-			  INCLUDE_VS_EXT
+//			  INCLUDE_PCF_EXT
               INCLUDE_SCENE_PARAM
               INCLUDE_DL
               INCLUDE_DL2
 "\n"              
               LIGHT_MAPS
+              SHADOW_INCLUDE
 
               STRINGIFY ( 
 \n
@@ -1404,25 +1467,26 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                vec3 viewpos;
 \n                vec2 detail_uv;
 \n                vec4 shadow_view;
-\n                vec4 shadow_view1;
-\n                vec4 shadow_view2;
+\n                /*vec4 shadow_view1;*/
+\n                /*vec4 shadow_view2;*/
 \n                vec4 lightmap_coord;
 \n                vec4 decal_coord;
 \n            } f_in;
 \n            
               out vec4  aFragColor;
               
-              uniform float zShadow0; 
-              uniform float zShadow1; 
-              uniform float zShadow2; 
+              /*uniform float zShadow0; */
+              /*uniform float zShadow1;*/ 
+              /*uniform float zShadow2; */
               
-              uniform sampler2DShadow shadowTexture1; 
-              uniform sampler2DShadow shadowTexture2;
+              /*uniform sampler2DShadow shadowTexture1;*/ 
+              /*uniform sampler2DShadow shadowTexture2;*/
 
 \n            void main (void)
 \n            {
-                     
-                float testZ = gl_FragCoord.z*2.0-1.0;
+$if 0
+\n
+\n              float testZ = gl_FragCoord.z*2.0-1.0;
                 float map0 = step(testZ, zShadow0);
                 float map1  = step(zShadow0,testZ)*step(testZ, zShadow1);
                 float map2  = step(zShadow1,testZ)*step(testZ, zShadow2);
@@ -1455,13 +1519,15 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 float v = clamp(term0+term1+term2,0.0,1.0);
 
                 float shadow = 1 - v * 0.5;
-
+$endif
+\n
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //float shadow = 1.0; 
                 //if(ambient.a > 0.35)
                 //{
                 //     shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
                 //}
+                float shadow =  shadow_fs_main(ambient.a);
 \n                
 \n
 \n                float rainy_value = specular.a;
@@ -1663,7 +1729,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         
         const char* vs_test2 = { 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             STRINGIFY ( 
             uniform mat4  shadowMatrix0;                                \n 
             uniform mat4  refMatrix;
@@ -1730,7 +1795,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             )
         };
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
         
         AUTO_REG_NAME(concrete, shaders::concrete_mat::get_shader)
 
@@ -1742,11 +1807,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_COMPABILITY
 
             "\n"       
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n          attribute vec3 tangent;
@@ -1776,9 +1841,11 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
                 //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                mat4 EyePlane =  transpose(shadowMatrix0); 
-                v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 
+                //mat4 EyePlane =  transpose(shadowMatrix0); 
+                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+                shadow_vs_main(viewpos);
+
                 SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
             }       
             )
@@ -1799,12 +1866,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FUNCS
             INCLUDE_FOG_FUNCS
             INCLUDE_VS
-			INCLUDE_VS_EXT
+//			INCLUDE_PCF_EXT
             INCLUDE_DL
             INCLUDE_DL2
             INCLUDE_SCENE_PARAM
 "\n"          
             LIGHT_MAPS
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 \n
@@ -1825,11 +1893,13 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             void main (void)
             {
                 // GET_SHADOW(f_in.viewpos, f_in);
-                float shadow = 1.0; 
-                if(ambient.a > 0.35)
-                {
-                    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
-                }
+                //float shadow = 1.0; 
+                //if(ambient.a > 0.35)
+                //{
+                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+                //}
+                
+                float shadow =  shadow_fs_main(ambient.a);
 
                 vec3 normal = normalize(f_in.normal);
                 float n_dot_l = saturate(fma(dot(normal, light_vec_view.xyz), 0.6, 0.4));
@@ -1868,7 +1938,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(railing, shaders::railing_mat::get_shader)
 
@@ -1926,7 +1996,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -1956,7 +2025,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(panorama, shaders::panorama_mat::get_shader)
 
@@ -2057,7 +2126,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(sky, shaders::sky_fog_mat::get_shader)
 
@@ -2140,7 +2209,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         };   
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
         
         AUTO_REG_NAME(clouds, shaders::clouds_mat::get_shader)
 
@@ -2241,7 +2310,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 		};   
 
-		SHADERS_GETTER
+		SHADERS_GETTER(get_shader,vs, fs)
 
 	    AUTO_REG_NAME(lightning, shaders::lightning_mat::get_shader)
 
@@ -2252,7 +2321,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         const char* vs = { 
             INCLUDE_VS
-			INCLUDE_VS_EXT
             INCLUDE_UNIFORMS
             INCLUDE_COMPABILITY
             INCLUDE_FUNCS
@@ -2318,7 +2386,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         const char* fs = { 
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
 
             STRINGIFY ( 
             // uniform sampler2D texCulturalLight;
@@ -2332,7 +2399,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             )
         };
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(simlight , shaders::light_mat::get_shader)
     }  // ns light_mat
@@ -2346,7 +2413,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
 
             INCLUDE_UNIFORMS
             
@@ -2391,7 +2457,6 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             "#extension GL_ARB_gpu_shader5 : enable \n"
 
             INCLUDE_VS
-			INCLUDE_VS_EXT
 
             STRINGIFY ( 
 
@@ -2427,11 +2492,157 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
             )
         };
 
-        SHADERS_GETTER
+        SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(spot , shaders::spot_mat::get_shader)
 
     }  // ns light_mat
+
+    namespace  shadow_mat
+    {
+
+        const char* vs = { 
+
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+            
+            SHADOW_INCLUDE 
+
+            STRINGIFY ( 
+
+            //out shadow_block
+            //{
+            out    vec4 shadow_view0;
+            out    vec4 shadow_view1;
+            out    vec4 shadow_view2;
+            //} shadow_out;
+
+            uniform mat4            shadowMatrix0; 
+            uniform mat4            shadowMatrix1;                                                          
+            uniform mat4            shadowMatrix2;  
+
+            void shadow_vs_main(vec4 viewpos)
+            {   
+                SAVE_SHADOWS_VARYINGS_VP(0, shadow_view, viewpos)
+                SAVE_SHADOWS_VARYINGS_VP(1, shadow_view, viewpos)
+                SAVE_SHADOWS_VARYINGS_VP(2, shadow_view, viewpos)
+            }
+
+            )
+        };
+
+        const char* fs = { 
+
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            SHADOW_INCLUDE 
+
+            STRINGIFY ( 
+
+            //in shadow_block
+            //{
+              in vec4 shadow_view0;
+              in vec4 shadow_view1;
+              in vec4 shadow_view2;
+            //} shadow_in;
+
+            uniform float zShadow0; 
+            uniform float zShadow1; 
+            uniform float zShadow2; 
+
+            uniform sampler2DShadow shadowTexture0; 
+            uniform sampler2DShadow shadowTexture1; 
+            uniform sampler2DShadow shadowTexture2;
+
+\n          float shadow_fs_main (float illum )
+\n          {
+\n                  float testZ = gl_FragCoord.z*2.0-1.0;
+\n                  float map0  = step(testZ, zShadow0);
+\n                  float map1  = step(zShadow0,testZ)*step(testZ, zShadow1);
+\n                  float map2  = step(zShadow1,testZ)*step(testZ, zShadow2);
+\n                  float fTexelSize=0.00137695;
+\n                  float fZOffSet  = -0.001954;
+\n
+\n                  GENERATE_SHADOW(0,shadow_view)
+\n                  GENERATE_SHADOW(1,shadow_view)
+\n                  GENERATE_SHADOW(2,shadow_view)
+\n
+\n                 float v = clamp(term0+term1+term2,0.0,1.0);
+\n
+\n                 return 1 - v * 0.5;
+            }
+
+            )
+        };
+
+        SHADERS_GETTER(get_shader_pssm,vs, fs)
+
+        const char* vs_vdsm = { 
+
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            SHADOW_INCLUDE 
+
+            STRINGIFY ( 
+
+            //out vdsm
+            //{
+            out    vec4 shadow_view0;
+
+            //} shadow_out;
+
+            uniform mat4            shadowMatrix0; 
+
+            void shadow_vs_main(vec4 viewpos)
+            {   
+                SAVE_SHADOWS_VARYINGS_VP(0, shadow_view, viewpos)
+            }
+
+            )
+        };
+
+        const char* fs_vdsm = { 
+
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+//            "float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa); \n"   
+
+            INCLUDE_PCF_EXT
+
+            SHADOW_INCLUDE 
+
+            STRINGIFY ( 
+
+            //in  vdsm
+            //{
+                in vec4 shadow_view0;
+            //} shadow_in;
+
+            uniform sampler2DShadow shadowTexture0; 
+
+\n          float shadow_fs_main (float illum )
+\n          {
+\n           
+                    if(/*ambient.a*/illum > 0.35)
+\n                  {
+\n                       return PCF4_Ext(shadowTexture0, /*shadow_in.*/shadow_view0, illum);
+\n                  }
+\n
+\n                  return 1.0;
+            }
+
+            )
+        };
+
+        SHADERS_GETTER(get_shader_vdsm,vs_vdsm, fs_vdsm)
+
+#ifdef  SHADOW_PSSM
+        AUTO_REG_NAME(shadow , shaders::shadow_mat::get_shader_pssm)
+#else       
+        AUTO_REG_NAME(shadow , shaders::shadow_mat::get_shader_vdsm)
+#endif
+
+    }  // ns shadow_mat
+
 
     namespace todo
     {

@@ -896,8 +896,13 @@ osg::Group*  Scene::createTerrainRoot()
 
     const int fbo_tex_size = 1024*4;
 
-    _st = /*new avShadow::ViewDependentShadowMap;*/ new avShadow::ParallelSplitShadowMap(NULL,3);
-     tr = new avShadow::ShadowedScene(_st.get());  
+#ifdef  SHADOW_PSSM
+    _st = new avShadow::ParallelSplitShadowMap(NULL,3);
+#else
+    _st = new avShadow::ViewDependentShadowMap; /*new avShadow::ParallelSplitShadowMap(NULL,3);*/
+#endif
+
+    tr = new avShadow::ShadowedScene(_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
     
@@ -916,8 +921,13 @@ osg::Group*  Scene::createTerrainRoot()
 	//settings->setCastsShadowTraversalMask(cCastsShadowTraversalMask);
 	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
     
-    if(auto p = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
-        p->setMaxFarDistance(1024.0);
+    if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
+    {
+        pssm->setMaxFarDistance(1024.0);
+        double polyoffsetfactor = pssm->getPolygonOffset().x() + 1.1;
+        double polyoffsetunit   = pssm->getPolygonOffset().y();
+        pssm->setPolygonOffset(osg::Vec2(polyoffsetfactor,polyoffsetunit));
+    }
 
 #else
     tr = new osg::Group;

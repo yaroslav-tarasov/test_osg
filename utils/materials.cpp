@@ -361,24 +361,12 @@ public:
             program_t p;
             p.program = new osg::Program;
             p.program->setName(mat_name);
-            
-            if(GetShader(shaders::VS,mat_name))
-            {
-                std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
-                    + osg_modification(version,utils::format(*GetShader(shaders::VS,mat_name)));
-                auto vs = new osg::Shader( osg::Shader::VERTEX, prog );
-                p.program->addShader( vs );
 
-            }
+            AddShader(shaders::VS, "shadow", version, comp_str, p);
+            AddShader(shaders::FS, "shadow", version, comp_str, p);
 
-            if(GetShader(shaders::FS,mat_name))
-            {
-                std::string prog = "#version " + boost::lexical_cast<string>(version)  +  comp_str +"\n "
-                    + osg_modification(version,utils::format(*GetShader(shaders::FS,mat_name)));
-                auto fs = new osg::Shader(osg::Shader::FRAGMENT, prog);
-                p.program->addShader( fs );
-                
-            }
+            AddShader(shaders::VS, mat_name, version, comp_str, p);
+            AddShader(shaders::FS, mat_name, version, comp_str, p);
 
             p.program->addBindAttribLocation( "tangent" , 6 );
             p.program->addBindAttribLocation( "binormal", 7 );
@@ -388,6 +376,19 @@ public:
 
         return GetPrograms()[mat_name];
     }
+
+    static void AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str, program_t &p ) 
+    {
+        if(GetShader(t,mat_name))
+        {
+            std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
+                + osg_modification(version,utils::format(*GetShader(t,mat_name)));
+            auto shader = new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
+            p.program->addShader( shader );
+
+        }
+    }
+
 
     static inline std::string GetMaterialName( const std::string& mat_name )
     {
