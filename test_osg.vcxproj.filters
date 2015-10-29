@@ -730,5 +730,11 @@
     <ClCompile Include="av\avShadows\ParallelSplitShadowMap.cpp">
       <Filter>Source Files\av\sm</Filter>
     </ClCompile>
+    <ClCompile Include="tests\osgsmartbody.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\osgshadowworks.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

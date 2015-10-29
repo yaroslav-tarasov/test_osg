@@ -347,6 +347,7 @@ std::string osg_modification(uint16_t version, const std::string& prog)
       return source;
 }
 
+
 class programsHolder: public programsHolder_base
 {
 
@@ -356,37 +357,42 @@ public:
         const uint16_t version = GLSL_VERSION;
         const std::string  comp_str = GLSL_VERSION>400? " compatibility":"";
 
-        if(GetPrograms().find(mat_name)==GetPrograms().end())
+        const std::string  mat_name_cut = GetMaterialName(mat_name);
+
+        if(GetPrograms().find(mat_name_cut)==GetPrograms().end())
         {
             program_t p;
             p.program = new osg::Program;
-            p.program->setName(mat_name);
+            p.program->setName(mat_name_cut);
 
-            AddShader(shaders::VS, "shadow", version, comp_str, p);
-            AddShader(shaders::FS, "shadow", version, comp_str, p);
+            static auto ssv = AddShader(shaders::VS, "shadow", version, comp_str);
+            static auto ssf = AddShader(shaders::FS, "shadow", version, comp_str);
 
-            AddShader(shaders::VS, mat_name, version, comp_str, p);
-            AddShader(shaders::FS, mat_name, version, comp_str, p);
+            p.program->addShader( ssv );
+            p.program->addShader( ssf );
+            
+            p.program->addShader( AddShader(shaders::VS, mat_name_cut, version, comp_str));
+            p.program->addShader( AddShader(shaders::FS, mat_name_cut, version, comp_str));
 
             p.program->addBindAttribLocation( "tangent" , 6 );
             p.program->addBindAttribLocation( "binormal", 7 );
 
-            GetPrograms()[mat_name]=p;
+            GetPrograms()[mat_name_cut]=p;
         }
 
-        return GetPrograms()[mat_name];
+        return GetPrograms()[mat_name_cut];
     }
 
-    static void AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str, program_t &p ) 
+    static osg::Shader* AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str ) 
     {
         if(GetShader(t,mat_name))
         {
             std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
                 + osg_modification(version,utils::format(*GetShader(t,mat_name)));
-            auto shader = new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
-            p.program->addShader( shader );
+            return new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
 
         }
+        return new osg::Shader();
     }
 
 
@@ -423,13 +429,6 @@ private:
         
         if (fp)
             return fp(t);
-
-        //FIXME( "Есть где-то buildingtrack" ) 
-
-        //if (mat_name.find("building") !=std::string::npos)
-        //{
-        //    return shaders::building_mat::get_shader(t); 
-        //}
 
         if (mat_name.find("default") !=std::string::npos)
         {
@@ -495,7 +494,7 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
     stateset->addUniform( new osg::Uniform("envTex"        , BASE_ENV_TEXTURE_UNIT) ); 
     stateset->addUniform( new osg::Uniform("ViewDecalMap"  , BASE_DECAL_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("ViewLightMap"  , BASE_LM_TEXTURE_UNIT) );
-    // Добавляется в VDS Map
+    // Добавляется в VDSM
     //stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
 
 

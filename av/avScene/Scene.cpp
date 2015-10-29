@@ -899,7 +899,7 @@ osg::Group*  Scene::createTerrainRoot()
 #ifdef  SHADOW_PSSM
     _st = new avShadow::ParallelSplitShadowMap(NULL,3);
 #else
-    _st = new avShadow::ViewDependentShadowMap; /*new avShadow::ParallelSplitShadowMap(NULL,3);*/
+    _st = new avShadow::ViewDependentShadowMap; 
 #endif
 
     tr = new avShadow::ShadowedScene(_st.get());  
