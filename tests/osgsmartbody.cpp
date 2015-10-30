@@ -24,6 +24,8 @@ int main_sb( int argc, char** argv )
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->setMediaPath( "./smartbody/" );   // data/
     scene->addAssetPath( "motion", "ChrBrad" );
+    scene->addAssetPath( "mesh", "mesh");
+    scene->addAssetPath( "script", "scripts");
     scene->loadAssets();
     
     int numMotions = scene->getNumMotions();
@@ -45,9 +47,9 @@ int main_sb( int argc, char** argv )
     viewer.addEventHandler( new osgViewer::StatsHandler );
     viewer.addEventHandler( new osgViewer::WindowSizeHandler );
     viewer.setSceneData( root.get() );
-    viewer.setUpViewOnSingleScreen( 0 );
+    viewer.setUpViewOnSingleScreen( 1 );
     
-    scene->getBmlProcessor()->execBML( "mycharacter", "<body posture=\"ChrBrad@Idle01\"/>" );
+    std::string ret =  scene->getBmlProcessor()->execBML( "mycharacter", "<body posture=\"ChrBrad@Idle01\"/>" );
     sim->start();
     while ( !viewer.done() )
     {
