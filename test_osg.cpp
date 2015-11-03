@@ -31,7 +31,7 @@
 int main( int argc, char** argv )
 {  
 
-    auto fp = fn_reg::function<int( int argc, char** argv )>("main_sb");//"av_scene"  main_grass_test
+    auto fp = fn_reg::function<int( int argc, char** argv )>("av_scene");//"av_scene"  main_grass_test
 
     if(fp)
         return fp(argc, argv);

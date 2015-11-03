@@ -174,7 +174,7 @@ namespace sync_fsm
                 //self_.set_desired_nm_pos(physpos.pos);
                 //self_.set_desired_nm_orien(physpos.orien);
                 {
-                    force_log fl;
+                    //force_log fl;
 
                     LOG_ODS_MSG (
                         " physpos.lat " << physpos.pos.lat <<

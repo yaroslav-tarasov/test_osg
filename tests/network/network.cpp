@@ -102,7 +102,7 @@ private:
         send(&bts[0], bts.size());
         
         LogInfo("update() send run " );
-
+#if 0
         if(ac_counter_++==40)
         {
             binary::bytes_t bts =  std::move(wrap_msg(create(0,0,90)));
@@ -118,6 +118,7 @@ private:
 
             LogInfo("update() send create " );
         }
+#endif
 
         timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
     }

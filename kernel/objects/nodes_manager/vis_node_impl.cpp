@@ -83,7 +83,32 @@ void vis_node_impl::pre_update(double time)
     double dt = time - *time_;
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {
-        LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt << "   node type: " << (extrapolated_position_.is_local()?"local":"global") << "\n" );
+        force_log fl;
+
+        LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt 
+                     << "   node type: " << (extrapolated_position_.is_local()?"local":"global")
+                     << "   time: " << time
+                     << "   time_: " << *time_
+                     << "\n" );
+        
+        nm::visit_sub_tree(manager_->get_node_tree_iterator(node_id()), [this](nm::node_info_ptr n)->bool
+        {
+            static int i = 0;
+            force_log fl;
+
+            if(i++ < 3 )
+            {
+                // dynamic_cast<vis_node_impl *>(n.get())->sync_position();
+                LOG_ODS_MSG( "vis_node_impl::pre_update(double time)  " << n->name() << "\n" );
+            }
+            else
+            {
+                i = 0;
+                return false;
+            }
+
+            return true;
+        });   
     }
 
     sync_position(dt);
