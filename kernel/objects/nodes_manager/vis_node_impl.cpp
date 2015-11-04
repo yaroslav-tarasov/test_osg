@@ -83,8 +83,7 @@ void vis_node_impl::pre_update(double time)
     double dt = time - *time_;
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {
-        force_log fl;
-
+#if 0
         LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt 
                      << "   node type: " << (extrapolated_position_.is_local()?"local":"global")
                      << "   time: " << time
@@ -108,7 +107,8 @@ void vis_node_impl::pre_update(double time)
             }
 
             return true;
-        });   
+        });
+#endif
     }
 
     sync_position(dt);

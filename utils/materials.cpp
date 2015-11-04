@@ -365,8 +365,8 @@ public:
             p.program = new osg::Program;
             p.program->setName(mat_name_cut);
 
-            static auto ssv = AddShader(shaders::VS, "shadow", version, comp_str);
-            static auto ssf = AddShader(shaders::FS, "shadow", version, comp_str);
+            static osg::Shader* ssv = AddShader(shaders::VS, "shadow", version, comp_str);
+            static osg::Shader* ssf = AddShader(shaders::FS, "shadow", version, comp_str);
 
             p.program->addShader( ssv );
             p.program->addShader( ssf );

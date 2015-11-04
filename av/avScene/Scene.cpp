@@ -1239,6 +1239,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         _terrainNode->create(path);
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
+		
+		load("elexis",_terrainRoot, 15000);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 

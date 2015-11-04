@@ -33,9 +33,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\env_vars.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\env_vars.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -71,14 +73,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DOM_DYNAMIC;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SolutionDir)\ext\pugixml-1.4\src;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SIMEX_DIR)\ext\include;$(SolutionDir)\ext\pugixml-1.4\src;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4;C:\simex\ext\lib\boost</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcollada14dom22.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
