@@ -35,9 +35,11 @@ void initDataPaths()
 	osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\misc");
 }
 
+bool LoadShaderFileInternal(const std::string & fileName, std::ostream & text);
 
-bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
+bool LoadShaderInternal(const std::string & fileName, std::stringstream& file, std::ostream & text )
 {
+#if 0
     std::ifstream file(fileName.c_str());
 
     if (file.bad())
@@ -47,6 +49,7 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
 
         return false;
     }
+#endif
 
     bool commentBlock = false;
     char szLineBuffer[1024];
@@ -80,7 +83,7 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
             
             if (!includeFullFileName.empty())
             {
-                if (!LoadShaderInternal(includeFullFileName, text))
+                if (!LoadShaderFileInternal(includeFullFileName, text))
                 {
                     avError(/*_T*/("Failed to load shader '%s'."), fileName.c_str());
 
@@ -121,12 +124,34 @@ bool LoadShaderInternal( const std::string & fileName, std::ostream & text )
     return true;
 }
 
+bool LoadShaderFileInternal(const std::string & fileName, std::ostream & shaderText)
+{
+    const std::string  file_name = osgDB::findDataFile(fileName);
+    std::ifstream file(fileName.c_str());
+    if (file.bad())
+    {
+        avError("Failed to load shader '%s'.", fileName.c_str());
+        return false;
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+
+    if (!LoadShaderInternal(fileName, buffer, shaderText))
+        return false;
+
+    return true;
+}
+
 std::string LoadShader(const std::string& name)
 {
     std::ostringstream shaderText;
     //  shaderText << cIt->first.second; // Add all defines
-    if (!LoadShaderInternal(osgDB::findDataFile(name), shaderText))
-        return "";
+
+    if (!LoadShaderFileInternal(name, shaderText))
+        return false;
+
     shaderText << std::ends;
 
     return shaderText.str();

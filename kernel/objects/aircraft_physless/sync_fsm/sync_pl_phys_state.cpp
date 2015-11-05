@@ -282,7 +282,7 @@ namespace sync_fsm
 
             desired_orien_in_rel = quaternion(cpr(0, 0, -root_next_orien.get_roll())) * desired_orien_in_rel;
 			
-			force_log fl;
+			//force_log fl;
 
 			LOG_ODS_MSG( "  wpos_rel_orien.get_course() = " << wpos_rel_orien.get_course() <<
 				"  wpos_rel_orien.get_roll() = "			<< wpos_rel_orien.get_roll()   <<

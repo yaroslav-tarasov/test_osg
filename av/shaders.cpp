@@ -73,61 +73,61 @@ namespace shaders
 
 #define INCLUDE_FUNCS                                                                                    \
         STRINGIFY (                                                                                      \
-        float saturate( const in float x )                                                               \
-        {                                                                                                \
-            return clamp(x, 0.0, 1.0);                                                                   \
-        }                                                                                                \
-                                                                                                         \
-        float lerp(float a, float b, float w)                                                            \
-        {                                                                                                \
-            return a + w*(b-a);                                                                          \
-        }                                                                                                \
-                                                                                                         \
-        vec3 hardlight( const in vec3 color, const in vec3 hl )                                          \
-        {                                                                                                \
-            vec3 hl_pos = step(vec3(0.0), hl);                                                           \
-            return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +                                     \
-                hl_pos * mix(color, vec3(1.0), hl);                                                      \
-        }                                                                                                \
-                                                                                                         \
-        float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )                          \
-        {                                                                                                \
-            vec2 grad_vec = fwidth(tex_c_mod);                                                           \
-            float detail_fac = exp(coef * dot(grad_vec, grad_vec));                                      \
-            return detail_fac * (2.0 - detail_fac);                                                      \
-        }                                                                                                \
-                                                                                                         \
-        float ramp_up( const in float x )                                                                \
-        {                                                                                                \
-            return x * fma(x, -0.5, 1.5);                                                                \
-        }                                                                                                \
-                                                                                                         \
-        float ramp_down( const in float x )                                                              \
-        {                                                                                                \
-            return x * fma(x, 0.5, 0.5);                                                                 \
-        }                                                                                                \
-                                                                                                         \
-                                                                                                         \
+\n        float saturate( const in float x )                                                               \
+\n        {                                                                                                \
+\n            return clamp(x, 0.0, 1.0);                                                                   \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n        float lerp(float a, float b, float w)                                                            \
+\n        {                                                                                                \
+\n            return a + w*(b-a);                                                                          \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n        vec3 hardlight( const in vec3 color, const in vec3 hl )                                          \
+\n        {                                                                                                \
+\n            vec3 hl_pos = step(vec3(0.0), hl);                                                           \
+\n            return (vec3(1.0) - hl_pos) * color * (hl + vec3(1.0)) +                                     \
+\n                hl_pos * mix(color, vec3(1.0), hl);                                                      \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n        float tex_detail_factor( const in vec2 tex_c_mod, const in float coef )                          \
+\n        {                                                                                                \
+\n            vec2 grad_vec = fwidth(tex_c_mod);                                                           \
+\n            float detail_fac = exp(coef * dot(grad_vec, grad_vec));                                      \
+\n            return detail_fac * (2.0 - detail_fac);                                                      \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n        float ramp_up( const in float x )                                                                \
+\n        {                                                                                                \
+\n            return x * fma(x, -0.5, 1.5);                                                                \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n        float ramp_down( const in float x )                                                              \
+\n        {                                                                                                \
+\n            return x * fma(x, 0.5, 0.5);                                                                 \
+\n        }                                                                                                \
+\n                                                                                                         \
+\n                                                                                                         \
         )
 
 #define INCLUDE_FOG_FUNCS                                                                                        \
     STRINGIFY (                                                                                                  \
-                float fog_decay_factor( const in vec3 view_pos )                                                 \
-                {                                                                                                \
-                    return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       \
-                }                                                                                                \
-                vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
-                {                                                                                                \
-                    vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-                    return mix(/*textureCube*/texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
-                    /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
-                }                                                                                                \
-                                                                                                                 \
-                vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
-                {                                                                                                \
-                    return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));             \
-                }                                                                                                \
-                                                                                                                 \
+\n                float fog_decay_factor( const in vec3 view_pos )                                                 \
+\n                {                                                                                                \
+\n                    return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       \
+\n                }                                                                                                \
+\n                vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
+\n                {                                                                                                \
+\n                    vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
+\n                    return mix(/*textureCube*/texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
+\n                    /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
+\n                }                                                                                                \
+\n                                                                                                                 \
+\n                vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
+\n                {                                                                                                \
+\n                    return mix(/*fog_params*/SceneFogParams.rgb, color, fog_decay_factor(view_pos));             \
+\n                }                                                                                                \
+\n                                                                                                                 \
                 )
 
 
@@ -246,22 +246,22 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 #define INCLUDE_SCENE_PARAM                                                                             \
      STRINGIFY (                                                                                        \
-        uniform vec4 ambient;                                                                           \
-        uniform vec4 diffuse;                                                                           \
-        uniform vec4 specular;                                                                          \
-        uniform vec4 light_vec_view;                                                                    \
+\n        uniform vec4 ambient;                                                                           \
+\n        uniform vec4 diffuse;                                                                           \
+\n        uniform vec4 specular;                                                                          \
+\n        uniform vec4 light_vec_view;                                                                    \
      )
 
 #define INCLUDE_UNIFORMS                                                                                \
     STRINGIFY (                                                                                         \
-        uniform sampler2D           ViewLightMap;                                                       \
-        uniform sampler2D           detailTex;                                                          \
-        uniform samplerCube         envTex;                                                             \
-        uniform sampler2DShadow     ShadowSplit0;                                                       \
-        uniform sampler2DShadow     ShadowSplit1;                                                       \
-        uniform sampler2DShadow     ShadowSplit2;                                                       \
-        uniform sampler2D           ViewDecalMap;                                                       \
-        uniform vec4                SceneFogParams;                                                     \
+\n        uniform sampler2D           ViewLightMap;                                                       \
+\n        uniform sampler2D           detailTex;                                                          \
+\n        uniform samplerCube         envTex;                                                             \
+\n        uniform sampler2DShadow     ShadowSplit0;                                                       \
+\n        uniform sampler2DShadow     ShadowSplit1;                                                       \
+\n        uniform sampler2DShadow     ShadowSplit2;                                                       \
+\n        uniform sampler2D           ViewDecalMap;                                                       \
+\n        uniform vec4                SceneFogParams;                                                     \
         )
 
 #define INCLUDE_COMPABILITY \
@@ -275,113 +275,113 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 #define INCLUDE_DL                                                                                       \
     STRINGIFY (                                                                                          \
-    \
-    const int nMaxLights = 124;                                                                           \
-    \
-    \
-    uniform int LightsActiveNum;                                                                         \
-    \
-    uniform vec4 LightVSPosAmbRatio[nMaxLights];                                                         \
-    uniform vec4 LightVSDirSpecRatio[nMaxLights];                                                        \
-    uniform vec4 LightAttenuation[nMaxLights];                                                           \
-    uniform vec3 LightDiffuse[nMaxLights];                                                               \
-    \
-    void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
-   {                                                                                                     \
-   int curLight = 0;                                                                                     \
-   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
-   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
-   while (curLight < LightsActiveNum)                                                                    \
-       {                                                                                                 \
-       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
-       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
-       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
-       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
-       \
-       vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                        \
-       float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                               \
-       vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                 \
-       \
-       float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                        \
-       float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);               \
-                                                                                                         \
-       fTotalAtt *= clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);              \
-       \
-       if (fTotalAtt != 0.0)                                                                             \
-           {                                                                                             \
-           \
-           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
-           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * step(0,fDiffuseDot) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
-           \
-           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
-           fSpecPower *= fSpecPower;                                                                     \
-           fSpecPower *= fSpecPower;                                                                     \
-           cSpecular += (fTotalAtt * curVSDirSpecRatio.w * fSpecPower) * curDiffuse;                     \
-           }                                                                                             \
-                                                                                                         \
-                                                                                                         \
-           ++curLight;                                                                                   \
-       }                                                                                                 \
-                                                                                                         \
-                                                                                                         \
-       return;                                                                                           \
-   }                                                                                                     \
+\n    \
+\n    const int nMaxLights = 124;                                                                           \
+\n    \
+\n    \
+\n    uniform int LightsActiveNum;                                                                         \
+\n    \
+\n    uniform vec4 LightVSPosAmbRatio[nMaxLights];                                                         \
+\n    uniform vec4 LightVSDirSpecRatio[nMaxLights];                                                        \
+\n    uniform vec4 LightAttenuation[nMaxLights];                                                           \
+\n    uniform vec3 LightDiffuse[nMaxLights];                                                               \
+\n    \
+\n    void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
+\n   {                                                                                                     \
+\n   int curLight = 0;                                                                                     \
+\n   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
+\n   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
+\n   while (curLight < LightsActiveNum)                                                                    \
+\n       {                                                                                                 \
+\n       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
+\n       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
+\n       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
+\n       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
+\n       \
+\n       vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                        \
+\n       float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                               \
+\n       vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                 \
+\n       \
+\n       float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                        \
+\n       float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);               \
+\n                                                                                                         \
+\n       fTotalAtt *= clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);              \
+\n       \
+\n       if (fTotalAtt != 0.0)                                                                             \
+\n           {                                                                                             \
+\n           \
+\n           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
+\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * step(0,fDiffuseDot) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
+\n           \
+\n           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
+\n           fSpecPower *= fSpecPower;                                                                     \
+\n           fSpecPower *= fSpecPower;                                                                     \
+\n           cSpecular += (fTotalAtt * curVSDirSpecRatio.w * fSpecPower) * curDiffuse;                     \
+\n           }                                                                                             \
+\n                                                                                                         \
+\n                                                                                                         \
+\n           ++curLight;                                                                                   \
+\n       }                                                                                                 \
+\n                                                                                                         \
+\n                                                                                                         \
+\n       return;                                                                                           \
+\n   }                                                                                                     \
    )        
 
 #define INCLUDE_DL2                                                                                      \
     STRINGIFY (                                                                                          \
-                                                                                                         \
-    const float PI = 3.14159265358979323846264;                                                          \
-                                                                                                         \
-   void compute_dynamic_lights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
-   {                                                                                                     \
-   int curLight = 0;                                                                                     \
-   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
-   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
-   while (curLight < LightsActiveNum)                                                                    \
-       {                                                                                                 \
-       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
-       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
-       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
-       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
-                                                                                                         \
-                                                                                                         \
-        vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);                                    \
-        vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                       \
-        float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                              \
-        vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                \
-                                                                                                         \
-        float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                       \
-        float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);              \
-                                                                                                         \
-        /*float*/ fTotalAtt = clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);    \
-                                                                                                         \
-        float intensity = 0.0;                                                                           \
-        vec4 spec = vec4(0.0);                                                                           \
-        vec3 ld = normalize(vVecToLight);                                                                \
-        vec3 sd = normalize(vec3(-curVSDirSpecRatio.xyz));                                               \
-                                                                                                         \
-        if (dot(ld,sd) > cos(PI/4)) {                                                        \
-                                                                                                         \
-                    vec3 n = normalize(vViewSpaceNormal);                                                \
-                    intensity = max(dot(n,ld), 0.0);                                                     \
-                                                                                                         \
-                        if (intensity > 0.0) {                                                           \
-                                vec3 eye = normalize(vViewSpacePoint);                                   \
-                                vec3 h = normalize(ld + eye);                                            \
-                                float intSpec = max(dot(h,n), 0.0);                                      \
-                                spec = specular_ * pow(intSpec, 1/*shininess*/);                         \
-                            }                                                                            \
-                }                                                                                        \
-                                                                                                         \
-           cAmbDiff += fTotalAtt *(intensity * curDiffuse + spec.rgb);                                   \
-                                                                                                         \
-                                                                                                         \
-           ++curLight;                                                                                   \
-       }                                                                                                 \
-                                                                                                         \
-       return;                                                                                           \
-   }                                                                                                     \
+\n                                                                                                         \
+\n    const float PI = 3.14159265358979323846264;                                                          \
+\n                                                                                                         \
+\n   void compute_dynamic_lights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
+\n   {                                                                                                     \
+\n   int curLight = 0;                                                                                     \
+\n   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
+\n   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
+\n   while (curLight < LightsActiveNum)                                                                    \
+\n       {                                                                                                 \
+\n       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
+\n       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
+\n       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
+\n       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
+\n                                                                                                         \
+\n                                                                                                         \
+\n        vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);                                    \
+\n        vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                       \
+\n        float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                              \
+\n        vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                \
+\n                                                                                                         \
+\n        float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                       \
+\n        float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);              \
+\n                                                                                                         \
+\n        /*float*/ fTotalAtt = clamp(curAttenuation.x * vDistToLightInv + curAttenuation.y, 0.0, 1.0);    \
+\n                                                                                                         \
+\n        float intensity = 0.0;                                                                           \
+\n        vec4 spec = vec4(0.0);                                                                           \
+\n        vec3 ld = normalize(vVecToLight);                                                                \
+\n        vec3 sd = normalize(vec3(-curVSDirSpecRatio.xyz));                                               \
+\n                                                                                                         \
+\n        if (dot(ld,sd) > cos(PI/4)) {                                                        \
+\n                                                                                                         \
+\n                    vec3 n = normalize(vViewSpaceNormal);                                                \
+\n                    intensity = max(dot(n,ld), 0.0);                                                     \
+\n                                                                                                         \
+\n                        if (intensity > 0.0) {                                                           \
+\n                                vec3 eye = normalize(vViewSpacePoint);                                   \
+\n                                vec3 h = normalize(ld + eye);                                            \
+\n                                float intSpec = max(dot(h,n), 0.0);                                      \
+\n                                spec = specular_ * pow(intSpec, 1/*shininess*/);                         \
+\n                            }                                                                            \
+\n                }                                                                                        \
+\n                                                                                                         \
+\n           cAmbDiff += fTotalAtt *(intensity * curDiffuse + spec.rgb);                                   \
+\n                                                                                                         \
+\n                                                                                                         \
+\n           ++curLight;                                                                                   \
+\n       }                                                                                                 \
+\n                                                                                                         \
+\n       return;                                                                                           \
+\n   }                                                                                                     \
    )  
 
 #undef INCLUDE_DL
@@ -455,10 +455,10 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         INCLUDE_UNIFORMS
 
         STRINGIFY ( 
-    
+\n    
         // layout(early_fragment_tests) in;
-
-        in mat4 viewworld_matrix;
+\n
+\n        in mat4 viewworld_matrix;
         )
 
         INCLUDE_FUNCS
@@ -476,39 +476,39 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 \n        
 \n      uniform sampler2D colorTex;
-        uniform sampler2D normalTex;
-       
-        
-
-        in block
-        {
-            vec2 texcoord;
-            vec3 normal;
-            vec3 vnormal;
-            vec3 tangent;
-            vec3 binormal;
-            vec3 viewpos;
-            vec4 shadow_view;
-            vec4 lightmap_coord;
-        } f_in;
-
-        out vec4  aFragColor;
-        
-        uniform float zShadow0; 
-
-        void main (void)
-        {
+\n      uniform sampler2D normalTex;
+\n       
+\n        
+\n
+\n        in block
+\n        {
+\n            vec2 texcoord;
+\n            vec3 normal;
+\n            vec3 vnormal;
+\n            vec3 tangent;
+\n            vec3 binormal;
+\n            vec3 viewpos;
+\n            vec4 shadow_view;
+\n            vec4 lightmap_coord;
+\n       } f_in;
+\n
+\n        out vec4  aFragColor;
+\n        
+\n        uniform float zShadow0; 
+\n
+\n        void main (void)
+\n        {
 $if 0
 \n
-            float fTexelSize=0.00137695;
-            float fZOffSet  = -0.001954;
-            float testZ = gl_FragCoord.z*2.0-1.0;
-            float map0 = step(testZ, zShadow0);
-            float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
-            float shadow0 = shadowOrg0;
-            float term0 = map0*(1.0-shadow0); 
-            float v = clamp(term0,0.0,1.0);
-            float shadow = 1 - v * 0.5;;
+\n            float fTexelSize=0.00137695;
+\n            float fZOffSet  = -0.001954;
+\n            float testZ = gl_FragCoord.z*2.0-1.0;
+\n            float map0 = step(testZ, zShadow0);
+\n            float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+\n            float shadow0 = shadowOrg0;
+\n            float term0 = map0*(1.0-shadow0); 
+\n            float v = clamp(term0,0.0,1.0);
+\n            float shadow = 1 - v * 0.5;;
 $endif
 \n
             // GET_SHADOW(f_in.viewpos, f_in);
@@ -516,66 +516,66 @@ $endif
           //  float shadow = 1.0; 
             //if(ambient.a > 0.35)
           //     shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
-
-            float shadow =  shadow_fs_main(ambient.a);
-
-            vec4 base = texture2D(colorTex, f_in.texcoord.xy);
-            vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
-            //vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;
-            //bump = normalize(bump * 2.0 - 1.0);
-            vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
-            vec4  dif_tex_col  = texture2D(colorTex,f_in.texcoord.xy, -1.0);
-            float glass_factor = 1.0 - dif_tex_col.a;
-
-            // get dist to point and normalized to-eye vector
-            float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
-            float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
-            float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
-            vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
-
-            vec3 view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
-            float normal_world_space_z = dot(view_up_vec, normal);
-                                
-
-            float incidence_dot  = dot(to_eye, normal);
-            float pow_fr         = pow(saturate(1.0 - incidence_dot), 3.0);
-            vec3  refl_vec_view  = -to_eye + (2.0 * incidence_dot) * normal;
-            vec3  refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
-            float refl_min       = fma(glass_factor, 0.275, 0.125);
-            float half_refl_z    = 0.5 * (refl_vec_world.z + normal_world_space_z);
-            float fresnel        = mix(refl_min, 0.97, pow_fr) * fma(half_refl_z, 0.15, fma(glass_factor, 0.6, 0.25)); 
-
-            float n_dot_l = shadow * saturate(dot(normal, light_vec_view.xyz));
-            float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 44.0) * 0.9;
-            vec3  pure_spec_color = specular.rgb * specular_val;
-            float spec_compose_fraction = 0.35;
-
-
-            //const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
-            vec3 cube_color = texture(envTex, refl_vec_world).rgb + pure_spec_color;
-
-
-            vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
-
+\n
+\n            float shadow =  shadow_fs_main(ambient.a);
+\n
+\n            vec4 base = texture2D(colorTex, f_in.texcoord.xy);
+\n            vec3 bump = fma(texture2D(normalTex, f_in.texcoord.xy).xyz, vec3(2.0), vec3(-1.0));
+\n            //vec3 bump = texture2D(normalTex, gl_TexCoord[0].xy).xyz;
+\n            //bump = normalize(bump * 2.0 - 1.0);
+\n            vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
+\n            vec4  dif_tex_col  = texture2D(colorTex,f_in.texcoord.xy, -1.0);
+\n            float glass_factor = 1.0 - dif_tex_col.a;
+\n
+\n            // get dist to point and normalized to-eye vector
+\n            float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n            float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n            float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n            vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n            vec3 view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+\n            float normal_world_space_z = dot(view_up_vec, normal);
+\n                                
+\n
+\n            float incidence_dot  = dot(to_eye, normal);
+\n            float pow_fr         = pow(saturate(1.0 - incidence_dot), 3.0);
+\n            vec3  refl_vec_view  = -to_eye + (2.0 * incidence_dot) * normal;
+\n            vec3  refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+\n            float refl_min       = fma(glass_factor, 0.275, 0.125);
+\n            float half_refl_z    = 0.5 * (refl_vec_world.z + normal_world_space_z);
+\n            float fresnel        = mix(refl_min, 0.97, pow_fr) * fma(half_refl_z, 0.15, fma(glass_factor, 0.6, 0.25)); 
+\n
+\n            float n_dot_l = shadow * saturate(dot(normal, light_vec_view.xyz));
+\n            float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 44.0) * 0.9;
+\n            vec3  pure_spec_color = specular.rgb * specular_val;
+\n            float spec_compose_fraction = 0.35;
+\n
+\n
+\n            //const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
+\n            vec3 cube_color = texture(envTex, refl_vec_world).rgb + pure_spec_color;
+\n
+\n
+\n            vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
+\n
 \n          // Apply spot lights
-\n          vec3 vLightsSpecAddOn;
-            vec3 light_res;  
-                  
-            // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n            vec3 vLightsSpecAddOn;
+\n            vec3 light_res;  
+\n                  
+\n            // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n          // vec3 lightmap_color = light_res ; 
-
-\n          GET_LIGHTMAP(f_in.viewpos, f_in);
-
-            float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
-            non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
-
-            float ao_trick = fma(up_dot_clamped, 0.4, 0.6);
-            vec3  composed_lighting = ao_trick * ambient.rgb + non_ambient_term;
-            vec3  day_result = mix(composed_lighting * dif_tex_col.rgb, cube_color, fresnel) + (1.0 - spec_compose_fraction) * pure_spec_color;
-            float night_factor = step(ambient.a, 0.35);
-            vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
-
-            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n
+\n            GET_LIGHTMAP(f_in.viewpos, f_in);
+\n
+\n            float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
+\n            non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
+\n
+\n            float ao_trick = fma(up_dot_clamped, 0.4, 0.6);
+\n            vec3  composed_lighting = ao_trick * ambient.rgb + non_ambient_term;
+\n            vec3  day_result = mix(composed_lighting * dif_tex_col.rgb, cube_color, fresnel) + (1.0 - spec_compose_fraction) * pure_spec_color;
+\n            float night_factor = step(ambient.a, 0.35);
+\n            vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
+\n
+\n            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
             
         }
     )
@@ -883,24 +883,24 @@ $endif
 
             STRINGIFY ( 
 \n            
-            out mat4 viewworld_matrix;
-
-            out block
-            {
-                vec2 texcoord;
-                vec3 normal;
-                vec3 vnormal;
-                vec3 viewpos;
-                vec4 shadow_view;
-                vec4 lightmap_coord;
-            } v_out;
-             
-            void main()
-            {
-                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
+\n          out mat4 viewworld_matrix;
+\n
+\n            out block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 vnormal;
+\n                vec3 viewpos;
+\n                vec4 shadow_view;
+\n                vec4 lightmap_coord;
+\n            } v_out;
+\n             
+\n            void main()
+\n            {
+\n                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+\n                vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
+\n                viewworld_matrix = inverse(gl_ModelViewMatrix);
+\n                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 
                 v_out.normal    = normal;
                 v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
@@ -940,88 +940,88 @@ $endif
 
             STRINGIFY ( 
 \n
-            uniform sampler2D           colorTex;
-            uniform sampler2D           nightTex;
-
-            in block
-            {
-                vec2 texcoord;
-                vec3 normal;
-                vec3 vnormal;
-                vec3 viewpos;
-                vec4 shadow_view;
-                vec4 lightmap_coord;
-            } f_in;
-            
-            out vec4  aFragColor;
-
-            void main (void)
-            {
-                // GET_SHADOW(f_in.viewpos, f_in);
-                //float shadow = 1.0; 
-                //if(ambient.a > 0.35)
-                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
-                
-                float shadow =  shadow_fs_main(ambient.a);
-
-                // get dist to point and normalized to-eye vector
-                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
-                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
-                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
-                vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
-
-                vec3  normal = normalize(f_in.normal);
-                float incidence_dot = dot(to_eye, normal);
-                vec3  refl_vec_view = -to_eye + (2.0 * incidence_dot) * normal;
-
-                vec3  view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
-                float normal_world_space_z = dot(view_up_vec, normal);
-
-                // diffuse color and glass factor (make windows color look darker)
-                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
-                dif_tex_col.rgb *= fma(dif_tex_col.a, 0.6, 0.4);
-                float glass_factor = 1.0 - dif_tex_col.a;
-
-                // get diffuse and specular value
-                float n_dot_l = ramp_up(shadow * saturate(dot(normal, light_vec_view.xyz)));
-                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 10.0) * 2.0;
-                vec3 spec_color = specular.rgb * specular_val;
-
-                // lightmaps
-                vec3 non_ambient_term = n_dot_l * diffuse.rgb;
-
+\n            uniform sampler2D           colorTex;
+\n            uniform sampler2D           nightTex;
+\n
+\n            in block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 vnormal;
+\n                vec3 viewpos;
+\n                vec4 shadow_view;
+\n                vec4 lightmap_coord;
+\n            } f_in;
+\n            
+\n            out vec4  aFragColor;
+\n
+\n            void main (void)
+\n            {
+\n                // GET_SHADOW(f_in.viewpos, f_in);
+\n                //float shadow = 1.0; 
+\n                //if(ambient.a > 0.35)
+\n                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+\n                
+\n                float shadow =  shadow_fs_main(ambient.a);
+\n
+\n                // get dist to point and normalized to-eye vector
+\n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n                vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n                vec3  normal = normalize(f_in.normal);
+\n                float incidence_dot = dot(to_eye, normal);
+\n                vec3  refl_vec_view = -to_eye + (2.0 * incidence_dot) * normal;
+\n
+\n                vec3  view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+\n                float normal_world_space_z = dot(view_up_vec, normal);
+\n
+\n                // diffuse color and glass factor (make windows color look darker)
+\n                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
+\n                dif_tex_col.rgb *= fma(dif_tex_col.a, 0.6, 0.4);
+\n                float glass_factor = 1.0 - dif_tex_col.a;
+\n
+\n                // get diffuse and specular value
+\n                float n_dot_l = ramp_up(shadow * saturate(dot(normal, light_vec_view.xyz)));
+\n                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 10.0) * 2.0;
+\n                vec3 spec_color = specular.rgb * specular_val;
+\n
+\n                // lightmaps
+\n                vec3 non_ambient_term = n_dot_l * diffuse.rgb;
+\n
 \n              // Apply spot lights
 \n              vec3 vLightsSpecAddOn;
-                vec3 light_res = vec3(0.0);  
-                  
-                // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n                vec3 light_res = vec3(0.0);  
+\n                  
+\n                // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n              // vec3 lightmap_color = light_res ; 
-
+\n
 \n              GET_LIGHTMAP(f_in.viewpos, f_in);
-
-                //    LIGHTMAP_BUILDING_HEIGHT_TRICK;
-                float up_dot_clamped = saturate(fma(normal_world_space_z, 0.4, 0.6));
-                non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
-
-                // overall lighting
-                vec3 light_color = ambient.rgb + non_ambient_term;
-
-                // apply detail texture
-                float detail_factor = dif_tex_col.a * tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.075);
-                if (detail_factor > 0.01)
-                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, detail_factor * fma(texture2D(detailTex, f_in.texcoord * 9.73f).rrr, vec3(0.5), vec3(-0.25)));
-
-                vec3 day_result = light_color * dif_tex_col.rgb;
-                vec3 night_tex = vec3(0.0f,0.0f,0.0f); // I'm not sure
-                if (glass_factor > 0.25)
-                {
-                    vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
-                    refl_vec_world.z = abs(refl_vec_world.z);
-                    float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
-                    vec3 cube_color = texture(envTex, refl_vec_world).rgb;
-                    day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
-                    night_tex = texture2D(nightTex, f_in.texcoord).rgb;
-                }
+\n
+\n                //    LIGHTMAP_BUILDING_HEIGHT_TRICK;
+\n                float up_dot_clamped = saturate(fma(normal_world_space_z, 0.4, 0.6));
+\n                non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
+\n
+\n                // overall lighting
+\n                vec3 light_color = ambient.rgb + non_ambient_term;
+\n
+\n                // apply detail texture
+\n                float detail_factor = dif_tex_col.a * tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.075);
+\n                if (detail_factor > 0.01)
+\n                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, detail_factor * fma(texture2D(detailTex, f_in.texcoord * 9.73f).rrr, vec3(0.5), vec3(-0.25)));
+\n
+\n                vec3 day_result = light_color * dif_tex_col.rgb;
+\n                vec3 night_tex = vec3(0.0f,0.0f,0.0f); // I'm not sure
+\n                if (glass_factor > 0.25)
+\n                {
+\n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+\n                   refl_vec_world.z = abs(refl_vec_world.z);
+\n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
+\n                   vec3 cube_color = texture(envTex, refl_vec_world).rgb;
+\n                   day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
+\n                   night_tex = texture2D(nightTex, f_in.texcoord).rgb;
+\n                }
 
                 float night_factor = step(ambient.a, 0.35);
                 vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
@@ -1346,10 +1346,46 @@ $endif
         SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(ground, shaders::ground_mat::get_shader)
-        AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
+        //AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
         AUTO_REG_NAME(mountain, shaders::ground_mat::get_shader)
 
     }  // ns ground_mat
+
+    namespace sea_mat
+    {
+
+        const char* vs = {
+
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+
+            STRINGIFY ( 
+            
+                //in vec2 fragCoord;
+
+                attribute vec3 tangent;
+                attribute vec3 binormal;
+                out       mat4 viewworld_matrix;
+                out       vec2 fragCoord;
+
+                void main()
+                {
+                    vec3 normal      = normalize(gl_NormalMatrix * gl_Normal);
+                    vec4 viewpos     = gl_ModelViewMatrix * gl_Vertex;
+                    viewworld_matrix = inverse(gl_ModelViewMatrix);
+                    gl_Position      = gl_ModelViewProjectionMatrix *  gl_Vertex;
+                    fragCoord        = vec2(gl_Position.xy);
+                }       
+            )
+        };
+
+        const char* fs =  STRINGIFY(
+            \n#include "data/materials/sea/sea.frag"
+        );
+        
+        SHADERS_GETTER(get_shader,vs, fs)
+
+        AUTO_REG_NAME(sea, shaders::sea_mat::get_shader)
+    }
 
     namespace concrete_mat 
     {
@@ -1487,39 +1523,39 @@ $endif
 $if 0
 \n
 \n              float testZ = gl_FragCoord.z*2.0-1.0;
-                float map0 = step(testZ, zShadow0);
-                float map1  = step(zShadow0,testZ)*step(testZ, zShadow1);
-                float map2  = step(zShadow1,testZ)*step(testZ, zShadow2);
-                float fTexelSize=0.00137695;
-                float fZOffSet  = -0.001954;
-
-                float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
-                float shadow00 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow10 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow20 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow30 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow0 = ( 2.0*shadowOrg0 + shadow00 + shadow10 + shadow20 + shadow30)/6.0;
-                float shadowOrg1 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(0.0,0.0,fZOffSet) ).r;
-                float shadow01 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow11 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow21 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow31 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow1 = ( 2.0*shadowOrg1 + shadow01 + shadow11 + shadow21 + shadow31)/6.0;
-                float shadowOrg2 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(0.0,0.0,fZOffSet) ).r;
-                float shadow02 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow12 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
-                float shadow22 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow32 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
-                float shadow2 = ( 2.0*shadowOrg2 + shadow02 + shadow12 + shadow22 + shadow32)/6.0;
-
-                float term0 = map0*(1.0-shadow0); 
-                float term1 = map1*(1.0-shadow1);
-                float term2 = map2*(1.0-shadow2);
-
-                float v = clamp(term0+term1+term2,0.0,1.0);
-
-                float shadow = 1 - v * 0.5;
-$endif
+\n                float map0 = step(testZ, zShadow0);
+\n                float map1  = step(zShadow0,testZ)*step(testZ, zShadow1);
+\n                float map2  = step(zShadow1,testZ)*step(testZ, zShadow2);
+\n                float fTexelSize=0.00137695;
+\n                float fZOffSet  = -0.001954;
+\n
+\n                float shadowOrg0 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+\n                float shadow00 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow10 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow20 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadow30 = shadow2D( shadowTexture0,f_in.shadow_view.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadow0 = ( 2.0*shadowOrg0 + shadow00 + shadow10 + shadow20 + shadow30)/6.0;
+\n                float shadowOrg1 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+\n                float shadow01 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow11 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow21 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadow31 = shadow2D( shadowTexture1,f_in.shadow_view1.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadowOrg2 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(0.0,0.0,fZOffSet) ).r;
+\n                float shadow02 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow12 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize,-fTexelSize,fZOffSet) ).r;
+\n                float shadow22 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3( fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadow32 = shadow2D( shadowTexture2,f_in.shadow_view2.xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;
+\n                float shadow2 = ( 2.0*shadowOrg2 + shadow02 + shadow12 + shadow22 + shadow32)/6.0;
+\n
+\n                float term0 = map0*(1.0-shadow0); 
+\n                float term1 = map1*(1.0-shadow1);
+\n                float term2 = map2*(1.0-shadow2);
+\n
+\n                float v = clamp(term0+term1+term2,0.0,1.0);
+\n
+\n                float shadow = 1 - v * 0.5;
+\n
+\n$endif
 \n
                 // GET_SHADOW(f_in.viewpos, f_in);
                 //float shadow = 1.0; 
@@ -1571,8 +1607,8 @@ $endif
 \n                // Apply spot lights
 \n                vec3 vLightsSpecAddOn;
                   vec3 light_res;  
-                  
-                  // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n                  
+\n                // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n                // vec3 lightmap_color = light_res ; 
 
 \n               GET_LIGHTMAP(f_in.viewpos, f_in);
@@ -1592,7 +1628,7 @@ $endif
 \n               }
 \n
 \n               
-                 aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
               }
             )
  

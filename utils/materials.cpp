@@ -5,6 +5,11 @@
 
 #include "visitors/ct_visitor.h"
 
+namespace Database
+{
+    bool LoadShaderInternal(const std::string & fileName, std::stringstream& file, std::ostream & text );
+}
+
 //
 //  ext
 //
@@ -385,10 +390,12 @@ public:
 
     static osg::Shader* AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str ) 
     {
-        if(GetShader(t,mat_name))
+        auto shader_text = GetShader(t,mat_name);
+
+        if(shader_text)
         {
             std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
-                + osg_modification(version,utils::format(*GetShader(t,mat_name)));
+                + osg_modification(version,utils::format(*shader_text));
             return new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
 
         }
@@ -416,8 +423,12 @@ private:
             const char* shader = GetShader_internal( t,  mat_name);
 
             if(shader)
-                return std::string(shader);
-
+            {
+                std::stringstream buffer(shader);
+                std::ostringstream shaderText;
+                Database::LoadShaderInternal(mat_name, buffer, shaderText);
+                return /*std::string(shader)*/shaderText.str();
+            }
             return boost::none;
     }
 
