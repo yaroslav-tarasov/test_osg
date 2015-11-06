@@ -126,6 +126,12 @@
     <Filter Include="Header Files\av\scene">
       <UniqueIdentifier>{5e30ecf6-0ae6-49dc-a71b-d5bbfec8682f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\av\animation">
+      <UniqueIdentifier>{3f1a4651-c653-40da-8d15-c5ef547bfb75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\animation">
+      <UniqueIdentifier>{681a4289-425c-422e-9d2a-82705566e8a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -256,6 +262,21 @@
     </ClInclude>
     <ClInclude Include="av\avScene\ScreenTextureManager.h">
       <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avAnimation\Bone.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avAnimation\XFileParser.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avAnimation\AnimationPrototype.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avAnimation\AnimTest.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avAnimation\AnimationObject.h">
+      <Filter>Header Files\av\animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -735,6 +756,21 @@
     </ClCompile>
     <ClCompile Include="tests\osgshadowworks.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avAnimation\AnimationPrototype.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avAnimation\XFileParser.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avAnimation\Bone.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avAnimation\AnimTest.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avAnimation\AnimationObject.cpp">
+      <Filter>Source Files\av\animation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

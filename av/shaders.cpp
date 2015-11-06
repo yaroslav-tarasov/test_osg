@@ -1374,6 +1374,7 @@ $endif
                     viewworld_matrix = inverse(gl_ModelViewMatrix);
                     gl_Position      = gl_ModelViewProjectionMatrix *  gl_Vertex;
                     fragCoord        = vec2(gl_Position.xy);
+                    gl_Position.z = 0;
                 }       
             )
         };

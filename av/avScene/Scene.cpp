@@ -13,6 +13,9 @@
 
 #include <osg/GLObjects>
 
+#include "av/avAnimation/AnimTest.h"
+
+
 //Degree precision versus length
 //
 //          decimal                                                                               N/S or E/W    E/W at    E/W at       E/W at
@@ -952,6 +955,10 @@ void Scene::createObjects()
     }
     );
 #endif
+    
+    
+    osg::ref_ptr<osg::Group> node =  avAnimation::Initialize ( "man.x" );
+    _terrainRoot->addChild(node);
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);

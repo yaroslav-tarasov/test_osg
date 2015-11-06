@@ -173,10 +173,11 @@ void main()
     uv.x *= iResolution.x / iResolution.y;    
     float time = osg_FrameTime * 0.3; // iGlobalTime * 0.3 + iMouse.x*0.01;
 
-	//vec3 vLocalSpaceCamPos = acos(normalize(viewworld_matrix[3].xyz));
+	vec3 vLocalSpaceCamPos = acos(normalize(viewworld_matrix[3].xyz));
 	   
     // ray
-    vec3 ang = vec3(0.0,/*vLocalSpaceCamPos.y*/0.0,PI/1.0/*PI - vLocalSpaceCamPos.z*/); 		// vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);    
+    // vec3 ang = vec3(0.0,0.0,PI/1.0); 		// vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);    
+	vec3 ang = vec3(0.0,vLocalSpaceCamPos.x,PI - vLocalSpaceCamPos.z); 		// vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);    
     vec3 ori = vec3(0.0,3.5,time*2.0); 		// vec3(0.0,3.5,time*5.0);
     vec3 dir = normalize(vec3(uv.xy,-2.0)); dir.z += length(uv) * 0.15;
     dir = normalize(dir) * fromEuler(ang);

@@ -120,6 +120,11 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="av\avAnimation\AnimationObject.h" />
+    <ClInclude Include="av\avAnimation\AnimationPrototype.h" />
+    <ClInclude Include="av\avAnimation\AnimTest.h" />
+    <ClInclude Include="av\avAnimation\Bone.h" />
+    <ClInclude Include="av\avAnimation\XFileParser.h" />
     <ClInclude Include="av\avCore\Database.h" />
     <ClInclude Include="av\avCore\DebugRenderer.h" />
     <ClInclude Include="av\avCore\Environment.h" />
@@ -151,6 +156,11 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="av\avAnimation\AnimationObject.cpp" />
+    <ClCompile Include="av\avAnimation\AnimationPrototype.cpp" />
+    <ClCompile Include="av\avAnimation\AnimTest.cpp" />
+    <ClCompile Include="av\avAnimation\Bone.cpp" />
+    <ClCompile Include="av\avAnimation\XFileParser.cpp" />
     <ClCompile Include="av\avCore\Database.cpp" />
     <ClCompile Include="av\avCore\DebugRenderer.cpp" />
     <ClCompile Include="av\avCore\Environment.cpp" />
