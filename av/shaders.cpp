@@ -856,7 +856,7 @@ $endif
                vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 
                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-
+			   aFragColor = vec4(1.0, 0.0, 0.0, 1.0);
            }
        )
 
@@ -1346,7 +1346,7 @@ $endif
         SHADERS_GETTER(get_shader,vs, fs)
 
         AUTO_REG_NAME(ground, shaders::ground_mat::get_shader)
-        //AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
+        AUTO_REG_NAME(sea, shaders::ground_mat::get_shader)
         AUTO_REG_NAME(mountain, shaders::ground_mat::get_shader)
 
     }  // ns ground_mat
@@ -1385,7 +1385,7 @@ $endif
         
         SHADERS_GETTER(get_shader,vs, fs)
 
-        AUTO_REG_NAME(sea, shaders::sea_mat::get_shader)
+        //AUTO_REG_NAME(sea, shaders::sea_mat::get_shader)
     }
 
     namespace concrete_mat 

@@ -67,7 +67,7 @@ bool Parser::IsEmpty()
             const char *end = start + 1;
             if ( *start != '{' && *start != '}' ) // one symbol tokens that are delimiters itself
             {
-                while ( *end != ';' && *end != ',' && *end != ' ' && *end != '\t' && *end != '\n' && *end != '\r' && *end != 0 )
+                while ( *end != '}' && *end != ';' && *end != ',' && *end != ' ' && *end != '\t' && *end != '\n' && *end != '\r' && *end != 0 )
                 {   
                     end++;
                 }
@@ -123,7 +123,7 @@ void Parser::GetRootFrame()
 {
     std::string token;
     GetNextToken ( token );
-    if ( token != "RootFrame" )
+    if ( token != "RootFrame")
     {
         Error ( "RootFrame expected" );
     }
@@ -416,20 +416,25 @@ void Parser::GetMeshMaterialList ( std::string &TextureName )
 void Parser::GetAnimationSet()
 {
     static int i = 0;
+	bool  bflag = false;
     std::string token;
     GetNextToken ( token ); // Name
     
     std::string  ani_set_name = token;
-    if ( token == "{" )  // Yeah it is fucking empty, many thx to VM  
+    if ( token == "{" )  // Yeah it's fucking empty, many thx to VM  
     {
-        ani_set_name = "empty";
+        ani_set_name = "default";
+		bflag = true;
     }
 
     m_pLoader -> BeginAnimationSet( ani_set_name );
-    CheckNext ( "{" );
-    while ( GetNextToken ( token ) )
+    if (!bflag) 
+		CheckNext ( "{" );
+    while ( bflag? true : GetNextToken ( token ) )
     {
-        if ( token == "}" )
+        bflag = false;
+
+		if ( token == "}" )
         {
             break;
         }

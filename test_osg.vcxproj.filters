@@ -727,9 +727,6 @@
     <ClCompile Include="av\avWeather\PrecipitationBase.cpp">
       <Filter>Source Files\av\weather</Filter>
     </ClCompile>
-    <ClCompile Include="av\avCore\Timer.cpp">
-      <Filter>Header Files\av\core</Filter>
-    </ClCompile>
     <ClCompile Include="av\avWeather\LocalWeather.cpp">
       <Filter>Source Files\av\weather</Filter>
     </ClCompile>
@@ -771,6 +768,9 @@
     </ClCompile>
     <ClCompile Include="av\avAnimation\AnimationObject.cpp">
       <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Timer.cpp">
+      <Filter>Source Files\av\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

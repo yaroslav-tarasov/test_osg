@@ -3,6 +3,7 @@
 
 #include "utils/high_res_timer.h"
 #include "utils/pickhandler.h"
+#include "utils/animutils.h"
 
 #if !defined(VISUAL_EXPORTS)
 #include "phys/RigidUpdater.h"
@@ -1248,6 +1249,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
 		load("elexis",_terrainRoot, 15000);
+		
+		load("juliet",_terrainRoot, 15000);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
@@ -1428,7 +1431,28 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
             if(wln_list.size()>0)
                 root->asGroup()->addChild(obj_light);
 
+			if( path == "juliet" )
+			{
+				using namespace avAnimation;
+				pat->asTransform()->asPositionAttitudeTransform()->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+				//pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
+				AnimationManagerFinder finder;
+				pat->accept(finder);
+				if (finder._am.valid()) {
+					pat->setUpdateCallback(finder._am.get());
+					AnimtkViewerModelController::setModel(finder._am.get());
 
+					// We're safe at this point, so begin processing.
+					AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
+					mc.play();
+
+				} else {
+					osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
+				}
+
+
+
+			}
         }
 
         _terrainRoot->asGroup()->addChild(mt);

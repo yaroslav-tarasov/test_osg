@@ -28,5 +28,10 @@ bool generateBulletFile(std::string name, osg::Node* body, cg::point_3& offset);
 
 
 #include "core/nfi/fn_reg.h"
+#include "core/config/config.h"
+
+#include "av/avCore/Database.h"
+
+
 
 namespace sp = std::placeholders;
