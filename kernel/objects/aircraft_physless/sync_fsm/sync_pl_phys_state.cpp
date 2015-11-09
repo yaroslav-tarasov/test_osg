@@ -284,11 +284,11 @@ namespace sync_fsm
 			
 			//force_log fl;
 
-			LOG_ODS_MSG( "  wpos_rel_orien.get_course() = " << wpos_rel_orien.get_course() <<
-				"  wpos_rel_orien.get_roll() = "			<< wpos_rel_orien.get_roll()   <<
-				"  wpos_rel_orien.get_pitch() = "			<< wpos_rel_orien.get_pitch()
-				<< "\n"                 
-				);
+			//LOG_ODS_MSG( "  wpos_rel_orien.get_course() = " << wpos_rel_orien.get_course() <<
+			//	"  wpos_rel_orien.get_roll() = "			<< wpos_rel_orien.get_roll()   <<
+			//	"  wpos_rel_orien.get_pitch() = "			<< wpos_rel_orien.get_pitch()
+			//	<< "\n"                 
+			//	);
 
             //LOG_ODS_MSG( "  desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
             //    "  desired_orien_in_rel.get_pitch() = " <<  desired_orien_in_rel.get_pitch() <<

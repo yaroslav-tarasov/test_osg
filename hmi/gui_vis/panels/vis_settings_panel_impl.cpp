@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#pragma optimize( "", off )
+
 // Ну и куда то убрать надо 
 FIXME(Заголовок как в рефренсном)
 #include <cegui/CEGUI.h>
@@ -64,6 +66,12 @@ bool setEditboxText(const CEGUI::String& editbox, const CEGUI::String& text)
     }
     return false;
 }
+
+std::string trim_copy (const char* name )
+{
+    return boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtRadX"));
+}
+
 
 vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, const app::settings_t& s )
 {
@@ -223,12 +231,14 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     setEditboxText("FrameWindow/LWeather/edtIntensity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
     setEditboxText("FrameWindow/GWeather/edtIntensity", boost::str(boost::format("%.2f") % s.intensity));
 
+
+
     auto cloud_settings_callback =
     [=](const CEGUI::EventArgs& args)->bool 
     {
         app::cloud_params_t s;
 
-        std::string edtRadX = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtRadX"));
+        std::string edtRadX = trim_copy("FrameWindow/LWeather/edtRadX");
         s.radius_x = boost::lexical_cast<float>(edtRadX.empty()?"0":edtRadX);
 
         std::string edtRadY = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtRadY"));

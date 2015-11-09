@@ -13,6 +13,7 @@
 #include "common/stl.h"
 
 #include "common/osg_inc.h"
+#include "common/misc.h"
 #include "common/bullet.h"
 #include "common/debug.h"
 
@@ -77,7 +78,7 @@ enum objects_t{
     VEHICLE_TYPE
 };
 
-#include "av/Database.h"
+#include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
 #include "osg_helpers.h"
 

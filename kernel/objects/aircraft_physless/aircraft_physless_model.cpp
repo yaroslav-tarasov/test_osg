@@ -106,9 +106,9 @@ void model::sync_nm_root(double /*dt*/)
     geo_point_3 const desired_pos   = *desired_nm_pos_;
     quaternion  const desired_orien = *desired_nm_orien_;
 	
-	force_log fl2;
+	//force_log fl2;
 
-    LOG_ODS_MSG( "sync_nm_root:  desired_pos:  x:  "  << desired_pos.lat << "    y: " << desired_pos.lon << "\n" );
+    //LOG_ODS_MSG( "sync_nm_root:  desired_pos:  x:  "  << desired_pos.lat << "    y: " << desired_pos.lon << "\n" );
 
     nodes_management::node_position root_node_pos = root_->position();
 
@@ -120,8 +120,8 @@ void model::sync_nm_root(double /*dt*/)
     root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
     
 
-    LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().pos :   x:  "  <<  root_node_pos.global().pos.lat << "    y: " << root_node_pos.global().pos.lon <<  "  calc_step=" << sys_->calc_step() << "\n" );
-	LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().dpos :  x:  "  <<  root_node_pos.global().dpos.x << "    y: " << root_node_pos.global().dpos.y << "\n" );
+    //LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().pos :   x:  "  <<  root_node_pos.global().pos.lat << "    y: " << root_node_pos.global().pos.lon <<  "  calc_step=" << sys_->calc_step() << "\n" );
+	//LOG_ODS_MSG( "sync_nm_root:   root_node_pos.global().dpos :  x:  "  <<  root_node_pos.global().dpos.x << "    y: " << root_node_pos.global().dpos.y << "\n" );
 
     root_->set_position(root_node_pos);
 }

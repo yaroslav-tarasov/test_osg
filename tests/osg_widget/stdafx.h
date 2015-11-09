@@ -83,7 +83,7 @@ namespace core {
  #include "common/bullet.h"
 #include "common/osg_inc.h"
 
-#include "av/Database.h"
+#include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
 #include "osg_helpers.h"
 

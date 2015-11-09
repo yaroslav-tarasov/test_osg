@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Generated Files">
@@ -35,6 +35,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Source Files\..\av">
+      <UniqueIdentifier>{e3adca4a-4130-4f58-be2a-adc45a76e577}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\.." />
@@ -49,6 +52,9 @@
     <ClCompile Include="..\_include\bada\bada_import.cpp">
       <Filter>Source Files\..\_include\bada</Filter>
     </ClCompile>
+    <ClCompile Include="..\av\avCore\DebugRenderer.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\_include\objects" />
@@ -56,39 +62,6 @@
   <ItemGroup>
     <ClCompile Include="..\_include\objects\bullet_importer.cpp">
       <Filter>Source Files\..\_include\objects</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Source Files\..\av" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\DebugRenderer.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\LightManager.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\Lights.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\shaders.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\test_objects1.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\av\test_systems.cpp">
-      <Filter>Source Files\..\av</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +81,33 @@
   <ItemGroup>
     <ClCompile Include="..\core\nfi\lib_loader.cpp">
       <Filter>Source Files\..\core\nfi</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\ext" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\hmi" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\hmi\gui_vis" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\hmi\gui_vis\panels" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
+      <Filter>Source Files\..\hmi\gui_vis\panels</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hmi\gui_vis\main_window_impl.cpp">
+      <Filter>Source Files\..\hmi\gui_vis</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hmi\gui_vis\menu_impl.cpp">
+      <Filter>Source Files\..\hmi\gui_vis</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -504,6 +504,40 @@
     <Filter Include="Source Files\..\tests" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Source Files\..\tests\cegui" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\cegui\CEGUIDrawable.cpp">
+      <Filter>Source Files\..\tests\cegui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\cegui\cegui_main.cpp">
+      <Filter>Source Files\..\tests\cegui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\tests\common" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\common\CommonFunctions.cpp">
+      <Filter>Source Files\..\tests\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\tests\systems" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\systems\test_objects1.cpp">
+      <Filter>Source Files\..\tests\systems</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\systems\test_systems.cpp">
+      <Filter>Source Files\..\tests\systems</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\tests\visapp" />
   </ItemGroup>
   <ItemGroup>
@@ -548,11 +582,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test_osg.cpp">
-      <Filter>Source Files\..</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="vis_app.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -568,7 +597,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\_Include\ui\tray_icon.h">
-      <Filter>Header Files\..\_Include\ui</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -586,7 +615,119 @@
     <Filter Include="Header Files\..\av" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Header Files\..\av\avAnimation" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avAnimation\AnimTest.h">
+      <Filter>Header Files\..\av\avAnimation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avAnimation\AnimationObject.h">
+      <Filter>Header Files\..\av\avAnimation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avAnimation\AnimationPrototype.h">
+      <Filter>Header Files\..\av\avAnimation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avAnimation\Bone.h">
+      <Filter>Header Files\..\av\avAnimation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avAnimation\XFileParser.h">
+      <Filter>Header Files\..\av\avAnimation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av\avCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\Database.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\DebugRenderer.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\Environment.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\Global.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\LOD.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\Logo.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\Utils.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av\avLights" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\LightManager.h">
+      <Filter>Header Files\..\av\avLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\LightMaps.h">
+      <Filter>Header Files\..\av\avLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\Lights.h">
+      <Filter>Header Files\..\av\avLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\NavAid.h">
+      <Filter>Header Files\..\av\avLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av\avScene" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avScene\Scene.h">
+      <Filter>Header Files\..\av\avScene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avScene\ScreenTexture.h">
+      <Filter>Header Files\..\av\avScene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avScene\ScreenTextureManager.h">
+      <Filter>Header Files\..\av\avScene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\av\Grass.h">
+      <Filter>Header Files\..\av</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\IVisual.h">
       <Filter>Header Files\..\av</Filter>
     </ClInclude>
   </ItemGroup>
@@ -631,12 +772,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\moc_tray_icon.cpp">
-      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\debug\visapp</Filter>
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\debug\visapp\qrc_visapp_resources.cpp">
-      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\debug\visapp</Filter>
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -647,12 +788,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\moc_tray_icon.cpp">
-      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\release\visapp</Filter>
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\simex_qt5\bin\release\visapp\qrc_visapp_resources.cpp">
-      <Filter>Generated Files\..\..\..\..\simex_qt5\bin\release\visapp</Filter>
+      <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

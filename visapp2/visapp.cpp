@@ -12,7 +12,7 @@
 #include "kernel/systems/vis_system.h"
 
 #include "av/Visual.h"
-#include "av/test_systems.h"
+#include "tests/systems/test_systems.h"
 
 using network::endpoint;
 using network::async_acceptor;
@@ -151,7 +151,7 @@ private:
     void on_setup(setup const& msg)
     {
         osg_vis_->CreateScene();
-        create_objects();
+        create_objects(msg.icao_code);
         LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
 

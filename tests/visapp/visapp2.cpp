@@ -22,7 +22,7 @@
 #include "tests/osg_widget/OSGWidget.h"
 
 #include "av/Visual.h"
-#include "av/test_systems.h"
+#include "tests/systems/test_systems.h"
 
 using network::endpoint;
 using network::async_acceptor;
@@ -522,7 +522,7 @@ namespace
         void on_setup(setup const& msg)
         {
             // vw_->createScene();
-            create_objects();
+            create_objects(msg.icao_code);
             vw_->endSceneCreation();
 
             binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));

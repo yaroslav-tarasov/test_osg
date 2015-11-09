@@ -273,13 +273,13 @@ void vis_node_impl::sync_position(double dt)
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
 
-            LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
-            LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   dx:  "
-                <<  extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat
-                << "    dy: "  << extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon
-                << "    dvx: " << (extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat) / (dt?dt:1.0) / 0.00001
-                << "    dvy: " << (extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon) / (dt?dt:1.0) / 0.00001
-                << "\n" );
+            //LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
+            //LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   dx:  "
+            //    <<  extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat
+            //    << "    dy: "  << extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon
+            //    << "    dvx: " << (extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat) / (dt?dt:1.0) / 0.00001
+            //    << "    dvy: " << (extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon) / (dt?dt:1.0) / 0.00001
+            //    << "\n" );
             
             prev_extrapolated_position_  = extrapolated_position_;
         }
