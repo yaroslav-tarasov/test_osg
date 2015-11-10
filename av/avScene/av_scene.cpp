@@ -584,19 +584,21 @@ private:
 
     void on_run(run const& msg)
     {
-        LogInfo("Got run message: " << msg.srv_time << " : " << msg.task_time );
+        LogInfo("Got run message: " << msg.speed << " : " << msg.time );
     }
     
     void async_run(run const& msg)
     {
-        LogInfo("async_run got run message: " << msg.srv_time << " : " << msg.task_time );
+        LogInfo("async_run got run message: "  );
     }
 
     void on_create(create const& msg)
     {
-        auto fp = fn_reg::function<void(create const&)>("create_aircraft");
+        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
+        kernel::object_info_ptr  a;
+        
         if(fp)
-            fp(msg);
+            a = fp(msg);
 
         LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }

@@ -10,6 +10,8 @@
 #include "logger/logger.hpp"
 #include "common/test_msgs.h"
 
+#include "utils/krv_import.h"
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -36,6 +38,35 @@ namespace
     std::string              g_icao_code = "URSS";
 }
 
+
+inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
+{
+
+    fms::trajectory::keypoints_t  kpts;
+    fms::trajectory::curses_t      crs;
+    fms::trajectory::speed_t  vls;
+
+    const unsigned start_idx = 11;
+    cg::point_2 prev(kdg.kd_[start_idx].x,kdg.kd_[start_idx].y);
+    double tlength = 0;
+    for(auto it = kdg.kd_.begin() + start_idx; it!= kdg.kd_.end();++it )
+    {
+        auto p = cg::point_2(it->x,it->y);
+        auto dist = cg::distance(prev,p);
+        tlength += dist;
+        crs.insert (std::make_pair(/*tlength*/it->time,cpr(it->fiw,it->tg, it->kr )));
+        kpts.insert(std::make_pair(/*tlength*/it->time,cg::point_3(p,it->h)));
+
+        auto pit = std::prev(it);
+        if(pit!=it)
+            vls.insert(std::make_pair(/*tlength*/it->time,dist/(it->time - pit->time)));
+
+        prev = p;
+    }
+
+    return fms::trajectory::create(kpts,crs,vls);
+}
+
 struct client
 {
 
@@ -45,12 +76,14 @@ struct client
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
         , timer_  (boost::bind(&client::update, this))
         , ac_counter_(0)
+        , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
     {
         LogInfo("Connecting to " << peer);
 
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
             ;
+
     }
 
     // from struct tcp_connection
@@ -88,9 +121,9 @@ private:
 
     void on_remote_ready(uint16_t value)
     {
-        //start_send();
+        start_send();
     }
-    
+                                  
     inline void start_send()
     {
         update();
@@ -98,14 +131,22 @@ private:
 
     void update()
     {   
-        binary::bytes_t bts =  std::move(wrap_msg(run(1111,2222)));
+        double time = 10;
+
+        binary::bytes_t bts =  std::move(wrap_msg(run(
+                                                        _traj->kp_value(time)
+                                                       ,_traj->curs_value(time)
+                                                       ,*_traj->speed_value(time)
+                                                       , time
+        )));
+
         send(&bts[0], bts.size());
         
         LogInfo("update() send run " );
-#if 0
+#if 1
         if(ac_counter_++==40)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(0,0,90)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,0,0,90)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
@@ -113,7 +154,23 @@ private:
 
         if(ac_counter_==45)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(0,0.005,0)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(2,0,0.005,0)));
+            send(&bts[0], bts.size());
+
+            LogInfo("update() send create " );
+        }
+
+        if(ac_counter_==45)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(create(3,0,0.006,0)));
+            send(&bts[0], bts.size());
+
+            LogInfo("update() send create " );
+        }
+
+        if(ac_counter_==45)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(create(4,0,0.007,0)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
@@ -134,6 +191,9 @@ private:
 
 private:
     uint32_t                  ac_counter_;
+
+private:
+    fms::trajectory_ptr      _traj;
 };
 
 

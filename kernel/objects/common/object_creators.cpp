@@ -79,7 +79,7 @@ namespace aircraft_physless
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos, uint32_t extern_id)
     {
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);

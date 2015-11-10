@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\av">
+      <UniqueIdentifier>{c25d3158-880d-4907-a105-20945ca7410a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\avCore">
+      <UniqueIdentifier>{32f135b3-5c56-4377-9df4-92dfe54cc1bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{e1d24e97-8141-4e8c-8d0c-dbe0667a3c49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -60,16 +69,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\av\avCore\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\av\avCore\Database.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\core\config\config.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\av\avCore</Filter>
     </ClCompile>
     <ClCompile Include="..\..\av\avCore\Timer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\av\avCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\Database.cpp">
+      <Filter>Source Files\av\avCore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\core\config\config.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

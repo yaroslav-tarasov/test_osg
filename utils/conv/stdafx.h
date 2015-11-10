@@ -7,8 +7,6 @@
 
 #include "targetver.h"
 
-#define BOOST_ALL_NO_LIB
-
 #include "common/boost.h"
 #include "common/stl.h"
 #include "common/osg_inc.h"

@@ -15,3 +15,17 @@
 #include "common/stl.h"
 
 #include "reflection/proc/binary.h"
+#include "common/points.h"
+
+#include "atc/position.h"
+
+#include "cpp_utils/polymorph_ptr.h"
+
+inline cg::geo_base_3 get_base()
+{
+    return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
+}
+
+#include "fms/trajectory.h"
+
+namespace sp = std::placeholders;

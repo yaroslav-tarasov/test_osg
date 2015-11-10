@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\fms">
+      <UniqueIdentifier>{a4fe9b5f-9530-43b4-8f07-7ea7e4470ddb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -29,8 +32,14 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\kernel\fms\trajectory.cpp">
+      <Filter>Source Files\fms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\fms\dubins.cpp">
+      <Filter>Source Files\fms</Filter>
+    </ClCompile>
     <ClCompile Include="network.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\fms</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

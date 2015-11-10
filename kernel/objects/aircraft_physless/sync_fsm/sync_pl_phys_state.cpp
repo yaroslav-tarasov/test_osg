@@ -108,9 +108,9 @@ namespace sync_fsm
                 
                 double current_velocity = desired_velocity_;
 
-                if(traj_->velocity_value(tar_len))
+                if(traj_->speed_value(tar_len))
                 {
-                    desired_velocity_ = *traj_->velocity_value(tar_len);
+                    desired_velocity_ = *traj_->speed_value(tar_len);
                 }
                 else
                 {

@@ -132,6 +132,9 @@
     <Filter Include="Source Files\av\animation">
       <UniqueIdentifier>{681a4289-425c-422e-9d2a-82705566e8a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\registrator">
+      <UniqueIdentifier>{df376c5c-b0b2-48b2-98b7-9fd1c12fd0eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -771,6 +774,9 @@
     </ClCompile>
     <ClCompile Include="av\avCore\Timer.cpp">
       <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

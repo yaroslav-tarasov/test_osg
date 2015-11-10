@@ -17,7 +17,7 @@ trajectory_ptr trajectory::create(const traj_data& data)
     return boost::make_shared<trajectory_impl>(data);
 }
 
-trajectory_ptr trajectory::create(const keypoints_t& kpts,curses_t const& crs,velocities_t const& vel)
+trajectory_ptr trajectory::create(const keypoints_t& kpts,curses_t const& crs,speed_t const& vel)
 {
     return boost::make_shared<trajectory_impl>(kpts,crs,vel);
 }
@@ -41,13 +41,13 @@ struct trajectory_impl : trajectory
         curs_seg_.push_back(crs);
     }
     
-    trajectory_impl(const keypoints_t& kpts,curses_t const& crs,velocities_t const& vel)   
+    trajectory_impl(const keypoints_t& kpts,curses_t const& crs,speed_t const& vel)   
         : curr_pos_(0)
     {
 
         kp_seg_.push_back(kpts);
         curs_seg_.push_back(crs);
-        (*vel_seg_).push_back(vel);
+        (*speed_seg_).push_back(vel);
     }
 
     trajectory_impl(const trajectory_impl_ptr& other)
@@ -78,12 +78,12 @@ struct trajectory_impl : trajectory
             curs_seg_.push_back(seg);
         }
 
-        if(vel_seg_)
+        if(speed_seg_)
         {
-            for(auto it = other->vel_seg_->begin();it!= other->vel_seg_->end();++it)
+            for(auto it = other->speed_seg_->begin();it!= other->speed_seg_->end();++it)
             {                         
                 auto seg = (*it).apply_offset(length_); 
-                vel_seg_->push_back(seg);
+                speed_seg_->push_back(seg);
             }
         }
 
@@ -105,11 +105,11 @@ struct trajectory_impl : trajectory
             curs_seg_.push_back(seg);
         }
 
-        if(vel_seg_ && other.vel_seg_)
-        for(auto it = other.vel_seg_->begin();it!= other.vel_seg_->end();++it)
+        if(speed_seg_ && other.speed_seg_)
+        for(auto it = other.speed_seg_->begin();it!= other.speed_seg_->end();++it)
         {                         
             auto seg = (*it).apply_offset(length_); 
-            vel_seg_->push_back(seg);
+            speed_seg_->push_back(seg);
         }
         
 
@@ -132,11 +132,11 @@ struct trajectory_impl : trajectory
         return curs_seg_.at(ind).value(arg);
     }
 
-    /*inline*/ boost::optional<velocities_t::value_type> velocity_value(double arg) /*const*/
+    /*inline*/ boost::optional<speed_t::value_type> speed_value(double arg) /*const*/
     { 
         size_t ind = current_segment(arg);
-        if(vel_seg_ && vel_seg_->size() > ind && vel_seg_->size() > 0 )
-            return vel_seg_->at(ind).value(arg);
+        if(speed_seg_ && speed_seg_->size() > ind && speed_seg_->size() > 0 )
+            return speed_seg_->at(ind).value(arg);
         else
             return boost::none;
     }

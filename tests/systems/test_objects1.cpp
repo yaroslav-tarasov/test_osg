@@ -162,7 +162,7 @@ void create_objects(const std::string & airport)
 
     fms::trajectory::keypoints_t  kpts;
     fms::trajectory::curses_t      crs;
-    fms::trajectory::velocities_t vls ;
+    fms::trajectory::speed_t vls ;
 
     const unsigned start_idx = 400;
     cg::point_2 prev(_krv_data_getter.kd_[start_idx].x,_krv_data_getter.kd_[start_idx].y);
@@ -207,8 +207,8 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "A319";//"A333";
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
-        auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
-        //aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
+        auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,0);
+        aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
 
     vehicle::settings_t vs;
@@ -246,17 +246,28 @@ void create_objects(const std::string & airport)
 
 using namespace net_layer::test_msg;
 
-void create_aircraft(create const& msg)
+object_info_ptr create_aircraft(create const& msg)
 {
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
     cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
     aircraft::settings_t as;
     as.kind = "A319";
     geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
-    auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+    return  aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 }
+
+object_info_ptr create_aircraft_phl(create const& msg)
+{
+    kernel::system_ptr _csys = sys_creator()->get_control_sys();
+    cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
+    aircraft::settings_t as;
+    as.kind = "A319";
+    geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
+    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,msg.ext_id);
+}
+
 
 }
 
 AUTO_REG(create_objects)
-AUTO_REG(create_aircraft)
+AUTO_REG_NAME(create_aircraft,create_aircraft_phl)
