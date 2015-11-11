@@ -34,6 +34,7 @@ namespace creators
         virtual osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture() = 0;
         virtual osg::ref_ptr<osg::Texture2D>        getDecalTexture() =0;
         virtual osg::ref_ptr<osg::Texture2D>        getLightMapTexture() =0;
+		virtual osg::ref_ptr<osg::Texture2D>        getReflTexture() =0;
     };    
 
     texturesHolder_base&             getTextureHolder();

@@ -25,7 +25,7 @@ void Prerender::traverse(osg::NodeVisitor& nv)
 
 void Prerender::init()
 {
-    _texture = creators::getTextureHolder().getLightMapTexture();
+    _texture = creators::getTextureHolder().getReflTexture();
 
     setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     setClearDepth(1.0);

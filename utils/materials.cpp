@@ -17,22 +17,7 @@ namespace Database
 
 namespace creators 
 {
-//class FogCallback: public osg::Uniform::Callback
-//{
-//public:
-//    virtual void operator() ( osg::Uniform* uniform, osg::NodeVisitor* nv )
-//    {
-//        //float angle = 2.0 * nv->getFrameStamp()->getSimulationTime();
-//        //float sine = sinf( angle );        // -1 -> 1
-//        //float v01 = 0.5f * sine + 0.5f;        //  0 -> 1
-//        //float v10 = 1.0f - v01;                //  1 -> 0
-//
-//        double  fractpart, intpart;
-//        fractpart = modf (nv->getFrameStamp()->getSimulationTime() / 100.0f , &intpart);
-//
-//        uniform->set( osg::Vec4(/*1.505f*/1.5f, /*0.8f*v01*/1.5f, 1.5f, 100*fractpart) ); 
-//    }
-//};
+
 
 class texturesHolder  : public texturesHolder_base
 {
@@ -54,6 +39,19 @@ class texturesHolder  : public texturesHolder_base
         return texture;
     }
 
+	osg::Texture2D * createTexture(int width, int height)
+	{
+		osg::Texture2D* texture = new osg::Texture2D;
+		texture->setTextureSize(width,height);
+		texture->setInternalFormat(GL_RGBA);
+		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+		texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+		texture->setUseHardwareMipMapGeneration(false);
+		return texture;
+	}
+
 public:
     struct textures_t
     {
@@ -64,6 +62,7 @@ public:
         osg::ref_ptr<osg::TextureCubeMap> envTex;
         osg::ref_ptr<osg::Texture2D>      decalTex;
         osg::ref_ptr<osg::Texture2D>      lmTex;
+		osg::ref_ptr<osg::Texture2D>      reflTex;
     };
 
 public:
@@ -90,84 +89,87 @@ public:
 
     osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()   override
     {
-        return   envTex;
+        return   texs_.envTex;
     }
 
     osg::ref_ptr<osg::Texture2D>   getDecalTexture() override
     {
-        return   decalTex;
+        return   texs_.decalTex;
     }
     
     osg::ref_ptr<osg::Texture2D>   getLightMapTexture()  override
     {
-        return   lmTex;
-    }
+        return   texs_.lmTex;
+	}
+
+	osg::ref_ptr<osg::Texture2D>   getReflTexture()  override
+	{
+		return   texs_.reflTex;
+	}
 
     friend texturesHolder_base&   getTextureHolder();
 
 private:
 
-    osg::ref_ptr<osg::Texture2D>      detailsTex;
-    osg::ref_ptr<osg::Texture2D>      emptyTex;
-    osg::ref_ptr<osg::TextureCubeMap> envTex;
-    osg::ref_ptr<osg::Texture2D>      decalTex;
-    osg::ref_ptr<osg::Texture2D>      lmTex;
+	textures_t					      texs_;
+	osg::ref_ptr<osg::Texture2D>      emptyTex;
 
     texturesHolder()
-    {          
-        detailsTex = new osg::Texture2D;
-        detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
-        detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-        detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-        detailsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-        detailsTex->setMaxAnisotropy(16.0f);
+    {    
 
-        emptyTex = new osg::Texture2D;
-        emptyTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
-        emptyTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
-        emptyTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
-        emptyTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-        emptyTex->setMaxAnisotropy(16.0f);
+		emptyTex = new osg::Texture2D;
+		emptyTex->setImage( osgDB::readImageFile("empty_n.dds",new osgDB::Options("")) );  
+		emptyTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+		emptyTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+		emptyTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+		emptyTex->setMaxAnisotropy(16.0f);
 
-        decalTex = new osg::Texture2D;
-        decalTex->setTextureSize(1024, 1024);
-        decalTex->setInternalFormat( GL_RGBA );
-        decalTex->setBorderWidth( 0 );
-        decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
-        decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
+        texs_.detailsTex = new osg::Texture2D;
+        texs_.detailsTex->setImage( osgDB::readImageFile("Detail.dds",new osgDB::Options("")) );  
+        texs_.detailsTex->setWrap(  osg::Texture::WRAP_S, osg::Texture::REPEAT );
+        texs_.detailsTex->setWrap(  osg::Texture::WRAP_T, osg::Texture::REPEAT );
+        texs_.detailsTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+        texs_.detailsTex->setMaxAnisotropy(16.0f);
+
+        texs_.decalTex = new osg::Texture2D;
+        texs_.decalTex->setTextureSize(1024, 1024);
+        texs_.decalTex->setInternalFormat( GL_RGBA );
+        texs_.decalTex->setBorderWidth( 0 );
+        texs_.decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
+        texs_.decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
 
         // create and setup the texture object
-        envTex = new osg::TextureCubeMap;
+        texs_.envTex = new osg::TextureCubeMap;
         const unsigned envSize = 256;
-        envTex->setInternalFormat(GL_RGB);
-        envTex->setTextureSize(envSize, envSize);
-        envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/); // CLAMP_TO_BORDER/*CLAMP_TO_EDGE*/
-        envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
-        envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
-        envTex->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR_MIPMAP_LINEAR/*LINEAR*/);
-        envTex->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
-        envTex->setMaxAnisotropy(16.0f);
+        texs_.envTex->setInternalFormat(GL_RGB);
+        texs_.envTex->setTextureSize(envSize, envSize);
+        texs_.envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/); // CLAMP_TO_BORDER/*CLAMP_TO_EDGE*/
+        texs_.envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
+        texs_.envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_BORDER/*REPEAT*//*CLAMP_TO_EDGE*/);
+        texs_.envTex->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR_MIPMAP_LINEAR/*LINEAR*/);
+        texs_.envTex->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
+        texs_.envTex->setMaxAnisotropy(16.0f);
 #ifndef TEST_EVN_CUBE_MAP 
-        envTex->setNumMipmapLevels(3);
-        envTex->setUseHardwareMipMapGeneration(true);
+        texs_.envTex->setNumMipmapLevels(3);
+        texs_.envTex->setUseHardwareMipMapGeneration(true);
 #endif
 
 FIXME(Все теже кривые плоскости)
 #ifdef TEST_EVN_CUBE_MAP 
 #if 1
-/*        envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
-        envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
-        envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP);
-        envTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-        envTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR); */   
+/*        texs_.envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
+        texs_.envTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP);
+        texs_.envTex->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP);
+        texs_.envTex->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        texs_.envTex->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR); */   
         // assign the six images to the texture object
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("test_posx.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("test_negx.jpg"));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("test_posy.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("test_negy.jpg"));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("test_posz.jpg"));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("test_negz.jpg"));
-        //envTex->setUseHardwareMipMapGeneration(true);
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_X, osgDB::readImageFile("test_posx.jpg"));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, osgDB::readImageFile("test_negx.jpg"));
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, osgDB::readImageFile("test_posy.jpg"));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, osgDB::readImageFile("test_negy.jpg"));
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, osgDB::readImageFile("test_posz.jpg"));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, osgDB::readImageFile("test_negz.jpg"));
+        //texs_.envTex->setUseHardwareMipMapGeneration(true);
 #else
         // generate the six highlight map images (light direction = [1, 1, -1])
         osgUtil::HighlightMapGenerator *mapgen = new osgUtil::HighlightMapGenerator(
@@ -178,16 +180,18 @@ FIXME(Все теже кривые плоскости)
         mapgen->generateMap();
 
         // assign the six images to the texture object
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_X, mapgen->getImage(osg::TextureCubeMap::POSITIVE_X));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_X));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Y));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Y));
-        envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Z));
-        envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Z));
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_X, mapgen->getImage(osg::TextureCubeMap::POSITIVE_X));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_X, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_X));
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_Y, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Y));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_Y, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Y));
+        texs_.envTex->setImage(osg::TextureCubeMap::POSITIVE_Z, mapgen->getImage(osg::TextureCubeMap::POSITIVE_Z));
+        texs_.envTex->setImage(osg::TextureCubeMap::NEGATIVE_Z, mapgen->getImage(osg::TextureCubeMap::NEGATIVE_Z));
 #endif
 #endif
 
-        lmTex = createLMTexture(1024, 1024);
+        texs_.lmTex = createLMTexture( 1024, 1024 );
+		 
+		texs_.reflTex = createTexture( 512, 512 );
     }
 
 
@@ -209,9 +213,9 @@ FIXME(Все теже кривые плоскости)
             t.colorTex = new osg::Texture2D;
             t.nightTex = new osg::Texture2D;
             t.normalTex  = new osg::Texture2D;
-            t.detailsTex = th.detailsTex;
-            t.envTex = th.envTex;
-            t.lmTex  = th.lmTex;
+            t.detailsTex = th.texs_.detailsTex;
+            t.envTex = th.texs_.envTex;
+            t.lmTex  = th.texs_.lmTex;
 
             auto range = mats.equal_range(mat_name);
 
