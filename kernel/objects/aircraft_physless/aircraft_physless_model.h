@@ -10,14 +10,16 @@ using network::msg_t;
 
 #include "aircraft_physless_msg.h"
 #include "common\airports_manager.h"
+#include "objects\common\aircraft_physless.h"
+
 
 namespace aircraft_physless
 {
     struct model
         : view
-        , aircraft::model_info                // интерфейс информации о модели
-        , aircraft::model_control             // интерфейс управления моделью
-        , aircraft::int_control
+        , model_info                // интерфейс информации о модели
+        , model_control             // интерфейс управления моделью
+        //, int_control
         , sync_fsm::self_t
     {
         static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
@@ -27,8 +29,8 @@ namespace aircraft_physless
         model( kernel::object_create_t const& oc, dict_copt dict);
 
     public:
-        void on_malfunction_changed( aircraft::malfunction_kind_t kind ) override; 
-        void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
+        void on_malfunction_changed ( aircraft::malfunction_kind_t kind ) override; 
+        void on_new_contact_effect  ( double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
 
     // base_presentation
         FIXME(private)
@@ -36,8 +38,8 @@ namespace aircraft_physless
 
         // base_view_presentation
     protected:
-        void on_child_removing(kernel::object_info_ptr child) override ;
-        void on_object_destroying(object_info_ptr object)     override ;
+        void on_child_removing   (kernel::object_info_ptr child) override ;
+        void on_object_destroying(object_info_ptr object)        override ;
 
         // model_info
     private:
@@ -66,12 +68,17 @@ namespace aircraft_physless
         aircraft::shassis_support_ptr    get_shassis() const;
         aircraft::rotors_support_ptr     get_rotors() const;
 
-        ::fms::trajectory_ptr    get_trajectory() const;
+        fms::trajectory_ptr              get_trajectory() const;
 
-        geo_position           get_root_pos() const;
-        bool is_fast_session() const;
-        void set_desired_nm_pos  (geo_point_3 const& pos);
-        void set_desired_nm_orien(quaternion const& orien);
+        geo_position                     get_root_pos() const;
+        bool                             is_fast_session() const;
+        void                             set_desired_nm_pos  (geo_point_3 const& pos);
+        void                             set_desired_nm_orien(quaternion const& orien);
+        
+        //geo_point_3 get_extern_desired_nm_pos   () const override;
+        //quaternion  get_extern_desired_nm_orien () const override;
+        //double      get_extern_desired_nm_speed () const override;
+
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
         void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
@@ -94,7 +101,10 @@ namespace aircraft_physless
     private:
         void on_state(msg::state_msg const& msg) override;   // fms
 
-   public:
+    private: 
+        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed)    override;
+    
+    public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};
         decart_position get_local_position() {return decart_position()/*phys_aircraft_->get_local_position()*/;};
         
@@ -120,10 +130,17 @@ namespace aircraft_physless
 
         double                                 rotors_angular_speed_;
 
-        //aircraft::phys_aircraft_ptr            phys_aircraft_;
+        //aircraft::phys_aircraft_ptr          phys_aircraft_;
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;
+        
+        //FIXME(optional);
+
+        //optional<geo_point_3>                  extern_desired_nm_pos_;
+        //optional<quaternion>                   extern_desired_nm_orien_;
+        //double                                 extern_desired_nm_speed_;
+
         double                                 nm_ang_smooth_;
         
         boost::function<void()>                tow_invalid_callback_;

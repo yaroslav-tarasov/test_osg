@@ -17,7 +17,6 @@ Prerender::Prerender(const Prerender& prerender,const osg::CopyOp& copyop):
 void Prerender::traverse(osg::NodeVisitor& nv)
 {
     // So do not allow any Visitors except CULL_VISITOR
- 
     if (nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
          osg::Group::traverse(nv);
 }
@@ -27,16 +26,16 @@ void Prerender::init()
 {
     _texture = creators::getTextureHolder().getReflTexture();
 
+    // set clear the color and depth buffer
     setClearMask(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    setClearColor(osg::Vec4(0,0,0,0));
     setClearDepth(1.0);
-    
-    setClearColor(osg::Vec4(0.0,0.0,0.0,0.0));
     setColorMask(true, true, true, true);
 
     // just inherit the main cameras view
     setReferenceFrame(osg::Transform::ABSOLUTE_RF);
     setProjectionMatrix(osg::Matrixd::identity());
-    setViewMatrix(osg::Matrixd::identity());
+    setViewMatrix(osg::Matrixd::scale(1,1,-1)); // Flip Z axis
 
     // set viewport
     setViewport(0,0,_texture->getTextureWidth(),_texture->getTextureHeight());
@@ -47,7 +46,20 @@ void Prerender::init()
     setRenderOrder(osg::CameraNode::PRE_RENDER);
 
     // attach the texture and use it as the color buffer.
-    attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, true, 0, 0);
+    attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, false, 0, 0);
+
+#if 1
+    // swap frontface order
+    getOrCreateStateSet()->setAttribute(new osg::FrontFace(osg::FrontFace::CLOCKWISE));
+
+    // don't reflect stars (if nodemask is set)
+#define REFLECTION_CULL_MASK 0x00010000
+
+    int im = getInheritanceMask();
+    im &= ~(osg::CullSettings::CULL_MASK);
+    setInheritanceMask(im);
+    setCullMask(REFLECTION_CULL_MASK);
+#endif
 
 }
 

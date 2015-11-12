@@ -488,7 +488,7 @@ programsHolder_base::program_t  createProgram(std::string mat_name)
 }
 
 
-void createMaterial(osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
+void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
 {
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name);
@@ -502,6 +502,15 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
         // pcp->apply(*(itr->second.first));
     }    
 
+    FIXME(И еще немного хардкода как alpha2covrage оформить)
+    if (     mat_name.find("ground")   !=std::string::npos   
+            || mat_name.find("sea")      !=std::string::npos     
+            || mat_name.find("mountain") !=std::string::npos 
+            || mat_name.find("concrete") !=std::string::npos 
+            || mat_name.find("tree") !=std::string::npos 
+            )
+            node->setNodeMask(~65536);
+    
     stateset->addUniform( new osg::Uniform("colorTex"      , BASE_COLOR_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("normalTex"     , BASE_NORMAL_TEXTURE_UNIT) ); 
     stateset->addUniform( new osg::Uniform("nightTex"      , BASE_NIGHT_TEXTURE_UNIT) );
@@ -544,7 +553,7 @@ void createMaterial(osg::StateSet* stateset,std::string model_name,std::string m
 }
 
 
-void createMaterialLite(osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
+void createMaterialLite(osg::Node* node,osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
 {
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
    

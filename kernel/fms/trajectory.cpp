@@ -41,7 +41,7 @@ struct trajectory_impl : trajectory
         curs_seg_.push_back(crs);
     }
     
-    trajectory_impl(const keypoints_t& kpts,curses_t const& crs,speed_t const& vel)   
+    trajectory_impl(const keypoints_t& kpts ,curses_t const& crs,speed_t const& vel )   
         : curr_pos_(0)
     {
 
@@ -60,7 +60,7 @@ struct trajectory_impl : trajectory
         append(other);
     }
 
-    void append(const trajectory_ptr o) 
+    void append(const trajectory_ptr o)     override
     {
         trajectory_impl_ptr other = trajectory_impl_ptr(o);
 
@@ -112,6 +112,23 @@ struct trajectory_impl : trajectory
             speed_seg_->push_back(seg);
         }
         
+
+    }
+
+    void append(double len, const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed)  override
+    {
+        //if (kp_seg_.size()==0)
+        //{   
+        //    kp_seg_.push_back(keypoints_t());
+        //    curs_seg_.push_back(curses_t());
+        //    if(speed)
+        //        (*speed_seg_).push_back(speed_t());
+        //}
+
+        kp_seg_.back().insert(make_pair<>(len,pos));
+        curs_seg_.back().insert(make_pair<>(len,orien));
+        if(speed)
+            (*speed_seg_).back().insert(make_pair<>(len,*speed));
 
     }
 

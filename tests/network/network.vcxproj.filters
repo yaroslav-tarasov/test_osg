@@ -39,7 +39,7 @@
       <Filter>Source Files\fms</Filter>
     </ClCompile>
     <ClCompile Include="network.cpp">
-      <Filter>Source Files\fms</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

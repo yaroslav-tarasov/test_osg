@@ -84,7 +84,7 @@ namespace aircraft_physless
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
         aircraft::state_t s(init_pos.pos,init_pos.orien);
-        obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s)));
+        obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s,extern_id)));
 
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))

@@ -1411,7 +1411,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
     nl.push_back("sea");
     nl.push_back("railing");
     nl.push_back("panorama");
-    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),computeAttributes,mat::reader::read(mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),computeAttributes,mat::reader::read(mat_file_name));
     scene->accept(mv);
 
     // All solid objects

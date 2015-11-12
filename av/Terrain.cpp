@@ -291,7 +291,7 @@ void  Terrain::create( const std::string& name )
     nl.push_back("panorama");
     nl.push_back("plane");
 
-    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),creators::computeAttributes,mat::reader::read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),creators::computeAttributes,mat::reader::read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);
 
 

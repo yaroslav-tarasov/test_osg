@@ -294,7 +294,7 @@ osg::Node* createObject(std::string name, bool fclone)
         nl.push_back("plane");
         //nl.push_back("rotor"); /// Õללללללללללללל נאסךמלוםעאנטעü ט הטםאלטקוסךטי ףבתועסÿ
         
-        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,name,sp::_2,sp::_3),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,mat::reader::read(mat_file_name));
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,mat::reader::read(mat_file_name));
         pat->accept(mv);
 
 

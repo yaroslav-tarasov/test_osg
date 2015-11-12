@@ -18,6 +18,9 @@
 #include "av/Visual.h"
 #include "tests/systems/test_systems.h"
 
+
+#include "objects/registrator.h"
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -65,6 +68,10 @@ namespace
            sys_.reset();
        }
 
+       __forceinline kernel::system_ptr get_sys()
+       {
+           return sys_;
+       }
 
     private:
        double                                                   period_; 
@@ -326,6 +333,8 @@ struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
+     
+
 
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
          : period_     (/*cfg().model_params.msys_step*/0.05)
@@ -507,6 +516,8 @@ private:
 
 struct visapp
 {
+    typedef boost::function<void(run const& msg)>   on_run_f;
+
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
         : osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
@@ -566,8 +577,6 @@ private:
 
         }
 
-
-        //LogInfo("update ");
     }
     
    
@@ -584,6 +593,8 @@ private:
 
     void on_run(run const& msg)
     {
+        if(on_run_)
+            on_run_(msg);
         LogInfo("Got run message: " << msg.speed << " : " << msg.time );
     }
     
@@ -628,6 +639,13 @@ private:
 
         force_log fl2;  
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.get_delta() << "\n");
+        
+        kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
+        
+        if (reg_obj)
+        {
+            on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+        }
     }
 
     kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
@@ -653,7 +671,8 @@ private:
     updater                                                    ctrl_sys_;
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
-
+private:
+    on_run_f                                                    on_run_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 };
@@ -688,8 +707,10 @@ int av_scene( int argc, char** argv )
         __main_srvc__->run(ec);
 
     }
-    catch(verify_error const&)
+    catch(verify_error const& err)
     {
+        std::string serr(err.what());
+        LogInfo( serr );
         return -1;
     }
     catch(std::exception const& err)

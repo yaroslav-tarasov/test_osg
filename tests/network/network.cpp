@@ -67,6 +67,9 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     return fms::trajectory::create(kpts,crs,vls);
 }
 
+
+bool create_a = true;
+
 struct client
 {
 
@@ -74,6 +77,7 @@ struct client
 
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
+        , period_(0.5)
         , timer_  (boost::bind(&client::update, this))
         , ac_counter_(0)
         , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
@@ -131,22 +135,35 @@ private:
 
     void update()
     {   
-        double time = 10;
+        static double time = 0;
 
-        binary::bytes_t bts =  std::move(wrap_msg(run(
-                                                        _traj->kp_value(time)
-                                                       ,_traj->curs_value(time)
-                                                       ,*_traj->speed_value(time)
-                                                       , time
-        )));
+        if (time>1 && create_a)
+        {
+            
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,0,0.007,0)));
+            send(&bts[0], bts.size());
+            LogInfo("update() send create " );
+            create_a = false;
+        }
 
-        send(&bts[0], bts.size());
+        if(time>10)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(run(
+                                                            1 
+                                                           ,_traj->kp_value(time)
+                                                           ,_traj->curs_value(time)
+                                                           ,*_traj->speed_value(time)
+                                                           , time
+            )));
+
+            send(&bts[0], bts.size());
+
+        }
         
-        LogInfo("update() send run " );
-#if 1
-        if(ac_counter_++==40)
+#if 0
+        if(ac_counter_==40)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,0,0,90)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(2,0,0,90)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
@@ -154,7 +171,7 @@ private:
 
         if(ac_counter_==45)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(2,0,0.005,0)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(3,0,0.005,0)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
@@ -162,7 +179,7 @@ private:
 
         if(ac_counter_==45)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(3,0,0.006,0)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(4,0,0.006,0)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
@@ -170,18 +187,21 @@ private:
 
         if(ac_counter_==45)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(4,0,0.007,0)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(5,0,0.007,0)));
             send(&bts[0], bts.size());
 
             LogInfo("update() send create " );
         }
 #endif
+        
+        time += period_;
 
-        timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * /*period_*/1)));
+        timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
     }
 
 private:
     async_timer             timer_; 
+    double                  period_;
 
 private:
     async_connector         con_;

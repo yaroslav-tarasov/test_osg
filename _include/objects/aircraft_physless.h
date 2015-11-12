@@ -75,7 +75,7 @@ namespace aircraft_physless
     {
         virtual ~info(){}
 
-        virtual state_t const&                get_state()           const = 0;  // fms
+        virtual state_t const&                  get_state()           const = 0;  // fms
         
         virtual geo_point_3 const&              pos              () const = 0;
         virtual point_3                         dpos             () const = 0;
@@ -89,7 +89,7 @@ namespace aircraft_physless
 
         virtual nodes_management::node_info_ptr root             () const = 0;
         virtual bool                            malfunction      (aircraft::malfunction_kind_t kind) const = 0;
-
+        virtual uint32_t                        extern_id        () const = 0;
         //virtual aircraft_fms::info_ptr          get_fms          () const = 0;
 
         virtual optional<double> get_prediction_length() const = 0;

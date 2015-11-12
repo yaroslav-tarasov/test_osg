@@ -778,5 +778,8 @@
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp">
       <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

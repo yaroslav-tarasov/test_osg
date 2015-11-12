@@ -133,6 +133,7 @@ namespace avScene {
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
         osg::ref_ptr<ScreenTextureManager>          _screenTextureManager;
 
+         osg::ref_ptr<osg::Group>                   _groupMainReflection;
 #if !defined(VISUAL_EXPORTS)
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
 #endif

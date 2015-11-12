@@ -41,13 +41,16 @@ namespace net_layer
         struct run
             : network::msg_id<id_run>
         {
-            run(const cg::point_3&       keypoint = cg::point_3(), const cg::quaternion& orien = cg::quaternion(), double speed = 0, double time = 0.)
-                : keypoint (keypoint)
+            run( const uint32_t id = 0, const cg::point_3&       keypoint = cg::point_3(), const cg::quaternion& orien = cg::quaternion(), double speed = 0, double time = 0.)
+                : ext_id(id)
+                , keypoint (keypoint)
                 , orien (orien) 
                 , time (time)
                 , speed(speed)
             {
             }
+
+            uint32_t          ext_id;
             cg::point_3       keypoint;
             cg::quaternion    orien;
             double            speed;
@@ -55,10 +58,11 @@ namespace net_layer
         };
 
         REFL_STRUCT(run)
+            REFL_ENTRY( ext_id   )
             REFL_ENTRY( time     )
             REFL_ENTRY( speed    )
             REFL_ENTRY( keypoint )
-            REFL_ENTRY( orien   )
+            REFL_ENTRY( orien    )
         REFL_END()
 
         struct create

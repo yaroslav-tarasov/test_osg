@@ -1402,67 +1402,71 @@ $endif
             SHADOW_INCLUDE
 
             STRINGIFY ( 
-            attribute vec3 tangent;
-            attribute vec3 binormal;
-            out mat4 viewworld_matrix;
-
-            mat4 decal_matrix;
-
-            out block
-            {
-                vec2 texcoord;
-                vec3 normal;
-                vec3 vnormal;
-                vec3 tangent;
-                vec3 binormal;
-                vec3 viewpos;
-                vec2 detail_uv;
-                vec4 shadow_view;
-                //vec4 shadow_view1;
-                //vec4 shadow_view2;
-                vec4 lightmap_coord;
-                vec4 decal_coord;
-            } v_out;
-            
-                                                        
-            uniform mat4            shadowMatrix1;                                                          
-            uniform mat4            shadowMatrix2;  
-
-            void main()
-            {
-                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-                vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
-                viewworld_matrix = inverse(gl_ModelViewMatrix);
-                
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
-
-                v_out.normal    = normal;
-                v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
-                v_out.tangent   = tangent;
-                v_out.binormal  = binormal;
-
-                v_out.viewpos   = viewpos.xyz;
-                // v_out.detail_uv = position.xy * 0.045;
-                v_out.detail_uv = gl_Vertex.xy * 0.045; // FIXME dont no how
-                v_out.texcoord  = gl_MultiTexCoord1.xy;
-
-                // SAVE_DECAL_VARYINGS_VP
-                v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
-
-                //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                //mat4 EyePlane =  transpose(shadowMatrix0); 
-                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
-                
-                //mat4 EyePlane1 =  transpose(shadowMatrix1); 
-                //v_out.shadow_view1 = vec4(dot( viewpos, EyePlane1[0]),dot( viewpos, EyePlane1[1] ),dot( viewpos, EyePlane1[2]),dot( viewpos, EyePlane1[3] ) );
-
-                //mat4 EyePlane2 =  transpose(shadowMatrix2); 
-                //v_out.shadow_view2 = vec4(dot( viewpos, EyePlane2[0]),dot( viewpos, EyePlane2[1] ),dot( viewpos, EyePlane2[2]),dot( viewpos, EyePlane2[3] ) );
-                
-                shadow_vs_main(viewpos);
-
-                SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
-            }       
+\n            attribute vec3 tangent;
+\n            attribute vec3 binormal;
+\n            out mat4 viewworld_matrix;
+\n
+\n            mat4 decal_matrix;
+\n
+\n            out block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 vnormal;
+\n                vec3 tangent;
+\n                vec3 binormal;
+\n                vec3 viewpos;
+\n                vec2 detail_uv;
+\n                vec4 shadow_view;
+\n                //vec4 shadow_view1;
+\n                //vec4 shadow_view2;
+\n                vec4 lightmap_coord;
+\n                vec4 decal_coord;
+\n                vec4 refl_coord;
+\n            } v_out;
+\n            
+\n                                                        
+\n            uniform mat4            shadowMatrix1;                                                          
+\n            uniform mat4            shadowMatrix2;  
+\n
+\n            void main()
+\n            {
+\n                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+\n                vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
+\n                viewworld_matrix = inverse(gl_ModelViewMatrix);
+\n                
+\n                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
+\n
+\n                v_out.normal    = normal;
+\n                v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
+\n                v_out.tangent   = tangent;
+\n                v_out.binormal  = binormal;
+\n
+\n                v_out.viewpos   = viewpos.xyz;
+\n                // v_out.detail_uv = position.xy * 0.045;
+\n                v_out.detail_uv = gl_Vertex.xy * 0.045; // FIXME dont no how
+\n                v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n
+\n                // SAVE_DECAL_VARYINGS_VP
+\n                v_out.decal_coord = (decal_matrix * vec4(v_out.viewpos,1.0)).xyzw;
+\n
+\n                //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
+\n                //mat4 EyePlane =  transpose(shadowMatrix0); 
+\n                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+\n                
+\n                //mat4 EyePlane1 =  transpose(shadowMatrix1); 
+\n                //v_out.shadow_view1 = vec4(dot( viewpos, EyePlane1[0]),dot( viewpos, EyePlane1[1] ),dot( viewpos, EyePlane1[2]),dot( viewpos, EyePlane1[3] ) );
+\n
+\n                //mat4 EyePlane2 =  transpose(shadowMatrix2); 
+\n                //v_out.shadow_view2 = vec4(dot( viewpos, EyePlane2[0]),dot( viewpos, EyePlane2[1] ),dot( viewpos, EyePlane2[2]),dot( viewpos, EyePlane2[3] ) );
+\n                
+\n                // Compute reflection texture coordinates
+\n                v_out.refl_coord = vec4(dot( gl_Position, vec4 ( 0.5, 0, 0, 0.5 ) ),dot( gl_Position, vec4 ( 0, 0.5, 0, 0.5 ) ),/*(viewworld_matrix * viewpos)*/gl_Position.z, gl_Position.w);
+\n
+\n                shadow_vs_main(viewpos);
+\n
+\n                SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
+\n            }       
             )
         };
 
@@ -1509,9 +1513,10 @@ $endif
 \n                /*vec4 shadow_view2;*/
 \n                vec4 lightmap_coord;
 \n                vec4 decal_coord;
+\n                vec4 refl_coord;
 \n            } f_in;
 \n            
-              out vec4  aFragColor;
+\n            out vec4  aFragColor;
               
               /*uniform float zShadow0; */
               /*uniform float zShadow1;*/ 
@@ -1519,7 +1524,8 @@ $endif
               
               /*uniform sampler2DShadow shadowTexture1;*/ 
               /*uniform sampler2DShadow shadowTexture2;*/
-
+\n            uniform sampler2D clipmap_FBOReflection;
+\n
 \n            void main (void)
 \n            {
 $if 0
@@ -1565,8 +1571,8 @@ $if 0
                 //{
                 //     shadow = PCF4_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
                 //}
-                float shadow =  shadow_fs_main(ambient.a);
-\n                
+\n
+\n                float shadow =  shadow_fs_main(ambient.a);
 \n
 \n                float rainy_value = specular.a;
 \n
@@ -1581,11 +1587,15 @@ $if 0
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
 \n
+\n                vec4 refl_data = textureProj(clipmap_FBOReflection, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
+\n                dif_tex_col.rgb = fma(dif_tex_col.rgb, vec3(1.0 - refl_data.a), refl_data.rgb);
+\n
 \n                // FIXME
 \n                // APPLY_DECAL(f_in, dif_tex_col);
 \n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
 \n                // dif_col.rgb = fma(dif_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);        // FIXME
 \n                // decal_data.a = 1.0; //FIXME Dummy code 
+\n
 \n
 \n                // get dist to point and normalized to-eye vector
 \n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
@@ -1608,11 +1618,11 @@ $if 0
 \n
 \n                // Apply spot lights
 \n                vec3 vLightsSpecAddOn;
-                  vec3 light_res;  
+\n                vec3 light_res;  
 \n                  
 \n                // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n                // vec3 lightmap_color = light_res ; 
-
+\n
 \n               GET_LIGHTMAP(f_in.viewpos, f_in);
 \n               LIGHTMAP_SHADOW_TRICK(shadow);
 \n
@@ -1631,7 +1641,7 @@ $if 0
 \n
 \n               
 \n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-              }
+\n            }
             )
  
         };   

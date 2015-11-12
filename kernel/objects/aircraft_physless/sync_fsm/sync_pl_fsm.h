@@ -45,8 +45,13 @@ namespace aircraft_physless
             virtual geo_position                  get_root_pos()         const = 0;
             virtual bool                          is_fast_session()      const = 0;
 
-            virtual void set_desired_nm_pos   (geo_point_3 const& pos) = 0;
-            virtual void set_desired_nm_orien (quaternion const& orien) = 0;
+            virtual void                          set_desired_nm_pos   (geo_point_3 const& pos) = 0;
+            virtual void                          set_desired_nm_orien (quaternion const& orien) = 0;
+
+            //virtual geo_point_3                   get_extern_desired_nm_pos  () const =0;
+            //virtual quaternion                    get_extern_desired_nm_orien() const =0;
+            //virtual double                        get_extern_desired_nm_speed() const =0;
+
             virtual void switch_sync_state    (state_ptr state) = 0;
             virtual void freeze_position      () = 0;
             //virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;

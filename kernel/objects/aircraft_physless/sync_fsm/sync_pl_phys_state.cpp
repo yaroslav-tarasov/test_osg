@@ -10,11 +10,12 @@ namespace aircraft_physless
 {
     namespace sync_fsm
     {
+
         struct phys_state2 : state_t
         {
             phys_state2(self_t &self, /*phys_aircraft_ptr phys_aircraft,*/ geo_base_3 const& base)
                 : self_(self)
-                , desired_velocity_(aircraft::min_desired_velocity())
+                , desired_speed_(aircraft::min_desired_velocity())
                 //, on_ground_(false)
                 //, phys_aircraft_(phys_aircraft)
                 , base_(base)
@@ -50,7 +51,8 @@ namespace aircraft_physless
             //phys_aircraft_ptr phys_aircraft_;
             //bool on_ground_;
 
-            double                                 desired_velocity_;
+
+            double                                 desired_speed_;
         };
 
 
@@ -75,6 +77,7 @@ namespace sync_fsm
         //if (!phys_aircraft_)
         //    return;
 
+#if 0
         if(auto traj_ = self_.get_trajectory())
         {
              const double  cur_len = traj_->cur_len();
@@ -213,14 +216,32 @@ namespace sync_fsm
             self_.set_desired_nm_pos(physpos.pos);
             self_.set_desired_nm_orien(physpos.orien);
 #endif
-            auto physpos = self_.fms_pos();//phys_aircraft_->get_position();
+            auto physpos = self_.fms_pos(); //phys_aircraft_->get_position();
 
             self_.set_desired_nm_pos(physpos.pos);
             self_.set_desired_nm_orien(physpos.orien);
             
             self_.freeze_position();
         }
+#else
+        FIXME(extern state);
+        if(auto traj_ = self_.get_trajectory())
+        {
 
+            traj_->set_cur_len (traj_->cur_len() + dt);
+            const double  tar_len = traj_->cur_len();
+            decart_position target_pos;
+
+            target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
+            target_pos.orien = traj_->curs_value(tar_len);
+            geo_position gtp(target_pos, get_base());
+       
+
+            self_.set_desired_nm_pos(gtp.pos);
+            self_.set_desired_nm_orien(gtp.orien);
+
+        }
+#endif
 
         sync_wheels(dt);
         sync_rotors(dt);

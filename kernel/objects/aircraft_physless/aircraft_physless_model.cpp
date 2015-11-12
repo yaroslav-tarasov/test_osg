@@ -13,6 +13,7 @@
 #include "aircraft\aircraft_rotors_impl.h"
 
 
+
 namespace aircraft_physless
 {
      
@@ -126,6 +127,24 @@ void model::sync_nm_root(double /*dt*/)
     root_->set_position(root_node_pos);
 }
 
+void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
+{
+    decart_position target_pos;
+
+    target_pos.pos   = pos;
+    target_pos.orien = orien;
+    geo_position gtp(target_pos, get_base());
+
+    //extern_desired_nm_orien_ = gtp.orien;
+    //extern_desired_nm_pos_   = gtp.pos;
+    //extern_desired_nm_speed_ = speed;
+
+    if(!traj_)
+        traj_ = fms::trajectory::create();
+
+    traj_->append(time, pos, orien, speed);
+
+}
 
 airports_manager::info_ptr model::get_airports_manager() const
 {
@@ -180,6 +199,21 @@ void model::set_desired_nm_orien(quaternion const& orien)
 {
     desired_nm_orien_ = orien;
 }
+
+//quaternion model::get_extern_desired_nm_orien()  const
+//{
+//    return *extern_desired_nm_orien_;
+//}
+//
+//geo_point_3 model::get_extern_desired_nm_pos  ()  const 
+//{
+//    return *extern_desired_nm_pos_ ;
+//}
+//
+//double  model::get_extern_desired_nm_speed   ()   const
+//{
+//    return extern_desired_nm_speed_;
+//}
 
 void model::on_malfunction_changed( aircraft::malfunction_kind_t kind ) 
 {

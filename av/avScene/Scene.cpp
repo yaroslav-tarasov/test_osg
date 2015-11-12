@@ -15,7 +15,7 @@
 #include <osg/GLObjects>
 
 #include "av/avAnimation/AnimTest.h"
-
+#include "av/PreRender.h"
 
 //Degree precision versus length
 //
@@ -317,6 +317,61 @@ private:
     float                                             _intensivity;
     avSky::Sky *                                      _sky;
 
+};
+
+// cull reflections matrix modificator
+class ReflectionCullCallback : public osg::NodeCallback
+{
+    virtual void operator()( osg::Node * pNode, osg::NodeVisitor * pNV )
+    {
+        osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
+        osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
+        avAssert(pCV && pNodeAsGroup);
+
+        Prerender * pPrerenderNode = static_cast<Prerender *>(pNodeAsGroup->getChild(0));
+        avAssert(pPrerenderNode);
+
+        FIXME(Need some tides);
+
+        const float fTide = 1.f;
+
+        const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
+
+        // check underwater status
+        osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * svCore::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
+        const bool bUnderWater = vEyeLTPPos.z() < fTide;
+
+        // reverted model view matrix for planar reflections
+        osg::Matrixd mModelView = *pCV->getModelViewMatrix();
+        if (!bUnderWater)
+            mModelView = osg::Matrixd::scale(1.0, 1.0, -1.0) * osg::Matrixd::translate(0.0, 0.0, 2.0 * fTide) * mModelView;
+
+        // extract oblique params
+        osg::Matrixd InvMVP = osg::Matrixd::inverse(mModelView * mProjection);
+        osg::Vec4d ClipPlane_OS(0.0, 0.0, 1.0, -fTide);
+        osg::Vec4d ClipPlane_NDC = InvMVP * ClipPlane_OS;
+        ClipPlane_NDC /= abs(ClipPlane_NDC.z()); // normalize such that depth is not scaled
+        ClipPlane_NDC.w() -= 1.0;
+
+        // inverse if we are below tide plane
+        if (ClipPlane_NDC.z() < 0)
+            ClipPlane_NDC *= -1.0;
+
+        // create oblique matrix
+        osg::Matrixd suffix;
+        suffix(0, 2) = ClipPlane_NDC.x();
+        suffix(1, 2) = ClipPlane_NDC.y();
+        suffix(2, 2) = ClipPlane_NDC.z();
+        suffix(3, 2) = ClipPlane_NDC.w();
+
+        // set projection matrix with oblique clip plane (near plane is set to be clipping plane)
+        const osg::Matrixd mNewProjection = mProjection * suffix;
+        pPrerenderNode->setProjectionMatrix(mNewProjection);
+        pPrerenderNode->setViewMatrix(/*avCore::GetCoordinateSystem()->GetLCS2LTPMatrix() **/ mModelView);
+
+        // go down
+        pNV->traverse(*pNode);
+    }
 };
 
 namespace avGUI {
@@ -745,8 +800,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 
 #else  
-
-
   
     // Create sky
     //
@@ -772,7 +825,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         }
     }
     );
-
 
 
 #if 1
@@ -887,6 +939,31 @@ FIXME(Чудеса с Ephemeris)
 		ptType, fIntensity, fCentralPortion);
 
 #endif
+
+#if 0
+    //
+    // Reflections
+    //
+
+    // add creation of main reflection texture
+    osg::ref_ptr<Prerender> pReflFBOGroup = new Prerender();
+    _groupMainReflection = pReflFBOGroup.get();
+
+    // tricky cull for reflections
+    osg::ref_ptr<osg::Group> reflectionSubGroup = new osg::Group();
+    reflectionSubGroup->addChild(pReflFBOGroup.get());
+    reflectionSubGroup->setCullCallback(new ReflectionCullCallback());
+    _environmentNode->addChild(reflectionSubGroup.get());
+
+    // reflection unit
+    getOrCreateStateSet()->addUniform(new osg::Uniform("clipmap_FBOReflection", int(BASE_REFL_TEXTURE_UNIT)));
+    getOrCreateStateSet()->setTextureAttribute(BASE_REFL_TEXTURE_UNIT, pReflFBOGroup->getTexture());
+
+
+    _groupMainReflection->addChild(_terrainRoot);
+#endif
+
+
 
     return true;
 }

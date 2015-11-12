@@ -16,7 +16,7 @@ namespace mat
 class MaterialVisitor : public osg::NodeVisitor
 {
 public:         
-    typedef std::function<void(osg::StateSet* stateset,std::string,const mat::materials_t& m)>       creator_f;
+    typedef std::function<void(osg::Node*, osg::StateSet* stateset,std::string,const mat::materials_t& m)>       creator_f;
     typedef std::function<void(osg::Node*,std::string)>                    computer_f;    
     typedef std::list<std::string>                                         namesList;
 public:
@@ -35,7 +35,7 @@ public:
         if(findTexture( &node, node.getStateSet() ))
         {   
             if(_cm) _cm(&node,_found_mat_name);
-            if(_cr) _cr(node.getStateSet(),_found_mat_name,_mats);
+            if(_cr) _cr(&node, node.getStateSet(),_found_mat_name,_mats);
         }
 
         traverse( node );
@@ -45,12 +45,12 @@ public:
     {
         bool ret = findTexture( &geode,geode.getStateSet() );
         if (ret)
-            _cr(geode.getStateSet(),_found_mat_name,_mats);
+            _cr(&geode,geode.getStateSet(),_found_mat_name,_mats);
         for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
         {
             ret |= findTexture( &geode, geode.getDrawable(i)->getStateSet() );
             if (ret)
-                _cr(geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
+                _cr(&geode, geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
         }
 
         if(ret && _cm)

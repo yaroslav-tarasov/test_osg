@@ -100,7 +100,8 @@ namespace
             create_auto_object(_msys,"airports_manager","aiports_manager");
             create_auto_object(_msys,"ada","ada");
             create_auto_object(_msys,"meteo_proxy","meteo_proxy");
-        }
+            create_auto_object(_msys,"aircraft_reg","aircraft_reg");
+        }                                                             
 
 
 
