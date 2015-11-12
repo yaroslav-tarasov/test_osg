@@ -940,7 +940,7 @@ FIXME(Чудеса с Ephemeris)
 
 #endif
 
-#if 0
+#if 1
     //
     // Reflections
     //

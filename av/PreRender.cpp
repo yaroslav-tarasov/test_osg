@@ -48,10 +48,10 @@ void Prerender::init()
     // attach the texture and use it as the color buffer.
     attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, false, 0, 0);
 
-#if 1
     // swap frontface order
     getOrCreateStateSet()->setAttribute(new osg::FrontFace(osg::FrontFace::CLOCKWISE));
 
+#if 0
     // don't reflect stars (if nodemask is set)
 #define REFLECTION_CULL_MASK 0x00010000
 
