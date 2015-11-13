@@ -328,12 +328,12 @@ class ReflectionCullCallback : public osg::NodeCallback
         osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
         avAssert(pCV && pNodeAsGroup);
 
-        Prerender * pPrerenderNode = static_cast<Prerender *>(pNodeAsGroup->getChild(0));
+        avCore::Prerender * pPrerenderNode = static_cast<avCore::Prerender *>(pNodeAsGroup->getChild(0));
         avAssert(pPrerenderNode);
 
         FIXME(Need some tides);
 
-        const float fTide = 1.f;
+        const float fTide = 0.f;
 
         const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
 
@@ -816,15 +816,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
-    avCore::GetEnvironment()->setCallBacks(
-        [=](float illum){ if(_st!=0) _st->setNightMode(illum < 0.8);}  //  FIXME magic night value
-        ,[this](float fog_vr) {
-        BOOST_FOREACH( auto g, this->_lamps)
-        {
-            dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
-        }
-    }
-    );
+
 
 
 #if 1
@@ -946,7 +938,7 @@ FIXME(Чудеса с Ephemeris)
     //
 
     // add creation of main reflection texture
-    osg::ref_ptr<Prerender> pReflFBOGroup = new Prerender();
+    osg::ref_ptr<avCore::Prerender> pReflFBOGroup = new avCore::Prerender();
     _groupMainReflection = pReflFBOGroup.get();
 
     // tricky cull for reflections
@@ -956,14 +948,22 @@ FIXME(Чудеса с Ephemeris)
     _environmentNode->addChild(reflectionSubGroup.get());
 
     // reflection unit
-    getOrCreateStateSet()->addUniform(new osg::Uniform("clipmap_FBOReflection", int(BASE_REFL_TEXTURE_UNIT)));
+    getOrCreateStateSet()->addUniform(new osg::Uniform("reflectionTexture", int(BASE_REFL_TEXTURE_UNIT)));
     getOrCreateStateSet()->setTextureAttribute(BASE_REFL_TEXTURE_UNIT, pReflFBOGroup->getTexture());
 
 
     _groupMainReflection->addChild(_terrainRoot);
 #endif
 
-
+    avCore::GetEnvironment()->setCallBacks(
+        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
+    ,[this](float fog_vr) {
+        BOOST_FOREACH( auto g, this->_lamps)
+        {
+            dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
+        }
+    }
+    );
 
     return true;
 }
@@ -1573,7 +1573,7 @@ void   Scene::onSetLights(bool on)
 	if (_lights.valid())
     {
         _lights->setNodeMask(on?0xffffffff:0);
-        LightManager::GetInstance()->setNodeMask(on?0xffffffff:0);
+        LightManager::GetInstance()->setNodeMask(on?/*0xffffffff*/0x00010000:0);
     }
 }
 

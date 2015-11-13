@@ -1524,7 +1524,7 @@ $endif
               
               /*uniform sampler2DShadow shadowTexture1;*/ 
               /*uniform sampler2DShadow shadowTexture2;*/
-\n            uniform sampler2D clipmap_FBOReflection;
+\n            uniform sampler2D reflectionTexture;
 \n
 \n            void main (void)
 \n            {
@@ -1587,8 +1587,9 @@ $if 0
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
 \n
-\n                vec4 refl_data = textureProj(clipmap_FBOReflection, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
-\n                dif_tex_col.rgb = fma(dif_tex_col.rgb, vec3(1.0 - refl_data.a), refl_data.rgb);
+\n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
+\n                // dif_tex_col.rgb = mix(dif_tex_col.rgb,mix(dif_tex_col.rgb,refl_data.rgb,refl_data.a),rainy_value);
+                  dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);
 \n
 \n                // FIXME
 \n                // APPLY_DECAL(f_in, dif_tex_col);

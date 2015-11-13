@@ -249,7 +249,7 @@ void vis_node_impl::sync_position(double dt)
 
     for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
     {
-        (*(it))->setNodeMask(visible?0xffffffff:0);   // set_process_flag(visible);
+        (*(it))->setNodeMask(visible?/*0xffffffff*/0x00010000:0);   // set_process_flag(visible);
     }
 
     if (visible)

@@ -46,7 +46,7 @@ class texturesHolder  : public texturesHolder_base
 		texture->setInternalFormat(GL_RGBA);
 		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
+		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::/*LINEAR*/LINEAR_MIPMAP_LINEAR);
 		texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
 		texture->setUseHardwareMipMapGeneration(false);
 		return texture;
@@ -507,9 +507,9 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
             || mat_name.find("sea")      !=std::string::npos     
             || mat_name.find("mountain") !=std::string::npos 
             || mat_name.find("concrete") !=std::string::npos 
-            || mat_name.find("tree") !=std::string::npos 
+            //|| mat_name.find("tree") !=std::string::npos 
             )
-            node->setNodeMask(~65536);
+            node->setNodeMask(~REFLECTION_MASK);
     
     stateset->addUniform( new osg::Uniform("colorTex"      , BASE_COLOR_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("normalTex"     , BASE_NORMAL_TEXTURE_UNIT) ); 

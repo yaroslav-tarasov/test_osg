@@ -1195,11 +1195,13 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
             // pass on shadow data to ShadowDataList
             sd->_textureUnit = textureUnit;
 
+#ifdef  DEPRECATED
             if (textureUnit >= 8)
             {
                 OSG_NOTICE<<"Shadow texture unit is invalid for texgen, will not be used."<<std::endl;
             }
             else
+#endif
             {
                 sdl.push_back(sd);
             }

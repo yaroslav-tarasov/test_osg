@@ -74,6 +74,6 @@ namespace kernel
     void visual_object_impl::set_visible(bool visible)
     {
         if(loaded_)
-            node_->setNodeMask(visible?0xffffffff:0);
+            node_->setNodeMask(visible?/*0xffffffff*/0x00010000:0);
     }
 }

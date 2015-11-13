@@ -2,7 +2,11 @@
 #include "Prerender.h"
 #include "materials.h"
 
+namespace avCore
+{
+
 Prerender::Prerender()
+    : _on (true)
 {
     init();
 }
@@ -16,6 +20,9 @@ Prerender::Prerender(const Prerender& prerender,const osg::CopyOp& copyop):
 
 void Prerender::traverse(osg::NodeVisitor& nv)
 {
+    if (!_on)
+        return;
+
     // So do not allow any Visitors except CULL_VISITOR
     if (nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
          osg::Group::traverse(nv);
@@ -51,15 +58,13 @@ void Prerender::init()
     // swap frontface order
     getOrCreateStateSet()->setAttribute(new osg::FrontFace(osg::FrontFace::CLOCKWISE));
 
-#if 0
-    // don't reflect stars (if nodemask is set)
-#define REFLECTION_CULL_MASK 0x00010000
-
+#if 1
     int im = getInheritanceMask();
     im &= ~(osg::CullSettings::CULL_MASK);
     setInheritanceMask(im);
-    setCullMask(REFLECTION_CULL_MASK);
+    setCullMask(REFLECTION_MASK);
 #endif
 
 }
 
+}

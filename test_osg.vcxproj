@@ -323,6 +323,7 @@
     <ClCompile Include="tests\systems\test_systems.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
+    <ClCompile Include="tests\test_boost_timer.cpp" />
     <ClCompile Include="tests\test_curves.cpp" />
     <ClCompile Include="tests\tex_test.cpp" />
     <ClCompile Include="utils\animation_handler.cpp" />

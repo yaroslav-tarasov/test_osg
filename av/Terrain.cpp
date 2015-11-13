@@ -312,11 +312,13 @@ void  Terrain::create( const std::string& name )
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
 
+#if 0
     Grass* grass = new Grass();
     grass->setWindFactor(1.0);
     addChild(grass);
     _grass = grass;
-    
+#endif
+
     //blender::Grass* grass2 = new blender::Grass();
     //addChild(grass2);
 

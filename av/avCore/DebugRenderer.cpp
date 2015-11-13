@@ -115,7 +115,7 @@ void DebugRenderer::setEnabled( bool enable )
     }
     else
     {
-        _group->setNodeMask( 0xffffffff );
+        _group->setNodeMask( /*0xffffffff*/0x00010000 );
     }
     _enabled = enable;
 }

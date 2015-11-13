@@ -53,7 +53,7 @@ bool view::add_aircraft(aircraft_physless::info_ptr airc_info)
 
 void view::inject_msg(net_layer::test_msg::run const& msg)
 {
-    set(msg);
+    // set(msg);
 }
 
 

@@ -781,5 +781,8 @@
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp">
       <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
+    <ClCompile Include="tests\test_boost_timer.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -78,7 +78,7 @@ void LOD::traverse(osg::NodeVisitor& nv)
             {
                 if (_rangeList[i].first<=required_range && required_range<_rangeList[i].second)
                 {
-                    _children[i]->setNodeMask(0xffffffff);// accept(nv);
+                    _children[i]->setNodeMask(/*0xffffffff*/0x00010000);// accept(nv);
                 }
                 else
                 {

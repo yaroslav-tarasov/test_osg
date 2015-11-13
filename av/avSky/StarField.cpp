@@ -11,7 +11,7 @@ using namespace avSky;
 // constructor
 StarField::StarField()
 {
-    setNodeMask(~65536);
+    setNodeMask(~REFLECTION_MASK);
     
     //setNodeMask(NODE_STARFIELD_MASK);
 
