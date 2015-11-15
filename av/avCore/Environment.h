@@ -8,7 +8,7 @@ class Environment
 public:
     
     typedef std::function<void(float)>  OnIlluminationChangeF;
-    typedef std::function<void(float&)> OnVisibleRangeChangeF;
+    typedef std::function<void(float, float)> OnVisibleRangeChangeF;
 
     struct WeatherParameters
     {
@@ -111,7 +111,7 @@ public:
     inline const TimeParameters &         GetTimeParameters()         const { return m_TimeParameters;         }
     
     void setIllumination (float Illumination)              { m_IlluminationParameters.Illumination = Illumination; if(ic_) ic_(Illumination); }
-    void setVisibleRange (float VisibleRange)              { if(vrc_)  vrc_(VisibleRange); }
+    void setVisibleRange (float VisibleRange,float ExpDensity)              { if(vrc_)  vrc_(VisibleRange,ExpDensity); }
     void setCallBacks    (const OnIlluminationChangeF& ic, const OnVisibleRangeChangeF& vrc) {ic_ = ic; vrc_=vrc; } 
 public:
 

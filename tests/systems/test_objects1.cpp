@@ -194,7 +194,7 @@ void create_objects(const std::string & airport)
 
         aircraft::settings_t as;
         as.kind = "A319";
-//      auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 //      aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
 
@@ -207,7 +207,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "A319";//"A333";
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
-//      auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,0);
+        auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,0);
 //      aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
 

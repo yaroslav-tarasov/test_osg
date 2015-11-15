@@ -83,12 +83,11 @@ void FogLayer::setFogParams( const osg::Vec3f & vFogColor, float fFogDensity )
     // for scene                
     m_realExp2Density = convertTraineeDensityToExp2SceneFog(fFogDensity, &m_fRealVisDist);
     
-    if ( fRealVisDist != m_fRealVisDist )
-         avCore::GetEnvironment()->setVisibleRange(m_fRealVisDist);
-
     // save uniform
     _sceneFogUniform->set(osg::Vec4f(vFogColor, m_realExp2Density));
 
+	if ( fRealVisDist != m_fRealVisDist )
+		avCore::GetEnvironment()->setVisibleRange(m_fRealVisDist,m_realExp2Density);
 }
 
 

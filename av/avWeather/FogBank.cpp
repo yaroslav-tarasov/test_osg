@@ -207,7 +207,7 @@ void LocalFogBank::SetPrecipitationDensityPortion( PrecipitationType ptType, flo
 void LocalFogBank::cull( osgUtil::CullVisitor * pCV )
 {
     // exit if reflections
-    const bool bMagicReflPath = (pCV->getCullMask() == 0x00010000UL);
+    const bool bMagicReflPath = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
 
     // calculate color
     m_uniformColor->set(GetPrecipitationColor(m_ptType));

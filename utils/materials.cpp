@@ -46,7 +46,7 @@ class texturesHolder  : public texturesHolder_base
 		texture->setInternalFormat(GL_RGBA);
 		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::/*LINEAR*/LINEAR_MIPMAP_LINEAR);
+		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR/*LINEAR_MIPMAP_LINEAR*/);
 		texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
 		texture->setUseHardwareMipMapGeneration(false);
 		return texture;

@@ -135,7 +135,7 @@ void LocalWeather::SetWorldTransformationMatrix(const osg::Matrix & mMatrix)
 bool LocalWeather::cull(osgUtil::CullVisitor * pCV)
 {
     // refl pass?
-    const bool bReflPass = (pCV->getCullMask() == 0x00010000UL);
+    const bool bReflPass = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
 
     // push matrix
     osg::ref_ptr<osg::RefMatrix> refModelViewMatrix = new osg::RefMatrix(*pCV->getModelViewMatrix());

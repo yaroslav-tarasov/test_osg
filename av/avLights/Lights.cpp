@@ -115,7 +115,7 @@ void Lights::cull(osg::NodeVisitor * nv)
     assert(pCV);
 
     // current stateset to work with
-    const bool bReflPass = (pCV->getCullMask() == 0x00010000UL);
+    const bool bReflPass = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
     std::vector<LightExternalInfo> & aCullVisibleLights = (bReflPass) ? m_aReflVisibleLights : m_aMainVisibleLights;
     std::vector<LightProcessedInfo> & aCullProcessedLights = (bReflPass) ? m_aReflProcessedLights : m_aMainProcessedLights;
 
@@ -229,7 +229,7 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
         m_pFatherRef = GetScene()->getLights();
 
     // current stateset to work with
-    const bool bReflPass = (pCV->getCullMask() == 0x00010000UL);
+    const bool bReflPass = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
     LightsPackStateSet & curStatePack = (bReflPass) ? m_lightsRefl : m_lightsMain;
     const std::vector<LightExternalInfo> & aCullVisibleLights = (bReflPass) ? m_pFatherRef->m_aReflVisibleLights : m_pFatherRef->m_aMainVisibleLights;
     const std::vector<LightProcessedInfo> & aCullProcessedLights = (bReflPass) ? m_pFatherRef->m_aReflProcessedLights : m_pFatherRef->m_aMainProcessedLights;

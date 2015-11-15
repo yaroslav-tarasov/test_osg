@@ -2,8 +2,6 @@
 #include <stdafx.h>
 
 #include "av/avCore/avCore.h"
-#include "av/avCore/Utils.h"
-#include "av/avCore/Global.h"
 
 #include "av/avScene/Scene.h"
 #include "av/avSky/Sky.h"
@@ -311,7 +309,7 @@ void Weather::cull(osg::NodeVisitor * nv)
     avAssert(pCV);
 
     // refl pass?
-    const bool bReflPass = (pCV->getCullMask() == 0x00010000UL);
+    const bool bReflPass = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
     BanksStateSetPack & bankUniforms = (bReflPass) ? m_BanksRefl : m_BanksMainView;
 
     // weather params

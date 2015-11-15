@@ -957,10 +957,11 @@ FIXME(Чудеса с Ephemeris)
 
     avCore::GetEnvironment()->setCallBacks(
         [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
-    ,[this](float fog_vr) {
+        ,[this](float fog_vr,float fog_exp) {
         BOOST_FOREACH( auto g, this->_lamps)
         {
             dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
+			dynamic_cast<NavAidGroup*>(g.get())->setFogCoeff(fog_exp);
         }
     }
     );

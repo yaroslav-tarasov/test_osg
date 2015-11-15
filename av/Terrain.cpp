@@ -210,7 +210,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
     : _lightsHandler(avScene::/*GlobalInfluence*/LocalInfluence)
     , _sceneRoot (sceneRoot)
 {
-    setNodeMask( PICK_NODE_MASK /*| cReceivesShadowTraversalMask*/ );
+    setNodeMask( PICK_NODE_MASK | REFLECTION_MASK/*| cReceivesShadowTraversalMask*/ );
 
 
     //

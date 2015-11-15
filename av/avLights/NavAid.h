@@ -16,6 +16,12 @@ public:
     META_Node(avScene, NavAidGroup);
     
     void addLight(osgSim::LightPoint pnt, const LightManager::Light& data);
+	void setFogCoeff(float fTotalFogDistAtt);
+
+private:
+
+	// cull callback
+	void cull( osg::NodeVisitor * nv );
 
 
 protected:
@@ -26,6 +32,7 @@ private:
     std::map<uint32_t,uint32_t>    lm_;
     bool                           usePointSprites_;
     static osg::ref_ptr<osg::Texture2D>        tex_;
+	std::function<float(bool)>		     	   sff_;
 };
 
 
