@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "av/precompiled.h"
 #include "materials.h"
 #include "av/shaders.h"
 #include "av/avCore/Utils.h"

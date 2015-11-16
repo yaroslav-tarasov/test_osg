@@ -88,10 +88,11 @@ namespace avScene
 				continue;
 			
 			
+            FIXME(Над коэффициентом )
 			float fSizeFogFactor = sff_?sff_(bReflPass):1.0;
 
-			if(bReflPass)
-				lp._radius = 10.0f * fSizeFogFactor;
+            if(bReflPass)
+				lp._radius = 3.5f * fSizeFogFactor;
 			else
 				lp._radius = 0.2f * fSizeFogFactor;
 
@@ -102,7 +103,7 @@ namespace avScene
 			if (doBlink)
 			{
 				FIXME(Интервал тут не просто так)
-					osg::Vec4 bs = lp._blinkSequence->color(time,0/*timeInterval*/);
+			    osg::Vec4 bs = lp._blinkSequence->color(time,0/*timeInterval*/);
 				if(bs.length2()>0)
 				{
 					light_data.active = true;

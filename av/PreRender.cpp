@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include "av/precompiled.h"
+
 #include "Prerender.h"
 #include "materials.h"
 

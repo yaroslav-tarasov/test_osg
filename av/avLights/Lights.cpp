@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "av/precompiled.h"
 
 #include <osgUtil/UpdateVisitor>
 #include <osgUtil/CullVisitor>

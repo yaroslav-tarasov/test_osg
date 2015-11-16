@@ -38,6 +38,7 @@ namespace
 {
     boost::asio::io_service* __main_srvc__ = 0;
 
+
     void tcp_error(error_code const& err)
     {
         LogError("Error happened: " << err);
@@ -234,6 +235,11 @@ struct session_timer
     }
 
 private:
+    double get_factor()
+    {
+        return factor_ ;
+    }
+
     void set_factor(double factor)
     {
         factor_ = factor;
@@ -448,7 +454,7 @@ private:
              sock, boost::bind(&net_worker::on_recieve, this, _1, _2, id),
              boost::bind(&net_worker::on_disconnected, this, _1, id),
              boost::bind(&net_worker::on_error, this, _1, id)));        
-
+         
          LogInfo("Client " << peer << " accepted");
      }
 

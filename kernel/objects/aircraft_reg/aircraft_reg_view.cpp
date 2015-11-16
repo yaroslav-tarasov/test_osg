@@ -53,8 +53,19 @@ bool view::add_aircraft(aircraft_physless::info_ptr airc_info)
 
 void view::inject_msg(net_layer::test_msg::run const& msg)
 {
+    buffer_.push_back(msg);
     // set(msg);
 }
 
+void view::pre_update(double time)
+{
+    base_view_presentation::pre_update(time);
+    while(buffer_.size()>0)
+    {
+        net_layer::test_msg::run const& msg = buffer_.front();
+        set(msg);
+        buffer_.pop_front();
+    }
+}
 
 } // end of aircraft_reg

@@ -29,3 +29,9 @@ enum RenderBinOrder
     RENDER_BIN_IMAGE_CALIBRATION        = 100 // Always on top
 };
 
+enum masks_t{
+    PICK_NODE_MASK                      = 0x1,
+    NODE_STARFIELD_MASK                 = 0x2,
+    REFLECTION_MASK                     = 0x00010000,
+    DO_NOT_PICK_NODE_MASK               = 0x4,
+};

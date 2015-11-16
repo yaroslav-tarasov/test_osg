@@ -1,11 +1,12 @@
 #include "stdafx.h"
+#include "av/precompiled.h"
+
 #include "Object.h"
 #include "avCore/LOD.h"
 #include "avLights/Lights.h"
 #include "avLights/LightManager.h"
 #include "avCore/Utils.h"
 
-#include "visitors/materials_visitor.h"
 #include "materials.h"
 
 namespace creators

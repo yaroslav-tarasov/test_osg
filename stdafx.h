@@ -25,9 +25,6 @@
 #include "common/misc.h"
 
 #define ORIG_EPHEMERIS
-#define PICK_NODE_MASK          0x1
-#define REFLECTION_MASK         0x00010000
-#define DO_NOT_PICK_NODE_MASK   0x2
 #define SCREEN_TEXTURE
 
 
