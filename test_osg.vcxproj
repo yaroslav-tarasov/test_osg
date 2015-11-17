@@ -313,6 +313,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="tests\patch-lowlevel.cpp" />
     <ClCompile Include="tests\render_points.cpp" />
     <ClCompile Include="tests\select_geometry.cpp" />
     <ClCompile Include="tests\shadow_map.cpp" />
