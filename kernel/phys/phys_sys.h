@@ -24,6 +24,11 @@ namespace phys
     {
         virtual ~rigid_body() {}
     };
+    
+    struct soft_body
+    {
+        virtual ~soft_body() {}
+    };
 
     struct static_mesh
     {

@@ -468,18 +468,19 @@ private:
 
         boost::asio::io_service::work skwark(asi.get_service());
 
-
+#if 0
         render_timer_ = session_timer::create (ses_, __render_period__,  [&](double time)
         {
             __main_srvc__->post(__priority_queue__->wrap(100, boost::bind(on_render_,time))/*boost::bind(on_render_,time)*/);
            
             std::cout << "on_render handler:  __render_period__  - __new_render_period__: " <<  __render_period__  - __new_render_period__ << " \n";
             
-            render_timer_->set_factor( render_timer_->get_factor() + __render_period__  - __new_render_period__ );
+            render_timer_->set_factor( /*render_timer_->get_factor()*//* - 1  +*/ __render_period__ / __new_render_period__  );
             
-        } , 1, true);
+        } , 1, false);
+#endif
 
-        calc_timer_   = session_timer::create (ses_, 0.05f, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
+        calc_timer_   = session_timer::create (ses_, 0.05f, boost::bind(&net_worker::on_timer, this ,_1) , 1, true);
 
 
         boost::system::error_code ec;
@@ -553,6 +554,11 @@ struct testapp
         w_.reset();
     }
 
+    void render()
+    {
+         on_render(0);
+    }
+
 private:
 
     void on_render(double time)
@@ -562,7 +568,7 @@ private:
         sleep(40);
         //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
         std::cout << "on_render handler:  " << time << " delta: " << _hr_timer.get_delta() << " \n";
-        __new_render_period__   = 0.001 * _hr_timer_render.get_delta();
+        __new_render_period__   = _hr_timer_render.get_delta();
     }
 
     void update(double time)
@@ -577,7 +583,7 @@ private:
         }
         else
         {
-            //sleep(20);
+            
             std::cout << "update handler  " << _hr_timer_update.get_delta() <<  " \n";
         }
 
@@ -601,7 +607,9 @@ void low_priority_handler()
     std::cout << "Low priority handler\n";
 }
 
-
+void empty_handler()
+{
+}
 
 
 }
@@ -635,9 +643,9 @@ int main_asio_test(int argc, char** argv)
     //timer.expires_at(boost::posix_time::neg_infin);
     //timer.async_wait(pri_queue.wrap(43, boost::bind(&middle_priority_handler,timer,pri_queue,_3)));
     
-    mhandler model_update(io_service,pri_queue,20,1000);
+    //mhandler model_update(io_service,pri_queue,20,1000);
 
-    mhandler vis_update(io_service,pri_queue,43,100);
+    //mhandler vis_update(io_service,pri_queue,43,100);
 
     try
     {
@@ -651,8 +659,12 @@ int main_asio_test(int argc, char** argv)
             // rather than executing them from within the poll_one() call.
             while (io_service.poll_one())
                 ;
-            //sleep( 1000 );
+            
             pri_queue.execute_all();
+
+            //s.render();
+
+            io_service.post(pri_queue.wrap(100, boost::bind(&testapp::render,&s)));
         }
 
     }

@@ -9,12 +9,14 @@ namespace phys
     struct static_mesh;
     struct collision;
     struct static_convex;
+    struct soft_body;
 
     typedef polymorph_ptr<rigid_body>    rigid_body_ptr;
     typedef polymorph_ptr<system>        system_ptr;
     typedef polymorph_ptr<static_mesh>   static_mesh_ptr;
     typedef polymorph_ptr<static_convex> static_convex_ptr;
-    typedef polymorph_ptr<collision> collision_ptr;
+    typedef polymorph_ptr<collision>     collision_ptr;
+    typedef polymorph_ptr<soft_body>     soft_body_ptr;
 
     namespace ray_cast_vehicle
     {
