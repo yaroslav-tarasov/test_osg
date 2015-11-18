@@ -5,13 +5,12 @@
 
 #include <stdafx.h>
 
-#include <osg/Texture2D>
 
 #include "av/avCore/HalfTypeHeader.h"
 
 #include "av/avCore/avCore.h"
 #include "av/avScene/Scene.h"
-//#include "svSea/Sea.h"
+//#include "avSea/Sea.h"
 
 #include "av/avWeather/PrecipitationBase.h"
 

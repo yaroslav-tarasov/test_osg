@@ -333,7 +333,7 @@ inline string get_model(string icao_code)
         return "sheremetyevo";
     else if (icao_code == "URSS")
         return "adler";
-    else if (icao_code == "UMMS")
+    else if (icao_code == "UMMS" || icao_code == "UMMM")
         return "minsk";
 
     return "";
@@ -346,7 +346,8 @@ inline bool valid_icao(string icao_code)
     return icao_code == "UUEE" || 
            icao_code == "URSS" ||
            icao_code == "UHWW" ||
-           icao_code == "UMMS"
+           icao_code == "UMMS" ||
+           icao_code == "UMMM"
            ;     
 }
 
