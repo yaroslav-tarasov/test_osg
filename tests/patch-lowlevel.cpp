@@ -83,6 +83,153 @@ struct MeshUpdater : public osg::Drawable::UpdateCallback
 };
 /** \endcond */
 
+namespace SoftBodyHelpers
+{
+
+
+btSoftBody*		CreateRope(	btSoftBodyWorldInfo& worldInfo, const btVector3& from,
+	const btVector3& to,
+	int res,
+	int fixeds)
+{
+	/* Create nodes	*/ 
+	const int		r=res+2;
+	btVector3*		x=new btVector3[r];
+	btScalar*		m=new btScalar[r];
+	int i;
+
+	for(i=0;i<r;++i)
+	{
+		const btScalar	t=i/(btScalar)(r-1);
+		x[i]=lerp(from,to,t);
+		m[i]=1;
+	}
+	btSoftBody*		psb= new btSoftBody(&worldInfo,r,x,m);
+	if(fixeds&1) psb->setMass(0,0);
+	if(fixeds&2) psb->setMass(r-1,0);
+	delete[] x;
+	delete[] m;
+	/* Create links	*/ 
+	for(i=1;i<r;++i)
+	{
+		psb->appendLink(i-1,i);
+	}
+	/* Finished		*/ 
+	return(psb);
+}
+
+//
+btSoftBody*		CreatePatch(btSoftBodyWorldInfo& worldInfo,const btVector3& corner00,
+	const btVector3& corner10,
+	const btVector3& corner01,
+	const btVector3& corner11,
+	int resx,
+	int resy,
+	int fixeds,
+	bool gendiags)
+{
+#define IDX(_x_,_y_)	((_y_)*rx+(_x_))
+	/* Create nodes	*/ 
+	if((resx<2)||(resy<2)) return(0);
+	const int	rx=resx;
+	const int	ry=resy;
+	const int	tot=rx*ry;
+	btVector3*	x=new btVector3[tot];
+	btScalar*	m=new btScalar[tot];
+	int iy;
+
+	for(iy=0;iy<ry;++iy)
+	{
+		const btScalar	ty=iy/(btScalar)(ry-1);
+		const btVector3	py0=lerp(corner00,corner01,ty);
+		const btVector3	py1=lerp(corner10,corner11,ty);
+		for(int ix=0;ix<rx;++ix)
+		{
+			const btScalar	tx=ix/(btScalar)(rx-1);
+			x[IDX(ix,iy)]=lerp(py0,py1,tx);
+			m[IDX(ix,iy)]=1;
+		}
+	}
+	btSoftBody*		psb=new btSoftBody(&worldInfo,tot,x,m);
+	if(fixeds&1)	psb->setMass(IDX(0,0),0);
+	if(fixeds&2)	psb->setMass(IDX(rx-1,0),0);
+	if(fixeds&4)	psb->setMass(IDX(0,ry-1),0);
+	if(fixeds&8)	psb->setMass(IDX(rx-1,ry-1),0);
+	delete[] x;
+	delete[] m;
+	/* Create links	and faces */ 
+	for(iy=0;iy<ry;++iy)
+	{
+		for(int ix=0;ix<rx;++ix)
+		{
+			const int	idx=IDX(ix,iy);
+			const bool	mdx=(ix+1)<rx;
+			const bool	mdy=(iy+1)<ry;
+			if(mdx) psb->appendLink(idx,IDX(ix+1,iy));
+			if(mdy) psb->appendLink(idx,IDX(ix,iy+1));
+			if(mdx&&mdy)
+			{
+				if((ix+iy)&1)
+				{
+					psb->appendFace(IDX(ix,iy),IDX(ix+1,iy),IDX(ix+1,iy+1));
+					psb->appendFace(IDX(ix,iy),IDX(ix+1,iy+1),IDX(ix,iy+1));
+					if(gendiags)
+					{
+						psb->appendLink(IDX(ix,iy),IDX(ix+1,iy+1));
+					}
+				}
+				else
+				{
+					psb->appendFace(IDX(ix,iy+1),IDX(ix,iy),IDX(ix+1,iy));
+					psb->appendFace(IDX(ix,iy+1),IDX(ix+1,iy),IDX(ix+1,iy+1));
+					if(gendiags)
+					{
+						psb->appendLink(IDX(ix+1,iy),IDX(ix,iy+1));
+					}
+				}
+			}
+		}
+	}
+	/* Finished		*/ 
+#undef IDX
+	return(psb);
+}
+
+btRigidBody*	createRigidBody(btDiscreteDynamicsWorld* dW,float mass, const btTransform& startTransform, btCollisionShape* shape,  const btVector4& color = btVector4(1, 0, 0, 1))
+{
+	btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
+
+	//rigidbody is dynamic if and only if mass is non zero, otherwise static
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		shape->calculateLocalInertia(mass, localInertia);
+
+	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+
+#define USE_MOTIONSTATE 1
+#ifdef USE_MOTIONSTATE
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+
+	btRigidBody* body = new btRigidBody(cInfo);
+	//body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+
+#else
+	btRigidBody* body = new btRigidBody(mass, 0, shape, localInertia);
+	body->setWorldTransform(startTransform);
+#endif//
+
+	body->setUserIndex(-1);
+	dW->addRigidBody(body);
+	return body;
+}
+
+}
+
+
 osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 {
     const short resX( 12 ), resY( 9 );
@@ -155,6 +302,29 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
     bw->addSoftBody( softBody );
     geom->setUpdateCallback( new MeshUpdater( softBody, resX*resY ) );
 
+#if 1
+	struct	Functors
+	{
+		static btSoftBody* CtorRope(btSoftRigidDynamicsWorld* dW,const btVector3& p)
+		{
+			btSoftBody*	psb=SoftBodyHelpers::CreateRope(worldInfo,p,p+btVector3(10,0,0),8,1);
+			psb->setTotalMass(50);
+			dW->addSoftBody(psb);
+			return(psb);
+		}
+	};
+	btTransform startTransform;
+	startTransform.setIdentity();
+	startTransform.setOrigin(btVector3(12,8,0));
+	btRigidBody*		body=SoftBodyHelpers::createRigidBody(bw,50,startTransform,new btBoxShape(btVector3(-2,-6,-2)));
+	btSoftBody*	psb0=Functors::CtorRope(bw,btVector3(0,8,-1));
+	btSoftBody*	psb1=Functors::CtorRope(bw,btVector3(0,8,+1));
+	psb0->appendAnchor(psb0->m_nodes.size()-1,body);
+	psb1->appendAnchor(psb1->m_nodes.size()-1,body);
+#endif
+
+
+
     return( geode.release() );
 }
 
@@ -218,7 +388,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( debugDisplay )
+    if( /*debugDisplay*/ true)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );
