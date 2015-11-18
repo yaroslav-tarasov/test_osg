@@ -4,10 +4,6 @@
 
 #include <stdafx.h>
 
-#include <osg/Texture2D>
-#include <osg/BlendFunc>
-#include <osg/Depth>
-
 #include "av/avCore/avCore.h"
 #include "av/avScene/Scene.h"
 

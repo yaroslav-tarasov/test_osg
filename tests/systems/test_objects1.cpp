@@ -27,7 +27,7 @@ namespace
             return "log_sochi_4.txt";
         else if (icao_code == "URSS")
             return "log_sochi_4.txt";
-        else if (icao_code == "UMMS")
+        else if (icao_code == "UMMS" || icao_code == "UMMS")
             return "log_minsk.txt";
 
         return "";
