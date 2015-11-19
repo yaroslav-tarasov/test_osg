@@ -315,10 +315,10 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	};
 	btTransform startTransform;
 	startTransform.setIdentity();
-	startTransform.setOrigin(btVector3(12,8,0));
-	btRigidBody*		body=SoftBodyHelpers::createRigidBody(bw,50,startTransform,new btBoxShape(btVector3(-2,-6,-2)));
-	btSoftBody*	psb0=Functors::CtorRope(bw,btVector3(0,8,-1));
-	btSoftBody*	psb1=Functors::CtorRope(bw,btVector3(0,8,+1));
+	startTransform.setOrigin(btVector3(12,0,0));
+	btRigidBody*		body=SoftBodyHelpers::createRigidBody(bw,50,startTransform,new btBoxShape(btVector3(2,6,2)));
+	btSoftBody*	psb0=Functors::CtorRope(bw,btVector3(1,4,0));
+	btSoftBody*	psb1=Functors::CtorRope(bw,btVector3(1,-4,0));
 	psb0->appendAnchor(psb0->m_nodes.size()-1,body);
 	psb1->appendAnchor(psb1->m_nodes.size()-1,body);
 #endif
@@ -383,7 +383,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
     // Add ground
     const osg::Vec4 plane( 0., 0., 1., 0. );
-    root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
+    // root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
 
 
 
