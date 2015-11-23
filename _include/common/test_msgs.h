@@ -77,18 +77,20 @@ namespace net_layer
             {
             }
 
-            create(uint32_t id, double lat, double lon, double course )
-                : ext_id (id)
-                , lat    (lat)
-                , lon    (lon )
-                , course (course)
+            create(uint32_t id, double lat, double lon, double course , const std::string& object_type)
+                : ext_id      (id)
+                , lat         (lat)
+                , lon         (lon )
+                , course      (course)
+				, object_type (object_type)
             {
             }
 
-            uint32_t ext_id;
-            double  lat;
-            double  lon;
-            double  course;
+            uint32_t    ext_id;
+            double      lat;
+            double      lon;
+            double      course;
+			std::string object_type;
         };
 
         REFL_STRUCT(create)
@@ -96,6 +98,7 @@ namespace net_layer
             REFL_ENTRY(lat)
             REFL_ENTRY(lon )
             REFL_ENTRY(course )
+			REFL_ENTRY(object_type )
         REFL_END()
 
         typedef gen_msg<id_ready, uint16_t> ready_msg;

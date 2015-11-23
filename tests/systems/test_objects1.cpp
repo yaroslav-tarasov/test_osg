@@ -251,7 +251,7 @@ object_info_ptr create_aircraft(create const& msg)
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
     cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
     aircraft::settings_t as;
-    as.kind = "A319";
+    as.kind = msg.object_type;
     geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 }
@@ -261,7 +261,7 @@ object_info_ptr create_aircraft_phl(create const& msg)
     kernel::system_ptr _csys = sys_creator()->get_control_sys();
     cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
     aircraft::settings_t as;
-    as.kind = "A319";
+    as.kind = msg.object_type;
     geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
     return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,msg.ext_id);
 }

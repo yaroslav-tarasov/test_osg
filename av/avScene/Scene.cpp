@@ -626,8 +626,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     settings_->clouds[0].x = 1000.0f;
     settings_->clouds[0].y = 1000.0f;
     settings_->clouds[0].height = 100.0f;
-    settings_->clouds[0].p_type = avWeather::PrecipitationRain;
-    settings_->clouds[0].intensity = 0.5f;
+    settings_->clouds[0].p_type = avWeather::/*PrecipitationRain*/PrecipitationFog;
+    FIXME("Меньше 0.5 нефига нет, чет не сильно нормально") 
+    settings_->clouds[0].intensity = 0.75f;
     settings_->intensity = 0.0f;
 
     if(true) _viewerPtr->addEventHandler( 
@@ -923,7 +924,7 @@ FIXME(Чудеса с Ephemeris)
 	const float fHeight      = settings_->clouds[0].height;
 	const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
 	const float fIntensity   = settings_->clouds[0].intensity;
-	const float fCentralPortion = 1;
+	const float fCentralPortion = 0.75;
 
 	pWeatherNode->UpdateLocalWeatherBank(nID, 
 		dLatitude, dLongitude, fHeading, 
@@ -1565,7 +1566,7 @@ void   Scene::onSetCloudParams(const app::cloud_params_t& s)
     pWeatherNode->UpdateLocalWeatherBank(666, 
         s.x, s.y, /*fHeading*/0, 
         s.radius_x, s.radius_y, s.height, 
-        /*ptType*/avWeather::PrecipitationRain , s.intensity, /*fCentralPortion*/1.0);
+        /*ptType*/avWeather::/*PrecipitationRain*/PrecipitationFog , s.intensity, /*fCentralPortion*/1.0);
 }
 
 
