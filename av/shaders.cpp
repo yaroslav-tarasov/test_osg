@@ -1498,7 +1498,8 @@ $endif
               STRINGIFY ( 
 \n
 \n            uniform sampler2D colorTex;
-\n
+\n			  uniform sampler2D normalTex;
+
 \n            in block
 \n            {
 \n                vec2 texcoord;
@@ -1587,9 +1588,11 @@ $if 0
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
 \n
+\n
+\n				  //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
 \n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
 \n                // dif_tex_col.rgb = mix(dif_tex_col.rgb,mix(dif_tex_col.rgb,refl_data.rgb,refl_data.a),rainy_value);
-                  dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);
+                  dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a ), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);
 \n
 \n                // FIXME
 \n                // APPLY_DECAL(f_in, dif_tex_col);
