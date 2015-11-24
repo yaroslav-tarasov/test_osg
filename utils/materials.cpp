@@ -3,6 +3,7 @@
 #include "materials.h"
 #include "av/shaders.h"
 #include "av/avCore/Utils.h"
+#include "av/avCore/Noise.h"
 
 #include "visitors/ct_visitor.h"
 
@@ -248,12 +249,18 @@ FIXME(Все теже кривые плоскости)
                 else
                 if(it->second.unit == 1) 
                 {   
-                    auto imf = osgDB::readImageFile(name);
-                    t.normalTex->setImage( imf );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::CLAMP*/ );
-                    t.normalTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::CLAMP*/ );
-                    t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    t.normalTex->setMaxAnisotropy(16.0f);
+                    if(it->second.path=="generate_noise")
+                       t.normalTex = avCore::Noise::generate2DTex(/*float baseFreq*/6.0f, /*float persistence*/0.5, /*int w*/512, /*int h*/512, /*bool periodic*/true);
+                    else
+                    {
+                        auto imf = osgDB::readImageFile(name);
+                        t.normalTex->setImage( imf );
+                        t.normalTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::CLAMP*/ );
+                        t.normalTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::CLAMP*/ );
+                        t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+                        t.normalTex->setMaxAnisotropy(16.0f);
+                    }
+
 
                     normal_tex = true;
                 } 

@@ -25,13 +25,22 @@ model::model( kernel::object_create_t const& oc, dict_copt dict)
 
 void model::on_inject_msg(net_layer::test_msg::run const& msg)
 {
-     LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " << e2n_.size() << "   " << e2n_.size()>0?e2n_.begin()->first:-1);
+     //LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " << e2n_.size() << "   " << e2n_.size()>0?e2n_.begin()->first:-1);
 
-     auto it_id = e2n_.find(msg.ext_id);
-     if(msg.ext_id>0 /*&& it_id != e2n_.end()*/ && e2n_.size()>0 )
+    auto it_id = e2n_.find(msg.ext_id);
+
+     //for(auto it = e2n_.begin();it!=e2n_.end();++it)
+     //{
+     //  LogInfo("e2n_: " << it->first << "  =  " << it->second);
+     //}
+
+     //if(e2n_.size()>0 && it_id != e2n_.end())
+     //    LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " <<e2n_[msg.ext_id]);
+
+     if(msg.ext_id>0 && it_id != e2n_.end() && e2n_.size()>0 )
      {
          aircraft_physless::info_ptr a = aircrafts_[e2n_[msg.ext_id]];
-         LogInfo("on_inject_msg extern id: " << a?a->extern_id():-1 );
+         // LogInfo("on_inject_msg extern id: " << a?a->extern_id():-1 );
          if(aircraft_physless::model_control_ptr(a))
             aircraft_physless::model_control_ptr(a)->set_desired(msg.time,msg.keypoint,msg.orien,msg.speed);
      }

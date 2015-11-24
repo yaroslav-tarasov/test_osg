@@ -41,7 +41,16 @@ namespace net_layer
         struct run
             : network::msg_id<id_run>
         {
-            run( const uint32_t id = 0, const cg::point_3&       keypoint = cg::point_3(), const cg::quaternion& orien = cg::quaternion(), double speed = 0, double time = 0.)
+            run()
+                : ext_id(0)
+                , keypoint (cg::point_3())
+                , orien    (cg::quaternion()) 
+                , time     (0)
+                , speed    (0)
+            {
+            }
+
+            run( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time)
                 : ext_id(id)
                 , keypoint (keypoint)
                 , orien (orien) 

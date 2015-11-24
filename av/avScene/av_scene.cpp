@@ -609,7 +609,7 @@ private:
     {
         if(on_run_)
             on_run_(msg);
-        LogInfo("Got run message: " << msg.speed << " : " << msg.time );
+        // LogInfo("Got run message: " << msg.speed << " : " << msg.time );
     }
     
     void async_run(run const& msg)
