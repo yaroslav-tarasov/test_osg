@@ -143,3 +143,164 @@ SPK::SPK_ID createSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int sc
     particleSystem->enableAABBComputing( true );
     return particleSystem->getSPKID();
 }
+
+using namespace SPK;
+using namespace SPK::GL;
+
+// Call back function to transform water particles that touches the water into splash particles
+bool splash(Particle& particle,float deltaTime)
+{
+    if (particle.position().y < 0.1f)
+    {
+        if (particle.velocity().y > -0.5f)
+            return true;
+
+        particle.position().y = 0.1f;
+        particle.position().x += random(0.0f,0.2f) - 0.1f;
+        particle.position().z += random(0.0f,0.2f) - 0.1f;
+
+        particle.velocity().set(0,-random(0.1f,0.4f) * particle.velocity().y,0);
+
+        particle.setParamCurrentValue(PARAM_ALPHA,0.4f);
+        particle.setParamCurrentValue(PARAM_SIZE,0.0f);
+
+        particle.setLifeLeft(0.5f);
+    }
+
+    return false;
+}
+
+
+SPK::SPK_ID createSomething( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
+{
+    Group* particleGroup = NULL;
+    System* particleSystem = NULL;
+
+    const float scale_coeff = 20;  
+    SparkDrawable::TextureIDMap::const_iterator itr;
+    GET_TEXTURE_ID( "waterdrops", textureSplash );
+
+
+    // Inits Particle Engine
+    Vector3D gravity(0.0f,-2.2f,0.0f);
+
+    // Renderer
+    GLPointRenderer* basicRenderer = GLPointRenderer::create();
+
+    GLQuadRenderer* particleRenderer = GLQuadRenderer::create();
+    particleRenderer->setScale(0.06f,0.06f);
+    particleRenderer->setTexturingMode(TEXTURE_2D);
+    particleRenderer->setTexture(textureSplash);
+    particleRenderer->setBlending(BLENDING_ALPHA);
+    particleRenderer->enableRenderingHint(DEPTH_WRITE,false);
+
+    // Model
+    Model* particleModel = Model::create(FLAG_ALPHA | FLAG_SIZE | FLAG_ANGLE,
+        FLAG_ALPHA | FLAG_SIZE | FLAG_ANGLE,
+        FLAG_SIZE | FLAG_ANGLE);
+
+    particleModel->setLifeTime(1.6f,2.2f);
+    particleModel->setParam(PARAM_ALPHA,0.2f,0.0f);
+    particleModel->setParam(PARAM_SIZE,1.0f,1.0f,2.0f,8.0f);
+    particleModel->setParam(PARAM_ANGLE,0.0f,4.0f * osg::PI,0.0f,4.0f * osg::PI);
+
+    // Emitters
+    const int NB_EMITTERS = 13;
+
+    Point* emitterZone[NB_EMITTERS];
+    emitterZone[0] = Point::create(Vector3D(0.0f,0.1f,0.0f));
+
+    emitterZone[1] = Point::create(Vector3D(0.0f,0.1f,0.0f));
+    emitterZone[2] = Point::create(Vector3D(0.0f,0.1f,0.0f));
+    emitterZone[3] = Point::create(Vector3D(0.0f,0.1f,0.0f));
+    emitterZone[4] = Point::create(Vector3D(0.0f,0.1f,0.0f));
+
+    emitterZone[5] = Point::create(Vector3D(-1.6f,0.1f,-1.6f));
+    emitterZone[6] = Point::create(Vector3D(1.6f,0.1f,1.6f));
+    emitterZone[7] = Point::create(Vector3D(1.6f,0.1f,-1.6f));
+    emitterZone[8] = Point::create(Vector3D(-1.6f,0.1f,1.6f));
+    emitterZone[9] = Point::create(Vector3D(-2.26f,0.1f,0.0f));
+    emitterZone[10] = Point::create(Vector3D(2.26f,0.1f,0.0f));
+    emitterZone[11] = Point::create(Vector3D(0.0f,0.1f,-2.26f));
+    emitterZone[12] = Point::create(Vector3D(0.0f,0.1f,2.26f));
+
+    StraightEmitter* particleEmitter[NB_EMITTERS];
+    particleEmitter[0] = StraightEmitter::create(Vector3D(0.0f,1.0f,0.0f));
+
+    particleEmitter[1] = StraightEmitter::create(Vector3D(1.0f,3.0f,1.0f));
+    particleEmitter[2] = StraightEmitter::create(Vector3D(-1.0f,3.0f,-1.0f));
+    particleEmitter[3] = StraightEmitter::create(Vector3D(-1.0f,3.0f,1.0f));
+    particleEmitter[4] = StraightEmitter::create(Vector3D(1.0f,3.0f,-1.0f));
+
+    particleEmitter[5] = StraightEmitter::create(Vector3D(1.0f,2.0f,1.0f));
+    particleEmitter[6] = StraightEmitter::create(Vector3D(-1.0f,2.0f,-1.0f));
+    particleEmitter[7] = StraightEmitter::create(Vector3D(-1.0f,2.0f,1.0f));
+    particleEmitter[8] = StraightEmitter::create(Vector3D(1.0f,2.0f,-1.0f));
+    particleEmitter[9] = StraightEmitter::create(Vector3D(1.41f,2.0f,0.0f));
+    particleEmitter[10] = StraightEmitter::create(Vector3D(-1.41f,2.0f,0.0f));
+    particleEmitter[11] = StraightEmitter::create(Vector3D(0.0f,2.0f,1.41f));
+    particleEmitter[12] = StraightEmitter::create(Vector3D(0.0f,2.0f,-1.41f));
+
+    float flow[NB_EMITTERS] =
+    {
+        500.0f,
+
+        600.0f,
+        600.0f,
+        600.0f,
+        600.0f,
+
+        900.0f,
+        900.0f,
+        900.0f,
+        900.0f,
+        900.0f,
+        900.0f,
+        900.0f,
+        900.0f,
+    };
+
+    float flowLow[NB_EMITTERS] =
+    {
+        150.0f,
+
+        200.0f,
+        200.0f,
+        200.0f,
+        200.0f,
+
+        250.0f,
+        250.0f,
+        250.0f,
+        250.0f,
+        250.0f,
+        250.0f,
+        250.0f,
+        250.0f,
+    };
+
+    for (int i = 0; i < NB_EMITTERS; ++i)
+    {
+        particleEmitter[i]->setZone(emitterZone[i]);
+        particleEmitter[i]->setFlow(flow[i]);
+        particleEmitter[i]->setForce(2.5f,4.0f);
+    }
+    particleEmitter[0]->setForce(3.0f,3.5f);
+
+    // Group
+    particleGroup = Group::create(particleModel,20000);
+    particleGroup->setRenderer(particleRenderer);
+    for (int i = 0; i < NB_EMITTERS; ++i)
+        particleGroup->addEmitter(particleEmitter[i]);
+    particleGroup->setCustomUpdate(&splash);
+    particleGroup->setGravity(gravity);
+    particleGroup->setFriction(0.7f);
+    particleGroup->enableAABBComputing( true );
+
+    // System
+    particleSystem = System::create();
+    particleSystem->addGroup(particleGroup);
+    particleSystem->enableAABBComputing( true );
+
+    return particleSystem->getSPKID();
+}

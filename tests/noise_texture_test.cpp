@@ -11,12 +11,28 @@ namespace avCore
 namespace Noise
 {
 
-	template <typename T>
-osg::Texture2D* storeTex( T * data, int w, int h ) 
+template <typename T>
+inline void setImageParams(osg::Image* image,int s,int t,int r, GLint internalTextureformat, GLenum pixelFormat,GLenum type, T* data,osg::Image::AllocationMode mode, int packing=1, int rowLength=0)
 {
-    //GLuint texID;
-    //glGenTextures(1, &texID);
+    image->setImage(s, t, r,
+        //GL_RGBA, /*GL_LUMINANCE*/GL_RGBA8, GL_UNSIGNED_BYTE,
+        internalTextureformat, pixelFormat, type,
+        reinterpret_cast<unsigned char *>(data),
+        mode,packing,rowLength);
+}
 
+template <>
+inline void setImageParams<float>(osg::Image* image,int s,int t,int r, GLint internalTextureformat, GLenum pixelFormat,GLenum type, float* data,osg::Image::AllocationMode mode, int packing, int rowLength)
+{
+    image->setImage(s, t, r,
+        GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT,
+        reinterpret_cast<unsigned char *>(data),
+        mode,packing, rowLength);
+}
+
+template <typename T>
+inline osg::Texture2D* storeTex( T * data, int w, int h ) 
+{
     //glBindTexture(GL_TEXTURE_2D, texID);
     //glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
     //glTexSubImage2D(GL_TEXTURE_2D,0,0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,data);
@@ -27,13 +43,18 @@ osg::Texture2D* storeTex( T * data, int w, int h )
     
     osg::Image* image = new osg::Image;
 
-    image->setImage(w, h, 1,
-        //GL_RGBA, /*GL_LUMINANCE*/GL_RGBA8, GL_UNSIGNED_BYTE,
-        GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT,
-        reinterpret_cast<unsigned char *>(data),
-        osg::Image::USE_NEW_DELETE);
-	
-	osg::Texture2D* pTexture = new osg::Texture2D;
+    //image->setImage(w, h, 1,
+    //    //GL_RGBA, /*GL_LUMINANCE*/GL_RGBA8, GL_UNSIGNED_BYTE,
+    //    GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT,
+    //    reinterpret_cast<unsigned char *>(data),
+    //    osg::Image::USE_NEW_DELETE);
+
+    setImageParams(image,w, h, 1,
+             GL_RGBA, /*GL_LUMINANCE*/GL_RGBA8, GL_UNSIGNED_BYTE,
+            data,
+            osg::Image::USE_NEW_DELETE);
+
+    osg::Texture2D* pTexture = new osg::Texture2D;
 	//tex->setTextureSize(w, h);
 	pTexture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
 	pTexture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
@@ -48,13 +69,14 @@ osg::Texture2D* storeTex( T * data, int w, int h )
 }
 
 
-osg::Texture2D* generate2DTex(float baseFreq, float persistence, int w, int h, bool periodic) 
+template< typename T >
+inline osg::Texture2D* generate2DTex_t(float baseFreq, float persistence, int w, int h, bool periodic) 
 {
 
     int width = w;
     int height = h;
 
-    auto *data = new /*unsigned char*/float[ width * height * 4 ];
+    auto *data = new /*unsigned char*/T[ width * height * 4 ];
 
     double xFactor = 1.0f / (width - 1);
     double yFactor = 1.0f / (height - 1);
@@ -85,21 +107,27 @@ osg::Texture2D* generate2DTex(float baseFreq, float persistence, int w, int h, b
                 result = result < 0.0f ? 0.0f : result;
 
                 // Store in texture
-                data[((row * width + col) * 4) + oct] = /*(unsigned char)*/ ( result * 255.0f );
+                data[((row * width + col) * 4) + oct] = (T) ( result * /*std::numeric_limits< T >::max()*//*255.0f*/ 1.0f );
                 freq *= 2.0f;
                 persist *= persistence;
             }
         }
     }
 
-
     osg::Texture2D* tex = storeTex(data, width, height);
-    //delete [] data;
 
     return tex;
 }
-
+ 
+osg::Texture2D* generate2DTex(float baseFreq, float persistence, int w, int h, bool periodic)
+{
+    // unsigned char    
+    return generate2DTex_t<float>( baseFreq, persistence, w, h, periodic); 
 }
 
 }
+
+}
+
+
 //AUTO_REG(noise_texture_test)

@@ -18,7 +18,9 @@
 #pragma comment(lib, "SPARK_debug.lib")
 #endif
 
-
+//
+//     C-like frdws
+//  
 extern SPK::SPK_ID createSimpleSystem ( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createSmoke        ( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createExplosion    ( const SparkDrawable::TextureIDMap&, int, int );
@@ -26,7 +28,7 @@ extern SPK::SPK_ID createFire         ( const SparkDrawable::TextureIDMap&, int,
 extern SPK::SPK_ID createRain         ( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createTest         ( const SparkDrawable::TextureIDMap&, int, int );
 extern SPK::SPK_ID createFireSmoke    ( const SparkDrawable::TextureIDMap&, int, int , float);
-
+extern SPK::SPK_ID createSomething    ( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight );
 
 namespace {
 osg::AnimationPath* createAnimationPath( float radius, float time )
@@ -139,6 +141,14 @@ namespace spark
             spark->addParticleSystem();
 			geode = new osg::Geode;
             geode->setName("fxTest");
+            break;
+        case SOMETHING:
+            spark->setBaseSystemCreator( &createSomething);  // Must use the proto type directly
+            spark->addImage( "waterdrops", osgDB::readImageFile("data/waterdrops.bmp"), GL_ALPHA );
+            geode = new osg::Geode;
+            geode->setName("fxRain");
+            
+            break;
         default:  // Simple
             spark->setBaseSystemCreator( &createSimpleSystem );
             spark->addParticleSystem();
@@ -183,7 +193,7 @@ int main_spark( int argc, char** argv )
     else if ( arguments.read("--rain") ) effectType = 3;
     else if ( arguments.read("--smoke") ) effectType = 4;
     
-    effectType = 4;
+    effectType = 3;
 
     spark::init();
 

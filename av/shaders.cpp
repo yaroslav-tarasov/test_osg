@@ -1589,7 +1589,9 @@ $if 0
 \n                }
 \n
 \n
-\n				  //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
+\n				  vec4 bump = texture2D(normalTex, f_in.texcoord).xyzw;
+\n 
+\n                rainy_value *= step (0.5, bump.w ) * bump.w;
 \n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
 \n                // dif_tex_col.rgb = mix(dif_tex_col.rgb,mix(dif_tex_col.rgb,refl_data.rgb,refl_data.a),rainy_value);
                   dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a ), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);

@@ -250,7 +250,7 @@ FIXME(Все теже кривые плоскости)
                 if(it->second.unit == 1) 
                 {   
                     if(it->second.path=="generate_noise")
-                       t.normalTex = avCore::Noise::generate2DTex(/*float baseFreq*/6.0f, /*float persistence*/0.5, /*int w*/512, /*int h*/512, /*bool periodic*/true);
+                       t.normalTex = avCore::Noise::generate2DTex(/*baseFreq*//*4.0f*/32.0f, /*persistence*/0.5, /*w*/512, /*h*/512, /*periodic*/true);
                     else
                     {
                         auto imf = osgDB::readImageFile(name);

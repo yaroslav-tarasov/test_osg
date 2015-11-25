@@ -1299,19 +1299,27 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         spark::spark_pair_t sp_fire =  spark::create(spark::FIRE,parent?mt_offset->asTransform():nullptr);
         sp_fire.first->setName("fire");
         mt_.back()->addChild(sp_fire.first);
+        
+        //spark::spark_pair_t sp_s =  spark::create(spark::SOMETHING/*,parent?mt_offset->asTransform():nullptr*/);
+        //sp_s.first->setName("something");
+        //mt_.back()->addChild(sp_s.first);
 
         //spark::spark_pair_t sp_smoke =  spark::create(spark::SMOKE,parent?mt_offset->asTransform():nullptr);
         //sp_smoke.first->setName("smoke");
         //mt_.back()->addChild(sp_smoke.first);
         
-		//addChild(mt_.back());
+		
 		_terrainRoot->asGroup()->addChild(mt_.back());
 
 		//sp_smoke.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
         sp_fire.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+ //       sp_s.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
+
 
         //_viewerPtr->addEventHandler(sp_smoke.second);
         _viewerPtr->addEventHandler(sp_fire.second);
+        
+        //_viewerPtr->addEventHandler(sp_s.second);
 
         return mt_.back();
     }
