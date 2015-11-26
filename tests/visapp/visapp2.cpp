@@ -35,7 +35,7 @@ typedef boost::system::error_code       error_code_t;
 using network::msg_dispatcher;
 using network::tcp_fragment_wrapper;
 
-using namespace net_layer::test_msg;
+using namespace net_layer::msg;
 
 namespace
 {

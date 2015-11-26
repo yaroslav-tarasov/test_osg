@@ -22,7 +22,7 @@ using network::msg_dispatcher;
 
 typedef boost::system::error_code       error_code_t;
 
-using namespace net_layer::test_msg;
+using namespace net_layer::msg;
 using network::tcp_fragment_wrapper;
 
 namespace
@@ -154,6 +154,7 @@ private:
                                                            ,_traj->curs_value(time)
                                                            ,*_traj->speed_value(time)
                                                            , time
+                                                           , meteo::local_params()
             )));
 
             send(&bts[0], bts.size());

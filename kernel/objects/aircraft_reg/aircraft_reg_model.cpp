@@ -18,12 +18,16 @@ AUTO_REG_NAME(aircraft_reg_model, model::create);
 model::model( kernel::object_create_t const& oc, dict_copt dict)
     : view                 (oc, dict)
 {
+    void (model::*on_run)  (net_layer::msg::run const& msg)             = &model::on_inject_msg;
+    void (model::*on_malf) (net_layer::msg::malfunction_msg const& msg) = &model::on_inject_msg;
+
     msg_disp()
-        .add<net_layer::test_msg::run >(boost::bind(&model::on_inject_msg      , this, _1))
+        .add<net_layer::msg::run >(boost::bind(on_run      , this, _1))
+        .add<net_layer::msg::malfunction_msg >(boost::bind(on_malf      , this, _1))
         ;
 }
 
-void model::on_inject_msg(net_layer::test_msg::run const& msg)
+void model::on_inject_msg(net_layer::msg::run const& msg)
 {
      //LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " << e2n_.size() << "   " << e2n_.size()>0?e2n_.begin()->first:-1);
 
@@ -41,9 +45,28 @@ void model::on_inject_msg(net_layer::test_msg::run const& msg)
      {
          aircraft_physless::info_ptr a = aircrafts_[e2n_[msg.ext_id]];
          // LogInfo("on_inject_msg extern id: " << a?a->extern_id():-1 );
-         if(aircraft_physless::model_control_ptr(a))
-            aircraft_physless::model_control_ptr(a)->set_desired(msg.time,msg.keypoint,msg.orien,msg.speed);
+         if(auto pa = aircraft_physless::model_control_ptr(a))
+         {
+             pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+             pa->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth ); 
+         }
      }
 }
+
+void model::on_inject_msg(net_layer::msg::malfunction_msg const& msg)
+{
+
+    auto it_id = e2n_.find(msg.ext_id);
+
+    if(msg.ext_id>0 && it_id != e2n_.end() && e2n_.size()>0 )
+    {
+        aircraft_physless::info_ptr a = aircrafts_[e2n_[msg.ext_id]];
+        if(auto pa = aircraft_physless::aircraft_ipo_control_ptr(a))
+        {
+
+        }
+    }
+}
+                     
 
 } // end of aircraft_reg

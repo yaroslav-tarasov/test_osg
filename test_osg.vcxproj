@@ -243,6 +243,7 @@
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />

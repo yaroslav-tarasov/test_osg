@@ -24,6 +24,8 @@ enum id
     am_traj_assign   , 
     afm_state        ,
     afm_kind,
+    afm_local_meteo,
+
 };
 
 //! тела сообщений, сгенерированные специальным шаблоном
@@ -137,14 +139,14 @@ struct state_msg
     explicit state_msg(state_t const& state);
     operator state_t() const;
 
-    geo_point_2 pos;
-    float       height;
-    cprf        orien;
-    float       TAS;
-    float       fuel_mass;
+    geo_point_2   pos;
+    float         height;
+    cprf          orien;
+    float         TAS;
+    float         fuel_mass;
     unsigned char cfg;
     unsigned char alt_state;
-    uint32_t version;
+    uint32_t      version;
 };
 
 
@@ -185,6 +187,31 @@ inline state_msg::operator state_t() const
 
     return state_t(pilot, orien.pitch, orien.roll, version);
 }
+
+struct local_meteo_msg 
+    : network::msg_id<afm_local_meteo>
+{
+    float wind_speed, wind_azimuth, wind_gusts;
+
+    local_meteo_msg() 
+        : wind_speed(0)
+        , wind_azimuth(0)
+        , wind_gusts(0)
+    {}
+
+    local_meteo_msg(float wind_speed, float wind_azimuth, float wind_gusts) 
+        : wind_speed  (wind_speed)
+        , wind_azimuth(wind_azimuth)
+        , wind_gusts  (wind_gusts)
+    {}
+};
+
+REFL_STRUCT(local_meteo_msg)
+    REFL_ENTRY(wind_speed)
+    REFL_ENTRY(wind_azimuth)
+    REFL_ENTRY(wind_gusts)
+REFL_END()
+
 
 } // msg
 

@@ -549,10 +549,10 @@ void model::check_rotors_malfunction()
     {
         if ( rotors_group.malfunction )
         {
-            rotors_group.angular_velocity(0);
+            rotors_group.angular_speed(0);
         }
         else
-            rotors_group.angular_velocity(rotors_angular_speed_);
+            rotors_group.angular_speed(rotors_angular_speed_);
     });
 }
 

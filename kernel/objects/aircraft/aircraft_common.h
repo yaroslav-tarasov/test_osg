@@ -191,7 +191,7 @@ namespace aircraft
             , malfunction(false)
             , started    (false) 
             , broken     (false)
-            , ang_velocity  (0)
+            , ang_speed  (0)
         {
 
         }
@@ -199,7 +199,7 @@ namespace aircraft
         bool                 malfunction;
         bool                 started;
         bool                 broken;
-        double               ang_velocity;
+        double               ang_speed;
 
         nm::node_control_ptr node;
 
@@ -227,9 +227,9 @@ namespace aircraft
         {
         }
 
-        void angular_velocity(double av)
+        void angular_speed(double as)
         {
-            ang_velocity = av;
+            ang_speed = as;
         }
 
         void broke(phys_aircraft_ptr aircraft_phys)

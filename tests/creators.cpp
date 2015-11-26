@@ -19,7 +19,6 @@
 #include "utils/materials.h"
 #include "utils/high_res_timer.h"
 
-//#include "phys/BulletInterface.h"
 #include "phys/RigidUpdater.h"
 
 //
@@ -962,8 +961,8 @@ public:
         if( tx != NULL)
         {   
             double dt = _hr_timer.get_delta();
-            const float angular_velocity = 3000 * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
-            _angle += angular_velocity * dt;// osg::PI/180.0 ; 
+            const float angular_speed = 3000 * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
+            _angle += angular_speed * dt;// osg::PI/180.0 ; 
 
             std::string name = tx->getName();
             osg::Vec3 b = tx->getBound().center();

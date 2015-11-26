@@ -13,8 +13,8 @@ struct model
     model(kernel::object_create_t const& oc, dict_copt dict);    
 
 protected:
-    void on_inject_msg(net_layer::test_msg::run const& msg);
-
+    void on_inject_msg(net_layer::msg::run const& msg);
+    void on_inject_msg(net_layer::msg::malfunction_msg const& msg);
 };
 
 } // end of aircraft_reg

@@ -58,6 +58,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
         
+        .add<msg::local_meteo_msg   >(boost::bind(&view::on_local_meteo, this, _1))
+
         .add<msg::state_msg>   (boost::bind(&view::on_state, this, _1))
                                            
         // just for recording visual effect to history 
@@ -310,6 +312,11 @@ void view::on_malfunction(msg::malfunction_msg const& m)
     on_malfunction_changed(m.kind);
 }
 
+void view::on_local_meteo(msg::local_meteo_msg const& m)
+{
+    lp_.wind_speed = m.wind_speed;
+    lp_.wind_azimuth = m.wind_azimuth;
+}
 
 void view::on_contact_effect(msg::contact_effect const& eff)      
 {

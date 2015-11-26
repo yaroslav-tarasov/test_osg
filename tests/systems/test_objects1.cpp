@@ -244,7 +244,7 @@ void create_objects(const std::string & airport)
 
 }
 
-using namespace net_layer::test_msg;
+using namespace net_layer::msg;
 
 object_info_ptr create_aircraft(create const& msg)
 {

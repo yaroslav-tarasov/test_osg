@@ -7,6 +7,8 @@
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
 
+#include "common/test_msgs.h"
+
 namespace aircraft_physless
 {
 
@@ -52,6 +54,7 @@ struct view
     , obj_data_holder<craft_data>
     , info
     , control
+    , aircraft_ipo_control
 {
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
@@ -109,7 +112,7 @@ protected:
 
     // aircraft_ipo_control
 protected:
-    void set_malfunction(aircraft::malfunction_kind_t kind, bool enabled) /*override*/;
+    void set_malfunction(aircraft::malfunction_kind_t kind, bool enabled) override;
 
 protected:
     void set_parking_initial_position(std::string const &airport_name, std::string const &parking_name);
@@ -138,12 +141,12 @@ private:
     void on_settings            (aircraft::settings_t const&          m);
     void on_fpl                 (optional<uint32_t> const&  id);
 
-    void on_malfunction         (msg::malfunction_msg   const&  m);
-    void on_contact_effect      (msg::contact_effect    const& eff)     ;
-    void on_wheel_contact_effect(msg::wheel_contact_effect const& eff)  ;
+    void on_malfunction         (msg::malfunction_msg   const&  m      );
+    void on_contact_effect      (msg::contact_effect    const& eff     );
+    void on_wheel_contact_effect(msg::wheel_contact_effect const& eff  );
     
-    void on_traj_assign         (msg::traj_assign_msg const &m)         ;
-
+    void on_traj_assign         (msg::traj_assign_msg const & tr       );
+    void on_local_meteo         (msg::local_meteo_msg const&  msg      );
 protected:
     virtual void on_state       (msg::state_msg const& msg); // fms
 
@@ -181,8 +184,10 @@ protected:
 protected:
     //////////////////////////////////////
     fms::trajectory_ptr            traj_;
-
+    meteo::local_params            lp_;
     /////////////////////////////////////
+
+
     state_t                                _state;
     inline        state_t  const&          get_state() const {return _state;}
 

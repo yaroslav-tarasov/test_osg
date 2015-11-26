@@ -310,8 +310,8 @@ namespace sync_fsm
             chassis_node_pos.local().dpos.z = (desired_pos_in_rel.z - wheel_node_pos.local().pos.z) / dt;
 
 #if 0
-            const float angular_velocity = 45 * 2 * cg::pif/60.0; 
-            desired_orien_in_rel = wheel_node_pos.local().orien * quaternion(cpr(0,-cg::rad2grad() * angular_velocity * dt,0));
+            const float angular_speed = 45 * 2 * cg::pif/60.0; 
+            desired_orien_in_rel = wheel_node_pos.local().orien * quaternion(cpr(0,-cg::rad2grad() * angular_speed * dt,0));
 #endif
             //quaternion q = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel);
             point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (dt);
@@ -334,11 +334,11 @@ namespace sync_fsm
             
             geo_position rpos;
 
-            const float ob_min = rg.ang_velocity;
+            const float ob_min = rg.ang_speed;
             nodes_management::node_position rotor_node_pos = rnode->position();
-            const float angular_velocity = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
+            const float angular_speed = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
            
-            quaternion des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,-cg::rad2grad() * angular_velocity * dt));
+            quaternion des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,-cg::rad2grad() * angular_speed * dt));
 
             // const cg::transform_4 rotor_node_trans = cg::transform_4(cg::as_translation(-rotor_node_pos.local().pos), /*rpos.orien*/des_orien.rotation()); 
             point_3 omega_rel     = cg::get_rotate_quaternion(rotor_node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
@@ -348,8 +348,8 @@ namespace sync_fsm
 
             rnode->set_position(rotor_node_pos);   
 
-            //if(rg.ang_velocity != av)
-            if(rg.ang_velocity>150)
+            //if(rg.ang_speed != av)
+            if(rg.ang_speed>150)
             {
                 if(rg.dyn_rotor_node)
                 {

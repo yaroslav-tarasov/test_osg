@@ -38,7 +38,7 @@ private:
 
     // control
 private:
-    virtual void inject_msg(net_layer::test_msg::run const& msg);
+    virtual void inject_msg(net_layer::msg::run const& msg);
 
     // info
 private:
@@ -52,8 +52,10 @@ protected:
     typedef size_t  extern_id_t;
 
     std::unordered_map<normal_id_t, aircraft_physless::info_ptr>  aircrafts_;
-    std::unordered_map<extern_id_t, normal_id_t>                  e2n_;
-    std::deque<net_layer::test_msg::run>                          buffer_;
+    std::unordered_map<extern_id_t, normal_id_t>                        e2n_;
+    std::deque<net_layer::msg::run>                                  buffer_;
+
+    net_layer::msg::container_msg::msgs_t                          messages_;
 };
 
 } // end of aircraft_reg

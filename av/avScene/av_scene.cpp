@@ -32,7 +32,7 @@ typedef boost::system::error_code       error_code_t;
 using network::msg_dispatcher;
 using network::tcp_fragment_wrapper;
 
-using namespace net_layer::test_msg;
+using namespace net_layer::msg;
 
 namespace
 {
@@ -530,7 +530,8 @@ private:
 
 struct visapp
 {
-    typedef boost::function<void(run const& msg)>   on_run_f;
+    typedef boost::function<void(run const& msg)>                   on_run_f;
+    typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
         : osg_vis_  (CreateVisual())
@@ -542,7 +543,8 @@ struct visapp
 
         disp_
             .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
-            .add<run                   >(boost::bind(&visapp::on_run        , this, _1))
+            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
+            .add<container_msg         >(boost::bind(&visapp::on_container  , this, _1))
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
        
@@ -609,9 +611,14 @@ private:
     {
         if(on_run_)
             on_run_(msg);
-        // LogInfo("Got run message: " << msg.speed << " : " << msg.time );
     }
     
+    void on_container(container_msg const& msg)
+    {
+        for (size_t i = 0; i < msg.msgs.size(); ++i)
+            disp_.dispatch_bytes(msg.msgs[i]);
+    }
+
     void async_run(run const& msg)
     {
         LogInfo("async_run got run message: "  );
@@ -658,7 +665,9 @@ private:
         
         if (reg_obj)
         {
-            on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+            // on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+            disp_
+                .add<run                   >(boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
         }
     }
 
@@ -687,6 +696,7 @@ private:
     IVisual*                                                    osg_vis_;
 private:
     on_run_f                                                    on_run_;
+    on_container_f                                              on_cont_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 };

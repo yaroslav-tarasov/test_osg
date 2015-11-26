@@ -146,6 +146,11 @@ void    model::set_desired        (double time, const cg::point_3& pos, const cg
 
 }
 
+void model::set_ext_wind       (double speed, double azimuth) 
+{
+
+}
+
 airports_manager::info_ptr model::get_airports_manager() const
 {
     return airports_manager_;
@@ -561,10 +566,10 @@ void model::check_rotors_malfunction()
     {
         if ( rotors_group.malfunction )
         {
-            rotors_group.angular_velocity(0);
+            rotors_group.angular_speed(0);
         }
         else
-            rotors_group.angular_velocity(rotors_angular_speed_);
+            rotors_group.angular_speed(rotors_angular_speed_);
     });
 }
 

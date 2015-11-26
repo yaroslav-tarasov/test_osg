@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
-#include "aircraft_visual.h"
+#include "aircraft_physless_visual.h"
 
-namespace aircraft
+#include "ext/spark/SmokeNode.h"
+
+namespace aircraft_physless
 {
 
 	object_info_ptr visual::create(kernel::object_create_t const& oc, dict_copt dict)
@@ -10,7 +12,7 @@ namespace aircraft
 		return object_info_ptr(new visual(oc, dict));
 	}
 
-	AUTO_REG_NAME(aircraft_visual, visual::create);
+	AUTO_REG_NAME(aircraft_physless_visual, visual::create);
 
 	visual::visual( kernel::object_create_t const& oc, dict_copt dict )
 		: view(oc,dict)
@@ -50,7 +52,7 @@ namespace aircraft
         //if (cg::eq_zero(dt))
         //    return;
 
-        bool has_smoke = malfunction(MF_FIRE_ON_BOARD) || malfunction(MF_SMOKE_ON_BOARD);
+        bool has_smoke = malfunction(aircraft::MF_FIRE_ON_BOARD) || malfunction(aircraft::MF_SMOKE_ON_BOARD);
         
         //if (has_smoke)
         //{
@@ -79,6 +81,14 @@ namespace aircraft
                 // smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
                 // smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(des_orien.rotation()/*node_orien.rotation()*/))));
                 
+                auto p = dynamic_cast<SmokeNode*>(smoke_object_->node().get());
+                
+                if(p)
+                {
+                    point_2 dir = cg::polar_point_2(lp_.wind_speed, lp_.wind_azimuth);
+                    p->setGravity(to_osg_vector3(cg::point_3(dir)));
+                }
+
                 smoke_object_->set_visible(true);
 
             }
@@ -89,13 +99,13 @@ namespace aircraft
         last_update_ = time;
     }
 
-    void visual::on_malfunction_changed( malfunction_kind_t kind )
+    void visual::on_malfunction_changed( aircraft::malfunction_kind_t kind )
     {
-        if (kind == MF_FIRE_ON_BOARD || kind == MF_SMOKE_ON_BOARD)
+        if (kind == aircraft::MF_FIRE_ON_BOARD || kind == aircraft::MF_SMOKE_ON_BOARD)
         {
             visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
-            bool has_smoke = malfunction(MF_FIRE_ON_BOARD) || malfunction(MF_SMOKE_ON_BOARD);
+            bool has_smoke = malfunction(aircraft::MF_FIRE_ON_BOARD) || malfunction(aircraft::MF_SMOKE_ON_BOARD);
 
             if (!smoke_object_ && has_smoke && engine_node_)
             {

@@ -117,7 +117,10 @@ struct model_control
     virtual void                 set_steer( double steer ) = 0;
     virtual void                 set_brake( double brake ) = 0;
     virtual void                 set_rotors_angular_speed ( double val ) = 0;
-    virtual void                 set_desired    (double time,const cg::point_3& pos, const cg::quaternion& q, const double speed)     = 0;
+    virtual void                 set_desired        (double time,const cg::point_3& pos, const cg::quaternion& q, const double speed)     = 0;
+    virtual void                 set_ext_wind  (double speed, double azimuth) =0;
 };
 
 } // end of aircraft
+
+

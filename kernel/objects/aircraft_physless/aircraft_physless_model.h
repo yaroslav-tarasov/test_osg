@@ -103,6 +103,7 @@ namespace aircraft_physless
 
     private: 
         void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed)    override;
+        void set_ext_wind       (double speed, double azimuth)                                                        override;
     
     public:
         inline aircraft::shassis_support_ptr get_chassis() {return shassis_;};

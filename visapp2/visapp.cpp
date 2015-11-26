@@ -23,7 +23,7 @@ using network::error_code;
 using network::msg_dispatcher;
 using network::tcp_fragment_wrapper;
 
-using namespace net_layer::test_msg;
+using namespace net_layer::msg;
 
 namespace
 {

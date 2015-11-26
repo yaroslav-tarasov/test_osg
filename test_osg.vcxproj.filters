@@ -790,5 +790,8 @@
     <ClCompile Include="tests\noise_texture_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
+      <Filter>Source Files\objects\aircraft_physless</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

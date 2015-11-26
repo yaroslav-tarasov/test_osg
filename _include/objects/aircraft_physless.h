@@ -111,7 +111,26 @@ namespace aircraft_physless
         virtual void set_turbulence (unsigned turb) = 0;
     };
 
+    //! интерфейс, управление ВС (со стороны пилота-оператора ?)
+    struct aircraft_ipo_control
+    {
+        virtual ~aircraft_ipo_control(){}
 
+        virtual void set_malfunction(aircraft::malfunction_kind_t kind, bool enabled) = 0;
+
+        // FIXME не реализованно
+        //virtual void set_cmd_go_around(uint32_t cmd_id)                                       = 0;
+        //virtual void set_cmd_holding  (uint32_t cmd_id, fms::holding_t const &holding)        = 0;
+        //virtual void set_cmd_course   (uint32_t cmd_id, fms::course_modifier_t const &course) = 0;
+        //virtual void cancel_cmd       (uint32_t cmd_id)                                       = 0;
+
+        //virtual void set_responder_mode(atc::responder_mode mode) = 0;
+        //virtual void set_responder_type(atc::squawk_type stype) = 0;
+        //virtual void set_responder_code(unsigned code) = 0;
+        //virtual void set_responder_flag(unsigned flag, bool enable) = 0;
+
+        //virtual void restore_responder_code() = 0;
+    };
 
 }
 
