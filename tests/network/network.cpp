@@ -137,6 +137,7 @@ private:
     {   
         static double time = 0;
 
+
         if (time>1 && create_a)
         {
             
@@ -148,7 +149,7 @@ private:
 
         if(time>10)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(run(
+            binary::bytes_t msg =  std::move(wrap_msg(run(
                                                             1 
                                                            ,_traj->kp_value(time)
                                                            ,_traj->curs_value(time)
@@ -157,9 +158,26 @@ private:
                                                            , meteo::local_params()
             )));
 
-            send(&bts[0], bts.size());
+            send(&msg[0], msg.size());
+           
+#if 0
+            if (messages_size_ + binary::size(msg) > /*msg_threshold_*/100)
+            {
+                binary::bytes_t bts =  network::wrap_msg(net_layer::msg::container_msg(move(messages_)));
 
+                send(&bts[0], bts.size()); 
+
+                messages_.clear();
+                messages_size_ = 0;
+            }
+
+            
+            messages_size_ += binary::size(msg);
+            messages_.push_back(move(msg));
+#endif
         }
+
+
         
 #if 0
         if(ac_counter_==40)
@@ -209,7 +227,8 @@ private:
     std::shared_ptr<tcp_fragment_wrapper>  srv_;
 
     msg_dispatcher<network::endpoint>                                    disp_;
-
+    net_layer::msg::container_msg::msgs_t                            messages_;
+    size_t                                                      messages_size_;
 private:
     uint32_t                  ac_counter_;
 

@@ -592,7 +592,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     
     _viewerPtr = vw;            
 
-    _viewerPtr->setSceneData( this );
+    //_viewerPtr->setSceneData( this );
    
     //
     // Set up the camera manipulators.
@@ -912,7 +912,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 
-#if 1
+#if 0
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
@@ -933,7 +933,7 @@ FIXME(Чудеса с Ephemeris)
 
 #endif
 
-#if 1
+#if 0
     //
     // Reflections
     //
@@ -957,7 +957,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
     avCore::GetEnvironment()->setCallBacks(
-        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
+        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); if(_groupMainReflection) dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
         ,[this](float fog_vr,float fog_exp) {
         BOOST_FOREACH( auto g, this->_lamps)
         {
@@ -1036,9 +1036,11 @@ void Scene::createObjects()
     );
 #endif
     
-    
+
+#if 0
     osg::ref_ptr<osg::Group> node =  avAnimation::Initialize ( "man.x" );
     _terrainRoot->addChild(node);
+#endif
 
     //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
     //_terrainRoot->addChild(heli);

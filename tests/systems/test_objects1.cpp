@@ -53,7 +53,7 @@ void create_objects(const std::string & airport)
     }
     
     force_log fl5;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
 
     if(false)
     {
@@ -148,7 +148,7 @@ void create_objects(const std::string & airport)
     }
 
     force_log fl2;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): aircraft::create " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "create_objects(const std::string& airport): aircraft::create " << hr_timer.set_point() << "\n");
 
     {
         cg::point_3 vpos(250,650,0);
@@ -183,7 +183,7 @@ void create_objects(const std::string & airport)
     }
 
     force_log fl3;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): fms::trajectory::velocities " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "create_objects(const std::string& airport): fms::trajectory::velocities " << hr_timer.set_point() << "\n");
 
     {
         cg::point_3 vpos(_krv_data_getter.kp_[start_idx]);
@@ -225,7 +225,7 @@ void create_objects(const std::string & airport)
     auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 
     force_log fl9;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.set_point() << "\n");
 
     //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_csys.get());
     //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");
@@ -240,7 +240,7 @@ void create_objects(const std::string & airport)
     auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),srs,vgp.pos);
 
     force_log fl6;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.set_point() << "\n");
 
 }
 

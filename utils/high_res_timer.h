@@ -20,10 +20,10 @@ public:
          : _last_point(0)
      {
         ::QueryPerformanceFrequency(&_frequency);
-        get_delta();
+        set_point();
      }
     
-     double get_delta() 
+     double set_point() 
      {   
          large_int point;
          ::QueryPerformanceCounter(&point);
@@ -32,6 +32,12 @@ public:
          return interval;
      }
 
+     double get_delta() 
+     {   
+         large_int point;
+         ::QueryPerformanceCounter(&point);
+         return static_cast<double>(point._value.QuadPart - _last_point._value.QuadPart) / _frequency._value.QuadPart;
+     }
 
 private:
      large_int     _frequency;

@@ -128,7 +128,7 @@ void Visual::Initialize()
     Database::initDataPaths();
 	avCore::Database::Create();
 
-	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*/
+	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -227,7 +227,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // disable ESC key
     _viewerPtr->setKeyEventSetsDone(0);
 
-    //_viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
+    _viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
 }
 
 void Visual::CreateScene()
@@ -241,6 +241,11 @@ void Visual::EndSceneCreation()
 {
    _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
 
+}
+
+bool   Visual::Done()
+{
+     return _viewerPtr->done();
 }
 
 void  Visual::Update()

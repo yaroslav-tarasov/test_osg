@@ -606,11 +606,14 @@ namespace bi
             break;
         case osgGA::GUIEventAdapter::FRAME:
             {
-                double dt = _hr_timer.get_delta();
+                double dt = _hr_timer.set_point();
                 double dt1 = ftm.diff();
 
-               if (abs(dt-dt1)>0.1) 
-                    OutputDebugString("Simulation time differ from real time more the 0.1 sec\n");     
+               if (abs(dt-dt1)>0.1)
+               { 
+                    force_log fl;
+                    LOG_ODS_MSG( "Simulation time differ from real time more the 0.1 sec  " << dt  << "  " <<  dt1 << "\n");
+               }
 
                 if( _dbgDraw)
                     _dbgDraw->BeginDraw();

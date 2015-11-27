@@ -567,8 +567,8 @@ private:
         
         sleep(40);
         //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
-        std::cout << "on_render handler:  " << time << " delta: " << _hr_timer.get_delta() << " \n";
-        __new_render_period__   = _hr_timer_render.get_delta();
+        std::cout << "on_render handler:  " << time << " delta: " << _hr_timer.set_point() << " \n";
+        __new_render_period__   = _hr_timer_render.set_point();
     }
 
     void update(double time)
@@ -584,7 +584,7 @@ private:
         else
         {
             
-            std::cout << "update handler  " << _hr_timer_update.get_delta() <<  " \n";
+            std::cout << "update handler  " << _hr_timer_update.set_point() <<  " \n";
         }
 
     }

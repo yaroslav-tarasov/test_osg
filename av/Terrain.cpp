@@ -310,7 +310,7 @@ void  Terrain::create( const std::string& name )
 
     baseModel->setDataVariance(osg::Object::STATIC);
 
-    OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
+    OSG_WARN << "Время загрузки сцены: " << _hr_timer.set_point() << "\n";
 
 #if 0
     Grass* grass = new Grass();
@@ -332,7 +332,7 @@ void  Terrain::create( const std::string& name )
     movingModel->setName("movingModel");
 #endif
 
-    OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.get_delta() << "\n";
+    OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.set_point() << "\n";
     
     auto light_masts = findNodes(baseModel,"lightmast_",findNodeVisitor::not_exact);
 
@@ -360,7 +360,7 @@ void  Terrain::create( const std::string& name )
     }
 
     force_log fl;
-    LOG_ODS_MSG( "Terrain::create  " << hr_timer.get_delta() << "\n");
+    LOG_ODS_MSG( "Terrain::create  " << hr_timer.set_point() << "\n");
 
     };
 

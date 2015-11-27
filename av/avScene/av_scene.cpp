@@ -341,7 +341,6 @@ struct net_worker
      typedef boost::function<void(double time)>                     on_update_f;     
      
 
-
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
          : period_     (/*cfg().model_params.msys_step*/0.05)
          , ses_        (new details::session(0))
@@ -527,7 +526,7 @@ private:
     details::session*                                         ses_;
 };
 
-
+#if 0
 struct visapp
 {
     typedef boost::function<void(run const& msg)>                   on_run_f;
@@ -607,21 +606,10 @@ private:
          LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
 
-    void on_run(run const& msg)
-    {
-        if(on_run_)
-            on_run_(msg);
-    }
-    
     void on_container(container_msg const& msg)
     {
         for (size_t i = 0; i < msg.msgs.size(); ++i)
             disp_.dispatch_bytes(msg.msgs[i]);
-    }
-
-    void async_run(run const& msg)
-    {
-        LogInfo("async_run got run message: "  );
     }
 
     void on_create(create const& msg)
@@ -635,12 +623,6 @@ private:
         LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }
 
-
-    uint32_t next_id()
-    {
-        static uint32_t id = 0;
-        return id++;
-    }
 
     void create_objects(const std::string& airport)
     {
@@ -695,12 +677,292 @@ private:
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
 private:
-    on_run_f                                                    on_run_;
+    //on_run_f                                                    on_run_;
     on_container_f                                              on_cont_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 };
+#else
 
+struct global_timer : boost::noncopyable
+{
+    inline void set_time(double time)
+    {
+         internal_time(time);
+    }
+
+    inline double get_time()
+    {
+        return internal_time();
+    }
+
+private:
+    
+    double internal_time(double time = -1)
+    {
+        static double                 time_    = 0.0;
+        static high_res_timer         hr_timer;
+        static boost::recursive_mutex m_guard;
+
+        boost::lock_guard<boost::recursive_mutex> lock(m_guard);
+
+        if(time > 0.0 )
+        {
+            time_ = time;
+            hr_timer = high_res_timer();
+            return time_;
+        }
+
+        return time_ + hr_timer.get_delta() ;
+    }
+
+};
+
+struct visapp_impl
+{
+    friend struct visapp;
+
+    typedef boost::function<void(run const& msg)>                   on_run_f;
+    typedef boost::function<void(container_msg const& msg)>   on_container_f;
+
+    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+        : osg_vis_  (CreateVisual())
+        , vis_sys_  (create_vis(props/*, bytes*/))
+    {   
+
+    }
+
+    ~visapp_impl()
+    {
+        vis_sys_.reset();
+    }
+
+    bool done()
+    {
+        return osg_vis_->Done();
+    }
+
+    void end_this()
+    {
+        osg_vis_->EndSceneCreation();
+    }
+
+private:
+
+    void on_render(double time)
+    {   
+        //high_res_timer                _hr_timer;
+        vis_sys_.update(time);
+        osg_vis_->Render();
+        //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
+
+        //force_log fl;
+        //LOG_ODS_MSG( "visapp_impl::on_render(double time)  " << time << "\n");
+
+    }
+
+private:
+
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        auto ptr = sys_creator()->get_visual_sys();
+
+        return ptr;
+    }
+
+private:
+    updater                                                     vis_sys_;
+    IVisual*                                                    osg_vis_;
+};
+
+struct visapp
+{
+    visapp( kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+        : props_ (props)
+        , thread_(new boost::thread(boost::bind(&visapp::run, this)))
+    {
+
+    }
+
+    ~visapp()
+    {
+        thread_->join();
+    }
+
+    void run()
+    {   
+        visapp_impl  va( props_);
+        end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
+        while (!va.done())
+          va.on_render(gt_.get_time());
+    }
+    
+    void end_this()
+    {
+        if(end_of_load_)
+            end_of_load_();
+    }
+
+private:
+    kernel::vis_sys_props               props_;
+    std::unique_ptr<boost::thread>     thread_;
+    boost::function<void()>       end_of_load_;
+private:
+
+    global_timer                                                gt_;
+
+};
+
+#endif
+
+struct mod_app
+{
+    typedef boost::function<void(run const& msg)>                   on_run_f;
+    typedef boost::function<void(container_msg const& msg)>   on_container_f;
+
+    mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
+        : ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
+        , mod_sys_  (sys_creator()->get_model_sys()  ,0.03/*cfg().model_params.msys_step*/)
+        , end_of_load_(eol)
+    {   
+
+        disp_
+            .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
+            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
+            .add<container_msg         >(boost::bind(&mod_app::on_container  , this, _1))
+            .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
+            ;
+
+
+
+        w_.reset (new net_worker( peer 
+            , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
+            , boost::bind(&mod_app::update, this, _1)
+            , boost::bind(&mod_app::on_timer, this, _1)
+            ));
+
+
+    }
+
+    ~mod_app()
+    {
+        w_.reset();
+    }
+
+private:
+
+    void on_timer(double time)
+    {   
+        //high_res_timer                _hr_timer;
+        //vis_sys_.update(time);
+        //osg_vis_->Render();
+        //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
+
+    }
+
+    void update(double time)
+    {   
+        //double sim_time = osg_vis_->GetInternalTime();
+
+        if(/*sim_time  < 0*/false)
+        {
+            w_->done();
+            __main_srvc__->stop();
+            return;
+        }
+        else
+        {
+            gt_.set_time(time);
+            //force_log fl;
+            //LOG_ODS_MSG( "mod_app::update(double time)  " << time << "\n");
+
+            mod_sys_.update(time);
+            ctrl_sys_.update(time);
+        }
+
+
+    }
+
+
+    void on_setup(setup const& msg)
+    {
+        create_objects(msg.icao_code);
+        //osg_vis_->EndSceneCreation();
+        end_of_load_();
+
+        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
+        w_->send(&bts[0], bts.size());
+
+        LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+    }
+
+    void on_container(container_msg const& msg)
+    {
+        for (size_t i = 0; i < msg.msgs.size(); ++i)
+            disp_.dispatch_bytes(msg.msgs[i]);
+    }
+
+    void on_create(create const& msg)
+    {
+        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
+        kernel::object_info_ptr  a;
+
+        if(fp)
+            a = fp(msg);
+
+        LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
+    }
+
+
+    void create_objects(const std::string& airport)
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        high_res_timer hr_timer;
+
+        sys_creator()->create_auto_objects();
+
+        force_log fl;       
+        LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.set_point() << "\n");
+
+        auto fp = fn_reg::function<void(const std::string&)>("create_objects");
+        if(fp)
+            fp(airport);
+
+        force_log fl2;  
+        LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
+
+        kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
+
+        if (reg_obj)
+        {
+            // on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+            disp_
+                .add<run                   >(boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+        }
+    }
+
+private:
+    msg_dispatcher<uint32_t>                                       disp_;
+
+private:
+    updater                                                     mod_sys_;
+    updater                                                    ctrl_sys_;
+private:
+    on_container_f                                              on_cont_;
+    boost::function<void()>                                 end_of_load_;
+private:
+    boost::scoped_ptr<net_worker>                                     w_;
+
+private:
+
+    global_timer                                                     gt_;
+
+};
 
 }
 
@@ -722,11 +984,12 @@ int av_scene( int argc, char** argv )
 
         endpoint peer(cfg().network.local_address);
 
-        kernel::vis_sys_props props_;
-        props_.base_point = ::get_base();
+        kernel::vis_sys_props props;
+        props.base_point = ::get_base();
 
-        visapp s(peer, props_ , argc, argv);
-        
+        visapp  va(props);
+        mod_app ma(peer,boost::bind(&visapp::end_this,&va));
+
         boost::system::error_code ec;
         __main_srvc__->run(ec);
 

@@ -59,6 +59,7 @@ namespace
             : _msys(nullptr)
             , _csys(nullptr)
             , _vsys(nullptr)
+            , msg_service_(boost::bind(&impl::push_back, this, _1,true))
         {
 
         }
@@ -69,6 +70,15 @@ namespace
         }
 
     private:
+         
+        void push_back (binary::bytes_cref bytes, bool /*sure*/)
+        {
+             queue_.push_back(bytes);
+             
+             msg_service_.on_remote_recv(queue_.front(),true);
+             queue_.pop_front();
+        }
+
         virtual kernel::system_ptr get_control_sys() override 
         { 
             if(!_csys)
@@ -104,6 +114,7 @@ namespace
         }                                                             
 
 
+        std::deque<binary::bytes_t>                           queue_;
 
         kernel::msg_service                             msg_service_;
         kernel::system_ptr                                     _msys;
@@ -117,6 +128,9 @@ namespace
 
 creator_ptr sys_creator()
 {
+    static boost::recursive_mutex guard;
+    boost::lock_guard<boost::recursive_mutex> lock(guard);
+
     static  shared_ptr<impl> cc = make_shared<impl>();
     return cc->get_this();
 }

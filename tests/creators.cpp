@@ -960,7 +960,7 @@ public:
         osg::MatrixTransform *tx = dynamic_cast<osg::MatrixTransform *>(node);
         if( tx != NULL)
         {   
-            double dt = _hr_timer.get_delta();
+            double dt = _hr_timer.set_point();
             const float angular_speed = 3000 * 2 * osg::PI/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
             _angle += angular_speed * dt;// osg::PI/180.0 ; 
 
@@ -1434,7 +1434,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 #endif
     
 
-    OSG_WARN << "Время загрузки сцены: " << _hr_timer.get_delta() << "\n";
+    OSG_WARN << "Время загрузки сцены: " << _hr_timer.set_point() << "\n";
 
     auto ret_array  = createMovingModel(center,radius*0.8f);
     
@@ -1605,7 +1605,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 
     root->addChild(movingModel);
     
-    OSG_WARN << "Время загрузки копирования самолетов: " << _hr_timer.get_delta() << "\n";
+    OSG_WARN << "Время загрузки копирования самолетов: " << _hr_timer.set_point() << "\n";
 
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
