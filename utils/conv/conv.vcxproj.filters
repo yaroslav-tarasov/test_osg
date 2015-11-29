@@ -80,5 +80,8 @@
     <ClCompile Include="..\..\core\config\config.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tests\noise_texture_test.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

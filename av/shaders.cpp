@@ -422,7 +422,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
         void main()
         {
-            vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+			vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
             vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
             
             //viewworld_matrix = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,0.0,1.0));
@@ -1592,7 +1592,8 @@ $if 0
 \n				  vec4 bump = texture2D(normalTex, f_in.texcoord).xyzw;
 \n 
 \n                rainy_value *= step (0.5, bump.w ) * bump.w;
-\n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord) * vec4(vec3(0.85), 1.0);
+\n                vec2 vDistort = f_in.normal.xz * 0.025;
+\n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord + vec4(vDistort,0.0,0.0)) * vec4(vec3(0.85), 1.0);
 \n                // dif_tex_col.rgb = mix(dif_tex_col.rgb,mix(dif_tex_col.rgb,refl_data.rgb,refl_data.a),rainy_value);
                   dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a ), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);
 \n

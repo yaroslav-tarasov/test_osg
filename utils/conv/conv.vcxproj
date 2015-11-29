@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;..\..;$(SolutionDir)\_include;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;common;$(SolutionDir)..\Externals\pugixml\1.0\Include;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;..\..;$(SolutionDir)\_include;$(OSG_DIR)\3rdparty\include;ext\pugixml-1.4\src;common;$(SolutionDir)..\Externals\pugixml\1.0\Include;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(OSG_DIR)\SPARK-1.5.5\include;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -108,6 +108,7 @@
     <ClCompile Include="..\..\av\avCore\Utils.cpp" />
     <ClCompile Include="..\..\av\shaders.cpp" />
     <ClCompile Include="..\..\core\config\config.cpp" />
+    <ClCompile Include="..\..\tests\noise_texture_test.cpp" />
     <ClCompile Include="..\materials.cpp" />
     <ClCompile Include="..\visitors\find_node_visitor.cpp" />
     <ClCompile Include="bullet_exporter.cpp" />

@@ -211,21 +211,57 @@ void create_objects(const std::string & airport)
 //      aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
 
-    vehicle::settings_t vs;
-    vs.model = "buksir";//"niva_chevrolet";//
 
-    //cg::point_3 vpos(330,750,00);
-    //cg::point_3 vpos(572,032,0);
-    //decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
-    //geo_position vgp(target_pos, ::get_base());
+		vehicle::settings_t vs;
+		vs.model = "buksir";//"niva_chevrolet";//
 
-    cg::geo_point_3 vpos(0.0006,0.0009,0.0);
-    geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+		//cg::point_3 vpos(330,750,00);
+		//cg::point_3 vpos(572,032,0);
+		//decart_position target_pos(vpos,cg::quaternion(cg::cpr(30, 0, 0)));
+		//geo_position vgp(target_pos, ::get_base());
 
-    auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+		cg::geo_point_3 vpos(0.0006,0.0009,0.0);
+		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-    force_log fl9;       
-    LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.set_point() << "\n");
+		auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+
+		force_log fl9;       
+		LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.set_point() << "\n");
+
+
+	{
+
+	vehicle::settings_t vs;
+	vs.model = "buksir";//"niva_chevrolet";//
+	cg::geo_point_3 vpos(0.00065,0.00095,0.0);
+	geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+
+	auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+
+	}
+
+
+	{
+		vehicle::settings_t vs;
+		vs.model = "buksir";//"niva_chevrolet";//
+		cg::geo_point_3 vpos(0.00055,0.0009,0.0);
+		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+
+		auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	}
+
+
+	{
+		vehicle::settings_t vs;
+		vs.model = "buksir";//"niva_chevrolet";//
+
+		cg::geo_point_3 vpos(0.0005,0.0009,0.0);
+		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+
+		auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	}
+
+
 
     //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_csys.get());
     //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");

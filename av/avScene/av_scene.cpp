@@ -526,7 +526,9 @@ private:
     details::session*                                         ses_;
 };
 
-#if 0
+//#define MULTITHREADED
+
+#ifndef  MULTITHREADED
 struct visapp
 {
     typedef boost::function<void(run const& msg)>                   on_run_f;
@@ -816,7 +818,7 @@ private:
 
 };
 
-#endif
+
 
 struct mod_app
 {
@@ -963,6 +965,8 @@ private:
     global_timer                                                     gt_;
 
 };
+#endif
+
 
 }
 
@@ -987,9 +991,12 @@ int av_scene( int argc, char** argv )
         kernel::vis_sys_props props;
         props.base_point = ::get_base();
 
+#ifdef  MULTITHREADED
         visapp  va(props);
         mod_app ma(peer,boost::bind(&visapp::end_this,&va));
-
+#else 
+		visapp  va(peer,props,argc, argv);
+#endif
         boost::system::error_code ec;
         __main_srvc__->run(ec);
 

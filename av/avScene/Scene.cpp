@@ -912,7 +912,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 
-#if 0
+#if 1
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
@@ -933,7 +933,7 @@ FIXME(Чудеса с Ephemeris)
 
 #endif
 
-#if 0
+#if 1
     //
     // Reflections
     //
