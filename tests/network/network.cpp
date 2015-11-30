@@ -77,7 +77,7 @@ struct client
 
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
-        , period_(0.5)
+        , period_(4./*5*/)
         , timer_  (boost::bind(&client::update, this))
         , ac_counter_(0)
         , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
@@ -175,6 +175,8 @@ private:
             messages_size_ += binary::size(msg);
             messages_.push_back(move(msg));
 #endif
+
+            LogInfo("update() send run " << time << "/n");
         }
 
 

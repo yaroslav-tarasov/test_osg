@@ -51,7 +51,7 @@ namespace
     }
 
 
-    class impl : public creator,
+    class impl : public systems,
                  public boost::enable_shared_from_this<impl>
     {
     public:
@@ -59,27 +59,53 @@ namespace
             : _msys(nullptr)
             , _csys(nullptr)
             , _vsys(nullptr)
-            , msg_service_(boost::bind(&impl::push_back, this, _1,true))
+            , msg_service_    (boost::bind(&impl::push_back_all, this, _1))
+            , msg_service_vis_(boost::bind(&impl::push_back, this, _1))
         {
 
         }
 
-        creator_ptr  get_this()
+        systems_ptr  get_this()
         {
             return shared_from_this();
         }
 
     private:
+
          
-        void push_back (binary::bytes_cref bytes, bool /*sure*/)
+        void push_back_all (binary::bytes_cref bytes)
         {
              queue_.push_back(bytes);
-             
-             msg_service_.on_remote_recv(queue_.front(),true);
-             queue_.pop_front();
+             queue_vis_.push_back(bytes);
+        }
+        
+        void push_back (binary::bytes_cref bytes)
+        {
+             queue_.push_back(bytes);
         }
 
-        virtual kernel::system_ptr get_control_sys() override 
+        virtual  void update_messages()
+        {
+            while(queue_.size()>0)
+            {
+                if(queue_.front().size()>0)
+                    msg_service_.on_remote_recv(queue_.front(),true);
+                queue_.pop_front();
+            }
+        }
+
+        virtual  void update_vis_messages()
+        {
+            while(queue_vis_.size()>0)
+            {
+                if(queue_vis_.front().size()>0)
+                    msg_service_vis_.on_remote_recv(queue_vis_.front(),true);
+
+                queue_vis_.pop_front();
+            }
+        }
+
+       virtual kernel::system_ptr get_control_sys() override 
         { 
             if(!_csys)
                 _csys = create_ctrl_system(msg_service_);
@@ -93,7 +119,7 @@ namespace
        
             FIXME(damn properties)
             if (!_vsys)
-                _vsys = create_visual_system(msg_service_, props_);
+                _vsys = create_visual_system(msg_service_vis_, props_);
             return  _vsys;
         };
 
@@ -106,17 +132,20 @@ namespace
 
         virtual void create_auto_objects()   override
         {
-            create_auto_object(_msys,"phys_sys","phys_sys");
-            create_auto_object(_msys,"airports_manager","aiports_manager");
-            create_auto_object(_msys,"ada","ada");
-            create_auto_object(_msys,"meteo_proxy","meteo_proxy");
-            create_auto_object(_msys,"aircraft_reg","aircraft_reg");
+            create_auto_object(_csys,"phys_sys","phys_sys");
+            create_auto_object(_csys,"airports_manager","aiports_manager");
+            create_auto_object(_csys,"ada","ada");
+            create_auto_object(_csys,"meteo_proxy","meteo_proxy");
+            create_auto_object(_csys,"aircraft_reg","aircraft_reg");
         }                                                             
 
 
         std::deque<binary::bytes_t>                           queue_;
+        std::deque<binary::bytes_t>                       queue_vis_;
 
         kernel::msg_service                             msg_service_;
+        kernel::msg_service                         msg_service_vis_;
+
         kernel::system_ptr                                     _msys;
         kernel::system_ptr                                     _vsys;
         kernel::system_ptr                                     _csys;
@@ -126,7 +155,7 @@ namespace
 }
 
 
-creator_ptr sys_creator()
+systems_ptr get_systems()
 {
     static boost::recursive_mutex guard;
     boost::lock_guard<boost::recursive_mutex> lock(guard);

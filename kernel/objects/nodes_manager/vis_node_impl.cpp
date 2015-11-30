@@ -82,7 +82,7 @@ void vis_node_impl::pre_update(double time)
 
     double dt = time - *time_;
 
-#if 0
+#if 1
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {
 
@@ -91,7 +91,7 @@ void vis_node_impl::pre_update(double time)
                      << "   time: " << time
                      << "   time_: " << *time_
                      << "\n" );
-        
+#if 0        
         nm::visit_sub_tree(manager_->get_node_tree_iterator(node_id()), [this](nm::node_info_ptr n)->bool
         {
             static int i = 0;
@@ -110,7 +110,7 @@ void vis_node_impl::pre_update(double time)
 
             return true;
         });
-
+#endif
     }
 #endif
 
@@ -136,7 +136,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
 
     // FIXME  Заглушка для анимации
     FIXME(Анимация на коленке)
-    osgAnimation::Animation::PlayMode pm = anim.from > 0?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
+    FIXME(Место для удара головой)
+
+    bool bopen = (cg::eq(anim.from,0.f)) && (cg::eq(anim.size,0.f)) || (anim.from >= 1.0) && (anim.size < 0);
+    osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
     // victory_nodes_->
     auto root = victory_nodes_[0];
@@ -168,11 +171,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
         {
             const std::string& name = animations[i]->getName();
 
-            LOG_ODS_MSG("animation name: " << name << "\n" );
             if(!manager_->isPlaying(name))
             {
                 animations[i]->setPlayMode(pm);                   
-                manager_->playAnimation( animations[i].get(),2,2.0 );
+                //manager_->playAnimation( animations[i].get(),2,2.0 );
 
             }
         }

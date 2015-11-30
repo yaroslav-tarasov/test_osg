@@ -18,6 +18,7 @@ struct VISUAL_API IVisual
     virtual void  EndSceneCreation() = 0;
 
     virtual bool   Done()            = 0;
+    virtual void   SetDone(bool )    = 0;
 };
 
 VISUAL_API IVisual *  CreateVisual();

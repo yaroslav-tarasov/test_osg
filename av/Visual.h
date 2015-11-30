@@ -19,6 +19,7 @@ public:
     virtual void   EndSceneCreation()               override;
                                         
     virtual bool   Done()                           override;
+    virtual void   SetDone(bool )                   override;
 
 
     virtual osgViewer::Viewer* GetViewer() const    override;

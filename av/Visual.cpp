@@ -248,6 +248,15 @@ bool   Visual::Done()
      return _viewerPtr->done();
 }
 
+
+
+void   Visual::SetDone(bool d)
+{
+    return _viewerPtr->setDone(d);
+}
+
+
+
 void  Visual::Update()
 {
     if (m_bInitialized )

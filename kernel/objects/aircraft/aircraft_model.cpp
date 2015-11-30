@@ -65,6 +65,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
     , rotors_angular_speed_ (0)
+    , shassi_anim_inited_(false)
 {
 
     if (get_nodes_manager())
@@ -93,7 +94,7 @@ void model::update( double time )
     //    aircraft_fms::model_control_ptr(get_fms_info())->activate();
         
     FIXME(init_shassi_anim)
-    // init_shassi_anim();
+    init_shassi_anim();
 
     double dt = time - (last_update_ ? *last_update_ : 0);
     if (cg::eq_zero(dt))
@@ -276,7 +277,9 @@ void model::init_shassi_anim ()
     {
         geo_point_3 const& pos = get_fms_info()->get_state().dyn_state.pos;
 
-        bool to_be_opened = pos.height < shassi_height_;
+        FIXME(init_shassi_anim)
+
+        bool to_be_opened = true ;//pos.height < shassi_height_;
 
         shassis_->visit_groups([to_be_opened](shassis_group_t & shassis_group)
         {
@@ -285,9 +288,12 @@ void model::init_shassi_anim ()
             else
                 shassis_group.close(true);
         });
+
+
+        shassi_anim_inited_ = true;
     }
 
-    shassi_anim_inited_ = true;
+    
 }
 
 void model::update_shassi_anim (double time)

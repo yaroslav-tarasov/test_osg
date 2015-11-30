@@ -22,7 +22,7 @@
 		REFL_ENTRY(model)
 	REFL_END()
 
-
+#if 0
     struct node_position
     {
         node_position() : pos_(geo_position()) { }
@@ -48,7 +48,33 @@
     private:
         boost::any pos_;
     };
+#else
+    struct node_position
+    {
+        node_position() : pos_(geo_position()) { }
+        node_position( geo_position const& pos ) : pos_(pos) { }
+        node_position( local_position const& pos ) : pos_(pos) { }
 
+        geo_position const & global() const { return boost::get<geo_position>(pos_); }
+        geo_position       & global()       { return boost::get<geo_position>(pos_); }
+
+        local_position const & local() const { return boost::get<local_position>(pos_); }
+        local_position       & local()       { return boost::get<local_position>(pos_); }
+
+        bool is_local() const { return typeid(local_position) == pos_.type(); }
+
+        void set_local(local_position const& p) { pos_ = p; }
+        void set_global(geo_position const& p)  { pos_ = p; }
+
+        bool is_static() const;
+        void set_static();
+
+        template<class processor> friend void reflect(processor&, node_position const&);
+
+    private:
+        boost::variant<local_position,geo_position> pos_;
+    };
+#endif
 REFL_STRUCT(node_position)
     
     bool __local__ = obj.is_local();

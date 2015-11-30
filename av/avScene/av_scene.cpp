@@ -393,7 +393,7 @@ private:
                                                                  __main_srvc__->post(boost::bind(on_render_,time));
                                                              } , 1, false);
 
-         calc_timer_   = session_timer::create (ses_, 0.05f, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
+         calc_timer_   = session_timer::create (ses_, period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
          
 		 boost::system::error_code ec;
@@ -526,7 +526,8 @@ private:
     details::session*                                         ses_;
 };
 
-//#define MULTITHREADED
+
+#define MULTITHREADED
 
 #ifndef  MULTITHREADED
 struct visapp
@@ -537,8 +538,8 @@ struct visapp
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
         : osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
-        , ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
-        , mod_sys_  (sys_creator()->get_model_sys(),0.03/*cfg().model_params.msys_step*/)
+        , ctrl_sys_ (get_systems()->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
+        , mod_sys_  (get_systems()->get_model_sys(),0.003/*cfg().model_params.msys_step*/)
        
     {   
 
@@ -633,7 +634,7 @@ private:
 
         high_res_timer hr_timer;
 
-        sys_creator()->create_auto_objects();
+        get_systems()->create_auto_objects();
         
         force_log fl;       
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.get_delta() << "\n");
@@ -662,7 +663,7 @@ private:
 
         //systems_factory_ptr sys_fab = nfi::function<systems_factory_ptr()>("systems", "create_system_factory")();
         auto ptr = // /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
-                   sys_creator()->get_visual_sys();
+                   get_systems()->get_visual_sys();
         //dict_t dic;
         //binary::unwrap(bytes, dic);
 
@@ -728,7 +729,8 @@ struct visapp_impl
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
-        : osg_vis_  (CreateVisual())
+        : systems_  (get_systems())
+        , osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
     {   
 
@@ -754,6 +756,7 @@ private:
     void on_render(double time)
     {   
         //high_res_timer                _hr_timer;
+        systems_->update_vis_messages();
         vis_sys_.update(time);
         osg_vis_->Render();
         //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
@@ -770,20 +773,24 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        auto ptr = sys_creator()->get_visual_sys();
+        auto ptr = systems_->get_visual_sys();
 
         return ptr;
     }
 
 private:
+
+    systems_ptr                                                 systems_;
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
+
 };
 
 struct visapp
 {
     visapp( kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
-        : props_ (props)
+        : done_  (false)
+        , props_ (props)
         , thread_(new boost::thread(boost::bind(&visapp::run, this)))
     {
 
@@ -791,6 +798,7 @@ struct visapp
 
     ~visapp()
     {
+        done();
         thread_->join();
     }
 
@@ -798,7 +806,7 @@ struct visapp
     {   
         visapp_impl  va( props_);
         end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
-        while (!va.done())
+        while (!va.done() && !done_)
           va.on_render(gt_.get_time());
     }
     
@@ -808,13 +816,20 @@ struct visapp
             end_of_load_();
     }
 
+    void done()
+    {
+        done_ = true;
+    }
+
+private:
+    bool                                 done_;
 private:
     kernel::vis_sys_props               props_;
     std::unique_ptr<boost::thread>     thread_;
     boost::function<void()>       end_of_load_;
 private:
 
-    global_timer                                                gt_;
+    global_timer                           gt_;
 
 };
 
@@ -826,8 +841,9 @@ struct mod_app
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
-        : ctrl_sys_ (sys_creator()->get_control_sys(),0.03/*cfg().model_params.csys_step*/)
-        , mod_sys_  (sys_creator()->get_model_sys()  ,0.03/*cfg().model_params.msys_step*/)
+        : systems_  (get_systems())
+        , ctrl_sys_ (systems_->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
+        , mod_sys_  (systems_->get_model_sys  (),0.003/*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
     {   
 
@@ -878,9 +894,8 @@ private:
         else
         {
             gt_.set_time(time);
-            //force_log fl;
-            //LOG_ODS_MSG( "mod_app::update(double time)  " << time << "\n");
-
+            
+            systems_->update_messages();
             mod_sys_.update(time);
             ctrl_sys_.update(time);
         }
@@ -926,7 +941,7 @@ private:
 
         high_res_timer hr_timer;
 
-        sys_creator()->create_auto_objects();
+        systems_->create_auto_objects();
 
         force_log fl;       
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.set_point() << "\n");
@@ -948,12 +963,15 @@ private:
         }
     }
 
+
+private:
+    systems_ptr                                                 systems_;
+    updater                                                     mod_sys_;
+    updater                                                    ctrl_sys_;
+
 private:
     msg_dispatcher<uint32_t>                                       disp_;
 
-private:
-    updater                                                     mod_sys_;
-    updater                                                    ctrl_sys_;
 private:
     on_container_f                                              on_cont_;
     boost::function<void()>                                 end_of_load_;
