@@ -37,6 +37,7 @@ REFL_END()
 //////////////////////////////////////////
 
 
+// FIXME messages and namespaces
 
 namespace net_layer
 {
@@ -49,7 +50,9 @@ namespace net_layer
             id_run              ,
             id_create           ,
             id_ready            ,
-            
+
+            id_start            ,
+
             am_malfunction      ,
             sm_container_msg
         };
@@ -58,22 +61,34 @@ namespace net_layer
         struct setup
             : network::msg_id<id_setup>
         {
-            setup(double task_time = 0., double srv_time = 0.,std::string icao_code = "URSS")
+            setup(std::string icao_code = "URSS")
+                : icao_code (icao_code)
+            {
+            }
+
+            std::string icao_code;
+        };
+        
+        REFL_STRUCT(setup)
+            REFL_ENTRY(icao_code )
+        REFL_END()
+
+        struct start
+            : network::msg_id<id_start>
+        {
+            start(double task_time = 0., double srv_time = 0.)
                 : task_time (task_time)
                 , srv_time  (srv_time )
-                , icao_code (icao_code)
             {
             }
 
             double      task_time;
             double      srv_time;
-            std::string icao_code;
         };
-        
-        REFL_STRUCT(setup)
+
+        REFL_STRUCT(start)
             REFL_ENTRY(task_time)
             REFL_ENTRY(srv_time )
-            REFL_ENTRY(icao_code )
         REFL_END()
 
         struct run

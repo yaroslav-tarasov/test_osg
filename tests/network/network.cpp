@@ -118,7 +118,7 @@ private:
         srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
       
-        binary::bytes_t bts =  std::move(wrap_msg(setup(0,0,g_icao_code)));
+        binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
         send(&bts[0], bts.size());
 
     }
@@ -176,7 +176,7 @@ private:
             messages_.push_back(move(msg));
 #endif
 
-            LogInfo("update() send run " << time << "/n");
+            LogInfo("update() send run " << time << "\n");
         }
 
 

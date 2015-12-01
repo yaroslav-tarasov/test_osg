@@ -38,7 +38,8 @@ private:
 
     // control
 private:
-    virtual void inject_msg(net_layer::msg::run const& msg);
+    virtual void inject_msg(net_layer::msg::run const& msg);  
+    virtual void inject_msg(net_layer::msg::container_msg const& msg); 
 
     // info
 private:

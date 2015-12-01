@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "av/Visual.h"
+
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
@@ -7,18 +9,12 @@
 #include "kernel/systems/fake_system.h"
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
+#include "kernel/systems/vis_system.h"
 #include "common/test_msgs.h"
 #include "common/locks.h"
 #include "common/time_counter.h"
-
-#include "kernel/systems/vis_system.h"
-
 #include "utils/high_res_timer.h"
-
-#include "av/Visual.h"
 #include "tests/systems/test_systems.h"
-
-
 #include "objects/registrator.h"
 
 using network::endpoint;
@@ -121,50 +117,105 @@ inline double time_control::time() const
     return last_time_ + time_counter::to_double(time_flow_.time()) * time_factor_;
 }
 
-    
+enum messages_id
+{
+    id_task_loaded_session, // sent from client to session_controller, indicating all session data successfully loaded by task
+    id_session_loaded     , // sent from session_controller to all clients, indicating all clients are ready for session processing
+
+    id_reset_time_request,
+    id_new_time_response ,
+    id_data_msg    
+};
+
+struct new_time_response
+    : network::msg_id<id_new_time_response>
+{
+    new_time_response(double srv_time, double ses_time, double factor)
+        : srv_time  (srv_time)
+        , ses_time  (ses_time)
+        , factor    (factor)
+    {
+    }
+
+    new_time_response(){}
+
+    double srv_time;
+    double ses_time;
+    double factor;
+};
+
 namespace details
 {
     struct timer_holder { virtual ~timer_holder(){} };
 
     struct session /*: net_layer::ses_srv*/ {
         
-        session ( double initial_time )
+        typedef boost::function<double()>           time_func_f;
+
+        session ( time_func_f const& srv_time, double initial_time )
             : time_(initial_time)
+            , srv_time_ (srv_time)
         {
-            time_.set_factor(1.0);
+            time_.set_factor(0.0);
         }
         
+
+        // native
         double time() const
         {
            return time_.time();
         }
 
+        // фантазии
         void stop()
         {
             time_reset_signal_(/*ses_time*/time(), 0);
         }
+
+
         
-        void set_factor(double factor)
-        {
-        }
-        
+        // native not realized (not used?)
         void send(binary::bytes_cref bytes, bool sure)
         {
             //Assert(send_);
             //send_(*network::wrap(data_msg(bytes)), sure);
         }
 
+        // modified
         void reset_time(double new_time)
         {
+            // сообщение в сеть с новым временем и текущим фактором
+            
+            time_.set_factor(time_.get_factor(), new_time);
+            time_reset_signal_(new_time, time_.get_factor());
+        }
+        
+        // modified
+        void set_factor(double factor)
+        {
+             // сообщение в сеть с новым фактором только, время не устанавливается
+
+            time_.set_factor(factor);
         }
 
+        // modified   
         bool local() const
         {
             return true/*control_*/;
         }
-        
+
+        // native
         void session_data_loaded()
         {
+            session_loaded_signal_();
+        }
+        
+        void on_new_time_response(new_time_response const& msg)
+        {
+            double ses_time = std::max(0., msg.ses_time + (srv_time_() - msg.srv_time) * msg.factor);
+
+            time_.set_factor(msg.factor, ses_time);
+            time_reset_signal_(ses_time, msg.factor);
         }
 
         //net_layer::timer_connection create_timer(double period_sec, on_timer_f const& on_timer, bool adjust_time_factor, bool terminal)
@@ -184,9 +235,15 @@ namespace details
 
         DECLARE_EVENT(time_reset    , (double /*time*/, double /*factor*/));
         DECLARE_EVENT(session_stopped   ,   ());
+        
+        DECLARE_EVENT(session_loaded, ());
 
     private:
-        time_control time_;
+        time_func_f                     srv_time_;
+
+    private:
+        time_control                    time_;
+
 
 
     };
@@ -343,7 +400,7 @@ struct net_worker
 
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
          : period_     (/*cfg().model_params.msys_step*/0.05)
-         , ses_        (new details::session(0))
+         , ses_        (new details::session(details::session::time_func_f(),0))
          , _peer       (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
@@ -375,6 +432,16 @@ struct net_worker
          _workerService->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)));
 
      }
+     
+     void reset_time(double new_time)
+     {
+         ses_->reset_time(new_time);
+     }
+
+     void set_factor(double factor)
+     {
+         ses_->set_factor(factor);
+     }
 
 private:
      void run()
@@ -387,11 +454,11 @@ private:
          
          boost::asio::io_service::work skwark(asi.get_service());
 
-         
-         render_timer_ = session_timer::create (ses_, 1/60.f,  [&](double time)
-                                                             {
-                                                                 __main_srvc__->post(boost::bind(on_render_,time));
-                                                             } , 1, false);
+         if(on_render_)
+             render_timer_ = session_timer::create (ses_, 1/60.f,  [&](double time)
+                                                                 {
+                                                                     __main_srvc__->post(boost::bind(on_render_,time));
+                                                                 } , 1, false);
 
          calc_timer_   = session_timer::create (ses_, period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
@@ -496,6 +563,7 @@ private:
      }
 
 
+
 private:
     boost::scoped_ptr<async_acceptor>                           acc_   ;
     std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
@@ -512,9 +580,9 @@ private:
     on_update_f                                                 on_render_;
 
 private:
-    //async_timer                                                   timer_; 
+    //async_timer                                                timer_; 
 
-    bool                                                          done_;
+    bool                                                         done_;
 
 private:
     double                                                       period_;
@@ -592,7 +660,6 @@ private:
         {
            mod_sys_.update(time);
            ctrl_sys_.update(time);
-
         }
 
     }
@@ -705,9 +772,9 @@ private:
     {
         static double                 time_    = 0.0;
         static high_res_timer         hr_timer;
-        static boost::recursive_mutex m_guard;
+        static boost::recursive_mutex guard_;
 
-        boost::lock_guard<boost::recursive_mutex> lock(m_guard);
+        boost::lock_guard<boost::recursive_mutex> lock(guard_);
 
         if(time > 0.0 )
         {
@@ -724,9 +791,6 @@ private:
 struct visapp_impl
 {
     friend struct visapp;
-
-    typedef boost::function<void(run const& msg)>                   on_run_f;
-    typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
         : systems_  (get_systems())
@@ -755,15 +819,9 @@ private:
 
     void on_render(double time)
     {   
-        //high_res_timer                _hr_timer;
         systems_->update_vis_messages();
         vis_sys_.update(time);
         osg_vis_->Render();
-        //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
-
-        //force_log fl;
-        //LOG_ODS_MSG( "visapp_impl::on_render(double time)  " << time << "\n");
-
     }
 
 private:
@@ -849,9 +907,10 @@ struct mod_app
 
         disp_
             .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
-            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
-            .add<container_msg         >(boost::bind(&mod_app::on_container  , this, _1))
             .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
+            .add<start                 >(boost::bind(&mod_app::on_start      , this, _1))
+            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
+            //.add<container_msg         >(boost::bind(&mod_app::on_container  , this, _1))
             ;
 
 
@@ -874,46 +933,33 @@ private:
 
     void on_timer(double time)
     {   
-        //high_res_timer                _hr_timer;
-        //vis_sys_.update(time);
-        //osg_vis_->Render();
-        //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
-
     }
 
     void update(double time)
     {   
-        //double sim_time = osg_vis_->GetInternalTime();
-
-        if(/*sim_time  < 0*/false)
-        {
-            w_->done();
-            __main_srvc__->stop();
-            return;
-        }
-        else
-        {
-            gt_.set_time(time);
+        gt_.set_time(time);
             
-            systems_->update_messages();
-            mod_sys_.update(time);
-            ctrl_sys_.update(time);
-        }
-
-
+        systems_->update_messages();
+        mod_sys_.update(time);
+        ctrl_sys_.update(time);
     }
 
 
     void on_setup(setup const& msg)
     {
+        w_->set_factor(0.0);
         create_objects(msg.icao_code);
-        //osg_vis_->EndSceneCreation();
-        end_of_load_();
+        
+        end_of_load_();  //osg_vis_->EndSceneCreation();
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send(&bts[0], bts.size());
+    }
 
-        LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+    void on_start(start const& msg)
+    {
+       w_->set_factor(1.0);
+       w_->reset_time(msg.srv_time);
     }
 
     void on_container(container_msg const& msg)
@@ -932,7 +978,6 @@ private:
 
         LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }
-
 
     void create_objects(const std::string& airport)
     {
@@ -957,9 +1002,12 @@ private:
 
         if (reg_obj)
         {
-            // on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+            void (aircraft_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &aircraft_reg::control::inject_msg;
+            void (aircraft_reg::control::*on_container) (net_layer::msg::container_msg const& msg) = &aircraft_reg::control::inject_msg;
+
             disp_
-                .add<run                   >(boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+                .add<run                   >(boost::bind(on_run, aircraft_reg::control_ptr(reg_obj).get(), _1))
+                .add<container_msg         >(boost::bind(on_container, aircraft_reg::control_ptr(reg_obj).get(), _1));
         }
     }
 

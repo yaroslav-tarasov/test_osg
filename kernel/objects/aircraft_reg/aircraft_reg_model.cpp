@@ -67,6 +67,10 @@ void model::on_inject_msg(net_layer::msg::malfunction_msg const& msg)
         }
     }
 }
-                     
+
+void model::on_inject_msg(net_layer::msg::container_msg const& msg)
+{
+
+}                     
 
 } // end of aircraft_reg

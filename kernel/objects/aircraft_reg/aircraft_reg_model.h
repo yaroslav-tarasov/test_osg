@@ -15,6 +15,7 @@ struct model
 protected:
     void on_inject_msg(net_layer::msg::run const& msg);
     void on_inject_msg(net_layer::msg::malfunction_msg const& msg);
+    void on_inject_msg(net_layer::msg::container_msg const& msg);
 };
 
 } // end of aircraft_reg

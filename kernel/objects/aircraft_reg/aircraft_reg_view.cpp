@@ -58,6 +58,11 @@ void view::inject_msg(net_layer::msg::run const& msg)
     // set(msg);
 }
 
+void view::inject_msg(net_layer::msg::container_msg const& msg)
+{
+    //buffer_.push_back(msg);
+}
+
 void view::pre_update(double time)
 {
     base_view_presentation::pre_update(time);
