@@ -46,7 +46,7 @@ struct tp_provider_impl
 
 struct craft_data
 {
-    explicit craft_data(settings_t const& settings = settings_t(), state_t const& state = state_t(),obj_id_opt fpl_id = boost::none)
+    explicit craft_data(settings_t const& settings = settings_t(), state_t const& state = state_t(),obj_id_opt fpl_id = /*boost::*/none)
         : settings_     (settings)
         , state_        (state)
         , fpl_id_       (fpl_id)

@@ -170,7 +170,7 @@ struct time_control
 {
     time_control(double initial_time = 0.);
 
-    void   set_factor(double factor, optional<double> ext_time = boost::none);
+    void   set_factor(double factor, optional<double> ext_time = /*boost::*/none);
     double get_factor() const;
     double time      () const;
 

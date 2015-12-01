@@ -17,7 +17,7 @@ namespace aircraft
         decart_position get_local_position();
 
     private:
-        ctrl(object_create_t const& oc, dict_copt dict, optional<cg::geo_point_3> const &initial_pos = boost::none, optional<double> const &initial_course = boost::none);
+        ctrl(object_create_t const& oc, dict_copt dict, optional<cg::geo_point_3> const &initial_pos = /*boost::*/none, optional<double> const &initial_course = /*boost::*/none);
 
     protected:
         void update(double time);

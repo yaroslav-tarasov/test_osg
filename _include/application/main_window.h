@@ -54,8 +54,8 @@ struct main_window
     virtual void    remove_widget(app::widget_ptr w) = 0 ;
     virtual widget* find_widget(std::string const &name) const = 0 ;
 
-    virtual void load_layout(boost::optional<std::string> const &lname = boost::none) = 0 ;
-    virtual void save_layout(boost::optional<std::string> const &lname = boost::none) const = 0 ;
+    virtual void load_layout(boost::optional<std::string> const &lname = /*boost::*/none) = 0 ;
+    virtual void save_layout(boost::optional<std::string> const &lname = /*boost::*/none) const = 0 ;
 
     virtual void set_title(std::string const &title) = 0 ;
 
