@@ -38,15 +38,15 @@ inline std::string getEditboxText(const CEGUI::String& editbox)
     return "";
 }
 
-inline bool setEditboxText(const CEGUI::String& editbox, const CEGUI::String& text)
+inline bool setItemText(const CEGUI::String& item_name, const CEGUI::String& text)
 {
     GUIContext& context = System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
     // Check
-    if (root->isChild(editbox))
+    if (root->isChild(item_name))
     {
-        Editbox* button = static_cast<Editbox*>(root->getChild(editbox));
-        button->setText(text);
+		auto * window = root->getChild(item_name);
+        window->setText(text);
         return true;
     }
     return false;

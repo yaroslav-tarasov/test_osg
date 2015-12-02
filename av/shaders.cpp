@@ -2286,7 +2286,7 @@ $if 0
                 vec4 cos_time;
 			} v_out;
 
-            uniform float osg_FrameTime;
+            uniform float osg_SimulationTime;
             const float fCoeffTime = 5;
 			void main()
 			{
@@ -2294,7 +2294,7 @@ $if 0
 				mat4 im = inverse(gl_ModelViewMatrix * MVP);
 				vec3 vLocalSpaceCamPos = im[3].xyz;
 
-                v_out.cos_time = cos( vec4( osg_FrameTime,  osg_FrameTime + 0.02,  osg_FrameTime + 0.1, osg_FrameTime + 0.12 ) * fCoeffTime );
+                v_out.cos_time = cos( vec4( osg_SimulationTime,  osg_SimulationTime + 0.02,  osg_SimulationTime + 0.1, osg_SimulationTime + 0.12 ) * fCoeffTime );
 
 				gl_Position =  gl_ModelViewProjectionMatrix * MVP * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
 				gl_Position.z = 0.0;

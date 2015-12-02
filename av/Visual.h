@@ -11,8 +11,8 @@ public:
     virtual void   Initialize()                      override;
     virtual void   Deinitialize()                    override;
 
-    virtual void   Update()                          override;
-    virtual void   Render()                          override;
+    virtual void   Update(double ref_time)           override;
+    virtual void   Render(double ref_time)           override;
 
     virtual double GetInternalTime()                override;
     virtual void   CreateScene()                    override;

@@ -875,7 +875,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _light_map = createLightMapRenderer(this);
     addChild( _light_map );
 
-#endif                                               ++++++
+#endif                                               
 
     FIXME(140 shaders version needed);
 

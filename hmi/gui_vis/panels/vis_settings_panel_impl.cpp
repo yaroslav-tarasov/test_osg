@@ -40,11 +40,11 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     demoWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
     demoWindow->setText( "Choose Zone" );
 
-    PushButton* demoButtonOK = static_cast<PushButton*>(
-        WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
-    demoButtonOK->setPosition(UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
-    demoButtonOK->setSize( USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
-    demoButtonOK->setText( "OK" );
+    //PushButton* demoButtonOK = static_cast<PushButton*>(
+    //    WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
+    //demoButtonOK->setPosition(UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
+    //demoButtonOK->setSize( USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
+    //demoButtonOK->setText( "OK" );
 
 	auto fn_exit = [=](const CEGUI::EventArgs& args)->bool 
         {
@@ -56,7 +56,7 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
         };
 
     demoWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,Event::Subscriber(fn_exit));
-	demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,Event::Subscriber(fn_exit));
+	//demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,Event::Subscriber(fn_exit));
 
 
 
@@ -83,7 +83,7 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     cbbo->setPosition(UVector2(cegui_reldim(0.15f), cegui_reldim( 0.1f)));
     //cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
     demoWindow->addChild(cbbo);
-	demoWindow->addChild( demoButtonOK );
+	//demoWindow->addChild( demoButtonOK );
     root->addChild( demoWindow );
 
     demoWindow->setVisible(false);
@@ -176,13 +176,13 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
 
     }));
 
-    setEditboxText("FrameWindow/LWeather/edtRadX"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_x));
-    setEditboxText("FrameWindow/LWeather/edtRadY"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_y));
-    setEditboxText("FrameWindow/LWeather/edtX"       , boost::str(boost::format("%.2f") % s.clouds[0].x));
-    setEditboxText("FrameWindow/LWeather/edtY"       , boost::str(boost::format("%.2f") % s.clouds[0].y));
-    setEditboxText("FrameWindow/LWeather/edtHeight"  , boost::str(boost::format("%.2f") % s.clouds[0].height));
-    setEditboxText("FrameWindow/LWeather/edtIntensity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
-    setEditboxText("FrameWindow/GWeather/edtIntensity", boost::str(boost::format("%.2f") % s.intensity));
+    setItemText("FrameWindow/LWeather/edtRadX"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_x));
+    setItemText("FrameWindow/LWeather/edtRadY"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_y));
+    setItemText("FrameWindow/LWeather/edtX"       , boost::str(boost::format("%.2f") % s.clouds[0].x));
+    setItemText("FrameWindow/LWeather/edtY"       , boost::str(boost::format("%.2f") % s.clouds[0].y));
+    setItemText("FrameWindow/LWeather/edtHeight"  , boost::str(boost::format("%.2f") % s.clouds[0].height));
+    setItemText("FrameWindow/LWeather/edtIntensity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
+    setItemText("FrameWindow/GWeather/edtIntensity", boost::str(boost::format("%.2f") % s.intensity));
 
 
 

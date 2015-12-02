@@ -257,7 +257,7 @@ void   Visual::SetDone(bool d)
 
 
 
-void  Visual::Update()
+void  Visual::Update(double ref_time)
 {
     if (m_bInitialized )
     {
@@ -285,7 +285,7 @@ struct frame_limiter
     double       _minFrameTime;
 };
 
-void  Visual::Render()
+void  Visual::Render(double ref_time)
 {
     static bool run_once = false;
     
@@ -309,7 +309,10 @@ void  Visual::Render()
         {
             //frame_limiter fr(0);
 
-            viewer->frame();
+			if(ref_time<0.0)
+				viewer->frame();
+			else
+				viewer->frame(ref_time);
         }
     }
 }

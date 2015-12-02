@@ -7,8 +7,8 @@ struct VISUAL_API IVisual
     virtual void  Initialize()   = 0;
     virtual void  Deinitialize() = 0;
 
-    virtual void  Update()       = 0;
-    virtual void  Render()       = 0;
+    virtual void  Update(double ref_time = -1.0)       = 0;
+    virtual void  Render(double ref_time = -1.0)       = 0;
     
     virtual osgViewer::Viewer* GetViewer() const    =0;
 

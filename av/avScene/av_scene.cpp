@@ -844,7 +844,7 @@ private:
     {   
         systems_->update_vis_messages();
         vis_sys_.update(time);
-        osg_vis_->Render();
+        osg_vis_->Render(time);
     }
 
 private:

@@ -146,7 +146,7 @@ private:
             LogInfo("update() send create " );
             create_a = false;
 
-            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,1.0)));
+            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,4.0)));
             send(&msg[0], msg.size());
         }
 
