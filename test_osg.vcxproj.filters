@@ -793,5 +793,8 @@
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
       <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
+    <ClCompile Include="hmi\gui_vis\panels\time_panel_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

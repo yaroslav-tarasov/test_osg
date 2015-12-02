@@ -143,6 +143,7 @@ namespace avScene {
         ILightMapRendererPtr                        _light_map;
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
+        app::time_panel_ptr                         _time_panel;
 		app::main_window_ptr						_mw;
         connection_holder                           conn_holder_;
 

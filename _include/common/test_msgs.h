@@ -51,7 +51,7 @@ namespace net_layer
             id_create           ,
             id_ready            ,
 
-            id_start            ,
+            id_state            ,
 
             am_malfunction      ,
             sm_container_msg
@@ -73,22 +73,32 @@ namespace net_layer
             REFL_ENTRY(icao_code )
         REFL_END()
 
-        struct start
-            : network::msg_id<id_start>
+        struct state
+            : network::msg_id<id_state>
         {
-            start(double task_time = 0., double srv_time = 0.)
+            state(double task_time, double srv_time, double factor)
                 : task_time (task_time)
                 , srv_time  (srv_time )
+				, factor    (factor   )
+            {
+            }
+
+            state()
+                : task_time (0)
+                , srv_time  (0)
+				, factor    (0)
             {
             }
 
             double      task_time;
             double      srv_time;
+			double      factor;
         };
 
-        REFL_STRUCT(start)
+        REFL_STRUCT(state)
             REFL_ENTRY(task_time)
             REFL_ENTRY(srv_time )
+            REFL_ENTRY(factor )
         REFL_END()
 
         struct run
@@ -137,33 +147,29 @@ namespace net_layer
             
             create()
                 : ext_id (0)
-                , lat    (0)
-                , lon    (0 )
-                , course (0)
+                , pos (pos)
+                , orien (orien) 
             {
             }
 
-            create(uint32_t id, double lat, double lon, double course , const std::string& object_type)
+            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , const std::string& object_type)
                 : ext_id      (id)
-                , lat         (lat)
-                , lon         (lon )
-                , course      (course)
+                , pos (pos)
+                , orien (orien) 
 				, object_type (object_type)
             {
             }
 
-            uint32_t    ext_id;
-            double      lat;
-            double      lon;
-            double      course;
-			std::string object_type;
+            uint32_t            ext_id;
+            cg::point_3         pos;
+            cg::quaternion      orien;
+			std::string         object_type;
         };
 
         REFL_STRUCT(create)
             REFL_ENTRY(ext_id)
-            REFL_ENTRY(lat)
-            REFL_ENTRY(lon )
-            REFL_ENTRY(course )
+            REFL_ENTRY( pos )
+            REFL_ENTRY( orien    )
 			REFL_ENTRY(object_type )
         REFL_END()
 

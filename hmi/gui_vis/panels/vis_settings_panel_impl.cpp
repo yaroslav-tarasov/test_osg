@@ -10,62 +10,15 @@ FIXME(Заголовок как в рефренсном)
 
 using namespace CEGUI;
 
+#include "cegui_utils.h"
+
+
+
 const  String combo_name     ( "selModeBox"		);
 const  String btn_exit_name  ( "btnExit"		);
 const  String main_menu_name ( "mainMenuBar"    );
 const  String tb_name		 ( "tbLight"        );
 
- void subscribeEvent(const String& widget, const String& event, const Event::Subscriber& method)
-{
-    GUIContext& context = System::getSingleton().getDefaultGUIContext();
-    CEGUI::Window* root = context.getRootWindow();
-
-    if (root->isChild(widget))
-    {
-        Window* window = root->getChild(widget);
-        window->subscribeEvent(event, method);
-    }
-}
-
-bool isCheckboxSelected(const CEGUI::String& checkbox)
-{
-    GUIContext& context = System::getSingleton().getDefaultGUIContext();
-    CEGUI::Window* root = context.getRootWindow();
-    // Check
-    if (root->isChild(checkbox))
-    {
-        ToggleButton* button = static_cast<ToggleButton*>(root->getChild(checkbox));
-        return button->isSelected();
-    }
-    return false;
-}
-
-std::string getEditboxText(const CEGUI::String& editbox)
-{
-	GUIContext& context = System::getSingleton().getDefaultGUIContext();
-	CEGUI::Window* root = context.getRootWindow();
-	// Check
-	if (root->isChild(editbox))
-	{
-		Editbox* button = static_cast<Editbox*>(root->getChild(editbox));
-		return std::string(button->getText().c_str());
-	}
-	return "";
-}
-
-bool setEditboxText(const CEGUI::String& editbox, const CEGUI::String& text)
-{
-    GUIContext& context = System::getSingleton().getDefaultGUIContext();
-    CEGUI::Window* root = context.getRootWindow();
-    // Check
-    if (root->isChild(editbox))
-    {
-        Editbox* button = static_cast<Editbox*>(root->getChild(editbox));
-        button->setText(text);
-        return true;
-    }
-    return false;
-}
 
 std::string trim_copy (const char* name )
 {

@@ -141,10 +141,13 @@ private:
         if (time>1 && create_a)
         {
             
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,0,0.007,0,"A319")));
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,point_3(0,250,0),cpr(0),"A319")));
             send(&bts[0], bts.size());
             LogInfo("update() send create " );
             create_a = false;
+
+            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,1.0)));
+            send(&msg[0], msg.size());
         }
 
         if(time>10)

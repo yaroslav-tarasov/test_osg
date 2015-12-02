@@ -326,7 +326,9 @@ namespace sync_fsm
 #if 0
             const float angular_speed = 45 * 2 * cg::pif/60.0; 
 #endif
-			auto delta = sqrt(body_pos.dpos.x * body_pos.dpos.x  + body_pos.dpos.y * body_pos.dpos.y);
+            point_3 wpos_rp = (!body_pos.orien).rotate_vector(body_pos.dpos);
+            auto delta = sqrt(wpos_rp.x * wpos_rp.x  + wpos_rp.y * wpos_rp.y);
+			// auto delta = sqrt(body_pos.dpos.x * body_pos.dpos.x  + body_pos.dpos.y * body_pos.dpos.y);
 
 			const float angular_speed = delta / wr; 
 			desired_orien_in_rel = wheel_node_pos.local().orien * quaternion(cpr(0,-cg::rad2grad() * angular_speed * dt,0));

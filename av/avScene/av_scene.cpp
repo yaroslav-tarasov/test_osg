@@ -766,24 +766,47 @@ struct global_timer : boost::noncopyable
         return internal_time();
     }
 
+    inline void set_factor(double factor)
+    {
+        internal_factor(factor);
+    }
+
 private:
     
-    double internal_time(double time = -1)
+    double internal_time(double time = -1.0)
     {
         static double                 time_    = 0.0;
+        static double                 prev_time_    = 0.0;
         static high_res_timer         hr_timer;
         static boost::recursive_mutex guard_;
-
         boost::lock_guard<boost::recursive_mutex> lock(guard_);
 
         if(time > 0.0 )
         {
             time_ = time;
             hr_timer = high_res_timer();
+            prev_time_ = time_;
             return time_;
         }
 
-        return time_ + hr_timer.get_delta() ;
+        if(internal_factor()>0.0)
+            prev_time_ = time_ + hr_timer.get_delta();
+        
+        return  prev_time_;
+    }
+
+    double internal_factor(double factor=-1.0)
+    {
+        static double   factor_ = 0.0; 
+        static boost::recursive_mutex guard_;
+        boost::lock_guard<boost::recursive_mutex> lock(guard_);
+
+        if(factor >= 0.0 )
+        {
+            factor_ = factor;
+        }
+
+        return factor_;
     }
 
 };
@@ -908,7 +931,7 @@ struct mod_app
         disp_
             .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
             .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
-            .add<start                 >(boost::bind(&mod_app::on_start      , this, _1))
+            .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
             //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
             //.add<container_msg         >(boost::bind(&mod_app::on_container  , this, _1))
             ;
@@ -948,6 +971,8 @@ private:
     void on_setup(setup const& msg)
     {
         w_->set_factor(0.0);
+        gt_.set_factor(0.0);
+
         create_objects(msg.icao_code);
         
         end_of_load_();  //osg_vis_->EndSceneCreation();
@@ -956,10 +981,11 @@ private:
         w_->send(&bts[0], bts.size());
     }
 
-    void on_start(start const& msg)
+    void on_state(state const& msg)
     {
-       w_->set_factor(1.0);
-       w_->reset_time(msg.srv_time);
+       w_->set_factor(msg.factor);
+       w_->reset_time(msg.srv_time / 1000.0f);
+       gt_.set_factor(msg.factor);
     }
 
     void on_container(container_msg const& msg)
@@ -976,7 +1002,7 @@ private:
         if(fp)
             a = fp(msg);
 
-        LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
+        LogInfo("Got create message: " << msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
     }
 
     void create_objects(const std::string& airport)

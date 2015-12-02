@@ -49,6 +49,9 @@
 #include "av/avScene/ScreenTextureManager.h"
 
 #include "application/panels/vis_settings_panel.h"
+#include "application/panels/time_panel.h"
+
+
 #include "application/main_window.h"
 #include "application/menu.h"
 
@@ -663,6 +666,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
                 this->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
                 this->_vis_settings_panel->subscribe_set_global_intensity       (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
                 this->_vis_settings_panel->set_light(true);
+
+                this->_time_panel = app::create_time_panel();
+
             }
         } )
     );
@@ -957,7 +963,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
     avCore::GetEnvironment()->setCallBacks(
-        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); if(_groupMainReflection) dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
+        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); if(_groupMainReflection.valid()) dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
         ,[this](float fog_vr,float fog_exp) {
         BOOST_FOREACH( auto g, this->_lamps)
         {
