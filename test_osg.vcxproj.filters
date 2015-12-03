@@ -796,5 +796,8 @@
     <ClCompile Include="hmi\gui_vis\panels\time_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_ctrl.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

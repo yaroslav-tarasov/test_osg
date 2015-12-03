@@ -169,10 +169,7 @@ bool view::malfunction(aircraft::malfunction_kind_t kind) const
     return malfunctions_[kind];
 }
 
-uint32_t  view::extern_id()  const
-{
-    return extern_id_;
-}
+
 
 optional<double> view::get_prediction_length() const
 {

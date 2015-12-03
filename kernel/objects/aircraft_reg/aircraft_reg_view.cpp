@@ -20,57 +20,6 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
 {
 }
 
-void view::on_object_created(object_info_ptr object)
-{
-    if (aircraft_physless::info_ptr airc_info = object)
-        if(airc_info)
-            add_aircraft(airc_info);
-}
 
-void view::on_object_destroying(object_info_ptr object)
-{
-    auto a = aircrafts_.find(object->object_id());
-    if ( a != aircrafts_.end())
-    {
-        e2n_.erase(aircraft_physless::info_ptr(a->second)->extern_id());
-        aircrafts_.erase(object->object_id());
-    }
-}
-
-bool view::add_aircraft(aircraft_physless::info_ptr airc_info)
-{
-    size_t id = object_info_ptr(airc_info)->object_id();
-    size_t eid = airc_info->extern_id();
-
-    aircrafts_[id] = airc_info;
-    e2n_[eid]      = id;
-
-    // nid2id_[narrow(id)] = id;
-
-    return true;
-}
-
-void view::inject_msg(uint32_t obj_id, net_layer::msg::run const& msg)
-{
-    buffer_.push_back(msg);
-    // messages_.push_back(network::wrap_msg(msg));
-    // set(msg);
-}
-
-void view::inject_msg( net_layer::msg::container_msg const& msg)
-{
-    //buffer_.push_back(msg);
-}
-
-void view::pre_update(double time)
-{
-    base_view_presentation::pre_update(time);
-    while(buffer_.size()>0)
-    {
-        net_layer::msg::run const& msg = buffer_.front();
-        set(msg);
-        buffer_.pop_front();
-    }
-}
 
 } // end of aircraft_reg

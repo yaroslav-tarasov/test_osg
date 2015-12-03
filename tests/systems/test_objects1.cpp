@@ -313,7 +313,7 @@ inline object_info_ptr create_aircraft_phl(create const& msg)
     aircraft::settings_t as;
     as.kind = msg.model_name;
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
-    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,msg.ext_id);
+    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 }
 
 inline object_info_ptr create_vehicle(create const& msg)

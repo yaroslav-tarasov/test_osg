@@ -997,14 +997,16 @@ private:
 
     void on_create(create const& msg)
     {
-        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
-        kernel::object_info_ptr  a = nullptr;
+        //auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
+        //kernel::object_info_ptr  a = nullptr;
 
-        if(fp)
-            a = fp(msg);
+        //if(fp)
+        //    a = fp(msg);
 
-        if (a)
-            e2o_[msg.ext_id] = a->object_id();
+        //if (a)
+        //    e2o_[msg.ext_id] = a->object_id();
+		
+		reg_obj_->create_object(msg);
 
         LogInfo("Got create message: " << msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
     }
@@ -1012,7 +1014,7 @@ private:
 
     void inject_msg(net_layer::msg::run const& msg)
     {
-       reg_obj_->inject_msg(e2o_[msg.ext_id], msg);
+       reg_obj_->inject_msg(msg);
     }
     
     void inject_msg(net_layer::msg::container_msg const& msg)
@@ -1068,9 +1070,9 @@ private:
     boost::scoped_ptr<net_worker>                                     w_;
 
 private:
-    typedef size_t  object_id_t;
-    typedef size_t  extern_id_t;    
-    std::unordered_map<extern_id_t, object_id_t>                    e2o_;
+    //typedef size_t  object_id_t;
+    //typedef size_t  extern_id_t;    
+    //std::unordered_map<extern_id_t, object_id_t>                    e2o_;
     aircraft_reg::control_ptr                                   reg_obj_;
 
     global_timer                                                     gt_;

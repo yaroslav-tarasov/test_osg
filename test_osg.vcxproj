@@ -249,6 +249,7 @@
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp" />
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
@@ -260,12 +261,8 @@
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp" />
-    <ClCompile Include="kernel\objects\nm\nodes_manager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="kernel\objects\nm\nodes_manager.cpp" />
+    <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp" />

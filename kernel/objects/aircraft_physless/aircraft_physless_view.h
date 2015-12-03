@@ -17,15 +17,13 @@ struct craft_data
     craft_data()
         : settings_     (aircraft::settings_t())
         , state_        (aircraft::state_t())
-        , extern_id_    (0)
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
     }
 
-    explicit craft_data(aircraft::settings_t const& settings, aircraft::state_t const& state,uint32_t extern_id)
+    explicit craft_data(aircraft::settings_t const& settings, aircraft::state_t const& state)
         : settings_     (settings)
         , state_        (state)
-        , extern_id_    (extern_id)
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
     }
@@ -34,13 +32,11 @@ protected:
     aircraft::settings_t              settings_;
     array<bool, aircraft::MF_SIZE>    malfunctions_;
     aircraft::state_t                 state_;       // Исключительно для задания начальных параметров 
-    uint32_t                          extern_id_;
 
     REFL_INNER(craft_data)
         REFL_ENTRY(settings_    )
         REFL_ENTRY(malfunctions_)
         REFL_ENTRY(state_       )
-        REFL_ENTRY(extern_id_   )
     REFL_END()
 };
 
@@ -93,7 +89,6 @@ protected:
     nodes_management::node_info_ptr tow_point() const override;
 
     bool                malfunction(aircraft::malfunction_kind_t kind) const override;
-    uint32_t            extern_id()  const override;
 
     optional<double>    get_prediction_length() const override;
     optional<double>    get_proc_length() const override;

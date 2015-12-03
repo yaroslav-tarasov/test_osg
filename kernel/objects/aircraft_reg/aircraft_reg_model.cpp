@@ -29,22 +29,10 @@ model::model( kernel::object_create_t const& oc, dict_copt dict)
 
 void model::on_inject_msg(net_layer::msg::run const& msg)
 {
-     //LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " << e2n_.size() << "   " << e2n_.size()>0?e2n_.begin()->first:-1);
 
-    auto it_id = e2n_.find(msg.ext_id);
-
-     //for(auto it = e2n_.begin();it!=e2n_.end();++it)
-     //{
-     //  LogInfo("e2n_: " << it->first << "  =  " << it->second);
-     //}
-
-     //if(e2n_.size()>0 && it_id != e2n_.end())
-     //    LogInfo("on_inject_msg: " << msg.ext_id << "; e2n_.size() " <<e2n_[msg.ext_id]);
-
-     if(msg.ext_id>0 && it_id != e2n_.end() && e2n_.size()>0 )
+     if(msg.ext_id>0 )
      {
-         aircraft_physless::info_ptr a = aircrafts_[e2n_[msg.ext_id]];
-         // LogInfo("on_inject_msg extern id: " << a?a->extern_id():-1 );
+         aircraft_physless::info_ptr a = aircrafts_[msg.ext_id/*e2o_[msg.ext_id]*/];
          if(auto pa = aircraft_physless::model_control_ptr(a))
          {
              pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
@@ -56,21 +44,37 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
 void model::on_inject_msg(net_layer::msg::malfunction_msg const& msg)
 {
 
-    auto it_id = e2n_.find(msg.ext_id);
-
-    if(msg.ext_id>0 && it_id != e2n_.end() && e2n_.size()>0 )
-    {
-        aircraft_physless::info_ptr a = aircrafts_[e2n_[msg.ext_id]];
-        if(auto pa = aircraft_physless::aircraft_ipo_control_ptr(a))
-        {
-
-        }
-    }
 }
 
 void model::on_inject_msg(net_layer::msg::container_msg const& msg)
 {
 
-}                     
+}    
+
+
+void model::on_object_created(object_info_ptr object)
+{
+	if (aircraft_physless::info_ptr airc_info = object)
+		if(airc_info)
+			add_aircraft(airc_info);
+}
+
+void model::on_object_destroying(object_info_ptr object)
+{
+	auto a = aircrafts_.find(object->object_id());
+	if ( a != aircrafts_.end())
+	{
+		aircrafts_.erase(object->object_id());
+	}
+}
+
+bool model::add_aircraft(aircraft_physless::info_ptr airc_info)
+{
+	size_t id = object_info_ptr(airc_info)->object_id();
+
+	aircrafts_[id] = airc_info;
+
+	return true;
+}
 
 } // end of aircraft_reg

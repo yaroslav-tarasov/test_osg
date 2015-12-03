@@ -79,12 +79,12 @@ namespace aircraft_physless
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos, uint32_t extern_id)
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
     {
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
         aircraft::state_t s(init_pos.pos,init_pos.orien);
-        obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s,extern_id)));
+        obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s)));
 
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
