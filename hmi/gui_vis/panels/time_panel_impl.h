@@ -14,5 +14,5 @@ public:
     void set_visible(bool visible) override;
     bool visible    ()             override;
 
-    void set_time   (double time)  override;
+    void set_time   (double ms)  override;
 };

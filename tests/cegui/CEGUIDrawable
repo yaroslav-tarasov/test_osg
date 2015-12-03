@@ -18,7 +18,6 @@ public:
     
     virtual void drawImplementation( osg::RenderInfo& renderInfo ) const;
     
-    void initializeControls();
     bool handleClose( const CEGUI::EventArgs& e );
 
     DECLARE_EVENT(ready_for_init  , ());
@@ -28,7 +27,6 @@ protected:
     
     mutable double _lastSimulationTime;
     mutable unsigned int _activeContextID;
-    // mutable bool _initialized;
     static  OpenThreads::Mutex  _mutex;
     static   bool    _initialized;
 };

@@ -282,7 +282,7 @@ void create_objects(const std::string & airport)
 
 using namespace net_layer::msg;
 
-object_info_ptr create_aircraft(create const& msg)
+inline object_info_ptr create_aircraft(create const& msg)
 {
     kernel::system_ptr _csys = get_systems()->get_control_sys();
     // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
@@ -294,12 +294,12 @@ object_info_ptr create_aircraft(create const& msg)
     geo_position agp(target_pos, get_base());
 
     aircraft::settings_t as;
-    as.kind = msg.object_type;
+    as.kind = msg.model_name;
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 }
 
-object_info_ptr create_aircraft_phl(create const& msg)
+inline object_info_ptr create_aircraft_phl(create const& msg)
 {
     kernel::system_ptr _csys = get_systems()->get_control_sys();
     // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
@@ -311,13 +311,37 @@ object_info_ptr create_aircraft_phl(create const& msg)
     geo_position agp(target_pos, get_base());
 
     aircraft::settings_t as;
-    as.kind = msg.object_type;
+    as.kind = msg.model_name;
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
     return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp,msg.ext_id);
 }
 
+inline object_info_ptr create_vehicle(create const& msg)
+{
+    kernel::system_ptr _csys = get_systems()->get_control_sys();
+
+    decart_position target_pos;
+
+    target_pos.pos   = msg.pos;
+    target_pos.orien = msg.orien;
+    geo_position vgp(target_pos, get_base());
+
+    vehicle::settings_t vs;
+    vs.model = msg.model_name;
+
+    return  vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+}
+
+object_info_ptr create_object(create const& msg)
+{
+    if(msg.object_kind == ok_vehicle)
+        return create_vehicle(msg);
+    else
+        return create_aircraft_phl(msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
+
+}
 
 }
 
 AUTO_REG(create_objects)
-AUTO_REG_NAME(create_aircraft,create_aircraft_phl)
+AUTO_REG_NAME(create_aircraft,create_object)

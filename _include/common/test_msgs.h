@@ -140,6 +140,23 @@ namespace net_layer
             REFL_ENTRY( orien    )
             REFL_ENTRY( mlp      )
         REFL_END()
+        
+        enum object_kind_t : int16_t
+        {
+            ok_none           ,
+            ok_aircraft = 0x10,
+            ok_helicopter     ,
+            ok_aerostat       ,
+            ok_vehicle = 0x100,
+            ok_tow_tractor    ,
+            ok_fire_engine    ,
+            ok_bus            ,
+            ok_cleaner        ,
+            ok_viewer         ,
+            ok_animal  = 0x200,
+            ok_flock_of_birds ,
+            // ok_size
+        };
 
         struct create
             : network::msg_id<id_create>
@@ -152,25 +169,29 @@ namespace net_layer
             {
             }
 
-            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , const std::string& object_type)
+            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name)
                 : ext_id      (id)
                 , pos (pos)
-                , orien (orien) 
-				, object_type (object_type)
+                , orien (orien)
+                , object_kind (ok)
+				, model_name (model_name)
             {
             }
 
             uint32_t            ext_id;
             cg::point_3         pos;
             cg::quaternion      orien;
-			std::string         object_type;
+            object_kind_t       object_kind;
+			std::string         model_name;
+
         };
 
         REFL_STRUCT(create)
-            REFL_ENTRY(ext_id)
-            REFL_ENTRY( pos )
+            REFL_ENTRY( ext_id   )
+            REFL_ENTRY( pos      )
             REFL_ENTRY( orien    )
-			REFL_ENTRY(object_type )
+			REFL_ENTRY( object_kind )
+            REFL_ENTRY( model_name  )
         REFL_END()
 
         typedef gen_msg<id_ready, uint16_t> ready_msg;
@@ -203,9 +224,9 @@ namespace net_layer
             : ext_id      (id),kind(kind), enabled(enabled)
         {}
          
-        uint32_t    ext_id;
+        uint32_t           ext_id;
         malfunction_kind_t kind;
-        bool enabled;
+        bool               enabled;
     };
 
     REFL_STRUCT(malfunction_msg)

@@ -77,7 +77,8 @@ namespace sync_fsm
         //if (!phys_aircraft_)
         //    return;
 
-#if 0
+#if 0   // local state
+
         if(auto traj_ = self_.get_trajectory())
         {
              const double  cur_len = traj_->cur_len();
@@ -223,7 +224,7 @@ namespace sync_fsm
             
             self_.freeze_position();
         }
-#else
+#else  // extern state
         FIXME(extern state);
         if(auto traj_ = self_.get_trajectory())
         {

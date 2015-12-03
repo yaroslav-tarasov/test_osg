@@ -56,7 +56,7 @@ namespace bi
 	{
 		        _private()
                     : _krv_data_getter("log_minsk.txt")
-                    , _sys            (phys::create_phys_system())
+                    , _sys            (nullptr/*phys::create_phys_system()*/)
                     , _msys(nullptr)
                     , _vsys(nullptr)
                     , _csys(nullptr)
@@ -474,7 +474,8 @@ namespace bi
         frame_timer ftm (view,_last_frame_time);
 
         if ( !view || !_root ) return false;
-        
+
+#ifdef DEPRECATED_DEBUG_MODE
         switch ( ea.getEventType() )
         {
         case osgGA::GUIEventAdapter::KEYUP:
@@ -648,6 +649,8 @@ namespace bi
 
         default: break;
         }
+#endif
+
         return false;
     }
 

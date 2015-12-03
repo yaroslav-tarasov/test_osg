@@ -42,6 +42,7 @@ void base_view_presentation::set_name(std::string const& name)
     name_changed_signal_();
 }
 
+FIXME (Ну это просто офигенно храним в size_t возвращаем uint32_t )
 uint32_t base_view_presentation::object_id() const
 {
     return object_id_;

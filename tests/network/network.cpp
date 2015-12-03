@@ -69,6 +69,7 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
 
 
 bool create_a = true;
+bool create_v = true;
 
 struct client
 {
@@ -77,9 +78,8 @@ struct client
 
     client(endpoint peer)
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
-        , period_(4./*5*/)
+        , period_(/*4.*/.5)
         , timer_  (boost::bind(&client::update, this))
-        , ac_counter_(0)
         , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
     {
         LogInfo("Connecting to " << peer);
@@ -136,17 +136,17 @@ private:
     void update()
     {   
         static double time = 0;
-
+        const  double factor = 2.0;
 
         if (time>1 && create_a)
         {
             
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,point_3(0,250,0),cpr(0),"A319")));
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,point_3(0,250,0),cpr(0), ok_aircraft, "A319")));
             send(&bts[0], bts.size());
             LogInfo("update() send create " );
             create_a = false;
 
-            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,4.0)));
+            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,factor)));
             send(&msg[0], msg.size());
         }
 
@@ -184,41 +184,18 @@ private:
 
 
         
-#if 0
-        if(ac_counter_==40)
+#if 1
+        if(time > 120 && create_v)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(2,0,0,90)));
+            binary::bytes_t bts =  std::move(wrap_msg(create(2,point_3(0,250,0),cpr(0),ok_vehicle,"niva_chevrolet")));
             send(&bts[0], bts.size());
-
+            create_v = false;
             LogInfo("update() send create " );
         }
 
-        if(ac_counter_==45)
-        {
-            binary::bytes_t bts =  std::move(wrap_msg(create(3,0,0.005,0)));
-            send(&bts[0], bts.size());
-
-            LogInfo("update() send create " );
-        }
-
-        if(ac_counter_==45)
-        {
-            binary::bytes_t bts =  std::move(wrap_msg(create(4,0,0.006,0)));
-            send(&bts[0], bts.size());
-
-            LogInfo("update() send create " );
-        }
-
-        if(ac_counter_==45)
-        {
-            binary::bytes_t bts =  std::move(wrap_msg(create(5,0,0.007,0)));
-            send(&bts[0], bts.size());
-
-            LogInfo("update() send create " );
-        }
 #endif
         
-        time += period_;
+        time += period_ * factor;
 
         timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
     }
@@ -234,8 +211,6 @@ private:
     msg_dispatcher<network::endpoint>                                    disp_;
     net_layer::msg::container_msg::msgs_t                            messages_;
     size_t                                                      messages_size_;
-private:
-    uint32_t                  ac_counter_;
 
 private:
     fms::trajectory_ptr      _traj;

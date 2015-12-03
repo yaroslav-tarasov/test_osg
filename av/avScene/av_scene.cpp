@@ -694,6 +694,7 @@ private:
     }
 
 
+
     void create_objects(const std::string& airport)
     {
         using namespace binary;
@@ -997,12 +998,26 @@ private:
     void on_create(create const& msg)
     {
         auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
-        kernel::object_info_ptr  a;
+        kernel::object_info_ptr  a = nullptr;
 
         if(fp)
             a = fp(msg);
 
+        if (a)
+            e2o_[msg.ext_id] = a->object_id();
+
         LogInfo("Got create message: " << msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
+    }
+
+
+    void inject_msg(net_layer::msg::run const& msg)
+    {
+       reg_obj_->inject_msg(e2o_[msg.ext_id], msg);
+    }
+    
+    void inject_msg(net_layer::msg::container_msg const& msg)
+    {
+        reg_obj_->inject_msg(msg);
     }
 
     void create_objects(const std::string& airport)
@@ -1024,16 +1039,16 @@ private:
         force_log fl2;  
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
 
-        kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
+        reg_obj_ = aircraft_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
 
-        if (reg_obj)
+        if (reg_obj_)
         {
-            void (aircraft_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &aircraft_reg::control::inject_msg;
-            void (aircraft_reg::control::*on_container) (net_layer::msg::container_msg const& msg) = &aircraft_reg::control::inject_msg;
+            void (mod_app::*on_run)       (net_layer::msg::run const& msg)           = &mod_app::inject_msg;
+            void (mod_app::*on_container) (net_layer::msg::container_msg const& msg) = &mod_app::inject_msg;
 
             disp_
-                .add<run                   >(boost::bind(on_run, aircraft_reg::control_ptr(reg_obj).get(), _1))
-                .add<container_msg         >(boost::bind(on_container, aircraft_reg::control_ptr(reg_obj).get(), _1));
+                .add<run                   >(boost::bind(on_run      , this , _1))
+                .add<container_msg         >(boost::bind(on_container, this , _1));
         }
     }
 
@@ -1053,6 +1068,10 @@ private:
     boost::scoped_ptr<net_worker>                                     w_;
 
 private:
+    typedef size_t  object_id_t;
+    typedef size_t  extern_id_t;    
+    std::unordered_map<extern_id_t, object_id_t>                    e2o_;
+    aircraft_reg::control_ptr                                   reg_obj_;
 
     global_timer                                                     gt_;
 

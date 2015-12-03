@@ -219,7 +219,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
 
 
     //_viewerPtr->setSceneData( this );
-    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded/*SingleThreaded*/ /*ThreadPerCamera*/);
+    _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded /*ThreadPerCamera*/);
 
     // TODO: enabled this for instructor tab, need implement special setting
     //_viewerPtr->setReleaseContextAtEndOfFrameHint(false); 

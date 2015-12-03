@@ -181,11 +181,11 @@ inline cg::vector_3f set_direction(const float pitch, const float heading)
 
 }
 
-class EnvHandler : public osgGA::GUIEventHandler
+class DebugHMIHandler : public osgGA::GUIEventHandler
 {
 
 public:  
-    EnvHandler(avSky::Sky* sky) 
+    DebugHMIHandler(avSky::Sky* sky) 
         : _currCloud  (avSky::cirrus)
         , _intensivity(0.1)
         , _sky(sky)
@@ -193,7 +193,7 @@ public:
 
     virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
     {
-        auto _skyClouds  = avCore::GetEnvironment()->GetWeatherParameters().CloudType;
+        auto  const _skyClouds  = avCore::GetEnvironment()->GetWeatherParameters().CloudType;
         const osg::Vec3f _color = osg::Vec3f(1.0,1.0,1.0);   // FIXME Whats color?
 
         if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
@@ -521,7 +521,7 @@ Scene::Scene()
     // disable alpha writes for whole bunch
     pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
 
-
+    setUpdateCallback(utils::makeNodeCallback(this, &Scene::update));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -819,7 +819,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         if(_terrainRoot) _terrainRoot->addChild(_ls.get());
     }
 
-    _viewerPtr->addEventHandler(new EnvHandler(_Sky));
+    _viewerPtr->addEventHandler(new DebugHMIHandler(_Sky));
 
 #endif
 
@@ -1642,7 +1642,14 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
 void Scene::onExit()
 {
     _viewerPtr->setDone(true);
+}
 
 
-
+// update pass
+void Scene::update( osg::NodeVisitor * nv )
+{
+      if(_time_panel)
+      {
+          _time_panel->set_time(_viewerPtr->getFrameStamp()->getSimulationTime() * 1000.f);
+      }
 }

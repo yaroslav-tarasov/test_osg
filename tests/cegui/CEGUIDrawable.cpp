@@ -23,7 +23,8 @@ bool                CEGUIDrawable::_initialized = false;
 using namespace CEGUI;
 
 CEGUIDrawable::CEGUIDrawable()
-    :   _lastSimulationTime(0.0), _activeContextID(0)/*, _initialized(false)*/
+    : _lastSimulationTime(0.0)
+    , _activeContextID(0)
 {
     setSupportsDisplayList( false );
     setDataVariance( osg::Object::DYNAMIC );
@@ -35,7 +36,6 @@ CEGUIDrawable::CEGUIDrawable( const CEGUIDrawable& copy,const osg::CopyOp& copyo
     :   osg::Drawable(copy, copyop)
     ,_lastSimulationTime(copy._lastSimulationTime)
     ,_activeContextID(copy._activeContextID)
-    /*_initialized(copy._initialized)*/
 {}
 
 void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
@@ -68,7 +68,6 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
         CEGUI::WindowManager::setDefaultResourceGroup( "layouts" );
         CEGUI::ScriptModule::setDefaultResourceGroup( "lua_scripts" );
 
-        // const_cast<CEGUIDrawable*>(this)->initializeControls();
          ready_for_init_signal_();
         _activeContextID = contextID;
         _initialized = true;
@@ -111,72 +110,6 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
 }
 
-void CEGUIDrawable::initializeControls()
-{
-	
-    GUIContext& context = System::getSingleton().getDefaultGUIContext();
-
-    SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
-    // context.getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-
-    FontManager::getSingleton().createFromFile( "DejaVuSans-10.font" );
-    context.setDefaultFont( "DejaVuSans-10" );
-    context.getDefaultFont()->setAutoScaled(CEGUI::ASM_Disabled);
-
-    Window* root = WindowManager::getSingleton().createWindow( "DefaultWindow", "Root" );
-    context.setRootWindow(root);
-
-    //FrameWindow* demoWindow = static_cast<FrameWindow*>(
-    //    CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "DemoWindow") );
-    //demoWindow->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim(0.01f)));
-    //demoWindow->setSize(USize(cegui_reldim(0.5f), cegui_reldim(0.3f)));
-    //demoWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
-    //demoWindow->setText( "Example Dialog" );
-
-    //PushButton* demoButtonOK = static_cast<PushButton*>(
-    //    WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
-    //demoButtonOK->setPosition(UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
-    //demoButtonOK->setSize( USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
-    //demoButtonOK->setText( "OK" );
-
-    //demoWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,
-    //    CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
-
-    //demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,
-    //    CEGUI::Event::Subscriber(&CEGUIDrawable::handleClose, this) );
-
-    //demoWindow->addChild( demoButtonOK );
-    //root->addChild( demoWindow );
-
-	// create combo-box.
-	Combobox* cbbo = static_cast<Combobox*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Combobox", "SelModeBox"));
-	root->addChild(cbbo);
-	cbbo->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim( 0.01f)));
-	//cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
-
-	ListboxTextItem* itm;
-    
-    //russian
-    std::wstring ruswide = L"Русский";
-    CEGUI::Win32StringTranscoder stc;
-    CEGUI::String ruslang = stc.stringFromStdWString(ruswide);
-
-	// populate combobox with possible selection modes
-	const CEGUI::Image* sel_img = &ImageManager::getSingleton().get("TaharezLook/MultiListSelectionBrush");
-	itm = new ListboxTextItem(stc.stringFromStdWString(L"Пустая сцена"), 0);
-	itm->setSelectionBrushImage(sel_img);
-	cbbo->addItem(itm);
-	itm = new ListboxTextItem(stc.stringFromStdWString(L"Шереметьево"), 1);
-	itm->setSelectionBrushImage(sel_img);
-	cbbo->addItem(itm);
-	itm = new ListboxTextItem(stc.stringFromStdWString(L"Сочи"), 2);
-	itm->setSelectionBrushImage(sel_img);
-	cbbo->addItem(itm);
-	cbbo->setReadOnly(true);
-	//cbbo->setSortingEnabled(false);
-	//cbbo->setSortingEnabled(true);
-	//cbbo->handleUpdatedListItemData();
-}
 
 bool CEGUIDrawable::handleClose( const CEGUI::EventArgs& e )
 {

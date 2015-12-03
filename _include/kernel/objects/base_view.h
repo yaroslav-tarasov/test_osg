@@ -238,8 +238,8 @@ private:
     }
 
 private:
-    size_t              object_id_;
-    string              name_;
+    size_t                      object_id_;
+    string                      name_;
     kernel::object_info_wptr    parent_;
     kernel::object_info_vector  objects_;
 

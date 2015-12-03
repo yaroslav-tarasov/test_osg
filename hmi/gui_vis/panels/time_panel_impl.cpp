@@ -42,13 +42,13 @@ time_panel_impl::~time_panel_impl()
 {
 }
 
-void time_panel_impl::set_time(double time)
+void time_panel_impl::set_time(double ms)
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
 	
 	using namespace boost::posix_time;
-	time_duration td =  microseconds(int64_t(time * 1000.));
+	time_duration td =  milliseconds(int64_t(ms));
 
 	setItemText("TimeLabel",to_short_string(td));
 }

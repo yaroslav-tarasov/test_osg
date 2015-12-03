@@ -34,7 +34,6 @@ void view::on_object_destroying(object_info_ptr object)
     {
         e2n_.erase(aircraft_physless::info_ptr(a->second)->extern_id());
         aircrafts_.erase(object->object_id());
-        //nid2id_.erase(narrow(object->object_id()));
     }
 }
 
@@ -51,14 +50,14 @@ bool view::add_aircraft(aircraft_physless::info_ptr airc_info)
     return true;
 }
 
-void view::inject_msg(net_layer::msg::run const& msg)
+void view::inject_msg(uint32_t obj_id, net_layer::msg::run const& msg)
 {
     buffer_.push_back(msg);
     // messages_.push_back(network::wrap_msg(msg));
     // set(msg);
 }
 
-void view::inject_msg(net_layer::msg::container_msg const& msg)
+void view::inject_msg( net_layer::msg::container_msg const& msg)
 {
     //buffer_.push_back(msg);
 }
