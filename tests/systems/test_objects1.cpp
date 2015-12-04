@@ -344,4 +344,4 @@ object_info_ptr create_object(create const& msg)
 }
 
 AUTO_REG(create_objects)
-AUTO_REG_NAME(create_aircraft,create_object)
+AUTO_REG_NAME(create_object, create_object)

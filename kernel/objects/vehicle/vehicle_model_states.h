@@ -27,7 +27,7 @@ struct follow_route_state : model_state
 
 private:
     simple_route::info_ptr route_;
-    double dcourse_;
+    double                 dcourse_;
 };
 
 typedef polymorph_ptr<follow_route_state> follow_route_state_ptr;
@@ -41,10 +41,10 @@ struct follow_curve_state : model_state
 
 private:
     cg::geo_curve_2 route_;
-    double dcourse_;
-    bool with_airtow_;
-    double end_course_;
-    bool end_;
+    double          dcourse_;
+    bool            with_airtow_;
+    double          end_course_;
+    bool            end_;
 };
 
 
@@ -54,13 +54,11 @@ struct follow_traj_state : model_state
     void update(model * self, double dt);
 
 private:
-    double                desired_velocity_;
-
-
-    bool with_airtow_;
-    cg::geo_point_2 target_pos_;
+    double           desired_speed_;
+    bool             with_airtow_;
+    cg::geo_point_2  target_pos_;
     optional<double> target_course_;
-    double dcourse_;
+    double           dcourse_;
 };
 
 
@@ -71,9 +69,9 @@ struct go_to_pos_state : model_state
     void update(model * self, double dt);
 
 private:
-    bool with_airtow_;
-    cg::geo_point_2 target_pos_;
+    bool             with_airtow_;
+    cg::geo_point_2  target_pos_;
     optional<double> target_course_;
-    double dcourse_;
+    double           dcourse_;
 };
 } // vehicle

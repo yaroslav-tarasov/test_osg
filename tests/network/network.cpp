@@ -136,12 +136,12 @@ private:
     void update()
     {   
         static double time = 0;
-        const  double factor = 2.0;
+        const  double factor = 1.0;
 
         if (time>1 && create_a)
         {
             
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,point_3(0,250,0),cpr(0), ok_aircraft, "A319")));
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,_traj->kp_value(1.0)/*point_3(0,250,0)*/,cpr(0), ok_aircraft, "A319")));
             send(&bts[0], bts.size());
             LogInfo("update() send create " );
             create_a = false;
@@ -185,12 +185,32 @@ private:
 
         
 #if 1
-        if(time > 120 && create_v)
+        if(time > 1 )
         {
-            binary::bytes_t bts =  std::move(wrap_msg(create(2,point_3(0,250,0),cpr(0),ok_vehicle,"niva_chevrolet")));
-            send(&bts[0], bts.size());
-            create_v = false;
-            LogInfo("update() send create " );
+            if (create_v)
+            {
+                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(1.0),cpr(0),ok_vehicle,"niva_chevrolet")));
+                send(&bts[0], bts.size());
+                create_v = false;
+                LogInfo("update() send create " );
+            }
+
+
+        }
+
+        if(time > 10 )
+        {
+            double vtime = time + 1;
+            binary::bytes_t msg =  std::move(wrap_msg(run(
+                2 
+                ,_traj->kp_value    (vtime)
+                ,_traj->curs_value  (vtime)
+                ,*_traj->speed_value(vtime)
+                , vtime 
+                , meteo::local_params()
+                )));
+
+            send(&msg[0], msg.size());
         }
 
 #endif

@@ -42,7 +42,7 @@ void ctrl::inject_msg( net_layer::msg::container_msg const& msg)
 
 void ctrl::create_object(net_layer::msg::create const& msg)
 {
-	auto fp = fn_reg::function<kernel::object_info_ptr (net_layer::msg::create const&)>("create_aircraft");
+	auto fp = fn_reg::function<kernel::object_info_ptr (net_layer::msg::create const&)>("create_object");
 	kernel::object_info_ptr  a = nullptr;
 
 	if(fp)

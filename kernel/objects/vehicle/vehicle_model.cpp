@@ -17,40 +17,6 @@ object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
     return object_info_ptr(new model(oc, dict));
 }
 
-#ifdef DEPRECATED  
-// FIXME Само собой чушь
-void block_obj_msgs(bool block)
-{}
-
-void send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
-{}
-
-object_info_ptr create(kernel::system_ptr sys, nodes_management::manager_ptr nodes_manager,const std::string& model_name)
-{
-    FIXME(Разврат)
-	size_t id  = nodes_manager->get_node(0)->object_id();
-    std::vector<object_info_ptr>  objects;
-    objects.push_back(nodes_manager);
-    auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
-    auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
-    kernel::object_create_t  oc(
-		nullptr, 
-		sys.get(),                  // kernel::system*                 sys             , 
-		id,                         // size_t                          object_id       , 
-		"name",                     // string const&                   name            , 
-		objects,                    // vector<object_info_ptr> const&  objects         , 
-		msg_service,                // kernel::send_msg_f const&       send_msg        , 
-		block_msgs                  // kernel::block_obj_msgs_f        block_msgs
-		);
-
-    vehicle::settings_t settings;
-    settings.model = model_name;
-    dict_t d = dict::wrap(vehicle_data(settings,state_t()));
-
-	return model::create(oc,d);
-}
-#endif
-
 AUTO_REG_NAME(vehicle_model, model::create);
 
 model::model(kernel::object_create_t const& oc, dict_copt dict)
@@ -76,7 +42,8 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         root_next_orien_ =  root_->position().global().orien;
     }
 
-    body_node_ = nodes_manager_->find_node("body");
+    body_node_      = nodes_manager_->find_node("body");
+    tow_point_node_ = nodes_manager_->find_node("tow_point");
 
     if (!settings_.route.empty())
         follow_route(settings_.route);
@@ -133,8 +100,8 @@ void model::update( double time )
         {
             if (aircraft::model_info_ptr(aerotow_)->get_rigid_body() && phys_vehicle_ && aircraft::model_info_ptr(aerotow_)->tow_attached())
             {
-                rod_course = cg::norm180(phys_vehicle_->get_tow_rod_course());
-                air_course = cg::norm180(aircraft::model_info_ptr(aerotow_)->get_phys_pos().orien.cpr().course);
+                rod_course   = cg::norm180(phys_vehicle_->get_tow_rod_course());
+                air_course   = cg::norm180(aircraft::model_info_ptr(aerotow_)->get_phys_pos().orien.cpr().course);
                 steer_course = cg::norm180(rod_course - air_course);
 
                 aircraft::model_control_ptr(aerotow_)->set_steer(steer_course);
@@ -168,6 +135,95 @@ void model::on_object_destroying(object_info_ptr object)
         if (object->name() == settings_.route)
             detach_cur_route();
     }
+}
+
+//
+//    model_info
+//
+
+//phys::rigid_body_ptr model::get_rigid_body() const
+//{
+//    return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
+//}
+
+point_3 model::tow_offset() const
+{
+    return tow_point_node_ ? nodes_manager_->get_relative_transform( tow_point_node_, body_node_).translation() : point_3();
+}
+
+bool model::tow_attached() const
+{
+    return tow_attached_;
+}
+
+geo_position model::get_phys_pos() const
+{
+    cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
+    decart_position cur_pos = phys_vehicle_->get_position();
+    geo_position cur_glb_pos(cur_pos, base);
+
+    return cur_glb_pos;
+}
+
+
+//
+//    model_control
+//
+
+void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback)
+{
+    if (tow_attached_ == attached)
+        return ;
+
+    //tow_attached_ = attached;
+    //tow_invalid_callback_ = tow_invalid_callback;
+    //if (phys_aircraft_)
+    //{
+    //    phys_aircraft_->attach_tow(attached);
+    //    traj_.reset();
+    //}
+
+    //if (!tow_attached_)
+    //    sync_fms(true);
+}
+
+void model::set_steer( double steer )
+{   
+    Assert(tow_attached_);
+
+    if (phys_vehicle_)
+        phys_vehicle_->set_steer(steer);
+}
+
+void model::set_brake( double brake )
+{   
+    Assert(tow_attached_);
+
+    if (phys_vehicle_)
+        phys_vehicle_->set_brake(brake);
+}
+
+void model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
+{
+    decart_position target_pos;
+
+    target_pos.pos   = pos;
+    target_pos.orien = orien;
+    geo_position gtp(target_pos, get_base());
+
+    if(!traj_)
+    {
+       traj_ = fms::trajectory::create();
+       model::on_follow_trajectory(0);
+    }
+
+    traj_->append(time, pos, orien, speed);
+
+}
+
+void model::set_ext_wind       (double speed, double azimuth) 
+{
+    FIXME(Need some wind)
 }
 
 void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)

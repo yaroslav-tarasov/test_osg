@@ -684,7 +684,7 @@ private:
 
     void on_create(create const& msg)
     {
-        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
+        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_object");
         kernel::object_info_ptr  a;
         
         if(fp)
@@ -997,15 +997,6 @@ private:
 
     void on_create(create const& msg)
     {
-        //auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_aircraft");
-        //kernel::object_info_ptr  a = nullptr;
-
-        //if(fp)
-        //    a = fp(msg);
-
-        //if (a)
-        //    e2o_[msg.ext_id] = a->object_id();
-		
 		reg_obj_->create_object(msg);
 
         LogInfo("Got create message: " << msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );

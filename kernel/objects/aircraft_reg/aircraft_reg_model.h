@@ -13,7 +13,7 @@ struct model
     model(kernel::object_create_t const& oc, dict_copt dict);
 
 private:
-	bool add_aircraft(aircraft_physless::info_ptr airc_info);
+	bool add_object(object_info_ptr object);
 
 private:
 	void on_object_created(object_info_ptr object) override;

@@ -43,7 +43,7 @@ namespace aircraft_physless
 
         // model_info
     private:
-       // phys::rigid_body_ptr get_rigid_body() const;
+        // phys::rigid_body_ptr get_rigid_body() const;
         phys::rigid_body_ptr model::get_rigid_body() const
         {
             return  phys::rigid_body_ptr();
@@ -75,10 +75,6 @@ namespace aircraft_physless
         void                             set_desired_nm_pos  (geo_point_3 const& pos);
         void                             set_desired_nm_orien(quaternion const& orien);
         
-        //geo_point_3 get_extern_desired_nm_pos   () const override;
-        //quaternion  get_extern_desired_nm_orien () const override;
-        //double      get_extern_desired_nm_speed () const override;
-
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
         void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
@@ -135,12 +131,6 @@ namespace aircraft_physless
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;
-        
-        //FIXME(optional);
-
-        //optional<geo_point_3>                  extern_desired_nm_pos_;
-        //optional<quaternion>                   extern_desired_nm_orien_;
-        //double                                 extern_desired_nm_speed_;
 
         double                                 nm_ang_smooth_;
         

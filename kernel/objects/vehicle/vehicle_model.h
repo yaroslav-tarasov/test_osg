@@ -17,8 +17,9 @@ namespace vehicle
 
 struct model
       : model_base
+      , model_info                // интерфейс информации о модели
+      , model_control             // интерфейс управления моделью
       , view
-    //, base_view_presentation
       , phys_object_model_base    
 {
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
@@ -38,6 +39,23 @@ private:
     // view
 private:
     void on_aerotow_changed(aircraft::info_ptr old_aerotow) override;
+    
+    
+    // model_info
+private:
+    // phys::rigid_body_ptr get_rigid_body() const;
+    point_3              tow_offset    () const;
+    bool                 tow_attached  () const;
+    geo_position         get_phys_pos  () const;
+
+
+    // model_control
+private:
+    void                 set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback);
+    void                 set_steer       ( double steer ) override;
+    void                 set_brake       ( double brake ) override;
+    void                 set_desired     ( double time,const cg::point_3& pos, const cg::quaternion& q, const double speed );
+    void                 set_ext_wind    ( double speed, double azimuth );
 
 public:
     void set_max_speed(double max_speed);
@@ -115,12 +133,17 @@ private:
     };
 
     nodes_management::node_info_ptr body_node_;
+    nodes_management::node_info_ptr        tow_point_node_;
 
     std::vector<wheel_t> wheels_;
 
     model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
 
     bool                 manual_controls_;
+
+//  FIXME А не выделить ли в общий функционал к самолету
+    boost::function<void()>                tow_invalid_callback_;
+    optional<uint32_t>                     tow_attached_;
 
 private:
     double rod_course ;

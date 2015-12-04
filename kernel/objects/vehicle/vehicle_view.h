@@ -5,7 +5,7 @@
 // #include "common/radar.h"
 #include "objects/nodes_management.h"
 #include "common/aircraft.h"
-
+#include "common/vehicle.h"
 
 
 namespace vehicle
