@@ -29,6 +29,7 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     , airport_(airports_manager_->find_closest_airport(pos()))
     , manual_controls_(false)
     , max_speed_(0)
+	, start_follow_(false)
 {
     FIXME(local global)
     if(root_->position().is_local())    
@@ -211,14 +212,23 @@ void model::set_desired        (double time, const cg::point_3& pos, const cg::q
     target_pos.orien = orien;
     geo_position gtp(target_pos, get_base());
 
+
     if(!traj_)
     {
        traj_ = fms::trajectory::create();
-       model::on_follow_trajectory(0);
+	   start_follow_ = true;
     }
 
     traj_->append(time, pos, orien, speed);
 
+	double dt = traj_->base_length() - (last_update_ ? *last_update_ : 0);
+    
+	if ( start_follow_ && dt < -0.1 )
+    {
+		model::on_follow_trajectory(0);
+		start_follow_ = false;
+    }
+    
 }
 
 void model::set_ext_wind       (double speed, double azimuth) 

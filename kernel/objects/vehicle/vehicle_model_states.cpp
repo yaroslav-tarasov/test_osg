@@ -229,7 +229,7 @@ void follow_traj_state::update(model * self, double dt)
     cg::geo_base_2 cur_pos     = self->pos();
     double         cur_course  = self->course();
     double         cur_speed   = self->speed();
-
+#if 0
     if(auto traj_ = self->get_trajectory())
     {
         if (true/*traj_->cur_len() < traj_->length()*/)
@@ -313,6 +313,24 @@ void follow_traj_state::update(model * self, double dt)
         }
 
     }
+#else    //   new try // extern state
+	FIXME(extern state);
+	if(auto traj_ = self->get_trajectory())
+	{
+
+		traj_->set_cur_len (traj_->cur_len() + dt);
+		const double  tar_len = traj_->cur_len();
+		decart_position target_pos;
+
+		target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
+		target_pos.orien = traj_->curs_value(tar_len);
+		geo_position gtp(target_pos, get_base());
+
+		self->set_state(state_t(gtp.pos, gtp.orien.get_course(), *traj_->speed_value(tar_len)));
+		self->set_max_speed(100.0);
+
+	}
+#endif
 
 
 }

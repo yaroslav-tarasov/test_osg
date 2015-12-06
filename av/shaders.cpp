@@ -200,12 +200,15 @@ namespace shaders
     \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
     \n            float result = 0.0;                                                                      \
     \n            int   count = 0;                                                                         \
+    \n            float coeff;                                                                             \
     \n            for(int x=-size.x; x<=size.x; x++){                                                      \
     \n                for(int y=-size.y; y<=size.y; y++){                                                  \
     \n                    count++;                                                                         \
-    \n                    result += textureProjOffset(depths, stpq, ivec2(x,y));/*.r;*/                    \
+    \n                    result += textureProjOffset(depths, stpq, ivec2(x,y)) * .25;/*.r;*/              \
     \n                }                                                                                    \
     \n            }                                                                                        \
+	\n                                                                                                     \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0)) *.75;                                \
     \n            return result/count;                                                                     \
     }                                                                                                      \
     \
@@ -2679,7 +2682,7 @@ $if 0
 \n           
                     if(/*ambient.a*/illum > 0.35)
 \n                  {
-\n                       return PCF4_Ext(shadowTexture0, /*shadow_in.*/shadow_view0, illum);
+\n                       return PCF4E_Ext(shadowTexture0, /*shadow_in.*/shadow_view0, illum);
 \n                  }
 \n
 \n                  return 1.0;

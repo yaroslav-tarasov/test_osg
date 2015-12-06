@@ -56,7 +56,8 @@ struct trajectory : traj_data
     virtual ~trajectory() {}
     virtual void                                       append        (const trajectory_ptr other) = 0;
     virtual void  append(double len,const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed=boost::none) = 0;
-    virtual double                                     length        () const                     = 0;
+	virtual double                                     length        () const                     = 0;
+    virtual double                                     base_length   () const                     = 0;
     virtual const keypoints_t::value_type              kp_value      (double arg)                 = 0; 
     virtual curses_t::value_type                       curs_value    (double arg)                 = 0; 
     virtual boost::optional<speed_t::value_type>       speed_value   (double arg)                 = 0;

@@ -198,9 +198,9 @@ private:
 
         }
 
-        if(time > 10 )
+        if(time >= 7 )
         {
-            double vtime = time + 1;
+            double vtime = time + 3;
             binary::bytes_t msg =  std::move(wrap_msg(run(
                 2 
                 ,_traj->kp_value    (vtime)

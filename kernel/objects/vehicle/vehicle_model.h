@@ -150,6 +150,8 @@ private:
     double air_course ;
     double steer_course ;
 
+
+	bool   start_follow_;
 #ifdef DEPRECATED
 // from view / data
 public:

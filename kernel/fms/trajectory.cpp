@@ -132,10 +132,15 @@ struct trajectory_impl : trajectory
 
     }
 
-    inline double length() const
+    double length() const
     {
         return  kp_seg_.size()>0?kp_seg_.back().length():0;
     }
+	
+	double base_length() const
+	{
+		return  kp_seg_.size()>0?kp_seg_.front().points().begin()->first:0;
+	}
 
     inline const keypoints_t::value_type kp_value(double arg) /*const*/
     {   

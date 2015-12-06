@@ -51,9 +51,6 @@
     <Filter Include="Source Files\objects\airport">
       <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\nodes_manager">
-      <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\nm">
       <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
     </Filter>
@@ -134,6 +131,9 @@
     </Filter>
     <Filter Include="Source Files\objects\registrator">
       <UniqueIdentifier>{df376c5c-b0b2-48b2-98b7-9fd1c12fd0eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\phys_sys_obj\nodes_manager">
+      <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -476,22 +476,22 @@
       <Filter>Source Files\objects\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp">
-      <Filter>Source Files\objects\nodes_manager</Filter>
+      <Filter>Source Files\objects\phys_sys_obj\nodes_manager</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp">
       <Filter>Source Files\objects\phys_sys_obj</Filter>
