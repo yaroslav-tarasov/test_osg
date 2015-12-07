@@ -46,7 +46,7 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     fms::trajectory::curses_t      crs;
     fms::trajectory::speed_t  vls;
 
-    const unsigned start_idx = 11;
+    const unsigned start_idx = 0/*11*/;
     cg::point_2 prev(kdg.kd_[start_idx].x,kdg.kd_[start_idx].y);
     double tlength = 0;
     for(auto it = kdg.kd_.begin() + start_idx; it!= kdg.kd_.end();++it )
@@ -57,9 +57,8 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
         crs.insert (std::make_pair(/*tlength*/it->time,cpr(it->fiw,it->tg, it->kr )));
         kpts.insert(std::make_pair(/*tlength*/it->time,cg::point_3(p,it->h)));
 
-        auto pit = std::prev(it);
-        if(pit!=it)
-            vls.insert(std::make_pair(/*tlength*/it->time,dist/(it->time - pit->time)));
+        if(it != kdg.kd_.begin())
+            vls.insert(std::make_pair(/*tlength*/it->time,dist/(it->time - std::prev(it)->time)));
 
         prev = p;
     }
@@ -80,7 +79,7 @@ struct client
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
         , period_(/*4.*/.5)
         , timer_  (boost::bind(&client::update, this))
-        , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
+        , _traj(fill_trajectory(krv::data_getter(/*"log_minsk.txt"*/"log_minsk_buks22.txt")))
     {
         LogInfo("Connecting to " << peer);
 
@@ -137,11 +136,13 @@ private:
     {   
         static double time = 0;
         const  double factor = 1.0;
-
+        const  double traj_offset = 20.;
+        const  double vehicle_prediction = 0;
+        
         if (time>1 && create_a)
         {
             
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,_traj->kp_value(1.0)/*point_3(0,250,0)*/,cpr(0), ok_aircraft, "A319")));
+            binary::bytes_t bts =  std::move(wrap_msg(create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319")));
             send(&bts[0], bts.size());
             LogInfo("update() send create " );
             create_a = false;
@@ -150,14 +151,14 @@ private:
             send(&msg[0], msg.size());
         }
 
-        if(time>10)
+        if(time>_traj->base_length())
         {
             binary::bytes_t msg =  std::move(wrap_msg(run(
                                                             1 
                                                            ,_traj->kp_value(time)
                                                            ,_traj->curs_value(time)
                                                            ,*_traj->speed_value(time)
-                                                           , time
+                                                           , time + traj_offset
                                                            , meteo::local_params()
             )));
 
@@ -179,7 +180,7 @@ private:
             messages_.push_back(move(msg));
 #endif
 
-            LogInfo("update() send run " << time << "\n");
+            
         }
 
 
@@ -189,7 +190,7 @@ private:
         {
             if (create_v)
             {
-                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(1.0),cpr(0),ok_vehicle,"niva_chevrolet")));
+                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"buksir"))); // "niva_chevrolet"
                 send(&bts[0], bts.size());
                 create_v = false;
                 LogInfo("update() send create " );
@@ -198,19 +199,24 @@ private:
 
         }
 
-        if(time >= 7 )
+        if(time >= _traj->base_length() - vehicle_prediction)
         {
-            double vtime = time + 3;
+            double vtime = time + vehicle_prediction;
             binary::bytes_t msg =  std::move(wrap_msg(run(
                 2 
                 ,_traj->kp_value    (vtime)
                 ,_traj->curs_value  (vtime)
                 ,*_traj->speed_value(vtime)
-                , vtime 
+                , vtime /*+ traj_offset*/
                 , meteo::local_params()
                 )));
 
             send(&msg[0], msg.size());
+
+            //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
+            //                                     << "  y: " << _traj->kp_value(vtime).y 
+            //                                     << "  h: " << _traj->kp_value(vtime).z
+            //                                     <<  "\n");
         }
 
 #endif

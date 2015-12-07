@@ -84,7 +84,14 @@ osg::Node* createObject(std::string name, bool fclone)
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 
 		osg::Node* lod3 =  findFirstNode(object_file,"Lod3"); 
 
-		osg::Group* root =  findFirstNode(object_file,"Root")->asGroup(); 
+		osg::Group* root =  dynamic_cast<osg::Group*>(findFirstNode(object_file,"Root")); 
+        if(root==nullptr)
+        {
+            root = new osg::Group; 
+            root->setName("Root");
+            root->addChild( object_file ); 
+            object_file = root;
+        }
 
         root->setUserValue("id",reinterpret_cast<uint32_t>(&*root));
 		// object_file->setName(name);

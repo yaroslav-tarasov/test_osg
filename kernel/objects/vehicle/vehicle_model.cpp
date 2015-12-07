@@ -83,6 +83,13 @@ void model::update( double time )
 
     if (!cg::eq_zero(dt))
     {
+        FIXME(Туфта жесткая) 
+        if ( traj_ && start_follow_ && traj_->base_length() - time < -0.1 )
+        {
+            model::on_follow_trajectory(0);
+            start_follow_ = false;
+        }
+
         update_model(dt);
 
         if (!manual_controls_)
@@ -221,14 +228,9 @@ void model::set_desired        (double time, const cg::point_3& pos, const cg::q
 
     traj_->append(time, pos, orien, speed);
 
-	double dt = traj_->base_length() - (last_update_ ? *last_update_ : 0);
-    
-	if ( start_follow_ && dt < -0.1 )
-    {
-		model::on_follow_trajectory(0);
-		start_follow_ = false;
-    }
-    
+    LogInfo("time :" << time << " pos :" << pos.x << " " << pos.y << " "  << pos.z
+             << " orien :" << orien.get_course() 
+             << " speed: " << speed << "\n" );
 }
 
 void model::set_ext_wind       (double speed, double azimuth) 

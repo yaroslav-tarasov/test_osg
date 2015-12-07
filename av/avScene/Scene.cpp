@@ -1344,6 +1344,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 		load("elexis",_terrainRoot, 15000);
 		
 		load("juliet",_terrainRoot, 15000);
+        
+        load("walking",_terrainRoot, 15000);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
@@ -1369,7 +1371,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 		mt->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
         
 		osg::Node* root =  findFirstNode(obj,"root"); 
-        root->setUserValue("id",seed);
+        if(root!=nullptr) root->setUserValue("id",seed);
         
         if(mt!=nullptr)
         {
@@ -1524,20 +1526,41 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
             if(wln_list.size()>0)
                 root->asGroup()->addChild(obj_light);
 
-			if( path == "juliet" )
+			if( path == "juliet" || path == "walking" )
 			{
+                struct UpdateNode: public osg::NodeCallback
+                {
+                    UpdateNode()
+                    {
+
+                    }
+
+                    void operator()(osg::Node* node, osg::NodeVisitor* nv) {
+                        auto mat = node->asTransform()->asMatrixTransform();
+                        const osg::Vec3d& pos = mat->getMatrix().getTrans();
+                        osg::Matrix trMatrix;            
+                        trMatrix.setTrans(pos + osg::Vec3d(0.001,0.001,0));
+                        mat->setMatrix(trMatrix);
+
+                    }
+                };
+
+
 				using namespace avAnimation;
 				pat->asTransform()->asPositionAttitudeTransform()->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
-				//pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
+				pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.01,0.01,0.01));
 				AnimationManagerFinder finder;
 				pat->accept(finder);
 				if (finder._am.valid()) {
 					pat->setUpdateCallback(finder._am.get());
 					AnimtkViewerModelController::setModel(finder._am.get());
-
+ 
 					// We're safe at this point, so begin processing.
 					AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
-					mc.play();
+					
+                    mc.play();
+
+
 
 				} else {
 					osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;

@@ -690,7 +690,7 @@ private:
         if(fp)
             a = fp(msg);
 
-        LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
+        LogInfo("Got create message: " << msg.model_name << "   " << msg.object_kind << "   " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }
 
 
@@ -999,7 +999,8 @@ private:
     {
 		reg_obj_->create_object(msg);
 
-        LogInfo("Got create message: " << msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
+        LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
+
     }
 
 

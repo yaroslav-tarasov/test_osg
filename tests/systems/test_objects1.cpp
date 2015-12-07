@@ -334,7 +334,7 @@ inline object_info_ptr create_vehicle(create const& msg)
 
 object_info_ptr create_object(create const& msg)
 {
-    if(msg.object_kind == ok_vehicle)
+    if(msg.object_kind & ok_vehicle)
         return create_vehicle(msg);
     else
         return create_aircraft_phl(msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект

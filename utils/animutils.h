@@ -56,6 +56,15 @@ public:
 		return true;
 	}
 
+    void setPlayMode (osgAnimation::Animation::PlayMode mode)
+    {
+          if(_focus < _amv.size()) 
+          {
+              std::cout << "Play " << _amv[_focus] << std::endl;
+              /*_model->playAnimation(*/_map[_amv[_focus]].get()->setPlayMode(mode);
+          }
+    }
+
 	bool play() 
 	{
 		if(_focus < _amv.size()) 
@@ -112,9 +121,9 @@ public:
 
 private:
 	osg::ref_ptr<osgAnimation::BasicAnimationManager> _model;
-	osgAnimation::AnimationMap                   _map;
-	AnimationMapVector                     _amv;
-	unsigned int                           _focus;
+	osgAnimation::AnimationMap                        _map;
+	AnimationMapVector                                _amv;
+	unsigned int                                      _focus;
 
 	AnimtkViewerModelController():
 	_model(0),
