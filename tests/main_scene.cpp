@@ -608,7 +608,6 @@ int main_scene( int argc, char** argv )
 
     osgViewer::Viewer viewer(arguments);
     arguments.reportRemainingOptionsAsUnrecognized();
-    //viewer.setUpViewOnSingleScreen(1);
     viewer.apply(new osgViewer::SingleScreen(1));
 	
         // Set the clear color to black
@@ -621,8 +620,7 @@ int main_scene( int argc, char** argv )
 
     // tilt the scene so the default eye position is looking down on the model.
     osg::ref_ptr<osg::MatrixTransform> rootnode = new osg::MatrixTransform;
-    //rootnode->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
-
+    
     // Use a default camera manipulator
     osgGA::FirstPersonManipulator* manip = new osgGA::FirstPersonManipulator;
     

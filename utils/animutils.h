@@ -3,6 +3,11 @@
 #include <osgAnimation/AnimationManagerBase>
 #include <osgAnimation/Bone>
 
+#include <osgAnimation/ActionStripAnimation>
+#include <osgAnimation/ActionBlendIn>
+#include <osgAnimation/ActionBlendOut>
+#include <osgAnimation/ActionAnimation>
+
 namespace avAnimation
 {
 
@@ -27,7 +32,8 @@ namespace avAnimation
 class AnimtkViewerModelController 
 {
 public:
-	typedef std::vector<std::string> AnimationMapVector;
+	typedef std::vector<std::string>        AnimationMapVector;
+	typedef std::map   <std::string,double> AnimationDurationMap;
 
 	static AnimtkViewerModelController& instance() 
 	{
@@ -43,7 +49,14 @@ public:
 			self._map[(*it)->getName()] = *it;
 
 		for(osgAnimation::AnimationMap::iterator it = self._map.begin(); it != self._map.end(); it++)
-			self._amv.push_back(it->first);
+		{
+            self._amv.push_back(it->first);
+            it->second.get()->computeDuration();
+            self._amd.insert(std::make_pair(it->first,it->second.get()->getDuration()));
+        }
+        
+        self._default = new osgAnimation::ActionStripAnimation(self._map[self._amv.back()].get(),0.0,0.0);
+        self._default->setLoop(0); // means forever
 
 		return true;
 	}
@@ -56,13 +69,28 @@ public:
 		return true;
 	}
 
+    osgAnimation::Animation* current()
+    {
+        return _map[_amv[_focus]].get();
+    }
+
     void setPlayMode (osgAnimation::Animation::PlayMode mode)
     {
           if(_focus < _amv.size()) 
           {
               std::cout << "Play " << _amv[_focus] << std::endl;
-              /*_model->playAnimation(*/_map[_amv[_focus]].get()->setPlayMode(mode);
+              _map[_amv[_focus]].get()->setPlayMode(mode);
           }
+    }
+    
+    void setDurationRatio (double ratio)
+    {
+        if(_focus < _amv.size()) 
+        {
+            const std::string& name = _amv[_focus];
+            std::cout << "Play " << name << std::endl;
+            _map[name].get()->setDuration(_amd[name] * ratio);
+        }
     }
 
 	bool play() 
@@ -119,11 +147,24 @@ public:
 		return _amv;
 	}
 
+    bool playing()
+    {
+        return _model->isPlaying(_amv[_focus]);
+    }
+
+    const osgAnimation::BasicAnimationManager* manager() const
+    {
+        return  _model;
+    }
+
+
 private:
 	osg::ref_ptr<osgAnimation::BasicAnimationManager> _model;
 	osgAnimation::AnimationMap                        _map;
 	AnimationMapVector                                _amv;
+    AnimationDurationMap                              _amd;
 	unsigned int                                      _focus;
+    osg::ref_ptr<osgAnimation::ActionStripAnimation>  _default;
 
 	AnimtkViewerModelController():
 	_model(0),
