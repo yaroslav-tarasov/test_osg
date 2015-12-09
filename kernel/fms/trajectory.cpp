@@ -117,14 +117,6 @@ struct trajectory_impl : trajectory
 
     void append(double len, const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed)  override
     {
-        //if (kp_seg_.size()==0)
-        //{   
-        //    kp_seg_.push_back(keypoints_t());
-        //    curs_seg_.push_back(curses_t());
-        //    if(speed)
-        //        (*speed_seg_).push_back(speed_t());
-        //}
-
         kp_seg_.back().insert(make_pair<>(len,pos));
         curs_seg_.back().insert(make_pair<>(len,orien));
         if(speed)

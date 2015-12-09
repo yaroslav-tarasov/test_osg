@@ -227,10 +227,6 @@ void model::set_desired        (double time, const cg::point_3& pos, const cg::q
     }
 
     traj_->append(time, pos, orien, speed);
-
-    LogInfo("time :" << time << " pos :" << pos.x << " " << pos.y << " "  << pos.z
-             << " orien :" << orien.get_course() 
-             << " speed: " << speed << "\n" );
 }
 
 void model::set_ext_wind       (double speed, double azimuth) 

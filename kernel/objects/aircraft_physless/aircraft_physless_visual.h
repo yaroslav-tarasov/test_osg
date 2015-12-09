@@ -21,6 +21,11 @@ namespace aircraft_physless
     private:
         nm::node_info_ptr engine_node_;
         visual_object_ptr smoke_object_;
+        visual_object_ptr label_object_;
         optional<double>  last_update_;
+
+    private:
+        struct label_support;
+        boost::shared_ptr<label_support>   ls_;
 	};
 }

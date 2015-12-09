@@ -229,7 +229,7 @@ namespace sync_fsm
         if(auto traj_ = self_.get_trajectory())
         {
 
-            traj_->set_cur_len (traj_->cur_len() + dt);
+            traj_->set_cur_len ((time-1.0>0)? time - 1.0:0.0/*traj_->cur_len() + dt*/);
             const double  tar_len = traj_->cur_len();
             decart_position target_pos;
 

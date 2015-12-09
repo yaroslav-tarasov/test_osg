@@ -141,6 +141,7 @@ void    model::set_desired        (double time, const cg::point_3& pos, const cg
 
     traj_->append(time, pos, orien, speed);
 
+
 }
 
 void model::set_ext_wind       (double speed, double azimuth) 

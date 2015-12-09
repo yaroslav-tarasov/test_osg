@@ -4,6 +4,66 @@
 
 #include "ext/spark/SmokeNode.h"
 
+
+namespace aircraft_physless
+{
+    struct visual::label_support
+    {
+        label_support(visual_object_ptr obj,const std::string& text )
+            : visual_object_(obj)
+            , label_            (nullptr) 
+        {
+                init_(text);
+        }
+
+        inline void update( cg::polar_point_3f const  &dir, point_3f offset )
+        {
+            update_(dir,offset); 
+        }
+
+    private:
+
+        inline void init_(const std::string&  text)
+        {
+            label_ = findFirstNode((visual_object_)->root(),"text_label");
+
+            osg::ComputeBoundsVisitor cbvs;
+            label_->accept( cbvs );
+            const osg::BoundingBox bb_s = cbvs.getBoundingBox();
+            
+            const auto& l = label_->asGeode()->getDrawableList();
+
+            for(auto itr=l.begin();
+                itr!= l.end();
+                ++itr)
+            {
+                if(auto dtext =  dynamic_cast<osgText::Text*>(itr->get()))
+                {
+                      dtext->setText(text);
+                }
+            }
+        }
+
+
+        inline void update_(cg::polar_point_3f const  &dir, point_3f offset )
+        {
+            //osg::Matrix trMatrix;
+            //trMatrix.setTrans(to_osg_vector3(offset));
+            //trMatrix.setRotate(osg::Quat(osg::inDegrees(-dir.course), osg::Z_AXIS));
+            //osg::Matrix scaleMatrix;
+            //scaleMatrix.makeScale(1., dir.range, 1.);
+
+            //(tow_visual_object_)->root()->asTransform()->asMatrixTransform()->setMatrix(scaleMatrix);
+            //(tow_visual_object_)->node()->asTransform()->asMatrixTransform()->setMatrix(trMatrix);
+        }
+
+        double                radius_;
+        osg::Node *           label_;
+
+        visual_object_ptr     visual_object_;
+    };
+}
+
 namespace aircraft_physless
 {
 
@@ -41,7 +101,11 @@ namespace aircraft_physless
             }
             return true;
         });
-	}
+
+        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
+        ls_ = boost::make_shared<label_support>(label_object_, settings_.custom_label);
+
+    }
 
     void visual::update(double time)
     {

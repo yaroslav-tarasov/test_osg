@@ -28,7 +28,7 @@ struct UpdateNode: public osg::NodeCallback
             auto& mc   = avAnimation::AnimtkViewerModelController::instance();
             if(!mc.playing())
             {
-                mat->setPosition(pos + osg::Vec3d(0.0,-300.0,0));
+                mat->setPosition(pos + osg::Vec3d(0.0,-170.0,0));
                 mc.play();
             }
         }
@@ -40,13 +40,27 @@ struct UpdateNode: public osg::NodeCallback
 
 struct UpdateNode2: public osg::NodeCallback
 {
-    UpdateNode2()
+    UpdateNode2(osg::Node* node,  const std::string& name)
         : flag_delayed(false)
     {
+          _body =  findFirstNode(node,name,findNodeVisitor::not_exact);
+          _body =  _body.valid()?_body->getParent(0):nullptr;
+          _pos  =  _body.valid()? _body->asTransform()->asMatrixTransform()->getMatrix().getTrans(): osg::Vec3d();
 
+          osg::notify(osg::WARN) << "Initial values " << 
+              _body->computeBound().center() <<  "    " <<
+              _body->computeBound().radius()
+              << std::endl;
+    }
+
+    UpdateNode2()
+        : flag_delayed(false)
+        , _body(nullptr)
+    {
     }
 
     void operator()(osg::Node* node, osg::NodeVisitor* nv) {
+        
         if(node->asTransform())
         {
             auto mat = node->asTransform()->asPositionAttitudeTransform();
@@ -55,7 +69,17 @@ struct UpdateNode2: public osg::NodeCallback
             
             if(flag_delayed)
             {
-                mat->setPosition(pos + osg::Vec3d(0.0,-300.0,0));
+                if(_body.valid())
+                {
+                    osg::notify(osg::WARN) << "Diff position " << 
+                        _pos  - _body->asTransform()->asMatrixTransform()->getMatrix().getTrans() <<  "    " <<
+                        _body->computeBound().center() <<  "    " <<
+                        _body->computeBound().radius()
+                        << std::endl;
+                }
+
+
+                mat->setPosition(pos + osg::Vec3d(0.0,-300.0,0));     // -170
                 flag_delayed = false;
             }
 
@@ -66,10 +90,14 @@ struct UpdateNode2: public osg::NodeCallback
             }
 
         }
+
         traverse(node,nv);
     }
 
-    bool flag_delayed;
+private:
+    bool                     flag_delayed;
+    osg::ref_ptr<osg::Node>         _body;
+     osg::Vec3d                      _pos;
 };
 
 int main_anim_test( int argc, char** argv )
@@ -85,7 +113,7 @@ int main_anim_test( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
    
-   auto anim_file = osgDB::readNodeFile("running/running_m.fbx");
+   auto anim_file = osgDB::readNodeFile("running/running.fbx");
    
    osgAnimation::AnimationManagerBase* animationManager = dynamic_cast<osgAnimation::AnimationManagerBase*>(anim_file->getUpdateCallback());
    
@@ -114,7 +142,7 @@ int main_anim_test( int argc, char** argv )
 
    root->addChild(ph_ctrl);
    
-   pat->addUpdateCallback(new UpdateNode2());
+   pat->addUpdateCallback(new UpdateNode2(pat,"Body"));
 
    using namespace avAnimation;
    AnimationManagerFinder finder;

@@ -183,7 +183,7 @@ namespace net_layer
             cg::quaternion      orien;
             object_kind_t       object_kind;
 			std::string         model_name;
-
+            std::string         custom_label;
         };
 
         REFL_STRUCT(create)
@@ -192,6 +192,7 @@ namespace net_layer
             REFL_ENTRY( orien    )
 			REFL_ENTRY( object_kind )
             REFL_ENTRY( model_name  )
+            REFL_ENTRY( custom_label  )
         REFL_END()
 
         typedef gen_msg<id_ready, uint16_t> ready_msg;

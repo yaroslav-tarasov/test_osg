@@ -83,7 +83,8 @@ private:
     void                FindByName(osg::Node* pNode, const char* szName);
     void                FindByName_nocase(osg::Node* pNode, const char* szName);
 public:
-						NodeFinder();
+    				    NodeFinder();
+    explicit        	NodeFinder(osg::Node* node);
 						~NodeFinder();
 
 	inline void			SetNode(osg::Node* pNode) { _pNode = pNode; }

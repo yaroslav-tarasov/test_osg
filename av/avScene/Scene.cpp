@@ -1332,6 +1332,73 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         return mt_.back();
     }
 
+
+    if( path == "text_label.scg" )
+    {
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+        
+        osg::MatrixTransform* root = nullptr;
+        
+        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+
+        auto label = findFirstNode(phys_ctrl,"text_label");
+        if( label == nullptr)
+        {
+            const osg::Quat quat0(osg::inDegrees(90.0f), osg::X_AXIS,                      
+                                  osg::inDegrees(0.f)  , osg::Y_AXIS,
+                                  osg::inDegrees(90.f) , osg::Z_AXIS ); 
+            
+            const osg::Quat quat1(osg::inDegrees(90.0f)  , osg::X_AXIS,                      
+                                  osg::inDegrees(0.f)    , osg::Y_AXIS,
+                                  osg::inDegrees(-90.f)  , osg::Z_AXIS ); 
+            
+            // double radius = phys_ctrl->computeBound().radius();
+            osg::ComputeBoundsVisitor cbv;
+            parent->accept( cbv );
+            const osg::BoundingBox& bb = cbv.getBoundingBox();
+
+            osg::Matrix mat; 
+            mat.setTrans(-offset/2);
+
+            root = new osg::MatrixTransform(mat);
+            root->setName("root");
+            phys_ctrl?phys_ctrl->asGroup()->addChild(root):nullptr;
+        
+            std::string timesFont("fonts/times.ttf");
+
+            osg::ref_ptr<osgText::Text> updateText = new osgText::Text;
+            updateText->setDataVariance(osg::Object::DYNAMIC);
+
+            osg::Geode* geode = new osg::Geode();
+            osg::StateSet* stateset = geode->getOrCreateStateSet();
+            stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+            stateset->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+            geode->setName("text_label");
+            geode->addDrawable( updateText );
+        
+            updateText->setName("text_label");
+            updateText->setCharacterSize(1.8f);
+            updateText->setFont(timesFont);
+            updateText->setColor(osg::Vec4(1.0f,1.0f,0.0f,1.0f));
+            updateText->setText("The label");
+            updateText->setPosition(osg::Vec3(0,0,(bb.zMax() - bb.zMin())));
+            updateText->setRotation(quat0);
+            updateText->setAlignment(osgText::TextBase::CENTER_TOP);
+            auto cpText = osg::clone(updateText.get(), osg::CopyOp::DEEP_COPY_ALL);
+            cpText->setRotation(quat1);
+            geode->addDrawable( cpText );
+
+            root->addChild(geode);
+        }
+        else
+        {
+           root = label->getParent(0)->asTransform()->asMatrixTransform();
+        }
+
+        return root;
+    }
+
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
     {
         //assert(_terrainRoot->removeChild(_terrainNode));

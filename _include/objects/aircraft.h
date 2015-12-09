@@ -46,14 +46,15 @@ struct settings_t
     std::string company_name;
     std::string airport;
     std::string parking;
+    std::string custom_label; 
 
     responder_settings responder;
-    unsigned turbulence;
+    unsigned           turbulence;
 
-    unsigned equipment;
+    unsigned           equipment;
 
-    double payload;  // passengers and luggage load
-    double fuelload; // 
+    double     payload;  // passengers and luggage load
+    double     fuelload; // 
     
     std::string responder_str(bool k_code = false) const
     {
@@ -160,6 +161,7 @@ REFL_STRUCT(settings_t)
     REFL_ENTRY(responder)
     REFL_FLAG_ENUM(equipment, ("W (RVSM)", NULL))
     REFL_SER(turbulence)
+    REFL_SER(custom_label)
 REFL_END()
 
 REFL_STRUCT(state_t)
