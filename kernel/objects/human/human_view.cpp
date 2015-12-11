@@ -2,9 +2,9 @@
 // FIXME
 #include "precompiled_objects.h"
 
-#include "vehicle_view.h"
+#include "human_view.h"
 
-namespace vehicle
+namespace human
 {
 view::view( kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
@@ -19,7 +19,6 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
         root_ = nodes_manager_->get_node(0);
         conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
         tow_point_node_ = nodes_manager_->find_node("tow_point");
-        rtow_point_node_ = nodes_manager_->find_node("rtow_point");
     }
 
     msg_disp()
@@ -36,7 +35,7 @@ object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
     return object_info_ptr(new view(oc, dict));
 }
 
-AUTO_REG_NAME(vehicle_view, view::create);
+AUTO_REG_NAME(human_view, view::create);
 
 void view::on_object_destroying(object_info_ptr object)
 {

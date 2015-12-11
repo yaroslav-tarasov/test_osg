@@ -6,10 +6,6 @@
 #include "sync_none_state.h"
 #include "sync_fms_state.h"
 
-
-
-
-
 namespace aircraft
 {
     namespace sync_fsm

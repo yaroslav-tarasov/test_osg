@@ -96,11 +96,11 @@ namespace aircraft
 
     phys_aircraft_impl::~phys_aircraft_impl()
     {
-        // FIXME TODO 
-        //shassis_->visit_chassis([](shassis_group_t const&, shassis_t & shassis)
-        //{
-        //    shassis.clear_wheels();
-        //});
+        // FIXME Testing needed 
+        shassis_->visit_chassis([](shassis_group_t const&, shassis_t & shassis)
+        {
+            shassis.clear_wheels();
+        });
     }
 
     void phys_aircraft_impl::update()
@@ -246,7 +246,7 @@ namespace aircraft
 #ifndef SIMEX_MOD
         const double phys_mass_factor_ = 1; // 1000;  // 1; //  
 #else
-       const double phys_mass_factor_ = 1000;
+        const double phys_mass_factor_ = 1000;
 #endif
         nm::node_info_ptr body_node = nodes_manager_->find_node("body");
 

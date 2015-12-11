@@ -23,6 +23,7 @@ namespace ray_cast_vehicle
         , steer_(0)
         , tow_mass_(0)
         , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
+        , reverse_(false) 
     {
         tuning_.m_maxSuspensionTravelCm = 50;
 
@@ -142,6 +143,7 @@ namespace ray_cast_vehicle
         info.m_wheelsDampingCompression = 4.4f;
         info.m_frictionSlip = 1.;
         info.m_rollInfluence = 0.1f;
+
     }
 
     void impl::set_steer   (double steer)
@@ -164,6 +166,21 @@ namespace ray_cast_vehicle
         {
             raycast_veh_->setBrake(btScalar(brake * 100),i);
         }
+    }
+
+    void impl::set_reverse (bool val) 
+    {
+        if (reverse_ != val)
+        {
+	        for (int i=0;i<raycast_veh_->getNumWheels();i++)
+	        {
+	            btWheelInfo& info = raycast_veh_->getWheelInfo(i);
+	
+	            info.m_bIsFrontWheel = !info.m_bIsFrontWheel;
+	        }
+        }
+
+        reverse_ = val;
     }
 
     void impl::set_thrust  (double thrust)

@@ -10,10 +10,11 @@ namespace phys
         {
             virtual ~info() {}
             virtual void add_wheel( double mass, double width, double radius, cg::point_3 const& offset, cg::cpr const & orien, bool has_damper ) = 0;
-
-            virtual void set_steer   (double steer) = 0;
-            virtual void set_brake   (double brake) = 0;
+            // FIXME info ? wth
+            virtual void set_steer   (double steer)  = 0;
+            virtual void set_brake   (double brake)  = 0;
             virtual void set_thrust  (double thrust) = 0;
+            virtual void set_reverse (bool val)      = 0;
 
             virtual decart_position get_position() const = 0;
             virtual decart_position get_wheel_position( size_t i ) const = 0;

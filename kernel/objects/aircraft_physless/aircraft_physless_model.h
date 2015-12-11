@@ -2,7 +2,8 @@
 
 #include "aircraft_physless_view.h"
 #include "sync_fsm/sync_pl_fsm.h"
-
+#include "phys/phys_sys.h"
+#include "common/phys_object_model_base.h"
 #include "network/msg_dispatcher.h"
 
 using network::gen_msg;  // FIXME
@@ -21,6 +22,7 @@ namespace aircraft_physless
         , model_control             // интерфейс управления моделью
         //, int_control
         , sync_fsm::self_t
+        , phys_object_model_base 
     {
         static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
@@ -64,6 +66,7 @@ namespace aircraft_physless
     private:  
         geo_position                     fms_pos() const;
         airports_manager::info_ptr       get_airports_manager() const;
+        phys::control_ptr                phys_control() const;
         nodes_management::manager_ptr    get_nodes_manager() const;
         aircraft::shassis_support_ptr    get_shassis() const;
         aircraft::rotors_support_ptr     get_rotors() const;
@@ -74,7 +77,8 @@ namespace aircraft_physless
         bool                             is_fast_session() const;
         void                             set_desired_nm_pos  (geo_point_3 const& pos);
         void                             set_desired_nm_orien(quaternion const& orien);
-        
+        optional<ada::data_t> const&     fsettings() const;
+
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
         void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
@@ -120,14 +124,14 @@ namespace aircraft_physless
         nodes_management::node_info_ptr        tow_point_node_;
         nodes_management::node_info_ptr        body_node_;
 
-        aircraft::rotors_support_ptr                 rotors_;
-        aircraft::shassis_support_ptr               shassis_;
-        optional<double>                   last_shassi_play_;
-        bool                             shassi_anim_inited_;
+        aircraft::rotors_support_ptr           rotors_;
+        aircraft::shassis_support_ptr          shassis_;
+        optional<double>                       last_shassi_play_;
+        bool                                   shassi_anim_inited_;
 
         double                                 rotors_angular_speed_;
 
-        //aircraft::phys_aircraft_ptr          phys_aircraft_;
+        phys_aircraft_ptr                      phys_aircraft_;
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;
@@ -136,7 +140,10 @@ namespace aircraft_physless
         
         boost::function<void()>                tow_invalid_callback_;
         optional<uint32_t>                     tow_attached_;
+        
+        FIXME("Нету fms надо как-то выкручиваться");
 
+        optional<ada::data_t>                  aircraft_data_;
     private:
         bool fast_session_;
 

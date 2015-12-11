@@ -149,6 +149,8 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h" />
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tests\systems\test_systems.h" />
     <ClInclude Include="utils\empty_scene.h" />
@@ -245,10 +247,13 @@
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\phys_aircraft_phl.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp" />
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp" />
@@ -260,6 +265,11 @@
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
+    <ClCompile Include="kernel\objects\human\human_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\human\human_model.cpp" />
+    <ClCompile Include="kernel\objects\human\human_model_states.cpp" />
+    <ClCompile Include="kernel\objects\human\human_view.cpp" />
+    <ClCompile Include="kernel\objects\human\human_visual.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_manager.cpp" />
     <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp" />
@@ -279,6 +289,7 @@
     <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp" />
     <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
+    <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />

@@ -38,11 +38,12 @@ namespace ray_cast_vehicle
         void set_steer   (double steer);
         void set_brake   (double brake);
         void set_thrust  (double thrust);
+        void set_reverse (bool val);
 
         decart_position get_position() const;
         decart_position get_wheel_position( size_t i ) const ;
 
-        double get_tow_rod_course() const;
+        double          get_tow_rod_course() const;
 
     //control
     private:
@@ -65,6 +66,10 @@ namespace ray_cast_vehicle
         bt_collision_shape_ptr         tow_rod_shape_;
         rigid_body_proxy               tow_rod_;
         double                         tow_mass_;
+
+        bool                           reverse_;
+
+        std::set<uint16_t>             front_wheels;
 
         constraint_proxy<bt_generic_constraint_ptr> tow_constraint_self_;
         constraint_proxy<bt_generic_constraint_ptr> tow_constraint_tow_;

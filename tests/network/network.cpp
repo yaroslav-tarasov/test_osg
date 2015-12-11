@@ -159,6 +159,7 @@ private:
                                                            ,_traj->curs_value(time)
                                                            ,*_traj->speed_value(time)
                                                            , time + traj_offset
+                                                           , false
                                                            , meteo::local_params()
             )));
 
@@ -208,6 +209,7 @@ private:
                 ,_traj->curs_value  (vtime)
                 ,*_traj->speed_value(vtime)
                 , vtime /*+ traj_offset*/
+                , false
                 , meteo::local_params()
                 )));
 

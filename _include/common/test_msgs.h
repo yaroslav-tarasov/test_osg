@@ -54,6 +54,8 @@ namespace net_layer
             id_state            ,
 
             am_malfunction      ,
+            vm_attach_tow       ,
+            vm_detach_tow       ,
             sm_container_msg
         };
 
@@ -110,16 +112,18 @@ namespace net_layer
                 , orien    (cg::quaternion()) 
                 , time     (0)
                 , speed    (0)
+			    , reverse  (false)
 				, mlp      (meteo::local_params())
             {
             }
 
-            run( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time, const meteo::local_params& mlp)
+            run( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time,  bool reverse, const meteo::local_params& mlp)
                 : ext_id(id)
                 , keypoint (keypoint)
                 , orien (orien) 
                 , time (time)
                 , speed(speed)
+				, reverse (reverse)
 				, mlp  (mlp)
             {
             }
@@ -127,8 +131,9 @@ namespace net_layer
             uint32_t            ext_id;
             cg::point_3         keypoint;
             cg::quaternion      orien;
+			double              time;
             double              speed;
-            double              time;
+			bool			    reverse;
 			meteo::local_params mlp;
         };
 
@@ -138,6 +143,7 @@ namespace net_layer
             REFL_ENTRY( speed    )
             REFL_ENTRY( keypoint )
             REFL_ENTRY( orien    )
+			REFL_ENTRY( reverse  )
             REFL_ENTRY( mlp      )
         REFL_END()
         
@@ -234,6 +240,32 @@ namespace net_layer
         REFL_ENTRY(kind)
         REFL_ENTRY(enabled)
     REFL_END()
+
+
+    struct attach_tow_msg
+        : network::msg_id<vm_attach_tow>
+    {
+        attach_tow_msg()
+            : tow_id (0)
+            , reverse   (false)
+        {}
+
+        attach_tow_msg( uint32_t  tow_id, bool      reverse)
+            : tow_id(tow_id), reverse(reverse)
+        {}
+
+        uint32_t  tow_id;
+        bool      reverse  ;
+    };
+
+    typedef attach_tow_msg   attach_tow_msg_t;
+
+    REFL_STRUCT(attach_tow_msg)
+        REFL_ENTRY(tow_id)
+        REFL_ENTRY(reverse)
+    REFL_END()
+    
+    typedef gen_msg<vm_detach_tow, void>               detach_tow_msg_t;
 
     struct container_msg
         : network::msg_id<sm_container_msg>

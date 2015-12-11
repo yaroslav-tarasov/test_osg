@@ -1,8 +1,8 @@
 #pragma once
 
-#include "vehicle_view.h"
+#include "human_view.h"
 
-namespace vehicle
+namespace human
 {
 	struct ctrl
 			: view
@@ -21,14 +21,13 @@ namespace vehicle
         void goto_pos(geo_point_2 pos,double course) override;
         void follow_route(const std::string& name)   override;
 
-        void                 follow_trajectory(std::string const& /*route*/);
+        void follow_trajectory(std::string const& /*route*/);
         decart_position      get_local_position() const;
         fms::trajectory_ptr  get_trajectory();
-        void                 set_trajectory(fms::trajectory_ptr  traj);
+        void set_trajectory(fms::trajectory_ptr  traj);
     private:
-        void attach_tow()           override; 
-        void detach_tow()           override; 
-        void set_brake (double val) override;
-        void set_reverse (bool)     override;
+        void attach_tow() override; 
+        void detach_tow() override; 
+        void set_brake(double val) override;
 	};
 }

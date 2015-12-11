@@ -15,7 +15,7 @@ namespace aircraft_physless
         virtual void                 set_air_cfg(fms::air_config_t cfg) = 0;
         virtual void                 set_prediction(double prediction) = 0;
         virtual geo_position         get_wheel_position( size_t i ) const = 0;
-        //virtual phys::rigid_body_ptr get_rigid_body() const = 0;
+        virtual phys::rigid_body_ptr get_rigid_body() const = 0;
         virtual void                 set_steer   (double steer) = 0;
         virtual void                 set_brake( double brake ) = 0;
         virtual double               get_steer () = 0;

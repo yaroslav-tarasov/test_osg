@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
+
+#include "objects/aircraft_physless.h"
+#include "aircraft_physless/aircraft_physless_common.h"
+
 #include "sync_pl_phys_state.h"
-//#include "sync_transition_phys_fms.h"
+#include "sync_pl_transition_phys_fms.h"
 #include "sync_pl_none_state.h"
 #include "sync_pl_fms_state.h"
 
@@ -13,15 +17,15 @@ namespace aircraft_physless
 
         struct phys_state2 : state_t
         {
-            phys_state2(self_t &self, /*phys_aircraft_ptr phys_aircraft,*/ geo_base_3 const& base)
+            phys_state2(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
                 : self_(self)
                 , desired_speed_(aircraft::min_desired_velocity())
-                //, on_ground_(false)
-                //, phys_aircraft_(phys_aircraft)
+                , on_ground_(false)
+                , phys_aircraft_(phys_aircraft)
                 , base_(base)
             {
                 self.set_nm_angular_smooth(2);
-                //self_.set_phys_aircraft(phys_aircraft_);
+                self_.set_phys_aircraft(phys_aircraft_);
             }
 
             ~phys_state2()
@@ -32,7 +36,7 @@ namespace aircraft_physless
             {
                 if (self_.get_shassis())
                     self_.get_shassis()->freeze();
-                //self_.set_phys_aircraft(nullptr);
+                self_.set_phys_aircraft(nullptr);
             }
 
             void update(double /*time*/, double dt);
@@ -48,17 +52,17 @@ namespace aircraft_physless
             self_t &self_;
             geo_base_3 base_;
             size_t zone_;
-            //phys_aircraft_ptr phys_aircraft_;
-            //bool on_ground_;
+            phys_aircraft_ptr phys_aircraft_;
+            bool on_ground_;
 
 
             double                                 desired_speed_;
         };
 
 
-        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, /*phys_aircraft_ptr phys_aircraft,*/ geo_base_3 const& base)
+        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
         {
-                return boost::make_shared<phys_state2>(self,/*phys_aircraft,*/base);
+                return boost::make_shared<phys_state2>(self,phys_aircraft,base);
         }
 
     }
@@ -74,8 +78,8 @@ namespace sync_fsm
 
     void phys_state2::update(double time, double dt) 
     {
-        //if (!phys_aircraft_)
-        //    return;
+        if (!phys_aircraft_)
+            return;
 
 #if 0   // local state
 
@@ -85,8 +89,8 @@ namespace sync_fsm
 
             if (cur_len < traj_->length())
             {
-                //phys_aircraft_->set_prediction(/*15.*/30.); 
-                //phys_aircraft_->freeze(false);
+                phys_aircraft_->set_prediction(/*15.*/30.); 
+                phys_aircraft_->freeze(false);
                
                 traj_->set_cur_len (traj_->cur_len() + dt*desired_velocity_);
                 const double  tar_len = traj_->cur_len();
@@ -95,11 +99,11 @@ namespace sync_fsm
                 target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
                 target_pos.orien = traj_->curs_value(tar_len);//cg::cpr(traj_->curs_value(tar_len),0,0);
                 geo_position gtp(target_pos, get_base());
-                //phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+                phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
 
                 if(gtp.pos.height > 0)
                 {
-                    // phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
+                    /phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
                 }
 
                 FIXME(Нужен позишн я я)
@@ -136,7 +140,7 @@ namespace sync_fsm
 
  
 
-                //const decart_position cur_pos = phys_aircraft_->get_local_position();
+                const decart_position cur_pos = phys_aircraft_->get_local_position();
 
                 {
 
@@ -240,6 +244,8 @@ namespace sync_fsm
 
             self_.set_desired_nm_pos(gtp.pos);
             self_.set_desired_nm_orien(gtp.orien);
+            
+            phys_aircraft_->go_to_pos(gtp.pos, gtp.orien);
 
         }
 #endif
@@ -251,8 +257,8 @@ namespace sync_fsm
 
     void phys_state2::on_zone_destroyed( size_t id )
     {
-        //if (phys_aircraft_->get_zone() == id)
-        //    self_.switch_sync_state(boost::make_shared<none_state>(self_));
+        if (phys_aircraft_->get_zone() == id)
+            self_.switch_sync_state(boost::make_shared<none_state>(self_));
     }
 
     void phys_state2::on_fast_session( bool fast )

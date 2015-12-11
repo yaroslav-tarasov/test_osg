@@ -135,6 +135,9 @@
     <Filter Include="Source Files\objects\nodes_manager">
       <UniqueIdentifier>{ffa5790b-3cd8-473e-947e-31ba35ef68d0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\human">
+      <UniqueIdentifier>{8a01353b-b642-40c6-8b88-6ebbf18608e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -280,6 +283,12 @@
     </ClInclude>
     <ClInclude Include="av\avAnimation\AnimationObject.h">
       <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -801,6 +810,33 @@
     </ClCompile>
     <ClCompile Include="tests\animation_test.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_ctrl.cpp">
+      <Filter>Source Files\objects\human</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_model.cpp">
+      <Filter>Source Files\objects\human</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_model_states.cpp">
+      <Filter>Source Files\objects\human</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_view.cpp">
+      <Filter>Source Files\objects\human</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_visual.cpp">
+      <Filter>Source Files\objects\human</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\phys_aircraft_phl.cpp">
+      <Filter>Source Files\objects\aircraft_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp">
+      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

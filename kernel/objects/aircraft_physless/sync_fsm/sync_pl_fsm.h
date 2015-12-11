@@ -1,9 +1,11 @@
 #pragma once
 
 #include "aircraft/aircraft_common.h"
+#include "aircraft_physless/aircraft_physless_common.h"
 #include "aircraft/aircraft_shassis_impl.h"
 #include "../../common/airports_manager.h"
 #include "../../common/aircraft_fms.h"
+#include "../../common/phys_sys.h"
 
 namespace aircraft_physless
 {
@@ -36,6 +38,7 @@ namespace aircraft_physless
 
             virtual geo_position                  fms_pos()              const = 0;
             virtual airports_manager::info_ptr    get_airports_manager() const = 0;
+            virtual phys::control_ptr             phys_control()         const = 0;
             virtual nodes_management::manager_ptr get_nodes_manager()    const = 0;
             //virtual aircraft_fms::info_ptr      get_fms_info()         const = 0;
             //virtual meteo::meteo_cursor_ptr     get_meteo_cursor()     const = 0;
@@ -47,14 +50,12 @@ namespace aircraft_physless
 
             virtual void                          set_desired_nm_pos   (geo_point_3 const& pos) = 0;
             virtual void                          set_desired_nm_orien (quaternion const& orien) = 0;
-
-            //virtual geo_point_3                   get_extern_desired_nm_pos  () const =0;
-            //virtual quaternion                    get_extern_desired_nm_orien() const =0;
-            //virtual double                        get_extern_desired_nm_speed() const =0;
-
+            
+            virtual optional<ada::data_t> const&  fsettings()            const = 0;
+            
             virtual void switch_sync_state    (state_ptr state) = 0;
             virtual void freeze_position      () = 0;
-            //virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;
+            virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;
             virtual void set_nm_angular_smooth(double val) = 0;
             
             virtual fms::trajectory_ptr get_trajectory() const = 0;  

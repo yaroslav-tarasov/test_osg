@@ -16,6 +16,7 @@ namespace do_not_optimize
         "lightmast",
         "navaid_",
         "tow_point",
+        "rtow_point",
         "back_tail",
         "rotor"
     };

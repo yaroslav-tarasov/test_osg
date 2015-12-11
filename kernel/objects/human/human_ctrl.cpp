@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "vehicle.h"
-#include "vehicle_ctrl.h"
+#include "human.h"
+#include "human_ctrl.h"
 #include "objects/ada.h"
 
 
-namespace vehicle
+namespace human
 {
 
 	object_info_ptr ctrl::create(kernel::object_create_t const& oc, dict_copt dict)
@@ -14,7 +14,7 @@ namespace vehicle
 		return object_info_ptr(new ctrl(oc, dict));
 	}
 
-	AUTO_REG_NAME(vehicle_ext_ctrl, ctrl::create);
+	AUTO_REG_NAME(human_ext_ctrl, ctrl::create);
 
 	ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict  )
 		: view(oc,dict)
@@ -63,32 +63,21 @@ namespace vehicle
     void ctrl::attach_tow()
     {
         aircraft::info_ptr towair;
-        bool reverse = false;
 
-        visit_objects<aircraft::info_ptr>(collection_, [this, &towair,&reverse](aircraft::info_ptr air)->bool
+        visit_objects<aircraft::info_ptr>(collection_, [this, &towair](aircraft::info_ptr air)->bool
         {       
             geo_point_3 tow_pos = geo_base_3(air->pos())(cg::rotation_3(cpr(air->orien().course, 0, 0)) * (point_3(0, 5., 0) + point_3(air->tow_point_transform().translation())));
             if (cg::distance2d(tow_pos, this->pos()) < 25)
-            {   
-                FIXME(Необходима проверка алгоритма работы);
-
-                double dist_tp  = tow_point_node_ ?cg::distance2d(tow_pos,tow_point_node_->get_global_pos()) :10000.0;
-                double dist_rtp = rtow_point_node_?cg::distance2d(tow_pos,rtow_point_node_->get_global_pos()):10000.0;
-
-                if ( dist_rtp < dist_tp)
-                {
-                    reverse = true;
-                }
-
+            {              
                 towair = air;
                 return false;
             }
-            
+
             return true;
         });
 
         if (towair)
-            send_cmd(msg::attach_tow_msg_t(object_info_ptr(towair)->object_id(), reverse));
+            send_cmd(msg::attach_tow_msg_t(object_info_ptr(towair)->object_id()));
     }
 
     void ctrl::detach_tow()
@@ -99,11 +88,6 @@ namespace vehicle
     void ctrl::set_brake(double val)
     {
         send_cmd(msg::brake_msg_t(val));
-    }
-
-    void ctrl::set_reverse (bool val) 
-    {
-        send_cmd(msg::reverse_msg_t(val));
     }
 
     void ctrl::follow_trajectory(std::string const& /*route*/)

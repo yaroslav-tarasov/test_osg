@@ -713,7 +713,8 @@ private:
 
         force_log fl2;  
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.get_delta() << "\n");
-        
+
+#if 0
         kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
         
         if (reg_obj)
@@ -722,6 +723,7 @@ private:
             disp_
                 .add<run                   >(boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
         }
+#endif
     }
 
     kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
@@ -927,14 +929,13 @@ struct mod_app
         , ctrl_sys_ (systems_->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
         , mod_sys_  (systems_->get_model_sys  (),0.003/*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
+        , disp_ (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
     {   
 
         disp_
             .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
             .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
             .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
-            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
-            //.add<container_msg         >(boost::bind(&mod_app::on_container  , this, _1))
             ;
 
 
@@ -1003,7 +1004,16 @@ private:
 
     }
 
+    void inject_msg(const void* data, size_t size)
+    {
+        if (reg_obj_)
+        {
+            reg_obj_->inject_msg(data, size);
+        }
 
+    }
+
+#if 0
     void inject_msg(net_layer::msg::run const& msg)
     {
        reg_obj_->inject_msg(msg);
@@ -1013,6 +1023,7 @@ private:
     {
         reg_obj_->inject_msg(msg);
     }
+#endif
 
     void create_objects(const std::string& airport)
     {
@@ -1033,8 +1044,9 @@ private:
         force_log fl2;  
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
 
-        reg_obj_ = aircraft_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
 
+        reg_obj_ = aircraft_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
+#if 0
         if (reg_obj_)
         {
             void (mod_app::*on_run)       (net_layer::msg::run const& msg)           = &mod_app::inject_msg;
@@ -1044,6 +1056,8 @@ private:
                 .add<run                   >(boost::bind(on_run      , this , _1))
                 .add<container_msg         >(boost::bind(on_container, this , _1));
         }
+#endif
+
     }
 
 
@@ -1062,9 +1076,6 @@ private:
     boost::scoped_ptr<net_worker>                                     w_;
 
 private:
-    //typedef size_t  object_id_t;
-    //typedef size_t  extern_id_t;    
-    //std::unordered_map<extern_id_t, object_id_t>                    e2o_;
     aircraft_reg::control_ptr                                   reg_obj_;
 
     global_timer                                                     gt_;

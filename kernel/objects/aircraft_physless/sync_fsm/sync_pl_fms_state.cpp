@@ -4,7 +4,7 @@
 #include "sync_pl_fms_state.h"
 #include "sync_pl_none_state.h"
 #include "sync_pl_phys_state.h"
-//#include "sync_transition_fms_phys.h"
+#include "sync_pl_transition_fms_phys.h"
 
 namespace aircraft_physless
 {
@@ -67,8 +67,20 @@ namespace sync_fsm
         }
         else
         {
-            FIXME(И гиде взять координаты)
-            self_.switch_sync_state(create_sync_phys_state(self_, /*phys_aircraft,*/ /*base*/::get_base()));
+            optional<size_t> phys_zone = self_.phys_control()->get_zone(fms_pos.pos);
+            if (phys_zone)
+            {
+                auto base = self_.phys_control()->get_base(*phys_zone);
+                auto phys_sys = self_.phys_control()->get_system(*phys_zone);
+
+                phys_aircraft_ptr phys_aircraft = phys_aircraft_impl::create(base, phys_sys, /*self_.get_meteo_cursor(),*/ 
+                            self_.get_nodes_manager(), self_.fms_pos(), 
+                            *self_./*get_fms_info()->*/fsettings(), self_.get_shassis(), *phys_zone);
+            
+
+                FIXME(И гиде взять координаты)
+                self_.switch_sync_state(create_sync_phys_state(self_, phys_aircraft, /*base*/::get_base()));
+            }
         }
 
 

@@ -1,7 +1,7 @@
 
 #pragma once 
 
-namespace vehicle
+namespace human
 {
 namespace msg 
 {
@@ -23,46 +23,20 @@ enum id
     vm_tow,
 
     vm_brake,
-    vm_reverse,
 
     vm_traj_assign,
     vm_follow_trajectory
 };
 
-typedef gen_msg<vm_settings, settings_t>           settings_msg_t;
-// typedef gen_msg<vm_attach_tow, uint32_t>           attach_tow_msg_t;
-typedef gen_msg<vm_detach_tow, void>               detach_tow_msg_t;
-typedef gen_msg<vm_follow_route, uint32_t>         follow_route_msg_t;
-typedef gen_msg<vm_disable_debug_controls>         disable_debug_ctrl_msg_t;
+typedef gen_msg<vm_settings, settings_t>    settings_msg_t;
+typedef gen_msg<vm_attach_tow, uint32_t>    attach_tow_msg_t;
+typedef gen_msg<vm_detach_tow, void>        detach_tow_msg_t;
+typedef gen_msg<vm_follow_route, uint32_t>  follow_route_msg_t;
+typedef gen_msg<vm_disable_debug_controls>  disable_debug_ctrl_msg_t;
 typedef gen_msg<vm_tow, boost::optional<uint32_t>> tow_msg_t;
-typedef gen_msg<vm_brake, double>                  brake_msg_t;
-typedef gen_msg<vm_reverse, bool>                  reverse_msg_t;
+typedef gen_msg<vm_brake, double> brake_msg_t;
 
-typedef gen_msg<vm_follow_trajectory, uint32_t>    follow_trajectory_msg_t;
-
-struct attach_tow_msg
-    : network::msg_id<vm_attach_tow>
-{
-    attach_tow_msg()
-    : tow_id (0)
-    , reverse   (false)
-    {}
-
-    attach_tow_msg( uint32_t  tow_id, bool      reverse)
-        : tow_id(tow_id), reverse(reverse)
-    {}
-
-    uint32_t  tow_id;
-    bool      reverse  ;
-};
-
-typedef attach_tow_msg   attach_tow_msg_t;
-
-REFL_STRUCT(attach_tow_msg)
-    REFL_ENTRY(tow_id)
-    REFL_ENTRY(reverse)
-REFL_END()
-
+typedef gen_msg<vm_follow_trajectory, uint32_t>  follow_trajectory_msg_t;
 
 struct state_msg_t
     : network::msg_id<vm_state>
@@ -176,5 +150,5 @@ REFL_STRUCT(traj_assign_msg)
 REFL_END()
 
 } // msg
-} // namespace vehicle
+} // namespace human
 

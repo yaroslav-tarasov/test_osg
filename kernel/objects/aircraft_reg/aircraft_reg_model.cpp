@@ -32,17 +32,35 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
      if(msg.ext_id>0 )                          
      {
          auto a = objects_[msg.ext_id];
-
+         
          if(auto pa = aircraft_physless::model_control_ptr(a))
          {
-             pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+             auto it = last_msg_.find(msg.ext_id);
+             if(it!=last_msg_.end() && msg.reverse != it->second.reverse)
+             {
+                 //pa->set_reverse(msg.reverse);
+             }
+             
+             cg::cpr vc(msg.orien.cpr());
+             pa->set_desired  (msg.time,msg.keypoint,msg.reverse?cg::cpr(cg::norm360(msg.orien.get_course() + msg.reverse * 180), msg.orien.get_pitch(), msg.orien.get_roll()):msg.orien,msg.speed);
+
+             // pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
              pa->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth ); 
          }
          else if (vehicle::model_control_ptr pv = vehicle::model_control_ptr(a))
          {
+             auto it = last_msg_.find(msg.ext_id);
+             if(it!=last_msg_.end() && msg.reverse != it->second.reverse)
+             {
+                 //pv->set_reverse(msg.reverse);
+             }
+
              pv->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
-             pv->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth ); 
+             pv->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }
+         
+         
+         last_msg_[msg.ext_id] =  msg;
      }
 }
 

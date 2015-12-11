@@ -29,6 +29,7 @@ AUTO_REG_NAME(aircraft_physless_model, model::create);
 
 model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view(oc,dict)
+    , phys_object_model_base    (collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
     , fast_session_    (false)
@@ -86,14 +87,16 @@ void model::update( double time )
 
     check_rotors_malfunction();
 
-    //if (phys_aircraft_)
-    //{
-    //    bool has_malfunction = false;
-    //    if (malfunction(MF_CHASSIS_FRONT) || malfunction(MF_CHASSIS_REAR_LEFT) || malfunction(MF_CHASSIS_REAR_RIGHT))
-    //        has_malfunction = true;
+    using namespace aircraft;
 
-    //    phys_aircraft_->set_malfunction(has_malfunction);
-    //}
+    if (phys_aircraft_)
+    {
+        bool has_malfunction = false;
+        if (malfunction(MF_CHASSIS_FRONT) || malfunction(MF_CHASSIS_REAR_LEFT) || malfunction(MF_CHASSIS_REAR_RIGHT))
+            has_malfunction = true;
+
+        phys_aircraft_->set_malfunction(has_malfunction);
+    }
 
     last_update_ = time;
 }
@@ -154,10 +157,10 @@ airports_manager::info_ptr model::get_airports_manager() const
     return airports_manager_;
 }
 
-//phys::control_ptr model::phys_control() const
-//{
-//    return phys_;
-//}
+phys::control_ptr model::phys_control() const
+{
+    return phys_;
+}
 
 nodes_management::manager_ptr model::get_nodes_manager() const
 {
@@ -317,10 +320,11 @@ void model::update_shassi_anim (double time)
 
 void model::update_contact_effects(double time)
 {
-#if 0
 
     if (!phys_aircraft_)
         return;
+
+    using namespace aircraft;
 
     auto contacts = std::move(phys_aircraft_->get_body_contacts());
     if (!contacts.empty())
@@ -367,17 +371,17 @@ void model::update_contact_effects(double time)
 
     });     
 
-#endif
 
 }
+
 
 
 
 void model::sync_fms(bool force)
 {
 #if 1	
-  //  if (!phys_aircraft_)
-		//return ;
+    if (!phys_aircraft_)
+        return ;
 
 	geo_position fmspos = fms_pos();
 	nodes_management::node_position root_node_pos = root_->position();
@@ -446,7 +450,7 @@ bool model::tow_attached() const
 geo_position model::get_phys_pos() const
 {
     // TODO
-    return geo_position();//phys_aircraft_->get_position();
+    return phys_aircraft_->get_position();
 }
 
 double model::rotors_angular_speed() const
@@ -459,32 +463,32 @@ void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()
     if (tow_attached_ == attached)
         return ;
 
-    //tow_attached_ = attached;
-    //tow_invalid_callback_ = tow_invalid_callback;
-    //if (phys_aircraft_)
-    //{
-    //    phys_aircraft_->attach_tow(attached);
-    //    traj_.reset();
-    //}
+    tow_attached_ = attached;
+    tow_invalid_callback_ = tow_invalid_callback;
+    if (phys_aircraft_)
+    {
+        phys_aircraft_->attach_tow(attached);
+        traj_.reset();
+    }
 
-    //if (!tow_attached_)
-    //    sync_fms(true);
+    if (!tow_attached_)
+        sync_fms(true);
 }
 
 void model::set_steer( double steer )
 {   
     Assert(tow_attached_);
 
-    //if (phys_aircraft_)
-    //    phys_aircraft_->set_steer(steer);
+    if (phys_aircraft_)
+        phys_aircraft_->set_steer(steer);
 }
 
 void model::set_brake( double brake )
 {   
     Assert(tow_attached_);
 
-    //if (phys_aircraft_)
-    //    phys_aircraft_->set_brake(brake);
+    if (phys_aircraft_)
+        phys_aircraft_->set_brake(brake);
 }
 
  
@@ -492,6 +496,13 @@ geo_position model::fms_pos() const
 {
     point_3 dir = cg::polar_point_3(1., /*get_fms_info()->*/get_state().orien().course, /*get_fms_info()->*/get_state().orien().pitch);
     return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*//*get_state().dyn_state.TAS * dir*/point_3(0,0,0), /*get_fms_info()->*/get_state().orien(), point_3(0,0,0));
+}
+
+optional<ada::data_t> const& model::fsettings() const
+{
+    FIXME("Да это нам надо, и в каком-то виде для  ");
+
+    return aircraft_data_;  // get_fms_info()->fsettings();
 }
 
 void model::switch_sync_state(sync_fsm::state_ptr state)
@@ -531,18 +542,20 @@ void model::set_rotors_angular_speed(double val)
 
 void model::check_wheel_brake()
 {
-    //if (!phys_aircraft_)
-    //    return;
+    if (!phys_aircraft_)
+        return;
 
-    //shassis_->visit_groups([this](shassis_group_t & shassis_group)
-    //{
-    //    if (shassis_group.opened && shassis_group.malfunction && !shassis_group.broken)
-    //    {
-    //        bool has_contact = shassis_group.check_contact(this->phys_aircraft_);
-    //        if (has_contact)
-    //            shassis_group.broke(this->phys_aircraft_);
-    //    }
-    //});
+    using namespace aircraft; 
+
+    shassis_->visit_groups([this](shassis_group_t & shassis_group)
+    {
+        if (shassis_group.opened && shassis_group.malfunction && !shassis_group.broken)
+        {
+            bool has_contact = shassis_group.check_contact(this->phys_aircraft_);
+            if (has_contact)
+                shassis_group.broke(this->phys_aircraft_);
+        }
+    });
 }
 
 void model::check_rotors_malfunction()

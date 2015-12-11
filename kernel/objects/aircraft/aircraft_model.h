@@ -113,10 +113,10 @@ namespace aircraft
         nodes_management::node_info_ptr        tow_point_node_;
         nodes_management::node_info_ptr        body_node_;
 
-        rotors_support_ptr                 rotors_;
-        shassis_support_ptr                shassis_;
-        optional<double>                   last_shassi_play_;
-        bool                               shassi_anim_inited_;
+        rotors_support_ptr                     rotors_;
+        shassis_support_ptr                    shassis_;
+        optional<double>                       last_shassi_play_;
+        bool                                   shassi_anim_inited_;
 
         double                                 rotors_angular_speed_;
 

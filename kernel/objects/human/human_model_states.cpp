@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "vehicle_model_states.h"
-#include "vehicle_model.h"
+#include "human_model_states.h"
+#include "human_model.h"
 
 #include "geometry/filter.h"
 
@@ -27,7 +27,7 @@ struct ff
     std::array<T,N> val_;
 };
 
-namespace vehicle
+namespace human
 {
 
 follow_route_state::follow_route_state(simple_route::info_ptr route)
@@ -205,13 +205,9 @@ void go_to_pos_state::update(model * self, double dt)
         cur_speed = filter::BreakApproachSpeed(0., dist_signed, cur_speed, nominal_speed, 10., dt, 1.1);
 
         double desired_course = cg::polar_point_2(offset).course;
-#if 1
         if (cur_speed < 0)
             desired_course = cg::norm180(180. + desired_course);
         double max_dcourse = cg::clamp(0., nominal_speed, 0., 100.)(fabs(cur_speed));
-#else
-        double max_dcourse = desired_course;
-#endif
         dcourse_ = filter::BreakApproachSpeed<cg::degree180_value>(cur_course, desired_course, dcourse_, max_dcourse, 100., dt, 1.1);
     }
 
@@ -321,6 +317,7 @@ void follow_traj_state::update(model * self, double dt)
 	FIXME(extern state);
 	if(auto traj_ = self->get_trajectory())
 	{
+
 		traj_->set_cur_len (traj_->cur_len() + dt);
 		const double  tar_len = traj_->cur_len();
 		decart_position target_pos;
@@ -330,7 +327,7 @@ void follow_traj_state::update(model * self, double dt)
 		geo_position gtp(target_pos, get_base());
 
 		self->set_state(state_t(gtp.pos, gtp.orien.get_course(), *traj_->speed_value(tar_len)));
-		self->set_max_speed(20.0);
+		self->set_max_speed(100.0);
 
 	}
 #endif

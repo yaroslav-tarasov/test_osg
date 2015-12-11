@@ -31,7 +31,7 @@ struct view
 protected:
     typedef size_t  object_id_t;
 
-    std::unordered_map<object_id_t, kernel::object_info_ptr/*aircraft_physless::info_ptr*/>  objects_;
+    std::unordered_map<object_id_t, kernel::object_info_ptr>  objects_;
 
 };
 
