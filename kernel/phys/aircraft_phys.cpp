@@ -400,6 +400,11 @@ FIXME("Off point for bullet")
     {
         return from_bullet_position(&*chassis_.get());
     }
+	
+	void impl::set_position(const decart_position& pos)
+	{
+		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+	}
 
     decart_position impl::get_wheel_position( size_t id ) const
     {

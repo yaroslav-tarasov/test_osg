@@ -95,15 +95,15 @@ void model::update( double time )
 
         update_model(dt);
 
-        if (!manual_controls_)
-            sync_phys();
-        else
-        {
-            cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
-            decart_position cur_pos = phys_vehicle_->get_position();
-            geo_position cur_glb_pos(cur_pos, base);
-            set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); 
-        }
+		if (!manual_controls_)
+			sync_phys();
+		else
+		{
+			cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
+			decart_position cur_pos = phys_vehicle_->get_position();
+			geo_position cur_glb_pos(cur_pos, base);
+			set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); 
+		}
 
         sync_nodes_manager(dt);
 
@@ -252,15 +252,18 @@ void model::set_ext_wind       (double speed, double azimuth)
     FIXME(Need some wind)
 }
 
-void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
+void model::on_aerotow_changed( aircraft::info_ptr old_aerotow, bool reverse )
 {   
     if (!phys_vehicle_)
         return;
 
     if (aerotow_ && aircraft::model_info_ptr(aerotow_)->get_rigid_body())
     {
-        cg::point_3 tow_offset = tow_point_node_ ? nodes_manager_->get_relative_transform(tow_point_node_, body_node_).translation() : cg::point_3();
-
+        cg::point_3 tow_offset = reverse
+			? (rtow_point_node_ ? nodes_manager_->get_relative_transform(rtow_point_node_, body_node_).translation() : cg::point_3())
+			: (tow_point_node_ ? nodes_manager_->get_relative_transform(tow_point_node_, body_node_).translation() : cg::point_3())
+			;
+		
         phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->set_tow(aircraft::model_info_ptr(aerotow_)->get_rigid_body(), tow_offset, aircraft::model_info_ptr(aerotow_)->tow_offset());
 
         aircraft::model_control_ptr(aerotow_)->set_tow_attached(object_id(), boost::bind(&model::on_detach_tow, this));
@@ -277,13 +280,13 @@ void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
 void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data)
 {
     if (!aerotow_)
-        set_tow(data.tow_id);
+        set_tow(data.tow_id,data.reverse);
 }
 
 void model::on_detach_tow()
 {
     if (aerotow_)
-        set_tow(boost::none);
+        set_tow(boost::none,false);
 }
 
 void model::on_follow_route(uint32_t route_id)
@@ -573,7 +576,7 @@ void model::settings_changed()
         aircraft::model_info_ptr new_aerotow = find_object<aircraft::model_info_ptr>(collection_, settings_.aerotow);
 
         if (new_aerotow)
-            set_tow(kernel::object_info_ptr(new_aerotow)->object_id()) ;
+            set_tow(kernel::object_info_ptr(new_aerotow)->object_id(), false) ;
     }
 }
 
@@ -588,8 +591,8 @@ void model::update_model( double dt )
         geo_position glb_phys_pos(phys_pos, base);
 
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
-        // FIXME state устанавливется через чарт
-        // у меня координаты отличаются надо думать
+        FIXME(state устанавливется через чарт); 
+	    // у меня координаты отличаются надо думать
         if (dist > 10)
             return;
     }

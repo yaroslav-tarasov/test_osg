@@ -2,7 +2,7 @@
 #include "precompiled_objects.h"
 
 
-#include "objects/aircraft_physless.h"
+//#include "objects/aircraft_physless.h"
 #include "aircraft_physless/aircraft_physless_common.h"
 
 #include "sync_pl_phys_state.h"
@@ -246,7 +246,7 @@ namespace sync_fsm
             self_.set_desired_nm_orien(gtp.orien);
             
             phys_aircraft_->go_to_pos(gtp.pos, gtp.orien);
-
+			phys_aircraft_->update();
         }
 #endif
 

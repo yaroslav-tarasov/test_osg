@@ -3,6 +3,9 @@
 
 #include "aircraft_reg_ctrl.h"
 
+//#include "objects\aircraft_physless.h"
+#include "objects\vehicle.h"
+
 
 namespace aircraft_reg
 {
@@ -20,13 +23,13 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 
     void (ctrl::*on_run)         (net_layer::msg::run const& msg)               = &ctrl::inject_msg;
     void (ctrl::*on_container)   (net_layer::msg::container_msg const& msg)     = &ctrl::inject_msg;
-    void (ctrl::*on_tow)         (net_layer::msg::attach_tow_msg const& msg)    = &ctrl::inject_msg;
+    void (ctrl::*on_tow)         (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg const& msg)   = &ctrl::inject_msg;
 
     disp_
         .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
         .add<net_layer::msg::container_msg         >(boost::bind(on_container   , this, _1))
-        .add<net_layer::msg::attach_tow_msg        >(boost::bind(on_tow         , this, _1))
+        .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_tow         , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
         ;
 }
@@ -67,11 +70,11 @@ void ctrl::inject_msg( net_layer::msg::container_msg const& msg)
 {
 }
 
-void ctrl::inject_msg(net_layer::msg::attach_tow_msg  const& msg)  
+void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)  
 {
-    if(msg.ext_id>0 )                          
+    if(ext_id>0 )                          
     {
-        auto a = objects_[msg.ext_id];
+        auto a = objects_[ext_id];
 
         if (vehicle::control_ptr pv = vehicle::control_ptr(a))
         {

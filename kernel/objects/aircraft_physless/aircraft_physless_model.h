@@ -6,20 +6,23 @@
 #include "common/phys_object_model_base.h"
 #include "network/msg_dispatcher.h"
 
+#include "objects/ada.h"
+
 using network::gen_msg;  // FIXME
 using network::msg_t;
 
 #include "aircraft_physless_msg.h"
 #include "common\airports_manager.h"
-#include "objects\common\aircraft_physless.h"
+//#include "objects\common\aircraft_physless.h"
 
 
 namespace aircraft_physless
 {
     struct model
         : view
-        , model_info                // интерфейс информации о модели
-        , model_control             // интерфейс управления моделью
+        , aircraft::model_info                // интерфейс информации о модели
+        , aircraft::model_control             // интерфейс управления моделью
+		, aircraft::model_ext_control
         //, int_control
         , sync_fsm::self_t
         , phys_object_model_base 
@@ -45,11 +48,7 @@ namespace aircraft_physless
 
         // model_info
     private:
-        // phys::rigid_body_ptr get_rigid_body() const;
-        phys::rigid_body_ptr model::get_rigid_body() const
-        {
-            return  phys::rigid_body_ptr();
-        }
+        phys::rigid_body_ptr get_rigid_body() const;
         point_3              tow_offset    () const;
         bool                 tow_attached  () const;
         geo_position         get_phys_pos  () const;
@@ -142,8 +141,10 @@ namespace aircraft_physless
         optional<uint32_t>                     tow_attached_;
         
         FIXME("Нету fms надо как-то выкручиваться");
-
+		void                                   make_aircraft_info();
         optional<ada::data_t>                  aircraft_data_;
+        ada::info_ptr                          ada_;
+
     private:
         bool fast_session_;
 

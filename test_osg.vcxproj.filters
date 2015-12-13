@@ -51,9 +51,6 @@
     <Filter Include="Source Files\objects\airport">
       <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\nm">
-      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\phys">
       <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
     </Filter>
@@ -137,6 +134,9 @@
     </Filter>
     <Filter Include="Source Files\objects\human">
       <UniqueIdentifier>{8a01353b-b642-40c6-8b88-6ebbf18608e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\nodes_manager\nm">
+      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -476,13 +476,13 @@
       <Filter>Source Files\nfi</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp">
-      <Filter>Source Files\objects\nm</Filter>
+      <Filter>Source Files\objects\nodes_manager\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp">
-      <Filter>Source Files\objects\nm</Filter>
+      <Filter>Source Files\objects\nodes_manager\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nm\nodes_manager.cpp">
-      <Filter>Source Files\objects\nm</Filter>
+      <Filter>Source Files\objects\nodes_manager\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp">
       <Filter>Source Files\objects\nodes_manager</Filter>

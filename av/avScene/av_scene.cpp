@@ -595,7 +595,7 @@ private:
 };
 
 
-#define MULTITHREADED
+//#define MULTITHREADED
 
 #ifndef  MULTITHREADED
 struct visapp
@@ -604,7 +604,8 @@ struct visapp
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     visapp(endpoint peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/,int argc, char** argv)
-        : osg_vis_  (CreateVisual())
+        : systems_  (get_systems())
+	    , osg_vis_  (CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
         , ctrl_sys_ (get_systems()->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
         , mod_sys_  (get_systems()->get_model_sys(),0.003/*cfg().model_params.msys_step*/)
@@ -626,7 +627,7 @@ struct visapp
             , boost::bind(&visapp::on_render, this, _1)
             ));
 
-
+		w_->set_factor(1.0);
     }
 
     ~visapp()
@@ -640,6 +641,7 @@ private:
     void on_render(double time)
     {   
         high_res_timer                _hr_timer;
+		systems_->update_vis_messages();
         vis_sys_.update(time);
         osg_vis_->Render();
         //LogInfo( "on_render(double time)" << _hr_timer.get_delta());
@@ -658,6 +660,8 @@ private:
         }
         else
         {
+		FIXME(И эту хрень тоже надо перенести сервис);
+		   systems_->update_messages();
            mod_sys_.update(time);
            ctrl_sys_.update(time);
         }
@@ -673,7 +677,8 @@ private:
          binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
          w_->send(&bts[0], bts.size());
 
-         LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
+		 
+        // LogInfo("Got setup message: " << msg.srv_time << " : " << msg.task_time );
     }
 
     void on_container(container_msg const& msg)
@@ -690,7 +695,7 @@ private:
         if(fp)
             a = fp(msg);
 
-        LogInfo("Got create message: " << msg.model_name << "   " << msg.object_kind << "   " << msg.course << " : " << msg.lat << " : " << msg.lon  );
+        //LogInfo("Got create message: " << msg.model_name << "   " << msg.object_kind << "   " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }
 
 
@@ -714,14 +719,16 @@ private:
         force_log fl2;  
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.get_delta() << "\n");
 
-#if 0
+#if 1
         kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
         
         if (reg_obj)
         {
             // on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
-            disp_
-                .add<run                   >(boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
+            void (aircraft_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &aircraft_reg::control::inject_msg;
+
+			disp_
+                .add<run                   >(boost::bind(on_run , aircraft_reg::control_ptr(reg_obj).get(), _1));
         }
 #endif
     }
@@ -745,13 +752,13 @@ private:
     msg_dispatcher<uint32_t>                                       disp_;
 
 private:
+	systems_ptr                                                 systems_;
+
     updater                                                     mod_sys_;
     updater                                                    ctrl_sys_;
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
-private:
-    //on_run_f                                                    on_run_;
-    on_container_f                                              on_cont_;
+
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 };

@@ -1,13 +1,15 @@
 #pragma once
 
 #include "common/aircraft.h"
-#include "common/aircraft_physless.h"
+//#include "common/aircraft_physless.h"
 
 #include "network/msg_base.h"
 #include "objects/aircraft_atc.h"
 #include "objects/aircraft.h"
-#include "objects/aircraft_physless.h"
+//#include "objects/aircraft_physless.h"
 #include "fms/trajectory.h"
+
+#include "aircraft_physless_state.h"
 
 namespace aircraft_physless
 {

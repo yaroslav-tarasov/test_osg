@@ -242,30 +242,31 @@ namespace net_layer
     REFL_END()
 
 
-    struct attach_tow_msg
-        : network::msg_id<vm_attach_tow>
-    {
-        attach_tow_msg()
-            : tow_id (0)
-            , reverse   (false)
-        {}
+    //struct attach_tow_msg
+    //    : network::msg_id<vm_attach_tow>
+    //{
+    //    attach_tow_msg()
+    //        : ext_id (0)
+    //        , reverse   (false)
+    //    {}
 
-        attach_tow_msg( uint32_t  tow_id, bool      reverse)
-            : tow_id(tow_id), reverse(reverse)
-        {}
+    //    attach_tow_msg( uint32_t  ext_id, bool      reverse)
+    //        : ext_id(tow_id), reverse(reverse)
+    //    {}
 
-        uint32_t  tow_id;
-        bool      reverse  ;
-    };
+    //    uint32_t  ext_id;
+    //    bool      reverse  ;
+    //};
 
-    typedef attach_tow_msg   attach_tow_msg_t;
+    //typedef attach_tow_msg   attach_tow_msg_t;
 
-    REFL_STRUCT(attach_tow_msg)
-        REFL_ENTRY(tow_id)
-        REFL_ENTRY(reverse)
-    REFL_END()
-    
-    typedef gen_msg<vm_detach_tow, void>               detach_tow_msg_t;
+    //REFL_STRUCT(attach_tow_msg)
+    //    REFL_ENTRY(tow_id)
+    //    REFL_ENTRY(reverse)
+    //REFL_END()
+
+    typedef gen_msg<vm_attach_tow, uint32_t>               attach_tow_msg_t;    
+    typedef gen_msg<vm_detach_tow, uint32_t>               detach_tow_msg_t;
 
     struct container_msg
         : network::msg_id<sm_container_msg>

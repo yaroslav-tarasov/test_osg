@@ -94,6 +94,7 @@ namespace
             }
         }
 
+		FIXME("Эту хренотень надо сделать частью сервиса")
         virtual  void update_vis_messages()
         {
             while(queue_vis_.size()>0)

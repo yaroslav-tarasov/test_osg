@@ -49,6 +49,8 @@ namespace aircraft
         aircraft_fms::state_t st = get_fms_info()->get_state();
         st.dyn_state.pos = p;
         st.dyn_state.course = c;
+		
+		FIXME("Вопрос зачем было создавать fms и потом лезть в баду напрямую");
 
         if (ada::info_ptr ada_obj = find_first_object<ada::info_ptr>(collection_))
         {

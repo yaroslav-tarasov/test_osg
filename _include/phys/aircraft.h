@@ -118,6 +118,8 @@ namespace phys
 		virtual void   apply_force (point_3 const& f) = 0;
 		virtual void   update_aerodynamics(double dt) = 0;
 		virtual void   reset_suspension() = 0;
+
+		virtual void   set_position(const decart_position& pos)  = 0;
 	};
 
 

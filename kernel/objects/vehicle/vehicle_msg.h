@@ -34,7 +34,7 @@ typedef gen_msg<vm_settings, settings_t>           settings_msg_t;
 typedef gen_msg<vm_detach_tow, void>               detach_tow_msg_t;
 typedef gen_msg<vm_follow_route, uint32_t>         follow_route_msg_t;
 typedef gen_msg<vm_disable_debug_controls>         disable_debug_ctrl_msg_t;
-typedef gen_msg<vm_tow, boost::optional<uint32_t>> tow_msg_t;
+// typedef gen_msg<vm_tow, boost::optional<uint32_t>> tow_msg_t;
 typedef gen_msg<vm_brake, double>                  brake_msg_t;
 typedef gen_msg<vm_reverse, bool>                  reverse_msg_t;
 
@@ -63,6 +63,28 @@ REFL_STRUCT(attach_tow_msg)
     REFL_ENTRY(reverse)
 REFL_END()
 
+struct tow_msg
+	: network::msg_id<vm_tow>
+{
+	tow_msg()
+		: tow_id (0)
+		, reverse   (false)
+	{}
+
+	tow_msg( boost::optional<uint32_t>  tow_id, bool      reverse)
+		: tow_id(tow_id), reverse(reverse)
+	{}
+
+	boost::optional<uint32_t>  tow_id ;
+	bool                       reverse;
+};
+
+typedef tow_msg   tow_msg_t;
+
+REFL_STRUCT(tow_msg)
+	REFL_ENTRY(tow_id)
+	REFL_ENTRY(reverse)
+REFL_END()
 
 struct state_msg_t
     : network::msg_id<vm_state>

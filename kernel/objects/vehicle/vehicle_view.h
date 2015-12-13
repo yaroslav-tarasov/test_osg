@@ -46,16 +46,16 @@ protected:
 
     // base_view_presentation
 protected:
-    void on_object_destroying(object_info_ptr object) override;
-    void on_child_removing(kernel::object_info_ptr child) override;
+    void on_object_destroying ( object_info_ptr object ) override;
+    void on_child_removing    ( kernel::object_info_ptr child) override;
 
 protected:
-    void on_state   (state_t const& state);
-    void on_settings(settings_t const& settings);
-    void on_tow     (optional<uint32_t> id);
-    void on_model_changed();
+    void on_state             ( state_t const& state );
+    void on_settings          ( settings_t const& settings );
+    void on_tow               ( /*optional<uint32_t> id*/msg::tow_msg const& msg );
+    void on_model_changed     ();
 
-    void on_traj_assign         (msg::traj_assign_msg const &m);
+    void on_traj_assign       (msg::traj_assign_msg const &m);
 
 public:
     geo_point_2 const& pos()     const {return state_.pos;}
@@ -66,24 +66,25 @@ public:
 protected:
     virtual void on_state_changed() {}    // Задействован только в чарте
     virtual void settings_changed() {}
-    virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) {}
+    virtual void on_aerotow_changed (aircraft::info_ptr old_aerotow, bool reverse) {current_tow_point_node_ = reverse?rtow_point_node_:tow_point_node_;}
 
 public:
-    void set_settings( settings_t const& settings );
-    void set_state(state_t const&state);
-    void set_tow( optional<uint32_t> tow_id );
+    void set_settings ( settings_t const& settings );
+    void set_state    ( state_t const&state );
+    void set_tow      ( optional<uint32_t> tow_id, bool reverse );
 
 protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
     nodes_management::node_info_ptr     tow_point_node_;
     nodes_management::node_info_ptr     rtow_point_node_;
-
-    aircraft::info_ptr                  aerotow_;
+	nodes_management::node_info_ptr     current_tow_point_node_;
+    
+	aircraft::info_ptr                  aerotow_;
 
 protected:
     //////////////////////////////////////
-    fms::trajectory_ptr                    traj_;
+    fms::trajectory_ptr                 traj_;
     /////////////////////////////////////
 
 private:

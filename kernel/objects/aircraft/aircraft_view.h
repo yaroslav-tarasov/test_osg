@@ -168,7 +168,7 @@ protected:
 #endif
     void unassign_fpl       ();
     void set_kind           (std::string const& kind) override;
-    void set_turbulence     (unsigned turb) override;
+    void set_turbulence     (unsigned turb)           override;
 #if 0
     void set_atc_controls   (atc_controls_t const& controls) override;
     void set_ipo_controls   (ipo_controls_t const& controls) override;
@@ -176,17 +176,17 @@ protected:
 
     // aircraft_ipo_control
 protected:
-    void set_malfunction(malfunction_kind_t kind, bool enabled) override;
-    void set_cmd_go_around(uint32_t cmd_id) override;
-    void set_cmd_holding  (uint32_t cmd_id, fms::holding_t const &holding)   override;
+    void set_malfunction  (malfunction_kind_t kind, bool enabled)                   override;
+    void set_cmd_go_around(uint32_t cmd_id)                                         override;
+    void set_cmd_holding  (uint32_t cmd_id, fms::holding_t const &holding)          override;
     void set_cmd_course   (uint32_t cmd_id, fms::course_modifier_t const &course)   override;
-    void cancel_cmd       (uint32_t cmd_id)   override;
+    void cancel_cmd       (uint32_t cmd_id)                                         override;
 
-    void set_responder_mode(atc::responder_mode mode) override;
-    void set_responder_type(atc::squawk_type stype) override;
-    void set_responder_code(unsigned code) override;
+    void set_responder_mode(atc::responder_mode mode)   override;
+    void set_responder_type(atc::squawk_type stype)     override;
+    void set_responder_code(unsigned code)              override;
     void set_responder_flag(unsigned flag, bool enable) override;
-    void restore_responder_code() override;
+    void restore_responder_code()                       override;
 
 protected:
     void set_parking_initial_position(std::string const &airport_name, std::string const &parking_name);

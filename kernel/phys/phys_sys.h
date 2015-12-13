@@ -51,6 +51,7 @@ namespace phys
         virtual static_convex_ptr          create_static_convex     ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) = 0;
         virtual ray_cast_vehicle::info_ptr create_ray_cast_vehicle  ( double mass, /*sensor_ptr s*/compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual aircraft::info_ptr         create_aircraft          ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
+		virtual aircraft::info_ptr         create_aircraft_pl       ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
     };
 
     //! интерфейс коллизии, 

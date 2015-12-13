@@ -7,7 +7,7 @@ namespace aircraft
     //struct tp_provider;
     //struct info;
     //struct control;
-    struct int_control;   // FIXME все внуть ибо нефиг
+    struct int_control;   // FIXME все внутрь ибо нефиг
     //struct fms_container;
     //struct aircraft_ipo_control;
     //struct aircraft_atc_control;
@@ -47,6 +47,7 @@ namespace aircraft
     struct ani_info;
     struct model_info;
     struct model_control;
+	struct model_ext_control;
     struct atc_info;
     struct chart_info;
     struct chart_control;
@@ -54,6 +55,7 @@ namespace aircraft
     typedef polymorph_ptr<ani_info>         ani_info_ptr;
     typedef polymorph_ptr<model_info>       model_info_ptr;
     typedef polymorph_ptr<model_control>    model_control_ptr;
+	typedef polymorph_ptr<model_ext_control> model_ext_control_ptr;
     typedef polymorph_ptr<atc_info>         atc_info_ptr;
     typedef polymorph_ptr<chart_info>       chart_info_ptr;
     typedef polymorph_ptr<chart_control>    chart_control_ptr;

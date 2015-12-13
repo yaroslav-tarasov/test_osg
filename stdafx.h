@@ -113,12 +113,11 @@ namespace vehicle
 	// FIXME for debugging purposes
 	struct model_base
 	{
-		virtual ~model_base() {};
-		virtual void update( double /*time*/ ) =0;
-		virtual void on_aerotow_changed(aircraft::info_ptr old_aerotow) =0;
-		virtual void go_to_pos(  cg::geo_point_2 pos, double course ) =0;
+		virtual ~model_base             () {};
+		virtual void update             ( double /*time*/ ) =0;
+		virtual void go_to_pos          ( cg::geo_point_2 pos, double course ) =0;
 #ifdef DEPRECATED
-		virtual void set_state_debug(state_t const& state) =0 ;
+		virtual void set_state_debug    (state_t const& state) =0 ;
 #endif
 		virtual nodes_management::node_info_ptr get_root()=0;
 	};

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "atc/position.h"
-#include "objects/aircraft_physless.h"
+//#include "objects/aircraft_physless.h"
 #include "aircraft_physless_common.h" 
 
 namespace phys

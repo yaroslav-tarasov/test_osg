@@ -16,6 +16,12 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
     if (nodes_manager_)
     {
+		//FIXME("Ќу ок, а если модель помен€ем то где tow искать? ")
+		//{
+		//	nodes_manager_->set_model(settings_.model);
+		//}
+
+
         root_ = nodes_manager_->get_node(0);
         conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
         tow_point_node_ = nodes_manager_->find_node("tow_point");
@@ -46,7 +52,7 @@ void view::on_object_destroying(object_info_ptr object)
     {
         auto old_aerotow = aerotow_;
         aerotow_.reset();
-        on_aerotow_changed(old_aerotow) ;
+        on_aerotow_changed(old_aerotow, false) ;
     }
 
 }
@@ -74,17 +80,19 @@ void view::on_settings(settings_t const& settings)
     settings_changed();
 }
 
-void view::on_tow(optional<uint32_t> id)
+void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
 {
     auto old_aerotow = aerotow_;
-    aerotow_ = id ? collection_->get_object(*id) : nullptr;
+    aerotow_ = msg.tow_id ? collection_->get_object(*msg.tow_id) : nullptr;
 
-    on_aerotow_changed(old_aerotow) ;
+    on_aerotow_changed(old_aerotow, msg.reverse) ;
 }
 
 void view::on_model_changed()
 {
     root_ = nodes_manager_->get_node(0);
+	tow_point_node_ = nodes_manager_->find_node("tow_point");
+	rtow_point_node_ = nodes_manager_->find_node("rtow_point");
 }
 
 void view::set_settings( settings_t const& settings )
@@ -97,9 +105,9 @@ void view::set_state(state_t const& state)
     set(msg::state_msg_t(state), false);
 }
 
-void view::set_tow(optional<uint32_t> tow_id)
+void view::set_tow(optional<uint32_t> tow_id, bool reverse)
 {
-    set(msg::tow_msg_t(tow_id), true);
+    set(msg::tow_msg_t(tow_id, reverse), true);
 }
 
 void view::on_traj_assign(msg::traj_assign_msg const &m)

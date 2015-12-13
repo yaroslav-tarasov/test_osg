@@ -30,12 +30,14 @@
 #include "objects/vehicle_fwd.h"
 #include "objects/vehicle.h"
 
-#include "aircraft_physless.h"
+//#include "aircraft_physless.h"
 
 #include "av/avCore/DebugRenderer.h"
 
 #include "utils/krv_import.h"
 #include "tests/systems/test_systems.h"
+
+#define DEPRECATED_DEBUG_MODE
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
@@ -56,7 +58,11 @@ namespace bi
 	{
 		        _private()
                     : _krv_data_getter("log_minsk.txt")
-                    , _sys            (nullptr/*phys::create_phys_system()*/)
+#ifdef DEPRECATED_DEBUG_MODE
+                    , _sys            (phys::create_phys_system())
+#else
+					, _sys            (nullptr/*phys::create_phys_system()*/)
+#endif
                     , _msys(nullptr)
                     , _vsys(nullptr)
                     , _csys(nullptr)
@@ -738,21 +744,21 @@ namespace bi
              return true;
          });
 
-         kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&a_or_v](aircraft_physless::control_ptr a)->bool
-         {
-             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
-             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+         //kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&a_or_v](aircraft_physless::control_ptr a)->bool
+         //{
+         //    auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+         //    uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
-             if( nm_id == this->selected_obj_id_)
-             {
-                 selected_object_type_signal_(AIRCRAFT_TYPE);
-                 auto traj = aircraft::int_control_ptr(a)->get_trajectory();
-                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
-                 a_or_v = true;
-                 return false;
-             }
-             return true;
-         });
+         //    if( nm_id == this->selected_obj_id_)
+         //    {
+         //        selected_object_type_signal_(AIRCRAFT_TYPE);
+         //        auto traj = aircraft::int_control_ptr(a)->get_trajectory();
+         //        if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
+         //        a_or_v = true;
+         //        return false;
+         //    }
+         //    return true;
+         //});
 
          if(!a_or_v)
             selected_object_type_signal_(NONE_TYPE);
@@ -928,48 +934,48 @@ namespace bi
             });
 
 
-            kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&target_pos](aircraft_physless::control_ptr a)->bool
-            {
-                auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
-                uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+            //kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&target_pos](aircraft_physless::control_ptr a)->bool
+            //{
+            //    auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+            //    uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
-                if( nm_id == this->selected_obj_id_)
-                {
-                    aircraft_physless::info_ptr am= aircraft_physless::info_ptr(a);
+            //    if( nm_id == this->selected_obj_id_)
+            //    {
+            //        aircraft_physless::info_ptr am= aircraft_physless::info_ptr(a);
 
-                    decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
-                    target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
+            //        decart_position cur_pos = aircraft::int_control_ptr(am)->get_local_position();
+            //        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - cur_pos.pos).course,0,0);
 
-                    if (!aircraft::int_control_ptr(am)->get_trajectory())
-                    {
-                        aircraft::int_control_ptr(am)->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
-                    }
-                    else
-                    {  
-                        fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
+            //        if (!aircraft::int_control_ptr(am)->get_trajectory())
+            //        {
+            //            aircraft::int_control_ptr(am)->set_trajectory( fms::trajectory::create(cur_pos,target_pos,aircraft::min_radius(),aircraft::step()));
+            //        }
+            //        else
+            //        {  
+            //            fms::trajectory_ptr main_ = aircraft::int_control_ptr(am)->get_trajectory();
 
-                        decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
-                            ,main_->curs_value(main_->length()).cpr()/*cg::cpr(main_->curs_value(main_->length()),0,0)*/ );
+            //            decart_position begin_pos(cg::point_3(main_->kp_value(main_->length()),0)
+            //                ,main_->curs_value(main_->length()).cpr()/*cg::cpr(main_->curs_value(main_->length()),0,0)*/ );
 
-                        target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
+            //            target_pos.orien = cg::cpr(cg::polar_point_2(target_pos.pos - begin_pos.pos).course);
 
-                        fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
-                            target_pos,
-                            aircraft::min_radius(),
-                            aircraft::step());
+            //            fms::trajectory_ptr traj = fms::trajectory::create( begin_pos,
+            //                target_pos,
+            //                aircraft::min_radius(),
+            //                aircraft::step());
 
-                        main_->append(traj);
+            //            main_->append(traj);
 
-                        aircraft::int_control_ptr(am)->set_trajectory(main_);
-                    }
+            //            aircraft::int_control_ptr(am)->set_trajectory(main_);
+            //        }
 
-                    // Подробная отрисовка
-                    _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory(),cg::coloraf(1.0f,0.0f,0.0f,1.0f));
+            //        // Подробная отрисовка
+            //        _trajectory_drawer->set(aircraft::int_control_ptr(am)->get_trajectory(),cg::coloraf(1.0f,0.0f,0.0f,1.0f));
 
-                    return false;
-                }
-                return true;
-            });
+            //        return false;
+            //    }
+            //    return true;
+            //});
 
         }
 

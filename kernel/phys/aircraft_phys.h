@@ -62,6 +62,7 @@ namespace phys
 
        void   update_aerodynamics(double dt)    override;
        void   reset_suspension()                override;
+       void   set_position(const decart_position& pos) override;
 
    // rigid_body_impl
    private:

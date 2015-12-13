@@ -39,7 +39,8 @@ public:
 	aircraft::info_ptr          createUFO2    ( osg::Node* node, int id, double mass);
 #endif
 
-    aircraft::info_ptr          create_aircraft(const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
+    aircraft::info_ptr          create_aircraft    (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
+	aircraft::info_ptr          create_aircraft_pl (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &);
     ray_cast_vehicle::info_ptr  create_ray_cast_vehicle(double,phys::compound_sensor_ptr,const decart_position & pos);
     static_mesh_ptr             create_static_mesh       ( sensor_ptr s ) ;
     static_convex_ptr           create_static_convex     ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) ;

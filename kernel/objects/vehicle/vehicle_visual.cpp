@@ -154,7 +154,7 @@ void visual::update(double time)
             
             quaternion atr_quat = aerotow_root->get_global_orien();
 
-            point_3f offset = base(tow_point_node_->get_global_pos());
+            point_3f offset = base(/*tow_point_node_*/current_tow_point_node_->get_global_pos());
             geo_point_3 air_tow_pos = geo_base_3(aerotow_root->get_global_pos())(aerotow_root->get_global_orien().rotate_vector(point_3(aerotow_->tow_point_transform().translation())));
             point_3f offset2 = base(air_tow_pos);
 

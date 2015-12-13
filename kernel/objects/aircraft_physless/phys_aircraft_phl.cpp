@@ -284,6 +284,11 @@ namespace aircraft_physless
     {
         if (!phys_aircraft_)
             return;
+		
+		decart_position cur_pos = phys_aircraft_->get_position();
+		decart_position root_pos = cur_pos * body_transform_inv_;
+		geo_position cur_glb_pos(cur_pos, base_);
+		geo_position root_glb_pos(root_pos, base_);
 
         if ( tow_attached_ )
         {
@@ -293,7 +298,8 @@ namespace aircraft_physless
             phys_aircraft_->set_elevator(0);
             phys_aircraft_->set_ailerons(0);
 
-            return;
+			FIXME(Наверное зависит от направления буксировки, причем сильно)
+            //return;
         }
 
         double steer = 0;
@@ -319,6 +325,7 @@ namespace aircraft_physless
         phys_aircraft_->set_rudder(rudder);
         // phys_aircraft_->set_wind(wind);
 
+		phys_aircraft_->set_position(decart_position(base_(desired_position_),desired_orien_));
     }
 
 }

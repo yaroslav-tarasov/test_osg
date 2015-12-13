@@ -2,12 +2,15 @@
 
 
 #include "common/aircraft.h"
-#include "objects/aircraft_physless.h"
+#include "common/aircraft_fms.h"
+
+//#include "objects/aircraft_physless.h"
 
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
 
 #include "common/test_msgs.h"
+#include "aircraft_physless_state.h"
 
 namespace aircraft_physless
 {
@@ -48,9 +51,9 @@ protected:
 struct view
     : kernel::base_view_presentation
     , obj_data_holder<craft_data>
-    , info
-    , control
-    , aircraft_ipo_control
+    , aircraft::info
+    , aircraft::control
+    , aircraft::aircraft_ipo_control
 {
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
@@ -82,7 +85,10 @@ protected:
     point_3             dpos               () const override;
     cpr                 orien              () const override;
     aircraft::settings_t const &  settings           () const override;
-    //bool                has_assigned_fpl   () const override;
+#if 1
+	fpl::info_ptr       get_fpl            () const override;
+#endif
+	bool                has_assigned_fpl   () const override;
     transform_4 const&  tow_point_transform() const override;
 
     nodes_management::node_info_ptr root() const override; 
@@ -99,20 +105,31 @@ protected:
     void unassign_fpl()     {};
     void set_kind           (std::string const& kind) override;
     void set_turbulence     (unsigned turb)           override;
-    
-    void set_state          (state_t const& st) override;
 
 protected:
+	void set_state          (state_t const& st) /*override*/;
     void set_state          (state_t const& st, bool sure);
 
-    // aircraft_ipo_control
+	// aircraft_ipo_control
 protected:
-    void set_malfunction(aircraft::malfunction_kind_t kind, bool enabled) override;
+	void set_malfunction  (aircraft::malfunction_kind_t kind, bool enabled)         override;
+	void set_cmd_go_around(uint32_t cmd_id)                                         override;
+	void set_cmd_holding  (uint32_t cmd_id, fms::holding_t const &holding)          override;
+	void set_cmd_course   (uint32_t cmd_id, fms::course_modifier_t const &course)   override;
+	void cancel_cmd       (uint32_t cmd_id)                                         override;
+
+	void set_responder_mode(atc::responder_mode mode)   override;
+	void set_responder_type(atc::squawk_type stype)     override;
+	void set_responder_code(unsigned code)              override;
+	void set_responder_flag(unsigned flag, bool enable) override;
+	void restore_responder_code()                       override;
 
 protected:
     void set_parking_initial_position(std::string const &airport_name, std::string const &parking_name);
 
-
+	// fms_container
+protected:
+	aircraft::aircraft_fms::info_ptr get_fms() const override;
 
 protected:
     virtual void on_settings_changed() {}
@@ -181,7 +198,7 @@ protected:
     fms::trajectory_ptr            traj_;
     meteo::local_params            lp_;
     /////////////////////////////////////
-
+	DECLARE_EVENT(state_changed, ()) ;                       // fms
 
     state_t                                _state;
     inline        state_t  const&          get_state() const {return _state;}

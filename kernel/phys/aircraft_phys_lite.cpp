@@ -74,6 +74,11 @@ FIXME("Off point for bullet")
             control_manager_(deltaTimeStep);
         // update_aerodynamics(deltaTimeStep);
 	}
+	
+	void impl::update_aerodynamics(double dt)
+	{
+
+	}
 
     void impl::debugDraw(btIDebugDraw* debugDrawer)
     {
@@ -263,6 +268,11 @@ FIXME("Off point for bullet")
         }
         
     }
+
+	void impl::set_position(const decart_position& pos)
+	{
+		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+	}
 
     decart_position impl::get_position() const
     {

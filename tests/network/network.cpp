@@ -44,7 +44,7 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
 
     fms::trajectory::keypoints_t  kpts;
     fms::trajectory::curses_t      crs;
-    fms::trajectory::speed_t  vls;
+    fms::trajectory::speed_t       vls;
 
     const unsigned start_idx = 0/*11*/;
     cg::point_2 prev(kdg.kd_[start_idx].x,kdg.kd_[start_idx].y);
@@ -79,7 +79,7 @@ struct client
         : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
         , period_(/*4.*/.5)
         , timer_  (boost::bind(&client::update, this))
-        , _traj(fill_trajectory(krv::data_getter(/*"log_minsk.txt"*/"log_minsk_buks22.txt")))
+        , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
     {
         LogInfo("Connecting to " << peer);
 

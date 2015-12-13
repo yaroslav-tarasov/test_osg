@@ -1,7 +1,6 @@
 #pragma once
 
 #include "objects/registrator.h"
-#include "aircraft_physless.h"
 
 namespace aircraft_reg
 {

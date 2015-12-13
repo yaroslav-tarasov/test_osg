@@ -32,6 +32,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , phys_object_model_base    (collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
+	, ada_             (find_first_object<ada::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
     , rotors_angular_speed_ (0)
@@ -52,6 +53,8 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     sync_state_.reset(new sync_fsm::none_state(*this));
 
      conn_holder() << dynamic_cast<system_session *>(sys_)->subscribe_time_factor_changed(boost::bind(&model::on_time_factor_changed, this, _1, _2));
+	 
+	 make_aircraft_info();
 
 }
 
@@ -436,6 +439,10 @@ void model::on_object_destroying(object_info_ptr object)
     }
 }
 
+phys::rigid_body_ptr model::get_rigid_body() const
+{
+	return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
+}
 
 point_3 model::tow_offset() const
 {
@@ -498,6 +505,14 @@ geo_position model::fms_pos() const
     return geo_position(/*get_fms_info()->*/get_state().dyn_state.pos, /*get_fms_info()->*//*get_state().dyn_state.TAS * dir*/point_3(0,0,0), /*get_fms_info()->*/get_state().orien(), point_3(0,0,0));
 }
 
+void model::make_aircraft_info()
+{
+	if (ada_)
+	{
+		aircraft_data_ = *ada_->get_data(/*"A319"*/settings_.kind);
+	}
+}
+
 optional<ada::data_t> const& model::fsettings() const
 {
     FIXME("Да это нам надо, и в каком-то виде для  ");
@@ -521,12 +536,12 @@ void model::freeze_position()
 
 void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
 {
-    /*   if (!phys_aircraft)
+    if (!phys_aircraft)
     {
-    if (tow_attached_ && tow_invalid_callback_)
-    tow_invalid_callback_();
+		if (tow_attached_ && tow_invalid_callback_)
+		tow_invalid_callback_();
     }
-    phys_aircraft_ = phys_aircraft;*/
+    phys_aircraft_ = phys_aircraft;
 }
 
 void model::set_nm_angular_smooth(double val)

@@ -995,14 +995,14 @@ osg::Group*  Scene::createTerrainRoot()
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
     
-    //settings->setDebugDraw(true);
+    //settings->setDebugDraw(false);
     
     settings->setShadowMapProjectionHint(avShadow::ShadowSettings::PERSPECTIVE_SHADOW_MAP);   //ORTHOGRAPHIC_SHADOW_MAP
     settings->setBaseShadowTextureUnit(BASE_SHADOW_TEXTURE_UNIT);
     settings->setMinimumShadowMapNearFarRatio(0.5);
     //settings->setNumShadowMapsPerLight(/*numShadowMaps*/2);
     //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::PARALLEL_SPLIT);
-    //settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
+    settings->setMultipleShadowMapHint(avShadow::ShadowSettings::CASCADED);
     settings->setTextureSize(osg::Vec2s(fbo_tex_size,fbo_tex_size));
     //settings->setLightNum(2);
     settings->setMaximumShadowMapDistance(1500);

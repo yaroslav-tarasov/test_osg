@@ -61,7 +61,10 @@ namespace phys
        void   set_wind    (cg::point_3 const& wind) override;
        void   apply_force (point_3 const& f)        override;
 
-       void   reset_suspension()                override;
+	   void   update_aerodynamics(double dt)        override;
+       void   reset_suspension()                    override;
+	   
+	   void   set_position(const decart_position& pos)  override;
 
    // rigid_body_impl
    private:

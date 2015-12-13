@@ -148,6 +148,19 @@ aircraft::settings_t const & view::settings() const
     return settings_;
 }
 
+#if 1
+fpl::info_ptr view::get_fpl() const
+{
+	assert(0);
+	return /*fpl_*/fpl::info_ptr();
+}
+#endif
+
+bool view::has_assigned_fpl() const
+{
+	assert(0);
+	return /*fpl_id_*/false;
+}
 
 transform_4 const&  view::tow_point_transform() const
 {
@@ -198,12 +211,120 @@ void view::set_turbulence(unsigned turbulence)
     set(msg::settings_msg(s));
 }
 
+aircraft::aircraft_fms::info_ptr view::get_fms() const
+{
+	assert(0);
+	return /*fms_info_*/aircraft::aircraft_fms::info_ptr();
+}
 
 void view::set_malfunction(aircraft::malfunction_kind_t kind, bool enabled)
 {
     set(msg::malfunction_msg(kind, enabled));
 }
 
+void view::set_cmd_go_around(uint32_t cmd_id)
+{ 
+#if 0
+	fpl::control_ptr const fpl = get_fpl();
+	Assert(fpl);
+
+	fpl->set_cmd_go_around(cmd_id, len_for_cmd());
+#endif
+}
+
+void view::set_cmd_holding(uint32_t cmd_id, fms::holding_t const &holding)
+{
+#if 0
+	fpl::control_ptr const fpl = get_fpl();
+	Assert(fpl);
+
+	fpl->set_cmd_holding(cmd_id, len_for_cmd(), holding);
+#endif
+}
+
+void view::set_cmd_course(uint32_t cmd_id, fms::course_modifier_t const &course)
+{
+#if 0
+	fpl::control_ptr const fpl = get_fpl();
+	Assert(fpl);
+
+	fpl->set_cmd_course(cmd_id, len_for_cmd(), course);
+#endif
+}
+
+void view::cancel_cmd(uint32_t cmd_id)
+{
+#if 0
+	fpl::control_ptr const fpl = get_fpl();
+	Assert(fpl);
+
+	fpl->cancel_cmd(cmd_id);
+#endif
+}
+
+void view::set_responder_mode(atc::responder_mode mode)
+{
+	if (settings_.responder.mode == mode)
+		return ;
+
+	aircraft::settings_t s = settings_;
+	s.responder.mode = mode ;
+
+	set(msg::settings_msg(s));
+}
+
+void view::set_responder_type(atc::squawk_type stype)
+{
+	if (settings_.responder.type == stype)
+		return ;
+
+	aircraft::settings_t s = settings_;
+	s.responder.type = stype ;
+
+	set(msg::settings_msg(s));
+}
+
+void view::set_responder_code(unsigned code)
+{
+	if (settings_.responder.code == code)
+		return ;
+
+	aircraft::settings_t s = settings_;
+
+	if (!old_responder_code_)
+		old_responder_code_ = s.responder.code ;
+
+	s.responder.code = code ;
+	set(msg::settings_msg(s));
+}
+
+void view::set_responder_flag(unsigned flag, bool enable)
+{
+	if (((settings_.responder.flags & flag) == flag) && enable)
+		return ;
+
+	aircraft::settings_t s = settings_;
+
+	if (enable)
+		s.responder.flags = flag ;
+	else
+		s.responder.flags &= ~flag ;
+
+	set(msg::settings_msg(s));
+}
+
+void view::restore_responder_code()
+{
+	if (!old_responder_code_)
+		return ;
+
+	aircraft::settings_t s = settings_;
+
+	s.responder.code = *old_responder_code_ ;
+	set(msg::settings_msg(s));
+
+	old_responder_code_ = boost::none ;
+}
 
 void view::set_parking_initial_position(std::string const &airport_name, std::string const &parking_name)
 {

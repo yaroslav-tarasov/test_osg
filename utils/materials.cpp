@@ -242,8 +242,8 @@ FIXME(Все теже кривые плоскости)
                     t.colorTex->setMaxAnisotropy(16.0f);
 
                     // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
-                    t.colorTex->setInternalFormatMode(
-                        osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
+                    //t.colorTex->setInternalFormatMode(
+                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
                     t.colorTex->setUnRefImageDataAfterApply( true );
                 } 
                 else

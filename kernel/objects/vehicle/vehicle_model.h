@@ -38,7 +38,7 @@ private:
 
     // view
 private:
-    void on_aerotow_changed  (aircraft::info_ptr old_aerotow) override;
+    void on_aerotow_changed  (aircraft::info_ptr old_aerotow, bool reverse) override;
     
     
     // model_info

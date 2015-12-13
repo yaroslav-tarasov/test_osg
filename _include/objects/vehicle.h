@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vehicle_fwd.h"
+
 namespace vehicle
 {
 

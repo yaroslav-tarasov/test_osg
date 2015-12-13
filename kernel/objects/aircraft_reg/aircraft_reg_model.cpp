@@ -2,7 +2,7 @@
 #include "precompiled_objects.h"
 
 #include "aircraft_reg_model.h"
-#include "objects\common\aircraft_physless.h"
+//#include "objects\common\aircraft_physless.h"
 #include "objects\common\vehicle.h"
 
 namespace aircraft_reg
@@ -33,7 +33,7 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
      {
          auto a = objects_[msg.ext_id];
          
-         if(auto pa = aircraft_physless::model_control_ptr(a))
+         if(auto pa = aircraft::model_ext_control_ptr(a))
          {
              auto it = last_msg_.find(msg.ext_id);
              if(it!=last_msg_.end() && msg.reverse != it->second.reverse)
@@ -77,7 +77,7 @@ void model::on_inject_msg(net_layer::msg::container_msg const& msg)
 
 void model::on_object_created(object_info_ptr object)
 {
-	if (aircraft_physless::info_ptr info = object)
+	if (aircraft::info_ptr info = object)
 	{
         if(info)
 			add_object(info);
