@@ -481,12 +481,14 @@ private:
      {   
          size_t size = binary::size(*data);
          error_code_t ec;
-         sockets_[id]->send(&size, sizeof(uint32_t));
-         if (ec)
-         {
-             LogError("TCP send error: " << ec.message());
-             return;
-         }
+         FIXME( XXX );
+         //  XXX
+         //sockets_[id]->send(&size, sizeof(uint32_t));
+         //if (ec)
+         //{
+         //    LogError("TCP send error: " << ec.message());
+         //    return;
+         //}
 
          sockets_[id]->send(binary::raw_ptr(*data), size);
          if (ec)
@@ -595,7 +597,7 @@ private:
 };
 
 
-//#define MULTITHREADED
+#define MULTITHREADED
 
 #ifndef  MULTITHREADED
 struct visapp
@@ -997,11 +999,13 @@ private:
        gt_.set_factor(msg.factor);
     }
 
+#if 0
     void on_container(container_msg const& msg)
     {
         for (size_t i = 0; i < msg.msgs.size(); ++i)
             disp_.dispatch_bytes(msg.msgs[i]);
     }
+#endif
 
     void on_create(create const& msg)
     {
@@ -1011,12 +1015,15 @@ private:
 
     }
 
+
     void inject_msg(const void* data, size_t size)
     {
         if (reg_obj_)
         {
             reg_obj_->inject_msg(data, size);
         }
+
+        // LogInfo("inject_msg (const void* data, size_t size) " << size  );
 
     }
 

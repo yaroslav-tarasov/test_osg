@@ -46,7 +46,7 @@ public:
 		AnimtkViewerModelController& self = instance();
 		self._model = model;
 		for (osgAnimation::AnimationList::const_iterator it = self._model->getAnimationList().begin(); it != self._model->getAnimationList().end(); it++)
-			self._map[(*it)->getName()] = *it;
+            self._map[(*it)->getName() + "_base"] = *it;
 
 		for(osgAnimation::AnimationMap::iterator it = self._map.begin(); it != self._map.end(); it++)
 		{
@@ -55,11 +55,45 @@ public:
             self._amd.insert(std::make_pair(it->first,it->second.get()->getDuration()));
         }
         
-        self._default = new osgAnimation::ActionStripAnimation(self._map[self._amv.back()].get(),0.0,0.0);
-        self._default->setLoop(0); // means forever
+        //self._default = new osgAnimation::ActionStripAnimation(self._map[self._amv.back()].get(),0.0,0.0);
+        //self._default->setLoop(0); // means forever
 
 		return true;
 	}
+
+    static bool addAnimation(osg::Node* anim_container ) 
+    {
+        osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(anim_container->getUpdateCallback());
+        osgAnimation::AnimationMap local_map;
+
+        if(!model) 
+        {
+            osg::notify(osg::FATAL) << "Did not find AnimationManagerBase updateCallback needed to animate elements" << std::endl;
+            return false;
+        }
+        
+        AnimtkViewerModelController& self = instance();
+        // self._model = model;
+        
+        for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
+        {
+            self._map[(*it)->getName() + "_" + anim_container->getName() ] = *it;
+            local_map[(*it)->getName() + "_" + anim_container->getName() ] = *it;
+            self._model->registerAnimation(*it);
+        }
+
+        for(osgAnimation::AnimationMap::iterator it = local_map.begin(); it != local_map.end(); it++)
+        {
+            self._amv.push_back(it->first);
+            it->second.get()->computeDuration();
+            self._amd.insert(std::make_pair(it->first,it->second.get()->getDuration()));
+        }
+
+        //self._default = new osgAnimation::ActionStripAnimation(self._map[self._amv.back()].get(),0.0,0.0);
+        //self._default->setLoop(0); // means forever
+
+        return true;
+    }
 
 	bool list() 
 	{
@@ -85,11 +119,10 @@ public:
     
     void setDurationRatio (double ratio)
     {
-        if(_focus < _amv.size()) 
+        for(osgAnimation::AnimationMap::iterator it = _map.begin(); it != _map.end(); it++)
         {
-            const std::string& name = _amv[_focus];
-            std::cout << "Play " << name << std::endl;
-            _map[name].get()->setDuration(_amd[name] * ratio);
+            const std::string& name = it->first;
+            it->second.get()->setDuration(_amd[name] * ratio);
         }
     }
 
@@ -149,7 +182,7 @@ public:
 
     bool playing()
     {
-        return _model->isPlaying(_amv[_focus]);
+        return _model->isPlaying(_map[_amv[_focus]].get());
     }
 
     const osgAnimation::BasicAnimationManager* manager() const

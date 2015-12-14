@@ -37,7 +37,8 @@
 #include "utils/krv_import.h"
 #include "tests/systems/test_systems.h"
 
-#define DEPRECATED_DEBUG_MODE
+////  ifndef MULTITHREADED
+//#define DEPRECATED_DEBUG_MODE
 
 // FIXME
 FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")

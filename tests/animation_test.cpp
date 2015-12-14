@@ -5,6 +5,81 @@
 #include "av/precompiled.h"
 #include "PickHandler.h"
 
+#include "osg_helpers.h"
+
+const bool walking = true;
+
+namespace {
+
+class KeyHandler : public osgGA::GUIEventHandler
+{
+
+public:
+    typedef std::function<void()> do_smthng_f;
+public:
+    KeyHandler(osg::Node * root) 
+        : _root (dynamic_cast<osg::MatrixTransform*>(root))
+        , _grad (0.0)
+    {}
+
+    virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+    {
+        if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
+        {            
+            if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Right )
+            { 
+                if ( _root )
+                { 
+                    _grad += 1;
+                    _grad = cg::norm360(_grad);
+                    const osg::Vec3d& pos = _root->getMatrix().getTrans();
+                    osg::Matrix trMatrix;            
+                    trMatrix.setTrans(pos);
+                    trMatrix.setRotate(osg::Quat(osg::inDegrees(_grad)  ,osg::Z_AXIS));
+                    _root->setMatrix(trMatrix);
+                }
+                return true;
+            }
+            else if ( ea.getKey()== osgGA::GUIEventAdapter::KEY_Left )
+            {
+                if ( _root )
+                { 
+                    _grad -= 1;
+                    _grad = cg::norm360(_grad);
+                    const osg::Vec3d& pos = _root->getMatrix().getTrans();
+                    osg::Matrix trMatrix;            
+                    trMatrix.setTrans(pos);
+                    trMatrix.setRotate(osg::Quat(osg::inDegrees(_grad)  ,osg::Z_AXIS));
+                    _root->setMatrix(trMatrix);
+                }
+                return true;
+            }
+            else if ( ea.getKey()== osgGA::GUIEventAdapter::KEY_N )
+            {
+                using namespace avAnimation;
+                AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
+                mc.stop();
+                mc.next();
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    virtual void getUsage(osg::ApplicationUsage& usage) const
+    {
+        usage.addKeyboardMouseBinding("Keypad +",       "Change texture");
+        usage.addKeyboardMouseBinding("Keypad -",       "Change texture");
+
+    }
+
+private:
+    osg::ref_ptr<osg::MatrixTransform>    _root;
+    double                                _grad;
+};
+
 struct UpdateNode: public osg::NodeCallback
 {
     UpdateNode(osg::Transform * tr)
@@ -28,7 +103,7 @@ struct UpdateNode: public osg::NodeCallback
             auto& mc   = avAnimation::AnimtkViewerModelController::instance();
             if(!mc.playing())
             {
-                mat->setPosition(pos + osg::Vec3d(0.0,-170.0,0));
+                mat->setPosition(pos + osg::Vec3d(0.0,walking?-170.0:-300.0,0));
                 mc.play();
             }
         }
@@ -63,8 +138,11 @@ struct UpdateNode2: public osg::NodeCallback
         
         if(node->asTransform())
         {
-            auto mat = node->asTransform()->asPositionAttitudeTransform();
-            const osg::Vec3d& pos = mat->getPosition();
+            auto pat = node->asTransform()->asPositionAttitudeTransform();
+            auto mat = pat->getParent(0)->asTransform()->asMatrixTransform();
+
+            const osg::Vec3d& pos = mat->getMatrix().getTrans();
+            // const osg::Vec3d& pos = mat->getPosition();
             auto& mc   = avAnimation::AnimtkViewerModelController::instance();
             
             if(flag_delayed)
@@ -78,8 +156,17 @@ struct UpdateNode2: public osg::NodeCallback
                         << std::endl;
                 }
 
+                const cg::quaternion orien = from_osg_quat(/*mat->getAttitude()*/mat->getMatrix().getRotate());
+                const cg::cpr&       cpr   = orien.cpr();
+                auto                 posv  = std::polar(-(walking?170.0:300.0),cg::grad2rad() * orien.cpr().course);
+                
+                // mat->setPosition(pos + osg::Vec3d(0.0,walking?-170.0:-300.0,0));
+                
+                osg::Matrix trMatrix;            
+                trMatrix.setTrans(pos + osg::Vec3d(posv.imag(),posv.real(),0)/*+ osg::Vec3d(0.0,walking?-170.0:-300.0,0)*/);
+                trMatrix.setRotate(mat->getMatrix().getRotate());
+                mat->setMatrix(trMatrix);
 
-                mat->setPosition(pos + osg::Vec3d(0.0,-300.0,0));     // -170
                 flag_delayed = false;
             }
 
@@ -100,6 +187,15 @@ private:
      osg::Vec3d                      _pos;
 };
 
+}
+
+inline osg::Node* loadAnimation(std::string aname)
+{
+    auto anim = osgDB::readNodeFile("running/" + aname + ".fbx");
+    anim->setName(aname);
+    return  anim;
+}
+
 int main_anim_test( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);
@@ -113,21 +209,20 @@ int main_anim_test( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
    
-   auto anim_file = osgDB::readNodeFile("running/running.fbx");
+   auto anim_file = walking? osgDB::readNodeFile("running/walking.fbx"):osgDB::readNodeFile("running/running.fbx")  ;
    
-   osgAnimation::AnimationManagerBase* animationManager = dynamic_cast<osgAnimation::AnimationManagerBase*>(anim_file->getUpdateCallback());
-   
-   if(!animationManager) 
-   {
-       osg::notify(osg::FATAL) << "Did not find AnimationManagerBase updateCallback needed to animate elements" << std::endl;
-       return 1;
-   }
+   auto anim_idle    = loadAnimation("idle");
+   auto anim_running = loadAnimation("running");
 
    auto object_file = osgDB::readNodeFile("running/Remy.fbx");
 
    auto pat = new osg::PositionAttitudeTransform; 
    pat->addChild(object_file);
-   pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+   pat->setAttitude(
+       osg::Quat(osg::inDegrees(90.0)  ,osg::X_AXIS,
+                 osg::inDegrees(0.0)   ,osg::Y_AXIS,
+                 osg::inDegrees(0.0)   ,osg::Z_AXIS)
+       );
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
 
    //root->setUpdateCallback(new UpdateNode(pat));
@@ -140,16 +235,23 @@ int main_anim_test( int argc, char** argv )
    ph_ctrl->setUserValue("id",6666);
    ph_ctrl->addChild( pat );
 
+   osg::Matrix trMatrix;            
+   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+   ph_ctrl->setMatrix(trMatrix);
+   
    root->addChild(ph_ctrl);
    
    pat->addUpdateCallback(new UpdateNode2(pat,"Body"));
 
    using namespace avAnimation;
    AnimationManagerFinder finder;
-   /*pat*/anim_file->accept(finder);
+   anim_file->accept(finder);
    if (finder._am.valid()) {
        pat->addUpdateCallback(finder._am.get());
        AnimtkViewerModelController::setModel(finder._am.get());
+       AnimtkViewerModelController::addAnimation(anim_idle); 
+       AnimtkViewerModelController::addAnimation(anim_running); 
+       
 
        // We're safe at this point, so begin processing.
        AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
@@ -160,12 +262,11 @@ int main_anim_test( int argc, char** argv )
    } else {
        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
-   
-
 
    osg::ref_ptr<PickHandler> picker = new PickHandler;
    root->addChild( picker->getOrCreateSelectionBox() );
 
+   viewer.addEventHandler( new KeyHandler( ph_ctrl.get() ) );
    viewer.addEventHandler( picker.get() );
    viewer.setSceneData(root);
 
