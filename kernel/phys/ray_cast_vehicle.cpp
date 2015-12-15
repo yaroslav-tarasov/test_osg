@@ -286,8 +286,8 @@ namespace ray_cast_vehicle
 
         tow_constraint_self_.get()->setLinearLowerLimit(to_bullet_vector3(cg::point_3(0, 0, 0)));
         tow_constraint_self_.get()->setLinearUpperLimit(to_bullet_vector3(cg::point_3(0, 0, 0)));
-        tow_constraint_self_.get()->setAngularLowerLimit(btVector3(SIMD_PI/2, SIMD_PI/2, btScalar(-80*cg::grad2rad())));
-        tow_constraint_self_.get()->setAngularUpperLimit(btVector3(-SIMD_PI/2, -SIMD_PI/2, btScalar(80*cg::grad2rad())));
+        tow_constraint_self_.get()->setAngularLowerLimit(btVector3(-SIMD_HALF_PI, -SIMD_HALF_PI, btScalar(-80*cg::grad2rad())));
+        tow_constraint_self_.get()->setAngularUpperLimit(btVector3(SIMD_HALF_PI, SIMD_HALF_PI, btScalar(80*cg::grad2rad())));
 
 //         tow_constraint_self_.get()->setParam(BT_CONSTRAINT_STOP_ERP, 0.1, 0);
 //         tow_constraint_self_.get()->setParam(BT_CONSTRAINT_STOP_ERP, 0.1, 1);
@@ -318,8 +318,8 @@ namespace ray_cast_vehicle
 
         tow_constraint_tow_.get()->setLinearLowerLimit(to_bullet_vector3(cg::point_3(0, 0, 0)));
         tow_constraint_tow_.get()->setLinearUpperLimit(to_bullet_vector3(cg::point_3( 0, 0, 0)));
-        tow_constraint_tow_.get()->setAngularLowerLimit(btVector3(SIMD_PI, SIMD_PI, SIMD_PI));
-        tow_constraint_tow_.get()->setAngularUpperLimit(btVector3(-SIMD_PI, -SIMD_PI, -SIMD_PI));
+        tow_constraint_tow_.get()->setAngularLowerLimit(btVector3(/*SIMD_PI*/SIMD_HALF_PI, /*SIMD_PI*/SIMD_HALF_PI, /*SIMD_PI*/SIMD_HALF_PI));
+        tow_constraint_tow_.get()->setAngularUpperLimit(btVector3(-/*SIMD_PI*/SIMD_HALF_PI, -/*SIMD_PI*/SIMD_HALF_PI, -/*SIMD_PI*/SIMD_HALF_PI));
     }
 
     void impl::reset_tow()

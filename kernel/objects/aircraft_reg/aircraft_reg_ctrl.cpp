@@ -23,13 +23,15 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 
     void (ctrl::*on_run)         (net_layer::msg::run const& msg)               = &ctrl::inject_msg;
     void (ctrl::*on_container)   (net_layer::msg::container_msg const& msg)     = &ctrl::inject_msg;
-    void (ctrl::*on_tow)         (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_atow)        (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
     void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg const& msg)   = &ctrl::inject_msg;
 
     disp_
         .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
         .add<net_layer::msg::container_msg         >(boost::bind(on_container   , this, _1))
-        .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_tow         , this, _1))
+        .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow         , this, _1))
+        .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow         , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
         ;
 }
@@ -79,6 +81,26 @@ void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)
         if (vehicle::control_ptr pv = vehicle::control_ptr(a))
         {
             pv->attach_tow();
+        }
+    }
+}
+
+void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)  
+{
+    if(ext_id>0 )                          
+    {
+        auto a = objects_[ext_id];
+
+        if (vehicle::control_ptr pv = vehicle::control_ptr(a))
+        {
+            pv->detach_tow();
+            cg::point_3 cur_pos = pv->get_local_position().pos;
+            cg::point_3 d_pos   = pv->get_local_position().dpos;
+            
+            LogInfo( 
+                "Tow tractor detach pos= " << cur_pos.x << " " << cur_pos.y << " " << cur_pos.z  << "/n" 
+                );
+
         }
     }
 }

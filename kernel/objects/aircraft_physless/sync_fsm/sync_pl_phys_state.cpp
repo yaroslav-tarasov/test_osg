@@ -103,7 +103,7 @@ namespace sync_fsm
 
                 if(gtp.pos.height > 0)
                 {
-                    /phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
+                    phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
                 }
 
                 FIXME(Нужен позишн я я)

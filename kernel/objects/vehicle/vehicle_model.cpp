@@ -7,7 +7,7 @@
 #include "phys/sensor.h"
 #include "phys/vehicle.h"
 
-
+#define MODEL_TOW_TESTING
 
 namespace vehicle
 {
@@ -237,14 +237,18 @@ void model::set_desired        (double time, const cg::point_3& pos, const cg::q
     target_pos.orien = orien;
     geo_position gtp(target_pos, get_base());
 
+    FIXME(Need to check reverse or maybe call it pushback);
 
-    if(!traj_)
+    if(!aerotow_)
     {
-       traj_ = fms::trajectory::create();
-	   start_follow_ = true;
-    }
+        if(!traj_)
+        {
+           traj_ = fms::trajectory::create();
+	       start_follow_ = true;
+        }
 
-    traj_->append(time, pos, orien, speed);
+        traj_->append(time, pos, orien, speed);
+    }
 }
 
 void model::set_ext_wind       (double speed, double azimuth) 
@@ -280,7 +284,13 @@ void model::on_aerotow_changed( aircraft::info_ptr old_aerotow, bool reverse )
 void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data)
 {
     if (!aerotow_)
+    {
+#ifdef MODEL_TOW_TESTING
+        model_state_.reset();
+        set_state(state_t(pos(), course(), 0));
+#endif
         set_tow(data.tow_id,data.reverse);
+    }
 }
 
 void model::on_detach_tow()
@@ -471,10 +481,20 @@ void model::sync_phys()
         thrust = 0;
     }
 
-
-    phys_vehicle_->set_steer(steer);
-    phys_vehicle_->set_thrust(thrust);
-    phys_vehicle_->set_brake(brake);
+#ifdef MODEL_TOW_TESTING
+    if (aerotow_)
+    {
+        // phys_vehicle_->set_steer (steer);
+        phys_vehicle_->set_thrust(0);
+        phys_vehicle_->set_brake (0);
+    }
+    else
+#endif
+    {
+        phys_vehicle_->set_steer(steer);
+        phys_vehicle_->set_thrust(thrust);
+        phys_vehicle_->set_brake(brake);
+    }    
 
     if (aerotow_)
     {
@@ -492,6 +512,7 @@ void model::sync_phys()
                  << "\n");
 
     logger::need_to_log(false);
+
     //if (settings_.debug_draw)
     //    send_cmd(msg::phys_pos_msg(cur_glb_pos.pos, cur_course));
 }
@@ -591,7 +612,7 @@ void model::update_model( double dt )
         geo_position glb_phys_pos(phys_pos, base);
 
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
-        FIXME(state устанавливется через чарт); 
+        FIXME(state устанавливается через чарт); 
 	    // у меня координаты отличаются надо думать
         if (dist > 10)
             return;

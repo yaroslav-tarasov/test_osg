@@ -20,7 +20,7 @@ namespace vehicle
 
          virtual decart_position      get_local_position() const=0;
          virtual fms::trajectory_ptr  get_trajectory()=0;
-         virtual void set_trajectory(fms::trajectory_ptr  traj)=0;
+         virtual void                 set_trajectory(fms::trajectory_ptr  traj)=0;
     };
 
 }
