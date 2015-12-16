@@ -1423,9 +1423,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     
    /* osg::ref_ptr<osg::MatrixTransform> mt = mt_;*/
 
+    bool clone = true;
+
     using namespace creators;
     
-    osg::Node* obj = creators::createObject(path);
+    osg::Node* obj = creators::createObject(path, clone);
     
 
     if(obj)

@@ -317,7 +317,8 @@ namespace aircraft_physless
         rudder   = cg::bound  (rudder, -1., 1.);
         thrust   = cg::bound  (thrust, -1., 1.);
 
-        phys_aircraft_->set_steer(steer);
+        FIXME(Set steer);
+        //phys_aircraft_->set_steer(steer);
         phys_aircraft_->set_thrust(thrust);
         phys_aircraft_->set_brake(brake);
         phys_aircraft_->set_elevator(elevator);

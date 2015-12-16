@@ -36,7 +36,7 @@ follow_route_state::follow_route_state(simple_route::info_ptr route)
 {
 }
 
-void follow_route_state::update(model * self, double dt)
+void follow_route_state::update(model * self,double time, double dt)
 {
     if (!route_)
         return;
@@ -98,7 +98,7 @@ follow_curve_state::follow_curve_state(cg::geo_curve_2 const& route, double end_
 {
 }
 
-void follow_curve_state::update(model * self, double dt)
+void follow_curve_state::update(model * self,double time, double dt)
 {
     double const model_calc_step = cfg().model_params.msys_step;
 
@@ -165,7 +165,7 @@ go_to_pos_state::go_to_pos_state(cg::geo_point_2 const& pos, optional<double> co
 {
 }
 
-void go_to_pos_state::update(model * self, double dt)
+void go_to_pos_state::update(model * self,double time, double dt)
 {
     const double nominal_speed = with_airtow_ ? 3. : 10;
 
@@ -228,7 +228,7 @@ follow_traj_state::follow_traj_state()
 {
 }
 
-void follow_traj_state::update(model * self, double dt)
+void follow_traj_state::update(model * self, double time, double dt)
 {
     cg::geo_base_2 cur_pos     = self->pos();
     double         cur_course  = self->course();
@@ -321,8 +321,9 @@ void follow_traj_state::update(model * self, double dt)
 	FIXME(extern state);
 	if(auto traj_ = self->get_trajectory())
 	{
-		traj_->set_cur_len (traj_->cur_len() + dt);
-		const double  tar_len = traj_->cur_len();
+		// traj_->set_cur_len (traj_->cur_len() + dt);
+		traj_->set_cur_len ((time-1.0>0)? time - 1.0:0.0/*traj_->cur_len() + dt*/);
+        const double  tar_len = traj_->cur_len();
 		decart_position target_pos;
 
 		target_pos.pos = cg::point_3(traj_->kp_value(tar_len));

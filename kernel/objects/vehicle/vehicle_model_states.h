@@ -12,7 +12,7 @@ struct model_state
 {      
     virtual ~model_state() {}
 
-    virtual void update(model * self, double dt) = 0;
+    virtual void update(model * self, double time, double dt) = 0;
     virtual bool end() const {return false;}
 };
 
@@ -23,7 +23,7 @@ struct follow_route_state : model_state
 {
     follow_route_state(simple_route::info_ptr route);
 
-    void update(model * self, double dt);
+    void update(model * self, double time, double dt);
 
 private:
     simple_route::info_ptr route_;
@@ -36,7 +36,7 @@ struct follow_curve_state : model_state
 {
     follow_curve_state(cg::geo_curve_2 const& route, double end_course, bool with_airtow);
 
-    void update(model * self, double dt);
+    void update(model * self, double time, double dt);
     bool end() const {return end_;}
 
 private:
@@ -51,7 +51,7 @@ private:
 struct follow_traj_state : model_state
 {
     follow_traj_state();
-    void update(model * self, double dt);
+    void update(model * self, double time, double dt);
 
 private:
     double           desired_speed_;
@@ -66,7 +66,7 @@ struct go_to_pos_state : model_state
 {
     go_to_pos_state(cg::geo_point_2 const& pos, optional<double> course, bool with_airtow);
 
-    void update(model * self, double dt);
+    void update(model * self, double time, double dt);
 
 private:
     bool             with_airtow_;

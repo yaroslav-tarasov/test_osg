@@ -85,7 +85,7 @@ private:
     void follow_route(std::string const& route);
     void detach_cur_route();
 
-    void update_model       ( double dt );
+    void update_model       ( double time, double dt );
     void on_zone_created    ( size_t id );
     void on_zone_destroyed  ( size_t id );
     void create_phys_vehicle();
@@ -152,6 +152,18 @@ private:
     double air_course ;
     double steer_course ;
 
+    struct deffered_tow_t {
+        deffered_tow_t (const msg::attach_tow_msg_t& msg,short counter)
+            : msg(msg)
+            , counter (counter)
+        {}
+         
+        inline short dec() {return counter--;};
+        msg::attach_tow_msg_t msg;
+        short                 counter;
+    };
+
+    boost::optional<deffered_tow_t>  deffered_tow_;
 
 	bool   start_follow_;
 #ifdef DEPRECATED

@@ -283,6 +283,7 @@ namespace sync_fsm
 
         self_.get_shassis()->visit_chassis([this, &root_next_orien, &root_next_pos, &body_pos, dt](aircraft::shassis_group_t const& gr, aircraft::shassis_t & shassis)
         {
+
             auto wnode = shassis.wheel_node;
             auto chassis_node = shassis.node;
 
@@ -292,11 +293,14 @@ namespace sync_fsm
 			geo_base_3 global_pos   = wnode->get_global_pos();
 			quaternion global_orien = wnode->get_global_orien();
 
-            // geo_position wpos = geo_position();//this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
+            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
             
-            quaternion wpos_rel_orien =  (!body_pos.orien) * global_orien/*wpos.orien*/;
+            // quaternion wpos_rel_orien_orig =  (!body_pos.orien) * wpos.orien;
+
+            quaternion wpos_rel_orien =  (!body_pos.orien) * global_orien;
+            //quaternion(cpr(wpos_rel_orien_orig.get_course(), global_orien.get_pitch(),0))/*wpos.orien*/;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(/*wpos.pos*/global_pos));
-            
+           
 #ifdef OSG_NODE_IMPL
             nodes_management::node_info_ptr rel_node = wnode;
 #else
@@ -309,19 +313,8 @@ namespace sync_fsm
             quaternion desired_orien_in_rel = (!quaternion(rel_node_root_tr.rotation().cpr())) * wpos_rel_orien;
 
             desired_orien_in_rel = quaternion(cpr(0, 0, -root_next_orien.get_roll())) * desired_orien_in_rel;
-			
-			//force_log fl;
 
-			//LOG_ODS_MSG( "  wpos_rel_orien.get_course() = " << wpos_rel_orien.get_course() <<
-			//	"  wpos_rel_orien.get_roll() = "			<< wpos_rel_orien.get_roll()   <<
-			//	"  wpos_rel_orien.get_pitch() = "			<< wpos_rel_orien.get_pitch()
-			//	<< "\n"                 
-			//	);
-
-            //LOG_ODS_MSG( "  desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
-            //    "  desired_orien_in_rel.get_pitch() = " <<  desired_orien_in_rel.get_pitch() <<
-            //    "  desired_orien_in_rel.get_roll() = " <<  desired_orien_in_rel.get_roll() << "\n"                 
-            //    );
+            // -----------------------------------------------------------------------
 
             nodes_management::node_position wheel_node_pos = wnode->position();
             nodes_management::node_position chassis_node_pos = chassis_node->position();
@@ -333,19 +326,23 @@ namespace sync_fsm
 #if 0
             const float angular_speed = 45 * 2 * cg::pif/60.0; 
 #endif
+            point_3 forward_dir = cg::normalized_safe(body_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
+
             point_3 wpos_rp = (!body_pos.orien).rotate_vector(body_pos.dpos);
-            auto delta = sqrt(wpos_rp.x * wpos_rp.x  + wpos_rp.y * wpos_rp.y);
+            auto delta = cg::sign(forward_dir * body_pos.dpos) * sqrt(wpos_rp.x * wpos_rp.x  + wpos_rp.y * wpos_rp.y);
 			// auto delta = sqrt(body_pos.dpos.x * body_pos.dpos.x  + body_pos.dpos.y * body_pos.dpos.y);
 
 			const float angular_speed = delta / wr; 
-			desired_orien_in_rel = wheel_node_pos.local().orien * quaternion(cpr(0,-cg::rad2grad() * angular_speed * dt,0));
-
+			desired_orien_in_rel = wheel_node_pos.local().orien * cg::quaternion(cg::cpr(0,-cg::rad2grad() * angular_speed * dt,0));
             //quaternion q = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel);
-            point_3 omega_rel     = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (dt);
+
+            cg::point_3 omega_rel       = cg::get_rotate_quaternion(wheel_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / dt;
             wheel_node_pos.local().omega = omega_rel ;
+
             
             wnode->set_position(wheel_node_pos);
             chassis_node->set_position(chassis_node_pos);
+
         });
 
 

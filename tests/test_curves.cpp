@@ -9,6 +9,9 @@ typedef cg::curve_t<cg::point_2> keypoints_t;
 
 int main_curves(int argc, char** argv )
 {
+
+    float res = cg::point_3f(1.f,1.f,0.f) * cg::point_3f(-0.5f,-0.5f,0.0f);
+
     keypoints_t kp;
     keypoints_t::value_type prev_p(0,0);
     double dist = 0;
@@ -31,6 +34,8 @@ int main_curves(int argc, char** argv )
     }
 
     val = kp.value(100.0);
+
+
 
     return 0;
 }

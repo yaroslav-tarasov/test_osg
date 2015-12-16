@@ -93,7 +93,7 @@ void model::update( double time )
             start_follow_ = false;
         }
 
-        update_model(dt);
+        update_model(time, dt);
 
 		if (!manual_controls_)
 			sync_phys();
@@ -116,6 +116,17 @@ void model::update( double time )
                 steer_course = cg::norm180(rod_course - air_course);
 
                 aircraft::model_control_ptr(aerotow_)->set_steer(steer_course);
+
+#ifdef MODEL_TOW_TESTING
+                decart_position cur_pos = phys_vehicle_->get_position();
+                cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+                geo_position cur_glb_pos(cur_pos, base);
+                
+                double veh_course   = cg::norm180(cur_glb_pos.orien.cpr().course);
+                
+                set_steer(cg::norm180(rod_course + 180 - veh_course));
+#endif
+
             }
             else
             {
@@ -126,6 +137,12 @@ void model::update( double time )
 
         last_update_ = time;
     }
+
+#ifdef MODEL_TOW_TESTING   
+    if(deffered_tow_)
+       on_attach_tow(deffered_tow_->msg);
+#endif
+
 }
 
 void model::on_object_created(object_info_ptr object)
@@ -283,13 +300,34 @@ void model::on_aerotow_changed( aircraft::info_ptr old_aerotow, bool reverse )
 
 void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data)
 {
+#ifdef MODEL_TOW_TESTING 
+    if(!deffered_tow_ )
+    {
+       deffered_tow_ = boost::in_place(data,10);
+       phys_vehicle_->set_brake (1000.0);
+       model_state_.reset();
+       set_state(state_t(pos(), course(), 0));
+       return;
+    } 
+    else if ( deffered_tow_->dec() > 0 )
+    {
+        return;
+    }
+#endif
+
     if (!aerotow_)
     {
 #ifdef MODEL_TOW_TESTING
+        phys_vehicle_->set_brake (1000.0);
         model_state_.reset();
         set_state(state_t(pos(), course(), 0));
 #endif
         set_tow(data.tow_id,data.reverse);
+
+#ifdef MODEL_TOW_TESTING         
+        deffered_tow_.reset();
+#endif
+
     }
 }
 
@@ -601,7 +639,7 @@ void model::settings_changed()
     }
 }
 
-void model::update_model( double dt )
+void model::update_model( double time, double dt )
 {
     cg::geo_base_2 cur_pos = pos();
 
@@ -620,7 +658,7 @@ void model::update_model( double dt )
 
     if (model_state_)
     {
-        model_state_->update(this, dt);
+        model_state_->update(this, time, dt);
         if (model_state_->end())
         {
             model_state_.reset();
