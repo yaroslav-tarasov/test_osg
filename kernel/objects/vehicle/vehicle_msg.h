@@ -71,12 +71,16 @@ struct tow_msg
 		, reverse   (false)
 	{}
 
-	tow_msg( boost::optional<uint32_t>  tow_id, bool      reverse)
-		: tow_id(tow_id), reverse(reverse)
+	tow_msg( boost::optional<uint32_t>  tow_id, bool      reverse , const cg::geo_point_2 &           pos)
+		: tow_id (tow_id)
+        , reverse(reverse)
+        , pos    (pos)
+
 	{}
 
 	boost::optional<uint32_t>  tow_id ;
 	bool                       reverse;
+    cg::geo_point_2            pos;
 };
 
 typedef tow_msg   tow_msg_t;
@@ -84,6 +88,7 @@ typedef tow_msg   tow_msg_t;
 REFL_STRUCT(tow_msg)
 	REFL_ENTRY(tow_id)
 	REFL_ENTRY(reverse)
+    REFL_ENTRY(pos)
 REFL_END()
 
 struct state_msg_t
@@ -106,8 +111,8 @@ struct state_msg_t
     }
 
     cg::geo_point_2 pos;
-    double course;
-    double speed;
+    double          course;
+    double          speed;
 };
 
 REFL_STRUCT(state_msg_t)

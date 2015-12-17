@@ -56,6 +56,7 @@ namespace net_layer
             am_malfunction      ,
             vm_attach_tow       ,
             vm_detach_tow       ,
+            vm_detach_tow_dc    ,
             sm_container_msg
         };
 
@@ -241,32 +242,26 @@ namespace net_layer
         REFL_ENTRY(enabled)
     REFL_END()
 
-
-    //struct attach_tow_msg
-    //    : network::msg_id<vm_attach_tow>
-    //{
-    //    attach_tow_msg()
-    //        : ext_id (0)
-    //        , reverse   (false)
-    //    {}
-
-    //    attach_tow_msg( uint32_t  ext_id, bool      reverse)
-    //        : ext_id(tow_id), reverse(reverse)
-    //    {}
-
-    //    uint32_t  ext_id;
-    //    bool      reverse  ;
-    //};
-
-    //typedef attach_tow_msg   attach_tow_msg_t;
-
-    //REFL_STRUCT(attach_tow_msg)
-    //    REFL_ENTRY(tow_id)
-    //    REFL_ENTRY(reverse)
-    //REFL_END()
-
     typedef gen_msg<vm_attach_tow, uint32_t>               attach_tow_msg_t;    
     typedef gen_msg<vm_detach_tow, uint32_t>               detach_tow_msg_t;
+    
+    struct detach_tow_coords_msg_t
+        : network::msg_id<vm_detach_tow_dc>
+    {
+        detach_tow_coords_msg_t() {}
+
+        detach_tow_coords_msg_t(uint32_t id, cg::point_3f const& pos)
+            : ext_id      (id), pos(pos)
+        {}
+
+        uint32_t           ext_id;
+        cg::point_3f          pos;
+    };
+    
+    REFL_STRUCT(detach_tow_coords_msg_t)
+        REFL_ENTRY(ext_id)
+        REFL_ENTRY(pos)
+    REFL_END()
 
     struct container_msg
         : network::msg_id<sm_container_msg>
@@ -290,4 +285,9 @@ namespace net_layer
 
 
     }
+
+
+
+
+
 }

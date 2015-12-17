@@ -3,7 +3,7 @@
 #include "aircraft_reg_view.h"
 
 
-namespace aircraft_reg
+namespace objects_reg
 {
 
 struct model
@@ -28,4 +28,4 @@ private:
     std::unordered_map<object_id_t, net_layer::msg::run>  last_msg_;
 };
 
-} // end of aircraft_reg
+} // end of objects_reg

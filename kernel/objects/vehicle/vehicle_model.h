@@ -38,7 +38,7 @@ private:
 
     // view
 private:
-    void on_aerotow_changed  (aircraft::info_ptr old_aerotow, bool reverse) override;
+    void on_aerotow_changed  (aircraft::info_ptr old_aerotow, const boost::optional<msg::tow_msg> & msg) override;
     
     
     // model_info

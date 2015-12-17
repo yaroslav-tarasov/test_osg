@@ -137,7 +137,7 @@ namespace
             create_auto_object(_csys,"airports_manager","aiports_manager");
             create_auto_object(_csys,"ada","ada");
             create_auto_object(_csys,"meteo_proxy","meteo_proxy");
-            create_auto_object(_csys,"aircraft_reg","aircraft_reg");
+            create_auto_object(_csys,"objects_reg","objects_reg");
         }                                                             
 
 

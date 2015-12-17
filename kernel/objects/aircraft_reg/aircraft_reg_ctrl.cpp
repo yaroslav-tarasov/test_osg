@@ -3,11 +3,12 @@
 
 #include "aircraft_reg_ctrl.h"
 
-//#include "objects\aircraft_physless.h"
 #include "objects\vehicle.h"
 
+#include "common/test_msgs.h"
 
-namespace aircraft_reg
+
+namespace objects_reg
 {
 
 object_info_ptr ctrl::create(kernel::object_create_t const& oc, dict_copt dict)
@@ -72,6 +73,10 @@ void ctrl::inject_msg( net_layer::msg::container_msg const& msg)
 {
 }
 
+void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg) 
+{
+}
+
 void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)  
 {
     if(ext_id>0 )                          
@@ -81,6 +86,7 @@ void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)
         if (vehicle::control_ptr pv = vehicle::control_ptr(a))
         {
             pv->attach_tow();
+            conn_holder_ << pv->subscribe_detach_tow(boost::bind(&ctrl::on_detach_tow,this,ext_id, _1));
         }
     }
 }
@@ -105,9 +111,19 @@ void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)
     }
 }
 
-void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg) 
+
+void ctrl::on_detach_tow (uint32_t ext_id, cg::point_3 const& pos)
 {
+    
+    if(send_)
+        send_(binary::wrap(net_layer::msg::detach_tow_coords_msg_t(ext_id,pos)));
+    
+    LogInfo( 
+        "Tow tractor detach pos= " << pos.x << " " << pos.y << " " << pos.z  << "/n" 
+        );
 }
+
+
 
 void ctrl::create_object(net_layer::msg::create const& msg)
 {
@@ -122,6 +138,11 @@ void ctrl::create_object(net_layer::msg::create const& msg)
 		e2o_[msg.ext_id] = a->object_id();
         objects_[msg.ext_id] = a;
     }
+}
+
+void ctrl::set_sender(remote_send_f s)
+{
+     send_ = s;
 }
 
 void ctrl::pre_update(double time)
@@ -145,4 +166,4 @@ void ctrl::pre_update(double time)
 #endif
 }
 
-} // end of aircraft_reg
+} // end of objects_reg

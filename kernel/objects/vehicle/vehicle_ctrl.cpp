@@ -130,6 +130,14 @@ namespace vehicle
 
         return decart_position(base(geo_point_3(pos(),0)),cg::cpr(course(),0,0));
     };
+
+    void ctrl::on_aerotow_changed (aircraft::info_ptr old_aerotow, const boost::optional<msg::tow_msg> & msg)
+    {
+        view::on_aerotow_changed (old_aerotow, msg);
+        geo_base_3 base = ::get_base();
+        
+        detach_tow_signal_(base(geo_point_3((*msg).pos,0)));
+    }
 }
 
 

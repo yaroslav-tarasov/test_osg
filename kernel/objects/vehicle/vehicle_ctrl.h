@@ -5,7 +5,7 @@
 namespace vehicle
 {
 	struct ctrl
-			: view
+			: public view
             , control
 	{
 		static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
@@ -15,6 +15,9 @@ namespace vehicle
 
     protected:
         void update(double time);
+    
+    protected:
+        void on_aerotow_changed (aircraft::info_ptr old_aerotow, const boost::optional<msg::tow_msg> & msg) override;
 
     private:
         void set_initial_position(cg::geo_point_3 const &p, double c);

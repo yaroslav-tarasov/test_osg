@@ -16,24 +16,18 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
     if (nodes_manager_)
     {
-		//FIXME("Ќу ок, а если модель помен€ем то где tow искать? ")
-		//{
-		//	nodes_manager_->set_model(settings_.model);
-		//}
-
-
         root_ = nodes_manager_->get_node(0);
-        conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
-        tow_point_node_ = nodes_manager_->find_node("tow_point");
+        conn_holder()    << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
+        tow_point_node_  = nodes_manager_->find_node("tow_point");
         rtow_point_node_ = nodes_manager_->find_node("rtow_point");
     }
 
     msg_disp()
-        .add<msg::state_msg_t   >(boost::bind(&view::on_state   , this, _1))
-        .add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
-        .add<msg::tow_msg_t>     (boost::bind(&view::on_tow     , this, _1))
+        .add<msg::state_msg_t     >(boost::bind(&view::on_state   , this, _1))
+        .add<msg::settings_msg_t  >(boost::bind(&view::on_settings, this, _1))
+        .add<msg::tow_msg_t       >(boost::bind(&view::on_tow     , this, _1))
 
-        .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
+        .add<msg::traj_assign_msg >(boost::bind(&view::on_traj_assign, this, _1))
         ;
 }
     
@@ -52,7 +46,7 @@ void view::on_object_destroying(object_info_ptr object)
     {
         auto old_aerotow = aerotow_;
         aerotow_.reset();
-        on_aerotow_changed(old_aerotow, false) ;
+        on_aerotow_changed(old_aerotow, boost::none ) ;
     }
 
 }
@@ -85,7 +79,7 @@ void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
     auto old_aerotow = aerotow_;
     aerotow_ = msg.tow_id ? collection_->get_object(*msg.tow_id) : nullptr;
 
-    on_aerotow_changed(old_aerotow, msg.reverse) ;
+    on_aerotow_changed(old_aerotow, msg) ;
 }
 
 void view::on_model_changed()
@@ -105,9 +99,9 @@ void view::set_state(state_t const& state)
     set(msg::state_msg_t(state), false);
 }
 
-void view::set_tow(optional<uint32_t> tow_id, bool reverse)
+void view::set_tow(optional<uint32_t> tow_id, bool reverse, const cg::geo_point_2& pos)
 {
-    set(msg::tow_msg_t(tow_id, reverse), true);
+    set(msg::tow_msg_t(tow_id, reverse, pos), true);
 }
 
 void view::on_traj_assign(msg::traj_assign_msg const &m)

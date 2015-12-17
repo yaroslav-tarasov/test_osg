@@ -260,8 +260,8 @@ namespace ray_cast_vehicle
 
         // double const rod_mass = cfg().model_params.rod_mass;
         // double const rod_mass = 100;
-        double const rod_mass = 200;//cg::clamp(1000.0,650000.0,1.0,200.0)(tow_mass_); //1; //100; // TYV  на самый легкий и самый тяжелый самолет (Ан-225)
-        double const rod_radius = 0.1;
+        double const rod_mass = 1;    //cg::clamp(1000.0,650000.0,1.0,200.0)(tow_mass_); //1; //100; // TYV  на самый легкий и самый тяжелый самолет (Ан-225)
+        double const rod_radius = .9; // 0.1;
 
         btVector3 inertia(btScalar(rod_mass*(3*cg::sqr(rod_radius)+ cg::sqr(2*half_dist))/12), 
                           btScalar(rod_mass*cg::sqr(rod_radius)/2),
@@ -281,15 +281,14 @@ namespace ray_cast_vehicle
         tow_rod_.get()->setCenterOfMassTransform(to_bullet_transform(rod_pos, cg::cpr(rod_fwd.course, rod_fwd.pitch, 0)));
 
 
-
         tow_constraint_self_.reset(boost::make_shared<btGeneric6DofConstraint>(*tow_rod_.get(), *chassis_.get(),  
                                         to_bullet_transform(cg::point_3(0, half_dist, 0), cg::cpr()), 
                                         to_bullet_transform(self_offset, cg::cpr(0,0,0)), true));
 
         tow_constraint_self_.get()->setLinearLowerLimit(to_bullet_vector3(cg::point_3(0, 0, 0)));
         tow_constraint_self_.get()->setLinearUpperLimit(to_bullet_vector3(cg::point_3(0, 0, 0)));
-        tow_constraint_self_.get()->setAngularLowerLimit(btVector3(-SIMD_HALF_PI, -SIMD_HALF_PI, btScalar(-80*cg::grad2rad())));
-        tow_constraint_self_.get()->setAngularUpperLimit(btVector3(SIMD_HALF_PI, SIMD_HALF_PI, btScalar(80*cg::grad2rad())));
+        tow_constraint_self_.get()->setAngularLowerLimit(btVector3(-SIMD_HALF_PI, -SIMD_HALF_PI, -SIMD_HALF_PI/*btScalar(-80*cg::grad2rad())*/));
+        tow_constraint_self_.get()->setAngularUpperLimit(btVector3(SIMD_HALF_PI, SIMD_HALF_PI, SIMD_HALF_PI/*btScalar(80*cg::grad2rad())*/));
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         tow_constraint_self_.get()->setParam(BT_CONSTRAINT_STOP_ERP, 0.1, 0);

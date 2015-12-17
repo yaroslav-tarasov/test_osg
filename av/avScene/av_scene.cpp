@@ -433,6 +433,11 @@ struct net_worker
 
      }
      
+     void send (binary::bytes_cref bytes)
+     {
+         _workerService->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+         
+     }
      void reset_time(double new_time)
      {
          ses_->reset_time(new_time);
@@ -722,15 +727,15 @@ private:
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.get_delta() << "\n");
 
 #if 1
-        kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg") ;   
+        kernel::object_info_ptr reg_obj = find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"objects_reg") ;   
         
         if (reg_obj)
         {
-            // on_run_ = (boost::bind(&aircraft_reg::control::inject_msg , aircraft_reg::control_ptr(reg_obj).get(), _1));
-            void (aircraft_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &aircraft_reg::control::inject_msg;
+            // on_run_ = (boost::bind(&objects_reg::control::inject_msg , objects_reg::control_ptr(reg_obj).get(), _1));
+            void (objects_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &objects_reg::control::inject_msg;
 
 			disp_
-                .add<run                   >(boost::bind(on_run , aircraft_reg::control_ptr(reg_obj).get(), _1));
+                .add<run                   >(boost::bind(on_run , objects_reg::control_ptr(reg_obj).get(), _1));
         }
 #endif
     }
@@ -938,7 +943,7 @@ struct mod_app
         , ctrl_sys_ (systems_->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
         , mod_sys_  (systems_->get_model_sys  (),0.003/*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
-        , disp_ (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
+        , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
     {   
 
         disp_
@@ -1027,18 +1032,6 @@ private:
 
     }
 
-#if 0
-    void inject_msg(net_layer::msg::run const& msg)
-    {
-       reg_obj_->inject_msg(msg);
-    }
-    
-    void inject_msg(net_layer::msg::container_msg const& msg)
-    {
-        reg_obj_->inject_msg(msg);
-    }
-#endif
-
     void create_objects(const std::string& airport)
     {
         using namespace binary;
@@ -1059,18 +1052,24 @@ private:
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
 
 
-        reg_obj_ = aircraft_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
-#if 0
+        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"objects_reg")) ;   
+
         if (reg_obj_)
         {
+            void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send;
+
+            reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
+#if 0
             void (mod_app::*on_run)       (net_layer::msg::run const& msg)           = &mod_app::inject_msg;
             void (mod_app::*on_container) (net_layer::msg::container_msg const& msg) = &mod_app::inject_msg;
 
             disp_
                 .add<run                   >(boost::bind(on_run      , this , _1))
                 .add<container_msg         >(boost::bind(on_container, this , _1));
-        }
+
 #endif
+
+        }
 
     }
 
@@ -1090,7 +1089,7 @@ private:
     boost::scoped_ptr<net_worker>                                     w_;
 
 private:
-    aircraft_reg::control_ptr                                   reg_obj_;
+    objects_reg::control_ptr                                   reg_obj_;
 
     global_timer                                                     gt_;
 

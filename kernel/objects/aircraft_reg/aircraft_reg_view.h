@@ -2,7 +2,7 @@
 
 #include "objects/registrator.h"
 
-namespace aircraft_reg
+namespace objects_reg
 {
 
 struct settings_t
@@ -34,4 +34,4 @@ protected:
 
 };
 
-} // end of aircraft_reg
+} // end of objects_reg

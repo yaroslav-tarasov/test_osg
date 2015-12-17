@@ -2,13 +2,15 @@
 
 #include "aircraft_reg_view.h"
 
-namespace aircraft_reg
+namespace objects_reg
 {
 
 struct ctrl
     : view   
     , control
 {
+
+
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
     ctrl(kernel::object_create_t const& oc, dict_copt dict);    
 
@@ -16,16 +18,22 @@ private:
     void on_object_created(object_info_ptr object) override;
     void on_object_destroying(object_info_ptr object) override;
 
+private:
+    
+    void on_detach_tow (uint32_t, cg::point_3 const& );
+
     // control
 private:
-    virtual void inject_msg(net_layer::msg::run               const& msg);  
-    virtual void inject_msg(net_layer::msg::container_msg     const& msg);
-    virtual void inject_msg(net_layer::msg::attach_tow_msg_t  const& msg);  
-    virtual void inject_msg(net_layer::msg::detach_tow_msg_t  const& msg); 
-    virtual void inject_msg(net_layer::msg::malfunction_msg   const& msg); 
+    virtual void inject_msg   (net_layer::msg::run               const& msg);  
+    virtual void inject_msg   (net_layer::msg::container_msg     const& msg);
+    virtual void inject_msg   (net_layer::msg::attach_tow_msg_t  const& msg);  
+    virtual void inject_msg   (net_layer::msg::detach_tow_msg_t  const& msg); 
+    virtual void inject_msg   (net_layer::msg::malfunction_msg   const& msg); 
 
-    virtual void inject_msg(const void* data, size_t size);
+    virtual void inject_msg   (const void* data, size_t size);
 	virtual void create_object(net_layer::msg::create const& msg);
+    virtual void set_sender   (remote_send_f s) override;
+
     // info
 private:
 
@@ -39,12 +47,13 @@ protected:
     std::unordered_map<extern_id_t, object_id_t>                        e2o_;
     std::deque<net_layer::msg::run>                                  buffer_;
     std::deque<bytes_t>                                            messages_;
-
-    // net_layer::msg::container_msg::msgs_t                          messages_;
-
+    
+    remote_send_f                                                      send_;
 private:
     network::msg_dispatcher<uint32_t>                                  disp_;
 
+private:
+    connection_holder                                           conn_holder_;
 };
 
-} // end of aircraft_reg
+} // end of objects_reg

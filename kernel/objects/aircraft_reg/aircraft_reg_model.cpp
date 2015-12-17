@@ -5,7 +5,7 @@
 //#include "objects\common\aircraft_physless.h"
 #include "objects\common\vehicle.h"
 
-namespace aircraft_reg
+namespace objects_reg
 {
 
 object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
@@ -108,4 +108,4 @@ bool model::add_object(object_info_ptr object)
 	return true;
 }
 
-} // end of aircraft_reg
+} // end of objects_reg

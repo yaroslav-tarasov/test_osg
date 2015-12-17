@@ -66,12 +66,12 @@ public:
 protected:
     virtual void on_state_changed() {}    // Задействован только в чарте
     virtual void settings_changed() {}
-    virtual void on_aerotow_changed (aircraft::info_ptr old_aerotow, bool reverse) {current_tow_point_node_ = reverse?rtow_point_node_:tow_point_node_;}
+    virtual void on_aerotow_changed (aircraft::info_ptr old_aerotow, const boost::optional<msg::tow_msg> & msg) {current_tow_point_node_ = (*msg).reverse?rtow_point_node_:tow_point_node_;}
 
 public:
     void set_settings ( settings_t const& settings );
     void set_state    ( state_t const&state );
-    void set_tow      ( optional<uint32_t> tow_id, bool reverse );
+    void set_tow      ( optional<uint32_t> tow_id, bool reverse, const cg::geo_point_2& pos);
 
 protected:
     nodes_management::manager_ptr       nodes_manager_;

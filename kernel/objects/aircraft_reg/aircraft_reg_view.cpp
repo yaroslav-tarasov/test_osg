@@ -4,7 +4,7 @@
 #include "aircraft_reg_view.h"
 
 
-namespace aircraft_reg
+namespace objects_reg
 {
 
 object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
@@ -22,4 +22,4 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
 
 
 
-} // end of aircraft_reg
+} // end of objects_reg
