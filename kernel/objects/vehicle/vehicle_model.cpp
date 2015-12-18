@@ -309,7 +309,7 @@ void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data
 #ifdef MODEL_TOW_TESTING 
     if(!deffered_tow_ )
     {
-       deffered_tow_ = boost::in_place(data,80);
+       deffered_tow_ = boost::in_place(data,40);
        phys_vehicle_->set_brake (1000.0);
        model_state_.reset();
        set_state(state_t(pos(), course(), 0));
@@ -330,7 +330,7 @@ void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data
         model_state_.reset();
         set_state(state_t(pos(), course(), 0));
 #endif
-        set_tow(data.tow_id,data.reverse, pos());
+        set_tow(data.tow_id,data.reverse, geo_position(cg::geo_point_3(pos(),0),quaternion(course())));
 
 #ifdef MODEL_TOW_TESTING         
         deffered_tow_.reset();
@@ -345,8 +345,9 @@ void model::on_detach_tow()
     {
 #ifdef MODEL_TOW_TESTING
         set_state(state_t(phys_pos(), course(), 0));
+        traj_.reset();
 #endif
-        set_tow(boost::none,false , phys_pos());
+        set_tow(boost::none, false , get_phys_pos());
     }
 
 }
@@ -649,7 +650,7 @@ void model::settings_changed()
         aircraft::model_info_ptr new_aerotow = find_object<aircraft::model_info_ptr>(collection_, settings_.aerotow);
 
         if (new_aerotow)
-            set_tow(kernel::object_info_ptr(new_aerotow)->object_id(), false , pos()) ;
+            set_tow(kernel::object_info_ptr(new_aerotow)->object_id(), false , get_phys_pos()) ;
     }
 }
 

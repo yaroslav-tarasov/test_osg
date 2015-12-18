@@ -71,7 +71,7 @@ protected:
 public:
     void set_settings ( settings_t const& settings );
     void set_state    ( state_t const&state );
-    void set_tow      ( optional<uint32_t> tow_id, bool reverse, const cg::geo_point_2& pos);
+    void set_tow      ( optional<uint32_t> tow_id, bool reverse, const geo_position& pos);
 
 protected:
     nodes_management::manager_ptr       nodes_manager_;

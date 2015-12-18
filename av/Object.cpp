@@ -316,13 +316,30 @@ osg::Node* createObject(std::string name, bool fclone)
         }
 #endif
 
-		objCache[name] = pat/*object_file*/;
+		objCache[name] = pat;
+
+
+        if(fclone)
+            pat = dynamic_cast<osg::PositionAttitudeTransform *>(
+            osg::clone(objCache[name].get(), osg::CopyOp::DEEP_COPY_ALL 
+            & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+            & ~osg::CopyOp::DEEP_COPY_ARRAYS
+            & ~osg::CopyOp::DEEP_COPY_IMAGES
+            & ~osg::CopyOp::DEEP_COPY_TEXTURES
+            & ~osg::CopyOp::DEEP_COPY_STATESETS  
+            & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+            & ~osg::CopyOp::DEEP_COPY_UNIFORMS
+            & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+            ));
+        else
+            pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name].get());
+
 
 	}
 
     pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
 
-	return pat/*object_file*/;
+	return pat;
 }
 
 }

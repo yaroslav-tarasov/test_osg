@@ -235,7 +235,6 @@ namespace details
 
         DECLARE_EVENT(time_reset    , (double /*time*/, double /*factor*/));
         DECLARE_EVENT(session_stopped   ,   ());
-        
         DECLARE_EVENT(session_loaded, ());
 
     private:
@@ -430,14 +429,13 @@ struct net_worker
      void send(void const* data, uint32_t size)
      {
          _workerService->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)));
-
      }
      
      void send (binary::bytes_cref bytes)
      {
          _workerService->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
-         
      }
+
      void reset_time(double new_time)
      {
          ses_->reset_time(new_time);
@@ -486,14 +484,6 @@ private:
      {   
          size_t size = binary::size(*data);
          error_code_t ec;
-         FIXME( XXX );
-         //  XXX
-         //sockets_[id]->send(&size, sizeof(uint32_t));
-         //if (ec)
-         //{
-         //    LogError("TCP send error: " << ec.message());
-         //    return;
-         //}
 
          sockets_[id]->send(binary::raw_ptr(*data), size);
          if (ec)
@@ -940,8 +930,8 @@ struct mod_app
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
         : systems_  (get_systems())
-        , ctrl_sys_ (systems_->get_control_sys(),0.003/*cfg().model_params.csys_step*/)
-        , mod_sys_  (systems_->get_model_sys  (),0.003/*cfg().model_params.msys_step*/)
+        , ctrl_sys_ (systems_->get_control_sys(),0.025/*cfg().model_params.csys_step*/)
+        , mod_sys_  (systems_->get_model_sys  (),0.025/*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
         , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
     {   
@@ -1004,14 +994,6 @@ private:
        gt_.set_factor(msg.factor);
     }
 
-#if 0
-    void on_container(container_msg const& msg)
-    {
-        for (size_t i = 0; i < msg.msgs.size(); ++i)
-            disp_.dispatch_bytes(msg.msgs[i]);
-    }
-#endif
-
     void on_create(create const& msg)
     {
 		reg_obj_->create_object(msg);
@@ -1052,13 +1034,14 @@ private:
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
 
 
-        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"objects_reg")) ;   
+        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
 
         if (reg_obj_)
         {
             void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send;
 
             reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
+
 #if 0
             void (mod_app::*on_run)       (net_layer::msg::run const& msg)           = &mod_app::inject_msg;
             void (mod_app::*on_container) (net_layer::msg::container_msg const& msg) = &mod_app::inject_msg;
@@ -1066,7 +1049,6 @@ private:
             disp_
                 .add<run                   >(boost::bind(on_run      , this , _1))
                 .add<container_msg         >(boost::bind(on_container, this , _1));
-
 #endif
 
         }

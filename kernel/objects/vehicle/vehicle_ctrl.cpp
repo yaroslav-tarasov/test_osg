@@ -26,17 +26,14 @@ namespace vehicle
             if (nodes_manager_->get_model() != settings_.model)
                 nodes_manager_->set_model(settings_.model);
 
-            //if (neo)
-                root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(course(), 0, 0)), point_3()));
+            root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(course(), 0, 0)), point_3()));
         }
-
 	}
 
     void ctrl::update(double time)
     {
         view::update(time);
         //update_len(time);
-
     }
 
     void ctrl::set_initial_position( cg::geo_point_3 const &p, double c)
@@ -136,7 +133,8 @@ namespace vehicle
         view::on_aerotow_changed (old_aerotow, msg);
         geo_base_3 base = ::get_base();
         
-        detach_tow_signal_(base(geo_point_3((*msg).pos,0)));
+        if(msg && !msg->tow_id)  
+            detach_tow_signal_(decart_position(base((*msg).geo_pos.pos),(*msg).geo_pos.orien));
     }
 }
 

@@ -22,7 +22,7 @@ namespace vehicle
          virtual fms::trajectory_ptr  get_trajectory()=0;
          virtual void                 set_trajectory(fms::trajectory_ptr  traj)=0;
 
-         DECLARE_EVENT(detach_tow ,   ( cg::point_3 const& ));
+         DECLARE_EVENT(detach_tow ,   ( decart_position const& ));
     };
 
 }

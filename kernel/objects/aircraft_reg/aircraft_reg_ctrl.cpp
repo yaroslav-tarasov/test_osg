@@ -31,8 +31,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     disp_
         .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
         .add<net_layer::msg::container_msg         >(boost::bind(on_container   , this, _1))
-        .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow         , this, _1))
-        .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow         , this, _1))
+        .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow        , this, _1))
+        .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
         ;
 }
@@ -112,14 +112,14 @@ void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)
 }
 
 
-void ctrl::on_detach_tow (uint32_t ext_id, cg::point_3 const& pos)
+void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 {
     
     if(send_)
-        send_(binary::wrap(net_layer::msg::detach_tow_coords_msg_t(ext_id,pos)));
-    
+        send_(network::wrap_msg(std::move(net_layer::msg::detach_tow_coords_msg_t(ext_id,pos.pos,pos.orien.get_course()))));
+
     LogInfo( 
-        "Tow tractor detach pos= " << pos.x << " " << pos.y << " " << pos.z  << "/n" 
+        "Tow tractor detach pos= " << pos.pos.x << " y " << pos.pos.y << " h " << pos.pos.z  << " course " << pos.orien.get_course()  << "/n" 
         );
 }
 

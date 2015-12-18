@@ -20,7 +20,7 @@ private:
 
 private:
     
-    void on_detach_tow (uint32_t, cg::point_3 const& );
+    void on_detach_tow (uint32_t, decart_position const& );
 
     // control
 private:

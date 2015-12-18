@@ -250,17 +250,21 @@ namespace net_layer
     {
         detach_tow_coords_msg_t() {}
 
-        detach_tow_coords_msg_t(uint32_t id, cg::point_3f const& pos)
-            : ext_id      (id), pos(pos)
+        detach_tow_coords_msg_t(uint32_t ext_id, cg::point_3f const& pos, double  course)
+            : ext_id ( ext_id )
+            , pos    ( pos    )
+            , course ( course )
         {}
 
         uint32_t           ext_id;
         cg::point_3f          pos;
+        double			   course;
     };
-    
+
     REFL_STRUCT(detach_tow_coords_msg_t)
         REFL_ENTRY(ext_id)
         REFL_ENTRY(pos)
+        REFL_ENTRY(course)
     REFL_END()
 
     struct container_msg

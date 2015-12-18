@@ -2,6 +2,8 @@
 #include "precompiled_objects.h"
 
 #include "vehicle_visual.h"
+#include "common/text_label.h"
+
 
 namespace vehicle
 {
@@ -125,6 +127,10 @@ AUTO_REG_NAME(vehicle_visual, visual::create);
 visual::visual(object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
 {
+    visual_system* vsys = dynamic_cast<visual_system*>(sys_);
+
+    label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
+    ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 }
 
 void visual::update(double time)

@@ -17,6 +17,8 @@ struct settings_t
     std::string route;
     std::string aerotow;
     bool debug_draw;
+    
+    std::string custom_label; 
 };
 
 REFL_STRUCT(settings_t)

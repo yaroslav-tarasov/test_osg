@@ -2,6 +2,12 @@
 
 #include "aircraft_physless_view.h"
 
+
+namespace visual_objects
+{
+    struct label_support;
+}
+
 namespace aircraft_physless
 {
 	struct visual
@@ -25,7 +31,6 @@ namespace aircraft_physless
         optional<double>  last_update_;
 
     private:
-        struct label_support;
-        boost::shared_ptr<label_support>   ls_;
+        boost::shared_ptr<visual_objects::label_support>   ls_;
 	};
 }

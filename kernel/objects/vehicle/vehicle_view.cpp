@@ -85,7 +85,7 @@ void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
 void view::on_model_changed()
 {
     root_ = nodes_manager_->get_node(0);
-	tow_point_node_ = nodes_manager_->find_node("tow_point");
+	tow_point_node_  = nodes_manager_->find_node("tow_point");
 	rtow_point_node_ = nodes_manager_->find_node("rtow_point");
 }
 
@@ -99,7 +99,7 @@ void view::set_state(state_t const& state)
     set(msg::state_msg_t(state), false);
 }
 
-void view::set_tow(optional<uint32_t> tow_id, bool reverse, const cg::geo_point_2& pos)
+void view::set_tow(optional<uint32_t> tow_id, bool reverse, const geo_position& pos)
 {
     set(msg::tow_msg_t(tow_id, reverse, pos), true);
 }

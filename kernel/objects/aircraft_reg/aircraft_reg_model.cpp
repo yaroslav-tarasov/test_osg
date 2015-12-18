@@ -55,7 +55,9 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
                  //pv->set_reverse(msg.reverse);
              }
 
-             pv->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+             //if(!msg.reverse)
+                pv->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+
              pv->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }
          

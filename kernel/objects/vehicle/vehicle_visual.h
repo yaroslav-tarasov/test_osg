@@ -4,6 +4,11 @@
 #include "objects/impl/local_position.h"
 #include "kernel/systems/vis_system.h"
 
+namespace visual_objects
+{
+    struct label_support;
+}
+
 namespace vehicle
 {
     struct visual
@@ -25,6 +30,11 @@ namespace vehicle
         struct tow_support;
         boost::shared_ptr<tow_support>   ts_;
 
+    private:
+        visual_object_ptr                       label_object_;
+
+    private:
+        boost::shared_ptr<visual_objects::label_support>   ls_;
     };
 
 }

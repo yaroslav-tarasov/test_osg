@@ -333,7 +333,8 @@ inline object_info_ptr create_vehicle(create const& msg)
     geo_position vgp(target_pos, get_base());
 
     vehicle::settings_t vs;
-    vs.model = msg.model_name;
+    vs.model        = msg.model_name;
+    vs.custom_label = msg.custom_label;
 
     return  vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 }
