@@ -153,6 +153,7 @@ osg::Node* createObject(std::string name, bool fclone)
             "strobe_",
             "landing_lamp",
             "back_tail",
+            "headlight"
             // "navaid_",
         };
 

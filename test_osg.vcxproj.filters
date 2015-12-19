@@ -48,9 +48,6 @@
     <Filter Include="Source Files\objects\aircraft_fms">
       <UniqueIdentifier>{90453dd4-b788-4821-8e97-a1903a771500}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\airport">
-      <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\phys">
       <UniqueIdentifier>{5825f9d1-57fe-4ae3-9df4-98c2c25390b5}</UniqueIdentifier>
     </Filter>
@@ -137,6 +134,9 @@
     </Filter>
     <Filter Include="Source Files\objects\nodes_manager\nm">
       <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\dubin_route\airport">
+      <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -455,13 +455,13 @@
       <Filter>Source Files\objects\aircraft_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_model.cpp">
-      <Filter>Source Files\objects\airport</Filter>
+      <Filter>Source Files\objects\dubin_route\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_view.cpp">
-      <Filter>Source Files\objects\airport</Filter>
+      <Filter>Source Files\objects\dubin_route\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp">
-      <Filter>Source Files\objects\airport</Filter>
+      <Filter>Source Files\objects\dubin_route\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\ada\ada_view.cpp">
       <Filter>Source Files\objects\ada</Filter>
@@ -680,7 +680,7 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
-      <Filter>Source Files\objects\airport</Filter>
+      <Filter>Source Files\objects\dubin_route\airport</Filter>
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\shaders</Filter>

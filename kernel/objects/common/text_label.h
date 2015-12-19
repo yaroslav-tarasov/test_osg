@@ -1,5 +1,6 @@
 #pragma once 
 
+#include "common/unicode_support.h"
 
 namespace visual_objects
 {
@@ -17,6 +18,21 @@ namespace visual_objects
             update_(dir,offset); 
         }
 
+        inline void set_text(const std::string&  text)
+        {
+            const auto& l = label_->asGeode()->getDrawableList();
+
+            for(auto itr=l.begin();
+                itr!= l.end();
+                ++itr)
+            {
+                if(auto dtext =  dynamic_cast<osgText::Text*>(itr->get()))
+                {
+                    dtext->setText(unicode::a2w(text).c_str());
+                }
+            }
+        }
+
     private:
 
         inline void init_(const std::string&  text)
@@ -27,17 +43,7 @@ namespace visual_objects
             label_->accept( cbvs );
             const osg::BoundingBox bb_s = cbvs.getBoundingBox();
 
-            const auto& l = label_->asGeode()->getDrawableList();
-
-            for(auto itr=l.begin();
-                itr!= l.end();
-                ++itr)
-            {
-                if(auto dtext =  dynamic_cast<osgText::Text*>(itr->get()))
-                {
-                    dtext->setText(text);
-                }
-            }
+            set_text(text) ;
         }
 
 

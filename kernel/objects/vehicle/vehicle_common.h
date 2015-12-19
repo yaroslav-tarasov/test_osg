@@ -13,10 +13,10 @@ struct settings_t
     {
     }
 
-    std::string model;
-    std::string route;
-    std::string aerotow;
-    bool debug_draw;
+    std::string        model;
+    std::string        route;
+    std::string      aerotow;
+    bool          debug_draw;
     
     std::string custom_label; 
 };
@@ -26,6 +26,7 @@ REFL_STRUCT(settings_t)
     REFL_ENTRY(route)
     REFL_ENTRY(aerotow)
     REFL_ENTRY(debug_draw)
+    REFL_ENTRY(custom_label)
 REFL_END()
 
 //! состояние подвижного объекта

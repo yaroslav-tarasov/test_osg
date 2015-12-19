@@ -133,6 +133,12 @@ visual::visual(object_create_t const& oc, dict_copt dict)
     ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 }
 
+void visual::settings_changed()
+{
+    view::settings_changed();
+    ls_->set_text(settings_.custom_label);
+}
+
 void visual::update(double time)
 {
     view::update(time);

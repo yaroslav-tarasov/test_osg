@@ -45,7 +45,7 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
 
     body_node_      = nodes_manager_->find_node("body");
     FIXME(Надо решить нужна ли здесь инициализация см view, как впрочем и дублирование переменных) 
-    //tow_point_node_ = nodes_manager_->find_node("tow_point");
+    //tow_point_node_  = nodes_manager_->find_node("tow_point");
     //rtow_point_node_ = nodes_manager_->find_node("rtow_point");
 
     if (!settings_.route.empty())
@@ -262,6 +262,7 @@ void model::set_desired        (double time, const cg::point_3& pos, const cg::q
         {
            traj_ = fms::trajectory::create();
 	       start_follow_ = true;
+           LogInfo(" Re-create trajectory  " << settings_.custom_label );
         }
 
         traj_->append(time, pos, orien, speed);
@@ -667,8 +668,12 @@ void model::update_model( double time, double dt )
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
         FIXME(state устанавливается через чарт); 
 	    // у меня координаты отличаются надо думать
+
+#ifndef MODEL_TOW_TESTING
         if (dist > 10)
             return;
+#endif
+
     }
 
     if (model_state_)

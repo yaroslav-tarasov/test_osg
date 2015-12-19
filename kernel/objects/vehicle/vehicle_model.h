@@ -91,7 +91,7 @@ private:
     void create_phys_vehicle();
     void sync_phys          ();
     void sync_nodes_manager ( double dt );
-    void settings_changed   ();
+    void settings_changed   ()             override;
 
 private:
     void go(cg::polar_point_2 const &dir) ;

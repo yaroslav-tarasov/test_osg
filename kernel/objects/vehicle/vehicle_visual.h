@@ -23,6 +23,8 @@ namespace vehicle
         void update     (double time);
 
     private:
+        void settings_changed   ()             override;
+    private:
         optional<visual_object_ptr>      tow_visual_object_;
         nodes_management::node_info_ptr  aero_tow_point_; 
         // experimental part

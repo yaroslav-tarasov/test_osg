@@ -1370,6 +1370,19 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
             osg::ref_ptr<osgText::Text> updateText = new osgText::Text;
             updateText->setDataVariance(osg::Object::DYNAMIC);
 
+            std::string font("fonts/times.ttf");
+            //std::string font("fonts/arial.ttf");
+
+            updateText->setFont(font);
+            updateText->setFontResolution(110,120);
+            //updateText->setAlignment(osgText::Text::RIGHT_CENTER);
+            //updateText->setAxisAlignment(osgText::Text::XZ_PLANE);
+            //updateText->setCharacterSize((bb.zMax()-bb.zMin())*1.0f);
+            //updateText->setPosition(bb.center()-osg::Vec3((bb.xMax()-bb.xMin()),-(bb.yMax()-bb.yMin())*0.5f,(bb.zMax()-bb.zMin())*0.1f));
+            //updateText->setColor(osg::Vec4(0.37f,0.48f,0.67f,1.0f)); // Neil's original OSG colour
+            updateText->setColor(osg::Vec4(0.20f,0.45f,0.60f,1.0f)); 
+
+
             osg::Geode* geode = new osg::Geode();
             osg::StateSet* stateset = geode->getOrCreateStateSet();
             stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
@@ -1447,6 +1460,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
             
             osg::Node* sl =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
             osg::Node* pat =  findFirstNode(mt,"pat",findNodeVisitor::not_exact);
+             
+            osg::Node* hd =  findFirstNode(mt,"headlight",findNodeVisitor::not_exact);
 
             const auto offset =  pat->asTransform()->asPositionAttitudeTransform()->getPosition();
 
@@ -1476,6 +1491,31 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
             }
 
+            if(hd)
+            {
+                avScene::LightManager::Light data;
+                data.transform  = mt;  
+                data.spotFalloff = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(32.f));  // FIXME градусы-радианы 
+                data.distanceFalloff = cg::range_2f(15.f, 70.f);
+                data.color.r = 0.55f;
+                data.color.g = 0.55f;
+                data.color.b = 0.5f;
+                FIXME(  Damned offset  );
+                data.position =  from_osg_vector3(hd->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+
+                osg::Quat      rot   = hd->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+                cg::quaternion orien = from_osg_quat(rot);
+                cg::cpr        cr    = orien.cpr(); 
+
+                const float heading = osg::DegreesToRadians(cr.course);
+                const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
+
+                data.direction = set_direction(pitch, heading);
+                data.active = true;
+
+                avScene::LightManager::GetInstance()->addLight(data);
+
+            }
 
             findNodeVisitor::nodeNamesList list_name;
             NavAidGroup*  obj_light  =  new NavAidGroup; 
@@ -1489,6 +1529,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 "strobe_",
                 "landing_lamp",
                 "back_tail",
+                "headlight"
                 // "navaid_",
             };
 
