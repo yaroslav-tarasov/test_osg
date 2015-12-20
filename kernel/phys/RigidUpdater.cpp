@@ -479,7 +479,6 @@ namespace bi
     {
         osgViewer::View* view = static_cast<osgViewer::View*>( &aa );
         frame_timer ftm (view,_last_frame_time);
-
         if ( !view || !_root ) return false;
 
 #ifdef DEPRECATED_DEBUG_MODE

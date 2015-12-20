@@ -135,7 +135,13 @@
     <Filter Include="Source Files\objects\nodes_manager\nm">
       <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\dubin_route\airport">
+    <Filter Include="Source Files\objects\flock_child">
+      <UniqueIdentifier>{75826f99-1a99-43c6-9e90-9c866cd446bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\flock_manager">
+      <UniqueIdentifier>{f7f2fd7b-532e-46f3-a31d-aad46eb458a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\airport">
       <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -289,6 +295,15 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h">
+      <Filter>Source Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_model.h">
+      <Filter>Source Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_view.h">
+      <Filter>Source Files\objects\flock_child</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -455,13 +470,13 @@
       <Filter>Source Files\objects\aircraft_fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_model.cpp">
-      <Filter>Source Files\objects\dubin_route\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_view.cpp">
-      <Filter>Source Files\objects\dubin_route\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp">
-      <Filter>Source Files\objects\dubin_route\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\ada\ada_view.cpp">
       <Filter>Source Files\objects\ada</Filter>
@@ -680,7 +695,7 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
-      <Filter>Source Files\objects\dubin_route\airport</Filter>
+      <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\shaders</Filter>
@@ -837,6 +852,21 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_ctrl.cpp">
+      <Filter>Source Files\objects\flock_child</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp">
+      <Filter>Source Files\objects\flock_child</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp">
+      <Filter>Source Files\objects\flock_child</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp">
+      <Filter>Source Files\objects\flock_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\animation_test2.cpp">
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

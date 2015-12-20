@@ -10,7 +10,6 @@ object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
     return object_info_ptr(new view(oc, dict));
 }
 
-FIXME("Авторегистрация, что тоже интересно")
 AUTO_REG_NAME(airports_manager_view, view::create);
 //AUTO_REG_NAME(airports_manager_chart, base_chart_presentation<view>::create);
 

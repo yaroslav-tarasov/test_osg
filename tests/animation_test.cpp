@@ -58,12 +58,33 @@ public:
             {
                 using namespace avAnimation;
                 AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
-                mc.stop();
+                //mc.stop();
                 mc.next();
+				_timer = ea.getTime();
                 return true;
             }
+			else if ( ea.getKey()== osgGA::GUIEventAdapter::KEY_P )
+			{
+				using namespace avAnimation;
+				AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
+				//mc.stop();
+				mc.previous();
+				_timer = ea.getTime();
+				return true;
+			}			
 
         }
+
+		if ( ea.getEventType()== osgGA::GUIEventAdapter::FRAME)
+		{
+			using namespace avAnimation;
+			AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
+			if(_timer && *_timer + 1.0 <= ea.getTime() )
+			{
+				mc.stopPrev();
+				_timer.reset();
+			}
+		}
 
         return false;
     }
@@ -78,6 +99,7 @@ public:
 private:
     osg::ref_ptr<osg::MatrixTransform>    _root;
     double                                _grad;
+	boost::optional<double>	     		 _timer;
 };
 
 struct UpdateNode: public osg::NodeCallback
@@ -156,16 +178,15 @@ struct UpdateNode2: public osg::NodeCallback
                         << std::endl;
                 }
 
-                const cg::quaternion orien = from_osg_quat(/*mat->getAttitude()*/mat->getMatrix().getRotate());
-                const cg::cpr&       cpr   = orien.cpr();
-                auto                 posv  = std::polar(-(walking?170.0:300.0),cg::grad2rad() * orien.cpr().course);
-                
-                // mat->setPosition(pos + osg::Vec3d(0.0,walking?-170.0:-300.0,0));
-                
-                osg::Matrix trMatrix;            
-                trMatrix.setTrans(pos + osg::Vec3d(posv.imag(),posv.real(),0)/*+ osg::Vec3d(0.0,walking?-170.0:-300.0,0)*/);
-                trMatrix.setRotate(mat->getMatrix().getRotate());
-                mat->setMatrix(trMatrix);
+                //const cg::quaternion orien = from_osg_quat(/*mat->getAttitude()*/mat->getMatrix().getRotate());
+                //const cg::cpr&       cpr   = orien.cpr();
+                //auto                 posv  = std::polar(-(walking?170.0:300.0),cg::grad2rad() * orien.cpr().course);
+                //
+               
+                //osg::Matrix trMatrix;            
+                //trMatrix.setTrans(pos + osg::Vec3d(posv.imag(),posv.real(),0)/*+ osg::Vec3d(0.0,walking?-170.0:-300.0,0)*/);
+                //trMatrix.setRotate(mat->getMatrix().getRotate());
+                //mat->setMatrix(trMatrix);
 
                 flag_delayed = false;
             }
@@ -187,16 +208,16 @@ private:
      osg::Vec3d                      _pos;
 };
 
-}
-
 inline osg::Node* loadAnimation(std::string aname)
 {
-    auto anim = osgDB::readNodeFile("running/" + aname + ".fbx");
+    auto anim = osgDB::readNodeFile("crow/" + aname + ".fbx");
     anim->setName(aname);
     return  anim;
 }
 
-int main_anim_test( int argc, char** argv )
+}
+
+int main_anim_test2( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);
 
@@ -209,12 +230,12 @@ int main_anim_test( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
    
-   auto anim_file = walking? osgDB::readNodeFile("running/walking.fbx"):osgDB::readNodeFile("running/running.fbx")  ;
+   auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
    
-   auto anim_idle    = loadAnimation("idle");
-   auto anim_running = loadAnimation("running");
+   auto anim_idle    = loadAnimation("flap");
+   auto anim_running = loadAnimation("soar");
 
-   auto object_file = osgDB::readNodeFile("running/Remy.fbx");
+   auto object_file = osgDB::readNodeFile("crow/soar.fbx");
 
    auto pat = new osg::PositionAttitudeTransform; 
    pat->addChild(object_file);
@@ -235,13 +256,14 @@ int main_anim_test( int argc, char** argv )
    ph_ctrl->setUserValue("id",6666);
    ph_ctrl->addChild( pat );
 
-   osg::Matrix trMatrix;            
+   osg::Matrix trMatrix;
+   trMatrix.setTrans(osg::Vec3f(0.0,0.0,20.0));
    trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
    ph_ctrl->setMatrix(trMatrix);
    
    root->addChild(ph_ctrl);
    
-   pat->addUpdateCallback(new UpdateNode2(pat,"Body"));
+   pat->addUpdateCallback(new UpdateNode2(pat,"CrowMesh"));
 
    using namespace avAnimation;
    AnimationManagerFinder finder;
@@ -256,7 +278,7 @@ int main_anim_test( int argc, char** argv )
        // We're safe at this point, so begin processing.
        AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
        mc.setPlayMode(osgAnimation::Animation::ONCE);
-       mc.setDurationRatio(10.);
+       // mc.setDurationRatio(10.);
        mc.play();
 
    } else {
@@ -275,4 +297,4 @@ int main_anim_test( int argc, char** argv )
    return 0;
 }
 
-AUTO_REG(main_anim_test)
+AUTO_REG(main_anim_test2)

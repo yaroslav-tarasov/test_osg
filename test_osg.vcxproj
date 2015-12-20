@@ -151,6 +151,9 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h" />
+    <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h" />
+    <ClInclude Include="kernel\objects\flock_child\flock_child_model.h" />
+    <ClInclude Include="kernel\objects\flock_child\flock_child_view.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tests\systems\test_systems.h" />
     <ClInclude Include="utils\empty_scene.h" />
@@ -265,6 +268,10 @@
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
+    <ClCompile Include="kernel\objects\flock_child\flock_child_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp" />
+    <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp" />
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp" />
     <ClCompile Include="kernel\objects\human\human_ctrl.cpp" />
     <ClCompile Include="kernel\objects\human\human_model.cpp" />
     <ClCompile Include="kernel\objects\human\human_model_states.cpp" />
@@ -302,6 +309,7 @@
     <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
     <ClCompile Include="tests\animation_test.cpp" />
+    <ClCompile Include="tests\animation_test2.cpp" />
     <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />

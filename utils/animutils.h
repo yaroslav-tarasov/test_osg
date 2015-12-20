@@ -148,9 +148,21 @@ public:
 		}
 		return false;
 	}    
+	
+	bool stopPrev() 
+	{
+		if(_prev_focus < _amv.size()) 
+		{
+			std::cout << "Stop " << _amv[_prev_focus] << std::endl;
+			_model->stopAnimation(_map[_amv[_prev_focus]].get());
+			return true;
+		}
+		return false;
+	} 
 
 	bool next() 
 	{
+		_prev_focus = _focus;
 		_focus = (_focus + 1) % _map.size();
 		std::cout << "Current now is " << _amv[_focus] << std::endl;
 		return true;
@@ -158,6 +170,7 @@ public:
 
 	bool previous() 
 	{
+		_prev_focus = _focus;
 		_focus = (_map.size() + _focus - 1) % _map.size();
 		std::cout << "Current now is " << _amv[_focus] << std::endl;
 		return true;
@@ -197,6 +210,7 @@ private:
 	AnimationMapVector                                _amv;
     AnimationDurationMap                              _amd;
 	unsigned int                                      _focus;
+    unsigned int                                      _prev_focus;
     osg::ref_ptr<osgAnimation::ActionStripAnimation>  _default;
 
 	AnimtkViewerModelController():
