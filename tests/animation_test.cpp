@@ -60,7 +60,8 @@ public:
                 AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
                 //mc.stop();
                 mc.next();
-				_timer = ea.getTime();
+                mc.play();
+                _timer = ea.getTime();
                 return true;
             }
 			else if ( ea.getKey()== osgGA::GUIEventAdapter::KEY_P )
@@ -69,6 +70,7 @@ public:
 				AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
 				//mc.stop();
 				mc.previous();
+                mc.play();
 				_timer = ea.getTime();
 				return true;
 			}			
@@ -229,13 +231,18 @@ int main_anim_test2( int argc, char** argv )
 
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
-   
+
+#if 0   
    auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
-   
+
    auto anim_idle    = loadAnimation("flap");
    auto anim_running = loadAnimation("soar");
+#endif
 
    auto object_file = osgDB::readNodeFile("crow/soar.fbx");
+   osg::ref_ptr<osg::NodeCallback> uc = object_file->getUpdateCallback();
+   object_file->removeUpdateCallback(uc.get());
+   uc.release();
 
    auto pat = new osg::PositionAttitudeTransform; 
    pat->addChild(object_file);
@@ -250,25 +257,31 @@ int main_anim_test2( int argc, char** argv )
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
   
+   for (int i =0;i<250;i++)
+   {
+       osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+       ph_ctrl->setName("phys_ctrl");
+       ph_ctrl->setUserValue("id",666 + i);
+       ph_ctrl->addChild( pat );
 
-   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
-   ph_ctrl->setName("phys_ctrl");
-   ph_ctrl->setUserValue("id",6666);
-   ph_ctrl->addChild( pat );
+       osg::Matrix trMatrix;
+       trMatrix.setTrans(osg::Vec3f(0.0 + i * 20,0.0 + i * 20, 20.0 + i * 1));
+       trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+       ph_ctrl->setMatrix(trMatrix);
 
-   osg::Matrix trMatrix;
-   trMatrix.setTrans(osg::Vec3f(0.0,0.0,20.0));
-   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
-   ph_ctrl->setMatrix(trMatrix);
-   
-   root->addChild(ph_ctrl);
-   
-   pat->addUpdateCallback(new UpdateNode2(pat,"CrowMesh"));
+       root->addChild(ph_ctrl);
+       //if (i==0 )
+       //    viewer.addEventHandler( new KeyHandler( ph_ctrl.get() ) );
 
+
+   }
+
+   //pat->addUpdateCallback(new UpdateNode2(pat,"CrowMesh"));
+#if 0
    using namespace avAnimation;
    AnimationManagerFinder finder;
    anim_file->accept(finder);
-   if (finder._am.valid()) {
+   if (false/*finder._am.valid()*/) {
        pat->addUpdateCallback(finder._am.get());
        AnimtkViewerModelController::setModel(finder._am.get());
        AnimtkViewerModelController::addAnimation(anim_idle); 
@@ -284,11 +297,12 @@ int main_anim_test2( int argc, char** argv )
    } else {
        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
+#endif
 
    osg::ref_ptr<PickHandler> picker = new PickHandler;
    root->addChild( picker->getOrCreateSelectionBox() );
 
-   viewer.addEventHandler( new KeyHandler( ph_ctrl.get() ) );
+   viewer.addEventHandler( new osgViewer::StatsHandler );
    viewer.addEventHandler( picker.get() );
    viewer.setSceneData(root);
 

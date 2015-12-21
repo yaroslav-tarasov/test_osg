@@ -44,6 +44,15 @@ public:
             ss->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
             ss->setAttributeAndModes( new osg::PolygonMode(
                 osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE) );
+
+
+            osg::Geode* sphere = new osg::Geode();
+            sphere->setName("Sphere");
+            sphere->addDrawable(new osg::ShapeDrawable(new osg::Sphere()));
+            
+            _selectionBox->setNodeMask( PICK_NODE_MASK );
+            _selectionBox->addChild( sphere );
+
         }
         return _selectionBox.get();
     }
@@ -141,10 +150,15 @@ public:
                         parent->accept( cbv );
                         const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-                        osg::Vec3 worldCenter = bb.center() /** osg::computeLocalToWorld(hit.nodePath)*/;
+                        const osg::Vec3 worldCenter = /*bb.center() * */osg::computeLocalToWorld(hit.nodePath).getTrans();
+                        const double fx =  (bb.xMax()-bb.xMin())/2.0;
+                        const double fy =  (bb.yMax()-bb.yMin())/2.0;
+                        const double fz =  (bb.zMax()-bb.zMin())/2.0;
+
                         _selectionBox->setMatrix(
-                            osg::Matrix::scale(bb.xMax()-bb.xMin(), bb.yMax()-bb.yMin(), bb.zMax()-bb.zMin()) *
-                            osg::Matrix::translate(worldCenter) );
+                            osg::Matrix::scale(fx, fy, fz) *
+                            osg::Matrix::translate( worldCenter )
+                            );
                     }));
 
                 }
