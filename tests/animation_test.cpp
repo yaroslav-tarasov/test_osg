@@ -7,9 +7,41 @@
 
 #include "osg_helpers.h"
 
+#include <osgAnimation/RigGeometry>
+#include <osgAnimation/RigTransformHardware>
+#include <osgAnimation/BoneMapVisitor>
+
+#include "utils\visitors\find_node_visitor.h"
+
 const bool walking = true;
 
 namespace {
+
+    struct SetupRigGeometry : public osg::NodeVisitor
+    {
+        bool _hardware;
+        SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
+
+        void apply(osg::Geode& geode)
+        {
+            for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
+                apply(*geode.getDrawable(i));
+        }
+        void apply(osg::Drawable& geom)
+        {
+            if (_hardware) {
+                osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
+                if (rig)
+                    rig->setRigTransformImplementation(new osgAnimation::RigTransformHardware);
+            }
+
+#if 0
+            if (geom.getName() != std::string("BoundingBox")) // we disable compute of bounding box for all geometry except our bounding box
+                geom.setComputeBoundingBoxCallback(new osg::Drawable::ComputeBoundingBoxCallback);
+            //            geom.setInitialBound(new osg::Drawable::ComputeBoundingBoxCallback);
+#endif
+        }
+    };
 
 class KeyHandler : public osgGA::GUIEventHandler
 {
@@ -232,32 +264,47 @@ int main_anim_test2( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
 
-#if 0   
+#if 1   
    auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
 
    auto anim_idle    = loadAnimation("flap");
    auto anim_running = loadAnimation("soar");
 #endif
 
-   auto object_file = osgDB::readNodeFile("crow/soar.fbx");
-   osg::ref_ptr<osg::NodeCallback> uc = object_file->getUpdateCallback();
-   object_file->removeUpdateCallback(uc.get());
-   uc.release();
+   auto object_file = osgDB::readNodeFile("crow/flap.fbx");
+
+
+   osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
+   osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
+   texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+   texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+   texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+   texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+   texture->setUseHardwareMipMapGeneration(true);
+
+   osg::ref_ptr<osg::StateSet> stateSet = object_file->getOrCreateStateSet();
+   stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+   stateSet->addUniform(new osg::Uniform("colorTexture", 0));
+   stateSet->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
+
+   SetupRigGeometry switcher(true);
+   object_file->accept(switcher);
 
    auto pat = new osg::PositionAttitudeTransform; 
    pat->addChild(object_file);
    pat->setAttitude(
-       osg::Quat(osg::inDegrees(90.0)  ,osg::X_AXIS,
+       osg::Quat(osg::inDegrees(0.0)   ,osg::X_AXIS,
                  osg::inDegrees(0.0)   ,osg::Y_AXIS,
                  osg::inDegrees(0.0)   ,osg::Z_AXIS)
        );
+
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
 
    //root->setUpdateCallback(new UpdateNode(pat));
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
   
-   for (int i =0;i<250;i++)
+   for (int i =0;i<100;i++)
    {
        osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
        ph_ctrl->setName("phys_ctrl");
@@ -270,18 +317,55 @@ int main_anim_test2( int argc, char** argv )
        ph_ctrl->setMatrix(trMatrix);
 
        root->addChild(ph_ctrl);
-       //if (i==0 )
-       //    viewer.addEventHandler( new KeyHandler( ph_ctrl.get() ) );
+       if (i==0 )
+           viewer.addEventHandler( new KeyHandler( ph_ctrl.get() ) );
 
 
    }
 
    //pat->addUpdateCallback(new UpdateNode2(pat,"CrowMesh"));
-#if 0
+#if 1
+////////////////////////////////////////////////////////////////////////////
+
+   findNodeByType< osg::Geode> geode_finder;  
+   geode_finder.apply(*object_file);
+
+   osg::Geode*    mesh = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
+   osg::Geometry* geo_mesh = mesh->getDrawable(0)->asGeometry();
+   osgAnimation::RigGeometry* rig_geom = dynamic_cast<osgAnimation::RigGeometry*>(geo_mesh);
+   
+   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+
+   osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
+   osg::ref_ptr<osgAnimation::RigGeometry> geometry = new osgAnimation::RigGeometry(*rig_geom, osg::CopyOp::DEEP_COPY_ALL);
+   geode->addDrawable(geometry);
+   osg::Matrix trMatrix;
+   trMatrix.setTrans(osg::Vec3f( -20, -20, 20));
+   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+   ph_ctrl->setMatrix(trMatrix);
+
+   findNodeByType< osgAnimation::Skeleton> s_finder;  
+   s_finder.apply(*object_file);
+
+   osg::ref_ptr<osgAnimation::Skeleton> sekel =  new osgAnimation::Skeleton(*dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast()), osg::CopyOp::DEEP_COPY_ALL);
+   geometry->setSkeleton(sekel.get());
+   
+   osgAnimation::BoneMapVisitor mapVisitor;
+   geometry->getSkeleton()->accept(mapVisitor);
+   osgAnimation::BoneMap bm = mapVisitor.getBoneMap();
+   
+   //SetupRigGeometry switcher2(true);
+   //geode->accept(switcher2);
+
+   //dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast())->addChild(geode);
+   ph_ctrl->addChild(geode);
+   root->addChild(ph_ctrl);
+//////////////////////////////////////////////////////////////////////////////
+
    using namespace avAnimation;
    AnimationManagerFinder finder;
    anim_file->accept(finder);
-   if (false/*finder._am.valid()*/) {
+   if (finder._am.valid()) {
        pat->addUpdateCallback(finder._am.get());
        AnimtkViewerModelController::setModel(finder._am.get());
        AnimtkViewerModelController::addAnimation(anim_idle); 

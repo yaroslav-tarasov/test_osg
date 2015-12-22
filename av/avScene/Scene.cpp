@@ -1429,6 +1429,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
+        auto object_file = osgDB::readNodeFile("crow/flap.fbx");
+
+        for(int i = 0; i<20; ++i)
+        {
+            _terrainRoot->addChild(object_file);
+        }
+
         return _terrainNode;
     }
 
