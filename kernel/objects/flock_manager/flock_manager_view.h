@@ -91,7 +91,8 @@ namespace flock
 		protected:
 			void on_object_created(object_info_ptr object)    override;
 			void on_object_destroying(object_info_ptr object) override;
-
+			// info
+			const settings_t& settings()                 const override;
 		protected:
 			std::set<child::info_ptr>				       	roamers_;
 

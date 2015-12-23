@@ -2,6 +2,7 @@
 
 #include "flock_child_common.h"
 #include "flock_child_view.h"
+#include "flock_manager/flock_manager_common.h"
 #include "common/flock_manager.h"
 #include "common/phys_sys.h"
 #include "objects/nodes_management.h"
@@ -33,6 +34,7 @@ private:
 
 private:
     void create_phys();
+	void flap();
 
 private:
     nodes_management::manager_ptr nodes_manager_;
@@ -41,7 +43,20 @@ private:
 
     optional<size_t>                  phys_zone_;
 
-    manager::info_ptr                   spawner_;
+    manager::info_ptr                   _spawner;
+
+	// Some data
+private:
+
+	bool									_soar; // state ?
+	bool								   _dived;
+
+	double  						   _soarTimer;
+
+
+private:
+	optional<double>                 last_update_;
+
 };
 
 } // child

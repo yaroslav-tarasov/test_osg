@@ -46,6 +46,11 @@ void view::on_object_destroying(object_info_ptr object)
     }
 }
 
+const settings_t& view::settings() const 
+{
+	return settings_;
+}
+
 
 } // manager
 

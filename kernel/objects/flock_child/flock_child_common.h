@@ -15,6 +15,7 @@ struct settings_t
     {}
 
     string   model;
+	float   _avoidValue; 
 };
 
 
@@ -51,6 +52,7 @@ REFL_END()
 
 REFL_STRUCT(settings_t)
     REFL_ENTRY(model)
+	REFL_ENTRY(_avoidValue)
 REFL_END()
 
 struct state_t

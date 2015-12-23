@@ -8,6 +8,7 @@ namespace flock
 	{
 		struct info
 		{
+			virtual const settings_t& settings() const =0;
 			virtual ~info() {}
 		};
 

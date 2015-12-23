@@ -12,10 +12,11 @@ struct settings_t
 {
     settings_t()
         : _childAmount(250)
+		, _soarMaxTime( 5 )
     {}
 
 	int _childAmount;
-
+	int _soarMaxTime;
 };
 
 
@@ -52,6 +53,7 @@ REFL_END()
 
 REFL_STRUCT(settings_t)
     REFL_ENTRY(_childAmount)
+	REFL_ENTRY(_soarMaxTime)
 REFL_END()
 
 struct state_t

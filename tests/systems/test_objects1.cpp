@@ -7,8 +7,9 @@
 
 FIXME(Это что за нафиг нужно  для object_creators )
 #include "common/simple_route.h"
-#include "common/flock_manager.h"
 #include "objects/flock_manager/flock_manager_common.h"
+#include "common/flock_manager.h"
+
 
 #include "object_creators.h"
 

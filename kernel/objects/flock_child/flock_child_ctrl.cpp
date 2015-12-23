@@ -31,6 +31,8 @@ ctrl::ctrl(kernel::object_create_t const& oc, dict_copt dict)
         
 
     }
+
+
 }
 
 void ctrl::set_model(const std::string&  icao_code)
