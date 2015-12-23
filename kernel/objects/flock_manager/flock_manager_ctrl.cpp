@@ -8,6 +8,7 @@ FIXME(Создание множества дочерних объектов и клонирование)
 #include "kernel/systems/fake_system.h"
 #include "flock_child/flock_child_view.h"
 #include "nodes_manager/nodes_manager_view.h"
+#include "common/randgen.h"
 
 namespace flock
 {
@@ -46,12 +47,14 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 {
     auto * of = dynamic_cast<kernel::fake_objects_factory*>(sys_);
     
-    settings_._childAmount = 1;
+    settings_._childAmount = 150;
+	
+	simplerandgen  rnd(static_cast<unsigned>(time(nullptr)));
 
-    for (int i=0; i < settings_._childAmount; ++i )
+	for (int i=0; i < settings_._childAmount; ++i )
     {
         decart_position target_pos;
-        //target_pos.pos   = msg.pos;
+        target_pos.pos   = point_3(rnd.random_16bit(),rnd.random_16bit(),rnd.random_16bit());
         //target_pos.orien = msg.orien;
         geo_position vgp(target_pos, get_base());
 

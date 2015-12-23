@@ -354,8 +354,8 @@ int main_anim_test2( int argc, char** argv )
    geometry->getSkeleton()->accept(mapVisitor);
    osgAnimation::BoneMap bm = mapVisitor.getBoneMap();
    
-   //SetupRigGeometry switcher2(true);
-   //geode->accept(switcher2);
+   SetupRigGeometry switcher2(true);
+   geode->accept(switcher2);
 
    //dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast())->addChild(geode);
    ph_ctrl->addChild(geode);
