@@ -496,7 +496,7 @@ object_info_ptr fake_system_base::create_object(obj_create_data const& data)
     msgs_blocker    mb(*this);
 
     {
-        locks::bool_lock l(create_object_lock_);
+        locks::bool_lock l(create_object_lock_,false);
         obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
     }
 

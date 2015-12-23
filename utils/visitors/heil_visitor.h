@@ -110,8 +110,10 @@ class heilVisitor : public osg::NodeVisitor
                     got_lod=false;
                 }
                 
-				new_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans()) + offset;
-                new_node.orien = from_osg_quat(node.asTransform()->asMatrixTransform()->getMatrix().getRotate());
+                bool mt = node.asTransform();
+				
+                new_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
+                new_node.orien = from_osg_quat(mt?node.asTransform()->asMatrixTransform()->getMatrix().getRotate():osg::Quat());
                 //const osg::BoundingSphere& bs = node.getBound();
                 //new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
                 
@@ -145,7 +147,7 @@ class heilVisitor : public osg::NodeVisitor
                 if(!damned_offset_added)
                 {
                     model_structure::node_data do_node;
-                    do_node.pos   = from_osg_vector3(node.asTransform()->asMatrixTransform()->getMatrix().getTrans()) + offset;
+                    do_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
                     do_node.name =  "damned_offset";
 
                     damned_offset_added = true;

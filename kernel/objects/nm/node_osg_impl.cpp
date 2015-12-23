@@ -138,38 +138,26 @@ void node_impl::play_animation  (std::string const& seq, double len, double from
     FIXME(Анимация на коленке)
     osgAnimation::Animation::PlayMode pm = from > 0?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
+    pm = from < 0?osgAnimation::Animation::LOOP:pm;
+    
     auto god_node = node_impl_ptr(root_node())->as_osg_node()->getParent(0);
                                            
     auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( god_node->getUpdateCallback() );
-    
+   
     if ( manager_ )
     {   
 
         const osgAnimation::AnimationList& animations =
             manager_->getAnimationList();
         
-        //std::vector<std::string>  childs_names;
-        
         if(childs_callbacks_.size()==0)
             for (int i =0; i < node_->asGroup()->getNumChildren();++i)
             {
                auto child_node = node_->asGroup()->getChild(i); 
                childs_callbacks_.push_back(child_node->getUpdateCallback());
-               // child_node->setUpdateCallback(nullptr);
+
             }
         
-        //osgAnimation::ChannelList& channels = animations[0]->getChannels();
-        //std::list<std::string>  chan_names;  
-        //std::for_each(channels.begin(),channels.end(),[&chan_names,&childs_names](osg::ref_ptr<osgAnimation::Channel> chan)
-        //                                              {
-        //                                                  chan_names.push_back(chan->getTargetName());
-        //                                                  if(std::find(childs_names.begin(), childs_names.end(), chan->getTargetName())!=childs_names.end())
-        //                                                  {
-        //                                                      chan->setTargetName("hhhhhh");
-        //                                                  }
-        //                                              }
-        //);
-
         for ( unsigned int i=0; i<animations.size(); ++i )
         {
             const std::string& name = animations[i]->getName();
@@ -177,18 +165,9 @@ void node_impl::play_animation  (std::string const& seq, double len, double from
             {
                 animations[i]->setPlayMode(pm);                   
                 manager_->playAnimation( animations[i].get(),2,2.0 );
-
             }
         }
 
-        //for( auto it = chan_names.begin();it!=chan_names.end();++it)
-        //    channels[std::distance(chan_names.begin(),it)]->setTargetName(*it);
-
-        //for (int i =0; i < node_->asGroup()->getNumChildren();++i)
-        //{
-        //    auto child_node = node_->asGroup()->getChild(i); 
-        //    child_node->setUpdateCallback(childs_callbacks_[i]);
-        //}
     }
 }
 

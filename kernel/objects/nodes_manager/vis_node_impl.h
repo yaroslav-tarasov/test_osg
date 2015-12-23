@@ -44,7 +44,7 @@ namespace nodes_management
         void init_disp();
 
     private:
-        mutable optional<bool> visible_;
+        mutable optional<bool>          visible_;
         std::vector</*victory::node_ptr*/osg::ref_ptr<osg::Node>> victory_nodes_;
 
         bool user_visible_;

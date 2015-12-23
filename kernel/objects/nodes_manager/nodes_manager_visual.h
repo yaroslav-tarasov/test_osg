@@ -16,7 +16,7 @@ private:
 
 public:
     void init() override;
-    visual_object_ptr visual_object() { return visual_object_; }
+    visual_object_ptr visual_object()    { return visual_object_; }
     kernel::visual_system * vis_system() { return sys_; }
 
 private:

@@ -19,8 +19,6 @@ namespace vehicle
 	ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict  )
 		: view(oc,dict)
 	{
-        ctrl_system* vsys = dynamic_cast<ctrl_system*>(sys_);
-
         if (nodes_manager_)
         {
             if (nodes_manager_->get_model() != settings_.model)

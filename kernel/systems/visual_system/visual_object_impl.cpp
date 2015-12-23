@@ -4,7 +4,7 @@
 
 #include "visual_object_impl.h"
 #include "av/avScene/Scene.h"
-
+#include "animutils.h"
 
 namespace kernel
 {
@@ -21,7 +21,12 @@ namespace kernel
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
         loaded_ = true;
 #endif
-
+        using namespace avAnimation;
+        AnimationManagerFinder finder;
+        node_->accept(finder);
+        anim_manager_  = finder._am; 
+        node_->setUpdateCallback(finder._am.get());
+        
         // node_->setNodeMask(0);
     }
 
@@ -40,6 +45,11 @@ namespace kernel
 #ifndef ASYNC_OBJECT_LOADING           
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
 #endif
+        using namespace avAnimation;
+        AnimationManagerFinder finder;
+        node_->accept(finder);
+        anim_manager_  = finder._am;  
+
     }
 
     visual_object_impl::~visual_object_impl()
@@ -71,6 +81,11 @@ namespace kernel
         return root_;
     }
     
+    osg::ref_ptr<osgAnimation::BasicAnimationManager> visual_object_impl::animation_manager() const
+    {
+        return anim_manager_;
+    }
+
     void visual_object_impl::set_visible(bool visible)
     {
         if(loaded_)

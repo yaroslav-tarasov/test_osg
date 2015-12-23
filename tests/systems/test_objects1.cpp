@@ -7,6 +7,8 @@
 
 FIXME(Это что за нафиг нужно  для object_creators )
 #include "common/simple_route.h"
+#include "common/flock_manager.h"
+#include "objects/flock_manager/flock_manager_common.h"
 
 #include "object_creators.h"
 
@@ -281,6 +283,17 @@ void create_objects(const std::string & airport)
 
     force_log fl6;       
     LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.set_point() << "\n");
+
+
+    {
+        flock::manager::settings_t vs;
+        // vs.model = "crow";
+        cg::geo_point_3 vpos(0.00055,0.0009,30.0);
+        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+
+        auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    }
+
 
 }
 

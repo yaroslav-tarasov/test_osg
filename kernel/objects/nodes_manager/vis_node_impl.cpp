@@ -137,21 +137,18 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     // FIXME  Заглушка для анимации
     FIXME(Анимация на коленке)
     FIXME(Место для удара головой)
+    
+    visual* vis_manager = dynamic_cast<visual*>(manager_);
+
+    auto manager_ =  vis_manager->visual_object()->animation_manager();
 
     bool bopen = (cg::eq(anim.from,0.f)) && (cg::eq(anim.size,0.f)) || (anim.from >= 1.0) && (anim.size < 0);
-    osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
+    osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE:osgAnimation::Animation::ONCE_BACKWARDS;
     
-    // victory_nodes_->
+    pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
+
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
-
-    while(0 != root->getNumParents() && "root" != boost::to_lower_copy(root->getName()))
-        root = root->getParent(0);
-
-
-    auto god_node =  root->getParent(0);
-
-    auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( god_node->getUpdateCallback() );
 
     if ( manager_ )
     {   
@@ -174,7 +171,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
             if(!manager_->isPlaying(name))
             {
                 animations[i]->setPlayMode(pm);                   
-                //manager_->playAnimation( animations[i].get(),2,2.0 );
+                manager_->playAnimation( animations[i].get(),2,2.0 );
 
             }
         }

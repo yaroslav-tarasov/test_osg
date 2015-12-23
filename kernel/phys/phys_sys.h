@@ -76,6 +76,11 @@ namespace phys
         compound_sensor_ptr fill_cs(nm::manager_ptr manager);
     }
 
+    namespace flock
+    {
+        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+    }
+
 }
 
 

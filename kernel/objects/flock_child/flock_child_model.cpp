@@ -22,7 +22,9 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view                  (oc, dict)
     , phys_object_model_base(collection_)
     , nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
+    , spawner_              (find_first_object<manager::info_ptr>(collection_))
 {
+    
     create_phys();
 }
 
@@ -42,10 +44,19 @@ void model::on_child_removing(object_info_ptr child)
 
 void model::create_phys()
 {
-    if (!phys_)
-         return;
-    
+    if (!phys_ || !root_)
+        return;
+
+    phys_zone_ = phys_->get_zone(cg::geo_point_3(pos(), 0));
+    if (!phys_zone_)
+        return;
+
+    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+
+    //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
+    phys::compound_sensor_ptr s = phys::flock::fill_cs(nodes_manager_);    
 }
+
 
 }
 

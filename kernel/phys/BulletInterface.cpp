@@ -250,6 +250,22 @@ namespace ray_cast_vehicle
 
 }
 
+namespace flock
+{
+    void fill_cs(const std::string& model_name, compound_sensor_impl& cs )
+    { 
+
+        bool loaded = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
+        if(loaded)
+        {
+            const btTransform ct0 = cs.cs_->getChildTransform(0);
+            cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+        }
+        else
+            cs.cs_ = nullptr;
+
+    }
+}
 
 namespace phys
 {
@@ -284,6 +300,18 @@ namespace phys
         }
     }
 
+    namespace flock
+    {
+        compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+        {
+            compound_sensor_impl cs;
+            const std::string model_name = manager->get_model();
+
+            ::flock::fill_cs(model_name,cs);
+
+            return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
+        }
+    }
 }
 
 namespace phys

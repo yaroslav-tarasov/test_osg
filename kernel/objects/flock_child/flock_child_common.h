@@ -11,10 +11,10 @@ namespace child
 struct settings_t
 {
     settings_t()
-        : icao_code("UUEE")
+        : model("crow")
     {}
 
-    string   icao_code;
+    string   model;
 };
 
 
@@ -48,33 +48,32 @@ REFL_END()
 } // messages 
 
 
-inline string get_model(string icao_code)
-{
-    if (icao_code == "UUEE")
-        return "sheremetyevo";
-    else if (icao_code == "URSS")
-        return "adler";
-    else if (icao_code == "UMMS" || icao_code == "UMMM")
-        return "minsk";
-
-    return "";
-}
-
-inline bool valid_icao(string icao_code)
-{
-    return icao_code == "UUEE" || 
-           icao_code == "URSS" ||
-           icao_code == "UHWW" ||
-           icao_code == "UMMS" ||
-           icao_code == "UMMM"
-           ;     
-}
-
 
 REFL_STRUCT(settings_t)
-    REFL_ENTRY(icao_code)
+    REFL_ENTRY(model)
 REFL_END()
 
+struct state_t
+{
+    state_t()
+        : course(0)
+        , speed(0)
+    {}
+
+    state_t(cg::geo_point_2 const& pos, double course, double speed)
+        : pos(pos), course(course), speed(speed)
+    {}
+
+    cg::geo_point_2 pos;
+    double course;
+    double speed;
+};
+
+REFL_STRUCT(state_t)
+    REFL_ENTRY(pos)
+    REFL_ENTRY(course)
+    REFL_ENTRY(speed)
+REFL_END()
 
 } // child
 

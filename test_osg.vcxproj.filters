@@ -868,5 +868,8 @@
     <ClCompile Include="tests\animation_test2.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp">
+      <Filter>Source Files\objects\flock_manager</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

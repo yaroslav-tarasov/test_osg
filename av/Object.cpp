@@ -64,10 +64,13 @@ osg::Node* createObject(std::string name, bool fclone)
 	{
 		std::string object_file_name =  osgDB::findFileInPath(name + ".osgb", fpl.fpl_,osgDB::CASE_INSENSITIVE);
         std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
-        
 
 		if(object_file_name.empty())
-			object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+			object_file_name = osgDB::findFileInPath(name+".fbx", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+
+        if(object_file_name.empty())
+            object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+
 
 		if(object_file_name.empty())
 			return nullptr;
@@ -307,6 +310,8 @@ osg::Node* createObject(std::string name, bool fclone)
         pat->accept(mv);
         pat->setName("pat");
         
+
+        FIXME(Свойства моделей на хардкоде);
 #if 1
         if(name=="towbar")
         {
@@ -316,24 +321,33 @@ osg::Node* createObject(std::string name, bool fclone)
            
         }
 #endif
+        if(name == "crow")
+        {
+            pat->setScale(osg::Vec3(0.1,0.1,0.1));
+            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+            pat->setPosition(osg::Vec3(100,150 ,100)); 
+        }
 
 		objCache[name] = pat;
 
-
+#if 1
         if(fclone)
+        {
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(
             osg::clone(objCache[name].get(), osg::CopyOp::DEEP_COPY_ALL 
-            & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
-            & ~osg::CopyOp::DEEP_COPY_ARRAYS
+            //& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+            //& ~osg::CopyOp::DEEP_COPY_ARRAYS
             & ~osg::CopyOp::DEEP_COPY_IMAGES
             & ~osg::CopyOp::DEEP_COPY_TEXTURES
             & ~osg::CopyOp::DEEP_COPY_STATESETS  
             & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
-            & ~osg::CopyOp::DEEP_COPY_UNIFORMS
-            & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+            //& ~osg::CopyOp::DEEP_COPY_UNIFORMS
+            //& ~osg::CopyOp::DEEP_COPY_DRAWABLES
             ));
+        }
         else
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name].get());
+#endif
 
 
 	}

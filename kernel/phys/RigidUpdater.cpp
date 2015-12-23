@@ -23,14 +23,13 @@
 #include "vehicle.h"
 
 #include "common/simple_route.h"
+#include "flock_manager/flock_manager_common.h"
 
 #include "object_creators.h"
 
 // Моя фантазия
 #include "objects/vehicle_fwd.h"
 #include "objects/vehicle.h"
-
-//#include "aircraft_physless.h"
 
 #include "av/avCore/DebugRenderer.h"
 

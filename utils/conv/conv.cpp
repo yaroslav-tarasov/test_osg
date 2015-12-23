@@ -934,10 +934,6 @@ int main( int argc, char **argv )
             osg::notify(osg::NOTICE)<<result.message()<< std::endl;
         }
 
-
-
-
-
     }
     else
     {

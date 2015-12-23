@@ -22,6 +22,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
 	, obj_data_base         (dict)
 {
+
+
 }
 
 void view::on_object_created(object_info_ptr object)

@@ -14,6 +14,16 @@ namespace vehicle
     object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos);
 }
 
+namespace flock
+{
+    namespace manager 
+    {
+        using namespace kernel;
+
+        object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos);
+    }
+}
+
 namespace simple_route
 {
     using namespace kernel;

@@ -18,17 +18,24 @@ AUTO_REG_NAME(flock_child_ext_ctrl, ctrl::create);
 
 ctrl::ctrl(kernel::object_create_t const& oc, dict_copt dict)
     : view(oc,dict)
+    , anim_started(false)
 {
-    nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(this);
-    if (manager)
+    //nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(this);
+    
+    if (nodes_manager_)
     {
-        if (manager->get_model() != get_model(settings_.icao_code))
-            manager->set_model(get_model(settings_.icao_code));
+        if (nodes_manager_->get_model() != settings_.model)
+            nodes_manager_->set_model(settings_.model);
+
+        root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(/*course()*/90, 0, 0)), point_3()));
+        
+
     }
 }
 
 void ctrl::set_model(const std::string&  icao_code)
 {
+#if 0
     if (!valid_icao(icao_code))
         return;
 
@@ -50,9 +57,20 @@ void ctrl::set_model(const std::string&  icao_code)
         // base_chart_t::set_position(app::layer_point_3(0, *atc::airport::kta_position(settings_.icao_code)));
         // update_visibility();
     }
+#endif
 
 }
 
+void ctrl::update( double time )
+{   
+    view::update(time);
+
+    if(time>10.0 && !anim_started)
+    {
+        anim_started = true;
+        root_->play_animation("clip1", 5, -1., -1.);
+    }
+}
 
 } // child 
 

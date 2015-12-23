@@ -24,6 +24,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 
     if (nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this))
     {
+        root_ = nodes_manager_->get_node(0);
         conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed_internal, this));
     }
 
@@ -39,7 +40,7 @@ geo_point_3 view::pos() const
 
 std::string const& view::name() const
 {
-    return settings_.icao_code;
+    return settings_.model;
 }
 
 settings_t const& view::settings() const
@@ -55,11 +56,13 @@ void view::on_settings(msg::settings_msg const& msg)
 
 void view::on_model_changed_internal()
 {
+#if 0
     if (nodes_manager_)
     {   
         if (nodes_manager_->get_model() != get_model(name()))
             on_model_changed();
     }
+#endif
 }
 
 }

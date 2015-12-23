@@ -2,6 +2,7 @@
 
 #include "flock_child_common.h"
 #include "flock_child_view.h"
+#include "common/flock_manager.h"
 #include "common/phys_sys.h"
 #include "objects/nodes_management.h"
 #include "common/phys_object_model_base.h"
@@ -37,6 +38,10 @@ private:
     nodes_management::manager_ptr nodes_manager_;
 
     phys::static_mesh_ptr                  mesh_;
+
+    optional<size_t>                  phys_zone_;
+
+    manager::info_ptr                   spawner_;
 };
 
 } // child
