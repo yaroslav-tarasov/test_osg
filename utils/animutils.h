@@ -7,11 +7,16 @@
 #include <osgAnimation/ActionBlendIn>
 #include <osgAnimation/ActionBlendOut>
 #include <osgAnimation/ActionAnimation>
+#include <osgAnimation/RigGeometry>
+#include <osgAnimation/RigTransformHardware>
+#include <osgAnimation/BoneMapVisitor>
+
+#include "materials.h"
 
 namespace avAnimation
 {
 
-	struct AnimationManagerFinder : public osg::NodeVisitor
+struct AnimationManagerFinder : public osg::NodeVisitor
 {
     osg::ref_ptr<osgAnimation::BasicAnimationManager> _am;
     AnimationManagerFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
@@ -26,6 +31,96 @@ namespace avAnimation
             }
         }
         traverse(node);
+    }
+};
+
+
+
+struct RigTransformHardware : public osgAnimation::RigTransformHardware
+{
+
+    void operator()(osgAnimation::RigGeometry& geom)
+    {
+        if (_needInit)
+            if (!init(geom))
+                return;
+        computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
+    }
+
+    bool init(osgAnimation::RigGeometry& geom)
+    {
+        osg::Vec3Array* pos = dynamic_cast<osg::Vec3Array*>(geom.getVertexArray());
+        if (!pos) {
+            osg::notify(osg::WARN) << "RigTransformHardware no vertex array in the geometry " << geom.getName() << std::endl;
+            return false;
+        }
+
+        if (!geom.getSkeleton()) {
+            osg::notify(osg::WARN) << "RigTransformHardware no skeleting set in geometry " << geom.getName() << std::endl;
+            return false;
+        }
+
+        osgAnimation::BoneMapVisitor mapVisitor;
+        geom.getSkeleton()->accept(mapVisitor);
+        osgAnimation::BoneMap bm = mapVisitor.getBoneMap();
+
+        if (!createPalette(pos->size(),bm, geom.getVertexInfluenceSet().getVertexToBoneList()))
+            return false;
+
+        int attribIndex = 11;
+        int nbAttribs = getNumVertexAttrib();
+
+        std::stringstream ss;
+        ss << "#define MAX_MATRIX  " << getMatrixPaletteUniform()->getNumElements();
+        
+        osg::ref_ptr<osg::Program> program = creators::createProgram("skinning",ss.str()).program; 
+        program->setName("HardwareSkinning");
+
+        for (int i = 0; i < nbAttribs; i++)
+        {
+            std::stringstream ss;
+            ss << "boneWeight" << i;
+            program->addBindAttribLocation(ss.str(), attribIndex + i);
+
+            osg::notify(osg::INFO) << "set vertex attrib " << ss.str() << std::endl;
+        }
+
+        for (int i = 0; i < nbAttribs; i++)
+        {
+            std::stringstream ss;
+            ss << "boneWeight" << i;
+            geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
+        }
+        
+        //avCore::Database::GetInstance()->LoadTexture();
+
+        geom.getOrCreateStateSet()->addUniform(getMatrixPaletteUniform());
+        geom.getOrCreateStateSet()->addUniform(new osg::Uniform("nbBonesPerVertex", getNumBonesPerVertex()));
+        geom.getOrCreateStateSet()->setAttributeAndModes(program.get());
+
+        _needInit = false;
+        return true;
+    }
+
+};
+
+struct SetupRigGeometry : public osg::NodeVisitor
+{
+    bool _hardware;
+    SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
+
+    void apply(osg::Geode& geode)
+    {
+        for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
+            apply(*geode.getDrawable(i));
+    }
+    void apply(osg::Drawable& geom)
+    {
+        if (_hardware) {
+            osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
+            if (rig)
+                rig->setRigTransformImplementation(new avAnimation::RigTransformHardware);
+        }
     }
 };
 

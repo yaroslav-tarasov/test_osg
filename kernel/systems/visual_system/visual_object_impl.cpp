@@ -8,7 +8,6 @@
 
 namespace kernel
 {
-    //! конструктор визуального объекта
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed )
         : scene_( avScene::GetScene() )
         , loaded_(false)
@@ -26,6 +25,9 @@ namespace kernel
         node_->accept(finder);
         anim_manager_  = finder._am; 
         node_->setUpdateCallback(finder._am.get());
+        
+        SetupRigGeometry switcher(true);
+        node_->accept(switcher);        
         
         // node_->setNodeMask(0);
     }

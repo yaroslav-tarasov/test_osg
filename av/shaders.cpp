@@ -652,7 +652,6 @@ $endif
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
-//			INCLUDE_PCF_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -768,7 +767,6 @@ $endif
        INCLUDE_FUNCS
        INCLUDE_FOG_FUNCS
        INCLUDE_VS
-//	   INCLUDE_PCF_EXT
        INCLUDE_DL
        INCLUDE_DL2
        INCLUDE_SCENE_PARAM
@@ -859,7 +857,7 @@ $endif
 \n               float night_factor = step(ambient.a, 0.35);
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
-\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               aFragColor = dif_tex_col;// vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n			   
 \n           }
        )
@@ -1387,9 +1385,21 @@ $endif
             \n#include "data/materials/sea/sea.frag"
         );
         
-        SHADERS_GETTER(get_shader,vs, fs)
+        SHADERS_GETTER(get_shader, vs, fs)
 
         //AUTO_REG_NAME(sea, shaders::sea_mat::get_shader)
+    }
+
+    namespace skinning_mat
+    {
+
+        const char* vs =  STRINGIFY(
+            \n#include "data/materials/misc/skinning.vert"
+            );
+
+        SHADERS_GETTER(get_shader, vs, default_mat::fs)
+
+        AUTO_REG_NAME(skinning, skinning_mat::get_shader)
     }
 
     namespace concrete_mat 

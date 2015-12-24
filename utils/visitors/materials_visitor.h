@@ -84,8 +84,9 @@ public:
                     {  
                         _found_mat_names.insert(name);
                         _found_mat_name = name;
-                        ret =true;
                     }
+
+                    ret =true;
                 }
             }
         }

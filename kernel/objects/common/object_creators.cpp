@@ -23,12 +23,11 @@ namespace aircraft
 
 using namespace kernel;
 
-object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
+object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
 {
     const std::string class_name = "aircraft";
     const std::string unique_name = sys->generate_unique_name(class_name);
-    state_t s(init_pos.pos,init_pos.orien);
-    obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft::craft_data(sett,s/*, fpl_id*/)));
+    obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft::craft_data(sett,state_t(init_pos.pos,init_pos.orien)/*, fpl_id*/)));
 
     ocd
         .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
@@ -50,9 +49,6 @@ namespace flock
             const std::string unique_name = sys->generate_unique_name(class_name);
 
             obj_create_data ocd(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien.get_course(), 10))));
-            ocd
-                .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
-
             return sys->create_object(ocd);	
         }
     }

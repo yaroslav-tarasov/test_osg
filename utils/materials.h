@@ -37,13 +37,13 @@ namespace creators
 		virtual osg::ref_ptr<osg::Texture2D>        getReflTexture() =0;
     };    
 
-    texturesHolder_base&             getTextureHolder();
+    texturesHolder_base&                            getTextureHolder();
 
-    programsHolder_base::program_t   createProgram(std::string mat_name);
+    programsHolder_base::program_t                  createProgram(const std::string& mat_name, const std::string& preprocessorDefinitions = std::string());
 
-    void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m);
-    void createMaterialLite(osg::Node* node,osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m);
-    void computeAttributes(osg::Node* model,std::string mat_name);
+    void createMaterial     (osg::Node* node , osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m);
+    void createMaterialLite (osg::Node* node , osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m);
+    void computeAttributes  (osg::Node* model, std::string mat_name);
 }
 
 

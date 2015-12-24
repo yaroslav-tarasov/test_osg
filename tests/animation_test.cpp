@@ -251,6 +251,9 @@ inline osg::Node* loadAnimation(std::string aname)
 
 }
 
+
+
+
 int main_anim_test2( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);

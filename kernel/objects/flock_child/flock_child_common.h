@@ -58,23 +58,20 @@ REFL_END()
 struct state_t
 {
     state_t()
-        : course(0)
-        , speed(0)
     {}
 
-    state_t(cg::geo_point_2 const& pos, double course, double speed)
-        : pos(pos), course(course), speed(speed)
+    state_t(cg::geo_point_3 const& pos, cg::quaternion const& orien)
+        : pos(pos)
+        , orien(orien)
     {}
 
-    cg::geo_point_2 pos;
-    double course;
-    double speed;
+    cg::geo_point_3 pos;
+    cg::quaternion  orien;
 };
 
 REFL_STRUCT(state_t)
     REFL_ENTRY(pos)
-    REFL_ENTRY(course)
-    REFL_ENTRY(speed)
+    REFL_ENTRY(orien)
 REFL_END()
 
 } // child

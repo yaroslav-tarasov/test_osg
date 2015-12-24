@@ -369,7 +369,7 @@ class programsHolder: public programsHolder_base
 {
 
 public:
-    static inline const program_t& Create(std::string mat_name)
+    static inline const program_t& Create(const std::string& mat_name , const std::string& preprocessorDefinitions = std::string())
     {
         const uint16_t version = GLSL_VERSION;
         const std::string  comp_str = GLSL_VERSION>400? " compatibility":"";
@@ -382,14 +382,14 @@ public:
             p.program = new osg::Program;
             p.program->setName(mat_name_cut);
 
-            static osg::Shader* ssv = AddShader(shaders::VS, "shadow", version, comp_str);
-            static osg::Shader* ssf = AddShader(shaders::FS, "shadow", version, comp_str);
+            static osg::Shader* ssv = AddShader(shaders::VS, "shadow", version, comp_str, string());
+            static osg::Shader* ssf = AddShader(shaders::FS, "shadow", version, comp_str, string());
 
             p.program->addShader( ssv );
             p.program->addShader( ssf );
             
-            p.program->addShader( AddShader(shaders::VS, mat_name_cut, version, comp_str));
-            p.program->addShader( AddShader(shaders::FS, mat_name_cut, version, comp_str));
+            p.program->addShader( AddShader(shaders::VS, mat_name_cut, version, comp_str, preprocessorDefinitions));
+            p.program->addShader( AddShader(shaders::FS, mat_name_cut, version, comp_str, preprocessorDefinitions));
 
             p.program->addBindAttribLocation( "tangent" , 6 );
             p.program->addBindAttribLocation( "binormal", 7 );
@@ -400,13 +400,14 @@ public:
         return GetPrograms()[mat_name_cut];
     }
 
-    static osg::Shader* AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str ) 
+    static osg::Shader* AddShader( const shaders::shader_t& t, std::string mat_name, const uint16_t version, const std::string comp_str, const std::string& preprocessorDefinitions ) 
     {
         auto shader_text = GetShader(t,mat_name);
 
         if(shader_text)
         {
             std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
+                + preprocessorDefinitions                                                     + "\n " 
                 + osg_modification(version,utils::format(*shader_text));
             return new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
 
@@ -490,9 +491,9 @@ void computeAttributes(osg::Node* model,std::string mat_name)
 }
 
 
-programsHolder_base::program_t  createProgram(std::string mat_name)
+programsHolder_base::program_t  createProgram(const std::string& mat_name, const std::string& preprocessorDefinitions)
 {
-    return programsHolder::Create(mat_name);
+    return programsHolder::Create(mat_name, preprocessorDefinitions);
 }
 
 

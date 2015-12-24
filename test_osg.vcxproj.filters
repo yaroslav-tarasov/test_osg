@@ -186,6 +186,9 @@
     <None Include="misc\shaders\headers\utils.hlsl">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="misc\shaders\skinning.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -870,6 +873,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp">
       <Filter>Source Files\objects\flock_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\flock_child_phys.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

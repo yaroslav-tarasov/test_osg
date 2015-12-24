@@ -26,9 +26,8 @@ ctrl::ctrl(kernel::object_create_t const& oc, dict_copt dict)
     {
         if (nodes_manager_->get_model() != settings_.model)
             nodes_manager_->set_model(settings_.model);
-
-        root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(/*course()*/90, 0, 0)), point_3()));
-        
+         
+        root_->set_position(geo_position(state_.pos, point_3(), state_.orien, point_3()));
 
     }
 

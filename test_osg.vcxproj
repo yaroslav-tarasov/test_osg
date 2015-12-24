@@ -110,6 +110,7 @@
     <None Include="misc\shaders\headers\scene_params.hlsl" />
     <None Include="misc\shaders\headers\spot_lights.hlsl" />
     <None Include="misc\shaders\headers\utils.hlsl" />
+    <None Include="misc\shaders\skinning.vert" />
     <None Include="misc\shaders\tess.frag" />
     <None Include="misc\shaders\tess.geo" />
     <None Include="misc\shaders\tess.vs" />
@@ -301,6 +302,7 @@
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
+    <ClCompile Include="kernel\phys\flock_child_phys.cpp" />
     <ClCompile Include="kernel\phys\GLDebugDrawer.cpp" />
     <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp" />
     <ClCompile Include="kernel\phys\RigidUpdater.cpp" />

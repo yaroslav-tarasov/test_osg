@@ -17,6 +17,7 @@ namespace phys
         rb_character, 
         rb_aircraft,
         rb_static_convex,
+        rb_flock_child
     };
 
     struct rigid_body_user_info_t // Must be first in derives, because static cast used in user_info

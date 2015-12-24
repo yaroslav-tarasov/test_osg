@@ -14,7 +14,6 @@ namespace vehicle
         virtual ~model_info() {}
 
         // virtual phys::rigid_body_ptr get_rigid_body() const = 0;
-        // phys::ray_cast_vehicle::info_ptr
         virtual bool                 tow_attached  () const = 0;
         virtual cg::point_3          tow_offset    () const = 0;
         virtual cg::point_3          rtow_offset   () const = 0;

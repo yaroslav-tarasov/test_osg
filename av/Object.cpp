@@ -46,14 +46,14 @@ osg::Node* createObject(std::string name, bool fclone)
 	{
 		if(fclone)
 		object_file = osg::clone(it->second.get(), osg::CopyOp::DEEP_COPY_ALL 
-			& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
-			& ~osg::CopyOp::DEEP_COPY_ARRAYS
+			//& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+			//& ~osg::CopyOp::DEEP_COPY_ARRAYS
 			& ~osg::CopyOp::DEEP_COPY_IMAGES
 			& ~osg::CopyOp::DEEP_COPY_TEXTURES
 			& ~osg::CopyOp::DEEP_COPY_STATESETS  
 			& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
-			& ~osg::CopyOp::DEEP_COPY_UNIFORMS
-			& ~osg::CopyOp::DEEP_COPY_DRAWABLES
+			//& ~osg::CopyOp::DEEP_COPY_UNIFORMS
+			//& ~osg::CopyOp::DEEP_COPY_DRAWABLES
 			);
 		else
 			object_file = it->second.get();
@@ -305,7 +305,13 @@ osg::Node* createObject(std::string name, bool fclone)
         nl.push_back("default");
         nl.push_back("plane");
         //nl.push_back("rotor"); /// Õללללללללללללל נאסךמלוםעאנטעü ט הטםאלטקוסךטי ףבתועסÿ
-        
+
+        if(name == "crow")
+        {
+            pat->setScale(osg::Vec3(0.02,.02,.02));
+            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+        }
+
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,mat::reader::read(mat_file_name));
         pat->accept(mv);
         pat->setName("pat");
@@ -321,12 +327,7 @@ osg::Node* createObject(std::string name, bool fclone)
            
         }
 #endif
-        if(name == "crow")
-        {
-            pat->setScale(osg::Vec3(0.1,0.1,0.1));
-            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
-            pat->setPosition(osg::Vec3(100,150 ,100)); 
-        }
+
 
 		objCache[name] = pat;
 

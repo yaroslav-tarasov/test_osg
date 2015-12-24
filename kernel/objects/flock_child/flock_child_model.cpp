@@ -35,6 +35,9 @@ void model::update(double time)
 	
 	double dt = time - (last_update_ ? *last_update_ : 0);
 
+    if (!_spawner)
+        _spawner = find_first_object<manager::info_ptr>(collection_);
+
 		//Soar Timeout - Limits how long a bird can soar
 		if(_soar && _spawner->settings()._soarMaxTime > 0){ 		
 			if(_soarTimer >_spawner->settings()._soarMaxTime){
