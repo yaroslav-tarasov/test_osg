@@ -15,7 +15,7 @@ namespace phys
     struct system_impl
     {
         virtual ~system_impl() {}
-        virtual bt_dynamics_world_ptr dynamics_world() const = 0;
+        virtual bt_dynamics_world_ptr    dynamics_world() const = 0;
         virtual bt_vehicle_raycaster_ptr vehicle_raycaster() const = 0;
         virtual void register_rigid_body( rigid_body_impl * rb ) = 0;
         virtual void unregister_rigid_body( rigid_body_impl * rb ) = 0;
@@ -23,5 +23,5 @@ namespace phys
 
 
     typedef polymorph_ptr<rigid_body_impl> rigid_body_impl_ptr;
-    typedef polymorph_ptr<system_impl> system_impl_ptr;
+    typedef polymorph_ptr<system_impl>     system_impl_ptr;
 }

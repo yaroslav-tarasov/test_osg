@@ -3,7 +3,7 @@
 #include "aircraft_view.h"
 #include "phys/phys_sys.h"
 #include "common/phys_object_model_base.h"
-#include "phys_sys/aircraft.h"
+#include "phys/aircraft.h"
 #include "sync_fsm/sync_fsm.h"
 
 #include "network/msg_dispatcher.h"

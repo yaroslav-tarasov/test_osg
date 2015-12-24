@@ -15,15 +15,8 @@
 #include "aircraft_phys_lite.h"
 #include "bvh_static_mesh.h"
 #include "static_convex.h"
-
 #include "ray_cast_vehicle.h"
-
-
-
-
-
-
-
+#include "flock_child_phys.h"
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
@@ -858,21 +851,24 @@ static_convex_ptr BulletInterface::create_static_convex( sensor_ptr s, point_3 c
 
 aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
-    aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),s,p,pos);
-    return ctrl;
+    return boost::make_shared<aircraft::impl>(shared_from_this(),s,p,pos);
 }
 
 aircraft::info_ptr BulletInterface::create_aircraft_pl(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
-	aircraft::control_ptr ctrl = boost::make_shared<aircraft_physless::impl>(shared_from_this(),s,p,pos);
-	return ctrl;
+	return  boost::make_shared<aircraft_physless::impl>(shared_from_this(),s,p,pos);
 }
 
 ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,phys::compound_sensor_ptr s,const decart_position & pos)
 {    	
-    ray_cast_vehicle::control_ptr ctrl = boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,s,pos);
-    return ctrl;
+    return boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,s,pos);
 }
+
+flock::info_ptr BulletInterface::create_flock_child(const phys::flock::params_t & p,compound_sensor_ptr s,const decart_position & pos)
+{    	
+	return  boost::make_shared<flock::impl>(shared_from_this(),s,p,pos);
+}
+
 
 boost::optional<double> BulletInterface::intersect_first(cg::point_3 const& p, cg::point_3 const& q) const
 {
