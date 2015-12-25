@@ -2,8 +2,6 @@
 
 #include "flock_child_common.h"
 #include "flock_child_view.h"
-#include "flock_manager/flock_manager_common.h"
-#include "common/flock_manager.h"
 #include "common/phys_sys.h"
 #include "objects/nodes_management.h"
 #include "common/phys_object_model_base.h"
@@ -33,8 +31,13 @@ private:
     void on_child_removing(object_info_ptr child) override;
 
 private:
+    
     void create_phys();
-	void flap();
+    void sync_phys          ( double dt );
+    void sync_nodes_manager ( double dt );
+
+private:
+    void flap();
 
 private:
     nodes_management::manager_ptr nodes_manager_;
@@ -42,8 +45,9 @@ private:
     phys::static_mesh_ptr                  mesh_;
 
     optional<size_t>                  phys_zone_;
-
-    manager::info_ptr                   _spawner;
+    
+    cg::geo_base_3                root_next_pos_;
+    cg::quaternion              root_next_orien_;
 
 	// Some data
 private:
@@ -51,10 +55,13 @@ private:
 	bool									_soar; // state ?
 	bool								   _dived;
 
-	double  						   _soarTimer;
+    double                                 _speed;
 
+	double  						   _soarTimer;
+    phys::flock::info_ptr             phys_flock_;
 
 private:
+    model_system *                           sys_;
 	optional<double>                 last_update_;
 
 };

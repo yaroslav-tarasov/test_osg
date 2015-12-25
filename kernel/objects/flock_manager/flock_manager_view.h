@@ -27,15 +27,12 @@ namespace flock
             settings_t settings_;
             state_t    state_;
 #if 0
-            var _childAmount:int = 250;				// Number of objects
+
 
             var _slowSpawn:boolean;					// Birds will not be instantiated all at once at start
             var _spawnSphere:float = 3;				// Range around the spawner waypoints will created
             var _spawnSphereHeight:float = 1.5;		// Height of the spawn sphere
-            var _minSpeed:float = 6;				// minimum random speed
-            var _maxSpeed:float = 10;				// maximum random speed
-            var _minScale:float = .7;				// minimum random size
-            var _maxScale:float = 1;				// maximum random size
+
             var _soarFrequency:float = 0;			// How often soar is initiated 1 = always 0 = never
             var _soarAnimation:String="Soar";		// Animation -required- for soar functionality
             var _flapAnimation:String="Flap";		//
@@ -45,8 +42,6 @@ namespace flock
             var _minDamping:float = 1;				// Rotation tween damping, lower number = smooth/slow rotation (if this get stuck in a loop, increase this value)
             var _maxDamping:float = 2;
             var _waypointDistance:float = 1;		// How close this can get to waypoint before creating a new waypoint (also fixes stuck in a loop)
-            var _minAnimationSpeed:float = 2;
-            var _maxAnimationSpeed:float = 4;
             var _randomPositionTimer:float = 10;	// *** 
             var _positionSphere:int = 25;			// If _randomPositionTimer is bigger than zero the controller will be moved to a random position within this sphere
             var _positionSphereHeight = 5;			// Overides height of sphere for more controll
@@ -73,8 +68,6 @@ namespace flock
                 REFL_ENTRY(state_)
            REFL_END()
         };
-
-
 
 
 		struct view

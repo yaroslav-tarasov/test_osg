@@ -42,7 +42,7 @@ osg::Node* createObject(std::string name, bool fclone)
     
     osg::PositionAttitudeTransform* pat;
 
-	if(( it = objCache.find(name))!=objCache.end())
+	if(( it = objCache.find(name))!=objCache.end() )
 	{
 		if(fclone)
 		object_file = osg::clone(it->second.get(), osg::CopyOp::DEEP_COPY_ALL 
@@ -50,8 +50,8 @@ osg::Node* createObject(std::string name, bool fclone)
 			//& ~osg::CopyOp::DEEP_COPY_ARRAYS
 			& ~osg::CopyOp::DEEP_COPY_IMAGES
 			& ~osg::CopyOp::DEEP_COPY_TEXTURES
-			& ~osg::CopyOp::DEEP_COPY_STATESETS  
-			& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+			& (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
+			//& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
 			//& ~osg::CopyOp::DEEP_COPY_UNIFORMS
 			//& ~osg::CopyOp::DEEP_COPY_DRAWABLES
 			);
@@ -308,7 +308,8 @@ osg::Node* createObject(std::string name, bool fclone)
 
         if(name == "crow")
         {
-            pat->setScale(osg::Vec3(0.02,.02,.02));
+            const double scale = 1/*0.02*/;
+            pat->setScale(osg::Vec3(scale,scale,scale));
             pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
         }
 
@@ -332,7 +333,7 @@ osg::Node* createObject(std::string name, bool fclone)
 		objCache[name] = pat;
 
 #if 1
-        if(fclone)
+        if(fclone )
         {
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(
             osg::clone(objCache[name].get(), osg::CopyOp::DEEP_COPY_ALL 
@@ -340,8 +341,8 @@ osg::Node* createObject(std::string name, bool fclone)
             //& ~osg::CopyOp::DEEP_COPY_ARRAYS
             & ~osg::CopyOp::DEEP_COPY_IMAGES
             & ~osg::CopyOp::DEEP_COPY_TEXTURES
-            & ~osg::CopyOp::DEEP_COPY_STATESETS  
-            & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+            & (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
+            // & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
             //& ~osg::CopyOp::DEEP_COPY_UNIFORMS
             //& ~osg::CopyOp::DEEP_COPY_DRAWABLES
             ));

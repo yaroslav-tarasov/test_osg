@@ -3,7 +3,6 @@
 
 #include "flock_child_ctrl.h"
 
-
 namespace flock
 {
 
@@ -69,7 +68,9 @@ void ctrl::update( double time )
     if(time>10.0 && !anim_started)
     {
         anim_started = true;
-        root_->play_animation("clip1", 5, -1., -1.);
+        auto const& settings = _spawner->settings();
+        
+        root_->play_animation("clip1", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1.);
     }
 }
 

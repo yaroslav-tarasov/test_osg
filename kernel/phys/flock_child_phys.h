@@ -17,6 +17,7 @@ namespace phys
        : public rigid_body_user_info_t
 	   , public rigid_body_impl
        , public btActionInterface
+       , public info
 	   , public control
    {
    public:
@@ -41,8 +42,10 @@ namespace phys
        void   set_wind    (cg::point_3 const& wind)    override;
        void   apply_force (point_3 const& f)           override;
 
-       void   update_aerodynamics(double dt)           override;
        void   set_position(const decart_position& pos) override;
+       void   set_linear_velocity  (point_3 const& v)  override;
+       void   set_angular_velocity (point_3 const& a)  override;
+       void   update_aerodynamics(double dt)       /*override*/;
 
    // rigid_body_impl
    private:

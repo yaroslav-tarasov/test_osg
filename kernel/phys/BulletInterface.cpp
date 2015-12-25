@@ -252,7 +252,9 @@ namespace flock
         if(loaded)
         {
             const btTransform ct0 = cs.cs_->getChildTransform(0);
-            cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+            cs.offset_ = from_bullet_vector3(ct0.getOrigin());
+            FIXME(Размер гребаных птичек)
+            cs.cs_->setLocalScaling( btVector3(0.01,0.01,0.01));
         }
         else
             cs.cs_ = nullptr;

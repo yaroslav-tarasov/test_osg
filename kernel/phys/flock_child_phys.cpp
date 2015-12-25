@@ -27,20 +27,19 @@ namespace phys
 		btVector3 aabbMin,aabbMax;
 		chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
 
-		btScalar dxx = btScalar(params_.wingspan / 2);
-		btScalar dyy = btScalar(params_.length / 2);
+		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);// btScalar(params_.wingspan / 2);
+		btScalar dyy = btScalar((aabbMax.y() - aabbMin.y()) / 2);// btScalar(params_.length / 2);
 		btScalar dzz = btScalar((aabbMax.z() - aabbMin.z()) / 2);
 		btScalar m12 = btScalar((params_.mass) /12);
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
         btDefaultMotionState* motionState = new btDefaultMotionState(tr);
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), NULL/*new custom_ms*//*motionState*/, &*chassis_shape_.get(), inertia);
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), /*NULL*//*new custom_ms*/motionState, &*chassis_shape_.get(), inertia);
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
 
 		// FIXME TODO
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
-FIXME("Off point for bullet")
-#if 1
+#if 0
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 #endif
 		//chassis_->setDamping(0.05f, 0.5f);
@@ -48,7 +47,7 @@ FIXME("Off point for bullet")
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
 		chassis_->setFriction(0.3f);
 
-		sys_->dynamics_world()->addAction(this);
+		// sys_->dynamics_world()->addAction(this);
 
 		sys_->register_rigid_body(this);
 
@@ -170,7 +169,16 @@ FIXME("Off point for bullet")
 
         return false;
     }
-
+    
+    void  impl::set_linear_velocity (point_3 const& v)
+    {
+        chassis_->setLinearVelocity(to_bullet_vector3(v));
+    }
+    
+    void  impl::set_angular_velocity (point_3 const& a)
+    {
+        chassis_->setAngularVelocity(to_bullet_vector3(a));
+    }
 
     void impl::apply_force (point_3 const& f)
     {

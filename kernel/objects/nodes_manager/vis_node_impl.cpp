@@ -145,7 +145,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     bool bopen = (cg::eq(anim.from,0.f)) && (cg::eq(anim.size,0.f)) || (anim.from >= 1.0) && (anim.size < 0);
     osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE:osgAnimation::Animation::ONCE_BACKWARDS;
     
-    pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
+    pm = anim.from < 0?osgAnimation::Animation::PPONG:pm;
 
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
@@ -170,6 +170,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
 
             if(!manager_->isPlaying(name))
             {
+                if(anim.len >0) animations[i]->setDuration(anim.len);
                 animations[i]->setPlayMode(pm);                   
                 manager_->playAnimation( animations[i].get(),2,2.0 );
 

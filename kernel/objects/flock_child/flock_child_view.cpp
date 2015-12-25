@@ -20,6 +20,8 @@ AUTO_REG_NAME(flock_child_view, view::create);
 view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
+    // , rnd_                  ((static_cast<unsigned>(time(nullptr))))
+    , _spawner              (find_first_object<manager::info_ptr>(collection_))
 {
 
     if (nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this))
@@ -63,6 +65,12 @@ void view::on_model_changed_internal()
             on_model_changed();
     }
 #endif
+}
+
+void view::update(double time)
+{
+    if (!_spawner)
+        _spawner = find_first_object<manager::info_ptr>(collection_);
 }
 
 }

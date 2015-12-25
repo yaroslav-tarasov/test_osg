@@ -44,6 +44,10 @@ namespace nodes_management
         void init_disp();
 
     private:
+        FIXME(Надо кэшировать при загрузке)
+        typedef std::map   <std::string,double> animation_duration_t;
+        animation_duration_t                                    amd_;
+
         mutable optional<bool>          visible_;
         std::vector</*victory::node_ptr*/osg::ref_ptr<osg::Node>> victory_nodes_;
 

@@ -37,11 +37,12 @@ namespace phys
         struct control
         {
             virtual ~control() {}
-            virtual void   set_wind    (cg::point_3 const& wind) = 0;
-            virtual void   apply_force (point_3 const& f) = 0;
-            virtual void   update_aerodynamics(double dt) = 0;
-
-            virtual void   set_position(const decart_position& pos)  = 0;
+            // virtual void   update_aerodynamics (double dt)                  = 0; // И нафиг оно тут
+            virtual void   set_wind            (cg::point_3 const& wind)    = 0;
+            virtual void   apply_force         (point_3 const& f)           = 0;
+            virtual void   set_linear_velocity (point_3 const& f)           = 0;
+            virtual void   set_angular_velocity(point_3 const& a)           = 0;
+            virtual void   set_position        (const decart_position& pos) = 0;
 
         };
 

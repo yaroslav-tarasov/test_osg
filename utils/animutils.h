@@ -35,7 +35,6 @@ struct AnimationManagerFinder : public osg::NodeVisitor
 };
 
 
-
 struct RigTransformHardware : public osgAnimation::RigTransformHardware
 {
 
@@ -59,6 +58,8 @@ struct RigTransformHardware : public osgAnimation::RigTransformHardware
             osg::notify(osg::WARN) << "RigTransformHardware no skeleting set in geometry " << geom.getName() << std::endl;
             return false;
         }
+        else
+            osg::notify(osg::WARN) << "RigTransformHardware skeleton address " << reinterpret_cast<uint32_t>( geom.getSkeleton()) << std::endl;
 
         osgAnimation::BoneMapVisitor mapVisitor;
         geom.getSkeleton()->accept(mapVisitor);
@@ -104,22 +105,67 @@ struct RigTransformHardware : public osgAnimation::RigTransformHardware
 
 };
 
+struct SkeletonFinder : public osg::NodeVisitor
+{
+    osg::ref_ptr<osgAnimation::Skeleton> _skel;
+    SkeletonFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+
+    void apply(osg::Node& node) {
+#if 0
+        if (_skel.valid())
+            return;
+#endif
+
+        osgAnimation::Skeleton* b = dynamic_cast<osgAnimation::Skeleton*>(&node);
+        if (b) {
+            _skel = b;
+            osg::notify(osg::WARN) << "SkeletonFinder address " << reinterpret_cast<uint32_t>( b ) << std::endl;
+            //return;
+        }
+
+        traverse(node);
+    }
+};
+
 struct SetupRigGeometry : public osg::NodeVisitor
 {
     bool _hardware;
+    osg::ref_ptr<osgAnimation::Skeleton> _skel;
+
     SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
+    
+    SetupRigGeometry( bool hardware, osg::Node& node ) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) 
+    {
+         SkeletonFinder sf;
+         node.accept(sf);
+         _skel = sf._skel;
+
+         node.accept(*this);
+    }
 
     void apply(osg::Geode& geode)
     {
         for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
             apply(*geode.getDrawable(i));
     }
+
     void apply(osg::Drawable& geom)
     {
         if (_hardware) {
             osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
             if (rig)
+            {
                 rig->setRigTransformImplementation(new avAnimation::RigTransformHardware);
+
+                if(_skel)
+                {
+                    //rig->setSkeleton(_skel.get());
+                    //rig->computeMatrixFromRootSkeleton();
+
+                }
+
+
+            }
         }
     }
 };

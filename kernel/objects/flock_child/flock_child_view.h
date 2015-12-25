@@ -3,6 +3,39 @@
 #include "flock_child_common.h"
 #include "common/flock_child.h"
 
+#include "flock_manager/flock_manager_common.h"
+#include "common/flock_manager.h"
+#include "common/randgen.h"
+
+#include <random>
+
+namespace
+{
+#if 1
+    struct simple_rand_gen
+    {
+        double random_range (double min_val, double max_val)
+        { 
+            static std::uniform_real_distribution<double> distribution(min_val,max_val);
+            static std::default_random_engine generator(rd);
+
+            return distribution(generator);
+        }
+
+        std::random_device rd;
+
+    };
+
+#if 0
+    double random_range (double min_val, double max_val)
+    { 
+        return min_val + ( static_cast<double> (std::rand()) / 32767.0 * ( max_val - min_val + 1 ) );
+    }
+#endif
+
+#endif
+
+}
 
 namespace flock
 {
@@ -66,7 +99,11 @@ struct view
 protected:
     view( kernel::object_create_t const& oc, dict_copt dict );
 
-//info
+    // base_presentation
+protected:
+    void update(double time) override;
+
+    //info
 protected:
     geo_point_3        pos () const;
     std::string const& name() const;
@@ -85,6 +122,9 @@ protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
 
+    simple_rand_gen                          rnd_;
+
+    manager::info_ptr                   _spawner;
 };
 
 

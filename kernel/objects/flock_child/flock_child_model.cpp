@@ -21,11 +21,11 @@ AUTO_REG_NAME(flock_child_model, model::create);
 model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view                  (oc, dict)
     , phys_object_model_base(collection_)
+    , sys_(dynamic_cast<model_system *>(oc.sys))
     , nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
-    , _spawner              (find_first_object<manager::info_ptr>(collection_))
+    , _speed                (10.0)
 {
-	simplerandgen  rnd(static_cast<unsigned>(time(nullptr)));
-    settings_._avoidValue = rnd.random_range(.3, .1);
+    settings_._avoidValue = rnd_.random_range(.2, .4/*.3, .1*/);
     create_phys();
 }
 
@@ -34,19 +34,40 @@ void model::update(double time)
     view::update(time);
 	
 	double dt = time - (last_update_ ? *last_update_ : 0);
+    if (!cg::eq_zero(dt))
+    {
 
-    if (!_spawner)
-        _spawner = find_first_object<manager::info_ptr>(collection_);
+        //Soar Timeout - Limits how long a bird can soar
+        if(_soar && _spawner->settings()._soarMaxTime > 0){ 		
+            if(_soarTimer >_spawner->settings()._soarMaxTime){
+                flap();
+                _soarTimer = 0;
+            }else {
+                _soarTimer+=dt;
+            }
+        }
 
-		//Soar Timeout - Limits how long a bird can soar
-		if(_soar && _spawner->settings()._soarMaxTime > 0){ 		
-			if(_soarTimer >_spawner->settings()._soarMaxTime){
-				flap();
-				_soarTimer = 0;
-			}else {
-				_soarTimer+=dt;
-			}
-		}
+
+#if 0
+        update_model(time, dt);
+
+        if (!manual_controls_)
+#endif
+            sync_phys(dt);
+#if 0
+        else
+        {
+            cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
+            decart_position cur_pos = phys_vehicle_->get_position();
+            geo_position cur_glb_pos(cur_pos, base);
+            set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); 
+        }
+#endif
+
+
+        sync_nodes_manager(dt);
+
+    }
 
 #if 0
 		if(!_landingSpotted && (transform.position - _wayPoint).magnitude < _spawner._waypointDistance+_stuckCounter){
@@ -113,7 +134,7 @@ void model::update(double time)
 
 #endif
 
-		last_update_ = time;
+    last_update_ = time;
 
 }
 
@@ -138,7 +159,73 @@ void model::create_phys()
     cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
     //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
-    phys::compound_sensor_ptr s = phys::flock::fill_cs(nodes_manager_);    
+    phys::compound_sensor_ptr s = phys::flock::fill_cs(nodes_manager_); 
+    decart_position p(/*veh_transform.translation()*/base(state_.pos), /*cg::quaternion(veh_transform.rotation().cpr())*/state_.orien);
+    
+    phys::flock::params_t  params;
+    params.mass = 1;
+    phys_flock_ = phys_->get_system(*phys_zone_)->create_flock_child(params, s, p);
+
+}
+
+void model::sync_phys(double dt)
+{
+    if (!phys_flock_ || !phys_)
+        return;
+
+    //        double const max_break_accel = aerotow_ ? 2 : 20;
+    double const max_accel = 15;
+    //        double const smooth_factor = 5.;
+
+    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+
+    decart_position cur_pos = phys_flock_->get_position();
+
+    geo_position cur_glb_pos(cur_pos, base);
+    double cur_speed = cg::norm(cur_pos.dpos);
+    double cur_course = cur_pos.orien.cpr().course;
+
+    point_3 forward_dir = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
+    point_3 right_dir   = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
+    point_3 up_dir      = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
+
+    // transform.position += transform.TransformDirection(Vector3.forward)*_speed*Time.deltaTime;
+    //cur_pos.pos    = cur_pos.pos;// +  up_dir * _speed  * dt;
+    //cur_pos.dpos   = right_dir * _speed * dt;
+    //cur_pos.orien  = cpr(0);
+    //cur_pos.omega  = point_3(0.0,0.0,0.0);
+
+    // phys::flock::control_ptr(phys_flock_)->set_position(cur_pos);
+    phys::flock::control_ptr(phys_flock_)->set_linear_velocity(-forward_dir * _speed * 10);
+    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(point_3(0.0,0.0,0.1));
+}
+
+void model::sync_nodes_manager( double /*dt*/ )
+{
+    if (phys_flock_ && root_)
+    {
+        cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+        decart_position bodypos = phys_flock_->get_position();
+        decart_position root_pos = bodypos /** body_transform_inv_*/;// FIXME Модельно зависимое решение 
+
+        geo_position pos(root_pos, base);
+
+        // FIXME Глобальные локальные преобразования 
+        nodes_management::node_position root_node_pos = root_->position();
+        root_node_pos.global().pos = root_next_pos_;
+        root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
+
+        root_node_pos.global().orien = root_next_orien_;
+        root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
+
+        // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
+        root_->set_position(root_node_pos);
+
+        root_next_pos_ = pos.pos;
+        root_next_orien_ = pos.orien;
+
+        //geo_position body_pos(phys_vehicle_->get_position() * body_transform_inv_, base);
+    }
 }
 
 void model::flap()

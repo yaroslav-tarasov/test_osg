@@ -20,14 +20,17 @@ namespace kernel
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
         loaded_ = true;
 #endif
+
         using namespace avAnimation;
+
         AnimationManagerFinder finder;
         node_->accept(finder);
-        anim_manager_  = finder._am; 
-        node_->setUpdateCallback(finder._am.get());
-        
-        SetupRigGeometry switcher(true);
-        node_->accept(switcher);        
+        anim_manager_  = finder._am;  
+        if(finder._am.valid())
+            node_->setUpdateCallback(finder._am.get());
+
+        SetupRigGeometry switcher(true, *node_.get());
+        // node_->accept(switcher);        
         
         // node_->setNodeMask(0);
     }

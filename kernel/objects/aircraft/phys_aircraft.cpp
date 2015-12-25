@@ -311,7 +311,7 @@ namespace aircraft
             params.thrust = 132050;
 #endif
 
-        phys_aircraft_ = phys_sys_->create_aircraft_pl(params, s, p);
+        phys_aircraft_ = phys_sys_->create_aircraft(params, s, p);
 //        phys_aircraft_->set_control_manager(boost::bind(&phys_aircraft_impl::sync_phys, this, _1));
 
         double const wheel_mass = mass / 10;

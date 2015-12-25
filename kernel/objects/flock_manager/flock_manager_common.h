@@ -11,12 +11,25 @@ namespace manager
 struct settings_t
 {
     settings_t()
-        : _childAmount(250)
-		, _soarMaxTime( 5 )
+        : _childAmount       ( 250 )
+		, _soarMaxTime       (  5  )
+        , _minSpeed          ( 6.f )
+        , _maxSpeed          (10.f )
+        , _minScale          ( .7f )
+        , _maxScale          ( 1.f )
+        , _minAnimationSpeed ( 2.f )
+        , _maxAnimationSpeed ( 4.f )
     {}
 
-	int _childAmount;
-	int _soarMaxTime;
+	int    _childAmount;
+    float  _minSpeed;				// minimum random speed
+    float  _maxSpeed;				// maximum random speed
+    float  _minScale;				// minimum random size
+    float  _maxScale;				// maximum random size	
+    float  _minAnimationSpeed;
+    float  _maxAnimationSpeed;
+    int    _soarMaxTime;
+
 };
 
 
