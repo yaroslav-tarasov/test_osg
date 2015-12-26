@@ -512,7 +512,7 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
     }    
 
     FIXME(И еще немного хардкода как alpha2covrage оформить)
-    if (     mat_name.find("ground")   !=std::string::npos   
+    if (       mat_name.find("ground")   !=std::string::npos   
             || mat_name.find("sea")      !=std::string::npos     
             || mat_name.find("mountain") !=std::string::npos 
             || mat_name.find("concrete") !=std::string::npos 
@@ -603,12 +603,29 @@ namespace mat
 
     reader::reader()
     {
+		init_();
     }
 
     reader::reader(std::string full_path)
     {
-        mats_ = read (full_path);
+        init_();
+		mats_ = read (full_path);
     }
+
+	void reader::init_()
+	{
+		valid_mats_.insert("building");
+		valid_mats_.insert("default");
+		valid_mats_.insert("tree");
+		valid_mats_.insert("ground"); 
+		valid_mats_.insert("concrete");
+		valid_mats_.insert("mountain");
+		valid_mats_.insert("sea");
+		valid_mats_.insert("railing");
+		valid_mats_.insert("panorama");
+		valid_mats_.insert("plane");
+		valid_mats_.insert("rotor"); 
+	}
 
     materials_t  reader::read (std::string full_path)
     {
@@ -631,7 +648,18 @@ namespace mat
                     tex.unit = t.attribute("unit").as_int();
                     tex.wrap_s =  getWrapMode(t.attribute("wrap_s").as_string());
                     tex.wrap_t =  getWrapMode(t.attribute("wrap_t").as_string());
-                    mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
+
+					std::string name = std::string(m.attribute("name").as_string());
+					
+					
+					bool matching = valid_mats_.end() != std::find_if(valid_mats_.begin(),valid_mats_.end(),[&](const std::string& name_)->bool {
+						return name.find(name_) !=std::string::npos; }
+					);
+
+					if(!matching)
+						name = "default_" + name;
+
+				    mats_.insert(materials_t::value_type(name,tex));
                 }
             }	
 

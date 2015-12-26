@@ -945,7 +945,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		processModel(file);
 	}
 	catch (...) {
-		// return testResult(false);
+		 printf("Something went wrong.\n");
+		 return 1;
 	}
 	
 	

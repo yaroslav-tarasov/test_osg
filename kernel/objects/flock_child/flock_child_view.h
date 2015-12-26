@@ -125,6 +125,8 @@ protected:
     simple_rand_gen                          rnd_;
 
     manager::info_ptr                   _spawner;
+
+	float                               _targetSpeed;
 };
 
 

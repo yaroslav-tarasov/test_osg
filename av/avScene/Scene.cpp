@@ -1440,19 +1440,19 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
     using namespace creators;
     
-    osg::Node* obj = creators::createObject(path, clone);
-    
+    creators::Object* obj = creators::createObject(path, clone);
+    osg::Node* obj_node = obj->getNode();
 
-    if(obj)
+    if(obj_node)
     {
         mt->setName("phys_ctrl");
         mt->setUserValue("id",seed);
 
-        mt->addChild( obj );
+        mt->addChild( obj_node );
 	    
 		mt->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
         
-		osg::Node* root =  findFirstNode(obj,"root"); 
+		osg::Node* root =  findFirstNode(obj_node,"root"); 
         if(root!=nullptr) root->setUserValue("id",seed);
         
         if(mt!=nullptr)
@@ -1679,12 +1679,14 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
 
 			}
+
+
+
         }
 
         _terrainRoot->asGroup()->addChild(mt);
-		
-        object_loaded_signal_(seed);
 
+        object_loaded_signal_(seed);
     } };
 
 #ifdef ASYNC_OBJECT_LOADING
@@ -1694,6 +1696,21 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 #endif
 
     LogInfo("Scene::load exit " << path);
+
+#if 1
+	FIXME(Жесть с анимацией, кто на ком стоял)
+	using namespace avAnimation;
+    if(path=="crow")
+	{
+		AnimationManagerFinder finder;
+		mt_.back()->accept(finder);
+		if(finder._am.valid())
+		{
+			SetupRigGeometry switcher(true, *mt_.back().get());
+			mt_.back()->setUpdateCallback(finder._am.get());
+		}
+	}
+#endif
 
     return mt_.back();
 }

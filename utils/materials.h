@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "visitors/materials_visitor.h"
+#include "utils/cpp_utils/singleton.h"
 
 namespace mat
 {
@@ -10,11 +11,14 @@ namespace mat
         reader();
 
         reader(std::string full_path);
-        static materials_t  read (std::string full_path);
-        materials_t get () {return mats_;}
+        materials_t  read (std::string full_path);
+        materials_t  get () {return mats_;}
+	private:
+		void         init_();
 
     private:
-        materials_t mats_;
+        materials_t                  mats_;
+		std::set<std::string>  valid_mats_;
     };
 
 }

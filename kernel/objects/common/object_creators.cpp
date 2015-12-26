@@ -48,7 +48,7 @@ namespace flock
             const std::string class_name = "flock_manager";
             const std::string unique_name = sys->generate_unique_name(class_name);
 
-            obj_create_data ocd(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien.get_course(), 10))));
+            obj_create_data ocd(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien))));
             return sys->create_object(ocd);	
         }
     }

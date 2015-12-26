@@ -399,7 +399,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
     const char* vs = {
         "#extension GL_ARB_gpu_shader5 : enable \n"
-        
+        "//       plane_mat \n"
+
         INCLUDE_VS
         INCLUDE_COMPABILITY
         "\n"       
@@ -454,7 +455,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
     const char* fs = {
         "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
-        
+        "//       plane_mat \n"
+
         INCLUDE_UNIFORMS
 
         STRINGIFY ( 
@@ -596,6 +598,7 @@ $endif
 
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+            "//       rotor_mat \n"
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
@@ -639,6 +642,7 @@ $endif
         const char* fs = {
 
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            "//       rotor_mat \n"
 
             INCLUDE_UNIFORMS
 
@@ -652,6 +656,7 @@ $endif
             INCLUDE_FOG_FUNCS
 
             INCLUDE_VS
+//			INCLUDE_PCF_EXT
             INCLUDE_SCENE_PARAM
 
             STRINGIFY ( 
@@ -703,8 +708,9 @@ $endif
     {
        const char* vs = {  
            "#extension GL_ARB_gpu_shader5 : enable \n"
-
-           INCLUDE_VS
+		   "//       default_mat \n"
+           
+		   INCLUDE_VS
            INCLUDE_COMPABILITY
            "\n"       
            LIGHT_MAPS
@@ -756,17 +762,19 @@ $endif
        const char* fs = {
        
        "#extension GL_ARB_gpu_shader5 : enable \n "
-        
+ 	   "//       default_mat \n"
+
        INCLUDE_UNIFORMS
 
        STRINGIFY ( 
 
-           in mat4 viewworld_matrix;
+\n          in mat4 viewworld_matrix;
        )
        
        INCLUDE_FUNCS
        INCLUDE_FOG_FUNCS
        INCLUDE_VS
+//	   INCLUDE_PCF_EXT
        INCLUDE_DL
        INCLUDE_DL2
        INCLUDE_SCENE_PARAM
@@ -875,7 +883,8 @@ $endif
         const char* vs = {  
 			
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            
+ 		    "//       building_mat \n"
+
             INCLUDE_VS
             INCLUDE_COMPABILITY
             
@@ -921,7 +930,8 @@ $endif
         const char* fs = { 
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            
+ 		    "//       building_mat \n"
+
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
@@ -1047,6 +1057,7 @@ $endif
         const char* vs = {  
 			
             "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       tree_mat \n"
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
@@ -1090,7 +1101,8 @@ $endif
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            
+  		    "//       tree_mat \n"
+
             INCLUDE_UNIFORMS
             
             STRINGIFY ( 
@@ -1155,6 +1167,7 @@ $endif
         const char* vs = {
 			
             "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       ground_mat \n"
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
@@ -1218,7 +1231,8 @@ $endif
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            
+  		    "//       ground_mat \n"
+
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
@@ -1359,6 +1373,7 @@ $endif
         const char* vs = {
 
             "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       sea_mat \n"
 
             STRINGIFY ( 
             
@@ -1407,6 +1422,7 @@ $endif
         const char* vs = {
             
             "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       concrete_mat \n"
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
@@ -1486,6 +1502,7 @@ $endif
         const char* fs = { 
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
+ 		    "//       concrete_mat \n"
 
             INCLUDE_UNIFORMS
             
@@ -1873,6 +1890,7 @@ $if 0
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       railing_mat \n"
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
@@ -1923,7 +1941,8 @@ $if 0
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            
+  		    "//       railing_mat \n"
+
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
@@ -2017,7 +2036,8 @@ $if 0
         const char* vs = {  
             
             "#extension GL_ARB_gpu_shader5 : enable \n"
-            
+  		    "//       panorama_mat \n"
+
             INCLUDE_COMPABILITY
 
             STRINGIFY ( 
@@ -2049,7 +2069,8 @@ $if 0
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            
+   		    "//       panorama_mat \n"
+
             INCLUDE_UNIFORMS
 
             STRINGIFY ( 
@@ -2104,6 +2125,7 @@ $if 0
         const char* vs = { 
             
             "#extension GL_ARB_gpu_shader5 : enable \n"
+  		    "//       sky_fog_mat \n"
 
             INCLUDE_COMPABILITY
 
@@ -2138,7 +2160,8 @@ $if 0
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable  \n"
-            
+   		    "//       sky_fog_mat \n"
+
             INCLUDE_SCENE_PARAM
 
             INCLUDE_UNIFORMS
@@ -2204,6 +2227,7 @@ $if 0
     {
         const char* vs = {  
             "#extension GL_ARB_gpu_shader5 : enable \n"
+  		    "//       clouds_mat \n"
 
             INCLUDE_COMPABILITY
 
@@ -2232,6 +2256,7 @@ $if 0
         const char* fs = {
             
             "#extension GL_ARB_gpu_shader5 : enable  \n"
+  		    "//       clouds_mat \n"
 
             STRINGIFY ( 
 
@@ -2288,6 +2313,7 @@ $if 0
 	{
 		const char* vs = {  
 			"#extension GL_ARB_gpu_shader5 : enable \n"
+  		    "//       lightning_mat \n"
 
 			INCLUDE_COMPABILITY
 
@@ -2319,6 +2345,7 @@ $if 0
 		const char* fs = {
 
 			"#extension GL_ARB_gpu_shader5 : enable  \n"
+  		    "//       lightning_mat \n"
 
 			STRINGIFY ( 
             

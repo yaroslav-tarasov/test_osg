@@ -174,6 +174,7 @@
     <ClCompile Include="av\avCore\Logo.cpp" />
     <ClCompile Include="av\avCore\Timer.cpp" />
     <ClCompile Include="av\avCore\Utils.cpp" />
+    <ClCompile Include="av\avCore\XmlModel.cpp" />
     <ClCompile Include="av\avLights\LightManager.cpp" />
     <ClCompile Include="av\avLights\LightMaps.cpp" />
     <ClCompile Include="av\avLights\Lights.cpp" />

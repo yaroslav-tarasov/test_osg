@@ -30,7 +30,7 @@ namespace flock
 
 
             var _slowSpawn:boolean;					// Birds will not be instantiated all at once at start
-            var _spawnSphere:float = 3;				// Range around the spawner waypoints will created
+
             var _spawnSphereHeight:float = 1.5;		// Height of the spawn sphere
 
             var _soarFrequency:float = 0;			// How often soar is initiated 1 = always 0 = never

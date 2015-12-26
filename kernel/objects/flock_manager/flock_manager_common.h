@@ -19,17 +19,29 @@ struct settings_t
         , _maxScale          ( 1.f )
         , _minAnimationSpeed ( 2.f )
         , _maxAnimationSpeed ( 4.f )
+		, _spawnSphere       ( 3.f )
+		, _minDamping        ( 1.f )
+		, _maxDamping        ( 2.f )
+		, _diveFrequency     ( 0.5f)
+		, _soarFrequency     ( 0.0f)
     {}
 
 	int    _childAmount;
+	int    _soarMaxTime;
     float  _minSpeed;				// minimum random speed
     float  _maxSpeed;				// maximum random speed
     float  _minScale;				// minimum random size
     float  _maxScale;				// maximum random size	
     float  _minAnimationSpeed;
     float  _maxAnimationSpeed;
-    int    _soarMaxTime;
-
+	float  _spawnSphere;		    // Range around the spawner waypoints will created
+	float  _minDamping;
+	float  _maxDamping;
+	float  _diveFrequency;
+	float  _soarFrequency;         // How often soar is initiated 1 = always 0 = never
+	std::string  _soarAnimation;
+	std::string  _flapAnimation;
+	std::string  _idleAnimation;
 };
 
 
@@ -67,29 +79,42 @@ REFL_END()
 REFL_STRUCT(settings_t)
     REFL_ENTRY(_childAmount)
 	REFL_ENTRY(_soarMaxTime)
+	REFL_ENTRY(_minSpeed)				
+	REFL_ENTRY(_maxSpeed)				
+	REFL_ENTRY(_minScale)				
+	REFL_ENTRY(_maxScale)				
+	REFL_ENTRY(_minAnimationSpeed)
+	REFL_ENTRY(_maxAnimationSpeed)
+	REFL_ENTRY(_spawnSphere)		    
+	REFL_ENTRY(_minDamping)
+	REFL_ENTRY(_maxDamping)
+	REFL_ENTRY(_diveFrequency)
+	REFL_ENTRY(_soarFrequency)
+	REFL_ENTRY(_soarAnimation)
+	REFL_ENTRY(_flapAnimation)
+	REFL_ENTRY(_idleAnimation)
 REFL_END()
 
 struct state_t
 {
-    state_t()
-        : course(0)
-        , speed(0)
-    {}
+	state_t()
+	{}
 
-    state_t(cg::geo_point_2 const& pos, double course, double speed)
-        : pos(pos), course(course), speed(speed)
-    {}
+	state_t(cg::geo_point_3 const& pos, cg::quaternion const& orien)
+		: pos(pos)
+		, orien(orien)
+	{}
 
-    cg::geo_point_2 pos;
-    double course;
-    double speed;
+	cg::geo_point_3 pos;
+	cg::quaternion  orien;
 };
 
 REFL_STRUCT(state_t)
-    REFL_ENTRY(pos)
-    REFL_ENTRY(course)
-    REFL_ENTRY(speed)
+	REFL_ENTRY(pos)
+	REFL_ENTRY(orien)
 REFL_END()
+
+
 
 } // manager
 

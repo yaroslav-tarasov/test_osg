@@ -877,5 +877,8 @@
     <ClCompile Include="kernel\phys\flock_child_phys.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
+    <ClCompile Include="av\avCore\XmlModel.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

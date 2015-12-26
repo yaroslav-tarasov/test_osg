@@ -110,7 +110,7 @@ class heilVisitor : public osg::NodeVisitor
                     got_lod=false;
                 }
                 
-                bool mt = node.asTransform();
+                bool mt = node.asTransform()!=nullptr;
 				
                 new_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
                 new_node.orien = from_osg_quat(mt?node.asTransform()->asMatrixTransform()->getMatrix().getRotate():osg::Quat());

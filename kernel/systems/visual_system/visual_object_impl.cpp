@@ -26,13 +26,13 @@ namespace kernel
         AnimationManagerFinder finder;
         node_->accept(finder);
         anim_manager_  = finder._am;  
+
         if(finder._am.valid())
             node_->setUpdateCallback(finder._am.get());
-
+#if 0
         SetupRigGeometry switcher(true, *node_.get());
-        // node_->accept(switcher);        
-        
-        // node_->setNodeMask(0);
+#endif
+       
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed )
@@ -50,10 +50,17 @@ namespace kernel
 #ifndef ASYNC_OBJECT_LOADING           
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
 #endif
-        using namespace avAnimation;
-        AnimationManagerFinder finder;
-        node_->accept(finder);
-        anim_manager_  = finder._am;  
+		using namespace avAnimation;
+
+		AnimationManagerFinder finder;
+		node_->accept(finder);
+		anim_manager_  = finder._am;  
+
+		if(finder._am.valid())
+			node_->setUpdateCallback(finder._am.get());
+#if 0
+		SetupRigGeometry switcher(true, *node_.get());
+#endif
 
     }
 

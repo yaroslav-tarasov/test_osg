@@ -82,11 +82,16 @@ public:
 
                     if(matching)
                     {  
-                        _found_mat_names.insert(name);
-                        _found_mat_name = name;
+						_found_mat_name = name;
+						_found_mat_names.insert(_found_mat_name);
                     }
+					else
+					{
+						_found_mat_name = "default_" + name;
+						_found_mat_names.insert(_found_mat_name);
+					}
 
-                    ret =true;
+                    ret = true;
                 }
             }
         }

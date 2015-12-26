@@ -38,9 +38,12 @@ private:
 
 private:
     void flap();
+    void dive();
+    void soar();
+    void wander(float delay);
 
 private:
-    nodes_management::manager_ptr nodes_manager_;
+    //nodes_management::manager_ptr nodes_manager_;
 
     phys::static_mesh_ptr                  mesh_;
 
@@ -54,16 +57,17 @@ private:
 
 	bool									_soar; // state ?
 	bool								   _dived;
+	bool                                 _landing;
 
     double                                 _speed;
-
 	double  						   _soarTimer;
-    phys::flock::info_ptr             phys_flock_;
-
+	float								 _damping;
+    float			    			 _lerpCounter;
+	bool							 _flatFlyDown;
 private:
     model_system *                           sys_;
 	optional<double>                 last_update_;
-
+	phys::flock::info_ptr             phys_flock_;
 };
 
 } // child

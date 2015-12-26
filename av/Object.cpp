@@ -6,8 +6,12 @@
 #include "avLights/Lights.h"
 #include "avLights/LightManager.h"
 #include "avCore/Utils.h"
+#include "avCore/XmlModel.h"
 
 #include "materials.h"
+
+
+using namespace avCore;
 
 namespace creators
 {
@@ -24,58 +28,93 @@ namespace creators
 	};
 
 
+namespace {
+	typedef std::map< std::string, osg::ref_ptr<Object> > objectMap; 
+	
+	objectMap objCache;
+}
 
-typedef std::map< std::string, osg::ref_ptr<osg::Node> > nodesMap;  
+// constructor and destructor
+Object::Object()
+{
+}
 
-nodesMap objCache;
+Object::Object(const Object& object,const osg::CopyOp& copyop)
+	: osg::Object(object,copyop)
+	, node_       (object.node_)
+	, animations_ (object.animations_)
+{
+}
+
+Object::Object(osg::Node& node)
+	: node_ (&node)
+{
+}
+
+void  Object::addAnimation(const std::string& name, osg::Node* anim)
+{
+	animations_.insert(make_pair(name,anim));
+}
 
 void  releaseObjectCache()
 {
-        objCache.clear();
+      objCache.clear();
 }
 
-osg::Node* createObject(std::string name, bool fclone)
+Object* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
-	nodesMap::iterator it;
-    
+	Object* object = nullptr;
+	objectMap::iterator it;
+    boost::optional<xml_model_t> data;
+
     osg::PositionAttitudeTransform* pat;
 
 	if(( it = objCache.find(name))!=objCache.end() )
 	{
 		if(fclone)
-		object_file = osg::clone(it->second.get(), osg::CopyOp::DEEP_COPY_ALL 
+		object = osg::clone(it->second.get(), osg::CopyOp::DEEP_COPY_ALL 
 			//& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
 			//& ~osg::CopyOp::DEEP_COPY_ARRAYS
 			& ~osg::CopyOp::DEEP_COPY_IMAGES
-			& ~osg::CopyOp::DEEP_COPY_TEXTURES
+			& (name != "crow"?~osg::CopyOp::DEEP_COPY_TEXTURES:osg::CopyOp::DEEP_COPY_ALL)
 			& (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
 			//& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
 			//& ~osg::CopyOp::DEEP_COPY_UNIFORMS
 			//& ~osg::CopyOp::DEEP_COPY_DRAWABLES
 			);
 		else
-			object_file = it->second.get();
+			object = it->second.get();
 
-        pat = object_file->asTransform()->asPositionAttitudeTransform();
+        pat = object->getNode()->asTransform()->asPositionAttitudeTransform();
 	}
 	else
 	{
-		std::string object_file_name =  osgDB::findFileInPath(name + ".osgb", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+		std::string object_file_name =  osgDB::findFileInPath(name + ".xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
         std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
-
+		
 		if(object_file_name.empty())
-			object_file_name = osgDB::findFileInPath(name+".fbx", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+		{
+			object_file_name = osgDB::findFileInPath(name+".osgb", fpl.fpl_,osgDB::CASE_INSENSITIVE);
 
-        if(object_file_name.empty())
-            object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+			if(object_file_name.empty())
+				object_file_name = osgDB::findFileInPath(name+".fbx", fpl.fpl_,osgDB::CASE_INSENSITIVE);
 
+			if(object_file_name.empty())
+				object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
 
-		if(object_file_name.empty())
-			return nullptr;
+			if(object_file_name.empty())
+				return nullptr;
 
-		object_file = osgDB::readNodeFile(object_file_name);
+			object_file = osgDB::readNodeFile(object_file_name);
+		}
+		else
+		{
+			ModelReader mr;
+			data = mr.Load(object_file_name);
+			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.fpl_,osgDB::CASE_INSENSITIVE));
+		}
 
         bool airplane = findFirstNode(object_file ,"shassi_",findNodeVisitor::not_exact)!=nullptr;
         bool vehicle  = findFirstNode(object_file ,"wheel",findNodeVisitor::not_exact)!=nullptr;
@@ -313,7 +352,7 @@ osg::Node* createObject(std::string name, bool fclone)
             pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
         }
 
-        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,mat::reader::read(mat_file_name));
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
         pat->accept(mv);
         pat->setName("pat");
         
@@ -330,17 +369,17 @@ osg::Node* createObject(std::string name, bool fclone)
 #endif
 
 
-		objCache[name] = pat;
+		objCache[name] = object = new Object(*pat);
 
 #if 1
         if(fclone )
         {
-            pat = dynamic_cast<osg::PositionAttitudeTransform *>(
+            object = /*dynamic_cast<osg::PositionAttitudeTransform *>*/(
             osg::clone(objCache[name].get(), osg::CopyOp::DEEP_COPY_ALL 
             //& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
             //& ~osg::CopyOp::DEEP_COPY_ARRAYS
             & ~osg::CopyOp::DEEP_COPY_IMAGES
-            & ~osg::CopyOp::DEEP_COPY_TEXTURES
+            & (name != "crow"?~osg::CopyOp::DEEP_COPY_TEXTURES:osg::CopyOp::DEEP_COPY_ALL)
             & (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
             // & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
             //& ~osg::CopyOp::DEEP_COPY_UNIFORMS
@@ -348,15 +387,24 @@ osg::Node* createObject(std::string name, bool fclone)
             ));
         }
         else
-            pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name].get());
+            pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name]->getNode());
 #endif
 
-
+		if(data)
+		{
+			const xml_model_t::animations_t&  anims = data->anims;
+			for(auto it = anims.begin();it!= anims.end();++it)
+			{
+				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.fpl_,osgDB::CASE_INSENSITIVE);
+				if(!anim_file_name.empty())
+					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
+			}
+		}
 	}
 
     pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
 
-	return pat;
+	return object;
 }
 
 }

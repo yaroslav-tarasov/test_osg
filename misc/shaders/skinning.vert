@@ -45,11 +45,9 @@ void computeAcummulatedNormalAndPosition(vec4 boneWeight)
     }
 }
 
-uniform sampler2D        baseTexture;
-uniform int              baseTextureUnit;
-uniform sampler2DShadow  shadowTextureRGB;
+
 uniform mat4             lightmap_matrix;
-uniform mat4             shadow0_matrix; 
+
 
 #define SAVE_LIGHTMAP_VARYINGS_VP(out_vert, view_pos_4)           \
 out_vert.lightmap_coord.xyw = (lightmap_matrix * view_pos_4).xyw; \
@@ -90,18 +88,7 @@ void main( void )
 
     normal = gl_NormalMatrix * normal;
 
-    //vec3 lightDir = normalize(vec3(gl_LightSource[0].position));
-    //float NdotL = max(dot(normal, lightDir), 0.0);
-	//vec4 diffuse = NdotL * gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
 
-	//vec4 ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
-	//vec4 globalAmbient = gl_LightModel.ambient * gl_FrontMaterial.ambient;
-
-	//float NdotHV = max(dot(normal, gl_LightSource[0].halfVector.xyz),0.0);
-	//vec4 specular = gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
-
-    //gl_FrontColor = specular + diffuse + globalAmbient + ambient;
-	
 	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * position;
 
     mat3 rotation = mat3(tangent, binormal, normal);

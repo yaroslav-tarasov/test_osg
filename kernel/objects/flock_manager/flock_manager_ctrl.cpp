@@ -47,20 +47,25 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 {
     auto * of = dynamic_cast<kernel::fake_objects_factory*>(sys_);
     
-    settings_._childAmount = 5;
+    settings_._childAmount = 70;
 	
 	simplerandgen  rnd(static_cast<unsigned>(time(nullptr)));
 
     child::settings_t vs;
     vs.model        = "crow"; 
 	
-    decart_position target_pos;
+	// transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
+
+    decart_position child_pos;
 
     for (int i=0; i < settings_._childAmount; ++i )
     {
-        target_pos.pos   = point_3(rnd.random_8bit(),rnd.random_8bit(),300/*rnd.random_8bit()*/);
-        //target_pos.orien = msg.orien;
-        geo_position vgp(target_pos, get_base());
+        // child_pos.pos   = point_3(rnd.random_8bit(),rnd.random_8bit(),300 + rnd.random_8bit()/2.0);
+        
+		// transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
+		child_pos.pos   =  point_3(rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0) ) * settings_._spawnSphere + cg::geo_base_3(get_base())(state_.pos);
+		//child_pos.orien = msg.orien;
+        geo_position vgp(child_pos, get_base());
 
         roamers_.insert(child::create(of,vs,vgp));
     }

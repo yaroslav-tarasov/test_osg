@@ -22,8 +22,9 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view                  (oc, dict)
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
-    , nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
+    //, nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
     , _speed                (10.0)
+	, _soar                 (true)
 {
     settings_._avoidValue = rnd_.random_range(.2, .4/*.3, .1*/);
     create_phys();
@@ -231,6 +232,36 @@ void model::sync_nodes_manager( double /*dt*/ )
 void model::flap()
 {
 
+}
+
+void model::soar()
+{
+
+}
+
+void model::dive()
+{
+
+}
+
+void model::wander(float delay)
+{
+	auto const& settings = _spawner->settings();
+
+	// yield(WaitForSeconds(delay));
+	_damping = rnd_.random_range(settings._minDamping, settings._maxDamping);
+	_targetSpeed = rnd_.random_range(settings._minSpeed, settings._maxSpeed);
+	_lerpCounter = 0;
+
+	if(!settings._soarAnimation.empty() &&!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._soarFrequency){
+		soar();
+	}else if(!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._diveFrequency){	
+		dive();
+	}else{
+		if(!_landing){
+			flap();
+		}
+	}
 }
 
 }
