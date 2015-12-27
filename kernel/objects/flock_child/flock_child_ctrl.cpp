@@ -70,7 +70,7 @@ void ctrl::update( double time )
         anim_started = true;
         auto const& settings = _spawner->settings();
         
-        root_->play_animation("clip1", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1.);
+        // root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
     }
 }
 

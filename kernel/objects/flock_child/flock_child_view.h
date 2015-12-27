@@ -14,6 +14,7 @@ namespace
 #if 1
     struct simple_rand_gen
     {
+#if 0
         double random_range (double min_val, double max_val)
         { 
             static std::uniform_real_distribution<double> distribution(min_val,max_val);
@@ -21,8 +22,19 @@ namespace
 
             return distribution(generator);
         }
+#endif
+		double random_range(const double from, const double to)
+		{
+			std::random_device rd;
 
+			return std::bind(
+				std::uniform_real_distribution<>(from, to),
+				std::default_random_engine( rd() ))();
+		}
+
+#if 0
         std::random_device rd;
+#endif
 
     };
 

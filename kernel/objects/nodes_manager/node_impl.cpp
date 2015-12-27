@@ -238,7 +238,7 @@ void node_impl::set_position(node_position const& pos)
             node_pos(pos))));
 }
 
-void node_impl::play_animation(string const& seq, double len, double from, double size)
+void node_impl::play_animation(string const& seq, double len, double from, double size, double cross_fade)
 {
     manager_->send_node_msg(
         node_id_,
@@ -247,7 +247,9 @@ void node_impl::play_animation(string const& seq, double len, double from, doubl
             seq, 
             (float)len, 
             (float)from, 
-            (float)size)));
+            (float)size,
+			(float)cross_fade
+			)));
 }
 
 void node_impl::set_texture(string const& texture)

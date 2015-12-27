@@ -17,12 +17,14 @@ namespace creators
 		  
 	      META_Object(osg, Object);
 
-		  inline osg::Node*  getNode() { return node_.get(); }
+		  inline osg::Node*  getNode() { return _node.get(); }
 		  inline void        addAnimation(const std::string& name, osg::Node*);
 
 	  private:
-		  osg::ref_ptr<osg::Node>                         node_;
-		  std::map<std::string, osg::ref_ptr<osg::Node> > animations_;
+		  osg::ref_ptr<osg::Node>                           _node;
+		  std::map<std::string, osg::ref_ptr<osg::Node> >   _anim_containers;
+		  osgAnimation::AnimationMap                        _animations;
+		  osg::ref_ptr<osgAnimation::BasicAnimationManager> _manager;
 	  };
 
 	  Object*    createObject(std::string name, bool fclone=true);

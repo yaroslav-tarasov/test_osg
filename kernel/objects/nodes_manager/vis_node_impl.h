@@ -46,14 +46,19 @@ namespace nodes_management
     private:
         FIXME(Надо кэшировать при загрузке)
         typedef std::map   <std::string,double> animation_duration_t;
-        animation_duration_t                                    amd_;
+        animation_duration_t                                                amd_;
 
-        mutable optional<bool>          visible_;
+        mutable optional<bool>							                visible_;
         std::vector</*victory::node_ptr*/osg::ref_ptr<osg::Node>> victory_nodes_;
 
-        bool user_visible_;
+        bool													   user_visible_;
 
-        bool need_update_;
+        bool                                                        need_update_;
+
+		optional< std::pair<double,std::string> >            deferred_cross_fade;
+		std::string												    current_anim;
+
+		 optional<double>											last_update_;
     };
 
     typedef polymorph_ptr<vis_node_impl> vis_node_impl_ptr;

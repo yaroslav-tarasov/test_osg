@@ -138,7 +138,7 @@ REFL_END()
         virtual ~node_control(){}
 
         virtual void set_position    (node_position const& pos) = 0;
-        virtual void play_animation  (std::string const& seq, double len, double from, double size) = 0;
+        virtual void play_animation  (std::string const& seq, double len, double from, double size, double cross_fade) = 0;
         virtual void set_texture     (std::string const& texture) = 0;
         virtual void set_visibility  (bool visible) = 0;
         virtual boost::optional<bool> get_visibility  () = 0;

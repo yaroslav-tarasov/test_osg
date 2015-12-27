@@ -52,7 +52,7 @@ public:
 
 //  node_control
 private:
-    void play_animation  (std::string const& seq, double len, double from, double size) override;
+    void play_animation  (std::string const& seq, double len, double from, double size, double cross_fade) override;
     void set_texture     (std::string const& texture) override;
     void set_visibility  (bool visible) override;
     void set_position    (node_position const& pos) override;

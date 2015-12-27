@@ -68,6 +68,17 @@ private:
     model_system *                           sys_;
 	optional<double>                 last_update_;
 	phys::flock::info_ptr             phys_flock_;
+
+	boost::function<void()>                start_;
+    
+	enum flock_state
+	{
+		fl_soar,
+		fl_dive,
+		fl_flap
+	};
+
+	flock_state                     flock_state_;
 };
 
 } // child

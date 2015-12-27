@@ -23,7 +23,7 @@ struct settings_t
 		, _minDamping        ( 1.f )
 		, _maxDamping        ( 2.f )
 		, _diveFrequency     ( 0.5f)
-		, _soarFrequency     ( 0.0f)
+		, _soarFrequency     (  0.f )
     {}
 
 	int    _childAmount;

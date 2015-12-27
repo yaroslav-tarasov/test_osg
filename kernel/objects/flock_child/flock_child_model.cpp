@@ -25,15 +25,25 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     //, nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
     , _speed                (10.0)
 	, _soar                 (true)
+    , _landing              (false)
+	, _flatFlyDown          (true)
 {
     settings_._avoidValue = rnd_.random_range(.2, .4/*.3, .1*/);
     create_phys();
+
+	start_ = boost::bind(&model::wander, this, 0.0f );
 }
 
 void model::update(double time)
 {
     view::update(time);
 	
+	if(start_)
+	{
+		start_();
+		start_.clear();
+	}
+
 	double dt = time - (last_update_ ? *last_update_ : 0);
     if (!cg::eq_zero(dt))
     {
@@ -48,6 +58,7 @@ void model::update(double time)
             }
         }
 
+		wander(0);
 
 #if 0
         update_model(time, dt);
@@ -189,16 +200,21 @@ void model::sync_phys(double dt)
     point_3 forward_dir = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
     point_3 right_dir   = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
     point_3 up_dir      = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
+	
+	double alphax = point_3(0, 0, 1) * up_dir <= 0.0?0.5:0.0;
 
-    // transform.position += transform.TransformDirection(Vector3.forward)*_speed*Time.deltaTime;
+	double alphax2 = point_3(0, 1, 0) * forward_dir > 0.0?0.5:0.0;
+    
+	// transform.position += transform.TransformDirection(Vector3.forward)*_speed*Time.deltaTime;
     //cur_pos.pos    = cur_pos.pos;// +  up_dir * _speed  * dt;
     //cur_pos.dpos   = right_dir * _speed * dt;
     //cur_pos.orien  = cpr(0);
     //cur_pos.omega  = point_3(0.0,0.0,0.0);
 
     // phys::flock::control_ptr(phys_flock_)->set_position(cur_pos);
+
     phys::flock::control_ptr(phys_flock_)->set_linear_velocity(-forward_dir * _speed * 10);
-    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(point_3(0.0,0.0,0.1));
+    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(point_3(alphax,0.0,0.1));
 }
 
 void model::sync_nodes_manager( double /*dt*/ )
@@ -231,17 +247,38 @@ void model::sync_nodes_manager( double /*dt*/ )
 
 void model::flap()
 {
-
+	if(flock_state_ != fl_flap)
+	{ 
+		auto const& settings = _spawner->settings();
+	    root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
+       _dived = false;
+	   flock_state_ = fl_flap;
+	}
 }
 
 void model::soar()
 {
+	if(flock_state_ != fl_soar)
+	{ 
+		auto const& settings = _spawner->settings();
+		root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
+		_soar = true;
+	
+		flock_state_ = fl_soar;
+	}
 
 }
 
 void model::dive()
 {
+	if(flock_state_ != fl_dive)
+	{ 	
+		auto const& settings = _spawner->settings();
+		root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
 
+		_dived = true;
+		 flock_state_ = fl_dive;
+	}
 }
 
 void model::wander(float delay)
@@ -252,8 +289,10 @@ void model::wander(float delay)
 	_damping = rnd_.random_range(settings._minDamping, settings._maxDamping);
 	_targetSpeed = rnd_.random_range(settings._minSpeed, settings._maxSpeed);
 	_lerpCounter = 0;
+	
+	double r = rnd_.random_range(0.0, 1.0);
 
-	if(!settings._soarAnimation.empty() &&!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._soarFrequency){
+	if(/*!settings._soarAnimation.empty() &&*/!_flatFlyDown && !_dived && r < settings._soarFrequency){
 		soar();
 	}else if(!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._diveFrequency){	
 		dive();

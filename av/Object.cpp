@@ -10,6 +10,7 @@
 
 #include "materials.h"
 
+#include "animutils.h"
 
 using namespace avCore;
 
@@ -41,19 +42,35 @@ Object::Object()
 
 Object::Object(const Object& object,const osg::CopyOp& copyop)
 	: osg::Object(object,copyop)
-	, node_       (object.node_)
-	, animations_ (object.animations_)
+	, _node       (copyop(object._node.get()))
+	, _anim_containers (object._anim_containers)
+	, _manager    (object._manager)
 {
+
 }
 
 Object::Object(osg::Node& node)
-	: node_ (&node)
+	: _node (&node)
 {
+	using namespace avAnimation;
+	AnimationManagerFinder finder;
+	_node->accept(finder);
+	_manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get()); 
 }
 
-void  Object::addAnimation(const std::string& name, osg::Node* anim)
+void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 {
-	animations_.insert(make_pair(name,anim));
+    osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(anim_container->getUpdateCallback());
+	
+	_anim_containers.insert(make_pair(name,anim_container));
+	
+	for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
+	{
+	    (*it)->setName(name);
+		//_animations.insert(make_pair(name,*it));
+		_animations[ name ] = *it;
+		_manager->registerAnimation(*it);
+	}
 }
 
 void  releaseObjectCache()
@@ -371,6 +388,17 @@ Object* createObject(std::string name, bool fclone)
 
 		objCache[name] = object = new Object(*pat);
 
+		if(data)
+		{
+			const xml_model_t::animations_t&  anims = data->anims;
+			for(auto it = anims.begin();it!= anims.end();++it)
+			{
+				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.fpl_,osgDB::CASE_INSENSITIVE);
+				if(!anim_file_name.empty())
+					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
+			}
+		}
+
 #if 1
         if(fclone )
         {
@@ -390,16 +418,7 @@ Object* createObject(std::string name, bool fclone)
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name]->getNode());
 #endif
 
-		if(data)
-		{
-			const xml_model_t::animations_t&  anims = data->anims;
-			for(auto it = anims.begin();it!= anims.end();++it)
-			{
-				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.fpl_,osgDB::CASE_INSENSITIVE);
-				if(!anim_file_name.empty())
-					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
-			}
-		}
+
 	}
 
     pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );

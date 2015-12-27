@@ -132,7 +132,7 @@ void node_impl::init_disp()
         .track<msg::visibility_msg  >();
 }
 
-void node_impl::play_animation  (std::string const& seq, double len, double from, double size) 
+void node_impl::play_animation  (std::string const& seq, double len, double from, double size, double cross_fade) 
 {
     // FIXME  Заглушка для анимации
     FIXME(Анимация на коленке)

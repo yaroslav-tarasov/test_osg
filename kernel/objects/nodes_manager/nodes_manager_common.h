@@ -235,13 +235,14 @@ struct node_animation
     : network::msg_id<nm_node_animation>
 {
     node_animation() {}
-    node_animation(double time, string const& name, float len, float from, float size);
+    node_animation(double time, string const& name, float len, float from, float size, float cross_fade);
 
     double  time;
     string  name;
     float   len;
     float   from;
     float   size;
+	float   cross_fade;
 };
 
 struct visibility_msg
@@ -288,6 +289,7 @@ REFL_STRUCT(node_animation)
     REFL_ENTRY(len )
     REFL_ENTRY(from)
     REFL_ENTRY(size)
+	REFL_ENTRY(cross_fade)
 REFL_END()
 
 
@@ -350,12 +352,13 @@ inline void read(binary::input_stream& is, node_pos_descr& msg)
 
 //
 
-inline node_animation::node_animation(double time, string const& name, float len, float from, float size)
+inline node_animation::node_animation(double time, string const& name, float len, float from, float size, float cross_fade)
     : time(time)
     , name(name)
     , len (len )
     , from(from)
     , size(size)
+	, cross_fade(cross_fade)
 {}
 
 } // msg

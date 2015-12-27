@@ -77,7 +77,8 @@ void vis_node_impl::extrapolated_position_reseted()
 void vis_node_impl::pre_update(double time)
 {
     node_impl::pre_update(time);
-    if (!time_)
+    
+	if (!time_)
         return;
 
     double dt = time - *time_;
@@ -111,10 +112,13 @@ void vis_node_impl::pre_update(double time)
             return true;
         });
 #endif
+
     }
 #endif
 
     sync_position(dt);
+
+	last_update_ = time;
 }
 
 void vis_node_impl::on_animation(msg::node_animation const& anim)
@@ -155,6 +159,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
         const osgAnimation::AnimationList& animations =
             manager_->getAnimationList();
 
+#if 0
         if(childs_callbacks_.size()==0)
         {
             for (int i =0; i < node_->asGroup()->getNumChildren();++i)
@@ -163,19 +168,37 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
                 childs_callbacks_.push_back(child_node->getUpdateCallback());
             }
         }
-
-        for ( unsigned int i=0; i<animations.size(); ++i )
+#endif
+		
+		const bool f = anim.name == "clip1";
+		
+		const bool need_to_stop_now = current_anim != anim.name && cg::eq_zero(anim.cross_fade);
+		
+		boost::optional<std::string> new_anim_name;
+ 
+		if(current_anim != anim.name && anim.cross_fade> 0.0 ) 
+		  deferred_cross_fade = make_pair(*last_update_ + anim.cross_fade, anim.name);
+		else
+		for ( unsigned int i=0; i<animations.size(); ++i )
         {
             const std::string& name = animations[i]->getName();
-
-            if(!manager_->isPlaying(name))
+           
+		    if(!manager_->isPlaying(name) && (f? true : name == anim.name))
             {
                 if(anim.len >0) animations[i]->setDuration(anim.len);
-                animations[i]->setPlayMode(pm);                   
+                animations[i]->setPlayMode(pm);
+				
                 manager_->playAnimation( animations[i].get(),2,2.0 );
-
-            }
+				new_anim_name = name;
+			}
+			
+			if(need_to_stop_now && current_anim == name)
+				manager_->stopAnimation(animations[i]);
         }
+
+		if(new_anim_name)
+			current_anim =  *new_anim_name;
+
 
     }
 
