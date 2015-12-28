@@ -19,11 +19,12 @@ struct settings_t
         , _maxScale          ( 1.f )
         , _minAnimationSpeed ( 2.f )
         , _maxAnimationSpeed ( 4.f )
-		, _spawnSphere       ( 3.f )
+		, _spawnSphere       ( 200.f ) // 3.f
 		, _minDamping        ( 1.f )
 		, _maxDamping        ( 2.f )
 		, _diveFrequency     ( 0.5f)
 		, _soarFrequency     (  0.f )
+        , _waypointDistance  ( 1.f )		
     {}
 
 	int    _childAmount;
@@ -39,6 +40,7 @@ struct settings_t
 	float  _maxDamping;
 	float  _diveFrequency;
 	float  _soarFrequency;         // How often soar is initiated 1 = always 0 = never
+    float  _waypointDistance;      // How close this can get to waypoint before creating a new waypoint (also fixes stuck in a loop)
 	std::string  _soarAnimation;
 	std::string  _flapAnimation;
 	std::string  _idleAnimation;
@@ -89,7 +91,8 @@ REFL_STRUCT(settings_t)
 	REFL_ENTRY(_minDamping)
 	REFL_ENTRY(_maxDamping)
 	REFL_ENTRY(_diveFrequency)
-	REFL_ENTRY(_soarFrequency)
+    REFL_ENTRY(_soarFrequency)
+	REFL_ENTRY(_waypointDistance)
 	REFL_ENTRY(_soarAnimation)
 	REFL_ENTRY(_flapAnimation)
 	REFL_ENTRY(_idleAnimation)

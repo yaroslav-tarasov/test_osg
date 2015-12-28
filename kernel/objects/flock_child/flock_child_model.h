@@ -32,9 +32,10 @@ private:
 
 private:
     
-    void create_phys();
+    void create_phys        ();
     void sync_phys          ( double dt );
     void sync_nodes_manager ( double dt );
+    void update_model       ( double time, double dt );
 
 private:
     void flap();
@@ -64,11 +65,19 @@ private:
 	float								 _damping;
     float			    			 _lerpCounter;
 	bool							 _flatFlyDown;
+    float                           _stuckCounter;
+	bool						  _landingSpotted;
+
+//  phys staff
 private:
     model_system *                           sys_;
 	optional<double>                 last_update_;
 	phys::flock::info_ptr             phys_flock_;
+    
+    cg::geo_point_3                 desired_position_;
+    quaternion                      desired_orien_;
 
+private: 
 	boost::function<void()>                start_;
     
 	enum flock_state

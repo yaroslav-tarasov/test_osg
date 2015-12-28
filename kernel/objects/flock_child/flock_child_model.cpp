@@ -23,10 +23,12 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     //, nodes_manager_        (find_first_child<nodes_management::manager_ptr>(this))
-    , _speed                (10.0)
-	, _soar                 (true)
+    , _speed                (10.0 )
+	, _soar                 (true )
     , _landing              (false)
-	, _flatFlyDown          (true)
+	, _flatFlyDown          (true )
+    , _stuckCounter         (0.0  )
+    , _landingSpotted       (false)
 {
     settings_._avoidValue = rnd_.random_range(.2, .4/*.3, .1*/);
     create_phys();
@@ -48,24 +50,11 @@ void model::update(double time)
     if (!cg::eq_zero(dt))
     {
 
-        //Soar Timeout - Limits how long a bird can soar
-        if(_soar && _spawner->settings()._soarMaxTime > 0){ 		
-            if(_soarTimer >_spawner->settings()._soarMaxTime){
-                flap();
-                _soarTimer = 0;
-            }else {
-                _soarTimer+=dt;
-            }
-        }
-
-		wander(0);
-
-#if 0
         update_model(time, dt);
-
+#if 0
         if (!manual_controls_)
 #endif
-            sync_phys(dt);
+        sync_phys(dt);
 #if 0
         else
         {
@@ -80,71 +69,6 @@ void model::update(double time)
         sync_nodes_manager(dt);
 
     }
-
-#if 0
-		if(!_landingSpotted && (transform.position - _wayPoint).magnitude < _spawner._waypointDistance+_stuckCounter){
-			Wander(0);	//create a new waypoint
-			_stuckCounter=0;
-		}else{
-			_stuckCounter+=dt;
-		}
-
-
-		if(_targetSpeed > -1){
-			var rotation = Quaternion.LookRotation(_wayPoint - transform.position);
-			transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _damping);
-		}
-		if(_spawner._childTriggerPos){
-			if((transform.position - _spawner.transform.position).magnitude < 1){
-				_spawner.randomPosition();
-			}
-		}
-		_speed = Mathf.Lerp(_speed, _targetSpeed, _lerpCounter * Time.deltaTime *.05);
-		_lerpCounter++;
-		//Position forward based on object rotation
-		if(_move){
-			transform.position += transform.TransformDirection(Vector3.forward)*_speed*Time.deltaTime;
-			//Avoidance
-			if(_spawner._birdAvoid){	
-				var hit : RaycastHit;
-				if (Physics.Raycast(transform.position, transform.forward+(transform.right*_avoidValue), hit, _avoidDistance)){
-					if(!hit.transform.gameObject.GetComponent(FlockController)){
-						transform.rotation.eulerAngles.y -= _spawner._birdAvoidHorizontalForce*Time.deltaTime*_damping;
-					}
-				}else if (Physics.Raycast(transform.position, transform.forward+(transform.right*-_avoidValue), hit, _avoidDistance)){
-					if(!hit.transform.gameObject.GetComponent(FlockController)){
-						transform.rotation.eulerAngles.y += _spawner._birdAvoidHorizontalForce*Time.deltaTime*_damping;
-					}
-				}
-
-				if (_spawner._birdAvoidDown && Physics.Raycast(transform.position, -Vector3.up, hit, _avoidDistance)){
-					if(!hit.transform.gameObject.GetComponent(FlockController)){
-						transform.rotation.eulerAngles.x -= _spawner._birdAvoidVerticalForce*Time.deltaTime*_damping;
-					}
-				}else if (_spawner._birdAvoidUp && Physics.Raycast(transform.position, Vector3.up, hit, _avoidDistance)){
-					if(!hit.transform.gameObject.GetComponent(FlockController)){
-						transform.rotation.eulerAngles.x += _spawner._birdAvoidVerticalForce*Time.deltaTime*_damping;
-					}
-				}
-			}
-		}
-		//Counteract Pitch Rotation When Flying Upwards
-		if((_soar && _spawner._flatSoar|| _spawner._flatFly && !_soar)&& _wayPoint.y > transform.position.y||_flatFlyDown)
-			_model.transform.localEulerAngles.x = Mathf.LerpAngle(_model.transform.localEulerAngles.x, -transform.localEulerAngles.x, _lerpCounter * Time.deltaTime * .25);
-		else
-			_model.transform.localEulerAngles.x = Mathf.LerpAngle(_model.transform.localEulerAngles.x, 0, _lerpCounter * Time.deltaTime * .25);
-
-		//btVector3 btFrom(camPos.x, camPos.y, camPos.z);
-		//btVector3 btTo(camPos.x, -5000.0f, camPos.z);
-		//btCollisionWorld::ClosestRayResultCallback res(btFrom, btTo);
-
-		//Base::getSingletonPtr()->m_btWorld->rayTest(btFrom, btTo, res); // m_btWorld is btDiscreteDynamicsWorld
-
-		//if(res.hasHit()){
-		//	printf("Collision at: <%.2f, %.2f, %.2f>\n", res.m_hitPointWorld.getX(), res.m_hitPointWorld.getY(), res.m_hitPointWorld.getZ());
-		//}
-
-#endif
 
     last_update_ = time;
 
@@ -180,10 +104,46 @@ void model::create_phys()
 
 }
 
+void model::update_model( double time, double dt )
+{
+    cg::geo_base_3 cur_pos = pos();
+
+    if (phys_ && phys_flock_) // callback to phys pos
+    {
+        const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
+        decart_position phys_pos = phys_flock_->get_position();
+        geo_position glb_phys_pos(phys_pos, base);
+        auto const& settings = _spawner->settings();
+
+        double dist = cg::distance(glb_phys_pos.pos, desired_position_/*cur_pos*/);
+
+        //Soar Timeout - Limits how long a bird can soar
+        if(_soar && settings._soarMaxTime > 0){ 		
+            if(_soarTimer >settings._soarMaxTime){
+                flap();
+                _soarTimer = 0;
+            }else {
+                _soarTimer+=dt;
+            }
+        }
+
+        if(!_landingSpotted && dist < settings._waypointDistance +_stuckCounter){
+            wander(0);	//create a new waypoint
+            _stuckCounter=0;
+        }else{
+            _stuckCounter += dt;
+        }
+    }
+
+
+}
+
 void model::sync_phys(double dt)
 {
     if (!phys_flock_ || !phys_)
         return;
+
+    point_3     wind(0.0,0.0,0.0);
 
     //        double const max_break_accel = aerotow_ ? 2 : 20;
     double const max_accel = 15;
@@ -194,27 +154,43 @@ void model::sync_phys(double dt)
     decart_position cur_pos = phys_flock_->get_position();
 
     geo_position cur_glb_pos(cur_pos, base);
-    double cur_speed = cg::norm(cur_pos.dpos);
+    double cur_speed  = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
-
-    point_3 forward_dir = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
-    point_3 right_dir   = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
-    point_3 up_dir      = cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
-	
-	double alphax = point_3(0, 0, 1) * up_dir <= 0.0?0.5:0.0;
-
-	double alphax2 = point_3(0, 1, 0) * forward_dir > 0.0?0.5:0.0;
+    double cur_roll   = cur_pos.orien.cpr().roll;
     
-	// transform.position += transform.TransformDirection(Vector3.forward)*_speed*Time.deltaTime;
-    //cur_pos.pos    = cur_pos.pos;// +  up_dir * _speed  * dt;
-    //cur_pos.dpos   = right_dir * _speed * dt;
-    //cur_pos.orien  = cpr(0);
-    //cur_pos.omega  = point_3(0.0,0.0,0.0);
+    cpr cpr_des =  cg::cpr(cg::polar_point_3(cg::geo_base_3(desired_position_)(cur_glb_pos.pos)).course);
+    quaternion  desired_orien_(cpr_des);  // FIXME pitch
 
-    // phys::flock::control_ptr(phys_flock_)->set_position(cur_pos);
+    point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
+    point_3 right_dir   =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
+    point_3 up_dir      =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
 
-    phys::flock::control_ptr(phys_flock_)->set_linear_velocity(-forward_dir * _speed * 10);
-    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(point_3(alphax,0.0,0.1));
+#if 0
+    point_3 vk = cur_pos.dpos - wind;
+
+    point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
+    point_3 Z = cg::normalized_safe(right_dir ^ Y);
+    point_3 X = cg::normalized_safe(Y ^ Z);
+    cg::rotation_3 vel_rotation(X, Y, Z);
+    
+    cg::rotation_3 rot(desired_orien_.cpr());
+
+    cg::geo_base_3 predict_pos = /*cur_glb_pos.pos*/desired_position_;//; FIXME desired_position_;
+    cg::geo_base_3 predict_tgt_pos = predict_pos(rot * cg::transform_4().inverted().translation()/* * body_transform_inv_.inverted().translation()*/);  // FIXME   *body_transform_inv_.inverted().translation()
+    
+    double dist2target = cg::distance2d(cur_glb_pos.pos, predict_tgt_pos);
+    point_2 offset = cg::point_2(cur_glb_pos.pos(predict_tgt_pos));
+
+    point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
+    double attack_angle = cg::rad2grad(cg::angle(Y_right_dir_proj, forward_dir)) * (-cg::sign(Y * up_dir));
+    double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
+#endif
+
+    point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * 1 * (dt);
+
+
+    phys::flock::control_ptr(phys_flock_)->set_linear_velocity(forward_dir * _speed );
+    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(omega_rel);
 }
 
 void model::sync_nodes_manager( double /*dt*/ )
@@ -245,19 +221,30 @@ void model::sync_nodes_manager( double /*dt*/ )
     }
 }
 
+
+
+
 void model::flap()
 {
-	if(flock_state_ != fl_flap)
+	auto const& settings = _spawner->settings();
+    if(flock_state_ != fl_flap)
 	{ 
-		auto const& settings = _spawner->settings();
+		
 	    root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
        _dived = false;
 	   flock_state_ = fl_flap;
 	}
+    
+    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
+    
+    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
+    desired_position_ = geo_position(d_pos, base).pos;
+
 }
 
 void model::soar()
 {
+    auto const& settings = _spawner->settings();
 	if(flock_state_ != fl_soar)
 	{ 
 		auto const& settings = _spawner->settings();
@@ -267,10 +254,15 @@ void model::soar()
 		flock_state_ = fl_soar;
 	}
 
+    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
+
+    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
+    desired_position_ = geo_position(d_pos, base).pos;
 }
 
 void model::dive()
 {
+    auto const& settings = _spawner->settings();
 	if(flock_state_ != fl_dive)
 	{ 	
 		auto const& settings = _spawner->settings();
@@ -279,6 +271,11 @@ void model::dive()
 		_dived = true;
 		 flock_state_ = fl_dive;
 	}
+
+    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
+
+    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
+    desired_position_ = geo_position(d_pos, base).pos;
 }
 
 void model::wander(float delay)

@@ -61,10 +61,12 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     for (int i=0; i < settings_._childAmount; ++i )
     {
         // child_pos.pos   = point_3(rnd.random_8bit(),rnd.random_8bit(),300 + rnd.random_8bit()/2.0);
-        
-		// transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
-		child_pos.pos   =  point_3(rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0) ) * settings_._spawnSphere + cg::geo_base_3(get_base())(state_.pos);
-		//child_pos.orien = msg.orien;
+
+        // transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
+		FIXME("Чудесный код, преобразование туда сюда")
+        point_3 spawner_pos = cg::geo_base_3(get_base())(state_.pos);
+        child_pos.pos   = point_3(rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0) ) * settings_._spawnSphere + spawner_pos;
+		child_pos.orien = state_.orien;
         geo_position vgp(child_pos, get_base());
 
         roamers_.insert(child::create(of,vs,vgp));

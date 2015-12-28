@@ -364,7 +364,7 @@ Object* createObject(std::string name, bool fclone)
 
         if(name == "crow")
         {
-            const double scale = 1/*0.02*/;
+            const double scale = /*0.2*/ 0.08;
             pat->setScale(osg::Vec3(scale,scale,scale));
             pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
         }

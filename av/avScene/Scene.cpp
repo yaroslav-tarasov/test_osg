@@ -1441,10 +1441,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     using namespace creators;
     
     creators::Object* obj = creators::createObject(path, clone);
-    osg::Node* obj_node = obj->getNode();
 
-    if(obj_node)
+    if(obj)
     {
+        osg::Node* obj_node = obj->getNode();
+
         mt->setName("phys_ctrl");
         mt->setUserValue("id",seed);
 

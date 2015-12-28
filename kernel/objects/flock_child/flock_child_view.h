@@ -32,6 +32,11 @@ namespace
 				std::default_random_engine( rd() ))();
 		}
 
+        inline cg::point_3 inside_unit_sphere () 
+        {
+           return cg::point_3(random_range(-1., 1.),random_range(-1., 1.),random_range(-1., 1.));
+        }
+
 #if 0
         std::random_device rd;
 #endif

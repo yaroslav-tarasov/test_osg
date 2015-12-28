@@ -517,9 +517,6 @@ namespace aircraft
                     );
             }
 
-
-
-
 // FIXME TYV      ј не то при рулении взлетаем хвостом вперед хо-хо   
             // desired_speed_signed = cg::bound(desired_speed_signed, -30., 30.);
 
@@ -542,19 +539,17 @@ namespace aircraft
         else
         {
 
-            double desired_slide_angle = slide_angle;
-            double desired_thrust = phys_aircraft_->thrust();
+            double desired_slide_angle  = slide_angle;
+            double desired_thrust       = phys_aircraft_->thrust();
             double desired_attack_angle = attack_angle;  // TYV 0
 
             point_3 desired_vel = geo_base_3(cur_glb_pos.pos)(predict_tgt_pos) / (1.2 * prediction_ * dt);
             
-
             if (cfg_ == fms::CFG_GD)
                 desired_vel.z = 0;
 
             point_3 desired_accel((desired_vel - cur_pos.dpos) / 0.3, 
-                (desired_vel.z - cur_pos.dpos.z) / 0.2);
-
+                                  (desired_vel.z - cur_pos.dpos.z) / 0.2);
 
             point_3 desired_accel_xz =  desired_accel - desired_accel*Y*Y;
             point_3 desired_accel_xz_velocity = desired_accel_xz * vel_rotation;
@@ -596,8 +591,8 @@ namespace aircraft
                     );
             }
 
-            double roll_omega_smooth = on_ground_ ? 2. : 0.3;
-            double aa_omega_smooth = on_ground_ ? 2. : 0.2;
+            double roll_omega_smooth  = on_ground_ ? 2. : 0.3;
+            double aa_omega_smooth    = on_ground_ ? 2. : 0.2;
             double slide_omega_smooth = on_ground_ ? 2. : 0.5;
 
             double desired_roll = cg::bound(cur_roll + delta_roll, -max_roll, max_roll);
@@ -612,7 +607,7 @@ namespace aircraft
             desired_omega += desired_droll * forward_dir;
 
             point_3 desired_omega_loc = (!cur_pos.orien).rotate_vector(desired_omega);
-            point_3 cur_loc_omega = (!cur_pos.orien).rotate_vector(cur_pos.omega);
+            point_3 cur_loc_omega     = (!cur_pos.orien).rotate_vector(cur_pos.omega);
 
             point_3 desired_domega = (desired_omega_loc - cur_loc_omega) / (dt);
 
@@ -622,9 +617,9 @@ namespace aircraft
 
             elevator = cg::bound(elevator, -1., 1.);
             ailerons = cg::bound(ailerons, -1., 1.);
-            rudder = cg::bound(rudder, -1., 1.);
+            rudder   = cg::bound(rudder, -1., 1.);
 
-            thrust = cg::bound(desired_thrust, -1., 1.);
+            thrust   = cg::bound(desired_thrust, -1., 1.);
 
             //LogTrace("slide_angle " << slide_angle << " thrust " << thrust << " aa " << attack_angle << " desired_attack_angle " << desired_attack_angle << " desired_accel.z " << desired_accel.z );
         }   
