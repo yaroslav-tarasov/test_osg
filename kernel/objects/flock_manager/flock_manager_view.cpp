@@ -46,11 +46,15 @@ void view::on_object_destroying(object_info_ptr object)
     }
 }
 
-const settings_t& view::settings() const 
+settings_t const& view::settings() const 
 {
 	return settings_;
 }
 
+geo_point_3 const& view::pos()          const
+{
+	return state_.pos;
+}
 
 } // manager
 

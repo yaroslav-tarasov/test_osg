@@ -145,11 +145,9 @@ void model::sync_phys(double dt)
 
     point_3     wind(0.0,0.0,0.0);
 
-    //        double const max_break_accel = aerotow_ ? 2 : 20;
     double const max_accel = 15;
-    //        double const smooth_factor = 5.;
 
-    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
     decart_position cur_pos = phys_flock_->get_position();
 
@@ -157,9 +155,12 @@ void model::sync_phys(double dt)
     double cur_speed  = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
     double cur_roll   = cur_pos.orien.cpr().roll;
+	
+	// ?? cg::geo_direction
     
-    cpr cpr_des =  cg::cpr(cg::polar_point_3(cg::geo_base_3(desired_position_)(cur_glb_pos.pos)).course);
-    quaternion  desired_orien_(cpr_des);  // FIXME pitch
+    cg::polar_point_3 cp (cg::geo_base_3(desired_position_)(cur_glb_pos.pos));
+    cpr cpr_des =  cg::cpr(cp.course,cp.pitch);
+    quaternion  desired_orien_(cpr_des);  
 
     point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
     point_3 right_dir   =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
@@ -186,11 +187,16 @@ void model::sync_phys(double dt)
     double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
 #endif
 
-    point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * 1 * (dt);
+    point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * _damping * (dt);
 
+
+    
+	if(_targetSpeed > -1){
+		phys::flock::control_ptr(phys_flock_)->set_angular_velocity(omega_rel);
+	}
 
     phys::flock::control_ptr(phys_flock_)->set_linear_velocity(forward_dir * _speed );
-    phys::flock::control_ptr(phys_flock_)->set_angular_velocity(omega_rel);
+
 }
 
 void model::sync_nodes_manager( double /*dt*/ )
@@ -217,11 +223,8 @@ void model::sync_nodes_manager( double /*dt*/ )
         root_next_pos_ = pos.pos;
         root_next_orien_ = pos.orien;
 
-        //geo_position body_pos(phys_vehicle_->get_position() * body_transform_inv_, base);
     }
 }
-
-
 
 
 void model::flap()
@@ -235,10 +238,7 @@ void model::flap()
 	   flock_state_ = fl_flap;
 	}
     
-    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
-    
-    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
-    desired_position_ = geo_position(d_pos, base).pos;
+	desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
 
 }
 
@@ -254,10 +254,7 @@ void model::soar()
 		flock_state_ = fl_soar;
 	}
 
-    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
-
-    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
-    desired_position_ = geo_position(d_pos, base).pos;
+    desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
 }
 
 void model::dive()
@@ -272,10 +269,9 @@ void model::dive()
 		 flock_state_ = fl_dive;
 	}
 
-    const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
-
-    decart_position d_pos(rnd_.inside_unit_sphere () * settings._spawnSphere,quaternion());
-    desired_position_ = geo_position(d_pos, base).pos;
+	cg::point_3 pos_us = rnd_.inside_unit_sphere () * settings._spawnSphere; 
+	pos_us.z = rnd_.random_range(-settings._spawnSphere *.5 , settings._spawnSphere *.5) - settings._diveValue; 
+    desired_position_ = geo_base_3(_spawner->pos())(pos_us) ;
 }
 
 void model::wander(float delay)
