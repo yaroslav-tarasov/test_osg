@@ -20,7 +20,7 @@ struct settings_t
         , _maxScale          ( 1.f )
         , _minAnimationSpeed ( 2.f )
         , _maxAnimationSpeed ( 4.f )
-		, _spawnSphere       ( 200.f ) // 3.f
+		, _spawnSphere       ( 100.f ) // 3.f
 		, _minDamping        ( 1.f )
 		, _maxDamping        ( 2.f )
 		, _diveFrequency     ( 0.5f)

@@ -802,12 +802,6 @@
     <ClCompile Include="av\avCore\Timer.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp">
-      <Filter>Source Files\objects\registrator</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp">
-      <Filter>Source Files\objects\registrator</Filter>
-    </ClCompile>
     <ClCompile Include="tests\test_boost_timer.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
@@ -822,9 +816,6 @@
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\time_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_ctrl.cpp">
-      <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
     <ClCompile Include="tests\animation_test.cpp">
       <Filter>Source Files\tests</Filter>
@@ -882,6 +873,15 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_model.cpp">
       <Filter>Source Files\objects\flock_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_ctrl.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_model.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

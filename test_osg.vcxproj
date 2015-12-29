@@ -259,9 +259,6 @@
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_model.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_reg\aircraft_reg_view.cpp" />
     <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
@@ -290,6 +287,9 @@
     <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp" />
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_model.cpp" />
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp" />
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp" />
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp" />
     <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp" />

@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "aircraft_reg_model.h"
+#include "objects_reg_model.h"
 //#include "objects\common\aircraft_physless.h"
 #include "objects\common\vehicle.h"
+#include "flock_manager\flock_manager_common.h"
 #include "objects\common\flock_manager.h"
 
 namespace objects_reg
@@ -61,7 +62,7 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
 
              pv->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }
-         else if (flock::manager::model_control_ptr pf = flock::manager::::model_control_ptr(a))
+         else if (flock::manager::model_ext_control_ptr pf = flock::manager::model_ext_control_ptr(a))
          {
              auto it = last_msg_.find(msg.ext_id);
 
@@ -88,15 +89,16 @@ void model::on_object_created(object_info_ptr object)
 {
 	if (aircraft::info_ptr info = object)
 	{
-        if(info)
-			add_object(info);
+		add_object(info);
     }
     else if (vehicle::model_info_ptr info = object)
     {
-        if(info)
-            add_object(info);
+        add_object(info);
     }
-
+    else if (flock::manager::info_ptr info = object)
+    {
+        add_object(info);
+    }
 }
 
 void model::on_object_destroying(object_info_ptr object)

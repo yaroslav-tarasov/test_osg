@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "aircraft_reg_ctrl.h"
+#include "objects_reg_ctrl.h"
 
 #include "objects\vehicle.h"
 
