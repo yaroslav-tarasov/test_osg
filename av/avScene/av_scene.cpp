@@ -930,8 +930,8 @@ struct mod_app
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
         : systems_  (get_systems())
-        , ctrl_sys_ (systems_->get_control_sys(),0.02/*cfg().model_params.csys_step*/)
-        , mod_sys_  (systems_->get_model_sys  (),0.02/*cfg().model_params.msys_step*/)
+        , ctrl_sys_ (systems_->get_control_sys()/*,0.02*//*cfg().model_params.csys_step*/)
+        , mod_sys_  (systems_->get_model_sys  ()/*,0.02*//*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
         , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
     {   
@@ -969,8 +969,8 @@ private:
         gt_.set_time(time);
             
         systems_->update_messages();
-        mod_sys_.update(time);
-        ctrl_sys_.update(time);
+        mod_sys_->update(time);
+        ctrl_sys_->update(time);
     }
 
 
@@ -1034,7 +1034,7 @@ private:
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
 
 
-        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get_sys().get()),"aircraft_reg")) ;   
+        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
 
         if (reg_obj_)
         {
@@ -1058,8 +1058,8 @@ private:
 
 private:
     systems_ptr                                                 systems_;
-    updater                                                     mod_sys_;
-    updater                                                    ctrl_sys_;
+    kernel::system_ptr                                          mod_sys_;
+    kernel::system_ptr                                         ctrl_sys_;
 
 private:
     msg_dispatcher<uint32_t>                                       disp_;
