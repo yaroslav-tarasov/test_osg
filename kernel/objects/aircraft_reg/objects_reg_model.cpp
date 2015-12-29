@@ -4,6 +4,7 @@
 #include "aircraft_reg_model.h"
 //#include "objects\common\aircraft_physless.h"
 #include "objects\common\vehicle.h"
+#include "objects\common\flock_manager.h"
 
 namespace objects_reg
 {
@@ -60,7 +61,13 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
 
              pv->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }
-         
+         else if (flock::manager::model_control_ptr pf = flock::manager::::model_control_ptr(a))
+         {
+             auto it = last_msg_.find(msg.ext_id);
+
+             pf->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+             pf->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
+         }        
          
          last_msg_[msg.ext_id] =  msg;
      }
