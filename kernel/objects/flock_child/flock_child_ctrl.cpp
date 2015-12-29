@@ -68,7 +68,7 @@ void ctrl::update( double time )
     if(time>10.0 && !anim_started)
     {
         anim_started = true;
-        auto const& settings = _spawner->settings();
+        // auto const& settings = _spawner->settings();
         
         // root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
     }

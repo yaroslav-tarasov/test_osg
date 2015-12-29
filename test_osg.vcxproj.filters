@@ -880,5 +880,8 @@
     <ClCompile Include="av\avCore\XmlModel.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_model.cpp">
+      <Filter>Source Files\objects\flock_manager</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

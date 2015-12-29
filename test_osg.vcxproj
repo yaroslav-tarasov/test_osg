@@ -274,6 +274,7 @@
     <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp" />
     <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp" />
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_model.cpp" />
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp" />
     <ClCompile Include="kernel\objects\human\human_ctrl.cpp" />
     <ClCompile Include="kernel\objects\human\human_model.cpp" />

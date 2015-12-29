@@ -147,7 +147,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     auto manager_ =  vis_manager->visual_object()->animation_manager();
 
     bool bopen = (cg::eq(anim.from,0.f)) && (cg::eq(anim.size,0.f)) || (anim.from >= 1.0) && (anim.size < 0);
-    osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE:osgAnimation::Animation::ONCE_BACKWARDS;
+    osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
     pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
 

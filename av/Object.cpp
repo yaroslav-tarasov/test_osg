@@ -88,19 +88,38 @@ Object* createObject(std::string name, bool fclone)
 
     osg::PositionAttitudeTransform* pat;
 
+    osg::CopyOp copyop;
+
+    if (name=="crow")
+    {
+       copyop =  osg::CopyOp::DEEP_COPY_ALL
+           //& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+           //& ~osg::CopyOp::DEEP_COPY_ARRAYS
+           & ~osg::CopyOp::DEEP_COPY_IMAGES
+           & ~osg::CopyOp::DEEP_COPY_TEXTURES    // (name != "crow"?~osg::CopyOp::DEEP_COPY_TEXTURES:osg::CopyOp::DEEP_COPY_ALL)
+           & (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
+           //& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+           //& ~osg::CopyOp::DEEP_COPY_UNIFORMS
+           //& ~osg::CopyOp::DEEP_COPY_DRAWABLES
+           ;
+    } else
+    {
+        copyop =  osg::CopyOp::DEEP_COPY_ALL
+            & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+            & ~osg::CopyOp::DEEP_COPY_ARRAYS
+            & ~osg::CopyOp::DEEP_COPY_IMAGES
+            & ~osg::CopyOp::DEEP_COPY_TEXTURES    
+            & ~osg::CopyOp::DEEP_COPY_STATESETS
+            & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+            & ~osg::CopyOp::DEEP_COPY_UNIFORMS
+            & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+            ;
+    }
+
 	if(( it = objCache.find(name))!=objCache.end() )
 	{
 		if(fclone)
-		object = osg::clone(it->second.get(), osg::CopyOp::DEEP_COPY_ALL 
-			//& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
-			//& ~osg::CopyOp::DEEP_COPY_ARRAYS
-			& ~osg::CopyOp::DEEP_COPY_IMAGES
-			& (name != "crow"?~osg::CopyOp::DEEP_COPY_TEXTURES:osg::CopyOp::DEEP_COPY_ALL)
-			& (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
-			//& ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
-			//& ~osg::CopyOp::DEEP_COPY_UNIFORMS
-			//& ~osg::CopyOp::DEEP_COPY_DRAWABLES
-			);
+		    object = osg::clone(it->second.get(), copyop);
 		else
 			object = it->second.get();
 
@@ -402,17 +421,7 @@ Object* createObject(std::string name, bool fclone)
 #if 1
         if(fclone )
         {
-            object = /*dynamic_cast<osg::PositionAttitudeTransform *>*/(
-            osg::clone(objCache[name].get(), osg::CopyOp::DEEP_COPY_ALL 
-            //& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
-            //& ~osg::CopyOp::DEEP_COPY_ARRAYS
-            & ~osg::CopyOp::DEEP_COPY_IMAGES
-            & (name != "crow"?~osg::CopyOp::DEEP_COPY_TEXTURES:osg::CopyOp::DEEP_COPY_ALL)
-            & (name != "crow"?~osg::CopyOp::DEEP_COPY_STATESETS:osg::CopyOp::DEEP_COPY_ALL)
-            // & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
-            //& ~osg::CopyOp::DEEP_COPY_UNIFORMS
-            //& ~osg::CopyOp::DEEP_COPY_DRAWABLES
-            ));
+            object = /*dynamic_cast<osg::PositionAttitudeTransform *>*/(osg::clone(objCache[name].get(), copyop ));
         }
         else
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name]->getNode());

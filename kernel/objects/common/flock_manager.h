@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "common/flock_child.h"
+#include "flock_manager_fwd.h"
 
 namespace flock
 {
@@ -14,6 +14,14 @@ namespace flock
 		};
 
 		typedef polymorph_ptr<info> info_ptr;
+
+
+        struct model_ext_control
+        {
+            virtual ~model_ext_control() {}
+            virtual void                 set_desired   (double time,const cg::point_3& pos, const cg::quaternion& q, const double speed)     = 0;
+            virtual void                 set_ext_wind  (double speed, double azimuth) =0;
+        };
 	}
 
 }

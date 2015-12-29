@@ -286,14 +286,14 @@ void create_objects(const std::string & airport)
     LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.set_point() << "\n");
 
 
-    {
-        flock::manager::settings_t vs;
-        // vs.model = "crow";
-        cg::geo_point_3 vpos(0.00055,0.0009,300.0);
-        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+    //{
+    //    flock::manager::settings_t vs;
+    //    // vs.model = "crow";
+    //    cg::geo_point_3 vpos(0.00055,0.0009,300.0);
+    //    geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-        auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
-    }
+    //    auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    //}
 
 
 }
@@ -353,14 +353,34 @@ inline object_info_ptr create_vehicle(create const& msg)
     return  vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 }
 
+inline object_info_ptr create_flock_of_birds(create const& msg)
+{
+    kernel::system_ptr _csys = get_systems()->get_control_sys();
+
+    decart_position target_pos;
+
+    target_pos.pos   = msg.pos;
+    target_pos.orien = msg.orien;
+    geo_position vgp(target_pos, get_base());
+    
+    flock::manager::settings_t vs;
+    vs.model = "crow";
+
+    return flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+}
+
 object_info_ptr create_object(create const& msg)
 {
     if(msg.object_kind & ok_vehicle)
         return create_vehicle(msg);
+    else if ( msg.object_kind == ok_flock_of_birds)
+        return create_flock_of_birds(msg);
     else
         return create_aircraft_phl(msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 
 }
+
+
 
 }
 

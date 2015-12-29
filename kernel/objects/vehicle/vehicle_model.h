@@ -56,6 +56,8 @@ private:
     void                 set_steer       ( double steer ) override;
     void                 set_brake       ( double brake ) override;
     void                 set_reverse     ( bool val )     override;
+    // model_control_ext
+private:
     void                 set_desired     ( double time,const cg::point_3& pos, const cg::quaternion& q, const double speed );
     void                 set_ext_wind    ( double speed, double azimuth );
 
@@ -108,14 +110,14 @@ private:
     //}
 
 private:
-    model_system *    sys_;
-    optional<double>  last_update_;
-    double            max_speed_;
+    model_system *                   sys_;
+    optional<double>                 last_update_;
+    double                           max_speed_;
     
-    airports_manager::info_ptr airports_manager_;
-    airport::info_ptr          airport_;
-    //ani_object::info_ptr     ani_ ;
-    //ani::airport_info_ptr    airport_;
+    airports_manager::info_ptr       airports_manager_;
+    airport::info_ptr                airport_;
+    //ani_object::info_ptr           ani_ ;
+    //ani::airport_info_ptr          airport_;
 
     phys::ray_cast_vehicle::info_ptr phys_vehicle_;
     optional<size_t>                 phys_zone_;

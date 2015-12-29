@@ -930,8 +930,8 @@ struct mod_app
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
         : systems_  (get_systems())
-        , ctrl_sys_ (systems_->get_control_sys(),0.025/*cfg().model_params.csys_step*/)
-        , mod_sys_  (systems_->get_model_sys  (),0.025/*cfg().model_params.msys_step*/)
+        , ctrl_sys_ (systems_->get_control_sys(),0.02/*cfg().model_params.csys_step*/)
+        , mod_sys_  (systems_->get_model_sys  (),0.02/*cfg().model_params.msys_step*/)
         , end_of_load_(eol)
         , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
     {   

@@ -11,7 +11,8 @@ namespace manager
 struct settings_t
 {
     settings_t()
-        : _childAmount       ( 250 )
+        : model ("crow")
+        , _childAmount       ( 250 )
 		, _soarMaxTime       (  5  )
         , _minSpeed          ( 6.f )
         , _maxSpeed          (10.f )
@@ -28,6 +29,7 @@ struct settings_t
 		, _diveValue         ( 7.0f )
     {}
 
+    std::string   model;
 	int    _childAmount;
 	int    _soarMaxTime;
     float  _minSpeed;				// minimum random speed
@@ -81,6 +83,7 @@ REFL_END()
 
 
 REFL_STRUCT(settings_t)
+    REFL_ENTRY( model)
     REFL_ENTRY(_childAmount)
 	REFL_ENTRY(_soarMaxTime)
 	REFL_ENTRY(_minSpeed)				

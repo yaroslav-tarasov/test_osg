@@ -4,6 +4,8 @@
 #include "flock_manager_common.h"
 #include "common/flock_child.h"
 #include "common/flock_manager.h"
+#include "flock_manager_msg.h"
+
 
 namespace flock
 {
@@ -51,10 +53,22 @@ namespace flock
 			// info
 			settings_t  const& settings()               const override;
 			geo_point_3 const& pos()                    const override;
+        
+        protected:
+            virtual void on_state_changed() {}    // Задействован только в чарте
+        
+        protected:
+            void on_state   (state_t const& state);
+
+        public:
+            //void set_settings( settings_t const& settings );
+            void set_state(state_t const&state);
 
 		protected:
 			std::set<child::info_ptr>				 roamers_;
 
+        protected:
+            fms::trajectory_ptr                         traj_;
 		};
 
 

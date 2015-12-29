@@ -22,7 +22,10 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
 	, obj_data_base         (dict)
 {
-
+    msg_disp()
+        .add<msg::state_msg_t     >(boost::bind(&view::on_state   , this, _1))
+        
+        ;
 
 }
 
@@ -54,6 +57,17 @@ settings_t const& view::settings() const
 geo_point_3 const& view::pos()          const
 {
 	return state_.pos;
+}
+
+void view::set_state(state_t const& state)
+{
+    set(msg::state_msg_t(state), false);
+}
+
+void view::on_state(state_t const& state)
+{                                              
+    state_ = state;
+    on_state_changed();     // Задействован только в чарте
 }
 
 } // manager
