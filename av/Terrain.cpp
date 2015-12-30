@@ -225,7 +225,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
 void  Terrain::create( const std::string& name )
 {
 
-    auto wf =  [this](std::string name) {
+    auto wf =  [this](std::string name)->osg::Node* {
  
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
@@ -355,17 +355,22 @@ void  Terrain::create( const std::string& name )
 			const float pitch = osg::DegreesToRadians(0.f/*-90.f*/);
 			data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
+#ifndef ASYNC_OBJECT_LOADING
             avScene::LightManager::GetInstance()->addLight(data);
+#endif
+
         }
     }
 
     force_log fl;
     LOG_ODS_MSG( "Terrain::create  " << hr_timer.set_point() << "\n");
 
+    return nullptr;
+
     };
 
 #ifdef ASYNC_OBJECT_LOADING
-    _lnt =   new utils::LoadNodeThread ( boost::bind<void>(wf, path) );
+    _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>(wf, name) );
 #else
     wf(name);
 #endif

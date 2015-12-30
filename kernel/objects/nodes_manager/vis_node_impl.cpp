@@ -151,57 +151,61 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     
     pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
 
+    if (victory_nodes_.size()>0)
+    {
+
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
 
     if ( manager_ )
     {   
-        const osgAnimation::AnimationList& animations =
-            manager_->getAnimationList();
+            const osgAnimation::AnimationList& animations =
+                manager_->getAnimationList();
 
-#if 0
-        if(childs_callbacks_.size()==0)
-        {
-            for (int i =0; i < node_->asGroup()->getNumChildren();++i)
+    #if 0
+            if(childs_callbacks_.size()==0)
             {
-                auto child_node = node_->asGroup()->getChild(i); 
-                childs_callbacks_.push_back(child_node->getUpdateCallback());
+                for (int i =0; i < node_->asGroup()->getNumChildren();++i)
+                {
+                    auto child_node = node_->asGroup()->getChild(i); 
+                    childs_callbacks_.push_back(child_node->getUpdateCallback());
+                }
             }
-        }
-#endif
+    #endif
 		
-		const bool f = anim.name == "clip1";
+		    const bool f = anim.name == "clip1";
 		
-		const bool need_to_stop_now = current_anim != anim.name && cg::eq_zero(anim.cross_fade);
+		    const bool need_to_stop_now = current_anim != anim.name && cg::eq_zero(anim.cross_fade);
 		
-		boost::optional<std::string> new_anim_name;
+		    boost::optional<std::string> new_anim_name;
  
-		if(current_anim != anim.name && anim.cross_fade> 0.0 ) 
-		  deferred_cross_fade = make_pair(*last_update_ + anim.cross_fade, anim.name);
-		else
-		for ( unsigned int i=0; i<animations.size(); ++i )
-        {
-            const std::string& name = animations[i]->getName();
-           
-		    if(!manager_->isPlaying(name) && (f? true : name == anim.name))
+		    if(current_anim != anim.name && anim.cross_fade> 0.0 ) 
+		      deferred_cross_fade = make_pair(*last_update_ + anim.cross_fade, anim.name);
+		    else
+		    for ( unsigned int i=0; i<animations.size(); ++i )
             {
-                if(anim.len >0) animations[i]->setDuration(anim.len);
-                animations[i]->setPlayMode(pm);
+                const std::string& name = animations[i]->getName();
+           
+		        if(!manager_->isPlaying(name) && (f? true : name == anim.name))
+                {
+                    if(anim.len >0) animations[i]->setDuration(anim.len);
+                    animations[i]->setPlayMode(pm);
 				
-                manager_->playAnimation( animations[i].get(),2,2.0 );
-				new_anim_name = name;
-			}
+                    manager_->playAnimation( animations[i].get(),2,2.0 );
+				    new_anim_name = name;
+			    }
 			
-			if(need_to_stop_now && current_anim == name)
-				manager_->stopAnimation(animations[i]);
+			    if(need_to_stop_now && current_anim == name)
+				    manager_->stopAnimation(animations[i]);
+            }
+
+		    if(new_anim_name)
+			    current_anim =  *new_anim_name;
+
+
         }
-
-		if(new_anim_name)
-			current_anim =  *new_anim_name;
-
 
     }
-
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)

@@ -15,6 +15,7 @@ namespace kernel
 #ifdef ASYNC_OBJECT_LOADING
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
         node_ = scene_->load(res, nullptr, seed);
+        seed_ =  seed;
 #else
         node_ = scene_->load(res, nullptr, seed);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
@@ -40,8 +41,9 @@ namespace kernel
                         , parent_(parent)
                         , loaded_(false)
     {
-#if ASYNC_OBJECT_LOADING           
+#ifdef ASYNC_OBJECT_LOADING           
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
+        seed_ =  seed;
 #endif
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
@@ -71,7 +73,7 @@ namespace kernel
         // scene_->get_objects()->remove(node_.get());
     }
 
-#if ASYNC_OBJECT_LOADING    
+#ifdef ASYNC_OBJECT_LOADING    
     void visual_object_impl::object_loaded( uint32_t seed )
     {
          if(seed_==seed)

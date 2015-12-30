@@ -82,7 +82,7 @@ Object* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
-	Object* object = nullptr;
+	Object*    object      = nullptr;
 	objectMap::iterator it;
     boost::optional<xml_model_t> data;
 
@@ -144,6 +144,7 @@ Object* createObject(std::string name, bool fclone)
 				return nullptr;
 
 			object_file = osgDB::readNodeFile(object_file_name);
+
 		}
 		else
 		{
@@ -297,9 +298,12 @@ Object* createObject(std::string name, bool fclone)
                  obj_light->addLightPoint(pnt);
         }
 
+//И чего тут делать с огнями и колбеками
+FIXME( Исправить структуру под mt)
+#ifndef ASYNC_OBJECT_LOADING
         if(wln_list.size()>0)
             object_file->asGroup()->addChild(obj_light);
-
+#endif
 
 #endif
 #endif

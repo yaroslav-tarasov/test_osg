@@ -883,5 +883,8 @@
     <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp">
       <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
+    <ClCompile Include="utils\async_load.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

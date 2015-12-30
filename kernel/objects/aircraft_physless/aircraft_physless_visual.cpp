@@ -49,8 +49,10 @@ namespace aircraft_physless
             return true;
         });
 
+#ifndef ASYNC_OBJECT_LOADING           
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+#endif
 
     }
 

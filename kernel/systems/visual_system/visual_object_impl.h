@@ -23,7 +23,7 @@ struct visual_object_impl
 
     void set_visible(bool visible)       override;
 
-#if ASYNC_OBJECT_LOADING
+#ifdef ASYNC_OBJECT_LOADING
 private:
     void object_loaded( uint32_t seed );
     uint32_t                          seed_;

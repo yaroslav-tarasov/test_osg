@@ -96,6 +96,7 @@ namespace avScene {
 		avSky::ISky*                                getSky();   
 		inline avWeather::Weather*                  getWeather();
         inline ScreenTextureManager*                getScreenTextureManager() const;
+        inline osg::Group*                          getTerrainRoot() const { return _terrainRoot.get(); } 
 
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
 
@@ -136,7 +137,9 @@ namespace avScene {
         osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
         osg::ref_ptr<ScreenTextureManager>          _screenTextureManager;
 
-         osg::ref_ptr<osg::Group>                   _groupMainReflection;
+         osg::ref_ptr<osg::Node>                    _loadManager;
+
+        osg::ref_ptr<osg::Group>                    _groupMainReflection;
 #if !defined(VISUAL_EXPORTS)
         osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
 #endif
@@ -160,7 +163,7 @@ namespace avScene {
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
 
     private:
-       app::settings_t*                                 settings_;
+       app::settings_t*                               settings_;
 
     public:
         DECLARE_EVENT(object_loaded, (uint32_t)) ;

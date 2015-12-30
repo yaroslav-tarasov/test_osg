@@ -505,6 +505,9 @@ Scene::Scene()
     _environmentNode = new Group();
     addChild(_environmentNode.get());
 
+    _loadManager = new utils::LoadManager();
+    addChild(_loadManager);
+
     // Common nodes for scene etc.
     _commonNode = new Group();
 
@@ -1421,21 +1424,20 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
-		load("elexis",_terrainRoot, 15000);
-		
-		load("juliet",_terrainRoot, 15000);
-        
-        // load("walking",_terrainRoot, 15000);
-
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
         return _terrainNode;
     }
 
-    auto  wf =  [this,&seed](std::string path, osg::MatrixTransform* mt) {
-    
-   /* osg::ref_ptr<osg::MatrixTransform> mt = mt_;*/
 
+    {
+        mt_.back()->setName("phys_ctrl");
+        mt_.back()->setUserValue("id",seed);
+        mt_.back()->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
+    }
+
+    auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt)->osg::Node* {
+    
     bool clone = true;
 
     using namespace creators;
@@ -1445,24 +1447,18 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
     if(obj)
     {
         osg::Node* obj_node = obj->getNode();
-
-        mt->setName("phys_ctrl");
-        mt->setUserValue("id",seed);
-
-        mt->addChild( obj_node );
-	    
-		mt->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
         
+        mt->addChild( obj_node );
+
 		osg::Node* root =  findFirstNode(obj_node,"root"); 
         if(root!=nullptr) root->setUserValue("id",seed);
         
         if(mt!=nullptr)
         {
             
-            osg::Node* sl =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
-            osg::Node* pat =  findFirstNode(mt,"pat",findNodeVisitor::not_exact);
-             
-            osg::Node* hd =  findFirstNode(mt,"headlight",findNodeVisitor::not_exact);
+            osg::Node* sl  =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
+            osg::Node* pat =  findFirstNode(mt,"pat"          ,findNodeVisitor::not_exact);
+            osg::Node* hd  =  findFirstNode(mt,"headlight"    ,findNodeVisitor::not_exact);
 
             const auto offset =  pat->asTransform()->asPositionAttitudeTransform()->getPosition();
 
@@ -1483,13 +1479,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
                 cg::cpr        cr    = orien.cpr(); 
 
                 const float heading = osg::DegreesToRadians(cr.course);
-                const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
+                const float pitch   = osg::DegreesToRadians(/*cr.pitch*/15.f);
 
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
-
+#ifndef ASYNC_OBJECT_LOADING
                 avScene::LightManager::GetInstance()->addLight(data);
-
+#endif
             }
 
             if(hd)
@@ -1513,9 +1509,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
-
+#ifndef ASYNC_OBJECT_LOADING
                 avScene::LightManager::GetInstance()->addLight(data);
-
+#endif
             }
 
             findNodeVisitor::nodeNamesList list_name;
@@ -1628,72 +1624,40 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
                 pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
                 pnt._radius = 0.2f;
+                //И чего тут делать с огнями и колбеками
+                FIXME( Исправить структуру под mt)
+#ifndef ASYNC_OBJECT_LOADING
                 if(need_to_add)
                 {
                     obj_light->addLight(pnt, data);
                 }
+#endif
             }
 
-            if(wln_list.size()>0)
-                root->asGroup()->addChild(obj_light);
-
-			if( path == "juliet" || path == "walking" )
-			{
-                struct UpdateNode: public osg::NodeCallback
-                {
-                    UpdateNode()
-                    {
-
-                    }
-
-                    void operator()(osg::Node* node, osg::NodeVisitor* nv) {
-                        auto mat = node->asTransform()->asMatrixTransform();
-                        const osg::Vec3d& pos = mat->getMatrix().getTrans();
-                        osg::Matrix trMatrix;            
-                        trMatrix.setTrans(pos + osg::Vec3d(0.001,0.001,0));
-                        mat->setMatrix(trMatrix);
-
-                    }
-                };
-
-
-				using namespace avAnimation;
-				pat->asTransform()->asPositionAttitudeTransform()->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
-				pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.01,0.01,0.01));
-				AnimationManagerFinder finder;
-				pat->accept(finder);
-				if (finder._am.valid()) {
-					pat->setUpdateCallback(finder._am.get());
-					AnimtkViewerModelController::setModel(finder._am.get());
- 
-					// We're safe at this point, so begin processing.
-					AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
-					
-                    mc.play();
-
-
-
-				} else {
-					osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
-				}
-
-
-
-			}
-
-
+            //И чего тут делать с огнями и колбеками
+            FIXME( Исправить структуру под mt)
+#ifndef ASYNC_OBJECT_LOADING
+                if(wln_list.size()>0)
+                    root->asGroup()->addChild(obj_light);
+#endif
 
         }
 
+#ifndef ASYNC_OBJECT_LOADING
         _terrainRoot->asGroup()->addChild(mt);
+#endif
 
         object_loaded_signal_(seed);
+        
+        return mt;
+
     } };
 
 #ifdef ASYNC_OBJECT_LOADING
-    _lnt =   new utils::LoadNodeThread ( boost::bind<void>(wf,path,mt_.back().get()) );
+    // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
+    dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()));
 #else
-    wf(path,mt_.back().get());
+    wf(seed, path,mt_.back().get());
 #endif
 
     LogInfo("Scene::load exit " << path);
