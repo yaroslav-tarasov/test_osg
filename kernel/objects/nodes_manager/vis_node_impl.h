@@ -59,6 +59,9 @@ namespace nodes_management
 		std::string												    current_anim;
 
 		 optional<double>											last_update_;
+	
+	private:
+        std::vector<msg::node_animation>                             anim_queue_;
     };
 
     typedef polymorph_ptr<vis_node_impl> vis_node_impl_ptr;

@@ -6,10 +6,12 @@ namespace utils
     struct  LoadNodeThread : public OpenThreads::Thread
     {
         typedef boost::function<osg::Node * ()> on_work_f  ; 
+		typedef boost::function<void ()       > set_signal_f  ;
 
-        LoadNodeThread( on_work_f work )
+        LoadNodeThread( on_work_f work, LoadNodeThread::set_signal_f s )
             : _work( work )
             , _node(nullptr)
+			, _sig (s)
         {
             startThread();
         }
@@ -28,14 +30,17 @@ namespace utils
 
         static OpenThreads::Mutex& getMutex()
         {
-            static OpenThreads::Mutex        _mutex;
+            static OpenThreads::Mutex   _mutex;
             return _mutex;
         }
 
-        on_work_f                 _work;
-        osg::ref_ptr< osg::Node > _node;
-        
-    };
+        on_work_f                       _work;
+        osg::ref_ptr< osg::Node >       _node;
+	    set_signal_f                     _sig;
+
+
+
+	};
 
     class LoadManager 
         : public osg::Node
@@ -45,12 +50,9 @@ namespace utils
 
         LoadManager();
         void   update  ( osg::NodeVisitor * nv );
-        void   load    ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work );
-
-        LoadNodeThread::on_work_f _work;
+        void   load    ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work, LoadNodeThread::set_signal_f s );
 
         std::deque<LoadNodeThread*>               threads_;
-        std::deque<osg::ref_ptr< osg::Node >>   nodesToAdd;
     };
           
 }

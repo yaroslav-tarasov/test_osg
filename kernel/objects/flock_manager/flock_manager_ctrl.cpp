@@ -45,33 +45,40 @@ AUTO_REG_NAME(flock_manager_ext_ctrl, ctrl::create);
 ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     : view(oc,dict)
 {
-    auto * of = dynamic_cast<kernel::fake_objects_factory*>(sys_);
-    
-    settings_._childAmount = 70;
-	
-	simplerandgen  rnd(static_cast<unsigned>(time(nullptr)));
 
-    child::settings_t vs;
-    vs.model        = "crow"; 
-	
-	// transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
+	settings_._childAmount = 70;
+}
 
-    decart_position child_pos;
+void ctrl::update( double time )
+{   
+	view::update(time);
 
-    for (int i=0; i < settings_._childAmount; ++i )
-    {
+	int count = settings_._childAmount - roamers_.size();
+	if (count>0)
+	{
+		auto * of = dynamic_cast<kernel::fake_objects_factory*>(sys_);
 
-        // child_pos.pos   = point_3(rnd.random_8bit(),rnd.random_8bit(),300 + rnd.random_8bit()/2.0);
-        // transform.position = (Random.insideUnitSphere *_spawner._spawnSphere) + _spawner.transform.position;
-		FIXME("Чудесный код, преобразование туда сюда")
-        point_3 spawner_pos = cg::geo_base_3(get_base())(state_.pos);
-        child_pos.pos   = point_3(rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0) ) * settings_._spawnSphere + spawner_pos;
-		child_pos.orien = state_.orien;
-        geo_position vgp(child_pos, get_base());
+		simplerandgen  rnd(static_cast<unsigned>(::time(nullptr)));
 
-        roamers_.insert(child::create(of,vs,vgp));
+		child::settings_t vs;
+		vs.model        = "crow"; 
 
-    }
+		decart_position child_pos;
+
+		for (int i=0; i < 4; ++i )
+		{
+			// child_pos.pos   = point_3(rnd.random_8bit(),rnd.random_8bit(),300 + rnd.random_8bit()/2.0);
+			FIXME("Чудесный код, преобразование туда сюда")
+	        point_3 spawner_pos = cg::geo_base_3(get_base())(state_.pos);
+			child_pos.pos   = point_3(rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0), rnd.random_range(-1.0,1.0) ) * settings_._spawnSphere + spawner_pos;
+			child_pos.orien = state_.orien;
+			geo_position vgp(child_pos, get_base());
+
+			roamers_.insert(child::create(of,vs,vgp));
+
+		}
+	}
+
 }
 
 } // manager

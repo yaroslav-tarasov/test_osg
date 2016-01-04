@@ -124,7 +124,7 @@ struct SkeletonFinder : public osg::NodeVisitor
         osgAnimation::Skeleton* b = dynamic_cast<osgAnimation::Skeleton*>(&node);
         if (b) {
             _skel = b;
-            osg::notify(osg::WARN) << "SkeletonFinder address " << reinterpret_cast<uint32_t>( b ) << std::endl;
+            // osg::notify(osg::WARN) << "SkeletonFinder address " << reinterpret_cast<uint32_t>( b ) << std::endl;
             //return;
         }
 

@@ -387,7 +387,7 @@ FIXME( Исправить структуру под mt)
 
         if(name == "crow")
         {
-            const double scale = /*0.2*/ 0.08;
+            const double scale = /*0.2*/ 0.035;
             pat->setScale(osg::Vec3(scale,scale,scale));
             pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
         }

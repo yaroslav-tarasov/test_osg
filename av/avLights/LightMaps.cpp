@@ -221,9 +221,7 @@ protected:
 
     _private(osg::Group * sceneRoot);
 
-    void _createArrays();
-
-
+    void							    _createArrays();
     osg::Geometry *                     _createGeometry();
     void                                _clearArrays();
     void                                _commitLights();
@@ -395,8 +393,6 @@ __forceinline static void make_intersection(inter_points_array_4& ipa, const cg:
 }
 
 
-
-#if 1
 struct LightMapCullCallback : public osg::NodeCallback
 {
     LightMapCullCallback(_private * p)
@@ -446,7 +442,7 @@ private:
     _private*           p_;
 
 };
-#endif
+
 
 void _private::traverse(osg::NodeVisitor& nv)
 {
@@ -512,8 +508,6 @@ osg::Geometry * _private::_createGeometry()
 
     // create tetrahedron around viewer (just to fill the whole volume)
     osg::Geometry * geom = new osg::Geometry;
-    geom->setUseDisplayList(true);
-    geom->setDataVariance(osg::Object::DYNAMIC);
     geom->setComputeBoundingBoxCallback(pDummyBBCompute);
     
     geom_array_ = new osg::Vec3Array;

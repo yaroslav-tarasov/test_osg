@@ -25,8 +25,10 @@ namespace utils
             if(!(*it)->isRunning())
             {
                if((*it)->_node.valid())
-                scene->getTerrainRoot()->addChild((*it)->_node);
-
+               {
+				   scene->getTerrainRoot()->addChild((*it)->_node);
+				   (*it)->_sig();
+			   }
                delete *it;
                threads_.erase(it);
                break;
@@ -37,9 +39,9 @@ namespace utils
         
     }
 
-    void LoadManager::load ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work )
+    void LoadManager::load ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work , LoadNodeThread::set_signal_f s)
     {
-        threads_.push_back(new LoadNodeThread(work));
+        threads_.push_back(new LoadNodeThread(work,s));
     }
 
 }

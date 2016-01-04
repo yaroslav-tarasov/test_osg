@@ -35,7 +35,15 @@ vis_node_impl::vis_node_impl( view * manager, binary::input_stream & stream )
 void vis_node_impl::on_visual_object_created()
 {
     fill_victory_nodes();
+	need_update_ = true;
     sync_position();
+
+	for (auto it=anim_queue_.begin(); it!=anim_queue_.end();++it )
+	{
+		on_animation(*it);
+	}
+
+	anim_queue_.clear();
 }
 
 void vis_node_impl::fill_victory_nodes()
@@ -206,6 +214,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
         }
 
     }
+	else
+	{
+		anim_queue_.push_back(anim);
+	}
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)

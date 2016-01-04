@@ -360,6 +360,7 @@ private:
 
             return;
         }
+		
 
         double period          = adjust_time_factor_ ? period_ : period_ * factor_;
         double next_time_point = (std::floor(session_->time() / period) + 1) * period;
@@ -686,11 +687,11 @@ private:
 
     void on_create(create const& msg)
     {
-        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>("create_object");
+        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>(kernel::system* csys, "create_object");
         kernel::object_info_ptr  a;
         
         if(fp)
-            a = fp(msg);
+            a = fp(ctrl_sys_.get(), msg);
 
         //LogInfo("Got create message: " << msg.model_name << "   " << msg.object_kind << "   " << msg.course << " : " << msg.lat << " : " << msg.lon  );
     }
@@ -967,7 +968,9 @@ private:
     void update(double time)
     {   
         gt_.set_time(time);
-            
+		force_log fl;       
+		LOG_ODS_MSG( "void update(double time) " << time << "\n");
+
         systems_->update_messages();
         mod_sys_->update(time);
         ctrl_sys_->update(time);
@@ -1009,9 +1012,6 @@ private:
         {
             reg_obj_->inject_msg(data, size);
         }
-
-        // LogInfo("inject_msg (const void* data, size_t size) " << size  );
-
     }
 
     void create_objects(const std::string& airport)

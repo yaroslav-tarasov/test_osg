@@ -16,6 +16,9 @@ namespace flock
 		protected:
 			ctrl(kernel::object_create_t const& oc, dict_copt dict);
 
+			// base_presentation
+		private:
+			void update( double /*time*/ ) override;
 		};
 
 

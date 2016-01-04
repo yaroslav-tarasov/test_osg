@@ -63,6 +63,7 @@ namespace utils
     struct  LoadNodeThread;
 }
 
+struct SmokeSfxNode;
 
 class PickHandler;
 
@@ -158,6 +159,7 @@ namespace avScene {
     private:
         osg::ref_ptr<osg::Node>                     _logo;
 
+		SmokeSfxNode *                 smoke_sfx_weak_ptr_;
     private:
         utils::LoadNodeThread*                          _lnt;
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;

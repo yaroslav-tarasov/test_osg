@@ -143,7 +143,9 @@ private:
         {
             
             binary::bytes_t bts =  std::move(wrap_msg(create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319")));
+#if 1
             send(&bts[0], bts.size());
+#endif
             LogInfo("update() send create " );
             create_a = false;
 
@@ -165,7 +167,7 @@ private:
 
             send(&msg[0], msg.size());
            
-#if 0
+#if 1
             if (messages_size_ + binary::size(msg) > /*msg_threshold_*/100)
             {
                 binary::bytes_t bts =  network::wrap_msg(net_layer::msg::container_msg(move(messages_)));
@@ -187,14 +189,22 @@ private:
 
         
 #if 1
-        if(time > 1 )
+        if(time > 10 )
         {
             if (create_v)
             {
                 binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"buksir"))); // "niva_chevrolet"
+#if 1
                 send(&bts[0], bts.size());
+#endif
                 create_v = false;
                 LogInfo("update() send create " );
+
+
+				binary::bytes_t bts2 =  std::move(wrap_msg(create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow"))); // "niva_chevrolet"
+#if 0
+				send(&bts2[0], bts2.size());
+#endif
             }
 
 
@@ -214,6 +224,21 @@ private:
                 )));
 
             send(&msg[0], msg.size());
+
+
+			binary::bytes_t msg_b =  std::move(wrap_msg(run(
+				3 
+				,_traj->kp_value    (vtime)
+				,_traj->curs_value  (vtime)
+				,*_traj->speed_value(vtime)
+				, vtime /*+ traj_offset*/
+				, false
+				, meteo::local_params()
+				)));
+
+#if 0
+			send(&msg_b[0], msg_b.size());
+#endif
 
             //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
             //                                     << "  y: " << _traj->kp_value(vtime).y 

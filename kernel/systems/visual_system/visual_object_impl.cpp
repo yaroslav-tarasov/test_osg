@@ -20,8 +20,8 @@ namespace kernel
         node_ = scene_->load(res, nullptr, seed);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
         loaded_ = true;
-#endif
 
+#if 1
         using namespace avAnimation;
 
         AnimationManagerFinder finder;
@@ -30,10 +30,13 @@ namespace kernel
 
         if(finder._am.valid())
             node_->setUpdateCallback(finder._am.get());
+#endif
+
 #if 0
         SetupRigGeometry switcher(true, *node_.get());
 #endif
-       
+#endif       
+
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed )
@@ -51,19 +54,22 @@ namespace kernel
 
 #ifndef ASYNC_OBJECT_LOADING           
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
-#endif
+
 		using namespace avAnimation;
 
+#if 1
 		AnimationManagerFinder finder;
 		node_->accept(finder);
 		anim_manager_  = finder._am;  
 
 		if(finder._am.valid())
 			node_->setUpdateCallback(finder._am.get());
+#endif
+
 #if 0
 		SetupRigGeometry switcher(true, *node_.get());
 #endif
-
+#endif
     }
 
     visual_object_impl::~visual_object_impl()
@@ -80,6 +86,16 @@ namespace kernel
          {
            root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact); 
            loaded_ = true;
+
+		   using namespace avAnimation;
+
+		   AnimationManagerFinder finder;
+		   node_->accept(finder);
+		   anim_manager_  = finder._am;  
+
+		   if(finder._am.valid())
+			   node_->setUpdateCallback(finder._am.get());
+
            object_loaded_signal_(seed);
          }
     }

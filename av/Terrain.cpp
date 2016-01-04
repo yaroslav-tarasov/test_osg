@@ -370,7 +370,8 @@ void  Terrain::create( const std::string& name )
     };
 
 #ifdef ASYNC_OBJECT_LOADING
-    _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>(wf, name) );
+    //_lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>(wf, name) );
+	wf(name);
 #else
     wf(name);
 #endif

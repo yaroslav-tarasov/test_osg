@@ -27,6 +27,7 @@ namespace Database
 
 void initDataPaths()
 {
+	osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials");

@@ -144,6 +144,9 @@
     <Filter Include="Source Files\objects\airport">
       <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\fx">
+      <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -187,6 +190,15 @@
       <Filter>Source Files\shaders</Filter>
     </None>
     <None Include="misc\shaders\skinning.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.gs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>
@@ -885,6 +897,12 @@
     </ClCompile>
     <ClCompile Include="utils\async_load.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avFx\SmokeFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

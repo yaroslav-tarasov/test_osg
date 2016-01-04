@@ -41,7 +41,7 @@
 #include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 #include <BulletSoftBody/btSoftBody.h>
 
-
+#include "utils/visitors/ComputeTriMeshVisitor.h"
 
 btSoftBodyWorldInfo	worldInfo;
 
@@ -65,7 +65,7 @@ struct MeshUpdater : public osg::Drawable::UpdateCallback
         const btSoftBody::tNodeArray& nodes = _softBody->m_nodes;
         osg::Vec3Array::iterator it( verts->begin() );
         unsigned int idx;
-        for( idx=0; idx<_size; idx++)
+        for( idx=0; idx<_size && idx<nodes.size(); idx++)
         {
             *it++ = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
         }
@@ -73,15 +73,37 @@ struct MeshUpdater : public osg::Drawable::UpdateCallback
         draw->dirtyBound();
 
         // Generate new normals.
+#if 0
         osgUtil::SmoothingVisitor smooth;
         smooth.smooth( *geom );
         geom->getNormalArray()->dirty();
+#endif
     }
 
     const btSoftBody* _softBody;
     const unsigned int _size;
 };
 /** \endcond */
+
+//
+// Random
+//
+
+static inline btScalar	UnitRand()
+{
+	return(rand()/(btScalar)RAND_MAX);
+}
+
+static inline btScalar	SignedUnitRand()
+{
+	return(UnitRand()*2-1);
+}
+
+static inline btVector3	Vector3Rand()
+{
+	const btVector3	p=btVector3(SignedUnitRand(),SignedUnitRand(),SignedUnitRand());
+	return(p.normalized());
+}
 
 namespace SoftBodyHelpers
 {
@@ -229,10 +251,157 @@ btRigidBody*	createRigidBody(btDiscreteDynamicsWorld* dW,float mass, const btTra
 
 }
 
+struct FindGeometry : public osg::NodeVisitor
+{
+	osg::Drawable*  geom_;
+
+	FindGeometry() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+
+	FindGeometry( osg::Node& node ) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	{
+		node.accept(*this);
+	}
+
+	void apply(osg::Geode& geode)
+	{
+		for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
+			apply(*geode.getDrawable(i));
+	}
+
+	void apply(osg::Drawable& geom)
+	{
+		geom_ = &geom;
+	}
+};
+
+btSoftBody* btSoftBodyFromOSG( osg::Node* node )
+{
+#if 0
+	utils::ComputeTriMeshVisitor visitor;
+	node->accept( visitor );
+
+	osg::Vec3Array* vertices = visitor.getTriMesh();
+	if( vertices->size() < 3 )
+	{
+		osg::notify( osg::WARN ) << "osgbCollision::btTriMeshCollisionShapeFromOSG, no triangles found" << std::endl;
+		return( NULL );
+	}
+#endif
+
+	FindGeometry fg(*node);
+	osg::Geometry* geom( fg.geom_->asGeometry() );
+	osg::Vec3Array* vertices( dynamic_cast< osg::Vec3Array* >( geom->getVertexArray() ) );
+
+	geom->setDataVariance( osg::Object::DYNAMIC );
+	geom->setUseDisplayList( false );
+	geom->setUseVertexBufferObjects( true );
+	geom->getOrCreateVertexBufferObject()->setUsage( GL_DYNAMIC_DRAW );
+
+#if 1
+
+#if 0
+	btTriangleMesh* mesh = new btTriangleMesh;
+	for( size_t i = 0; i + 2 < vertices->size(); i += 3 )
+	{
+		osg::Vec3& p1 = ( *vertices )[ i ];
+		osg::Vec3& p2 = ( *vertices )[ i + 1 ];
+		osg::Vec3& p3 = ( *vertices )[ i + 2 ];
+		mesh->addTriangle( osgbCollision::asBtVector3( p1 ),
+			osgbCollision::asBtVector3( p2 ), osgbCollision::asBtVector3( p3 ) );
+	}
+
+
+	unsigned char *vertexbase;
+    int            numverts=0;
+	PHY_ScalarType type;
+	int            vertexStride;
+	unsigned char* indexbase;
+	int            indexstride;
+    int            numfaces;
+    PHY_ScalarType indicestype;
+
+	mesh->getLockedVertexIndexBase(&vertexbase, numverts, type,
+		                            vertexStride,&indexbase, indexstride,
+							        numfaces, indicestype);
+//#else
+	std::vector<btScalar> vtxs((btScalar*)vertexbase, (btScalar*)vertexbase + numverts*4);
+    std::vector<int>      idxs((int*)indexbase , (int*)indexbase + numverts);
+#endif
+
+	std::vector<btScalar>	vtx;
+	std::vector<int>        idx;
+	vtx.resize(vertices->size() * 3);
+	idx.resize(vertices->size());
+
+	for( size_t i = 0; i < vertices->size(); ++i )
+	{
+		osg::Vec3& p1 = ( *vertices )[ i ];
+		vtx[i * 3 + 0] = p1.x();
+		vtx[i * 3 + 1] = p1.y();
+		vtx[i * 3 + 2] = p1.z();
+		idx[i] = i;
+	}
+
+////////////////////////////////////////////////////////////////
+	const size_t mVertexCount = vertices->size();
+
+	std::vector<int> dupVertices(mVertexCount);
+	int dupVerticesCount = 0;
+	int i,j;
+	std::vector<int> newIndexes(mVertexCount);
+	for(i=0; i < mVertexCount; i++)
+	{
+		osg::Vec3& v1 = ( *vertices )[ i ];
+		dupVertices[i] = -1;
+		newIndexes[i] = i - dupVerticesCount;
+		for(j=0; j < i; j++)
+		{
+		    osg::Vec3& v2 = ( *vertices )[ j ];
+			if (v1 == v2) {
+				dupVertices[i] = j;
+				dupVerticesCount++;
+				break;
+			}
+		}
+	}
+	printf("dupVerticesCount %d\n", dupVerticesCount);
+
+	int newVertexCount = mVertexCount - dupVerticesCount;
+	printf("newVertexCount %d\n", newVertexCount);
+	std::vector<btScalar> verts;
+	verts.resize(newVertexCount * 3);
+	for(i=0, j=0; i < mVertexCount; i++)
+	{
+		if (dupVertices[i] == -1) {
+		    osg::Vec3& v = ( *vertices )[ i ];
+			verts[j++] = v.x();
+			verts[j++] = v.y();
+			verts[j++] = v.z();
+		}
+	}
+
+	std::vector<int> indexes(vertices->size());
+	int idnx, idnxDup;
+	for(i=0; i < vertices->size(); i++)
+	{
+		idnx = idx[i];
+		idnxDup = dupVertices[idnx];
+		printf("dup %d\n", idnxDup);
+		idnx = idnxDup == -1 ? idnx : idnxDup;
+		indexes[i] = newIndexes[idnx];
+	}
+
+#endif
+
+	return  btSoftBodyHelpers::CreateFromTriMesh(worldInfo,&vtx[0],&idx[0], vertices->size()/3 );
+}
+
 
 osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 {
     const short resX( 12 ), resY( 9 );
+
+	osg::ref_ptr< osg::Group > group = new osg::Group;
 
     osg::ref_ptr< osg::Geode > geode( new osg::Geode );
 
@@ -302,7 +471,7 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
     bw->addSoftBody( softBody );
     geom->setUpdateCallback( new MeshUpdater( softBody, resX*resY ) );
 
-#if 1
+#if 0
 	struct	Functors
 	{
 		static btSoftBody* CtorRope(btSoftRigidDynamicsWorld* dW,const btVector3& p)
@@ -322,10 +491,120 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	psb0->appendAnchor(psb0->m_nodes.size()-1,body);
 	psb1->appendAnchor(psb1->m_nodes.size()-1,body);
 #endif
+	
 
+//////////////////////////////////////////////////////////////////////////////////
 
+#if 1
+	const btScalar	s=2;
+	const btScalar	h=10;
+	const int		segments=6;
+	const int		count=50;
+	for(int i=0;i<count;++i)
+	{
+		btSoftBody*		psb=btSoftBodyHelpers::CreatePatch(worldInfo,btVector3(-s,h,-s),
+			btVector3(+s,h,-s),
+			btVector3(-s,h,+s),
+			btVector3(+s,h,+s),
+			segments,segments,
+			0,true);
+		btSoftBody::Material*	pm=psb->appendMaterial();
+		pm->m_flags				-=	btSoftBody::fMaterial::DebugDraw;
+		psb->generateBendingConstraints(2,pm);
+		psb->m_cfg.kLF			=	0.004;
+		psb->m_cfg.kDG			=	0.0003;
+		psb->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSided;
+		btTransform		trs;
+		btQuaternion	rot;
+		btVector3		ra=Vector3Rand()*0.1;
+		btVector3		rp=Vector3Rand()*15+btVector3(0,20,80);
+		rot.setEuler(SIMD_PI/8+ra.x(),-SIMD_PI/7+ra.y(),ra.z());
+		trs.setIdentity();
+		trs.setOrigin(rp);
+		trs.setRotation(rot);
+		psb->transform(trs);
+		psb->setTotalMass(0.1);
+		psb->addForce(btVector3(0,2,0),0);
+		bw->addSoftBody(psb);
 
-    return( geode.release() );
+	}
+#endif
+
+//////////////////////////////////////////////////////////////////////////////////////
+	//osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+	//osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
+	//sd->setColor( osg::Vec4( 1.f, 0.f, 0.f, 1.f ) );
+	//sd->setName( "A nice sphere" );
+
+	//osg::Geode* sgeode = new osg::Geode;
+	//sgeode->addDrawable( sd );
+
+    osg::Node*  para_node = /*sgeode;*/osgDB::readNodeFile( "cube2.dae" );
+	btSoftBody* para = btSoftBodyFromOSG( para_node );
+	// Configure the soft body for interaction with the wind.
+	btSoftBody::Material*	pm=para->appendMaterial();
+	pm->m_flags				-=	btSoftBody::fMaterial::DebugDraw;
+	para->generateBendingConstraints(2,pm);
+#if 0
+	para->getCollisionShape()->setMargin( 0.1 );
+	para->m_materials[ 0 ]->m_kLST = 0.3;
+	para->generateBendingConstraints( 2, softBody->m_materials[ 0 ] );
+	para->m_cfg.kLF = 0.05;
+	para->m_cfg.kDG = 0.01;
+	para->m_cfg.piterations = 20;
+	para->m_cfg.citerations = 20;
+    para->m_cfg.collisions = btSoftBody::fCollision::CL_SS + btSoftBody::fCollision::CL_RS;
+    para->m_cfg.kPR = 0.0;
+	para->m_cfg.kDF   =   1;
+	para->m_cfg.kSRHR_CL      =   0;
+	para->m_cfg.kSR_SPLT_CL   =   0.0;
+	para->m_cfg.kKHR = 0.0;
+	para->generateClusters(0);
+#endif
+	para->m_cfg.kLF			=	0.004;
+	para->m_cfg.kDG			=	0.0003;
+	para->m_cfg.aeromodel	=	btSoftBody::eAeroModel::V_TwoSided;
+	btTransform		trs;
+	btQuaternion	rot;
+	btVector3		ra=Vector3Rand()*0.1;
+	btVector3		rp=Vector3Rand()*15+btVector3(0,20,80);
+	rot.setEuler(SIMD_PI/2,-SIMD_PI/2,ra.z());
+	trs.setIdentity();
+	//trs.setOrigin(rp);
+	trs.setRotation(rot);
+	para->transform(trs);
+	para->setTotalMass(0.01);
+	// para->addForce(btVector3(0,2,0),0);
+
+#if 0
+#if( BT_BULLET_VERSION >= 279 )
+	para->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSidedLiftDrag;
+#else
+	// Hm. Not sure how to make the wind blow on older Bullet.
+	// This doesn't seem to work.
+	para->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
+#endif
+#endif
+	
+	bw->addSoftBody( para );
+
+	FindGeometry fg(*para_node);
+
+	osg::Geometry* pgeom( fg.geom_->asGeometry() );
+	osg::Vec3Array* vertices( dynamic_cast< osg::Vec3Array* >( pgeom->getVertexArray() ) );
+
+	pgeom->setUpdateCallback( new MeshUpdater( para, vertices->size() ) );
+	
+
+	
+	osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform;
+	pat->setAttitude(osg::Quat(osg::inDegrees(-90.0),osg::X_AXIS));
+	pat->addChild(para_node);
+
+	group->addChild(geode);
+    group->addChild(pat);
+    
+	return( group.release() );
 }
 
 btSoftRigidDynamicsWorld* initPhysics()
@@ -342,7 +621,7 @@ btSoftRigidDynamicsWorld* initPhysics()
 
     btSoftRigidDynamicsWorld* dynamicsWorld = new btSoftRigidDynamicsWorld( dispatcher, broadphase, solver, collision );
 
-    btVector3 gravity( 0, 0, -32.17 );
+    btVector3 gravity( 0, 0, -9.8/*-32.17*/ );
     dynamicsWorld->setGravity( gravity );
     worldInfo.m_gravity = gravity;
 
@@ -354,6 +633,7 @@ btSoftRigidDynamicsWorld* initPhysics()
 
     return( dynamicsWorld );
 }
+
 
 
 int main_patched_lowlevel( int argc, char** argv )
@@ -382,13 +662,13 @@ int main_patched_lowlevel( int argc, char** argv )
         osgbInteraction::SaveRestoreHandler;
 
     // Add ground
-    const osg::Vec4 plane( 0., 0., 1., 0. );
-    // root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
+    const osg::Vec4 plane( 0., 0., 1., -100. );
+    root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
 
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( /*debugDisplay*/ true)
+    if( /*debugDisplay*/ false)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );
@@ -404,7 +684,7 @@ int main_patched_lowlevel( int argc, char** argv )
     viewer.setSceneData( root );
 
     osgGA::TrackballManipulator* tb = new osgGA::TrackballManipulator;
-    tb->setHomePosition( osg::Vec3( 0., -16., 6. ), osg::Vec3( 0., 0., 5. ), osg::Vec3( 0., 0., 1. ) ); 
+    // tb->setHomePosition( osg::Vec3( 0., -16., 6. ), osg::Vec3( 0., 0., 5. ), osg::Vec3( 0., 0., 1. ) ); 
     viewer.setCameraManipulator( tb );
     viewer.getCamera()->setClearColor( osg::Vec4( .5, .5, .5, 1. ) );
     viewer.realize();

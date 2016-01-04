@@ -166,28 +166,34 @@ void create_objects(const std::string & airport)
     fms::trajectory::keypoints_t  kpts;
     fms::trajectory::curses_t      crs;
     fms::trajectory::speed_t vls ;
+	
+
 
     const unsigned start_idx = 400;
-    cg::point_2 prev(_krv_data_getter.kd_[start_idx].x,_krv_data_getter.kd_[start_idx].y);
-    double tlength = 0;
-    for(auto it = _krv_data_getter.kd_.begin() + start_idx; it!= _krv_data_getter.kd_.end();++it )
-    {
-        auto p = cg::point_2(it->x,it->y);
-        auto dist = cg::distance(prev,p);
-        tlength += dist;
-        crs.insert(std::make_pair(tlength,cpr(it->fiw,it->tg, it->kr )));
-        kpts.insert(std::make_pair(tlength,cg::point_3(p,it->h)));
+	double tlength = 0;
+	if(_krv_data_getter.kp_.size()>0)
+	{
+		cg::point_2 prev(_krv_data_getter.kd_[start_idx].x,_krv_data_getter.kd_[start_idx].y);
 
-        auto pit = std::prev(it);
-        if(pit!=it)
-            vls.insert(std::make_pair(tlength,dist/(it->time - pit->time)/* + 20*/));
-        // vel.push_back(dist/(it->time - pit->time));
-        prev = p;
-    }
+		for(auto it = _krv_data_getter.kd_.begin() + start_idx; it!= _krv_data_getter.kd_.end();++it )
+		{
+			auto p = cg::point_2(it->x,it->y);
+			auto dist = cg::distance(prev,p);
+			tlength += dist;
+			crs.insert(std::make_pair(tlength,cpr(it->fiw,it->tg, it->kr )));
+			kpts.insert(std::make_pair(tlength,cg::point_3(p,it->h)));
+
+			auto pit = std::prev(it);
+			if(pit!=it)
+				vls.insert(std::make_pair(tlength,dist/(it->time - pit->time)/* + 20*/));
+			// vel.push_back(dist/(it->time - pit->time));
+			prev = p;
+		}
+	}
 
     force_log fl3;       
     LOG_ODS_MSG( "create_objects(const std::string& airport): fms::trajectory::velocities " << hr_timer.set_point() << "\n");
-
+	if(_krv_data_getter.kp_.size()>0)
     {
         cg::point_3 vpos(_krv_data_getter.kp_[start_idx]);
         decart_position target_pos(vpos,cpr(/*180 -*/ _krv_data_getter.kd_[start_idx].fiw,0,0));
@@ -200,7 +206,8 @@ void create_objects(const std::string & airport)
 //      auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 //      aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
-
+	
+	if(_krv_data_getter.kp_.size()>0)
     {
         // cg::geo_point_3 apos(0.0,-0.0005/*0.0045*/,0.0);
         cg::point_3 vpos(350,650,0);
@@ -213,9 +220,11 @@ void create_objects(const std::string & airport)
 		cg::geo_point_3 apos(0.00045,0.00087,0.0);
 		geo_position agp(apos,quaternion(cpr(30,0,0)));
 
+#if 0
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
         auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
 //      aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
+#endif
     }
 
 
@@ -230,8 +239,9 @@ void create_objects(const std::string & airport)
 		cg::geo_point_3 vpos(0.0006,0.0009,0.0);
 		geo_position vgp(vpos,quaternion(cpr(30 + 180,0,0)));
 
+#if 0
 		auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
-
+#endif
 		force_log fl9;       
 		LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.set_point() << "\n");
 
@@ -300,9 +310,8 @@ void create_objects(const std::string & airport)
 
 using namespace net_layer::msg;
 
-inline object_info_ptr create_aircraft(create const& msg)
+inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
 {
-    kernel::system_ptr _csys = get_systems()->get_control_sys();
     // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
 
     decart_position target_pos;
@@ -314,12 +323,11 @@ inline object_info_ptr create_aircraft(create const& msg)
     aircraft::settings_t as;
     as.kind = "A319";//msg.model_name;
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
-    return  aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+    return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
 }
 
-inline object_info_ptr create_aircraft_phl(create const& msg)
+inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& msg)
 {
-    kernel::system_ptr _csys = get_systems()->get_control_sys();
     // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
 
     decart_position target_pos;
@@ -333,13 +341,11 @@ inline object_info_ptr create_aircraft_phl(create const& msg)
     as.custom_label = msg.custom_label;
 
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
-    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
 }
 
-inline object_info_ptr create_vehicle(create const& msg)
+inline object_info_ptr create_vehicle(kernel::system* csys,create const& msg)
 {
-    kernel::system_ptr _csys = get_systems()->get_control_sys();
-
     decart_position target_pos;
 
     target_pos.pos   = msg.pos;
@@ -350,13 +356,11 @@ inline object_info_ptr create_vehicle(create const& msg)
     vs.model        = msg.model_name;
     vs.custom_label = msg.custom_label;
 
-    return  vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    return  vehicle::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
 }
 
-inline object_info_ptr create_flock_of_birds(create const& msg)
+inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const& msg)
 {
-    kernel::system_ptr _csys = get_systems()->get_control_sys();
-
     decart_position target_pos;
 
     target_pos.pos   = msg.pos;
@@ -366,17 +370,17 @@ inline object_info_ptr create_flock_of_birds(create const& msg)
     flock::manager::settings_t vs;
     vs.model = "crow";
 
-    return flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
 }
 
-object_info_ptr create_object(create const& msg)
+object_info_ptr create_object( kernel::system* csys, create const& msg)
 {
     if(msg.object_kind & ok_vehicle)
-        return create_vehicle(msg);
+        return create_vehicle(csys, msg);
     else if ( msg.object_kind == ok_flock_of_birds)
-        return create_flock_of_birds(msg);
+        return create_flock_of_birds(csys, msg);
     else
-        return create_aircraft_phl(msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
+        return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 
 }
 

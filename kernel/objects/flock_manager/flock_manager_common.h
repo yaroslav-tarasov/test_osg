@@ -30,7 +30,7 @@ struct settings_t
     {}
 
     std::string   model;
-	int    _childAmount;
+	size_t _childAmount;
 	int    _soarMaxTime;
     float  _minSpeed;				// minimum random speed
     float  _maxSpeed;				// maximum random speed

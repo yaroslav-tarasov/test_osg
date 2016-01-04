@@ -4,6 +4,10 @@
 
 
 #include <btBulletDynamicsCommon.h> 
+#include <BulletSoftBody/btSoftBodyHelpers.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btSoftBody.h>
 
 #include "BulletInterface.h"
 
@@ -387,8 +391,14 @@ BulletInterface::BulletInterface()
     d_->_overlappingPairCache = new btDbvtBroadphase;
     d_->_solver = new btSequentialImpulseConstraintSolver;
 
+#if 0
     d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
-    d_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
+#endif
+    
+    
+	d_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+	
+	d_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
 
     d_->_dw->getSolverInfo().m_numIterations = 20;
     d_->_dw->getSolverInfo().m_damping = 1.;

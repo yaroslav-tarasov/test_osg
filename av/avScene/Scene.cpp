@@ -60,6 +60,8 @@
 
 #include "utils/async_load.h"
 
+
+#include "av/avFx/SmokeFx.h"
 //
 //  ext
 //
@@ -501,6 +503,7 @@ Scene* Scene::GetInstance()
 
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene()
+	: smoke_sfx_weak_ptr_(nullptr)
 {      
     _environmentNode = new Group();
     addChild(_environmentNode.get());
@@ -828,7 +831,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 
 
-
 #if 1
 	//
 	// Create weather
@@ -975,6 +977,12 @@ FIXME(Чудеса с Ephemeris)
         }
     }
     );
+
+#if 1
+	avFx::SmokeFx* smoke = new avFx::SmokeFx;
+	smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode*>(smoke);
+	addChild(smoke);
+#endif
 
     return true;
 }
@@ -1435,6 +1443,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         mt_.back()->setUserValue("id",seed);
         mt_.back()->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
     }
+	
+	auto sig = [&](uint32_t seed)->void {object_loaded_signal_(seed);};
 
     auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt)->osg::Node* {
     
@@ -1647,35 +1657,47 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         _terrainRoot->asGroup()->addChild(mt);
 #endif
 
-        object_loaded_signal_(seed);
-        
-        return mt;
+#if 1
+		FIXME("Жесть с анимацией, кто на ком стоял")
+	    using namespace avAnimation;
+		if(path=="crow")
+		{
+			AnimationManagerFinder finder;
+			mt->accept(finder);
+			if(finder._am.valid())
+			{
+				SetupRigGeometry switcher(true, *mt);
+#ifdef ASYNC_OBJECT_LOADING
+				mt->setUpdateCallback(finder._am.get());
+#endif
 
-    } };
+			}
+		}
+#endif
+
+#ifndef ASYNC_OBJECT_LOADING
+        object_loaded_signal_(seed);
+#endif  
+
+		return mt;
+
+    }
+
+	return nullptr;
+ };
+
+
 
 #ifdef ASYNC_OBJECT_LOADING
     // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
-    dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()));
+    dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()),boost::bind<void>(sig, seed));
 #else
     wf(seed, path,mt_.back().get());
 #endif
 
     LogInfo("Scene::load exit " << path);
 
-#if 1
-	FIXME(Жесть с анимацией, кто на ком стоял)
-	using namespace avAnimation;
-    if(path=="crow")
-	{
-		AnimationManagerFinder finder;
-		mt_.back()->accept(finder);
-		if(finder._am.valid())
-		{
-			SetupRigGeometry switcher(true, *mt_.back().get());
-			mt_.back()->setUpdateCallback(finder._am.get());
-		}
-	}
-#endif
+
 
     return mt_.back();
 }
@@ -1767,4 +1789,13 @@ void Scene::update( osg::NodeVisitor * nv )
       {
           _time_panel->set_time(_viewerPtr->getFrameStamp()->getSimulationTime() * 1000.f);
       }
+
+	  if (smoke_sfx_weak_ptr_)
+	  {
+		  auto const intensity = 4.0f;
+
+		  smoke_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
+		  smoke_sfx_weak_ptr_->setIntensity(intensity * 2);
+	      
+	  }
 }

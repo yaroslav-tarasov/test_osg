@@ -127,11 +127,11 @@ void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 
 void ctrl::create_object(net_layer::msg::create const& msg)
 {
-	auto fp = fn_reg::function<kernel::object_info_ptr (net_layer::msg::create const&)>("create_object");
+	auto fp = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create const&)>( "create_object");
 	kernel::object_info_ptr  a = nullptr;
 
 	if(fp)
-		a = fp(msg);
+		a = fp(sys_, msg);
 
 	if (a)
     {
