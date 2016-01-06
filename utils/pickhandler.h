@@ -46,12 +46,14 @@ public:
                 osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE) );
 
 
+#if 0
             osg::Geode* sphere = new osg::Geode();
             sphere->setName("Sphere");
             sphere->addDrawable(new osg::ShapeDrawable(new osg::Sphere()));
             
             _selectionBox->setNodeMask( PICK_NODE_MASK );
             _selectionBox->addChild( sphere );
+#endif
 
         }
         return _selectionBox.get();

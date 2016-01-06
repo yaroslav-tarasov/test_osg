@@ -76,10 +76,14 @@ public:
 protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
-    nodes_management::node_info_ptr     tow_point_node_;
+    /// towing points
+	nodes_management::node_info_ptr     tow_point_node_;
     nodes_management::node_info_ptr     rtow_point_node_;
 	nodes_management::node_info_ptr     current_tow_point_node_;
-    
+	
+	/// fire engine points
+    nodes_management::node_info_ptr     turret_point_node_;    
+	 
 	aircraft::info_ptr                  aerotow_;
 
 protected:

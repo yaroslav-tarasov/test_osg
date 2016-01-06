@@ -129,6 +129,16 @@ visual::visual(object_create_t const& oc, dict_copt dict)
 {
     visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
+	nm::visit_sub_tree(nodes_manager_->get_node_tree_iterator(root_->node_id()), [this](nm::node_info_ptr n)->bool
+	{
+		if (boost::starts_with(n->name(), "turret"))
+		{
+			this->turret_node_ = n;
+			return false;
+		}
+		return true;
+	});
+
 #ifndef ASYNC_OBJECT_LOADING 
     label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
     ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
@@ -145,43 +155,56 @@ void visual::update(double time)
 {
     view::update(time);
     
-    if (nodes_management::vis_node_info_ptr(root_)->is_visible() && aerotow_)
+    if (nodes_management::vis_node_info_ptr(root_)->is_visible() )
     {
+		if( aerotow_)
+		{
+			if (!tow_visual_object_)
+			{
 
-        if (!tow_visual_object_)
-        {
-
-            std::string tow_type = "towbar"; // "towbar"  "tube"
-            tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type) ;
+				std::string tow_type = "towbar"; // "towbar"  "tube"
+				tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type) ;
             
-            ts_ = boost::make_shared<tow_support>(*tow_visual_object_, tow_type);
-        }
+				ts_ = boost::make_shared<tow_support>(*tow_visual_object_, tow_type);
+			}
 
 
-        aircraft::info_ptr towair;
+			aircraft::info_ptr towair;
 
-        if (tow_visual_object_ && *tow_visual_object_)
-        {
-            geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
+			if (tow_visual_object_ && *tow_visual_object_)
+			{
+				geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
             
-            nodes_management::node_info_ptr aerotow_root = aerotow_->root();
+				nodes_management::node_info_ptr aerotow_root = aerotow_->root();
             
-            quaternion atr_quat = aerotow_root->get_global_orien();
+				quaternion atr_quat = aerotow_root->get_global_orien();
 
-            point_3f offset = base(/*tow_point_node_*/current_tow_point_node_->get_global_pos());
-            geo_point_3 air_tow_pos = geo_base_3(aerotow_root->get_global_pos())(aerotow_root->get_global_orien().rotate_vector(point_3(aerotow_->tow_point_transform().translation())));
-            point_3f offset2 = base(air_tow_pos);
+				point_3f offset = base(/*tow_point_node_*/current_tow_point_node_->get_global_pos());
+				geo_point_3 air_tow_pos = geo_base_3(aerotow_root->get_global_pos())(aerotow_root->get_global_orien().rotate_vector(point_3(aerotow_->tow_point_transform().translation())));
+				point_3f offset2 = base(air_tow_pos);
 
-            cg::polar_point_3f dir(offset2 - offset);
-            cpr orien(dir.course, dir.pitch, 0);
+				cg::polar_point_3f dir(offset2 - offset);
+				cpr orien(dir.course, dir.pitch, 0);
 
-            // cg::transform_4f tr(cg::as_translation(offset), rotation_3f(orien), cg::as_scale(point_3f(1., dir.range, 1.)));
-            // (*tow_visual_object_)->node()->as_transform()->set_transform(tr);
+				// cg::transform_4f tr(cg::as_translation(offset), rotation_3f(orien), cg::as_scale(point_3f(1., dir.range, 1.)));
+				// (*tow_visual_object_)->node()->as_transform()->set_transform(tr);
             
-            ts_->update(dir, offset);
+				ts_->update(dir, offset);
 
-            (*tow_visual_object_)->set_visible(true);
-        }
+				(*tow_visual_object_)->set_visible(true);
+			}
+		}
+
+		if (turret_node_ )
+		{
+			FIXME(Make me work)
+#if 0
+			if(!foam_stream_object_)
+			   foam_stream_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object("sfx//foam_stream.scg") ;
+			else
+			   foam_stream_object_->root();
+#endif
+		}
     }
     else
     {

@@ -139,8 +139,6 @@ private:
     std::vector<wheel_t> wheels_;
     
     nodes_management::node_info_ptr body_node_;
-    //nodes_management::node_info_ptr tow_point_node_;
-    //nodes_management::node_info_ptr rtow_point_node_;
 
     model_state_ptr                 model_state_; // В оригинале state_ и мне это не нравиться
     bool                            manual_controls_;

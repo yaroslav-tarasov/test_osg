@@ -35,42 +35,28 @@ private:
     void on_object_created(object_info_ptr object) override;
     void on_object_destroying(object_info_ptr object) override;
 
-    // view
-private:
-    void on_aerotow_changed(aircraft::info_ptr old_aerotow) override;
-    
     
     // model_info
 private:
     // phys::rigid_body_ptr get_rigid_body() const;
-    point_3              tow_offset    () const;
-    bool                 tow_attached  () const;
     geo_position         get_phys_pos  () const;
 
 
     // model_control
 private:
-    void                 set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback);
-    void                 set_steer       ( double steer ) override;
-    void                 set_brake       ( double brake ) override;
     void                 set_desired     ( double time,const cg::point_3& pos, const cg::quaternion& q, const double speed );
     void                 set_ext_wind    ( double speed, double azimuth );
 
 public:
     void set_max_speed(double max_speed);
-    void set_course_hard(double course);
     cg::geo_point_2 phys_pos() const;
 
     nodes_management::node_info_ptr get_root();
 
 private:
-    void on_attach_tow( uint32_t tow_id );
-    void on_detach_tow();
     void on_go_to_pos(msg::go_to_pos_data const& data);
     void on_follow_route(uint32_t route_id);
-    void on_brake(double val);
-    //void on_debug_controls(msg::debug_controls_data const&);
-    //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
+
     void on_follow_trajectory(uint32_t /*route_id*/);
 
 public:
@@ -111,8 +97,6 @@ private:
     
     airports_manager::info_ptr airports_manager_;
     airport::info_ptr          airport_;
-    //ani_object::info_ptr    ani_ ;
-    //ani::airport_info_ptr  airport_;
 
     // FIXME Yeah we need it badly. ray_cast_human? yeah
     //phys::ray_cast_human::info_ptr phys_human_;
@@ -133,20 +117,12 @@ private:
     };
 
     nodes_management::node_info_ptr body_node_;
-    nodes_management::node_info_ptr        tow_point_node_;
 
 
     model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
 
-    bool                 manual_controls_;
-
-//  FIXME А не выделить ли в общий функционал к самолету
-    boost::function<void()>                tow_invalid_callback_;
-    optional<uint32_t>                     tow_attached_;
 
 private:
-    double rod_course ;
-    double air_course ;
     double steer_course ;
 
 

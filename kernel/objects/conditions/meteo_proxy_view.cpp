@@ -57,8 +57,8 @@ meteo::manager_ptr view::manager() const
 //    met_zones_          [obj_id] = met_zone;
 //    layer_changed_conns_[obj_id].reset(new scoped_connection(
 //        met_zone->subscribe_layer_changed(boost::bind(&view::on_met_zone_layer_changed, this, obj_id, _1))));
-//    geom_changed_conns_ [obj_id].reset(new scoped_connection(
-//        met_zone->subscribe_geometry_changed(boost::bind(&view::on_met_zone_geom_changed, this, obj_id))));
+//    _geomchanged_conns_ [obj_id].reset(new scoped_connection(
+//        met_zone->subscribe_geometry_changed(boost::bind(&view::on_met_zone__geomchanged, this, obj_id))));
 //
 //    for (size_t i = 0; i < met_zone->get_layers().size(); ++i)
 //        if (met_zone->get_layers()[i])
@@ -83,7 +83,7 @@ void view::remove_met_zone(size_t obj_id)
     //        mgr_->remove(**mz);
 
     //layer_changed_conns_.erase(obj_id);
-    //geom_changed_conns_ .erase(obj_id);
+    //_geomchanged_conns_ .erase(obj_id);
     //met_zones_          .erase(obj_id);
     //mgr_met_zns_        .erase(obj_id);
 }
@@ -107,7 +107,7 @@ void view::remove_met_zones()
     //            mgr_->remove(**mit);
 
     //layer_changed_conns_.clear();
-    //geom_changed_conns_ .clear();
+    //_geomchanged_conns_ .clear();
     //met_zones_          .clear();
     //mgr_met_zns_        .clear();
 }

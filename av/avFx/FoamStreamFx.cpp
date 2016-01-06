@@ -7,7 +7,7 @@
 #include "av/avCore/avCore.h"
 #include "av/avScene/Scene.h"
 
-#include "av/avFx/SmokeFx.h"
+#include "av/avFx/FoamStreamFx.h"
 
 #include "utils/materials.h"
 
@@ -23,7 +23,7 @@ using namespace avFx;
 //
 
 // constructor
-SmokeFx::SmokeFx()
+FoamStreamFx::FoamStreamFx()
 {
     _createGeometry();
 
@@ -62,10 +62,10 @@ SmokeFx::SmokeFx()
 
     // setup shader
     osg::Program * pCurProgram = new osg::Program;
-    pCurProgram->setName("SmokeFx");
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.vs", NULL, osg::Shader::VERTEX  ));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.gs", NULL, osg::Shader::GEOMETRY));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.fs", NULL, osg::Shader::FRAGMENT));
+    pCurProgram->setName("FoamStreamFx");
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FoamStreamFx.vs", NULL, osg::Shader::VERTEX  ));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FoamStreamFx.gs", NULL, osg::Shader::GEOMETRY));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FoamStreamFx.fs", NULL, osg::Shader::FRAGMENT));
     pCurProgram->setParameter(GL_GEOMETRY_VERTICES_OUT_EXT, 4);
     pCurProgram->setParameter(GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
     pCurProgram->setParameter(GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
@@ -94,13 +94,13 @@ SmokeFx::SmokeFx()
     pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/smoke_atlas.dds", osg::Texture::REPEAT));
 
 	
-	setCullCallback(utils::makeNodeCallback(this, &SmokeFx::cull));
+	setCullCallback(utils::makeNodeCallback(this, &FoamStreamFx::cull));
     // exit
     return;
 }
 
 
-void SmokeFx::_createArrays()
+void FoamStreamFx::_createArrays()
 {
 	lifetimercp_factor_ = new osg::Vec3Array();
 	_geom->setVertexAttribArray(1, lifetimercp_factor_.get(),osg::Array::BIND_PER_VERTEX);
@@ -122,14 +122,14 @@ void SmokeFx::_createArrays()
 	_geom->addPrimitiveSet(_drawArrays.get());
 }
 
-void SmokeFx::_clearArrays()
+void FoamStreamFx::_clearArrays()
 {
 	pos_start_time_->clear();
 	lifetimercp_factor_->clear();
 	randoms_->clear();
 }
 
-void SmokeFx::_createGeometry()
+void FoamStreamFx::_createGeometry()
 {
 	// dummy bounding box callback
 	osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
@@ -158,7 +158,7 @@ void SmokeFx::_createGeometry()
 
 }
 
-void SmokeFx::setIntensity( float inten )
+void FoamStreamFx::setIntensity( float inten )
 {
 	inten = abs(inten);
 	if (cg::eq_zero(data_.intensity) || cg::eq_zero(inten))
@@ -168,15 +168,15 @@ void SmokeFx::setIntensity( float inten )
 }
 
 // update
-void SmokeFx::cull( osg::NodeVisitor * pNV )
+void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 {
 
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
-	
+
 	const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
-	
-	const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+
+	const avCore::Environment::EnvironmentParameters  & cEnvironmentParameters  = avCore::GetEnvironment()->GetEnvironmentParameters();
 
 	// particles updater
 	cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
@@ -185,20 +185,20 @@ void SmokeFx::cull( osg::NodeVisitor * pNV )
 		const float & t_unit = part.t();
 		const float & t = part.get_age();
 		const float mega_age_func = t_unit * (t_unit * (0.333333f * t_unit - 1.0f) + 1.0f);
-		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y, part.start_vel.z + 35.0f) * (mega_age_func * t);
+		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y + 50.0, part.start_vel.z + 20.0/*+ 135.0f*/) * (/*mega_age_func **/ t)  + cg::point_3f(0.f,0.f,-9.8f) * t * t ;
 		part.start_pos() += wind_vec * dt;
 		part.cur_pos() = part.start_pos() + velocity_impact;
 	};
 
 	// update current
 	static const float break_sfx_dist = 80.f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), cg::point_3f(150.0f,200.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*/, break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), cg::point_3f(150.0f,200.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*//*pUV->get_current_model_world().translation()*/, break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;
 	auto const & cpu_emit_new = [&factor_val]( cg::point_3f const & wp, float emit_timestamp, float tfe, simplerandgen & rnd )->cpu_particle
 	{
-		const float lt_particle = rnd.random_range(smoke_lifetime_min, smoke_lifetime_max);
+		const float lt_particle = rnd.random_range(foam_lifetime_min, foam_lifetime_max);
 
 		cg::colorab randoms;
 		randoms.r = rnd.random_8bit();
@@ -207,19 +207,18 @@ void SmokeFx::cull( osg::NodeVisitor * pNV )
 		randoms.a = rnd.random_8bit();
 
 		cg::point_3f start_vel;
-		start_vel.x = rnd.random_unit_signed() * (factor_val * 5.0f);
-		start_vel.y = rnd.random_unit_signed() * (factor_val * 5.0f);
-		start_vel.z = rnd.random_unit() * (factor_val * 2.5f);
+		start_vel.x = rnd.random_unit_signed() * (factor_val * 1.2/*5.0f*/);
+		start_vel.y = rnd.random_unit_signed() * (factor_val * 1.2/*5.0f*/);
+		start_vel.z = rnd.random_unit() * (factor_val * 1.5/*2.5f*/);
 
-		return SmokeFx::cpu_particle(wp, emit_timestamp, lt_particle, tfe, start_vel, factor_val, randoms);
+		return FoamStreamFx::cpu_particle(wp, emit_timestamp, lt_particle, tfe, start_vel, factor_val, randoms);
 	};
 	// particles emission
-	static const float break_time_dist = 2.f;
+	static const float break_time_dist = 0.9f;
 	emitter_.emit_new_particles(data_.intensity, 1.25f / cg::max(data_.factor, 1.0f), break_time_dist, cpu_emit_new, cpu_updater);
 	
 	_clearArrays();
 	
-	// feed it to gpu
 	auto const & cpu_queue = emitter_.get_queue();
 	pos_start_time_->resize(cpu_queue.size()); 
     lifetimercp_factor_->resize(cpu_queue.size());

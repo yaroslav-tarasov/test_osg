@@ -791,7 +791,7 @@ private:
 
         if(time > 0.0 )
         {
-            time_ = time;
+			time_ = cg::eq(time,prev_time_,20e-3)? prev_time_: time;
             hr_timer = high_res_timer();
             prev_time_ = time_;
             return time_;
@@ -850,7 +850,12 @@ private:
 
     void on_render(double time)
     {   
-        systems_->update_vis_messages();
+#if 0
+		force_log fl;       
+		LOG_ODS_MSG( "on_render(double time)= " << time  <<"\n");
+#endif
+
+		systems_->update_vis_messages();
         vis_sys_.update(time);
         osg_vis_->Render(time);
     }
@@ -968,9 +973,12 @@ private:
     void update(double time)
     {   
         gt_.set_time(time);
-		force_log fl;       
-		LOG_ODS_MSG( "void update(double time) " << time << "\n");
+		double dt = _hr_timer.set_point();
 
+#if 0
+		force_log fl;       
+		LOG_ODS_MSG( "void update(double time) " << time << "   dt=  "<< dt << "\n");
+#endif
         systems_->update_messages();
         mod_sys_->update(time);
         ctrl_sys_->update(time);
@@ -1074,7 +1082,7 @@ private:
     objects_reg::control_ptr                                   reg_obj_;
 
     global_timer                                                     gt_;
-
+	high_res_timer                                             _hr_timer;
 };
 #endif
 

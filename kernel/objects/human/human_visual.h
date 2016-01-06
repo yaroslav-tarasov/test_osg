@@ -17,13 +17,6 @@ namespace human
     protected:
         void update     (double time);
 
-    private:
-        optional<visual_object_ptr>      tow_visual_object_;
-        nodes_management::node_info_ptr  aero_tow_point_; 
-        // experimental part
-    private:
-        struct tow_support;
-        boost::shared_ptr<tow_support>   ts_;
 
     };
 

@@ -205,7 +205,7 @@ void model::set_desired_nm_pos  (geo_point_3 const& pos)
 {
     desired_nm_pos_ = pos;
     
-    LOG_ODS_MSG( "set_desired_nm_pos:  x:  "  << pos.lat << "    y: " << pos.lon << "\n" );
+    //LOG_ODS_MSG( "set_desired_nm_pos:  x:  "  << pos.lat << "    y: " << pos.lon << "\n" );
 
 }
 

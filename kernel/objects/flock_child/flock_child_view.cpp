@@ -20,7 +20,6 @@ AUTO_REG_NAME(flock_child_view, view::create);
 view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
-    // , rnd_                  ((static_cast<unsigned>(time(nullptr))))
     , _spawner              (find_first_object<manager::info_ptr>(collection_))
 {
 
@@ -51,7 +50,12 @@ settings_t const& view::settings() const
 
 void view::on_settings(msg::settings_msg const& msg)
 {
-    settings_ = msg.settings;
+#if 0  // Нужно или нет пока не понятно 
+	if (nodes_manager_ && nodes_manager_->get_model() != settings.model)
+		nodes_manager_->set_model(settings.model);
+#endif
+	
+	settings_ = msg.settings;
     on_new_settings();
 }
 

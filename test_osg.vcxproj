@@ -104,9 +104,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.fs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.gs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.vs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.fs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.gs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.vs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.fs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.gs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.vs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs" />
     <None Include="misc\shaders\grass.frag" />
     <None Include="misc\shaders\grass.vert" />
     <None Include="misc\shaders\headers\fog.hlsl" />
@@ -178,7 +187,10 @@
     <ClCompile Include="av\avCore\Timer.cpp" />
     <ClCompile Include="av\avCore\Utils.cpp" />
     <ClCompile Include="av\avCore\XmlModel.cpp" />
+    <ClCompile Include="av\avFx\FoamStreamFx.cpp" />
+    <ClCompile Include="av\avFx\LandingDustFx.cpp" />
     <ClCompile Include="av\avFx\SmokeFx.cpp" />
+    <ClCompile Include="av\avFx\SparksFx.cpp" />
     <ClCompile Include="av\avLights\LightManager.cpp" />
     <ClCompile Include="av\avLights\LightMaps.cpp" />
     <ClCompile Include="av\avLights\Lights.cpp" />

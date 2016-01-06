@@ -26,8 +26,7 @@ namespace human
             if (nodes_manager_->get_model() != settings_.model)
                 nodes_manager_->set_model(settings_.model);
 
-            //if (neo)
-                root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(course(), 0, 0)), point_3()));
+			root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(course(), 0, 0)), point_3()));
         }
 
 	}
@@ -35,7 +34,6 @@ namespace human
     void ctrl::update(double time)
     {
         view::update(time);
-        //update_len(time);
 
     }
 
@@ -43,7 +41,6 @@ namespace human
     {
         nodes_management::node_control_ptr root(/*get_nodes_manager()*/nodes_manager_->get_node(0));
         root->set_position(geo_position(p, quaternion(cpr(c, 0, 0))));
-        FIXME(А у самолета тут гораздо больше кода)
     }
 
     void ctrl::goto_pos(geo_point_2 pos,double course)
@@ -60,35 +57,6 @@ namespace human
         }
     }
 
-    void ctrl::attach_tow()
-    {
-        aircraft::info_ptr towair;
-
-        visit_objects<aircraft::info_ptr>(collection_, [this, &towair](aircraft::info_ptr air)->bool
-        {       
-            geo_point_3 tow_pos = geo_base_3(air->pos())(cg::rotation_3(cpr(air->orien().course, 0, 0)) * (point_3(0, 5., 0) + point_3(air->tow_point_transform().translation())));
-            if (cg::distance2d(tow_pos, this->pos()) < 25)
-            {              
-                towair = air;
-                return false;
-            }
-
-            return true;
-        });
-
-        if (towair)
-            send_cmd(msg::attach_tow_msg_t(object_info_ptr(towair)->object_id()));
-    }
-
-    void ctrl::detach_tow()
-    {
-        send_cmd(msg::detach_tow_msg_t());
-    }
-
-    void ctrl::set_brake(double val)
-    {
-        send_cmd(msg::brake_msg_t(val));
-    }
 
     void ctrl::follow_trajectory(std::string const& /*route*/)
     {

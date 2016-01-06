@@ -1,34 +1,10 @@
 #include "stdafx.h" 
-// FIXME
 #include "precompiled_objects.h"
 
 #include "human_view.h"
 
 namespace human
 {
-view::view( kernel::object_create_t const& oc, dict_copt dict)
-    : base_view_presentation(oc)
-    , obj_data_base         (dict)
-{
-    if (dict)
-        set_name(oc.name);
-
-    nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
-    if (nodes_manager_)
-    {
-        root_ = nodes_manager_->get_node(0);
-        conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
-        tow_point_node_ = nodes_manager_->find_node("tow_point");
-    }
-
-    msg_disp()
-        .add<msg::state_msg_t   >(boost::bind(&view::on_state   , this, _1))
-        .add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
-        .add<msg::tow_msg_t>     (boost::bind(&view::on_tow     , this, _1))
-
-        .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
-        ;
-}
     
 object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
 {
@@ -37,17 +13,36 @@ object_info_ptr view::create(kernel::object_create_t const& oc, dict_copt dict)
 
 AUTO_REG_NAME(human_view, view::create);
 
-void view::on_object_destroying(object_info_ptr object)
+view::view( kernel::object_create_t const& oc, dict_copt dict)
+	: base_view_presentation(oc)
+	, obj_data_base         (dict)
 {
-    base_view_presentation::on_object_destroying(object);
+	if (dict)
+		set_name(oc.name);
 
-    if (object == aerotow_)
-    {
-        auto old_aerotow = aerotow_;
-        aerotow_.reset();
-        on_aerotow_changed(old_aerotow) ;
-    }
+	nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this);
+	if (nodes_manager_)
+	{
+		root_ = nodes_manager_->get_node(0);
+		conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
+	}
 
+	msg_disp()
+		.add<msg::state_msg_t   >(boost::bind(&view::on_state   , this, _1))
+		.add<msg::settings_msg_t>(boost::bind(&view::on_settings, this, _1))
+
+		.add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
+		;
+}
+
+geo_point_2 view::pos() const
+{
+	return state_.pos;
+}
+
+std::string const& view::name() const
+{
+	return settings_.model;
 }
 
 void view::on_child_removing(object_info_ptr child)
@@ -73,13 +68,6 @@ void view::on_settings(settings_t const& settings)
     settings_changed();
 }
 
-void view::on_tow(optional<uint32_t> id)
-{
-    auto old_aerotow = aerotow_;
-    aerotow_ = id ? collection_->get_object(*id) : nullptr;
-
-    on_aerotow_changed(old_aerotow) ;
-}
 
 void view::on_model_changed()
 {
@@ -96,10 +84,6 @@ void view::set_state(state_t const& state)
     set(msg::state_msg_t(state), false);
 }
 
-void view::set_tow(optional<uint32_t> tow_id)
-{
-    set(msg::tow_msg_t(tow_id), true);
-}
 
 void view::on_traj_assign(msg::traj_assign_msg const &m)
 {

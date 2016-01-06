@@ -147,6 +147,12 @@
     <Filter Include="Source Files\av\fx">
       <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shaders\fx">
+      <UniqueIdentifier>{fd8681e9-0ef4-4610-bfc8-f0746d3626a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shaders\animation">
+      <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -189,17 +195,44 @@
     <None Include="misc\shaders\headers\utils.hlsl">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="misc\shaders\skinning.vert">
-      <Filter>Source Files\shaders</Filter>
-    </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.fs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs">
+      <Filter>Source Files\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.gs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.vs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="misc\shaders\skinning.vert">
+      <Filter>Source Files\shaders\animation</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.fs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.gs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.vs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.fs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.gs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.vs">
+      <Filter>Source Files\shaders\fx</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -902,6 +935,15 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\SmokeFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avFx\FoamStreamFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avFx\SparksFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avFx\LandingDustFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
   </ItemGroup>

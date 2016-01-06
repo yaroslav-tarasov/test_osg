@@ -193,7 +193,7 @@ private:
         {
             if (create_v)
             {
-                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"buksir"))); // "niva_chevrolet"
+                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka"))); // "niva_chevrolet"
 #if 1
                 send(&bts[0], bts.size());
 #endif
@@ -202,7 +202,7 @@ private:
 
 
 				binary::bytes_t bts2 =  std::move(wrap_msg(create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow"))); // "niva_chevrolet"
-#if 0
+#if 1
 				send(&bts2[0], bts2.size());
 #endif
             }
@@ -236,7 +236,7 @@ private:
 				, meteo::local_params()
 				)));
 
-#if 0
+#if 1
 			send(&msg_b[0], msg_b.size());
 #endif
 

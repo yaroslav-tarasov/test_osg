@@ -14,28 +14,13 @@ enum id
 
     vm_go_to_pos,
     vm_follow_route,
-    vm_attach_tow,
-    vm_detach_tow,
-
-    vm_debug_controls,
-    vm_disable_debug_controls,
-
-    vm_tow,
-
-    vm_brake,
 
     vm_traj_assign,
     vm_follow_trajectory
 };
 
 typedef gen_msg<vm_settings, settings_t>    settings_msg_t;
-typedef gen_msg<vm_attach_tow, uint32_t>    attach_tow_msg_t;
-typedef gen_msg<vm_detach_tow, void>        detach_tow_msg_t;
 typedef gen_msg<vm_follow_route, uint32_t>  follow_route_msg_t;
-typedef gen_msg<vm_disable_debug_controls>  disable_debug_ctrl_msg_t;
-typedef gen_msg<vm_tow, boost::optional<uint32_t>> tow_msg_t;
-typedef gen_msg<vm_brake, double> brake_msg_t;
-
 typedef gen_msg<vm_follow_trajectory, uint32_t>  follow_trajectory_msg_t;
 
 struct state_msg_t
@@ -68,26 +53,7 @@ REFL_STRUCT(state_msg_t)
     REFL_ENTRY(speed)
 REFL_END   ()
 
-//! сообщение - что-то отладочное (?)
-struct debug_controls_data
-    : network::msg_id<vm_debug_controls>
-{
-    debug_controls_data(double thrust = 0, double steer = 0, double brake = 0)
-        : thrust(thrust)
-        , steer (steer )
-        , brake (brake )
-    {}
-
-    double thrust;
-    double steer;
-    double brake;
-};           
-
-REFL_STRUCT(debug_controls_data)
-    REFL_ENTRY(thrust)
-    REFL_ENTRY(steer)
-    REFL_ENTRY(brake)
-REFL_END()
+       
 
 //! сообщение - позиция подвижного объекта
 struct phys_pos_msg

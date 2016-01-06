@@ -6,26 +6,6 @@
 
 #include "geometry/filter.h"
 
-template<typename T,int N>
-struct ff
-{
-
-    double next(T value )
-    {
-        T sum=value;
-        int i;
-        for (i=0;i<N;i++)
-        {
-           sum+=val_[i];
-           if(i<(N-1)) 
-               val_[i] = val_[i+1];
-        }
-        val_[i] = sum/N;
-        return val_[i];
-    }
-
-    std::array<T,N> val_;
-};
 
 namespace human
 {
@@ -146,7 +126,8 @@ void follow_curve_state::update(model * self, double dt)
     {
         if (cg::distance2d(self->phys_pos(), cur_pos) < 0.5)
         {
-            self->set_course_hard(cur_course);
+            FIXME(mmmmmmm hard_course);
+			//self->set_course_hard(cur_course);
             end_ = true;
         }
     }
@@ -327,7 +308,7 @@ void follow_traj_state::update(model * self, double dt)
 		geo_position gtp(target_pos, get_base());
 
 		self->set_state(state_t(gtp.pos, gtp.orien.get_course(), *traj_->speed_value(tar_len)));
-		self->set_max_speed(100.0);
+		self->set_max_speed(15.0);
 
 	}
 #endif

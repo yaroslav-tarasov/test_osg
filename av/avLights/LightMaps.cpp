@@ -251,7 +251,7 @@ protected:
     
     osg::ref_ptr<osg::Uniform>           _lightmapMatrix;
 
-    osg::ref_ptr<osg::Geometry>          geom_         ;
+    osg::ref_ptr<osg::Geometry>          _geom         ;
     osg::Vec3Array  *                    geom_array_   ;
     osg::ref_ptr<osg::Vec3Array>         from_l_       ;
     osg::ref_ptr<osg::Vec3Array>         ldir_         ;
@@ -537,12 +537,12 @@ _private::_private(osg::Group * sceneRoot)
 
     osg::Geode* geode = new osg::Geode;
 
-    geom_ = _createGeometry();
+    _geom = _createGeometry();
 
 
-    geode->addDrawable(geom_.get());
+    geode->addDrawable(_geom.get());
 
-    osg::StateSet* stateset = geom_->getOrCreateStateSet();
+    osg::StateSet* stateset = _geom->getOrCreateStateSet();
 
     osg::Program* program = new osg::Program;
 
@@ -670,20 +670,20 @@ bool _private::GetNightMode() const
 void _private::_createArrays()
 {
     from_l_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(1, false);
+    _geom->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(1, false);
     ldir_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(2, ldir_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(2, false);
+    _geom->setVertexAttribArray(2, ldir_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(2, false);
     lcolor_ = new osg::Vec3Array();
-    geom_->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(3, false);
+    _geom->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(3, false);
     dist_falloff_ = new osg::Vec2Array();
-    geom_->setVertexAttribArray(4, dist_falloff_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(4, false);
+    _geom->setVertexAttribArray(4, dist_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(4, false);
     cone_falloff_ = new osg::Vec2Array();
-    geom_->setVertexAttribArray(5, cone_falloff_.get(),osg::Array::BIND_PER_VERTEX);
-    geom_->setVertexAttribNormalize(5, false);
+    _geom->setVertexAttribArray(5, cone_falloff_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(5, false);
 
     from_l_->setPreserveDataType(true);
     ldir_->setPreserveDataType(true);
@@ -691,7 +691,7 @@ void _private::_createArrays()
     cone_falloff_->setPreserveDataType(true);
     lcolor_->setPreserveDataType(true);
 
-    geom_->addPrimitiveSet(new osg::DrawArrays() );
+    _geom->addPrimitiveSet(new osg::DrawArrays() );
 }
 
 void _private::_clearArrays()
@@ -756,14 +756,14 @@ void _private::add_light( T const & light_contour, cg::point_3f const & world_li
 
 void _private::_commitLights()
 {
-    geom_array_ = static_cast<osg::Vec3Array *>(geom_->getVertexArray());
+    geom_array_ = static_cast<osg::Vec3Array *>(_geom->getVertexArray());
     geom_array_->resize(0);
     
     _clearArrays();
 
     if(vertices_.empty())
     {
-        geom_->setPrimitiveSet(0, new osg::DrawArrays() );
+        _geom->setPrimitiveSet(0, new osg::DrawArrays() );
         return;
     }
 
@@ -788,7 +788,7 @@ void _private::_commitLights()
     }
 
 
-    geom_->setPrimitiveSet(0, new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
+    _geom->setPrimitiveSet(0, new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
 
     from_l_->dirty();
     ldir_->dirty();

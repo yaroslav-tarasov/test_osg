@@ -33,8 +33,9 @@ namespace vehicle
         boost::shared_ptr<tow_support>   ts_;
 
     private:
+		nm::node_info_ptr                        turret_node_;
         visual_object_ptr                       label_object_;
-
+		visual_object_ptr                 foam_stream_object_;
     private:
         boost::shared_ptr<visual_objects::label_support>   ls_;
     };

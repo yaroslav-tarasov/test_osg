@@ -24,11 +24,8 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
-    //, ani_(find_first_object<ani_object::info_ptr>(collection_))
-    //, airport_(ani_->navigation_info()->find_airport(pos()))
     , airports_manager_(find_first_object<airports_manager::info_ptr>(collection_))
     , airport_(airports_manager_->find_closest_airport(pos()))
-    , manual_controls_(false)
     , max_speed_(0)
 	, start_follow_(false)
 {
@@ -45,21 +42,14 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     }
 
     body_node_      = nodes_manager_->find_node("body");
-    tow_point_node_ = nodes_manager_->find_node("tow_point");
 
     if (!settings_.route.empty())
         follow_route(settings_.route);
 
     msg_disp()
-        .add<msg::attach_tow_msg_t          >(boost::bind(&model::on_attach_tow             , this, _1))
-        .add<msg::detach_tow_msg_t          >(boost::bind(&model::on_detach_tow             , this))
         .add<msg::go_to_pos_data            >(boost::bind(&model::on_go_to_pos              , this, _1))
         .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
-        .add<msg::brake_msg_t>               (boost::bind(&model::on_brake                  , this, _1))
-
         .add<msg::follow_trajectory_msg_t        >(boost::bind(&model::on_follow_trajectory , this, _1))
-//        .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
-//        .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
         ;
 
     //create_phys_human();
@@ -94,37 +84,9 @@ void model::update( double time )
 
         update_model(dt);
 
-        if (!manual_controls_)
-            sync_phys();
-        else
-        {
-            cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
-            
-            // FIXME physics
-            //decart_position cur_pos = phys_human_->get_position();
-            //geo_position cur_glb_pos(cur_pos, base);
-            //set_state(state_t(cur_glb_pos.pos, cur_pos.orien.get_course(), 0)); 
-        }
-
-        sync_nodes_manager(dt);
-
-        if (aerotow_)
-        {
-            // FIXME physics
-            //if (aircraft::model_info_ptr(aerotow_)->get_rigid_body() && phys_human_ && aircraft::model_info_ptr(aerotow_)->tow_attached())
-            //{
-            //    rod_course   = cg::norm180(phys_human_->get_tow_rod_course());
-            //    air_course   = cg::norm180(aircraft::model_info_ptr(aerotow_)->get_phys_pos().orien.cpr().course);
-            //    steer_course = cg::norm180(rod_course - air_course);
-
-            //    aircraft::model_control_ptr(aerotow_)->set_steer(steer_course);
-            //}
-            //else
-            //{
-            //    on_detach_tow();
-            //}
-        }
-
+        sync_phys();
+ 
+		sync_nodes_manager(dt);
 
         last_update_ = time;
     }
@@ -159,16 +121,6 @@ void model::on_object_destroying(object_info_ptr object)
 //    return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
 //}
 
-point_3 model::tow_offset() const
-{
-    return tow_point_node_ ? nodes_manager_->get_relative_transform( tow_point_node_, body_node_).translation() : point_3();
-}
-
-bool model::tow_attached() const
-{
-    return tow_attached_;
-}
-
 geo_position model::get_phys_pos() const
 {
         // FIXME physics
@@ -188,42 +140,6 @@ geo_position model::get_phys_pos() const
 //
 //    model_control
 //
-
-void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()> tow_invalid_callback)
-{
-    if (tow_attached_ == attached)
-        return ;
-
-    //tow_attached_ = attached;
-    //tow_invalid_callback_ = tow_invalid_callback;
-    //if (phys_aircraft_)
-    //{
-    //    phys_aircraft_->attach_tow(attached);
-    //    traj_.reset();
-    //}
-
-    //if (!tow_attached_)
-    //    sync_fms(true);
-}
-
-void model::set_steer( double steer )
-{   
-    Assert(tow_attached_);
-    // FIXME physics
-    
-    //if (phys_human_)
-    //    phys_human_->set_steer(steer);
-}
-
-void model::set_brake( double brake )
-{   
-    Assert(tow_attached_);
-    
-    // FIXME physics
-
-    //if (phys_human_)
-    //    phys_human_->set_brake(brake);
-}
 
 void model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
 {
@@ -248,41 +164,6 @@ void model::set_ext_wind       (double speed, double azimuth)
     FIXME(Need some wind)
 }
 
-void model::on_aerotow_changed(aircraft::info_ptr old_aerotow)
-{   
-    // FIXME physics
-
-    //if (!phys_human_)
-    //    return;
-
-    //if (aerotow_ && aircraft::model_info_ptr(aerotow_)->get_rigid_body())
-    //{
-    //    cg::point_3 tow_offset = tow_point_node_ ? nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node_, body_node_).translation() : cg::point_3();
-
-    //    phys::ray_cast_human::control_ptr(phys_human_)->set_tow(aircraft::model_info_ptr(aerotow_)->get_rigid_body(), tow_offset, aircraft::model_info_ptr(aerotow_)->tow_offset());
-
-    //    aircraft::model_control_ptr(aerotow_)->set_tow_attached(object_id(), boost::bind(&model::on_detach_tow, this));
-    //}
-    //else
-    //{
-    //    if (old_aerotow)
-    //        aircraft::model_control_ptr(old_aerotow)->set_tow_attached(boost::none, boost::function<void()>());
-
-    //    phys::ray_cast_human::control_ptr(phys_human_)->reset_tow();
-    //}
-}
-
-void model::on_attach_tow( uint32_t tow_id )
-{
-    if (!aerotow_)
-        set_tow(tow_id);
-}
-
-void model::on_detach_tow()
-{
-    if (aerotow_)
-        set_tow(boost::none);
-}
 
 void model::on_follow_route(uint32_t route_id)
 {
@@ -297,11 +178,6 @@ void model::on_follow_trajectory(uint32_t /*route_id*/)
         /*state_*/model_state_ = boost::make_shared<follow_traj_state>();
 }
  
-void model::on_brake(double val)
-{
-    //phys_human_->set_brake(val);
-        // FIXME physics
-}
 
 void model::on_go_to_pos(msg::go_to_pos_data const& data)
 {
@@ -316,43 +192,14 @@ void model::on_go_to_pos(msg::go_to_pos_data const& data)
 //        }
     }
         
-    model_state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, !!aerotow_);
+    model_state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, /*!!aerotow_*/false);
 }
 
 // FIXME это лишнее работаем через см выше
 void model::go_to_pos(  cg::geo_point_2 pos, double course )
 {
-    model_state_ = boost::make_shared<go_to_pos_state>(pos, course, !!aerotow_);
+    model_state_ = boost::make_shared<go_to_pos_state>(pos, course, /*!!aerotow_*/false);
 }
-
-//void model::on_debug_controls(msg::debug_controls_data const& d)
-//{
-//    if (phys_human_)
-//    {
-//        state_.reset();
-//        phys_human_->set_steer(30 * d.steer);
-//        phys_human_->set_thrust(0.1 * d.thrust);
-//        phys_human_->set_brake(d.brake);
-//        manual_controls_ = true;
-//    }
-//}
-
-//void model::on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& /*d*/)
-//{
-//    if (phys_human_)
-//    {
-//        phys_human_->set_steer(0.);
-//        phys_human_->set_thrust(0.);
-//        phys_human_->set_brake(1.);
-//        manual_controls_ = false;
-//
-//        geo_base_3 base = phys_->get_base(*phys_zone_);
-//        decart_position cur_pos = phys_human_->get_position();
-//        geo_position cur_glb_pos(cur_pos, base);
-//
-//        set_state(state_t(cur_glb_pos.pos(cur_pos.dpos * 10*0.1), cur_pos.orien.get_course(), 0));
-//    }
-//}
 
 fms::trajectory_ptr  model::get_trajectory()
 {
@@ -377,15 +224,6 @@ void model::detach_cur_route()
 void model::set_max_speed(double max_speed)
 {
     max_speed_ = max_speed;
-}
-
-void model::set_course_hard(double course)
-{  
-    // FIXME physics
-    //if (phys_human_)
-    //{
-    //    phys::ray_cast_human::control_ptr(phys_human_)->set_course_hard(course);
-    //}
 }
 
 cg::geo_point_2 model::phys_pos() const
@@ -528,14 +366,6 @@ void model::sync_nodes_manager( double /*dt*/ )
 void model::settings_changed()
 {
     view::settings_changed();
-
-    if (!aerotow_ || (object_info_ptr(aerotow_)->name() != settings_.aerotow))
-    {            
-        aircraft::model_info_ptr new_aerotow = find_object<aircraft::model_info_ptr>(collection_, settings_.aerotow);
-
-        if (new_aerotow)
-            set_tow(kernel::object_info_ptr(new_aerotow)->object_id()) ;
-    }
 }
 
 void model::update_model( double dt )
@@ -629,7 +459,7 @@ void model::create_phys_human()
 
 void model::go(cg::polar_point_2 const &offset)
 {
-    model_state_ = boost::make_shared<go_to_pos_state>(cg::geo_offset(pos(), offset), boost::none, !!aerotow_);
+    model_state_ = boost::make_shared<go_to_pos_state>(cg::geo_offset(pos(), offset), boost::none, /*!!aerotow_*/false);
 }
 
 } // human 

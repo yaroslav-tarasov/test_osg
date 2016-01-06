@@ -60,7 +60,7 @@ namespace part_sys
             if (dt < 0.f)
             {
 				force_log fl;       
-				LOG_ODS_MSG( "trace_and_update " << sim_time<< "\n");
+				LOG_ODS_MSG( "trace_and_update sim_time= " << sim_time << " *visit_last_= " <<*visit_last_ <<"\n");
                 reset_visit_last();
                 reset_emanation_last();
                 reset_emit_pos_last();

@@ -49,7 +49,7 @@ osg::Geometry * _createGeometry()
     return box_geometry;
 }
 
-void add_something(osg::Geometry* geom_ )
+void add_something(osg::Geometry* _geom )
 {
 
     SpotRenderVertex  new_v;
@@ -98,11 +98,11 @@ void add_something(osg::Geometry* geom_ )
 
     // set vertex array
     paBoxPointsPos->setDataVariance(osg::Object::DYNAMIC);
-    geom_->setVertexArray(paBoxPointsPos);
+    _geom->setVertexArray(paBoxPointsPos);
 
-    geom_->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
+    _geom->addPrimitiveSet( new osg::DrawArrays( GL_TRIANGLES, 0, vertices_.size() ) );
 
-    osg::StateSet* stateset = geom_->getOrCreateStateSet();
+    osg::StateSet* stateset = _geom->getOrCreateStateSet();
 
     osg::Program* program = new osg::Program;
 

@@ -72,15 +72,18 @@ namespace aircraft_physless
         //    last_fire_time_ = time;
         //}
 
+#if 0
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
         geo_base_3 root_pos = root()->get_global_pos();
         quaternion root_orien = root()->get_global_orien();
+#endif
 
         
         if (smoke_object_ && engine_node_)
         {
             if (nodes_management::vis_node_info_ptr(root())->is_visible())
             {
+#if 0
                 geo_base_3 node_pos   = engine_node_->get_global_pos();
                 quaternion node_orien = engine_node_->get_global_orien();
                 point_3f   pos        = base(node_pos);
@@ -93,7 +96,7 @@ namespace aircraft_physless
                 
                 // smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
                 // smoke_object_->node()->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(des_orien.rotation()/*node_orien.rotation()*/))));
-                
+#endif                
                 auto p = dynamic_cast<SmokeNode*>(smoke_object_->node().get());
                 
                 if(p)

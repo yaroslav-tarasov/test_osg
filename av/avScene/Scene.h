@@ -6,6 +6,8 @@
 
 #include "av/avLights/LightMaps.h"
 #include "av/ISky.h"
+#include "av/avFx/Fx.h"
+
 
 #ifdef NON_DLL
 # define VISUAL_API
@@ -63,7 +65,6 @@ namespace utils
     struct  LoadNodeThread;
 }
 
-struct SmokeSfxNode;
 
 class PickHandler;
 
@@ -155,11 +156,19 @@ namespace avScene {
         connection_holder                           conn_holder_;
 
         static std::string                          zone_to_reload_;
+        
+		// uniforms	
+	private:
+		osg::ref_ptr<osg::Uniform>                  _windTime;
+
 
     private:
         osg::ref_ptr<osg::Node>                     _logo;
 
 		SmokeSfxNode *                 smoke_sfx_weak_ptr_;
+		SparksSfxNode *                sparks_sfx_weak_ptr;
+		LandingDustSfxNode *           ld_sfx_weak_ptr;
+		FoamStreamSfxNode *            fs_sfx_weak_ptr_;
     private:
         utils::LoadNodeThread*                          _lnt;
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;

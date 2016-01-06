@@ -62,6 +62,10 @@
 
 
 #include "av/avFx/SmokeFx.h"
+#include "av/avFx/SparksFx.h"
+#include "av/avFx/LandingDustFx.h"
+#include "av/avFx/FoamStreamFx.h"
+
 //
 //  ext
 //
@@ -734,7 +738,11 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     addChild(ppu);
 #endif
-    
+    	
+	
+	
+	_windTime   = new osg::Uniform("windTime"  , osg::Vec4(0.0,0.0,0.0,0.0));
+	pGlobalStateSet->addUniform(_windTime);
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
     
@@ -979,9 +987,29 @@ FIXME(Чудеса с Ephemeris)
     );
 
 #if 1
+#if 0
 	avFx::SmokeFx* smoke = new avFx::SmokeFx;
 	smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode*>(smoke);
 	addChild(smoke);
+#endif
+	avFx::FoamStreamFx* fs = new avFx::FoamStreamFx;
+	fs_sfx_weak_ptr_ = dynamic_cast<FoamStreamSfxNode*>(fs);
+	addChild(fs);
+
+	
+
+	avFx::SparksFx* spark = new avFx::SparksFx;
+	sparks_sfx_weak_ptr = dynamic_cast<SparksSfxNode*>(spark);
+	addChild(spark);
+
+	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
+	ld_sfx_weak_ptr = dynamic_cast<LandingDustSfxNode*>(ld);
+
+	osg::PositionAttitudeTransform* pat;
+	pat = new osg::PositionAttitudeTransform;
+	pat->setScale(osg::Vec3(1,1,1));
+	pat->addChild(ld);
+	addChild(pat);
 #endif
 
     return true;
@@ -1785,9 +1813,12 @@ void Scene::onExit()
 // update pass
 void Scene::update( osg::NodeVisitor * nv )
 {
-      if(_time_panel)
+      const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+	  const double lt = nv->getFrameStamp()->getSimulationTime();
+
+	  if(_time_panel)
       {
-          _time_panel->set_time(_viewerPtr->getFrameStamp()->getSimulationTime() * 1000.f);
+          _time_panel->set_time(lt * 1000.f);
       }
 
 	  if (smoke_sfx_weak_ptr_)
@@ -1798,4 +1829,29 @@ void Scene::update( osg::NodeVisitor * nv )
 		  smoke_sfx_weak_ptr_->setIntensity(intensity * 2);
 	      
 	  }
+
+	  if(sparks_sfx_weak_ptr)
+	  {
+		  sparks_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
+		  sparks_sfx_weak_ptr->setContactFlag(true);
+	  }
+
+	  if(ld_sfx_weak_ptr && cg::mod(int(lt),5) == 0 )
+	  {
+		  ld_sfx_weak_ptr->makeContactDust(lt, cg::point_3f(0, 0, 0)/*cg::point_3f(-20, 110, 0)*/, cg::point_3f(-60.f, -10.f, 0.f));
+	  }
+
+	  if (fs_sfx_weak_ptr_)
+	  {
+		  auto const intensity = 1.0f;
+
+		  fs_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),2.5)));
+		  fs_sfx_weak_ptr_->setIntensity(intensity * 120);
+		  //fs_sfx_weak_ptr_->setEmitterWorldSpeed(cg::point_3f(20, 10, 20) * 2);
+	  }	  
+
+	  FIXME( "Ну и нафиг оно в cg?" );
+	  FIXME( "А третья координата?" );
+	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
+	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
 }

@@ -44,8 +44,6 @@ private:
     void wander(float delay);
 
 private:
-    //nodes_management::manager_ptr nodes_manager_;
-
     phys::static_mesh_ptr                  mesh_;
 
     optional<size_t>                  phys_zone_;

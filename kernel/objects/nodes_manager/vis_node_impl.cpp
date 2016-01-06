@@ -91,7 +91,7 @@ void vis_node_impl::pre_update(double time)
 
     double dt = time - *time_;
 
-#if 1
+#if 0
     if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
     {
 

@@ -253,7 +253,7 @@ btRigidBody*	createRigidBody(btDiscreteDynamicsWorld* dW,float mass, const btTra
 
 struct FindGeometry : public osg::NodeVisitor
 {
-	osg::Drawable*  geom_;
+	osg::Drawable*  _geom;
 
 	FindGeometry() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
 
@@ -270,7 +270,7 @@ struct FindGeometry : public osg::NodeVisitor
 
 	void apply(osg::Drawable& geom)
 	{
-		geom_ = &geom;
+		_geom = &geom;
 	}
 };
 
@@ -289,7 +289,7 @@ btSoftBody* btSoftBodyFromOSG( osg::Node* node )
 #endif
 
 	FindGeometry fg(*node);
-	osg::Geometry* geom( fg.geom_->asGeometry() );
+	osg::Geometry* geom( fg._geom->asGeometry() );
 	osg::Vec3Array* vertices( dynamic_cast< osg::Vec3Array* >( geom->getVertexArray() ) );
 
 	geom->setDataVariance( osg::Object::DYNAMIC );
@@ -590,7 +590,7 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 
 	FindGeometry fg(*para_node);
 
-	osg::Geometry* pgeom( fg.geom_->asGeometry() );
+	osg::Geometry* pgeom( fg._geom->asGeometry() );
 	osg::Vec3Array* vertices( dynamic_cast< osg::Vec3Array* >( pgeom->getVertexArray() ) );
 
 	pgeom->setUpdateCallback( new MeshUpdater( para, vertices->size() ) );

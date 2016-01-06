@@ -10,21 +10,21 @@
 #include "BoundInfo.h"
 
 //
-// Smoke special effect
+// Foam stream special effect
 //
 
-struct smoke_sfx_data /*: node_data*/
+struct foam_sfx_data /*: node_data*/
 {
 	float intensity, factor;
 	cg::point_3f emit_dir;
 	cg::point_3f emitter_speed;
 
-	smoke_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f) {}
+	foam_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f) {}
 };
 
 
-static const float smoke_lifetime_min = 4.0f;
-static const float smoke_lifetime_max = 8.5f;
+static const float foam_lifetime_min = 4.0f;
+static const float foam_lifetime_max = 8.5f;
 
 //
 // Local namespaces
@@ -36,18 +36,18 @@ namespace avFx
 	using namespace av::part_sys;
 
     //
-    // SmokeFx class
-    // Implements smoke effect
+    // FoamSreamFx class
+    // Implements foam stream effect
     //
 
-    class SmokeFx : public osg::Geode
-				  ,	public SmokeSfxNode
+    class FoamStreamFx : public osg::Geode
+				       , public FoamStreamSfxNode
     {
 
     public:
 
         // constructor
-        SmokeFx();
+        FoamStreamFx();
 
 
         //
@@ -58,6 +58,7 @@ namespace avFx
     public:
 
         // special culling method
+        // void cull  ( osgUtil::CullVisitor * pCV );
 		void cull( osg::NodeVisitor * pNV );
 
 	private:
@@ -67,10 +68,10 @@ namespace avFx
 
 	private: // particles_effect_info
 
-		virtual float getMaxParticleLifetime() const override { return smoke_lifetime_max; }
+		virtual float getMaxParticleLifetime() const override { return foam_lifetime_max; }
 		virtual bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
 
-	private: // SmokeSfxNode
+	private: // smoke_sfx_node
 
 		virtual void                 setIntensity( float inten ) override;
 		virtual float                getIntensity() const override { return data_.intensity; }
@@ -87,7 +88,7 @@ namespace avFx
 	private:
 
 		// data
-		smoke_sfx_data data_;
+		foam_sfx_data data_;
 
 		// cpu part queue
 		struct cpu_particle : base_cpu_particle
@@ -100,8 +101,8 @@ namespace avFx
 			base_cpu_particle(sp, lt, age), start_time(st), start_vel(sv), factor(f), randoms(rand) {}
 		};
 
-		typedef cpu_part_queue<cpu_particle>    smoke_cpu_queue;
-		sfx_pos_time_emitter<smoke_cpu_queue>   emitter_;
+		typedef cpu_part_queue<cpu_particle>    foam_cpu_queue;
+		sfx_pos_time_emitter<foam_cpu_queue>   emitter_;
 
 		// gpu part queue
 #pragma pack(push, 1)

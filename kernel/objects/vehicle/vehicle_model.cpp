@@ -44,9 +44,6 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     }
 
     body_node_      = nodes_manager_->find_node("body");
-    FIXME(Надо решить нужна ли здесь инициализация см view, как впрочем и дублирование переменных) 
-    //tow_point_node_  = nodes_manager_->find_node("tow_point");
-    //rtow_point_node_ = nodes_manager_->find_node("rtow_point");
 
     if (!settings_.route.empty())
         follow_route(settings_.route);
@@ -83,6 +80,7 @@ void model::update( double time )
     }
 
     double dt = time - (last_update_ ? *last_update_ : 0);
+
 
     if (!cg::eq_zero(dt))
     {
@@ -572,7 +570,7 @@ void model::sync_phys()
 }
 
 
-void model::sync_nodes_manager( double /*dt*/ )
+void model::sync_nodes_manager( double dt )
 {
     
     if (phys_vehicle_ && root_)
@@ -638,6 +636,20 @@ void model::sync_nodes_manager( double /*dt*/ )
             wheels_[i].node->set_position(node_pos);
         }
 
+
+		if(turret_point_node_) 
+		{
+			nodes_management::node_position node_pos = turret_point_node_->position();
+
+			const float angular_speed = 5 * 2 * cg::pif/60.0; 
+			quaternion des_orien = quaternion(cpr(node_pos.local().orien.get_course(),30,0))
+				                   * quaternion(cpr(-cg::rad2grad() * angular_speed * dt,0,0));
+			point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
+
+		    node_pos.local().omega = omega_rel;
+
+			nm::node_control_ptr(turret_point_node_)->set_position(node_pos);  
+		}
 
     }
 }

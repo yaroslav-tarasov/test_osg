@@ -25,9 +25,5 @@ namespace human
         decart_position      get_local_position() const;
         fms::trajectory_ptr  get_trajectory();
         void set_trajectory(fms::trajectory_ptr  traj);
-    private:
-        void attach_tow() override; 
-        void detach_tow() override; 
-        void set_brake(double val) override;
 	};
 }

@@ -5,54 +5,8 @@
 
 #include "flock_manager/flock_manager_common.h"
 #include "common/flock_manager.h"
-#include "common/randgen.h"
+#include "common/stdrandgen.h"
 
-#include <random>
-
-namespace
-{
-#if 1
-    struct simple_rand_gen
-    {
-#if 0
-        double random_range (double min_val, double max_val)
-        { 
-            static std::uniform_real_distribution<double> distribution(min_val,max_val);
-            static std::default_random_engine generator(rd);
-
-            return distribution(generator);
-        }
-#endif
-		double random_range(const double from, const double to)
-		{
-			std::random_device rd;
-
-			return std::bind(
-				std::uniform_real_distribution<>(from, to),
-				std::default_random_engine( rd() ))();
-		}
-
-        inline cg::point_3 inside_unit_sphere () 
-        {
-           return cg::point_3(random_range(-1., 1.),random_range(-1., 1.),random_range(-1., 1.));
-        }
-
-#if 0
-        std::random_device rd;
-#endif
-
-    };
-
-#if 0
-    double random_range (double min_val, double max_val)
-    { 
-        return min_val + ( static_cast<double> (std::rand()) / 32767.0 * ( max_val - min_val + 1 ) );
-    }
-#endif
-
-#endif
-
-}
 
 namespace flock
 {
@@ -75,30 +29,6 @@ struct child_data
 protected:
     settings_t settings_;
     state_t    state_;
-
-#if 0
-
-    public var _spawner:FlockController;
-    public var _wayPoint : Vector3;
-    public var _speed:float= 10;
-    public var _dived:boolean =true;
-    public var _stuckCounter:float;			//prevents looping around a waypoint by increasing minimum distance to waypoint
-    public var _damping:float;
-    public var _soar:boolean = true;
-    public var _flatFlyDown:boolean;
-    public var _landing:boolean;
-    public var _landingSpotted:boolean;
-    private var _lerpCounter:int;
-    public var _targetSpeed:float;
-    public var _move:boolean = true;
-    var        _model:GameObject;
-
-    var        _avoidValue:float;		//Random value used to check for obstacles. Randomized to lessen uniformed behaviour when avoiding
-    var        _avoidDistance:float;
-
-    private var _soarTimer:float;	
-
-#endif
 
     REFL_INNER(child_data)
         REFL_ENTRY(settings_)
@@ -139,7 +69,7 @@ protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
 
-    simple_rand_gen                          rnd_;
+    std_simple_randgen                      rnd_;
 
     manager::info_ptr                   _spawner;
 
