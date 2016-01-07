@@ -42,10 +42,35 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     if (get_nodes_manager())
     {
         root_               = get_nodes_manager()->get_node(0);
-        elev_rudder_node_   = get_nodes_manager()->find_node("elevrudr");
-        rudder_node_        = get_nodes_manager()->find_node("rudder");
-        tow_point_node_     = get_nodes_manager()->find_node("tow_point");
-        body_node_          = get_nodes_manager()->find_node("body");
+
+		nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root_->node_id()), [this](nm::node_info_ptr n)->bool
+		{
+			if (boost::starts_with(n->name(), "engine"))
+			{
+				this->engines_nodes_.push_back(n);
+				return true;
+			}
+
+			if (boost::starts_with(n->name(), "rudder"))
+			{
+				elev_rudder_node_ = n;
+				return true;
+			}
+			
+			if (boost::starts_with(n->name(), "tow_point"))
+			{
+				tow_point_node_ = n;
+				return true;
+			}
+			
+			if (boost::starts_with(n->name(), "body"))
+			{
+				body_node_ = n;
+				return true;
+			}
+
+			return true;
+		});
     }
 
     shassis_ = boost::make_shared<aircraft::shassis_support_impl>(get_nodes_manager());

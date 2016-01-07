@@ -7,6 +7,8 @@
 
 namespace vehicle
 {
+	const double visual::fs_end_duration_  = 10;
+
     struct visual::tow_support
     {
         tow_support(visual_object_ptr obj,const std::string& tow_type )
@@ -31,9 +33,10 @@ namespace vehicle
 
         inline void init_towbar()
         {
-            body_s_ = findFirstNode((tow_visual_object_)->root(),"body_s");
-            body_b_ = findFirstNode((tow_visual_object_)->root(),"body_b");
-            body_a_ = findFirstNode((tow_visual_object_)->root(),"body_a");
+            const auto root_node = (tow_visual_object_)->root();
+			body_s_ = findFirstNode(root_node,"body_s");
+            body_b_ = findFirstNode(root_node,"body_b");
+            body_a_ = findFirstNode(root_node,"body_a");
 
             osg::ComputeBoundsVisitor cbvs;
             body_s_->accept( cbvs );
@@ -48,7 +51,7 @@ namespace vehicle
             const osg::BoundingBox bb_a = cbva.getBoundingBox();
 
             osg::ComputeBoundsVisitor cbv;
-            (tow_visual_object_)->root()->accept( cbv );
+            root_node->accept( cbv );
             const osg::BoundingBox bb_ = cbv.getBoundingBox();
 
             radius_   = abs(bb_.yMax() - bb_.yMin())/2.0;//(*tow_visual_object_)->root()->getBound().radius();
@@ -157,6 +160,15 @@ void visual::update(double time)
     
     if (nodes_management::vis_node_info_ptr(root_)->is_visible() )
     {
+
+#ifdef ASYNC_OBJECT_LOADING 
+		if(!label_object_)
+		{
+			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
+		    ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+		}
+#endif
+		
 		if( aerotow_)
 		{
 			if (!tow_visual_object_)
@@ -164,7 +176,6 @@ void visual::update(double time)
 
 				std::string tow_type = "towbar"; // "towbar"  "tube"
 				tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type) ;
-            
 				ts_ = boost::make_shared<tow_support>(*tow_visual_object_, tow_type);
 			}
 
@@ -194,16 +205,59 @@ void visual::update(double time)
 				(*tow_visual_object_)->set_visible(true);
 			}
 		}
-
-		if (turret_node_ )
+		
+		if (/*has_stream*/ true)
 		{
-			FIXME(Make me work)
-#if 0
+			last_fs_time_ = time;
+		}
+
+		if ( turret_node_ && burning_plane_)
+		{
 			if(!foam_stream_object_)
-			   foam_stream_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object("sfx//foam_stream.scg") ;
-			else
-			   foam_stream_object_->root();
+			{
+				if (true)
+				{
+				   foam_stream_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(turret_node_,"sfx//foam_stream.scg") ;
+				   foam_stream_sfx_weak_ptr_ = nullptr;
+				   if (auto foam_stream_node = findFirstNode(foam_stream_object_->node().get(),"FoamStreamFx"))
+				   {
+					   foam_stream_sfx_weak_ptr_ = dynamic_cast<FoamStreamSfxNode *>(foam_stream_node);
+				   }
+				}
+			}
+			
+			if(foam_stream_object_)
+			{
+				geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
+				geo_base_3 root_pos = root_->get_global_pos();
+				quaternion root_orien = root_->get_global_orien();
+
+				if (nodes_management::vis_node_info_ptr(root_)->is_visible())
+				{
+#if 0
+					geo_base_3 node_pos = turret_node_->get_global_pos();
+					quaternion node_orien = turret_node_->get_global_orien();
+					point_3f pos = base(node_pos);
 #endif
+
+					// foam_stream_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
+					foam_stream_object_->set_visible(true);
+
+					if (foam_stream_sfx_weak_ptr_)
+					{
+						auto const intensity = 1.0f;
+						
+						fs_factor_ = intensity; 
+						
+						foam_stream_sfx_weak_ptr_->setFactor(fs_factor_ * cg::clamp(0., fs_end_duration_, 1., 0.)(time-last_fs_time_));
+						foam_stream_sfx_weak_ptr_->setIntensity(fs_factor_ * 120);
+					}
+				}
+				else
+					foam_stream_object_->set_visible(false);
+			}
+
+
 		}
     }
     else
@@ -211,6 +265,14 @@ void visual::update(double time)
         if (tow_visual_object_ && *tow_visual_object_)
             (*tow_visual_object_)->set_visible(false);
     }
+
+#if 0
+	if (foam_stream_object_ && time > last_fs_time_ + fs_end_duration_ + foam_stream_sfx_weak_ptr_->getMaxParticleLifetime())
+	{
+		foam_stream_sfx_weak_ptr_ = nullptr;
+		foam_stream_object_.reset();
+	}
+#endif
 }
 
 

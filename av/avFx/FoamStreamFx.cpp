@@ -11,11 +11,13 @@
 
 #include "utils/materials.h"
 
+
 //
 // Module namespaces
 //
 
 using namespace avFx;
+using namespace utils;
 
 
 //
@@ -25,7 +27,9 @@ using namespace avFx;
 // constructor
 FoamStreamFx::FoamStreamFx()
 {
-    _createGeometry();
+     setName("FoamStreamFx");
+	
+	_createGeometry();
 
     //
     // create state set
@@ -173,9 +177,22 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
-
+	
 	const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
 
+	if(_tracker) 
+		_tracker->update();
+
+	const osg::Matrixd mWorld = _tracker?_tracker->getMatrix():osg::Matrixd();
+	
+	if(_tracker)
+	{
+		getParent(0)->asTransform()->asMatrixTransform()->setMatrix(_tracker->getRotMatrix());
+	}
+
+	// const osg::Matrixd mWorld2 =  osg::computeLocalToWorld(pNV->getNodePath());
+	cg::point_3f mt = _tracker?from_osg_vector3(mWorld.getTrans()):cg::point_3f();
+	
 	const avCore::Environment::EnvironmentParameters  & cEnvironmentParameters  = avCore::GetEnvironment()->GetEnvironmentParameters();
 
 	// particles updater
@@ -184,15 +201,15 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 	{
 		const float & t_unit = part.t();
 		const float & t = part.get_age();
-		const float mega_age_func = t_unit * (t_unit * (0.333333f * t_unit - 1.0f) + 1.0f);
-		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y + 50.0, part.start_vel.z + 20.0/*+ 135.0f*/) * (/*mega_age_func **/ t)  + cg::point_3f(0.f,0.f,-9.8f) * t * t ;
+		// const float mega_age_func = t_unit * (t_unit * (0.333333f * t_unit - 1.0f) + 1.0f);
+		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y + 50.0, part.start_vel.z) * (/*mega_age_func **/ t)  + cg::point_3f(0.f,0.f,-9.8f) * t * t ;
 		part.start_pos() += wind_vec * dt;
 		part.cur_pos() = part.start_pos() + velocity_impact;
 	};
 
 	// update current
 	static const float break_sfx_dist = 80.f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), cg::point_3f(150.0f,200.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*//*pUV->get_current_model_world().translation()*/, break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), mt, break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;
@@ -240,4 +257,11 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 	randoms_->dirty();
 
 	_drawArrays->setCount(cpu_queue.size());
+}
+
+
+void FoamStreamFx::setTrackNode(osg::Node* node)
+{
+	_tracker = new utils::NodeTracker;
+	_tracker->setTrackNode(node);
 }

@@ -25,6 +25,8 @@ using namespace avFx;
 // constructor
 LandingDustFx::LandingDustFx()
 {
+	setName("LandingDustFx");
+     
 	_createGeometry();
 
 	//

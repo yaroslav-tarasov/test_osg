@@ -26,7 +26,10 @@ enum id
     vm_reverse,
 
     vm_traj_assign,
-    vm_follow_trajectory
+    vm_follow_trajectory,
+
+	vm_fight_fire,
+	vm_fight_fire_view
 };
 
 typedef gen_msg<vm_settings, settings_t>           settings_msg_t;
@@ -63,6 +66,8 @@ REFL_STRUCT(attach_tow_msg)
     REFL_ENTRY(reverse)
 REFL_END()
 
+
+
 struct tow_msg
 	: network::msg_id<vm_tow>
 {
@@ -90,6 +95,30 @@ REFL_STRUCT(tow_msg)
 	REFL_ENTRY(reverse)
     REFL_ENTRY(geo_pos)
 REFL_END()
+
+
+struct fight_fire_t
+{
+	fight_fire_t()
+		: burning_id (0)
+		, engines    (0)
+	{}
+
+	fight_fire_t( boost::optional<uint32_t>   burning_id, uint32_t  engines)
+		: burning_id(burning_id), engines(engines)
+	{}
+
+	boost::optional<uint32_t>   burning_id;
+	uint32_t                     engines  ;
+};
+
+REFL_STRUCT(fight_fire_t)
+	REFL_ENTRY(burning_id)
+	REFL_ENTRY(engines)
+REFL_END()
+
+typedef gen_msg<vm_fight_fire_view, fight_fire_t>      fight_fire_view_msg_t;
+typedef gen_msg<vm_fight_fire,      fight_fire_t>           fight_fire_msg_t;
 
 struct state_msg_t
     : network::msg_id<vm_state>

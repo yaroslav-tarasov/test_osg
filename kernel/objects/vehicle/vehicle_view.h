@@ -56,6 +56,7 @@ protected:
     void on_model_changed     ();
 
     void on_traj_assign       (msg::traj_assign_msg const &m);
+	void on_fight_fire        (msg::fight_fire_t const& data);
 
 public:
     geo_point_2 const& pos()     const {return state_.pos;}
@@ -72,6 +73,7 @@ public:
     void set_settings ( settings_t const& settings );
     void set_state    ( state_t const&state );
     void set_tow      ( optional<uint32_t> tow_id, bool reverse, const geo_position& pos);
+	void set_burning_obj(msg::fight_fire_t const& data);
 
 protected:
     nodes_management::manager_ptr       nodes_manager_;
@@ -85,6 +87,7 @@ protected:
     nodes_management::node_info_ptr     turret_point_node_;    
 	 
 	aircraft::info_ptr                  aerotow_;
+	aircraft::info_ptr                  burning_plane_;
 
 protected:
     //////////////////////////////////////

@@ -25,7 +25,9 @@ using namespace avFx;
 // constructor
 SparksFx::SparksFx()
 {
-    _createGeometry();
+    setName("SparksFx");
+
+	_createGeometry();
 
     //
     // create state set

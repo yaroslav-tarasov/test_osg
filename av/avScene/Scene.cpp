@@ -987,16 +987,19 @@ FIXME(Чудеса с Ephemeris)
     );
 
 #if 1
+	smoke_sfx_weak_ptr_ = nullptr;
 #if 0
 	avFx::SmokeFx* smoke = new avFx::SmokeFx;
 	smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode*>(smoke);
 	addChild(smoke);
 #endif
+	fs_sfx_weak_ptr_ = nullptr;
+#if 0
 	avFx::FoamStreamFx* fs = new avFx::FoamStreamFx;
 	fs_sfx_weak_ptr_ = dynamic_cast<FoamStreamSfxNode*>(fs);
 	addChild(fs);
+#endif
 
-	
 
 	avFx::SparksFx* spark = new avFx::SparksFx;
 	sparks_sfx_weak_ptr = dynamic_cast<SparksSfxNode*>(spark);
@@ -1371,6 +1374,26 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
         return mt_.back();
     }
 
+	if( path == "sfx//foam_stream.scg" )
+	{
+		osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+		osg::Matrix mat; 
+		mat.setTrans(-offset/2);
+
+		auto mt_offset = new osg::MatrixTransform(mat);
+		parent?parent->asGroup()->addChild(mt_offset):nullptr;
+
+		avFx::FoamStreamFx* fs = new avFx::FoamStreamFx;
+		
+		fs->setTrackNode(parent);
+
+		mt_.back()->addChild(fs);
+		_terrainRoot/*parent*/->asGroup()->addChild(mt_.back());
+
+		return mt_.back();
+	}
 
     if( path == "text_label.scg" )
     {

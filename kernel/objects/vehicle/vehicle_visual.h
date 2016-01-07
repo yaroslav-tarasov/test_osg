@@ -4,6 +4,8 @@
 #include "objects/impl/local_position.h"
 #include "kernel/systems/vis_system.h"
 
+#include "av/avFx/Fx.h"
+
 namespace visual_objects
 {
     struct label_support;
@@ -35,9 +37,17 @@ namespace vehicle
     private:
 		nm::node_info_ptr                        turret_node_;
         visual_object_ptr                       label_object_;
+		FoamStreamSfxNode *         foam_stream_sfx_weak_ptr_;
 		visual_object_ptr                 foam_stream_object_;
     private:
         boost::shared_ptr<visual_objects::label_support>   ls_;
+
+	private:
+		double last_fs_time_;
+		double fs_factor_;
+
+	private:
+		static const double fs_end_duration_;
     };
 
 }

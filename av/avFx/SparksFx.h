@@ -122,8 +122,7 @@ namespace avFx
     private:
 
         // AABB data for clipping
-        osg::BoundingBox	      m_aabbEllipsoid;
-
+        osg::BoundingBox	         _aabbEllipsoid;
 		osg::Geometry *               _geom;
     };
 

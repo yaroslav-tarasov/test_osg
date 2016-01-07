@@ -55,8 +55,9 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
         .add<msg::brake_msg_t               >(boost::bind(&model::on_brake                  , this, _1))
         .add<msg::reverse_msg_t             >(boost::bind(&model::on_reverse                , this, _1))
-
-        .add<msg::follow_trajectory_msg_t        >(boost::bind(&model::on_follow_trajectory , this, _1))
+		
+		.add<msg::fight_fire_msg_t          >(boost::bind(&model::on_fight_fire             , this, _1))
+        .add<msg::follow_trajectory_msg_t   >(boost::bind(&model::on_follow_trajectory , this, _1))
 //        .add<msg::debug_controls_data       >(boost::bind(&model::on_debug_controls         , this, _1))
 //        .add<msg::disable_debug_ctrl_msg_t  >(boost::bind(&model::on_disable_debug_controls , this, _1))
         ;
@@ -301,6 +302,12 @@ void model::on_aerotow_changed( aircraft::info_ptr old_aerotow, const boost::opt
 
 
     }
+}
+
+
+void model::on_fight_fire(msg::fight_fire_t const& data)
+{
+	view::set_burning_obj(data);
 }
 
 void model::on_attach_tow(/* uint32_t tow_id*/ msg::attach_tow_msg_t const& data)
@@ -642,7 +649,7 @@ void model::sync_nodes_manager( double dt )
 			nodes_management::node_position node_pos = turret_point_node_->position();
 
 			const float angular_speed = 5 * 2 * cg::pif/60.0; 
-			quaternion des_orien = quaternion(cpr(node_pos.local().orien.get_course(),30,0))
+			quaternion des_orien = quaternion(cpr(node_pos.local().orien.get_course(),15,0))
 				                   * quaternion(cpr(-cg::rad2grad() * angular_speed * dt,0,0));
 			point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
 

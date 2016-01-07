@@ -65,8 +65,6 @@ namespace vehicle
             geo_point_3 tow_pos = geo_base_3(air->pos())(cg::rotation_3(cpr(air->orien().course, 0, 0)) * (point_3(0, 5., 0) + point_3(air->tow_point_transform().translation())));
             if (cg::distance2d(tow_pos, this->pos()) < 25)
             {   
-                FIXME(Необходима проверка алгоритма работы);
-
                 double dist_tp  = tow_point_node_ ?cg::distance2d(tow_pos,tow_point_node_->get_global_pos()) :10000.0;
                 double dist_rtp = rtow_point_node_?cg::distance2d(tow_pos,rtow_point_node_->get_global_pos()):10000.0;
 

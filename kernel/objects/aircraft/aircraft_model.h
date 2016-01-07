@@ -112,6 +112,8 @@ namespace aircraft
         nodes_management::node_control_ptr     rudder_node_;
         nodes_management::node_info_ptr        tow_point_node_;
         nodes_management::node_info_ptr        body_node_;
+		
+		std::vector<nodes_management::node_info_ptr>        engines_nodes_;
 
         rotors_support_ptr                     rotors_;
         shassis_support_ptr                    shassis_;

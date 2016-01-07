@@ -9,6 +9,12 @@
 #include "Fx.h"
 #include "BoundInfo.h"
 
+namespace utils
+{
+	class  NodeTracker;
+}
+
+
 //
 // Foam stream special effect
 //
@@ -54,6 +60,7 @@ namespace avFx
         // Base interface
         //
 
+		void setTrackNode(osg::Node* node);
 
     public:
 
@@ -127,9 +134,9 @@ namespace avFx
     private:
 
         // AABB data for clipping
-        osg::BoundingBox					  m_aabbEllipsoid;
-
+        osg::BoundingBox					  _aabbEllipsoid;
 		osg::Geometry *                       _geom;
+		osg::ref_ptr<utils::NodeTracker>      _tracker;
     };
 
 }

@@ -25,7 +25,9 @@ using namespace avFx;
 // constructor
 SmokeFx::SmokeFx()
 {
-    _createGeometry();
+    setName("SmokeFX");
+
+	_createGeometry();
 
     //
     // create state set

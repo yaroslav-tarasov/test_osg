@@ -18,8 +18,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
     {
         root_ = nodes_manager_->get_node(0);
         conn_holder()    << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
-        tow_point_node_  = nodes_manager_->find_node("tow_point");
-        rtow_point_node_ = nodes_manager_->find_node("rtow_point");
+        tow_point_node_    = nodes_manager_->find_node("tow_point");
+        rtow_point_node_   = nodes_manager_->find_node("rtow_point");
 		turret_point_node_ = nodes_manager_->find_node("turret");
     }
 
@@ -27,7 +27,8 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::state_msg_t     >(boost::bind(&view::on_state   , this, _1))
         .add<msg::settings_msg_t  >(boost::bind(&view::on_settings, this, _1))
         .add<msg::tow_msg_t       >(boost::bind(&view::on_tow     , this, _1))
-
+		.add<msg::fight_fire_view_msg_t   >(boost::bind(&view::on_fight_fire     , this, _1))
+		
         .add<msg::traj_assign_msg >(boost::bind(&view::on_traj_assign, this, _1))
         ;
 }
@@ -83,6 +84,12 @@ void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
     on_aerotow_changed(old_aerotow, msg) ;
 }
 
+void view::on_fight_fire   (msg::fight_fire_t const& data)
+{
+	FIXME("Может как tow сделать?");
+	aerotow_ = data.burning_id ? collection_->get_object(*data.burning_id) : nullptr;
+}
+
 void view::on_model_changed()
 {
     root_ = nodes_manager_->get_node(0);
@@ -104,6 +111,11 @@ void view::set_state(state_t const& state)
 void view::set_tow(optional<uint32_t> tow_id, bool reverse, const geo_position& pos)
 {
     set(msg::tow_msg_t(tow_id, reverse, pos), true);
+}
+
+void view::set_burning_obj(msg::fight_fire_t const& data)
+{
+	set(msg::fight_fire_view_msg_t(data), true);
 }
 
 void view::on_traj_assign(msg::traj_assign_msg const &m)

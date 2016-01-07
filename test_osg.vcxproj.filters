@@ -946,5 +946,8 @@
     <ClCompile Include="av\avFx\LandingDustFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
+    <ClCompile Include="av\avCore\NodeTracker.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

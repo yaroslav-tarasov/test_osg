@@ -78,7 +78,15 @@ namespace aircraft_physless
         quaternion root_orien = root()->get_global_orien();
 #endif
 
-        
+#ifdef ASYNC_OBJECT_LOADING 
+		if(!label_object_)
+		{ 
+			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
+			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
+			ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+		}
+#endif
+
         if (smoke_object_ && engine_node_)
         {
             if (nodes_management::vis_node_info_ptr(root())->is_visible())

@@ -78,6 +78,7 @@ private:
     //void on_debug_controls(msg::debug_controls_data const&);
     //void on_disable_debug_controls(msg::disable_debug_ctrl_msg_t const& d);
     void on_follow_trajectory(uint32_t /*route_id*/);
+    void on_fight_fire       (msg::fight_fire_t const& data);
 
 public:
     void go_to_pos(  cg::geo_point_2 pos, double course );

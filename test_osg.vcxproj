@@ -184,6 +184,7 @@
     <ClCompile Include="av\avCore\Environment.cpp" />
     <ClCompile Include="av\avCore\LOD.cpp" />
     <ClCompile Include="av\avCore\Logo.cpp" />
+    <ClCompile Include="av\avCore\NodeTracker.cpp" />
     <ClCompile Include="av\avCore\Timer.cpp" />
     <ClCompile Include="av\avCore\Utils.cpp" />
     <ClCompile Include="av\avCore\XmlModel.cpp" />
