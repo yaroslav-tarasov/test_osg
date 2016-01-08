@@ -153,6 +153,9 @@
     <Filter Include="Source Files\shaders\animation">
       <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\aerostat">
+      <UniqueIdentifier>{85f57a9b-c35a-404f-840c-01d3ca96b6af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -352,6 +355,18 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\flock_child\flock_child_view.h">
       <Filter>Source Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_common.h">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_ctrl.h">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_model.h">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_view.h">
+      <Filter>Source Files\objects\aerostat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -948,6 +963,21 @@
     </ClCompile>
     <ClCompile Include="av\avCore\NodeTracker.cpp">
       <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avFx\FrictionDustFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_model.cpp">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_view.cpp">
+      <Filter>Source Files\objects\aerostat</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\aerostat_phys.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

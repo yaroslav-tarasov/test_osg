@@ -33,5 +33,6 @@ namespace vehicle
         void detach_tow()           override; 
         void set_brake (double val) override;
         void set_reverse (bool)     override;
+	    void fire_fight()           override;
 	};
 }

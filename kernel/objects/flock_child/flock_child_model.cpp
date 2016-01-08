@@ -99,7 +99,7 @@ void model::create_phys()
     
     phys::flock::params_t  params;
     params.mass = 1;
-    phys_flock_ = phys_->get_system(*phys_zone_)->create_flock_child(params, s, p);
+    phys_model_ = phys_->get_system(*phys_zone_)->create_flock_child(params, s, p);
 
 }
 
@@ -107,10 +107,10 @@ void model::update_model( double time, double dt )
 {
     cg::geo_base_3 cur_pos = pos();
 
-    if (phys_ && phys_flock_) // callback to phys pos
+    if (phys_ && phys_model_) // callback to phys pos
     {
         const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
-        decart_position phys_pos = phys_flock_->get_position();
+        decart_position phys_pos = phys_model_->get_position();
         geo_position glb_phys_pos(phys_pos, base);
         auto const& settings = _spawner->settings();
 
@@ -139,7 +139,7 @@ void model::update_model( double time, double dt )
 
 void model::sync_phys(double dt)
 {
-    if (!phys_flock_ || !phys_)
+    if (!phys_model_ || !phys_)
         return;
 
     point_3     wind(0.0,0.0,0.0);
@@ -148,7 +148,7 @@ void model::sync_phys(double dt)
 
 	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
-    decart_position cur_pos = phys_flock_->get_position();
+    decart_position cur_pos = phys_model_->get_position();
 
     geo_position cur_glb_pos(cur_pos, base);
     double cur_speed  = cg::norm(cur_pos.dpos);
@@ -191,19 +191,19 @@ void model::sync_phys(double dt)
 
     
 	if(_targetSpeed > -1){
-		phys::flock::control_ptr(phys_flock_)->set_angular_velocity(omega_rel);
+		phys::flock::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
 	}
 
-    phys::flock::control_ptr(phys_flock_)->set_linear_velocity(forward_dir * _speed );
+    phys::flock::control_ptr(phys_model_)->set_linear_velocity(forward_dir * _speed );
 
 }
 
 void model::sync_nodes_manager( double /*dt*/ )
 {
-    if (phys_flock_ && root_)
+    if (phys_model_ && root_)
     {
         cg::geo_base_3 base = phys_->get_base(*phys_zone_);
-        decart_position bodypos = phys_flock_->get_position();
+        decart_position bodypos = phys_model_->get_position();
         decart_position root_pos = bodypos /** body_transform_inv_*/;// FIXME Модельно зависимое решение 
 
         geo_position pos(root_pos, base);

@@ -23,10 +23,14 @@ struct visual_system
 {
     virtual ~visual_system(){}
 
-
-    virtual visual_object_ptr       create_visual_object(std::string const & res, uint32_t seed = 0) = 0;
-    virtual visual_object_ptr       create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed = 0 ) = 0;
-    //virtual victory::IVictoryPtr    victory () = 0;
+#ifdef ASYNC_OBJECT_LOADING
+    virtual visual_object_ptr       create_visual_object(std::string const & res, uint32_t seed = 0, bool async=true) = 0;
+    virtual visual_object_ptr       create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed = 0, bool async=true ) = 0;
+#else
+	virtual visual_object_ptr       create_visual_object(std::string const & res, uint32_t seed = 0, bool async=false) = 0;
+	virtual visual_object_ptr       create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed = 0, bool async=false ) = 0;
+#endif
+	//virtual victory::IVictoryPtr    victory () = 0;
     //virtual victory::IScenePtr      scene   () = 0;
     //virtual victory::IViewportPtr   viewport() = 0;
 };

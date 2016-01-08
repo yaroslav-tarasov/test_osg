@@ -14,6 +14,7 @@ namespace vehicle
          virtual void                 detach_tow  ()                             =0; 
          virtual void                 set_brake   (double brake)                 =0;     
          virtual void                 set_reverse (bool val)                     =0;
+		 virtual void                 fire_fight()                               =0;
 
          FIXME(Надо сократить до follow_trajectory)
          virtual void                 follow_trajectory(std::string const& /*route*/)=0;

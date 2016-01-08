@@ -82,9 +82,9 @@ protected:
 	nodes_management::node_info_ptr     tow_point_node_;
     nodes_management::node_info_ptr     rtow_point_node_;
 	nodes_management::node_info_ptr     current_tow_point_node_;
-	
+
 	/// fire engine points
-    nodes_management::node_info_ptr     turret_point_node_;    
+    nodes_management::node_info_ptr     turret_node_;    
 	 
 	aircraft::info_ptr                  aerotow_;
 	aircraft::info_ptr                  burning_plane_;

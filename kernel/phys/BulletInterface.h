@@ -45,7 +45,7 @@ public:
     static_mesh_ptr             create_static_mesh     ( sensor_ptr s ) override;
     static_convex_ptr           create_static_convex   ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) override;
     flock::info_ptr             create_flock_child     (const phys::flock::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
-
+    aerostat::info_ptr          create_aerostat        (const phys::aerostat::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
 #ifdef DEPRECATED    
     ray_cast_vehicle::info_ptr  createVehicle(osg::Node* node,int id,double mass);
 #endif

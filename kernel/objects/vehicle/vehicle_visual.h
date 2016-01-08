@@ -35,7 +35,6 @@ namespace vehicle
         boost::shared_ptr<tow_support>   ts_;
 
     private:
-		nm::node_info_ptr                        turret_node_;
         visual_object_ptr                       label_object_;
 		FoamStreamSfxNode *         foam_stream_sfx_weak_ptr_;
 		visual_object_ptr                 foam_stream_object_;

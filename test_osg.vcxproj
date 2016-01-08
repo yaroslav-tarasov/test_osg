@@ -158,6 +158,10 @@
     <ClInclude Include="av\Visual.h" />
     <ClInclude Include="ext\spark\SmokeNode.h" />
     <ClInclude Include="kernel\fms\trajectory.h" />
+    <ClInclude Include="kernel\objects\aerostat\aerostat_common.h" />
+    <ClInclude Include="kernel\objects\aerostat\aerostat_ctrl.h" />
+    <ClInclude Include="kernel\objects\aerostat\aerostat_model.h" />
+    <ClInclude Include="kernel\objects\aerostat\aerostat_view.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h" />
@@ -189,6 +193,7 @@
     <ClCompile Include="av\avCore\Utils.cpp" />
     <ClCompile Include="av\avCore\XmlModel.cpp" />
     <ClCompile Include="av\avFx\FoamStreamFx.cpp" />
+    <ClCompile Include="av\avFx\FrictionDustFx.cpp" />
     <ClCompile Include="av\avFx\LandingDustFx.cpp" />
     <ClCompile Include="av\avFx\SmokeFx.cpp" />
     <ClCompile Include="av\avFx\SparksFx.cpp" />
@@ -250,6 +255,9 @@
     <ClCompile Include="kernel\fms\dubins.cpp" />
     <ClCompile Include="kernel\fms\trajectory.cpp" />
     <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
+    <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\aerostat\aerostat_model.cpp" />
+    <ClCompile Include="kernel\objects\aerostat\aerostat_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp" />
@@ -316,6 +324,7 @@
     <ClCompile Include="kernel\objects\vehicle\vehicle_model_states.cpp" />
     <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp" />
     <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp" />
+    <ClCompile Include="kernel\phys\aerostat_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />

@@ -100,7 +100,7 @@ namespace avScene {
         inline ScreenTextureManager*                getScreenTextureManager() const;
         inline osg::Group*                          getTerrainRoot() const { return _terrainRoot.get(); } 
 
-        osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0);
+        osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0, bool async=true);
 
         static std::string                          zoneToReload(){return zone_to_reload_;}
     private:
@@ -167,6 +167,8 @@ namespace avScene {
 
 		SmokeSfxNode *                 smoke_sfx_weak_ptr_;
 		SparksSfxNode *                sparks_sfx_weak_ptr;
+		FrictionDustSfxNode*           fd_sfx_weak_ptr;
+
 		LandingDustSfxNode *           ld_sfx_weak_ptr;
 		FoamStreamSfxNode *            fs_sfx_weak_ptr_;
     private:

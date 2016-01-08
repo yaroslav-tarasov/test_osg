@@ -12,6 +12,7 @@
 #include "simple_route/simple_route_view.h"
 #include "airport/airport_view.h"
 #include "flock_manager/flock_manager_view.h"
+#include "aerostat/aerostat_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
@@ -54,6 +55,23 @@ namespace flock
     }
 }
 
+
+namespace aerostat
+{
+
+	object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+	{
+		const std::string class_name = "aerostat";
+		const std::string unique_name = sys->generate_unique_name(class_name);
+
+		obj_create_data ocd(class_name, unique_name, dict::wrap(aerostat_data(sett, state_t(init_pos.pos, init_pos.orien))));
+		ocd
+			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
+
+		return sys->create_object(ocd);	
+	}
+
+}
 
 namespace vehicle
 {

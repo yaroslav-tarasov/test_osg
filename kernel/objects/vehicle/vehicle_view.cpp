@@ -20,7 +20,7 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
         conn_holder()    << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed, this));
         tow_point_node_    = nodes_manager_->find_node("tow_point");
         rtow_point_node_   = nodes_manager_->find_node("rtow_point");
-		turret_point_node_ = nodes_manager_->find_node("turret");
+		turret_node_       = nodes_manager_->find_node("turret");
     }
 
     msg_disp()
@@ -95,7 +95,7 @@ void view::on_model_changed()
     root_ = nodes_manager_->get_node(0);
 	tow_point_node_  = nodes_manager_->find_node("tow_point");
 	rtow_point_node_ = nodes_manager_->find_node("rtow_point");
-	turret_point_node_ = nodes_manager_->find_node("turret_point");
+	turret_node_     = nodes_manager_->find_node("turret");
 }
 
 void view::set_settings( settings_t const& settings )

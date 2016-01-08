@@ -130,19 +130,10 @@ AUTO_REG_NAME(vehicle_visual, visual::create);
 visual::visual(object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
 {
-    visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
-	nm::visit_sub_tree(nodes_manager_->get_node_tree_iterator(root_->node_id()), [this](nm::node_info_ptr n)->bool
-	{
-		if (boost::starts_with(n->name(), "turret"))
-		{
-			this->turret_node_ = n;
-			return false;
-		}
-		return true;
-	});
 
 #ifndef ASYNC_OBJECT_LOADING 
+    visual_system* vsys = dynamic_cast<visual_system*>(sys_);
     label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
     ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 #endif
@@ -162,9 +153,10 @@ void visual::update(double time)
     {
 
 #ifdef ASYNC_OBJECT_LOADING 
-		if(!label_object_)
+		if(!label_object_ && nm::vis_node_control_ptr(root_)->vis_nodes().size()>0)
 		{
-			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
+			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
+			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg", 0 ,false);
 		    ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 		}
 #endif
@@ -239,7 +231,6 @@ void visual::update(double time)
 					quaternion node_orien = turret_node_->get_global_orien();
 					point_3f pos = base(node_pos);
 #endif
-
 					// foam_stream_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
 					foam_stream_object_->set_visible(true);
 

@@ -1214,8 +1214,13 @@ private:
 
     // visual_system
 private:
-    visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 );
-    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0 );
+#ifdef ASYNC_OBJECT_LOADING
+    visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 , bool async=true);
+    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0, bool async=true );
+#else
+	visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 , bool async=false);
+	visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0, bool async=false );
+#endif
 
     // visual_system_props
 private:
@@ -1281,14 +1286,14 @@ void visual_system_impl::load_exercise(dict_cref dict)
     //init_eye();
 }
 
-visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/ )
+visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/, bool async )
 {
-    return boost::make_shared<visual_object_impl>( res, seed);
+    return boost::make_shared<visual_object_impl>( res, seed, async);
 }
 
-visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed/* = 0*/ )
+visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed/* = 0*/, bool async )
 {
-    return boost::make_shared<visual_object_impl>( parent, res, seed);
+    return boost::make_shared<visual_object_impl>( parent, res, seed, async);
 }
 
 

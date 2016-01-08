@@ -7,7 +7,7 @@
 #include "av/avCore/avCore.h"
 #include "av/avScene/Scene.h"
 
-#include "av/avFx/SparksFx.h"
+#include "av/avFx/FrictionDustFx.h"
 
 #include "utils/materials.h"
 
@@ -23,11 +23,9 @@ using namespace avFx;
 //
 
 // constructor
-SparksFx::SparksFx()
+FrictionDustFx::FrictionDustFx()
 {
-    setName("SparksFx");
-
-	_createGeometry();
+    _createGeometry();
 
     //
     // create state set
@@ -40,20 +38,23 @@ SparksFx::SparksFx()
     pCurStateSet->setRenderBinDetails(RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin");
 
     // setup blending
-    osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ZERO);
+    osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
     pCurStateSet->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
 	
 	osg::BlendEquation* pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
 	pCurStateSet->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     // enable depth test but disable depth write
-    osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, true);
+    osg::Depth * pDepth = new osg::Depth(osg::Depth::LEQUAL, 0.0, 1.0, false);
     pCurStateSet->setAttribute(pDepth);
 
-	pCurStateSet->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE,osg::StateAttribute::ON);  
-#if 0
 	// enable depth clamping to avoid cutting
 	pCurStateSet->setMode(GL_DEPTH_CLAMP_NV, osg::StateAttribute::ON);
+
+#if 0
+	// do not write alpha
+	osg::ColorMask * pColorMask = new osg::ColorMask(true, true, true, false);
+	pCurStateSet->setAttribute(pColorMask);
 #endif
 
     // disable cull-face just for the case
@@ -61,10 +62,10 @@ SparksFx::SparksFx()
 
     // setup shader
     osg::Program * pCurProgram = new osg::Program;
-    pCurProgram->setName("SparksFx");
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SparksFx.vs", NULL, osg::Shader::VERTEX  ));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SparksFx.gs", NULL, osg::Shader::GEOMETRY));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SparksFx.fs", NULL, osg::Shader::FRAGMENT));
+    pCurProgram->setName("FrictionDustFx");
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FrictionDustFx.vs", NULL, osg::Shader::VERTEX  ));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FrictionDustFx.gs", NULL, osg::Shader::GEOMETRY));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FrictionDustFx.fs", NULL, osg::Shader::FRAGMENT));
     pCurProgram->setParameter(GL_GEOMETRY_VERTICES_OUT_EXT, 4);
     pCurProgram->setParameter(GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
     pCurProgram->setParameter(GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);
@@ -72,29 +73,37 @@ SparksFx::SparksFx()
 
     // bind shader
     pCurStateSet->setAttribute(pCurProgram);
- 
-	// uniforms
+   
 
-	_effectData = new osg::Uniform("effect_data"  , osg::Vec4(0.0,0.0,0.0,0.0));
+
+    // uniforms
+
+   
+	pCurStateSet->addUniform( new osg::Uniform("SmokeAtlas"  , 0) );
 	
+	pCurStateSet->addUniform( new osg::Uniform("ViewLightMap"  , BASE_LM_TEXTURE_UNIT) );
+    pCurStateSet->addUniform( new osg::Uniform("envTex"        , BASE_ENV_TEXTURE_UNIT) );
+
 	osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
-	
-	pCurStateSet->addUniform( new osg::Uniform("envTex"        , BASE_ENV_TEXTURE_UNIT) );
+	pCurStateSet->setTextureAttributeAndModes( BASE_LM_TEXTURE_UNIT, creators::getTextureHolder().getLightMapTexture().get(), value ); 
 	pCurStateSet->setTextureAttributeAndModes( BASE_ENV_TEXTURE_UNIT, creators::getTextureHolder().getEnvTexture().get()    , value );
+	
+	// textures
 
-	pCurStateSet->addUniform( _effectData.get() );
+    // setup texture for point quads
+    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/smoke_puff_atlas.dds", osg::Texture::REPEAT));
+
 	
-	
-	setCullCallback(utils::makeNodeCallback(this, &SparksFx::cull));
+	setCullCallback(utils::makeNodeCallback(this, &FrictionDustFx::cull));
     // exit
     return;
 }
 
 
-void SparksFx::_createArrays()
+void FrictionDustFx::_createArrays()
 {
-	prev_pos_ = new osg::Vec3Array();
-	_geom->setVertexAttribArray(1, prev_pos_.get(),osg::Array::BIND_PER_VERTEX);
+	factor_dummies_ = new osg::Vec3Array();
+	_geom->setVertexAttribArray(1, factor_dummies_.get(),osg::Array::BIND_PER_VERTEX);
 	_geom->setVertexAttribNormalize(1, false);
 
 	randoms_            = new osg::Vec4Array();
@@ -102,7 +111,7 @@ void SparksFx::_createArrays()
 	_geom->setVertexAttribNormalize(2, false);
 
 	pos_time_unit_->setPreserveDataType(true);
-	prev_pos_->setPreserveDataType(true);
+	factor_dummies_->setPreserveDataType(true);
 	randoms_->setPreserveDataType(true);
 
 	// draw arrays command, that would be executed
@@ -113,14 +122,14 @@ void SparksFx::_createArrays()
 	_geom->addPrimitiveSet(_drawArrays.get());
 }
 
-void SparksFx::_clearArrays()
+void FrictionDustFx::_clearArrays()
 {
 	pos_time_unit_->clear();
-	prev_pos_->clear();
+	factor_dummies_->clear();
 	randoms_->clear();
 }
 
-void SparksFx::_createGeometry()
+void FrictionDustFx::_createGeometry()
 {
 	// dummy bounding box callback
 	osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
@@ -150,17 +159,17 @@ void SparksFx::_createGeometry()
 }
 
 //
-// sparks_sfx_node
+// FrictionDustSfxNode
 //
 
-void SparksFx::setContactFlag( bool flag )
+void FrictionDustFx::setContactFlag( bool flag )
 {
 	if (flag != data_.active)
 		emitter_.reset_emanation_last();
 	data_.active = flag;
 }
 
-void SparksFx::setEmitterWorldSpeed( cg::point_3f const & speed )
+void FrictionDustFx::setEmitterWorldSpeed( cg::point_3f const & speed )
 {
 	data_.emitter_speed = speed;
 	speed_left = normalized_safe(cg::point_3f(0, 0, 1) ^ speed);
@@ -168,77 +177,64 @@ void SparksFx::setEmitterWorldSpeed( cg::point_3f const & speed )
 }
 
 // update
-void SparksFx::cull( osg::NodeVisitor * pNV )
+void FrictionDustFx::cull( osg::NodeVisitor * pNV )
 {
+
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
-    
-	const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
-	const osg::Matrixd mProjection  = *pCV->getProjectionMatrix();
 
-	const avCore::Environment::IlluminationParameters & cIlluminationParameters = avCore::GetEnvironment()->GetIlluminationParameters();
 	const avCore::Environment::EnvironmentParameters  & cEnvironmentParameters  = avCore::GetEnvironment()->GetEnvironmentParameters();
 
-	_effectData->set(osg::Vec4(data_.factor * mProjection(0,0), cIlluminationParameters.Illumination, 1.f / pCV->getViewport()->width(), 0.0));
-
 	// particles updater
-    cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
+	cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
 	auto const & cpu_updater = [&wind_vec]( cpu_particle & part, float dt )
 	{
-		part.prev_pos = part.cur_pos();
-
-		part.cur_vel *= exp(-0.6f * dt);
-		part.cur_vel.z -= 18.0f * dt;
-
-		part.cur_pos() += (wind_vec + part.cur_vel) * dt;
-		if (part.cur_pos().z <= 0.f && part.cur_vel.z <= 0.f)
-		{
-			part.cur_pos().z = -part.cur_pos().z;
-			part.cur_vel.z = -0.8f * part.cur_vel.z;
-			part.cur_vel *= 0.9f;
-		}
+		part.cur_vel *= exp(-1.75f * dt);
+		part.cur_pos() += (wind_vec + part.c_vel + part.cur_vel) * dt;
 	};
-
 	// update current
 	static const float break_sfx_dist = 30.f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), cg::point_3f(0.0f,0.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*/, break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(),  cg::point_3f(0.0f,0.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*/, break_sfx_dist, cpu_updater);
 
 	// need to emit?
 	if (data_.active)
 	{
 		// decide about intensity
-		float intensity_cur = cg::clamp(7.0f, 60.f, 0.f, 1.f)(speed_val_);
-		intensity_cur *= 0.7f * intensity_cur + 0.3f;
+		float intensity_cur = cg::clamp(15.0f, 70.f, 0.f, 1.f)(speed_val_);
+		intensity_cur *= 0.5f * intensity_cur + 0.5f;
 		// new particles emitter
 		auto const & cpu_emit_new = [this, intensity_cur]( cg::point_3f const & wp, float /*emit_timestamp*/, float tfe, simplerandgen & rnd )->cpu_particle
 		{
-			const unsigned spark_dir = rnd.random_32bit() & 3;
-			const float lt = rnd.random_range(spark_lifetime_min, spark_lifetime_max);
-			cg::point_3f vel = data_.emitter_speed;
-			if (spark_dir < 2)
-			{
-				const float speed_sign = -1.f + 2.f * spark_dir;
-				vel = vel * rnd.random_dev(1.1f, 0.15f) + speed_left * (speed_sign * rnd.random_dev(3.f + 4.f * intensity_cur, 2.f));
-				vel.z = rnd.random_dev(3.f + 3.f * intensity_cur, 2.f);
-			}
-			else
-			{
-				vel = vel * rnd.random_dev(0.9f, 0.075f) + speed_left * rnd.random_dev(0.f, 1.f + 2.f * intensity_cur);
-				vel.z = rnd.random_dev(2.f + 2.f * intensity_cur, 1.f);
-			}
-			return SparksFx::cpu_particle(wp, lt, tfe, vel);
+			const float lt = rnd.random_range(dust_lifetime_min, dust_lifetime_max);
+
+			cg::colorab randoms;
+			randoms.r = rnd.random_8bit();
+			randoms.g = rnd.random_8bit();
+			randoms.b = rnd.random_8bit();
+			randoms.a = rnd.random_8bit();
+
+			cg::point_3f start_vel = this->data_.emitter_speed;
+
+			cg::point_3f cvel;
+			cvel.x += rnd.random_unit_signed() * (intensity_cur * 3.5f);
+			cvel.y += rnd.random_unit_signed() * (intensity_cur * 3.5f);
+			cvel.z += rnd.random_unit() * (intensity_cur * 1.0f);
+
+			return FrictionDustFx::cpu_particle(wp, lt, tfe, start_vel, intensity_cur, randoms, cvel);
 		};
 		// particles emission
 		static const float break_time_dist = 1.f;
-		emitter_.emit_new_particles(intensity_cur * 5.f, intensity_cur / cg::max(data_.factor, 1.f), break_time_dist, cpu_emit_new, cpu_updater);
+		emitter_.emit_new_particles(0, 0.8f, break_time_dist, cpu_emit_new, cpu_updater);
 	}
 
+	// feed it to gpu
+	FIXME("Масштаб?");
+	static const float max_part_size = 20.f;
 	_clearArrays();
 	
-	// feed it to gpu
 	auto const & cpu_queue = emitter_.get_queue();
 	pos_time_unit_->resize(cpu_queue.size()); 
-    prev_pos_->resize(cpu_queue.size());
+    factor_dummies_->resize(cpu_queue.size());
     randoms_->resize(cpu_queue.size());
 	
 	
@@ -248,11 +244,12 @@ void SparksFx::cull( osg::NodeVisitor * pNV )
 		// result_aabb |= part->cur_pos();
 		auto cpu_p = *part;
 		pos_time_unit_->at(i).set(cpu_p.cur_pos().x,cpu_p.cur_pos().y,cpu_p.cur_pos().z,cpu_p.t());
-		prev_pos_->at(i).set(cpu_p.prev_pos.x, cpu_p.prev_pos.y, cpu_p.prev_pos.z);
+		factor_dummies_->at(i).set( cpu_p.factor, 0.f, 0.f);
+		randoms_->at(i).set(float(cpu_p.randoms.r)/255.0f,float(cpu_p.randoms.g)/255.0f,float(cpu_p.randoms.b)/255.0f,float(cpu_p.randoms.a)/255.0f); 
 	}
 
 	pos_time_unit_->dirty();
-	prev_pos_->dirty();
+	factor_dummies_->dirty();
 	randoms_->dirty();
 
 	_drawArrays->setCount(cpu_queue.size());

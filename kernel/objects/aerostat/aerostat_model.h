@@ -1,16 +1,15 @@
 #pragma once
 
-#include "flock_child_common.h"
-#include "flock_child_view.h"
+#include "aerostat_common.h"
+#include "aerostat_view.h"
 #include "common/phys_sys.h"
 #include "objects/nodes_management.h"
 #include "common/phys_object_model_base.h"
 
-namespace flock
+namespace aerostat
 {
 
-namespace child
-{
+
 
 struct model
     : model_presentation        // базовый класс, виртуальрость
@@ -38,12 +37,6 @@ private:
     void update_model       ( double time, double dt );
 
 private:
-    void flap();
-    void dive();
-    void soar();
-    void wander(float delay);
-
-private:
     phys::static_mesh_ptr                  mesh_;
 
     optional<size_t>                  phys_zone_;
@@ -59,18 +52,14 @@ private:
 	bool                                 _landing;
 
     double                                 _speed;
-	double  						   _soarTimer;
 	float								 _damping;
     float			    			 _lerpCounter;
-	bool							 _flatFlyDown;
-    float                           _stuckCounter;
-	bool						  _landingSpotted;
 
 //  phys staff
 private:
     model_system *                           sys_;
 	optional<double>                 last_update_;
-	phys::flock::info_ptr             phys_model_;
+	phys::aerostat::info_ptr             phys_model_;
     
     cg::geo_point_3                 desired_position_;
     quaternion                      desired_orien_;
@@ -78,16 +67,7 @@ private:
 private: 
 	boost::function<void()>                start_;
     
-	enum flock_state
-	{
-		fl_soar,
-		fl_dive,
-		fl_flap
-	};
-
-	flock_state                     flock_state_;
 };
 
-} // child
 
-} // end of namespace flock
+} // end of namespace model

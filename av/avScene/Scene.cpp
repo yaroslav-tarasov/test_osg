@@ -65,6 +65,7 @@
 #include "av/avFx/SparksFx.h"
 #include "av/avFx/LandingDustFx.h"
 #include "av/avFx/FoamStreamFx.h"
+#include "av/avFx/FrictionDustFx.h"
 
 //
 //  ext
@@ -1000,10 +1001,13 @@ FIXME(Чудеса с Ephemeris)
 	addChild(fs);
 #endif
 
-
 	avFx::SparksFx* spark = new avFx::SparksFx;
 	sparks_sfx_weak_ptr = dynamic_cast<SparksSfxNode*>(spark);
 	addChild(spark);
+	
+	avFx::FrictionDustFx* fd = new avFx::FrictionDustFx;
+	fd_sfx_weak_ptr = dynamic_cast<FrictionDustSfxNode*>(fd);
+	addChild(fd);
 
 	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
 	ld_sfx_weak_ptr = dynamic_cast<LandingDustSfxNode*>(ld);
@@ -1325,7 +1329,7 @@ void Scene::createObjects()
 
 
 
-osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
+osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool async)
 {
     using namespace creators;
 
@@ -1741,7 +1745,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed)
 
 #ifdef ASYNC_OBJECT_LOADING
     // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
-    dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()),boost::bind<void>(sig, seed));
+    if(async)
+		dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()),boost::bind<void>(sig, seed));
+	else
+		wf(seed, path,mt_.back().get());
 #else
     wf(seed, path,mt_.back().get());
 #endif
@@ -1857,6 +1864,12 @@ void Scene::update( osg::NodeVisitor * nv )
 	  {
 		  sparks_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
 		  sparks_sfx_weak_ptr->setContactFlag(true);
+	  }
+
+	  if(fd_sfx_weak_ptr)
+	  {
+		  fd_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
+		  fd_sfx_weak_ptr->setContactFlag(true);
 	  }
 
 	  if(ld_sfx_weak_ptr && cg::mod(int(lt),5) == 0 )

@@ -9,7 +9,8 @@ FIXME(Это что за нафиг нужно  для object_creators )
 #include "common/simple_route.h"
 #include "objects/flock_manager/flock_manager_common.h"
 #include "common/flock_manager.h"
-
+#include "objects/aerostat/aerostat_common.h"
+#include "common/aerostat.h"
 
 #include "object_creators.h"
 
@@ -296,16 +297,27 @@ void create_objects(const std::string & airport)
     LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.set_point() << "\n");
 
 
-    //{
-    //    flock::manager::settings_t vs;
-    //    // vs.model = "crow";
-    //    cg::geo_point_3 vpos(0.00055,0.0009,300.0);
-    //    geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+#if 0
+    {
+        flock::manager::settings_t vs;
+        // vs.model = "crow";
+        cg::geo_point_3 vpos(0.00055,0.0009,300.0);
+        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-    //    auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
-    //}
+        auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    }
+#endif
 
+#if 1
+	{
+		aerostat::settings_t vs;
+	    vs.model = "aerostat";
+		cg::geo_point_3 vpos(0.00055,0.0009,300.0);
+		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
+		auto obj_aerostat = aerostat::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	}
+#endif
 }
 
 using namespace net_layer::msg;
@@ -371,6 +383,20 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const&
     vs.model = "crow";
 
     return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
+}
+
+inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
+{
+	decart_position target_pos;
+
+	target_pos.pos   = msg.pos;
+	target_pos.orien = msg.orien;
+	geo_position vgp(target_pos, get_base());
+
+	aerostat::settings_t ms;
+	ms.model = "aerostat";
+
+	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,vgp);
 }
 
 object_info_ptr create_object( kernel::system* csys, create const& msg)

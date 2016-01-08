@@ -21,6 +21,7 @@
 #include "static_convex.h"
 #include "ray_cast_vehicle.h"
 #include "flock_child_phys.h"
+#include "aerostat_phys.h"
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
@@ -266,6 +267,24 @@ namespace flock
     }
 }
 
+namespace aerostat
+{
+	void fill_cs(const std::string& model_name, compound_sensor_impl& cs )
+	{ 
+
+		bool loaded = loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs.cs_);
+		if(loaded)
+		{
+			const btTransform ct0 = cs.cs_->getChildTransform(0);
+			cs.offset_ = from_bullet_vector3(ct0.getOrigin());
+				// cs.cs_->setLocalScaling( btVector3(0.01,0.01,0.01));
+		}
+		else
+			cs.cs_ = nullptr;
+
+	}
+}
+
 namespace phys
 {
     namespace aircraft
@@ -311,6 +330,19 @@ namespace phys
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
     }
+
+	namespace aerostat
+	{
+		compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+		{
+			compound_sensor_impl cs;
+			const std::string model_name = manager->get_model();
+
+			::aerostat::fill_cs(model_name,cs);
+
+			return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
+		}
+	}
 }
 
 namespace phys
@@ -879,6 +911,11 @@ ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,
 flock::info_ptr BulletInterface::create_flock_child(const phys::flock::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
 	return  boost::make_shared<flock::impl>(shared_from_this(),s,p,pos);
+}
+
+aerostat::info_ptr BulletInterface::create_aerostat(const phys::aerostat::params_t  & p,compound_sensor_ptr s,const decart_position & pos)
+{    	
+	return  boost::make_shared<aerostat::impl>(shared_from_this(),s,p,pos);
 }
 
 

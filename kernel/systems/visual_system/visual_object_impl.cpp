@@ -8,16 +8,18 @@
 
 namespace kernel
 {
-    visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed )
+    visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async )
         : scene_( avScene::GetScene() )
         , loaded_(false)
     {
 #ifdef ASYNC_OBJECT_LOADING
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
-        node_ = scene_->load(res, nullptr, seed);
+        node_ = scene_->load(res, nullptr, seed, async);
         seed_ =  seed;
-#else
-        node_ = scene_->load(res, nullptr, seed);
+#endif
+		if(!async)
+		{
+        node_ = scene_->load(res, nullptr, seed, async);
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
         loaded_ = true;
 
@@ -35,11 +37,11 @@ namespace kernel
 #if 0
         SetupRigGeometry switcher(true, *node_.get());
 #endif
-#endif       
+		}     
 
     }
 
-    visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed )
+    visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async )
                         : scene_ ( avScene::GetScene() )
                         , parent_(parent)
                         , loaded_(false)
@@ -50,9 +52,11 @@ namespace kernel
 #endif
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
-        node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed);
+        node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed, async);
 
-#ifndef ASYNC_OBJECT_LOADING           
+		if(!async)
+		{
+
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
 
 		using namespace avAnimation;
@@ -69,7 +73,7 @@ namespace kernel
 #if 0
 		SetupRigGeometry switcher(true, *node_.get());
 #endif
-#endif
+		}
     }
 
     visual_object_impl::~visual_object_impl()
