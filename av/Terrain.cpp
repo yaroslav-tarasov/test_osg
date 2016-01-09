@@ -355,9 +355,9 @@ void  Terrain::create( const std::string& name )
 			const float pitch = osg::DegreesToRadians(0.f/*-90.f*/);
 			data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
-#ifndef ASYNC_OBJECT_LOADING
+//#ifndef ASYNC_OBJECT_LOADING
             avScene::LightManager::GetInstance()->addLight(data);
-#endif
+//#endif
 
         }
     }

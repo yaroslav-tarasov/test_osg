@@ -1,3 +1,4 @@
+
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
@@ -647,15 +648,13 @@ void model::sync_nodes_manager( double dt )
 		if(turret_node_ && burning_plane_) 
 		{
 			geo_base_3 node_gpos = turret_node_->get_global_pos();
-			double stream_course = cg::polar_point_2(node_gpos(burning_plane_->pos())).course;
+			//double stream_course = cg::polar_point_2(node_gpos(burning_plane_->pos())).course;
+			double stream_course = geo_direction(node_gpos,burning_plane_->pos() ).course - pos.orien.get_course();
 
 			nodes_management::node_position node_pos = turret_node_->position();
 
-			const float angular_speed = 5 * 2 * cg::pif/60.0; 
-			quaternion des_orien = quaternion(cpr(node_pos.local().orien.get_course(),15,0))
-								   * quaternion(cpr(-cg::rad2grad() * stream_course,0,0));
-				                   // * quaternion(cpr(-cg::rad2grad() * angular_speed * dt,0,0));
-			point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
+			quaternion des_orien = quaternion(cpr(stream_course,15,0));
+			point_3    omega_rel = cg::get_rotate_quaternion(node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
 
 		    node_pos.local().omega = omega_rel;
 

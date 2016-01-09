@@ -18,37 +18,6 @@ namespace aircraft
      
     const double model::shassi_height_ = 130;
 
-#ifdef DEPRECATED  
-// FIXME Само собой чушь
-void /*system_base::*/block_obj_msgs(bool block)
-{ }
-
-void /*system_base::*/send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
-{}
-
-object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys)
-{
-    size_t id  = 0x666;
-    std::vector<object_info_ptr>  objects;
-    objects.push_back(nodes_manager);
-    auto msg_service = boost::bind(&send_obj_message, id, _1, _2, _3);
-    auto block_msgs  = [=](bool block){ block_obj_msgs(block); };
-    kernel::object_create_t  oc(
-        nullptr, 
-        sys.get(),                  // kernel::system*                 sys             , 
-        id,                         // size_t                          object_id       , 
-        "name",                     // string const&                   name            , 
-        objects,                    // vector<object_info_ptr> const&  objects         , 
-        msg_service,                // kernel::send_msg_f const&       send_msg        , 
-        block_msgs                  // kernel::block_obj_msgs_f        block_msgs
-        );
-
-    aircraft::settings_t air_settings;
-    dict_t d = dict::wrap(craft_data(air_settings));
-
-    return model::create(oc,d);
-}
-#endif
 
 object_info_ptr model::create(kernel::object_create_t const& oc, dict_copt dict)
 {

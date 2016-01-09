@@ -87,7 +87,7 @@ void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
 void view::on_fight_fire   (msg::fight_fire_t const& data)
 {
 	FIXME("Может как tow сделать?");
-	aerotow_ = data.burning_id ? collection_->get_object(*data.burning_id) : nullptr;
+	burning_plane_ = data.burning_id ? collection_->get_object(*data.burning_id) : nullptr;
 }
 
 void view::on_model_changed()

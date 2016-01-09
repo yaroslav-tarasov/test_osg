@@ -37,8 +37,8 @@ protected:
         
         osg::observer_ptr<SparkDrawable> _spark;
         osg::observer_ptr<osg::Transform> _trackee;  // The trackee will be followed by the spark
-        osg::Matrix _transformMatrix;  // The matrix from trackee coordinate to spark coordinate
-        bool _dirtyMatrix;  // Dirty the matrix if trackee is changed in the scene graph
+        osg::Matrix _transformMatrix;                // The matrix from trackee coordinate to spark coordinate
+        bool _dirtyMatrix;                           // Dirty the matrix if trackee is changed in the scene graph
     };
     std::vector<SparkObject> _sparks;
 };

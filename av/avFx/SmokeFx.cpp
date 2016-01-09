@@ -175,12 +175,12 @@ void SmokeFx::cull( osg::NodeVisitor * pNV )
 
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
-	
-	const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
-	
-	const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 
-	// particles updater
+	const osg::Matrixd mLocalToWorld = computeLocalToWorld(pNV->getNodePath());
+
+	const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+	
+    // particles updater
 	cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
 	auto const & cpu_updater = [&wind_vec]( cpu_particle & part, float dt )
 	{
@@ -194,7 +194,7 @@ void SmokeFx::cull( osg::NodeVisitor * pNV )
 
 	// update current
 	static const float break_sfx_dist = 80.f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), cg::point_3f(150.0f,200.0,0.0)/*from_osg_vector3(mWorldToView.getTrans())*/, break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), data_.emit_pos, break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;

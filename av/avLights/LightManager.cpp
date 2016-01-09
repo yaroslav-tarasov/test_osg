@@ -71,7 +71,7 @@ uint32_t  LightManager::genUID()
 {
       uint32_t uid = 0;
       
-      while (uid==0 || m_LightsMap.find(uid)!=m_LightsMap.end())
+      while (uid==0 || _LightsMap.find(uid)!=_LightsMap.end())
       {
           uid = cg::rand(cg::range_2(1, std::numeric_limits<uint32_t>::max()));
       };
@@ -79,44 +79,13 @@ uint32_t  LightManager::genUID()
       return uid;
 }
 
-
-#if 0
-uint32_t  LightManager::addLight(osg::MatrixTransform* mt )
-{
-    const unsigned lightID = genUID();
-    
-    Light & light = m_LightsMap[lightID];
-
-    light.transform = mt;
-
-    light.spotFalloff = cg::range_2f(cg::grad2rad(15.f), cg::grad2rad(45.f));
-
-    const float distanceFalloff0 = 80.f;
-    const float distanceFalloff1 = 220.f;
-    light.distanceFalloff = cg::range_2f(distanceFalloff0, distanceFalloff1);
-
-    light.color.r = 0.99;
-    light.color.g = 0.99;
-    light.color.b = 0.99;
-    
-    light.position = cg::point_3f(0,0,0);
-
-    const float heading = osg::DegreesToRadians(0.f);
-    const float pitch = osg::DegreesToRadians(/*-90.f*/0.);
-    light.direction = as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
-
-    light.active = true;
-
-	return lightID;
-}
-#endif 
-
-
 uint32_t LightManager::addLight(const Light& data)
 {
-    const unsigned lightID = genUID();
+    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lightManagerMapMutex);
 
-    Light & light = m_LightsMap[lightID];
+	const unsigned lightID = genUID();
+
+	Light & light = _LightsMap[lightID];
 
     light = data;
     
@@ -136,8 +105,10 @@ void LightManager::update( osg::NodeVisitor * nv )
 
     if (lights == NULL)
         return;
-     
-    for (LightsMap::const_iterator it = m_LightsMap.cbegin(); it != m_LightsMap.cend(); ++it)
+    
+	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lightManagerMapMutex);
+
+    for (LightsMap::const_iterator it = _LightsMap.cbegin(); it != _LightsMap.cend(); ++it)
     {
         const Light & light = it->second;
 
@@ -154,8 +125,8 @@ void LightManager::update( osg::NodeVisitor * nv )
         if(light.transform)
         if(light.transform->asMatrixTransform())
         {
-           osg::Node* parent = light.transform->getParent(0);
-           if(parent->asTransform())
+           osg::Node* parent = light.transform->getNumParents()>0?light.transform->getParent(0):nullptr;
+           if(parent && parent->asTransform())
                 matrix =  light.transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
            else
                 matrix =  light.transform->asMatrixTransform()->getMatrix() ;

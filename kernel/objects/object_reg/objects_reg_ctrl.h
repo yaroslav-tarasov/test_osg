@@ -24,11 +24,12 @@ private:
 
     // control
 private:
-    virtual void inject_msg   (net_layer::msg::run               const& msg);  
-    virtual void inject_msg   (net_layer::msg::container_msg     const& msg);
-    virtual void inject_msg   (net_layer::msg::attach_tow_msg_t  const& msg);  
-    virtual void inject_msg   (net_layer::msg::detach_tow_msg_t  const& msg); 
-    virtual void inject_msg   (net_layer::msg::malfunction_msg   const& msg); 
+    void inject_msg   (net_layer::msg::run               const& msg);  
+    void inject_msg   (net_layer::msg::container_msg     const& msg);
+    void inject_msg   (net_layer::msg::attach_tow_msg_t  const& msg);  
+    void inject_msg   (net_layer::msg::detach_tow_msg_t  const& msg); 
+    void inject_msg   (net_layer::msg::malfunction_msg   const& msg); 
+	void inject_msg   (net_layer::msg::fire_fight_msg_t  const& msg); 
 
     virtual void inject_msg   (const void* data, size_t size);
 	virtual void create_object(net_layer::msg::create const& msg);

@@ -39,6 +39,9 @@ struct SmokeSfxNode : particles_effect_info
 
 	virtual void setEmitWorldDir( cg::point_3f const & dir ) = 0;
 	virtual cg::point_3f const & getEmitWorldDir() const = 0;
+	
+	virtual void setEmitWorldPos( cg::point_3f const & dir ) = 0;
+	virtual cg::point_3f const & getEmitWorldPos() const = 0;
 
 	virtual void setEmitterWorldSpeed( cg::point_3f const & speed ) = 0;
 	virtual cg::point_3f const & getEmitterWorldSpeed() const = 0;

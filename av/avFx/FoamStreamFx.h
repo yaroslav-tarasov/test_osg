@@ -25,7 +25,7 @@ struct foam_sfx_data /*: node_data*/
 	cg::point_3f emit_dir;
 	cg::point_3f emitter_speed;
 
-	foam_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f) {}
+	foam_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emitter_speed(0.f,50.f, 0.f) {}
 };
 
 

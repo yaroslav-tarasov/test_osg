@@ -167,9 +167,9 @@ namespace avScene {
 
 		SmokeSfxNode *                 smoke_sfx_weak_ptr_;
 		SparksSfxNode *                sparks_sfx_weak_ptr;
-		FrictionDustSfxNode*           fd_sfx_weak_ptr;
+		FrictionDustSfxNode*           fd_sfx_weak_ptr_;
 
-		LandingDustSfxNode *           ld_sfx_weak_ptr;
+		LandingDustSfxNode *           ld_sfx_weak_ptr_;
 		FoamStreamSfxNode *            fs_sfx_weak_ptr_;
     private:
         utils::LoadNodeThread*                          _lnt;

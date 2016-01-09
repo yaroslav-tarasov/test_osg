@@ -63,8 +63,6 @@ struct RigTransformHardware : public osgAnimation::RigTransformHardware
             osg::notify(osg::WARN) << "RigTransformHardware no skeleting set in geometry " << geom.getName() << std::endl;
             return false;
         }
-        else
-            osg::notify(osg::WARN) << "RigTransformHardware skeleton address " << reinterpret_cast<uint32_t>( geom.getSkeleton()) << std::endl;
 
         osgAnimation::BoneMapVisitor mapVisitor;
         geom.getSkeleton()->accept(mapVisitor);

@@ -1006,17 +1006,21 @@ FIXME(Чудеса с Ephemeris)
 	addChild(spark);
 	
 	avFx::FrictionDustFx* fd = new avFx::FrictionDustFx;
-	fd_sfx_weak_ptr = dynamic_cast<FrictionDustSfxNode*>(fd);
+	fd_sfx_weak_ptr_ = dynamic_cast<FrictionDustSfxNode*>(fd);
 	addChild(fd);
 
+	ld_sfx_weak_ptr_ = nullptr;
+#if 0
 	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
-	ld_sfx_weak_ptr = dynamic_cast<LandingDustSfxNode*>(ld);
+	ld_sfx_weak_ptr_ = dynamic_cast<LandingDustSfxNode*>(ld);
 
 	osg::PositionAttitudeTransform* pat;
 	pat = new osg::PositionAttitudeTransform;
 	pat->setScale(osg::Vec3(1,1,1));
 	pat->addChild(ld);
 	addChild(pat);
+#endif
+
 #endif
 
     return true;
@@ -1339,7 +1343,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
     
     LogInfo("Scene::load enter " << path);
 
-    if( path == "sfx//smoke.scg" )
+    if( path == "smoke" )
     {
         osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
@@ -1377,6 +1381,27 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
         return mt_.back();
     }
+
+	if( path == "sfx//smoke.scg" )
+	{
+		osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+		osg::Matrix mat; 
+		mat.setTrans(-offset/2);
+
+		auto mt_offset = new osg::MatrixTransform(mat);
+		parent?parent->asGroup()->addChild(mt_offset):nullptr;
+
+		avFx::SmokeFx* fs = new avFx::SmokeFx;
+
+		// fs->setTrackNode(parent);
+
+		mt_.back()->addChild(fs);
+		_terrainRoot/*parent*/->asGroup()->addChild(mt_.back());
+
+		return mt_.back();
+	}
 
 	if( path == "sfx//foam_stream.scg" )
 	{
@@ -1548,9 +1573,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
-#ifndef ASYNC_OBJECT_LOADING
+//#ifndef ASYNC_OBJECT_LOADING
                 avScene::LightManager::GetInstance()->addLight(data);
-#endif
+//#endif
             }
 
             if(hd)
@@ -1574,9 +1599,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
-#ifndef ASYNC_OBJECT_LOADING
+//#ifndef ASYNC_OBJECT_LOADING
                 avScene::LightManager::GetInstance()->addLight(data);
-#endif
+//#endif
             }
 
             findNodeVisitor::nodeNamesList list_name;
@@ -1691,12 +1716,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                 pnt._radius = 0.2f;
                 //И чего тут делать с огнями и колбеками
                 FIXME( Исправить структуру под mt)
-#ifndef ASYNC_OBJECT_LOADING
+//#ifndef ASYNC_OBJECT_LOADING
                 if(need_to_add)
                 {
                     obj_light->addLight(pnt, data);
                 }
-#endif
+//#endif
             }
 
             //И чего тут делать с огнями и колбеками
@@ -1866,15 +1891,15 @@ void Scene::update( osg::NodeVisitor * nv )
 		  sparks_sfx_weak_ptr->setContactFlag(true);
 	  }
 
-	  if(fd_sfx_weak_ptr)
+	  if(fd_sfx_weak_ptr_)
 	  {
-		  fd_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
-		  fd_sfx_weak_ptr->setContactFlag(true);
+		  fd_sfx_weak_ptr_->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
+		  fd_sfx_weak_ptr_->setContactFlag(true);
 	  }
 
-	  if(ld_sfx_weak_ptr && cg::mod(int(lt),5) == 0 )
+	  if(ld_sfx_weak_ptr_ && cg::mod(int(lt),5) == 0 )
 	  {
-		  ld_sfx_weak_ptr->makeContactDust(lt, cg::point_3f(0, 0, 0)/*cg::point_3f(-20, 110, 0)*/, cg::point_3f(-60.f, -10.f, 0.f));
+		  ld_sfx_weak_ptr_->makeContactDust(lt, cg::point_3f(0, 0, 0)/*cg::point_3f(-20, 110, 0)*/, cg::point_3f(-60.f, -10.f, 0.f));
 	  }
 
 	  if (fs_sfx_weak_ptr_)

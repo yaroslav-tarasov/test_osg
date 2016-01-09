@@ -57,6 +57,8 @@ namespace net_layer
             vm_attach_tow       ,
             vm_detach_tow       ,
             vm_detach_tow_dc    ,
+			vm_fire_fight       ,
+
             sm_container_msg
         };
 
@@ -238,6 +240,7 @@ namespace net_layer
     };
 
     REFL_STRUCT(malfunction_msg)
+		REFL_ENTRY(ext_id)
         REFL_ENTRY(kind)
         REFL_ENTRY(enabled)
     REFL_END()
@@ -266,6 +269,8 @@ namespace net_layer
         REFL_ENTRY(pos)
         REFL_ENTRY(course)
     REFL_END()
+	
+	typedef gen_msg<vm_fire_fight, uint32_t>         fire_fight_msg_t;  
 
     struct container_msg
         : network::msg_id<sm_container_msg>

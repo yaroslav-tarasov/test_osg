@@ -197,12 +197,12 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 
 	// particles updater
 	cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
-	auto const & cpu_updater = [&wind_vec]( cpu_particle & part, float dt )
+	auto const & cpu_updater = [&wind_vec,this]( cpu_particle & part, float dt )
 	{
 		const float & t_unit = part.t();
 		const float & t = part.get_age();
 		// const float mega_age_func = t_unit * (t_unit * (0.333333f * t_unit - 1.0f) + 1.0f);
-		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y + 50.0, part.start_vel.z) * (/*mega_age_func **/ t)  + cg::point_3f(0.f,0.f,-9.8f) * t * t ;
+		const cg::point_3f velocity_impact = (part.start_vel + data_.emitter_speed) * (/*mega_age_func **/ t)  + 0.5 * cg::point_3f(0.f,0.f,-9.8f) * t * t ;
 		part.start_pos() += wind_vec * dt;
 		part.cur_pos() = part.start_pos() + velocity_impact;
 	};

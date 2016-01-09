@@ -15,11 +15,13 @@
 
 struct smoke_sfx_data /*: node_data*/
 {
-	float intensity, factor;
-	cg::point_3f emit_dir;
+	float            intensity,
+		                factor;
+	cg::point_3f      emit_pos;
+	cg::point_3f      emit_dir;
 	cg::point_3f emitter_speed;
 
-	smoke_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f) {}
+	smoke_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
 };
 
 
@@ -77,6 +79,9 @@ namespace avFx
 
 		virtual void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }
 		virtual cg::point_3f const & getEmitWorldDir() const override { return data_.emit_dir; }
+
+		virtual void                 setEmitWorldPos( cg::point_3f const & emit_pos ) override { data_.emit_pos = emit_pos; }
+		virtual cg::point_3f const & getEmitWorldPos() const override { return data_.emit_pos; }
 
 		virtual void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override { data_.emitter_speed = speed; }
 		virtual cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }

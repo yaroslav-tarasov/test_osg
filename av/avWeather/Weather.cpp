@@ -343,7 +343,6 @@ void Weather::cull(osg::NodeVisitor * nv)
         {
             if (bankIt->second->cull(pCV) && nLocalBanksVisible < m_nMaxVisibleBanks)
             {
-#ifdef GOT_FOG
                 LocalFogBank * pFogBankCur = bankIt->second->m_pFogBank.get();
                 osg::Vec3f vTempVec;
                 osg::Vec4f vTempVec4;
@@ -357,7 +356,7 @@ void Weather::cull(osg::NodeVisitor * nv)
                 bankUniforms.bankColor->setElement(nLocalBanksVisible, vTempVec);
                 pFogBankCur->m_uniformDensity->get(vTempVec4);
                 bankUniforms.bankDensityControl->setElement(nLocalBanksVisible, vTempVec4);
-#endif
+
                 // increment counter
                 ++nLocalBanksVisible;
             }

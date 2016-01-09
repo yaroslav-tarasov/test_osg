@@ -34,9 +34,8 @@ LocalWeather::LocalWeather(Weather * pFather, size_t nID)
     , m_fPortion(0.5f)
 {
     // fog bank object
-#ifdef GOT_FOG
     m_pFogBank = new LocalFogBank();
-#endif
+
     // cloud
     m_pCloud = new Cloud(nID);
 
@@ -63,9 +62,8 @@ void LocalWeather::SetEllipse(float fRadX, float fRadY, float fMaxH)
 
     // tell them to fog bank
     const float fFogHeightDelta = (m_ptType == PrecipitationFog) ? 0.f : 0.5f * m_pCloud->GetHeightCorrection();
-#ifdef GOT_FOG
     m_pFogBank->SetEllipse(m_fRadX, m_fRadY, m_fMaxH + fFogHeightDelta);
-#endif
+
 }
 
 // set precipitation, density and portion
@@ -103,9 +101,8 @@ void LocalWeather::SetPrecipitationDensityPortion(PrecipitationType pType, float
     }
 
     // pass them to fog bank
-#ifdef GOT_FOG
     m_pFogBank->SetPrecipitationDensityPortion(m_ptType, fFogDensity, cg::lerp01(osg::square(m_fPortion), 0.25f, 0.75f), fFogDownScale);
-#endif
+
     // pass also to cloud
     m_pCloud->SetPrecipitationDensity(m_ptType, m_fDensity);
 
@@ -152,7 +149,6 @@ bool LocalWeather::cull(osgUtil::CullVisitor * pCV)
     // is visible or inside region somehow?
 
     bool bFogVisible = false;
-#ifdef GOT_FOG
     if (!pCV->isCulled(m_pFogBank->GetCyliderAABB()))
     {
         // ok so make culling of local fog part
@@ -173,7 +169,6 @@ bool LocalWeather::cull(osgUtil::CullVisitor * pCV)
             }
         }
     }
-#endif
 
     // pop model view matrix
     pCV->popModelViewMatrix();

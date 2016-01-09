@@ -67,19 +67,25 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
 }
 
 
-bool create_a = true;
-bool create_v = true;
+
 
 struct client
 {
 
     DECL_LOGGER("visa_control");
+	
+	bool create_a;
+	bool create_v;
+	bool create_f;
 
     client(endpoint peer)
-        : con_(peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
-        , period_(/*4.*/.5)
-        , timer_  (boost::bind(&client::update, this))
-        , _traj(fill_trajectory(krv::data_getter("log_minsk.txt")))
+        : con_     (peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
+        , period_  (/*4.*/.5)
+        , timer_   (boost::bind(&client::update, this))
+        , _traj    (fill_trajectory(krv::data_getter("log_minsk.txt")))
+		, create_a (true)
+	    , create_v (true)
+		, create_f (true)
     {
         LogInfo("Connecting to " << peer);
 
@@ -187,7 +193,18 @@ private:
         }
 
 
-        
+        if(time > 120)
+		{
+			if(create_f)
+			{
+				binary::bytes_t bts3 =  std::move(wrap_msg(fire_fight_msg_t(2))); 
+#if 1
+				send(&bts3[0], bts3.size());
+#endif
+				create_f = false;
+			}
+
+		}
 #if 1
         if(time > 10 )
         {
@@ -201,10 +218,16 @@ private:
                 LogInfo("update() send create " );
 
 
-				binary::bytes_t bts2 =  std::move(wrap_msg(create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow"))); // "niva_chevrolet"
+				binary::bytes_t bts2 =  std::move(wrap_msg(create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow"))); 
 #if 1
 				send(&bts2[0], bts2.size());
 #endif
+
+				binary::bytes_t bts3 =  std::move(wrap_msg(malfunction_msg(1,MF_FIRE_ON_BOARD,true))); 
+#if 1
+				send(&bts3[0], bts3.size());
+#endif
+
             }
 
 

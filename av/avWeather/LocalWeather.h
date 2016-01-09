@@ -6,7 +6,6 @@
 
 #include "av/avWeather/Weather.h"
 
-#define GOT_FOG
 
 //
 // Local namespaces
@@ -81,10 +80,10 @@ namespace avWeather
 
         // model matrix
         osg::Matrix m_mModelMatrix;
-#ifdef GOT_FOG
-        // fog bank object
+		
+		// fog bank object
         osg::ref_ptr<LocalFogBank> m_pFogBank;
-#endif
+
         // local cloud object
         osg::ref_ptr<Cloud> m_pCloud;
     };

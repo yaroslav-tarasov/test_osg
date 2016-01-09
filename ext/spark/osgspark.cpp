@@ -63,7 +63,7 @@ struct fire_creator
 
     static SPK::SPK_ID createFireSmoke( const SparkDrawable::TextureIDMap& textureIDMap, int screenWidth, int screenHeight )
     {
-        return ::createFireSmoke(textureIDMap,screenWidth,screenHeight,scale_coeff());
+        return ::createFire(textureIDMap,screenWidth,screenHeight,scale_coeff());
     }
 
 private:

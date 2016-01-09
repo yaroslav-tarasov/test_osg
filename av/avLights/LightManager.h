@@ -40,15 +40,12 @@ public:
 public:
 
     void      update  ( osg::NodeVisitor * nv );
-#if 0
-    uint32_t  addLight( osg::MatrixTransform* mt);
-#endif
     uint32_t  addLight( const Light& light);
 
 
     FIXME(Check before return);
     
-    Light&   getLight(uint32_t id) {return m_LightsMap[id];};
+    Light&   getLight(uint32_t id) {return _LightsMap[id];};
 
 private:
 	uint32_t genUID();
@@ -58,8 +55,8 @@ private:
     static osg::ref_ptr<LightManager> g_Instance;
 
     typedef std::map<unsigned,Light>  LightsMap;
-    LightsMap                         m_LightsMap;
-
+    LightsMap                         _LightsMap;
+    mutable OpenThreads::Mutex        _lightManagerMapMutex;
 };
 
 
