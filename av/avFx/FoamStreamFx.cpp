@@ -178,8 +178,6 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
 	
-	const osg::Matrixd mWorldToView = *pCV->getModelViewMatrix();
-
 	if(_tracker) 
 		_tracker->update();
 
@@ -224,15 +222,15 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 		randoms.a = rnd.random_8bit();
 
 		cg::point_3f start_vel;
-		start_vel.x = rnd.random_unit_signed() * (factor_val * 1.2/*5.0f*/);
-		start_vel.y = rnd.random_unit_signed() * (factor_val * 1.2/*5.0f*/);
-		start_vel.z = rnd.random_unit() * (factor_val * 1.5/*2.5f*/);
+		start_vel.x = 0.0;//rnd.random_unit_signed() * (factor_val * 1.0/*5.0f*/);
+		start_vel.y = 0.0;//rnd.random_unit_signed() * (factor_val * 1.0/*5.0f*/);
+		start_vel.z = 0.0;//rnd.random_unit() * (factor_val * 1.5/*2.5f*/);
 
 		return FoamStreamFx::cpu_particle(wp, emit_timestamp, lt_particle, tfe, start_vel, factor_val, randoms);
 	};
 	// particles emission
 	static const float break_time_dist = 0.9f;
-	emitter_.emit_new_particles(data_.intensity, 1.25f / cg::max(data_.factor, 1.0f), break_time_dist, cpu_emit_new, cpu_updater);
+	emitter_.emit_new_particles(data_.intensity, 1.25f/*10.f*/ / cg::max(data_.factor, 1.0f), break_time_dist, cpu_emit_new, cpu_updater);
 	
 	_clearArrays();
 	

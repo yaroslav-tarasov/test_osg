@@ -236,7 +236,7 @@ void visual::update(double time)
 					
 					geo_base_3 node_gpos = turret_node_->get_global_pos();
 					double dist = cg::norm(geo_base_3(root_pos)(/*burning_plane_->pos()*/bp_geo_root)); // node_gpos(burning_plane_->pos()
-					double speed = cg::sqrt(dist*9.8/cg::abs(sin(2.0*cg::grad2rad()*15.0)) )/1.5;
+					double speed = cg::sqrt(dist*9.8/cg::abs(sin(2.0*cg::grad2rad()*15.0)) ) * 0.8;
 
 					// foam_stream_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
 					foam_stream_object_->set_visible(true);
