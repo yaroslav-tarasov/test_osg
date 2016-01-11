@@ -238,9 +238,11 @@ void SmokeFx::cull( osg::NodeVisitor * pNV )
 		randoms_->at(i).set(float(cpu_p.randoms.r)/255.0f,float(cpu_p.randoms.g)/255.0f,float(cpu_p.randoms.b)/255.0f,float(cpu_p.randoms.a)/255.0f); 
 	}
 
-	pos_start_time_->dirty();
-	lifetimercp_factor_->dirty();
-	randoms_->dirty();
-
-	_drawArrays->setCount(cpu_queue.size());
+    if(i>0)
+	{
+        pos_start_time_->dirty();
+	    lifetimercp_factor_->dirty();
+	    randoms_->dirty();
+    	_drawArrays->setCount(cpu_queue.size());
+    }
 }

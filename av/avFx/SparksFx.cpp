@@ -251,9 +251,12 @@ void SparksFx::cull( osg::NodeVisitor * pNV )
 		prev_pos_->at(i).set(cpu_p.prev_pos.x, cpu_p.prev_pos.y, cpu_p.prev_pos.z);
 	}
 
-	pos_time_unit_->dirty();
-	prev_pos_->dirty();
-	randoms_->dirty();
+    if(i>0)
+    {
+        pos_time_unit_->dirty();
+        prev_pos_->dirty();
+        randoms_->dirty();
 
-	_drawArrays->setCount(cpu_queue.size());
+        _drawArrays->setCount(cpu_queue.size());
+    }
 }

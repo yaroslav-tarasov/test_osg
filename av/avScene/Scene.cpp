@@ -1000,17 +1000,25 @@ FIXME(Чудеса с Ephemeris)
 	fs_sfx_weak_ptr_ = dynamic_cast<FoamStreamSfxNode*>(fs);
 	addChild(fs);
 #endif
-
+     
+    sparks_sfx_weak_ptr = nullptr;
+#if 0 
 	avFx::SparksFx* spark = new avFx::SparksFx;
 	sparks_sfx_weak_ptr = dynamic_cast<SparksSfxNode*>(spark);
 	addChild(spark);
-	
+#endif
+
+    fd_sfx_weak_ptr_ =0;
+
+
+#if 0 
 	avFx::FrictionDustFx* fd = new avFx::FrictionDustFx;
 	fd_sfx_weak_ptr_ = dynamic_cast<FrictionDustSfxNode*>(fd);
 	addChild(fd);
+#endif
 
 	ld_sfx_weak_ptr_ = nullptr;
-#if 0
+#if 0 
 	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
 	ld_sfx_weak_ptr_ = dynamic_cast<LandingDustSfxNode*>(ld);
 

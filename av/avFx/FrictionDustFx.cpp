@@ -248,9 +248,12 @@ void FrictionDustFx::cull( osg::NodeVisitor * pNV )
 		randoms_->at(i).set(float(cpu_p.randoms.r)/255.0f,float(cpu_p.randoms.g)/255.0f,float(cpu_p.randoms.b)/255.0f,float(cpu_p.randoms.a)/255.0f); 
 	}
 
-	pos_time_unit_->dirty();
-	factor_dummies_->dirty();
-	randoms_->dirty();
+    if(i>0)
+    {
+	    pos_time_unit_->dirty();
+	    factor_dummies_->dirty();
+	    randoms_->dirty();
 
-	_drawArrays->setCount(cpu_queue.size());
+	    _drawArrays->setCount(cpu_queue.size());
+    }
 }
