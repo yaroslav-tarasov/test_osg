@@ -156,6 +156,9 @@
     <Filter Include="Source Files\objects\aerostat">
       <UniqueIdentifier>{85f57a9b-c35a-404f-840c-01d3ca96b6af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\net_layer">
+      <UniqueIdentifier>{8c039649-13e7-468d-8a45-acb9e36acd0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -987,6 +990,12 @@
     </ClCompile>
     <ClCompile Include="kernel\phys\aerostat_phys.cpp">
       <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cluster\net_layer\session_impl.cpp">
+      <Filter>Source Files\net_layer</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cluster\net_layer\net_worker.cpp">
+      <Filter>Source Files\net_layer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

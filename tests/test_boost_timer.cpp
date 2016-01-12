@@ -439,19 +439,19 @@ struct net_worker
         , on_render_  (on_render)
         , done_       (false)
     {
-        _workerThread = boost::thread(&net_worker::run, this);
+        worker_thread_ = boost::thread(&net_worker::run, this);
     }
 
     ~net_worker()
     {
         delete  ses_;
-        _workerService->post(boost::bind(&boost::asio::io_service::stop, _workerService));
-        _workerThread.join();
+        worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+        worker_thread_.join();
     }
 
     boost::asio::io_service* GetService()
     {
-        return _workerService;
+        return worker_service_;
     }
 
     void done()
@@ -464,7 +464,7 @@ private:
     {
         async_services_initializer asi(false);
 
-        _workerService = &(asi.get_service());
+        worker_service_ = &(asi.get_service());
 
         boost::asio::io_service::work skwark(asi.get_service());
 
@@ -484,7 +484,7 @@ private:
 
 
         boost::system::error_code ec;
-        size_t ret = _workerService->run(ec);
+        size_t ret = worker_service_->run(ec);
 
     }
 
@@ -511,9 +511,9 @@ private:
 
 
 private:
-    boost::thread                                               _workerThread;
-    boost::asio::io_service*                                    _workerService;
-    std::shared_ptr<boost::asio::io_service::work>              _work;
+    boost::thread                                               worker_thread_;
+    boost::asio::io_service*                                    worker_service_;
+    std::shared_ptr<boost::asio::io_service::work>              work_;
 
 private:
     on_receive_f                                                on_receive_;

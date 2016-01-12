@@ -209,9 +209,41 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     m_fRight  = +m_fHalfTanH;
     m_fBottom = -m_fHalfTanH * fVertAspect;
     m_fTop    = +m_fHalfTanH * fVertAspect;
+
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(m_fLeft,m_fRight,m_fBottom,m_fTop,4.0,7000.0);
 #endif
     
+#if 1
+    
+    float fZoom = 2.0f; 
+
+    float zNear  =  1.0f; 
+    float zFar   =  40000.0f;
+    
+    float zoom   = (fZoom > 1.0f) ? fZoom : 1.0f;
+    
+    float                           fFOVHor[2];
+    float                           fFOVVer[2];
+
+    const float fVertAspect = 1200.f/1920.f;
+    const float half_fovhor = 20.f;
+    const float half_fovver = half_fovhor * fVertAspect;
+
+    fFOVHor[0] = osg::inDegrees(-half_fovhor);
+    fFOVHor[1] = osg::inDegrees( half_fovhor);
+    fFOVVer[0] = osg::inDegrees(-half_fovver);
+    fFOVVer[1] = osg::inDegrees( half_fovver);
+ 	
+    float left, right, bottom, top;
+
+    left   = zNear * tan(0.5*(fFOVHor[0] - fFOVHor[1])/zoom /*+ cVisualConfig.fTwist[0]*/);
+    right  = zNear * tan(0.5*(fFOVHor[1] - fFOVHor[0])/zoom /*+ cVisualConfig.fTwist[0]*/);
+    bottom = zNear * tan(fFOVVer[0]/zoom);
+    top    = zNear * tan(fFOVVer[1]/zoom);
+    // _viewerPtr->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(left, right, bottom, top, zNear, zFar);
+#endif
+
 
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
