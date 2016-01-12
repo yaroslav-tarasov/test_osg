@@ -1423,11 +1423,15 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 		parent?parent->asGroup()->addChild(mt_offset):nullptr;
 
 		avFx::FoamStreamFx* fs = new avFx::FoamStreamFx;
-		
-		fs->setTrackNode(parent);
 
+#ifdef TRACKNODE 		
+		fs->setTrackNode(parent);
 		mt_.back()->addChild(fs);
-		_terrainRoot/*parent*/->asGroup()->addChild(mt_.back());
+		_terrainRoot->asGroup()->addChild(mt_.back());
+#else
+        mt_.back()->addChild(fs);
+        parent->asGroup()->addChild(mt_.back());
+#endif
 
 		return mt_.back();
 	}

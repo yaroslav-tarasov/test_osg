@@ -172,7 +172,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 {
     osgUtil::CullVisitor* cv = dynamic_cast<osgUtil::CullVisitor*>(nv);
     osg::Camera* camera = dynamic_cast<osg::Camera*>(node);
+#if 0
     OSG_INFO<<"VDSMCameraCullCallback::operator()(osg::Node* "<<camera<<", osg::NodeVisitor* "<<cv<<")"<<std::endl;
+#endif
 
 #if 1
     if (!_polytope.empty())
@@ -200,7 +202,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
     _renderStage = cv->getCurrentRenderBin()->getStage();
 
+#if 0
     OSG_INFO<<"VDSM second : _renderStage = "<<_renderStage<<std::endl;
+#endif
 
     if (cv->getComputeNearFarMode() != osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR)
     {
@@ -219,7 +223,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
                                 bottom, top,
                                 zNear,  zFar);
 
+#if 0
             OSG_INFO<<"Ortho zNear="<<zNear<<", zFar="<<zFar<<std::endl;
+#endif
         }
         else
         {
@@ -227,10 +233,14 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
                                 bottom, top,
                                 zNear,  zFar);
 
+#if 0
             OSG_INFO<<"Frustum zNear="<<zNear<<", zFar="<<zFar<<std::endl;
+#endif
         }
 
+#if 0
         OSG_INFO<<"Calculated zNear = "<<cv->getCalculatedNearPlane()<<", zFar = "<<cv->getCalculatedFarPlane()<<std::endl;
+#endif
 
         zNear = osg::maximum(zNear, cv->getCalculatedNearPlane());
         zFar = osg::minimum(zFar, cv->getCalculatedFarPlane());
@@ -240,8 +250,10 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
         cv->clampProjectionMatrix(projection, zNear, zFar);
 
+#if 0
         //OSG_INFO<<"RTT zNear = "<<zNear<<", zFar = "<<zFar<<std::endl;
         OSG_INFO<<"RTT Projection matrix after clamping "<<projection<<std::endl;
+#endif
 
         camera->setProjectionMatrix(projection);
 
@@ -297,7 +309,9 @@ public:
 
     void apply(osg::Billboard&)
     {
+#if 0
         OSG_INFO<<"Warning Billboards not yet supported"<<std::endl;
+#endif
         return;
     }
 
@@ -394,14 +408,18 @@ void ViewDependentShadowMap::LightData::setLightData(osg::RefMatrix* lm, const o
         lightPos3.set(0.0, 0.0, 0.0); // directional light has no destinct position
         lightDir.set(-lightPos.x(), -lightPos.y(), -lightPos.z());
         lightDir.normalize();
+#if 0
         OSG_INFO<<"   Directional light, lightPos="<<lightPos<<", lightDir="<<lightDir<<std::endl;
+#endif
         if (lightMatrix.valid())
         {
             OSG_INFO<<"   Light matrix "<<*lightMatrix<<std::endl;
             osg::Matrix lightToLocalMatrix(*lightMatrix * osg::Matrix::inverse(modelViewMatrix) );
             lightDir = osg::Matrix::transform3x3( lightDir, lightToLocalMatrix );
             lightDir.normalize();
+#if 0
             OSG_INFO<<"   new LightDir ="<<lightDir<<std::endl;
+#endif
         }
     }
     else
@@ -411,13 +429,17 @@ void ViewDependentShadowMap::LightData::setLightData(osg::RefMatrix* lm, const o
         lightDir.normalize();
         if (lightMatrix.valid())
         {
+#if 0
             OSG_INFO<<"   Light matrix "<<*lightMatrix<<std::endl;
+#endif
             osg::Matrix lightToLocalMatrix(*lightMatrix * osg::Matrix::inverse(modelViewMatrix) );
             lightPos = lightPos * lightToLocalMatrix;
             lightDir = osg::Matrix::transform3x3( lightDir, lightToLocalMatrix );
             lightDir.normalize();
+#if 0
             OSG_INFO<<"   new LightPos ="<<lightPos<<std::endl;
             OSG_INFO<<"   new LightDir ="<<lightDir<<std::endl;
+#endif
         }
         lightPos3.set(lightPos.x()/lightPos.w(), lightPos.y()/lightPos.w(), lightPos.z()/lightPos.w());
     }
@@ -567,7 +589,9 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
 
 void ViewDependentShadowMap::ShadowData::releaseGLObjects(osg::State* state) const
 {
+#if 0
     OSG_INFO<<"ViewDependentShadowMap::ShadowData::releaseGLObjects"<<std::endl;
+#endif
     _texture->releaseGLObjects(state);
     _camera->releaseGLObjects(state);
 
@@ -590,7 +614,9 @@ ViewDependentShadowMap::Frustum::Frustum(osgUtil::CullVisitor* cv, double minZNe
     projectionMatrix = *(cv->getProjectionMatrix());
     modelViewMatrix = *(cv->getModelViewMatrix());
 
+#if 0
     OSG_INFO<<"Projection matrix "<<projectionMatrix<<std::endl;
+#endif
 
     if (cv->getComputeNearFarMode()!=osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR)
     {
@@ -599,8 +625,10 @@ ViewDependentShadowMap::Frustum::Frustum(osgUtil::CullVisitor* cv, double minZNe
 
         cv->clampProjectionMatrix(projectionMatrix, zNear, zFar);
 
+#if 0
         OSG_INFO<<"zNear = "<<zNear<<", zFar = "<<zFar<<std::endl;
         OSG_INFO<<"Projection matrix after clamping "<<projectionMatrix<<std::endl;
+#endif
     }
 
     corners[0].set(-1.0,-1.0,-1.0);
@@ -622,7 +650,9 @@ ViewDependentShadowMap::Frustum::Frustum(osgUtil::CullVisitor* cv, double minZNe
     {
         *itr = (*itr) * clipToWorld;
 
+#if 0
         OSG_INFO<<"   corner "<<*itr<<std::endl;
+#endif
     }
 
     // compute eye point
@@ -635,7 +665,9 @@ ViewDependentShadowMap::Frustum::Frustum(osgUtil::CullVisitor* cv, double minZNe
     frustumCenterLine = centerFarPlane-centerNearPlane;
     frustumCenterLine.normalize();
 
+#if 0
     OSG_INFO<<"   center "<<center<<std::endl;
+#endif
 
     faces[0].push_back(0);
     faces[0].push_back(3);
@@ -753,7 +785,9 @@ void ViewDependentShadowMap::init()
 {
     if (!_shadowedScene) return;
 
+#if 0
     OSG_INFO<<"ViewDependentShadowMap::init()"<<std::endl;
+#endif
 
     createShaders();
 
@@ -783,13 +817,17 @@ ViewDependentShadowMap::ViewDependentData* ViewDependentShadowMap::getViewDepend
 
 void ViewDependentShadowMap::update(osg::NodeVisitor& nv)
 {
+#if 0
     OSG_INFO<<"ViewDependentShadowMap::update(osg::NodeVisitor& "<<&nv<<")"<<std::endl;
+#endif
     _shadowedScene->osg::Group::traverse(nv);
 }
 
 void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 {
+#if 0
     OSG_INFO<<std::endl<<std::endl<<"ViewDependentShadowMap::cull(osg::CullVisitor&"<<&cv<<")"<<std::endl;
+#endif
 
     if (!_shadowCastingStateSet || _nightMode || !_enableShadows)
     {
@@ -804,14 +842,18 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
     if (!vdd)
     {
+#if 0
         OSG_INFO<<"Warning, now ViewDependentData created, unable to create shadows."<<std::endl;
+#endif
         _shadowedScene->osg::Group::traverse(cv);
         return;
     }
 
     ShadowSettings* settings = getShadowedScene()->getShadowSettings();
 
+#if 0
     OSG_INFO<<"cv->getProjectionMatrix()="<<*cv.getProjectionMatrix()<<std::endl;
+#endif
 
     osg::CullSettings::ComputeNearFarMode cachedNearFarMode = cv.getComputeNearFarMode();
 
@@ -836,7 +878,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
         {
             viewProjectionMatrix.getFrustum(left, right, bottom, top, minZNear, maxZFar);
         }
+#if 0
         OSG_INFO<<"minZNear="<<minZNear<<", maxZFar="<<maxZFar<<std::endl;
+#endif
     }
 
     // set the compute near/far mode to the highest quality setting to ensure we push the near plan out as far as possible
@@ -856,7 +900,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
     if (cv.getComputeNearFarMode()!=osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR)
     {
+#if 0
         OSG_INFO<<"Just done main subgraph traversak"<<std::endl;
+#endif
         // make sure that the near plane is computed correctly so that any projection matrix computations
         // are all done correctly.
         cv.computeNearPlane();
@@ -873,8 +919,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
     // return compute near far mode back to it's original settings
     cv.setComputeNearFarMode(cachedNearFarMode);
 
+#if 0
     OSG_INFO<<"frustum.eye="<<frustum.eye<<", frustum.centerNearPlane, "<<frustum.centerNearPlane<<" distance = "<<(frustum.eye-frustum.centerNearPlane).length()<<std::endl;
-
+#endif
 
     // 2. select active light sources
     //    create a list of light sources + their matrices to place them
@@ -892,7 +939,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
     unsigned int numShadowMapsPerLight = settings->getNumShadowMapsPerLight();
     if (numShadowMapsPerLight>2)
     {
+#if 0
         OSG_NOTICE<<"numShadowMapsPerLight of "<<numShadowMapsPerLight<<" is greater than maximum supported, falling back to 2."<<std::endl;
+#endif
         numShadowMapsPerLight = 2;
     }
 
@@ -913,7 +962,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
         // if polytope is empty then no rendering.
         if (polytope.empty())
         {
+#if 0
             OSG_NOTICE<<"Polytope empty no shadow to render"<<std::endl;
+#endif
             continue;
         }
 
@@ -923,7 +974,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
         osg::Matrixd viewMatrix;
         if (!computeShadowCameraSettings(frustum, pl, projectionMatrix, viewMatrix))
         {
+#if 0
             OSG_NOTICE<<"No valid Camera settings, no shadow to render"<<std::endl;
+#endif
             continue;
         }
 
@@ -991,12 +1044,16 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
             osg::Vec3d eye_ls = eye_v * projectionMatrix;
 
+#if 0
             OSG_INFO<<"Angle between view vector and eye "<<osg::RadiansToDegrees(angle)<<std::endl;
             OSG_INFO<<"eye_ls="<<eye_ls<<std::endl;
+#endif
 
             if (eye_ls.y()>=-1.0 && eye_ls.y()<=1.0)
             {
+#if 0
                 OSG_INFO<<"Eye point inside light space clip region   "<<std::endl;
+#endif
                 splitPoint = 0.0;
             }
             else
@@ -1008,7 +1065,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
                 double ratioOfMidToUseForSplit = 0.8;
                 splitPoint = mid * ratioOfMidToUseForSplit;
 
+#if 0
                 OSG_INFO<<"  n="<<n<<", f="<<f<<", sqrt_nf="<<sqrt_nf<<" mid="<<mid<<std::endl;
+#endif
             }
         }
 
@@ -1019,12 +1078,16 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
             if (previous_sdl.empty())
             {
+#if 0
                 OSG_INFO<<"Create new ShadowData"<<std::endl;
+#endif
                 sd = new ShadowData(vdd);
             }
             else
             {
+#if 0
                 OSG_INFO<<"Taking ShadowData from from of previous_sdl"<<std::endl;
+#endif
                 sd = previous_sdl.front();
                 previous_sdl.erase(previous_sdl.begin());
             }
@@ -1198,7 +1261,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 #ifdef  DEPRECATED
             if (textureUnit >= 8)
             {
+#if 0
                 OSG_NOTICE<<"Shadow texture unit is invalid for texgen, will not be used."<<std::endl;
+#endif
             }
             else
 #endif
@@ -1222,7 +1287,9 @@ void ViewDependentShadowMap::cull(osgUtil::CullVisitor& cv)
 
 bool ViewDependentShadowMap::selectActiveLights(osgUtil::CullVisitor* cv, ViewDependentData* vdd) const
 {
+#if 0
     OSG_INFO<<"selectActiveLights"<<std::endl;
+#endif
 
     LightDataList& pll = vdd->getLightDataList();
 
@@ -1232,7 +1299,9 @@ bool ViewDependentShadowMap::selectActiveLights(osgUtil::CullVisitor* cv, ViewDe
     //MR testing giving a specific light
     osgUtil::RenderStage * rs = cv->getCurrentRenderBin()->getStage();
 
+#if 0
     OSG_INFO<<"selectActiveLights osgUtil::RenderStage="<<rs<<std::endl;
+#endif
 
     osg::Matrixd modelViewMatrix = *(cv->getModelViewMatrix());
 
@@ -1260,14 +1329,18 @@ bool ViewDependentShadowMap::selectActiveLights(osgUtil::CullVisitor* cv, ViewDe
 
             if (pll_itr==pll.end())
             {
+#if 0
                 OSG_INFO<<"Light num "<<light->getLightNum()<<std::endl;
+#endif
                 LightData* ld = new LightData(vdd);
                 ld->setLightData(itr->second.get(), light, modelViewMatrix);
                 pll.push_back(ld);
             }
             else
             {
+#if 0
                 OSG_INFO<<"Light num "<<light->getLightNum()<<" already used, ignore light"<<std::endl;
+#endif
             }
         }
     }
@@ -1406,7 +1479,9 @@ void ViewDependentShadowMap::createShaders()
 
 osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& frustum, LightData& positionedLight)
 {
+#if 0
     OSG_INFO<<"computeLightViewFrustumPolytope()"<<std::endl;
+#endif
 
     osg::Polytope polytope;
     polytope.setToUnitFrustum();
@@ -1423,22 +1498,30 @@ osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& f
         osg::Polytope::ClippingMask result_mask = 0x0;
         for(unsigned int i=0; i<planes.size(); ++i, selector_mask <<= 1)
         {
+#if 0
             OSG_INFO<<"      plane "<<planes[i]<<"  planes["<<i<<"].dotProductNormal(lightDir)="<<planes[i].dotProductNormal(positionedLight.lightDir);
+#endif
             if (planes[i].dotProductNormal(positionedLight.lightDir)>=0.0)
             {
+#if 0
                 OSG_INFO<<"     Need remove side "<<i<<std::endl;
+#endif
             }
             else
             {
+#if 0
                 OSG_INFO<<std::endl;
+#endif
                 lightVolumePolytope.add(planes[i]);
                 result_mask = result_mask | selector_mask;
             }
         }
 
+#if 0
         OSG_INFO<<"    planes.size() = "<<planes.size()<<std::endl;
         OSG_INFO<<"    planes.getResultMask() = "<<polytope.getResultMask()<<std::endl;
         OSG_INFO<<"    resultMask = "<<result_mask<<std::endl;
+#endif
         polytope.setResultMask(result_mask);
     }
     else
@@ -1450,10 +1533,14 @@ osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& f
         {
 
             double d = planes[i].distance(positionedLight.lightPos3);
+#if 0
             OSG_INFO<<"      plane "<<planes[i]<<"  planes["<<i<<"].distance(lightPos3)="<<d;
+#endif
             if (d<0.0)
             {
+#if 0
                 OSG_INFO<<"     Need remove side "<<i<<std::endl;
+#endif
             }
             else
             {
@@ -1462,13 +1549,17 @@ osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& f
                 result_mask = result_mask | selector_mask;
             }
         }
+#if 0
         OSG_INFO<<"    planes.size() = "<<planes.size()<<std::endl;
         OSG_INFO<<"    planes.getResultMask() = "<<polytope.getResultMask()<<std::endl;
         OSG_INFO<<"    resultMask = "<<result_mask<<std::endl;
+#endif
         polytope.setResultMask(result_mask);
     }
 
+#if 0
     OSG_INFO<<"Which frustum edges are active?"<<std::endl;
+#endif
     for(unsigned int i=0; i<12; ++i)
     {
         Frustum::Indices& indices = frustum.edges[i];
@@ -1498,27 +1589,37 @@ osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& f
                 boundaryPlane.set(positionedLight.lightPos3, frustum.corners[corner_a], frustum.corners[corner_b]);
             }
 
+#if 0
             OSG_INFO<<"Boundary Edge "<<i<<", corner_a="<<corner_a<<", corner_b="<<corner_b<<", face_a_active="<<face_a_active<<", face_b_active="<<face_b_active;
+#endif       
             if (boundaryPlane.distance(frustum.center)<0.0)
             {
                 boundaryPlane.flip();
+#if 0
                 OSG_INFO<<", flipped boundary edge "<<boundaryPlane<<std::endl;
+#endif
             }
             else
             {
+#if 0
                 OSG_INFO<<", no need to flip boundary edge "<<boundaryPlane<<std::endl;
+#endif
             }
             lightVolumePolytope.add(boundaryPlane);
         }
+#if 0
         else OSG_INFO<<"Internal Edge "<<i<<", corner_a="<<corner_a<<", corner_b="<<corner_b<<", face_a_active="<<face_a_active<<", face_b_active="<<face_b_active<<std::endl;
+#endif   
     }
 
 
+#if 0
     const osg::Polytope::PlaneList& planes = lightVolumePolytope.getPlaneList();
     for(unsigned int i=0; i<planes.size(); ++i)
     {
         OSG_INFO<<"      plane "<<planes[i]<<"  "<<((lightVolumePolytope.getResultMask() & (0x1<<i))?"on":"off")<<std::endl;
     }
+#endif
 
     return lightVolumePolytope;
 }
@@ -1570,7 +1671,9 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
                                            cornerDelta*lightUp,
                                            cornerDelta*positionedLight.lightDir);
 
+#if 0
             OSG_INFO<<"    corner ="<<*itr<<" in lightcoords "<<cornerInLightCoords<<std::endl;
+#endif
 
             xMin = osg::minimum( xMin, cornerInLightCoords.x());
             xMax = osg::maximum( xMax, cornerInLightCoords.x());
@@ -1580,15 +1683,18 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
             zMax = osg::maximum( zMax, cornerInLightCoords.z());
         }
 
+#if 0
         OSG_INFO<<"before bs xMin="<<xMin<<", xMax="<<xMax<<", yMin="<<yMin<<", yMax="<<yMax<<", zMin="<<zMin<<", zMax="<<zMax<<std::endl;
-
+#endif
         osg::BoundingSphere bs = _shadowedScene->getBound();
         osg::Vec3d modelCenterRelativeFrustumCenter(bs.center()-frustum.center);
         osg::Vec3d modelCenterInLightCoords(modelCenterRelativeFrustumCenter*lightSide,
                                             modelCenterRelativeFrustumCenter*lightUp,
                                             modelCenterRelativeFrustumCenter*positionedLight.lightDir);
 
+#if 0
         OSG_INFO<<"modelCenterInLight="<<modelCenterInLightCoords<<" radius="<<bs.radius()<<std::endl;
+#endif       
         double radius(bs.radius());
 
         xMin = osg::maximum(xMin, modelCenterInLightCoords.x()-radius);
@@ -1598,11 +1704,14 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
         zMin = modelCenterInLightCoords.z()-radius;
         zMax = osg::minimum(zMax, modelCenterInLightCoords.z()+radius);
 
+#if 0
         OSG_INFO<<"after bs xMin="<<xMin<<", xMax="<<xMax<<", yMin="<<yMin<<", yMax="<<yMax<<", zMin="<<zMin<<", zMax="<<zMax<<std::endl;
-
+#endif
         if (xMin>=xMax || yMin>=yMax || zMin>=zMax)
         {
+#if 0
             OSG_INFO<<"Warning nothing available to create shadows"<<zMax<<std::endl;
+#endif          
             return false;
         }
         else
@@ -1615,8 +1724,10 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
     {
         double zMax=-DBL_MAX;
 
+#if 0
         OSG_INFO<<"lightDir = "<<positionedLight.lightDir<<std::endl;
         OSG_INFO<<"lightPos3 = "<<positionedLight.lightPos3<<std::endl;
+#endif
         for(Frustum::Vertices::iterator itr = frustum.corners.begin();
             itr != frustum.corners.end();
             ++itr)
@@ -1626,12 +1737,16 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
                                            cornerDelta*lightUp,
                                            cornerDelta*positionedLight.lightDir);
 
+#if 0
             OSG_INFO<<"   cornerInLightCoords= "<<cornerInLightCoords<<std::endl;
+#endif
 
             zMax = osg::maximum( zMax, cornerInLightCoords.z());
         }
 
+#if 0
         OSG_INFO<<"zMax = "<<zMax<<std::endl;
+#endif
 
         if (zMax<0.0)
         {
@@ -1671,7 +1786,9 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
                 }
             }
 
+#if 0
             OSG_INFO<<"Computed fov = "<<fov<<std::endl;
+#endif
 
             if (fov>fovMAX)
             {
@@ -2460,7 +2577,9 @@ bool ViewDependentShadowMap::assignTexGenSettings(osgUtil::CullVisitor* cv, osg:
 
 void ViewDependentShadowMap::cullShadowReceivingScene(osgUtil::CullVisitor* cv) const
 {
+#if 0
     OSG_INFO<<"cullShadowReceivingScene()"<<std::endl;
+#endif
 
     // record the traversal mask on entry so we can reapply it later.
     unsigned int traversalMask = cv->getTraversalMask();
@@ -2476,7 +2595,9 @@ void ViewDependentShadowMap::cullShadowReceivingScene(osgUtil::CullVisitor* cv) 
 
 void ViewDependentShadowMap::cullShadowCastingScene(osgUtil::CullVisitor* cv, osg::Camera* camera) const
 {
+#if 0
     OSG_INFO<<"cullShadowCastingScene()"<<std::endl;
+#endif
 
     // record the traversal mask on entry so we can reapply it later.
     unsigned int traversalMask = cv->getTraversalMask();
@@ -2492,7 +2613,9 @@ void ViewDependentShadowMap::cullShadowCastingScene(osgUtil::CullVisitor* cv, os
 
 osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDependentData& vdd) const
 {
+#if 0
     OSG_INFO<<"   selectStateSetForRenderingShadow() "<<vdd.getStateSet()<<std::endl;
+#endif
 
     osg::ref_ptr<osg::StateSet> stateset = vdd.getStateSet();
 
@@ -2506,7 +2629,9 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
         itr!=_uniforms.end();
         ++itr)
     {
+#if 0
         OSG_INFO<<"addUniform("<<(*itr)->getName()<<")"<<std::endl;
+#endif
         stateset->addUniform(itr->get());
     }
 
@@ -2528,12 +2653,14 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
         // if no texture units have been activated for this light then no shadow state required.
         if (pl.textureUnits.empty()) continue;
 
+#if 0
         for(LightData::ActiveTextureUnits::iterator atu_itr = pl.textureUnits.begin();
             atu_itr != pl.textureUnits.end();
             ++atu_itr)
         {
             OSG_INFO<<"   Need to assign state for "<<*atu_itr<<std::endl;
         }
+#endif
 
     }
 
@@ -2553,7 +2680,9 @@ osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDepe
 
         ShadowData& sd = (**itr);
 
+#if 0
         OSG_INFO<<"   ShadowData for "<<sd._textureUnit<<std::endl;
+#endif
 
         stateset->setTextureAttributeAndModes(sd._textureUnit, sd._texture.get(), shadowMapModeValue);
 
