@@ -71,6 +71,9 @@ namespace aircraft_physless
 
 namespace aircraft_physless
 {
+
+const double packet_delay = 1.0;
+
 namespace sync_fsm
 {
     const double comfortable_acceleration  = 2.5;
@@ -233,9 +236,19 @@ namespace sync_fsm
         if(auto traj_ = self_.get_trajectory())
         {
 
-            traj_->set_cur_len ((time-1.0>0)? time - 1.0:0.0/*traj_->cur_len() + dt*/);
+            traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0/*traj_->cur_len() + dt*/);
             const double  tar_len = traj_->cur_len();
             decart_position target_pos;
+
+#if 1
+            if(tar_len > traj_->length())
+            {
+                force_log fl;       
+                LOG_ODS_MSG( "phys_state2::update " << tar_len << "  traj_->length() - traj_->base_length()= " << traj_->length() - traj_->base_length() << "\n"
+                << "  traj_->length() " << traj_->length() << " traj_->base_length()= " << traj_->base_length()    << "\n" 
+                );           
+            }
+#endif
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = traj_->curs_value(tar_len);

@@ -267,7 +267,7 @@ int main_anim_test2( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
 
-#if 1   
+#if 0   
    auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
 
    auto anim_idle    = loadAnimation("flap");
@@ -275,7 +275,8 @@ int main_anim_test2( int argc, char** argv )
 #endif
 
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
-
+   //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
+   
 
    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
@@ -307,7 +308,7 @@ int main_anim_test2( int argc, char** argv )
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
   
-   for (int i =0;i<100;i++)
+   for (int i =0;i<300;i++)
    {
        osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
        ph_ctrl->setName("phys_ctrl");
@@ -327,7 +328,7 @@ int main_anim_test2( int argc, char** argv )
    }
 
    //pat->addUpdateCallback(new UpdateNode2(pat,"CrowMesh"));
-#if 1
+#if 0
 ////////////////////////////////////////////////////////////////////////////
 
    findNodeByType< osg::Geode> geode_finder;  
@@ -377,7 +378,7 @@ int main_anim_test2( int argc, char** argv )
 
        // We're safe at this point, so begin processing.
        AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
-       mc.setPlayMode(osgAnimation::Animation::ONCE);
+       mc.setPlayMode(osgAnimation::Animation::LOOP);
        // mc.setDurationRatio(10.);
        mc.play();
 

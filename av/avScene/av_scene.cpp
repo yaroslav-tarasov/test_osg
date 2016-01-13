@@ -90,7 +90,7 @@ struct net_worker
      
 
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
-         : period_     (/*cfg().model_params.msys_step*/0.05)
+         : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , peer_       (peer)
          , on_receive_ (on_recv)

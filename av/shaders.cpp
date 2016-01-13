@@ -1625,7 +1625,7 @@ $if 0
 \n                vec2 vDistort = f_in.normal.xz * 0.025;
 \n                vec4 refl_data = textureProj(reflectionTexture, f_in.refl_coord + vec4(vDistort,0.0,0.0)) * vec4(vec3(0.85), 1.0);
 \n                // dif_tex_col.rgb = mix(dif_tex_col.rgb,mix(dif_tex_col.rgb,refl_data.rgb,refl_data.a),rainy_value);
-                  dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a ), refl_data.rgb - dif_tex_col.rgb ,dif_tex_col.rgb);
+                  dif_tex_col.rgb = fma(vec3(rainy_value * refl_data.a ), refl_data.rgb - dif_tex_col.rgb  ,dif_tex_col.rgb );
 \n
 \n                // FIXME
 \n                // APPLY_DECAL(f_in, dif_tex_col);

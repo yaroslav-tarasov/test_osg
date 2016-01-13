@@ -1738,10 +1738,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
             //И чего тут делать с огнями и колбеками
             FIXME( Исправить структуру под mt)
-#ifndef ASYNC_OBJECT_LOADING
+//#ifndef ASYNC_OBJECT_LOADING
                 if(wln_list.size()>0)
                     root->asGroup()->addChild(obj_light);
-#endif
+//#endif
 
         }
 
