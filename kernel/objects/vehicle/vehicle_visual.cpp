@@ -76,11 +76,8 @@ namespace vehicle
             // (*tow_visual_object_)->root()->asTransform()->asMatrixTransform()->setMatrix(scaleMatrix);
             {
                 const double dy = (scale_coeff - 1) * radius_s_;
-                osg::Matrix trMatrix;            
-                trMatrix.setTrans(osg::Vec3(0,-(0/*dir.range *.5 - radius_*/),0));
-                body_b_->asTransform()->asMatrixTransform()->setMatrix(trMatrix);
-                trMatrix.setTrans(osg::Vec3(0,2*dy/*dir.range *.5 - radius_*/,0));
-                body_a_->asTransform()->asMatrixTransform()->setMatrix(trMatrix);
+                body_b_->asTransform()->asMatrixTransform()->setMatrix(osg::Matrix::translate(osg::Vec3(0,-(0/*dir.range *.5 - radius_*/),0)) );
+                body_a_->asTransform()->asMatrixTransform()->setMatrix(osg::Matrix::translate(osg::Vec3(0,2*dy/*dir.range *.5 - radius_*/,0)));
                 osg::Matrix m3;
                 m3.setTrans(osg::Vec3(0,-(0.05*dy/*dir.range *.5 - radius_*/),0));
                 scaleMatrix.postMult(m3);
@@ -198,7 +195,7 @@ void visual::update(double time)
 			}
 		}
 		
-		if (/*has_stream*/ true)
+		if ( burning_plane_ )
 		{
 			last_fs_time_ = time;
 		}
@@ -215,6 +212,8 @@ void visual::update(double time)
 				   {
 					   foam_stream_sfx_weak_ptr_ = dynamic_cast<FoamStreamSfxNode *>(foam_stream_node);
 				   }
+
+                   fs_start_time_ = time;
 				}
 			}
 			
@@ -231,13 +230,14 @@ void visual::update(double time)
 					quaternion node_orien = turret_node_->get_global_orien();
 					point_3f pos = base(node_pos);
 #endif
-					nodes_management::node_info_ptr burning_plane_root = burning_plane_->root();
+                    nodes_management::node_info_ptr burning_plane_root = burning_plane_->root();
 					cg::geo_point_3 bp_geo_root = burning_plane_root->get_global_pos();
 					
 					geo_base_3 node_gpos = turret_node_->get_global_pos();
 					double dist = cg::norm(geo_base_3(root_pos)(/*burning_plane_->pos()*/bp_geo_root)); // node_gpos(burning_plane_->pos()
 					// double speed = cg::sqrt(dist*9.8/cg::abs(sin(2.0*cg::grad2rad()*15.0)) );
-                    double speed = cg::sqrt(dist*9.8/cg::abs(sin(cg::grad2rad()*15.0)) * 0.5 );
+                    const double dt = (time - *fs_start_time_)/4.0;
+                    double speed = cg::sqrt(dist*9.8/cg::abs(sin(cg::grad2rad()*15.0)) * 0.5 ) * ((dt)<1.0?dt:1.0);
 
 					// foam_stream_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
 					foam_stream_object_->set_visible(true);
@@ -266,7 +266,7 @@ void visual::update(double time)
             (*tow_visual_object_)->set_visible(false);
     }
 
-#if 0
+#if 1
 	if (foam_stream_object_ && time > last_fs_time_ + fs_end_duration_ + foam_stream_sfx_weak_ptr_->getMaxParticleLifetime())
 	{
 		foam_stream_sfx_weak_ptr_ = nullptr;

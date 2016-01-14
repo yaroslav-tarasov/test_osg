@@ -68,6 +68,20 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
 
 
 
+#define ADD_EVENT(time, msg)                                   \
+  msgs_.insert(make_pair(time,                                 \
+       std::move(network::wrap_msg(msg))                       \
+    ));                                                        
+
+namespace
+{
+
+    const  double traj_offset = 20.;
+    const  double vehicle_prediction = 0;
+    const  double factor = 1.0; 
+
+} 
+
 
 struct client
 {
@@ -92,6 +106,52 @@ struct client
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
             ;
+        
+        const double time = 0.0;
+
+        ADD_EVENT(time , state(0.0,/*time*/time,factor))
+        ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
+        ADD_EVENT(120.0, fire_fight_msg_t(2))
+        ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
+        ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
+
+        ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
+        ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
+        ADD_EVENT(30.0 , attach_tow_msg_t(11) )
+        
+        run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                id 
+                ,_traj->kp_value    (time)
+                ,_traj->curs_value  (time)
+                ,*_traj->speed_value(time)
+                , time + traj_offset
+                , false
+                , meteo::local_params()
+                )));
+
+            this->send(&msg[0], msg.size());
+        };
+
+
+        runs_.insert(make_pair(_traj->base_length(),                                 
+            boost::bind( run_f_, 1,_1,traj_offset)
+            ));
+
+        runs_.insert(make_pair( _traj->base_length() - vehicle_prediction,
+            [this] (double time)
+            {
+                double vtime = time + vehicle_prediction;
+
+                run_f_(2,vtime,0);
+                run_f_(3,vtime,0);
+               //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
+                //                                     << "  y: " << _traj->kp_value(vtime).y 
+                //                                     << "  h: " << _traj->kp_value(vtime).z
+                //                                     <<  "\n");
+           } 
+         ));
 
     }
 
@@ -141,39 +201,32 @@ private:
     void update()
     {   
         static double time = 0;
-        const  double factor = 1.0;
-        const  double traj_offset = 20.;
-        const  double vehicle_prediction = 0;
-        
-        if (time>1 && create_a)
-        {
-            
-            binary::bytes_t bts =  std::move(wrap_msg(create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319")));
-#if 1
-            send(&bts[0], bts.size());
-#endif
-            LogInfo("update() send create " );
-            create_a = false;
-
-            binary::bytes_t msg =  std::move(wrap_msg(state(0.0,time,factor)));
-            send(&msg[0], msg.size());
+       
+       
+        for(time_queue_msgs_t::iterator it = msgs_.begin(); it != msgs_.end(); ) {
+            if (it->first <= time) {
+                send(&it->second[0], it->second.size());
+                msgs_.erase(it++);
+            } else {
+                ++it;
+            }
         }
 
-        if(time>_traj->base_length())
-        {
-            binary::bytes_t msg =  std::move(wrap_msg(run(
-                                                            1 
-                                                           ,_traj->kp_value(time)
-                                                           ,_traj->curs_value(time)
-                                                           ,*_traj->speed_value(time)
-                                                           , time + traj_offset
-                                                           , false
-                                                           , meteo::local_params()
-            )));
+        typedef std::multimap<double, run_f>  time_queue_run_t;
+        time_queue_run_t                         run_queque_f_;
 
-            send(&msg[0], msg.size());
+        for(time_queue_run_t::iterator it = runs_.begin(); it != runs_.end(); ++it ) {
+            if (it->first <= time) {
+                it->second(time);
+            }
+        }
+
+#if 0
+        if(time>=_traj->base_length())
+        {
+            run_f_(1,time,traj_offset);
            
-#if 1
+#if 0
             if (messages_size_ + binary::size(msg) > /*msg_threshold_*/100)
             {
                 binary::bytes_t bts =  network::wrap_msg(net_layer::msg::container_msg(move(messages_)));
@@ -188,87 +241,7 @@ private:
             messages_size_ += binary::size(msg);
             messages_.push_back(move(msg));
 #endif
-
-            
         }
-
-
-        if(time > 120)
-		{
-			if(create_f)
-			{
-				binary::bytes_t bts3 =  std::move(wrap_msg(fire_fight_msg_t(2))); 
-#if 1
-				send(&bts3[0], bts3.size());
-#endif
-				create_f = false;
-			}
-
-		}
-#if 1
-        if(time > 10 )
-        {
-            if (create_v)
-            {
-                binary::bytes_t bts =  std::move(wrap_msg(create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka"))); // "niva_chevrolet"
-#if 1
-                send(&bts[0], bts.size());
-#endif
-                create_v = false;
-                LogInfo("update() send create " );
-
-
-				binary::bytes_t bts2 =  std::move(wrap_msg(create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow"))); 
-#if 1
-				send(&bts2[0], bts2.size());
-#endif
-
-				binary::bytes_t bts3 =  std::move(wrap_msg(malfunction_msg(1,MF_FIRE_ON_BOARD,true))); 
-#if 1
-				send(&bts3[0], bts3.size());
-#endif
-
-            }
-
-
-        }
-
-        if(time >= _traj->base_length() - vehicle_prediction)
-        {
-            double vtime = time + vehicle_prediction;
-            binary::bytes_t msg =  std::move(wrap_msg(run(
-                2 
-                ,_traj->kp_value    (vtime)
-                ,_traj->curs_value  (vtime)
-                ,*_traj->speed_value(vtime)
-                , vtime /*+ traj_offset*/
-                , false
-                , meteo::local_params()
-                )));
-
-            send(&msg[0], msg.size());
-
-
-			binary::bytes_t msg_b =  std::move(wrap_msg(run(
-				3 
-				,_traj->kp_value    (vtime)
-				,_traj->curs_value  (vtime)
-				,*_traj->speed_value(vtime)
-				, vtime /*+ traj_offset*/
-				, false
-				, meteo::local_params()
-				)));
-
-#if 1
-			send(&msg_b[0], msg_b.size());
-#endif
-
-            //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
-            //                                     << "  y: " << _traj->kp_value(vtime).y 
-            //                                     << "  h: " << _traj->kp_value(vtime).z
-            //                                     <<  "\n");
-        }
-
 #endif
         
         time += period_ * factor;
@@ -289,7 +262,19 @@ private:
     size_t                                                      messages_size_;
 
 private:
-    fms::trajectory_ptr      _traj;
+    
+    fms::trajectory_ptr                              _traj;
+    typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
+    time_queue_msgs_t                                msgs_;
+    boost::function<void(uint32_t,double,double)>   run_f_;
+
+    typedef boost::function<void(double /*time*/)>    run_f;
+
+    typedef std::multimap<double, run_f>  time_queue_run_t;
+    time_queue_run_t                                  runs_;
+
+
+
 };
 
 

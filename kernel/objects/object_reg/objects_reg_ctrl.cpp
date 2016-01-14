@@ -74,6 +74,11 @@ void ctrl::inject_msg(net_layer::msg::run const& msg)
 
 void ctrl::inject_msg( net_layer::msg::container_msg const& msg)
 {
+    auto const& msgs = msg.msgs; 
+    for(auto it = msgs.begin(); it!= msgs.end(); ++it)    
+    {
+        disp_.dispatch_bytes(*it);
+    }
 }
 
 void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg) 

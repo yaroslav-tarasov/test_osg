@@ -44,7 +44,7 @@ namespace vehicle
 	private:
 		double last_fs_time_;
 		double fs_factor_;
-
+        boost::optional<double> fs_start_time_;
 	private:
 		static const double fs_end_duration_;
     };
