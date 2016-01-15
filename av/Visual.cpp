@@ -215,7 +215,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     
 #if 1
     
-    float fZoom = 2.0f; 
+    float fZoom = 1.0f; 
 
     float zNear  =  1.0f; 
     float zFar   =  40000.0f;

@@ -11,7 +11,6 @@
 #include "kernel/msg_proxy.h"
 #include "kernel/systems/vis_system.h"
 #include "common/test_msgs.h"
-//#include "common/locks.h"
 #include "common/time_counter.h"
 #include "utils/high_res_timer.h"
 #include "tests/systems/test_systems.h"

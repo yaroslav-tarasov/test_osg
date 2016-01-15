@@ -58,6 +58,38 @@ Object::Object(osg::Node& node)
 	_manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get()); 
 }
 
+static void delete_unused( osgAnimation::Animation &anim ) 
+{
+    osgAnimation::ChannelList& channels_list = anim.getChannels();
+
+    channels_list.erase(
+        std::remove_if (channels_list.begin(), channels_list.end(), 
+        [=](osg::ref_ptr<osgAnimation::Channel>& chan)->bool
+    {
+        osgAnimation::FloatCubicBezierKeyframeContainer* fkc = dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(chan->getSampler()->getKeyframeContainer());
+        if (fkc)
+        {
+            float val = (*fkc)[0].getValue().getPosition();
+            const unsigned fkc_size = fkc->size();
+            if(fkc_size>0)
+                for (size_t i=1; i < fkc_size; i++)
+                {
+                    // (*fkc)[i].getTime();
+                    if(!cg::eq(val, (*fkc)[i].getValue().getPosition()))
+                    {
+                        return false;
+                    }
+                    val = (*fkc)[i].getValue().getPosition();
+                }
+
+
+                return true;
+        }
+
+        return chan->getName()=="scale" || chan->getName()=="translate";
+    }), channels_list.end()) ;
+}
+
 void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 {
     osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(anim_container->getUpdateCallback());
@@ -66,10 +98,13 @@ void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 	
 	for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
 	{
-	    (*it)->setName(name);
+        delete_unused(*(*it).get());
+	    
+        (*it)->setName(name);
 		//_animations.insert(make_pair(name,*it));
 		_animations[ name ] = *it;
 		_manager->registerAnimation(*it);
+
 	}
 }
 

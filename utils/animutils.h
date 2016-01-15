@@ -185,12 +185,16 @@ public:
 		return avmc;
 	}
 
+
 	static bool setModel(osgAnimation::BasicAnimationManager* model) 
 	{
 		AnimtkViewerModelController& self = instance();
 		self._model = model;
 		for (osgAnimation::AnimationList::const_iterator it = self._model->getAnimationList().begin(); it != self._model->getAnimationList().end(); it++)
+        {
+            delete_unused(*(*it).get());
             self._map[(*it)->getName() + "_base"] = *it;
+        }
 
 		for(osgAnimation::AnimationMap::iterator it = self._map.begin(); it != self._map.end(); it++)
 		{
@@ -204,6 +208,39 @@ public:
 
 		return true;
 	}
+
+    static void delete_unused( osgAnimation::Animation &anim ) 
+    {
+        osgAnimation::ChannelList& channels_list = anim.getChannels();
+
+        channels_list.erase(
+            std::remove_if (channels_list.begin(), channels_list.end(), 
+            [=](osg::ref_ptr<osgAnimation::Channel>& chan)->bool
+        {
+            osgAnimation::FloatCubicBezierKeyframeContainer* fkc = dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(chan->getSampler()->getKeyframeContainer());
+            if (fkc)
+            {
+                float val = (*fkc)[0].getValue().getPosition();
+                const unsigned fkc_size = fkc->size();
+                if(fkc_size>0)
+                for (size_t i=1; i < fkc_size; i++)
+                {
+                    // (*fkc)[i].getTime();
+                    if(!cg::eq(val, (*fkc)[i].getValue().getPosition()))
+                    {
+                        return false;
+                    }
+                    val = (*fkc)[i].getValue().getPosition();
+                }
+                
+                
+                return true;
+            }
+
+            return chan->getName()=="scale" || chan->getName()=="translate";
+        }), channels_list.end()) ;
+    }
+
 
     static bool addAnimation(osg::Node* anim_container ) 
     {
@@ -220,6 +257,8 @@ public:
         
         for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
         {
+            delete_unused(*(*it).get());
+
             self._map[(*it)->getName() + "_" + anim_container->getName() ] = *it;
             local_map[(*it)->getName() + "_" + anim_container->getName() ] = *it;
             self._model->registerAnimation(*it);

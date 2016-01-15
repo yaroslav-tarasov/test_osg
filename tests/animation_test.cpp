@@ -252,13 +252,13 @@ inline osg::Node* loadAnimation(std::string aname)
 }
 
 
-
-
-int main_anim_test2( int argc, char** argv )
+int main_anim_test( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);
 
    osg::DisplaySettings::instance()->setNumMultiSamples( 8 );
+   
+   osg::setNotifyLevel( osg::INFO );   
 
    osgViewer::Viewer viewer(arguments);
    //arguments.reportRemainingOptionsAsUnrecognized();
@@ -267,7 +267,7 @@ int main_anim_test2( int argc, char** argv )
    osg::ref_ptr<osg::Group> root = new osg::Group;
    osg::ref_ptr<osg::Group> mt = new osg::Group;
 
-#if 0   
+#if 1   
    auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
 
    auto anim_idle    = loadAnimation("flap");
@@ -365,6 +365,7 @@ int main_anim_test2( int argc, char** argv )
    ph_ctrl->addChild(geode);
    root->addChild(ph_ctrl);
 //////////////////////////////////////////////////////////////////////////////
+#endif
 
    using namespace avAnimation;
    AnimationManagerFinder finder;
@@ -380,12 +381,13 @@ int main_anim_test2( int argc, char** argv )
        AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
        mc.setPlayMode(osgAnimation::Animation::LOOP);
        // mc.setDurationRatio(10.);
+       mc.next();
        mc.play();
 
    } else {
        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
-#endif
+
 
    osg::ref_ptr<PickHandler> picker = new PickHandler;
    root->addChild( picker->getOrCreateSelectionBox() );
@@ -399,4 +401,4 @@ int main_anim_test2( int argc, char** argv )
    return 0;
 }
 
-AUTO_REG(main_anim_test2)
+AUTO_REG(main_anim_test)

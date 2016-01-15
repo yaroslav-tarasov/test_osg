@@ -196,7 +196,7 @@ inline osg::Node* loadAnimation(std::string aname)
     return  anim;
 }
 
-int main_anim_test( int argc, char** argv )
+int main_anim_test2( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);
 
@@ -275,4 +275,4 @@ int main_anim_test( int argc, char** argv )
    return 0;
 }
 
-AUTO_REG(main_anim_test)
+AUTO_REG(main_anim_test2)
