@@ -39,6 +39,63 @@ struct AnimationManagerFinder : public osg::NodeVisitor
     }
 };
 
+inline void deleteUseless( osgAnimation::Animation &anim ) 
+{
+	osgAnimation::ChannelList& channels_list = anim.getChannels();
+
+	channels_list.erase(
+		std::remove_if (channels_list.begin(), channels_list.end(), 
+		[=](osg::ref_ptr<osgAnimation::Channel>& chan)->bool
+	{
+		osgAnimation::FloatCubicBezierKeyframeContainer* fkc = dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(chan->getSampler()->getKeyframeContainer());
+		if (fkc)
+		{
+			const unsigned fkc_size = fkc->size();
+			if(fkc_size>0)
+			{
+				float val = (*fkc)[0].getValue().getPosition();
+				for (size_t i=1; i < fkc_size; i++)
+				{
+					// (*fkc)[i].getTime();
+					if(!cg::eq(val, (*fkc)[i].getValue().getPosition()))
+					{
+						return false;
+					}
+					val = (*fkc)[i].getValue().getPosition();
+				}
+			}
+
+			return true;
+		}
+		else
+		{
+
+			osgAnimation::Vec3CubicBezierKeyframeContainer* vkc = dynamic_cast<osgAnimation::Vec3CubicBezierKeyframeContainer*>(chan->getSampler()->getKeyframeContainer());
+			if (vkc)
+			{
+				const unsigned vkc_size = vkc->size();
+				if(vkc_size>0)
+				{
+					osg::Vec3 val = (*vkc)[0].getValue().getPosition();
+					for (size_t i=1; i < vkc_size; i++)
+					{
+						// (*fkc)[i].getTime();
+						if(!cg::eq(val.x(), (*vkc)[i].getValue().getPosition().x()) || !cg::eq(val.y(), (*vkc)[i].getValue().getPosition().y()) || !cg::eq(val.z(), (*vkc)[i].getValue().getPosition().z()))
+						{
+							return false;
+						}
+						val = (*vkc)[i].getValue().getPosition();
+					}
+				}
+
+				return true;
+			}		
+
+		}		
+
+		return false;
+	}), channels_list.end()) ;
+}
 
 struct RigTransformHardware : public osgAnimation::RigTransformHardware
 {
@@ -192,7 +249,7 @@ public:
 		self._model = model;
 		for (osgAnimation::AnimationList::const_iterator it = self._model->getAnimationList().begin(); it != self._model->getAnimationList().end(); it++)
         {
-            delete_unused(*(*it).get());
+            deleteUseless(*(*it).get());
             self._map[(*it)->getName() + "_base"] = *it;
         }
 
@@ -209,39 +266,6 @@ public:
 		return true;
 	}
 
-    static void delete_unused( osgAnimation::Animation &anim ) 
-    {
-        osgAnimation::ChannelList& channels_list = anim.getChannels();
-
-        channels_list.erase(
-            std::remove_if (channels_list.begin(), channels_list.end(), 
-            [=](osg::ref_ptr<osgAnimation::Channel>& chan)->bool
-        {
-            osgAnimation::FloatCubicBezierKeyframeContainer* fkc = dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(chan->getSampler()->getKeyframeContainer());
-            if (fkc)
-            {
-                float val = (*fkc)[0].getValue().getPosition();
-                const unsigned fkc_size = fkc->size();
-                if(fkc_size>0)
-                for (size_t i=1; i < fkc_size; i++)
-                {
-                    // (*fkc)[i].getTime();
-                    if(!cg::eq(val, (*fkc)[i].getValue().getPosition()))
-                    {
-                        return false;
-                    }
-                    val = (*fkc)[i].getValue().getPosition();
-                }
-                
-                
-                return true;
-            }
-
-            return chan->getName()=="scale" || chan->getName()=="translate";
-        }), channels_list.end()) ;
-    }
-
-
     static bool addAnimation(osg::Node* anim_container ) 
     {
         osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(anim_container->getUpdateCallback());
@@ -257,7 +281,7 @@ public:
         
         for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
         {
-            delete_unused(*(*it).get());
+            deleteUseless(*(*it).get());
 
             self._map[(*it)->getName() + "_" + anim_container->getName() ] = *it;
             local_map[(*it)->getName() + "_" + anim_container->getName() ] = *it;

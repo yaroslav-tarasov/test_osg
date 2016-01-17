@@ -77,7 +77,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Work\anki\thirdparty\GLES3\include;..;$(SolutionDir);$(SolutionDir)\ext\EASTL\include;$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\kernel;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\GFSDK_HBAO\lib;$(OSG_DIR)\..\SmartBody\src\SmartBody;$(OSG_DIR)\..\SmartBody\include\steersuite;$(OSG_DIR)\..\SmartBody\include\bonebus;$(OSG_DIR)\..\SmartBody\include\vhcl;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\build\include;$(OSG_DIR)\OpenSceneGraph-3.2.1\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -346,6 +346,7 @@
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
     <ClCompile Include="tests\animation_test.cpp" />
     <ClCompile Include="tests\animation_test2.cpp" />
+    <ClCompile Include="tests\animation_test3.cpp" />
     <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />

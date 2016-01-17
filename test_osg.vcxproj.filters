@@ -997,5 +997,8 @@
     <ClCompile Include="core\cluster\net_layer\net_worker.cpp">
       <Filter>Source Files\net_layer</Filter>
     </ClCompile>
+    <ClCompile Include="tests\animation_test3.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
