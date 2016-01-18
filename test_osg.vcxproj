@@ -347,6 +347,7 @@
     <ClCompile Include="tests\animation_test.cpp" />
     <ClCompile Include="tests\animation_test2.cpp" />
     <ClCompile Include="tests\animation_test3.cpp" />
+    <ClCompile Include="tests\animation_test4.cpp" />
     <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />

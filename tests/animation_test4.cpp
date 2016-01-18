@@ -25,38 +25,38 @@ mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
 
 struct image_data
 {
-    int s;
-    int t;
-    int r;
-    GLenum pixelFormat;
-    GLenum type;
-    GLint internalFormat;
+	int s;
+	int t;
+	int r;
+	GLenum pixelFormat;
+	GLenum type;
+	GLint internalFormat;
 	size_t                  data_num;
-    std::vector<unsigned char> data;
-    
-    image_data ()
-    {}
-    
-    image_data (const osg::Image* image)
-    {
-        s = image->s();
-        t = image->t();
-        r = image->r();
-        pixelFormat = image->getPixelFormat(); 
-        type  = image->getDataType();
-        internalFormat = image->getInternalTextureFormat();
-    }
+	std::vector<unsigned char> data;
+
+	image_data ()
+	{}
+
+	image_data (const osg::Image* image)
+	{
+		s = image->s();
+		t = image->t();
+		r = image->r();
+		pixelFormat = image->getPixelFormat(); 
+		type  = image->getDataType();
+		internalFormat = image->getInternalTextureFormat();
+	}
 };
 
 REFL_STRUCT(image_data)
-    REFL_ENTRY(s)
-    REFL_ENTRY(t)
-    REFL_ENTRY(r)
-    REFL_ENTRY(pixelFormat) 
-    REFL_ENTRY(internalFormat) 
-    REFL_ENTRY(type)
-    REFL_ENTRY(data_num)
-    REFL_ENTRY(data)
+	REFL_ENTRY(s)
+	REFL_ENTRY(t)
+	REFL_ENTRY(r)
+	REFL_ENTRY(pixelFormat) 
+	REFL_ENTRY(internalFormat) 
+	REFL_ENTRY(type)
+	REFL_ENTRY(data_num)
+	REFL_ENTRY(data)
 REFL_END()
 
 class  InstancedAnimationManager
@@ -165,6 +165,35 @@ public:
 	    
 		return createAnimationTexture(mat_num);
 	}
+	
+
+    osg::TextureRectangle* createAnimationTexture( image_data& idata)
+	{
+		size_t something_num = idata.data_num ;
+		
+		osg::ref_ptr<osg::Image> image = new osg::Image;
+		image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
+
+		osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
+		texture->setInternalFormat(GL_RGBA32F_ARB);
+		texture->setSourceFormat(GL_RGBA);
+		texture->setSourceType(GL_FLOAT);
+		texture->setTextureSize(4, something_num);
+		texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+
+		idata_.data.resize(texture->getImage()->getTotalSizeInBytes());
+		unsigned char* dest_ptr = &idata_.data[0];
+		for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
+		{
+			memcpy(dest_ptr, itr.data(), itr.size());
+			dest_ptr += itr.size();
+		}
+
+		return texture.release();
+	}
 
 	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
 	{
@@ -203,8 +232,8 @@ public:
 		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
 		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
 		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-        
-		idata_.data_num = something_num;
+
+        idata_.data_num = something_num;
         idata_.data.resize(texture->getImage()->getTotalSizeInBytes());
         unsigned char* dest_ptr = &idata_.data[0];
         for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
@@ -341,7 +370,9 @@ inline osg::Node* loadAnimation(std::string aname)
 
 }
 
-int main_anim_test3( int argc, char** argv )
+osg::ref_ptr<osg::TextureRectangle> at;
+
+int main_anim_test4( int argc, char** argv )
 {  
    osg::ArgumentParser arguments(&argc,argv);
 
@@ -366,7 +397,22 @@ int main_anim_test3( int argc, char** argv )
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
    //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
 
-   InstancedAnimationManager im(anim_file);   
+   InstancedAnimationManager im(anim_file);  
+   
+   std::string filename = "data.row";
+
+   image_data rd;
+
+   std::ifstream image_data_file(filename, std::ios_base::binary);
+
+   if (image_data_file.good())
+   {
+	   binary::bytes_t data;
+	   data.resize(boost::filesystem::file_size(filename));
+	   image_data_file.read(data.data(), data.size());
+	   binary::unwrap(data, rd);
+	   at = im.createAnimationTexture(rd);
+   }
 
    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
@@ -416,6 +462,35 @@ int main_anim_test3( int argc, char** argv )
    }
 #endif
 
+
+#if 1
+   ////////////////////////////////////////////////////////////////////////////
+
+   findNodeByType< osg::Geode> geode_finder;  
+   geode_finder.apply(*object_file);
+
+   osg::Geode*    mesh = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
+   osg::Geometry* geo_mesh = mesh->getDrawable(0)->asGeometry();
+   osgAnimation::RigGeometry* rig_geom = dynamic_cast<osgAnimation::RigGeometry*>(geo_mesh);
+
+   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+
+   osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
+   osg::ref_ptr<osgAnimation::RigGeometry> geometry = new osgAnimation::RigGeometry(*rig_geom, osg::CopyOp::DEEP_COPY_ALL);
+   geode->addDrawable(geometry);
+   osg::Matrix trMatrix;
+   trMatrix.setTrans(osg::Vec3f( -20, -20, 20));
+   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+   ph_ctrl->setMatrix(trMatrix);
+
+   geode->getOrCreateStateSet()->setTextureAttributeAndModes(6, at.get(), osg::StateAttribute::ON);
+   geode->getOrCreateStateSet()->addUniform(new osg::Uniform("animatiomTexture", 6));
+
+   ph_ctrl->addChild(geode);
+   root->addChild(ph_ctrl);
+   //////////////////////////////////////////////////////////////////////////////
+#endif
+
    using namespace avAnimation;
 
    AnimationManagerFinder finder;
@@ -428,9 +503,9 @@ int main_anim_test3( int argc, char** argv )
        AnimtkViewerModelController::addAnimation(anim_idle); 
        AnimtkViewerModelController::addAnimation(anim_running); 
 
-#if 0
        //at = im.stripAnimation(finder._am.get());
 
+#if 0
 	   pat->getOrCreateStateSet()->setTextureAttributeAndModes(6, at.get(), osg::StateAttribute::ON);
 	   pat->getOrCreateStateSet()->addUniform(new osg::Uniform("animatiomTexture", 6));
 #endif
@@ -447,27 +522,10 @@ int main_anim_test3( int argc, char** argv )
 
    viewer.setSceneData(root);
 
-   // viewer.run();
-
-   const std::string& cn             = mc.getCurrentAnimationName();
-   const AnimtkViewerModelController::AnimationDurationMap& ad_map = mc.getDurations();
-
-   for (double t=0.0;t<ad_map.at(cn);t+= ad_map.at(cn)/150.0 )
-   {
-       viewer.frame(t);
-   }
-
-   im.createAnimationTexture(switcher.my_ptr->anim_data_);
-
-   std::string filename = "data.row";
-   {
-       std::ofstream image_data_file(filename, std::ios_base::binary);
-       auto bts = binary::wrap(im.getImageData());
-       image_data_file.write(binary::raw_ptr(bts),binary::size(bts));
-   }
+   viewer.run();
 
 
    return 0;
 }
 
-AUTO_REG(main_anim_test3)
+AUTO_REG(main_anim_test4)
