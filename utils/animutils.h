@@ -322,7 +322,12 @@ public:
               _map[_amv[_focus]].get()->setPlayMode(mode);
           }
     }
-    
+        
+    const AnimationDurationMap& getDurations()
+    {
+        return _amd;
+    }
+
     void setDurationRatio (double ratio)
     {
         for(osgAnimation::AnimationMap::iterator it = _map.begin(); it != _map.end(); it++)

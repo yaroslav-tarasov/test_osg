@@ -95,6 +95,10 @@ namespace {
 void Visual::Initialize()
 {
     avAssert(!m_bInitialized);
+    
+#if 0
+    osgDB::Registry::instance()->setBuildKdTreesHint(osgDB::ReaderWriter::Options::BUILD_KDTREES);
+#endif
 
     // OSG graphics context
     osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = nullptr; //new osg::GraphicsContext::Traits();

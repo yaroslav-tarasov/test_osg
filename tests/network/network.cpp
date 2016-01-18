@@ -145,7 +145,7 @@ struct client
                 double vtime = time + vehicle_prediction;
 
                 run_f_(2,vtime,0);
-                run_f_(3,vtime,0);
+                //run_f_(3,vtime,0);
                //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
                 //                                     << "  y: " << _traj->kp_value(vtime).y 
                 //                                     << "  h: " << _traj->kp_value(vtime).z
