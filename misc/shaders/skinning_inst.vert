@@ -21,9 +21,6 @@ in vec4 boneWeight3;
 
 uniform float osg_SimulationTime;
 uniform int   nbBonesPerVertex;
-//uniform mat4 matrixPalette[MAX_MATRIX];
-//uniform mat4 matrixPalette[20];
-mat4 matrixPalette[20];
 
 vec4    position;
 vec3    normal;
@@ -33,7 +30,7 @@ uniform sampler2DRect instanceMatrixTexture;
 
 mat4  getBoneMatrix ( int idx )
 {
-		int  animID = idx * 150 + int(osg_SimulationTime * (gl_InstanceID + 5) * 2 ) % 150;
+		int  animID = idx * 150 + int(osg_SimulationTime * (gl_InstanceID % 600 + 200) ) % 150;
 		vec2 animCoord = vec2((animID % 4096) * 4.0, animID / 4096);
 		return mat4(texture2DRect(animationTex, animCoord),
 					texture2DRect(animationTex, animCoord + vec2(1.0, 0.0)),
@@ -50,7 +47,7 @@ void computeAcummulatedNormalAndPosition(vec4 boneWeight)
     {
         matrixIndex =  int(boneWeight[0]);
         matrixWeight = boneWeight[1];
-        mat4 matrix = getBoneMatrix(matrixIndex);// matrixPalette[matrixIndex];
+        mat4 matrix = getBoneMatrix(matrixIndex);
         // correct for normal if no scale in bone
         mat3 matrixNormal = mat3(matrix);
         position += matrixWeight * (matrix *     gl_Vertex ); 
@@ -88,16 +85,6 @@ out block
 void main( void )
 {
     
-	//for (int i=0;i<20;++i)
-	//{
-	//	int  animID = i * 150 + int(osg_SimulationTime * (gl_InstanceID + 100) * 10 ) % 150;
-	//	vec2 animCoord = vec2((animID % 4096) * 4.0, animID / 4096);
-	//	matrixPalette[i] = mat4(texture2DRect(animationTex, animCoord),
-	//									texture2DRect(animationTex, animCoord + vec2(1.0, 0.0)),
-	//									texture2DRect(animationTex, animCoord + vec2(2.0, 0.0)),
-	//									texture2DRect(animationTex, animCoord + vec2(3.0, 0.0)));
-	//}
-
 	vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
 	mat4 instanceModelMatrix = mat4(texture2DRect(instanceMatrixTexture, instanceCoord),
 									texture2DRect(instanceMatrixTexture, instanceCoord + vec2(1.0, 0.0)),
