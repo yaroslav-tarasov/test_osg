@@ -13,6 +13,8 @@
 
 #include "utils\visitors\find_node_visitor.h"
 
+#include "InstancedData.h"
+
 #if 0
 mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
 {
@@ -23,41 +25,8 @@ mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
 }
 #endif
 
-struct image_data
-{
-    int s;
-    int t;
-    int r;
-    GLenum pixelFormat;
-    GLenum type;
-    GLint internalFormat;
-	size_t                  data_num;
-    std::vector<unsigned char> data;
-    
-    image_data ()
-    {}
-    
-    image_data (const osg::Image* image)
-    {
-        s = image->s();
-        t = image->t();
-        r = image->r();
-        pixelFormat = image->getPixelFormat(); 
-        type  = image->getDataType();
-        internalFormat = image->getInternalTextureFormat();
-    }
-};
+namespace avAnimation {
 
-REFL_STRUCT(image_data)
-    REFL_ENTRY(s)
-    REFL_ENTRY(t)
-    REFL_ENTRY(r)
-    REFL_ENTRY(pixelFormat) 
-    REFL_ENTRY(internalFormat) 
-    REFL_ENTRY(type)
-    REFL_ENTRY(data_num)
-    REFL_ENTRY(data)
-REFL_END()
 
 class  InstancedAnimationManager
 {
@@ -84,9 +53,8 @@ class  InstancedAnimationManager
 		osg::ref_ptr<osgAnimation::Channel> scale;
 	};
 
-	typedef std::map<std::string, AnimChannels >                 ChannelMapType;
-	typedef std::map<std::string, std::vector<osg::Matrix>>      AnimationChannelMatricesType;
-	typedef std::map<std::string, AnimationChannelMatricesType>  AnimationDataType;
+	typedef std::unordered_map<std::string, AnimChannels >                ChannelMapType;
+
 
 	AnimationDataType       anim_data_;
 	osgAnimation::BoneMap          bm_;
@@ -111,6 +79,7 @@ public:
 	{}
 
 
+#if 0
 	osg::TextureRectangle* stripAnimation(osgAnimation::BasicAnimationManager* model) 
 	{
 		size_t mat_num = 0;
@@ -165,6 +134,7 @@ public:
 	    
 		return createAnimationTexture(mat_num);
 	}
+#endif
 
 	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
 	{
@@ -187,11 +157,11 @@ public:
 			auto & vm = it_a->second;
 			for (auto it_vm = vm.begin();it_vm != vm.end(); ++it_vm,  ++j)
 			{
-				//osg::Matrixf matrix = m_matrices[i];
 				osg::Matrixf matrix = *it_vm;
 				float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
 				memcpy(data, matrix.ptr(), 16 * sizeof(float));
 			}
+            idata_.bones.push_back(it_a->first);
 		}
 
 		osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
@@ -257,14 +227,16 @@ public:
     {
         return idata_;
     }
-}; 
+};
+
+}
 
 namespace {
 
     struct MyRigTransformHardware : public osgAnimation::RigTransformHardware
     {
-        typedef std::map<std::string, std::vector<osg::Matrix>>      AnimationChannelMatricesType;
-        AnimationChannelMatricesType       anim_data_;
+
+        avAnimation::AnimationChannelMatricesType       anim_mat_data_;
 
         void operator()(osgAnimation::RigGeometry& geom);
         bool init(osgAnimation::RigGeometry& geom);
@@ -281,14 +253,16 @@ namespace {
     
     void MyRigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
     {
-        for (int i = 0; i < (int)_bonePalette.size(); i++)
+        const size_t palSize = _bonePalette.size();
+        for (size_t i = 0; i < palSize; i++)
         {
             osg::ref_ptr<osgAnimation::Bone> bone = _bonePalette[i].get();
             const osg::Matrix& invBindMatrix = bone->getInvBindMatrixInSkeletonSpace();
             const osg::Matrix& boneMatrix = bone->getMatrixInSkeletonSpace();
             osg::Matrix resultBoneMatrix = invBindMatrix * boneMatrix;
             osg::Matrix result =  transformFromSkeletonToGeometry * resultBoneMatrix * invTransformFromSkeletonToGeometry;
-            anim_data_[bone->getName()].push_back(result);
+            anim_mat_data_[i].first = bone->getName();
+            anim_mat_data_[i].second.push_back(result);
             if (!_uniformMatrixPalette->setElement(i, result))
                 OSG_WARN << "RigTransformHardware::computeUniformMatrixPalette can't set uniform at " << i << " elements" << std::endl;
         }
@@ -296,7 +270,12 @@ namespace {
 
     bool MyRigTransformHardware::init(osgAnimation::RigGeometry& geom)
     {
-        return osgAnimation::RigTransformHardware::init(geom);
+        bool binit = osgAnimation::RigTransformHardware::init(geom);
+
+        if(binit)
+            anim_mat_data_.resize(_bonePalette.size());
+
+        return binit;
     }
 
 
@@ -366,7 +345,8 @@ int main_anim_test3( int argc, char** argv )
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
    //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
 
-   InstancedAnimationManager im(anim_file);   
+      
+   avAnimation::InstancedAnimationManager im(anim_file);   
 
    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
@@ -457,7 +437,7 @@ int main_anim_test3( int argc, char** argv )
        viewer.frame(t);
    }
 
-   im.createAnimationTexture(switcher.my_ptr->anim_data_);
+   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationTexture(switcher.my_ptr->anim_mat_data_);
 
    std::string filename = "data.row";
    {

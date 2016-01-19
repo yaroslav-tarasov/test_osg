@@ -13,6 +13,38 @@
 
 #include "utils\visitors\find_node_visitor.h"
 
+#include "InstancedData.h"
+
+namespace
+{
+    class LogFileHandler : public osg::NotifyHandler
+    {
+    public:
+        LogFileHandler( const std::string& file )
+        { _log.open( file.c_str() ); }
+        virtual ~LogFileHandler() { _log.close(); }
+        virtual void notify(osg::NotifySeverity severity,
+            const char* msg)
+        { 
+            static std::string str_severity[] =
+            {
+                "ALWAYS",
+                "FATAL",
+                "WARN",
+                "NOTICE",
+                "INFO",
+                "DEBUG_INFO",
+                "DEBUG_FP"
+            };
+
+            _log << str_severity[severity] << ": " << msg;
+
+        }
+    protected:
+        std::ofstream _log;
+    };
+
+
 #if 0
 mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
 {
@@ -23,41 +55,44 @@ mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
 }
 #endif
 
-struct image_data
+class ComputeTextureBoundingBoxCallback : public osg::Drawable::ComputeBoundingBoxCallback
 {
-	int s;
-	int t;
-	int r;
-	GLenum pixelFormat;
-	GLenum type;
-	GLint internalFormat;
-	size_t                  data_num;
-	std::vector<unsigned char> data;
+public:
+    ComputeTextureBoundingBoxCallback(std::vector<osg::Matrixd> instanceMatrices)
+        : m_instanceMatrices(instanceMatrices)
+    {
+    }
 
-	image_data ()
-	{}
-
-	image_data (const osg::Image* image)
-	{
-		s = image->s();
-		t = image->t();
-		r = image->r();
-		pixelFormat = image->getPixelFormat(); 
-		type  = image->getDataType();
-		internalFormat = image->getInternalTextureFormat();
-	}
+    virtual osg::BoundingBox computeBound(const osg::Drawable& drawable) const;
+private:
+    std::vector<osg::Matrixd> m_instanceMatrices;
 };
 
-REFL_STRUCT(image_data)
-	REFL_ENTRY(s)
-	REFL_ENTRY(t)
-	REFL_ENTRY(r)
-	REFL_ENTRY(pixelFormat) 
-	REFL_ENTRY(internalFormat) 
-	REFL_ENTRY(type)
-	REFL_ENTRY(data_num)
-	REFL_ENTRY(data)
-REFL_END()
+
+osg::BoundingBox ComputeTextureBoundingBoxCallback::computeBound(const osg::Drawable& drawable) const
+{
+    osg::BoundingBox bounds;
+    const osg::Geometry* geometry = dynamic_cast<const osg::Geometry*>(&drawable);
+
+    if (!geometry)
+        return bounds;
+
+    const osg::Vec3Array* vertices = dynamic_cast<const osg::Vec3Array*>(geometry->getVertexArray());
+
+    for (unsigned int i = 0; i < m_instanceMatrices.size(); ++i)
+    {
+        for (auto it = vertices->begin(); it != vertices->end(); ++it)
+        {
+            bounds.expandBy(*it * m_instanceMatrices[i]);
+        }
+    }
+
+    return bounds;
+}
+
+}
+
+namespace  {
 
 class  InstancedAnimationManager
 {
@@ -75,22 +110,10 @@ class  InstancedAnimationManager
 		uint32_t lerpValue;          // lerp between frames
 	};
 
-	struct AnimChannels
-	{
-		osg::ref_ptr<osgAnimation::Channel> position;
-		osg::ref_ptr<osgAnimation::Channel> rotateX;
-		osg::ref_ptr<osgAnimation::Channel> rotateY;
-		osg::ref_ptr<osgAnimation::Channel> rotateZ;
-		osg::ref_ptr<osgAnimation::Channel> scale;
-	};
-
-	typedef std::map<std::string, AnimChannels >                 ChannelMapType;
-	typedef std::map<std::string, std::vector<osg::Matrix>>      AnimationChannelMatricesType;
-	typedef std::map<std::string, AnimationChannelMatricesType>  AnimationDataType;
-
-	AnimationDataType       anim_data_;
+	avAnimation::AnimationDataType anim_data_;
 	osgAnimation::BoneMap          bm_;
-    image_data                  idata_;
+    image_data                     idata_;
+    std::vector<osg::Matrixd>      matrices_;
 private:
 	
 	inline osgAnimation::BoneMap getBoneMap(osg::Node* base_model)
@@ -110,62 +133,9 @@ public:
 		:bm_(getBoneMap(base_model))
 	{}
 
-
-	osg::TextureRectangle* stripAnimation(osgAnimation::BasicAnimationManager* model) 
-	{
-		size_t mat_num = 0;
-		for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
-		{
-			osgAnimation::ChannelList& channels_list = (*it)->getChannels();
-			AnimationChannelMatricesType   out_data;
-			ChannelMapType  cm; 
-		
-			for(auto it_a = channels_list.begin();it_a != channels_list.end(); ++it_a)
-			{
-				osg::ref_ptr<osgAnimation::Channel>& chan = *it_a;
-
-				if(chan->getName() == "rotateX")
-					cm[chan->getTargetName()].rotateX  = chan;
-				if(chan->getName() == "rotateY")
-					cm[chan->getTargetName()].rotateY  = chan;
-				if(chan->getName() == "rotateZ")
-					cm[chan->getTargetName()].rotateZ  = chan;
-				if(chan->getName() == "position")
-					cm[chan->getTargetName()].position = chan;
-				if(chan->getName() == "scale")
-					cm[chan->getTargetName()].scale    = chan;
-			}
-
-			for(auto it_a = cm.begin();it_a != cm.end(); ++it_a)
-			{
-				osg::Matrix matrix;
-
-				auto* fkc_rX = it_a->second.rotateX?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateX->getSampler()->getKeyframeContainer()):nullptr;
-				auto* fkc_rY = it_a->second.rotateY?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateY->getSampler()->getKeyframeContainer()):nullptr;
-				auto* fkc_rZ = it_a->second.rotateZ?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateZ->getSampler()->getKeyframeContainer()):nullptr;
-			
-				size_t fkc_size = fkc_rX?fkc_rX->size():(fkc_rY?fkc_rY->size():(fkc_rZ?fkc_rZ->size():(0)));
-
-				for (size_t i=0; i < fkc_size; i++)
-				{
-					// (*fkc)[i].getTime();
-					matrix.setRotate(osg::Quat(fkc_rX?(*fkc_rX)[i].getValue().getPosition():0,osg::X_AXIS,
-											   fkc_rY?(*fkc_rY)[i].getValue().getPosition():0,osg::Y_AXIS,
-											   fkc_rZ?(*fkc_rZ)[i].getValue().getPosition():0,osg::Z_AXIS
-											   )
-					);
-
-					out_data[it_a->first].push_back(matrix);
-					mat_num++;
-				}			
-			}
-
-			anim_data_[(*it)->getName() + "_" + boost::lexical_cast<std::string>(std::distance(model->getAnimationList().begin(),it))] = out_data;
-		}
-	    
-		return createAnimationTexture(mat_num);
-	}
-	
+    inline void addMatrix(const osg::Matrixd& matrix) { matrices_.push_back(matrix); }
+    inline osg::Matrixd getMatrix(size_t index) const { return matrices_[index]; }
+    inline void clearMatrices() { matrices_.clear(); }
 
     osg::TextureRectangle* createAnimationTexture( image_data& idata)
 	{
@@ -195,7 +165,7 @@ public:
 		return texture.release();
 	}
 
-	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
+	osg::TextureRectangle* createAnimationTexture( const avAnimation::AnimationChannelMatricesType& acmt)
 	{
         
         size_t something_num = acmt.size() * acmt.begin()->second.size();
@@ -208,7 +178,7 @@ public:
 		
         idata_ = image_data(image.get());
 
-        const AnimationChannelMatricesType&   mats = acmt;
+        const auto&   mats = acmt;
 
 		unsigned int j = 0;
 		for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
@@ -253,7 +223,7 @@ public:
         image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
         image->setInternalTextureFormat(GL_RGBA32F_ARB);
 
-        const AnimationChannelMatricesType&   mats = anim_data_.begin()->second;
+        const auto&   mats = anim_data_.begin()->second;
 
         unsigned int j = 0;
         for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
@@ -282,22 +252,72 @@ public:
         return texture.release();
     }
 
+    osg::TextureRectangle* createTextureHardwareInstancedGeode(osg::Geometry* geometry) const
+    {
+        const unsigned int start = 0;
+        const unsigned int end = matrices_.size();
+
+        // first turn on hardware instancing for every primitive set
+        for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
+        {
+            geometry->getPrimitiveSet(i)->setNumInstances(matrices_.size());
+        }
+
+        // we need to turn off display lists for instancing to work
+        geometry->setUseDisplayList(false);
+        geometry->setUseVertexBufferObjects(true);
+
+        // create texture to encode all matrices
+        unsigned int height = ((/*end-start*/matrices_.size()) / 4096u) + 1u;
+        osg::ref_ptr<osg::Image> image = new osg::Image;
+        image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
+        image->setInternalTextureFormat(GL_RGBA32F_ARB);
+
+        for (unsigned int i = /*start*/0, j = 0; i < /*end*/matrices_.size(); ++i, ++j)
+        {
+            osg::Matrixf matrix = matrices_[i];
+            float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
+            memcpy(data, matrix.ptr(), 16 * sizeof(float));
+        }
+
+        osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
+        texture->setInternalFormat(GL_RGBA32F_ARB);
+        texture->setSourceFormat(GL_RGBA);
+        texture->setSourceType(GL_FLOAT);
+        texture->setTextureSize(4, end-start);
+        texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+        texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+
+        // copy part of matrix list and create bounding box callback
+        std::vector<osg::Matrixd> matrices;
+        matrices.insert(matrices.begin(), matrices_.begin(), matrices_.end());
+        geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(matrices));
+        
+        return texture.release();
+    }
+
     const image_data& getImageData() const                
     {
         return idata_;
     }
-}; 
+};
+
+}
 
 namespace {
 
     struct MyRigTransformHardware : public osgAnimation::RigTransformHardware
     {
-        typedef std::map<std::string, std::vector<osg::Matrix>>      AnimationChannelMatricesType;
-        AnimationChannelMatricesType       anim_data_;
+        avAnimation::AnimationChannelMatricesType       anim_mat_data_;
+        osg::ref_ptr<osg::Geometry>        inst_geom_;
 
         void operator()(osgAnimation::RigGeometry& geom);
         bool init(osgAnimation::RigGeometry& geom);
+        bool init(osg::Geometry& geom);
         void computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry);
+        void setInstancedGeometry(osg::Geometry* geom) {inst_geom_ = geom;}
     };
 
     void MyRigTransformHardware::operator()(osgAnimation::RigGeometry& geom)
@@ -305,19 +325,22 @@ namespace {
         if (_needInit)
             if (!init(geom))
                 return;
+            else if (!init(*inst_geom_.get()))
+                return;
+
         MyRigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
     }
     
     void MyRigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
     {
-        for (int i = 0; i < (int)_bonePalette.size(); i++)
+        const size_t palSize = _bonePalette.size();
+        for (size_t i = 0; i < palSize; i++)
         {
             osg::ref_ptr<osgAnimation::Bone> bone = _bonePalette[i].get();
             const osg::Matrix& invBindMatrix = bone->getInvBindMatrixInSkeletonSpace();
             const osg::Matrix& boneMatrix = bone->getMatrixInSkeletonSpace();
             osg::Matrix resultBoneMatrix = invBindMatrix * boneMatrix;
             osg::Matrix result =  transformFromSkeletonToGeometry * resultBoneMatrix * invTransformFromSkeletonToGeometry;
-            anim_data_[bone->getName()].push_back(result);
             if (!_uniformMatrixPalette->setElement(i, result))
                 OSG_WARN << "RigTransformHardware::computeUniformMatrixPalette can't set uniform at " << i << " elements" << std::endl;
         }
@@ -328,6 +351,89 @@ namespace {
         return osgAnimation::RigTransformHardware::init(geom);
     }
 
+    bool MyRigTransformHardware::init(osg::Geometry& geom)
+    {
+        osg::Geometry& source = geom;
+        osg::Vec3Array* positionSrc = dynamic_cast<osg::Vec3Array*>(source.getVertexArray());
+        if (!positionSrc)
+        {
+            OSG_WARN << "RigTransformHardware no vertex array in the geometry " << geom.getName() << std::endl;
+            return false;
+        }
+
+#if 0
+        if (!geom.getSkeleton())
+        {
+            OSG_WARN << "RigTransformHardware no skeleton set in geometry " << geom.getName() << std::endl;
+            return false;
+        }
+
+
+
+        // copy shallow from source geometry to rig
+        geom.copyFrom(source);
+
+
+        BoneMapVisitor mapVisitor;
+        geom.getSkeleton()->accept(mapVisitor);
+        BoneMap bm = mapVisitor.getBoneMap();
+
+        if (!createPalette(positionSrc->size(),bm, geom.getVertexInfluenceSet().getVertexToBoneList()))
+            return false;
+
+
+        osg::ref_ptr<osg::Program> program = new osg::Program;
+        program->setName("HardwareSkinning");
+        if (!_shader.valid())
+            _shader = osg::Shader::readShaderFile(osg::Shader::VERTEX,"skinning.vert");
+
+        if (!_shader.valid()) {
+            OSG_WARN << "RigTransformHardware can't load VertexShader" << std::endl;
+            return false;
+        }
+ #endif
+
+        osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
+        cSkinningProg->setName("SkinningShader");
+
+#if 0
+        // replace max matrix by the value from uniform
+        {
+            std::string str = _shader->getShaderSource();
+            std::string toreplace = std::string("MAX_MATRIX");
+            std::size_t start = str.find(toreplace);
+            std::stringstream ss;
+            ss << getMatrixPaletteUniform()->getNumElements();
+            str.replace(start, toreplace.size(), ss.str());
+            _shader->setShaderSource(str);
+            OSG_INFO << "Shader " << str << std::endl;
+        }
+#endif
+
+        int attribIndex = 11;
+        int nbAttribs = getNumVertexAttrib();
+        for (int i = 0; i < nbAttribs; i++)
+        {
+            std::stringstream ss;
+            ss << "boneWeight" << i;
+            cSkinningProg->addBindAttribLocation(ss.str(), attribIndex + i);
+            geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
+            OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
+        }
+#if 0
+        program->addShader(_shader.get());
+#endif
+
+        osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
+        ss->addUniform(getMatrixPaletteUniform());
+        ss->addUniform(new osg::Uniform("nbBonesPerVertex", getNumBonesPerVertex()));
+        ss->setAttributeAndModes(cSkinningProg.get());
+
+#if 0
+        _needInit = false;
+#endif
+        return true;
+    }
 
     struct SetupRigGeometry : public osg::NodeVisitor
     {
@@ -370,7 +476,7 @@ inline osg::Node* loadAnimation(std::string aname)
 
 }
 
-osg::ref_ptr<osg::TextureRectangle> at;
+
 
 int main_anim_test4( int argc, char** argv )
 {  
@@ -379,7 +485,8 @@ int main_anim_test4( int argc, char** argv )
    osg::DisplaySettings::instance()->setNumMultiSamples( 8 );
    
    osg::setNotifyLevel( osg::INFO );   
-   
+   osg::setNotifyHandler( new LogFileHandler("animtestlog.txt") );
+
    osgViewer::Viewer viewer(arguments);
    //arguments.reportRemainingOptionsAsUnrecognized();
    viewer.apply(new osgViewer::SingleScreen(1));
@@ -399,21 +506,51 @@ int main_anim_test4( int argc, char** argv )
 
    InstancedAnimationManager im(anim_file);  
    
+   osg::Vec3 scale(2.0f, 2.0f, 2.0f);
+
+   // create some matrices
+   srand(time(NULL));
+   for (unsigned int i = 0; i < 64; ++i)
+   {
+       for (unsigned int j = 0; j < 64; ++j)
+       {
+           // get random angle and random scale
+           double angle = (rand() % 360) / 180.0 * cg::pi;
+           double scale = (rand() % 2)  + 1.0;
+
+           // calculate position
+           osg::Vec3 position(i * 70, j * 70, 0.0f);
+           osg::Vec3 jittering((rand() % 100) * 2.f, (rand() % 100) * 2.f, (rand() % 100) * 2.f);
+           position += jittering;
+           position.z() *= 2.0f;
+           position.x() *= 2.0f;
+           position.y() *= 2.0f;
+
+           osg::Matrixd modelMatrix = osg::Matrixd::scale(scale, scale, scale) 
+                                    * osg::Matrixd::rotate(angle, osg::Vec3d(0.0, 0.0, 1.0), angle, osg::Vec3d(0.0, 1.0, 0.0), angle, osg::Vec3d(1.0, 0.0, 0.0)) 
+                                    * osg::Matrixd::translate(position);
+           im.addMatrix(modelMatrix);
+       }
+   }
+
    std::string filename = "data.row";
 
    image_data rd;
 
    std::ifstream image_data_file(filename, std::ios_base::binary);
-
+   
+   osg::ref_ptr<osg::TextureRectangle> animTex;
+   osg::ref_ptr<osg::TextureRectangle> instTex;
+   
    if (image_data_file.good())
    {
 	   binary::bytes_t data;
 	   data.resize(boost::filesystem::file_size(filename));
 	   image_data_file.read(data.data(), data.size());
 	   binary::unwrap(data, rd);
-	   at = im.createAnimationTexture(rd);
+	   animTex = im.createAnimationTexture(rd);
    }
-
+   
    osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
    texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
@@ -422,6 +559,57 @@ int main_anim_test4( int argc, char** argv )
    texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
    texture->setUseHardwareMipMapGeneration(true);
 
+
+#if 1
+   ////////////////////////////////////////////////////////////////////////////
+
+   findNodeByType< osg::Geode> geode_finder;  
+   geode_finder.apply(*object_file);
+
+   osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
+   osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
+   // osgAnimation::RigGeometry* rig_geom = dynamic_cast<osgAnimation::RigGeometry*>(mesh);
+
+   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+
+   osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
+   osg::StateSet* pSS = geode->getOrCreateStateSet();
+   // osg::ref_ptr<osgAnimation::RigGeometry> geometry = new osgAnimation::RigGeometry(*rig_geom, osg::CopyOp::DEEP_COPY_ALL);
+   osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
+       & ~osg::CopyOp::DEEP_COPY_CALLBACKS
+       );
+   
+   osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
+   geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
+   
+   instTex = im.createTextureHardwareInstancedGeode(geometry);
+
+   geode->addDrawable(geometry);
+   osg::Matrix trMatrix;
+   trMatrix.setTrans(osg::Vec3f( -20, -20, 20));
+   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+   ph_ctrl->setMatrix(trMatrix);
+
+
+   pSS->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+   pSS->addUniform(new osg::Uniform("colorTex", 0));
+   //pSS->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
+
+   pSS->setTextureAttributeAndModes(6, animTex.get(), osg::StateAttribute::ON);
+   pSS->addUniform(new osg::Uniform("animationTex", 6));
+
+   pSS->setTextureAttributeAndModes(1, instTex.get(), osg::StateAttribute::ON);
+   pSS->addUniform(new osg::Uniform("instanceMatrixTexture", 1));
+
+   ph_ctrl->addChild(geode);
+   root->addChild(ph_ctrl);
+
+
+
+   //////////////////////////////////////////////////////////////////////////////
+#endif   
+
+   
    osg::ref_ptr<osg::StateSet> stateSet = object_file->getOrCreateStateSet();
    stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
    stateSet->addUniform(new osg::Uniform("colorTexture", 0));
@@ -462,34 +650,7 @@ int main_anim_test4( int argc, char** argv )
    }
 #endif
 
-
-#if 1
-   ////////////////////////////////////////////////////////////////////////////
-
-   findNodeByType< osg::Geode> geode_finder;  
-   geode_finder.apply(*object_file);
-
-   osg::Geode*    mesh = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
-   osg::Geometry* geo_mesh = mesh->getDrawable(0)->asGeometry();
-   osgAnimation::RigGeometry* rig_geom = dynamic_cast<osgAnimation::RigGeometry*>(geo_mesh);
-
-   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
-
-   osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
-   osg::ref_ptr<osgAnimation::RigGeometry> geometry = new osgAnimation::RigGeometry(*rig_geom, osg::CopyOp::DEEP_COPY_ALL);
-   geode->addDrawable(geometry);
-   osg::Matrix trMatrix;
-   trMatrix.setTrans(osg::Vec3f( -20, -20, 20));
-   trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
-   ph_ctrl->setMatrix(trMatrix);
-
-   geode->getOrCreateStateSet()->setTextureAttributeAndModes(6, at.get(), osg::StateAttribute::ON);
-   geode->getOrCreateStateSet()->addUniform(new osg::Uniform("animatiomTexture", 6));
-
-   ph_ctrl->addChild(geode);
-   root->addChild(ph_ctrl);
-   //////////////////////////////////////////////////////////////////////////////
-#endif
+   switcher.my_ptr->setInstancedGeometry(geometry.get());
 
    using namespace avAnimation;
 
@@ -503,13 +664,6 @@ int main_anim_test4( int argc, char** argv )
        AnimtkViewerModelController::addAnimation(anim_idle); 
        AnimtkViewerModelController::addAnimation(anim_running); 
 
-       //at = im.stripAnimation(finder._am.get());
-
-#if 0
-	   pat->getOrCreateStateSet()->setTextureAttributeAndModes(6, at.get(), osg::StateAttribute::ON);
-	   pat->getOrCreateStateSet()->addUniform(new osg::Uniform("animatiomTexture", 6));
-#endif
-
        // We're safe at this point, so begin processing.
        mc.setPlayMode(osgAnimation::Animation::ONCE);
        // mc.setDurationRatio(10.);
@@ -520,6 +674,8 @@ int main_anim_test4( int argc, char** argv )
        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
 
+
+   viewer.addEventHandler( new osgViewer::StatsHandler );
    viewer.setSceneData(root);
 
    viewer.run();

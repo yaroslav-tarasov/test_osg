@@ -958,9 +958,6 @@
     <ClCompile Include="utils\async_load.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="av\avFx\SmokeFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
@@ -1001,6 +998,9 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\animation_test4.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>

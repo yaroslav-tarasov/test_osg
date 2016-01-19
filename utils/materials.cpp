@@ -372,7 +372,7 @@ public:
     static inline const program_t& Create(const std::string& mat_name , const std::string& preprocessorDefinitions = std::string())
     {
         const uint16_t version = GLSL_VERSION;
-        const std::string  comp_str = GLSL_VERSION>400? " compatibility":"";
+        const std::string  comp_str = GLSL_VERSION>=150 ?" compatibility":"";
 
         const std::string  mat_name_cut = GetMaterialName(mat_name);
 

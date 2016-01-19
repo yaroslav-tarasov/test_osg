@@ -1531,6 +1531,19 @@ $endif
         AUTO_REG_NAME(skinning, skinning_mat::get_shader)
     }
 
+    namespace skinning_inst_mat
+    {
+
+        const char* vs =  STRINGIFY(
+            \n#include "data/materials/misc/skinning_inst.vert"
+            );
+
+
+        SHADERS_GETTER(get_shader, vs, skinning_mat::fs)
+
+        AUTO_REG_NAME(skininst, skinning_inst_mat::get_shader)
+    }
+
     namespace concrete_mat 
     {
         const char* vs = {
