@@ -82,11 +82,18 @@ namespace avSky
             // dim specular
             const float fSpecularOvercastCoef = pow(1.f - fDiffuseOvercast, 0.5f);
             auto cFogSpec = sls->getSpecular() * fSpecularOvercastCoef;
+            
+            FIXME (Нелепые цветные фантазии) 
+            osg::Vec4 diffuse =  cFogDif*1.8f;     //sls->getDiffuse();
+            osg::Vec4 ambient =  cFogAmb * 3.0 *(1 - 0.75 * _skyClouds->getOvercastCoef());      //sls->getAmbient();  // 1.2
+            osg::Vec4 specular = cFogSpec*1.8;     // sls->getSpecular();
 
             // recalc illumination based on new foggy values
             const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
-            auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
-            
+            FIXME (Нелепые цветные фантазии) 
+            // auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+            auto illumination = cg::luminance_crt(ambient + diffuse * fIllumDiffuseFactor);
+
             _ephem->setIllumination(illumination);
             // FIXME Надо передавать в программы скорректированые значения освещения 
 
@@ -106,9 +113,7 @@ namespace avSky
             _skyClouds->setRotationSiderealTime(-float(fmod(data->localSiderealTime / 24.0, 1.0)) * 360.0f);
              
             
-             osg::Vec4 diffuse =  cFogDif*1.8f;     //sls->getDiffuse();
-             osg::Vec4 ambient =  cFogAmb*1.2;      //sls->getAmbient();
-             osg::Vec4 specular = cFogSpec*1.8;     // sls->getSpecular();
+
              
              ambient.w() = illumination;
              specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                    

@@ -511,6 +511,11 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
         // pcp->apply(*(itr->second.first));
     }    
 
+    if (mat_name.find("tree")   !=std::string::npos
+        || mat_name.find("building") !=std::string::npos 
+        )
+        node->setNodeMask(0);
+
     FIXME(И еще немного хардкода как alpha2covrage оформить)
     if (       mat_name.find("ground")   !=std::string::npos   
             || mat_name.find("sea")      !=std::string::npos     

@@ -44,18 +44,6 @@ class  InstancedAnimationManager
 		uint32_t lerpValue;          // lerp between frames
 	};
 
-	struct AnimChannels
-	{
-		osg::ref_ptr<osgAnimation::Channel> position;
-		osg::ref_ptr<osgAnimation::Channel> rotateX;
-		osg::ref_ptr<osgAnimation::Channel> rotateY;
-		osg::ref_ptr<osgAnimation::Channel> rotateZ;
-		osg::ref_ptr<osgAnimation::Channel> scale;
-	};
-
-	typedef std::unordered_map<std::string, AnimChannels >                ChannelMapType;
-
-
 	AnimationDataType       anim_data_;
 	osgAnimation::BoneMap          bm_;
     image_data                  idata_;
@@ -78,63 +66,6 @@ public:
 		:bm_(getBoneMap(base_model))
 	{}
 
-
-#if 0
-	osg::TextureRectangle* stripAnimation(osgAnimation::BasicAnimationManager* model) 
-	{
-		size_t mat_num = 0;
-		for (osgAnimation::AnimationList::const_iterator it = model->getAnimationList().begin(); it != model->getAnimationList().end(); it++)
-		{
-			osgAnimation::ChannelList& channels_list = (*it)->getChannels();
-			AnimationChannelMatricesType   out_data;
-			ChannelMapType  cm; 
-		
-			for(auto it_a = channels_list.begin();it_a != channels_list.end(); ++it_a)
-			{
-				osg::ref_ptr<osgAnimation::Channel>& chan = *it_a;
-
-				if(chan->getName() == "rotateX")
-					cm[chan->getTargetName()].rotateX  = chan;
-				if(chan->getName() == "rotateY")
-					cm[chan->getTargetName()].rotateY  = chan;
-				if(chan->getName() == "rotateZ")
-					cm[chan->getTargetName()].rotateZ  = chan;
-				if(chan->getName() == "position")
-					cm[chan->getTargetName()].position = chan;
-				if(chan->getName() == "scale")
-					cm[chan->getTargetName()].scale    = chan;
-			}
-
-			for(auto it_a = cm.begin();it_a != cm.end(); ++it_a)
-			{
-				osg::Matrix matrix;
-
-				auto* fkc_rX = it_a->second.rotateX?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateX->getSampler()->getKeyframeContainer()):nullptr;
-				auto* fkc_rY = it_a->second.rotateY?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateY->getSampler()->getKeyframeContainer()):nullptr;
-				auto* fkc_rZ = it_a->second.rotateZ?dynamic_cast<osgAnimation::FloatCubicBezierKeyframeContainer*>(it_a->second.rotateZ->getSampler()->getKeyframeContainer()):nullptr;
-			
-				size_t fkc_size = fkc_rX?fkc_rX->size():(fkc_rY?fkc_rY->size():(fkc_rZ?fkc_rZ->size():(0)));
-
-				for (size_t i=0; i < fkc_size; i++)
-				{
-					// (*fkc)[i].getTime();
-					matrix.setRotate(osg::Quat(fkc_rX?(*fkc_rX)[i].getValue().getPosition():0,osg::X_AXIS,
-											   fkc_rY?(*fkc_rY)[i].getValue().getPosition():0,osg::Y_AXIS,
-											   fkc_rZ?(*fkc_rZ)[i].getValue().getPosition():0,osg::Z_AXIS
-											   )
-					);
-
-					out_data[it_a->first].push_back(matrix);
-					mat_num++;
-				}			
-			}
-
-			anim_data_[(*it)->getName() + "_" + boost::lexical_cast<std::string>(std::distance(model->getAnimationList().begin(),it))] = out_data;
-		}
-	    
-		return createAnimationTexture(mat_num);
-	}
-#endif
 
 	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
 	{
@@ -344,7 +275,6 @@ int main_anim_test3( int argc, char** argv )
 
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
    //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
-
       
    avAnimation::InstancedAnimationManager im(anim_file);   
 
@@ -374,7 +304,6 @@ int main_anim_test3( int argc, char** argv )
 
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
 
-   //root->setUpdateCallback(new UpdateNode(pat));
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
   
@@ -408,13 +337,6 @@ int main_anim_test3( int argc, char** argv )
        AnimtkViewerModelController::addAnimation(anim_idle); 
        AnimtkViewerModelController::addAnimation(anim_running); 
 
-#if 0
-       //at = im.stripAnimation(finder._am.get());
-
-	   pat->getOrCreateStateSet()->setTextureAttributeAndModes(6, at.get(), osg::StateAttribute::ON);
-	   pat->getOrCreateStateSet()->addUniform(new osg::Uniform("animatiomTexture", 6));
-#endif
-
        // We're safe at this point, so begin processing.
        mc.setPlayMode(osgAnimation::Animation::ONCE);
        // mc.setDurationRatio(10.);
@@ -427,7 +349,6 @@ int main_anim_test3( int argc, char** argv )
 
    viewer.setSceneData(root);
 
-   // viewer.run();
 
    const std::string& cn             = mc.getCurrentAnimationName();
    const AnimtkViewerModelController::AnimationDurationMap& ad_map = mc.getDurations();

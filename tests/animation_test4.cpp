@@ -26,7 +26,7 @@ namespace
         virtual void notify(osg::NotifySeverity severity,
             const char* msg)
         { 
-            static std::string str_severity[] =
+            static std::string str_severity[] =                           
             {
                 "ALWAYS",
                 "FATAL",
@@ -43,17 +43,7 @@ namespace
     protected:
         std::ofstream _log;
     };
-
-
-#if 0
-mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
-{
-	return mat4( vec4(m1.xyz,m1.w),
-				 vec4(m2.xyz,m2.w),
-				 vec4(m3.xyz,m3.w),
-				 vec4(0,0,0,1));
-}
-#endif
+ 
 
 class ComputeTextureBoundingBoxCallback : public osg::Drawable::ComputeBoundingBoxCallback
 {
@@ -165,93 +155,6 @@ public:
 		return texture.release();
 	}
 
-	osg::TextureRectangle* createAnimationTexture( const avAnimation::AnimationChannelMatricesType& acmt)
-	{
-        
-        size_t something_num = acmt.size() * acmt.begin()->second.size();
-
-		// create texture to encode all matrices
-		unsigned int height = ((something_num) / 4096u) + 1u;
-		osg::ref_ptr<osg::Image> image = new osg::Image;
-		image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
-		image->setInternalTextureFormat(GL_RGBA32F_ARB);
-		
-        idata_ = image_data(image.get());
-
-        const auto&   mats = acmt;
-
-		unsigned int j = 0;
-		for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
-		{
-			auto & vm = it_a->second;
-			for (auto it_vm = vm.begin();it_vm != vm.end(); ++it_vm,  ++j)
-			{
-				//osg::Matrixf matrix = m_matrices[i];
-				osg::Matrixf matrix = *it_vm;
-				float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
-				memcpy(data, matrix.ptr(), 16 * sizeof(float));
-			}
-		}
-
-		osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
-		texture->setInternalFormat(GL_RGBA32F_ARB);
-		texture->setSourceFormat(GL_RGBA);
-		texture->setSourceType(GL_FLOAT);
-		texture->setTextureSize(4, something_num);
-		texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-
-        idata_.data_num = something_num;
-        idata_.data.resize(texture->getImage()->getTotalSizeInBytes());
-        unsigned char* dest_ptr = &idata_.data[0];
-        for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
-        {
-            memcpy(dest_ptr, itr.data(), itr.size());
-            dest_ptr += itr.size();
-        }
-
-        return texture.release();
-	}
-
-    osg::TextureRectangle* createAnimationTexture(size_t something_num)
-    {
-        // create texture to encode all matrices
-        unsigned int height = ((something_num) / 4096u) + 1u;
-        osg::ref_ptr<osg::Image> image = new osg::Image;
-        image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
-        image->setInternalTextureFormat(GL_RGBA32F_ARB);
-
-        const auto&   mats = anim_data_.begin()->second;
-
-        unsigned int j = 0;
-        for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
-        {
-            auto & vm = it_a->second;
-            for (auto it_vm = vm.begin();it_vm != vm.end(); ++it_vm,  ++j)
-            {
-                //osg::Matrixf matrix = m_matrices[i];
-                osg::Matrixf matrix = *it_vm;
-                float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
-                memcpy(data, matrix.ptr(), 16 * sizeof(float));
-            }
-        }
-
-
-        osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
-        texture->setInternalFormat(GL_RGBA32F_ARB);
-        texture->setSourceFormat(GL_RGBA);
-        texture->setSourceType(GL_FLOAT);
-        texture->setTextureSize(4, something_num);
-        texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-        texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-
-        return texture.release();
-    }
-
     osg::TextureRectangle* createTextureHardwareInstancedGeode(osg::Geometry* geometry) const
     {
         const unsigned int start = 0;
@@ -361,54 +264,8 @@ namespace {
             return false;
         }
 
-#if 0
-        if (!geom.getSkeleton())
-        {
-            OSG_WARN << "RigTransformHardware no skeleton set in geometry " << geom.getName() << std::endl;
-            return false;
-        }
-
-
-
-        // copy shallow from source geometry to rig
-        geom.copyFrom(source);
-
-
-        BoneMapVisitor mapVisitor;
-        geom.getSkeleton()->accept(mapVisitor);
-        BoneMap bm = mapVisitor.getBoneMap();
-
-        if (!createPalette(positionSrc->size(),bm, geom.getVertexInfluenceSet().getVertexToBoneList()))
-            return false;
-
-
-        osg::ref_ptr<osg::Program> program = new osg::Program;
-        program->setName("HardwareSkinning");
-        if (!_shader.valid())
-            _shader = osg::Shader::readShaderFile(osg::Shader::VERTEX,"skinning.vert");
-
-        if (!_shader.valid()) {
-            OSG_WARN << "RigTransformHardware can't load VertexShader" << std::endl;
-            return false;
-        }
- #endif
-
         osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
         cSkinningProg->setName("SkinningShader");
-
-#if 0
-        // replace max matrix by the value from uniform
-        {
-            std::string str = _shader->getShaderSource();
-            std::string toreplace = std::string("MAX_MATRIX");
-            std::size_t start = str.find(toreplace);
-            std::stringstream ss;
-            ss << getMatrixPaletteUniform()->getNumElements();
-            str.replace(start, toreplace.size(), ss.str());
-            _shader->setShaderSource(str);
-            OSG_INFO << "Shader " << str << std::endl;
-        }
-#endif
 
         int attribIndex = 11;
         int nbAttribs = getNumVertexAttrib();
@@ -420,18 +277,12 @@ namespace {
             geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
             OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
         }
-#if 0
-        program->addShader(_shader.get());
-#endif
 
         osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
         ss->addUniform(getMatrixPaletteUniform());
         ss->addUniform(new osg::Uniform("nbBonesPerVertex", getNumBonesPerVertex()));
         ss->setAttributeAndModes(cSkinningProg.get());
 
-#if 0
-        _needInit = false;
-#endif
         return true;
     }
 
@@ -568,13 +419,11 @@ int main_anim_test4( int argc, char** argv )
 
    osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
    osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
-   // osgAnimation::RigGeometry* rig_geom = dynamic_cast<osgAnimation::RigGeometry*>(mesh);
 
    osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
 
    osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
    osg::StateSet* pSS = geode->getOrCreateStateSet();
-   // osg::ref_ptr<osgAnimation::RigGeometry> geometry = new osgAnimation::RigGeometry(*rig_geom, osg::CopyOp::DEEP_COPY_ALL);
    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
        & ~osg::CopyOp::DEEP_COPY_CALLBACKS
        );
@@ -627,8 +476,7 @@ int main_anim_test4( int argc, char** argv )
        );
 
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
-
-   //root->setUpdateCallback(new UpdateNode(pat));
+  
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
   
