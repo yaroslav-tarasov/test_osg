@@ -1524,6 +1524,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
+        load("su_25tm",_terrainRoot, 15000);
+
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
         return _terrainNode;
