@@ -32,13 +32,20 @@ public:
 
     virtual void apply( osg::Node& node )
     {
-        if(findTexture( &node, node.getStateSet() ))
-        {   
-            if(_cm) _cm(&node,_found_mat_name);
-            if(_cr) _cr(&node, node.getStateSet(),_found_mat_name,_mats);
-        }
+        osg::StateSet* stateset = node.getStateSet();
 
-        traverse( node );
+		if (stateset)
+		{
+			if(findTexture( &node, stateset ))
+	        {   
+	            if(_cm) _cm(&node,_found_mat_name);
+	            if(_cr) _cr(&node, node.getStateSet(),_found_mat_name,_mats);
+	        }
+			
+
+		}
+        
+		traverse( node );
     }
 
     virtual void apply( osg::Geode& geode )
@@ -65,6 +72,15 @@ public:
         bool ret = false;
         if ( stateset )
         {
+			osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
+			if ( osgmat != NULL && !ret )
+			{
+				float shininess = osgmat->getShininessFrontAndBack()?osgmat->getShininess( osg::Material::FRONT_AND_BACK ):osgmat->getShininess( osg::Material::FRONT );
+				_found_mat_name = "statmat";
+				_found_mat_names.insert("statmat");
+				ret = true;
+			}
+
             size_t tl_s = stateset->getTextureAttributeList().size();
 
             for(unsigned i = 0;i< tl_s;i++)
@@ -94,6 +110,8 @@ public:
                     ret = true;
                 }
             }
+
+
         }
 
         return ret;

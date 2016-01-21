@@ -878,6 +878,185 @@ $endif
 
     }  // ns default_mat
 
+    namespace static_mat 
+    {
+       const char* vs = {  
+           "#extension GL_ARB_gpu_shader5 : enable \n"
+		   "//       statmat_mat \n"
+           
+		   INCLUDE_VS
+           INCLUDE_COMPABILITY
+           "\n"       
+           LIGHT_MAPS
+           SHADOW_INCLUDE
+
+           STRINGIFY ( 
+\n
+\n           attribute vec3 tangent;
+\n           attribute vec3 binormal;
+\n           out mat4 viewworld_matrix;
+\n
+\n           out block
+\n           {
+\n               vec2 texcoord;
+\n               vec3 normal;
+\n               vec3 vnormal;
+\n               vec3 tangent;
+\n               vec3 binormal;
+\n               vec3 viewpos;
+\n               vec4 shadow_view;
+\n               vec4 lightmap_coord;
+\n           } v_out;
+\n
+\n           void main()
+\n           {
+\n               vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+\n               mat3 rotation = mat3(tangent, binormal, normal);
+\n               vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
+\n               viewworld_matrix = inverse(gl_ModelViewMatrix);
+\n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
+\n
+\n               v_out.tangent   = tangent;
+\n               v_out.binormal  = binormal;
+\n               v_out.normal    = normal;
+\n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
+\n               v_out.viewpos   = viewpos.xyz;
+\n               v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n               //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
+\n               //mat4 EyePlane =  transpose(shadowMatrix0); 
+\n               //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
+\n               shadow_vs_main(viewpos);
+\n
+\n               SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
+\n           }       
+       )
+       };
+
+
+       const char* fs = {
+       
+       "#extension GL_ARB_gpu_shader5 : enable \n "
+ 	   "//       default_mat \n"
+
+       INCLUDE_UNIFORMS
+
+       STRINGIFY ( 
+
+\n          in mat4 viewworld_matrix;
+       )
+       
+       INCLUDE_FUNCS
+       INCLUDE_FOG_FUNCS
+       INCLUDE_VS
+
+	   INCLUDE_DL
+       INCLUDE_DL2
+       INCLUDE_SCENE_PARAM
+"\n"      
+       LIGHT_MAPS
+       SHADOW_INCLUDE
+
+       STRINGIFY ( 
+\n
+\n           uniform sampler2D colorTex;
+\n           uniform sampler2D normalTex;
+\n           uniform vec4 eCol;
+\n           uniform vec4 aCol; 
+\n           uniform vec4 dCol;
+\n           uniform vec4 sCol; 
+\n           in block
+\n           {
+\n               vec2 texcoord;
+\n               vec3 normal;
+\n               vec3 vnormal;
+\n               vec3 tangent;
+\n               vec3 binormal;
+\n               vec3 viewpos;
+\n               vec4 shadow_view;
+\n               vec4 lightmap_coord;
+\n           } f_in;
+\n
+\n           out vec4  aFragColor;
+\n
+\n           void main (void)
+\n           {
+\n               // GET_SHADOW(f_in.viewpos, f_in);
+\n               //float shadow = 1.0; 
+\n               //if(ambient.a > 0.35)
+\n               //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+\n               
+\n               float shadow =  shadow_fs_main(ambient.a);
+\n
+\n               // vec4 base = texture2D(colorTex, f_in.texcoord);
+\n               vec3 bump = fma(texture2D(normalTex, f_in.texcoord).xyz, vec3(2.0), vec3(-1.0));
+\n               //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
+\n               //bump = normalize(bump * 2.0 - 1.0);
+\n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
+\n               vec4  dif_tex_col  = dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
+\n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
+\n
+\n               // get dist to point and normalized to-eye vector
+\n               float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n               float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n               float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n               vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n               vec3 view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+\n               float normal_world_space_z = dot(view_up_vec, normal);
+\n
+\n
+\n               float incidence_dot  = dot(to_eye, normal);
+\n               float pow_fr         = pow(saturate(1.0 - incidence_dot), 3.0);
+\n               vec3  refl_vec_view  = -to_eye + (2.0 * incidence_dot) * normal;
+\n               vec3  refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+\n               float refl_min       = 0.10 + glass_factor * 0.30;
+\n               float half_refl_z    = 0.5 * (refl_vec_world.z + normal_world_space_z);
+\n               float fresnel        = mix(refl_min, 0.6, pow_fr) * fma(half_refl_z, 0.15, fma(glass_factor, 0.6, 0.)); 
+\n
+\n               float n_dot_l = shadow * saturate(dot(normal, light_vec_view.xyz));
+\n               float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 44.0) * 0.9;
+\n               vec3  pure_spec_color = specular.rgb * specular_val;
+\n               float spec_compose_fraction = 0.35;
+\n
+\n
+\n               // const vec3 cube_color = texture(Env, refl_vec_world).rgb + pure_spec_color;
+\n               vec3 cube_color = texture(envTex, refl_vec_world).rgb + pure_spec_color;
+\n
+\n               vec3 non_ambient_term = diffuse.rgb * n_dot_l + spec_compose_fraction * pure_spec_color;
+\n
+\n             // Apply spot lights
+\n             vec3 vLightsSpecAddOn;
+\n              vec3 light_res;  
+\n                  
+\n               // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n             // vec3 lightmap_color = light_res ; 
+\n
+\n             GET_LIGHTMAP(f_in.viewpos, f_in);
+\n
+\n               float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
+\n               non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
+\n
+\n               float ao_trick = fma(up_dot_clamped, 0.4, 0.6);
+\n               vec3  composed_lighting = ao_trick * ambient.rgb + non_ambient_term;
+\n               vec3  day_result = mix(composed_lighting * dif_tex_col.rgb, cube_color, fresnel) + (1.0 - spec_compose_fraction) * pure_spec_color;
+\n               float night_factor = step(ambient.a, 0.35);
+\n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
+\n
+\n               aFragColor = dCol;//vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n			   
+\n           }
+       )
+
+       };   
+
+       SHADERS_GETTER(get_shader, vs, fs)
+
+       AUTO_REG_NAME(statmat, shaders::static_mat::get_shader)
+
+    }  // ns static_mat	
+	
+	
+
     namespace building_mat 
     {
         const char* vs = {  

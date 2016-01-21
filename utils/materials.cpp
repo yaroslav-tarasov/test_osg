@@ -535,6 +535,18 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
     // Добавляется в VDSM
     //stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
 
+	osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
+	if ( osgmat != NULL && mat_name=="statmat")
+	{
+		const osg::Vec4 &eCol = osgmat->getEmissionFrontAndBack()?osgmat->getEmission( osg::Material::FRONT_AND_BACK ):osgmat->getEmission( osg::Material::FRONT );
+		const osg::Vec4 &aCol = osgmat->getAmbientFrontAndBack()?osgmat->getAmbient( osg::Material::FRONT_AND_BACK ):osgmat->getAmbient( osg::Material::FRONT );
+		const osg::Vec4 &dCol = osgmat->getDiffuseFrontAndBack()?osgmat->getDiffuse( osg::Material::FRONT_AND_BACK ):osgmat->getDiffuse( osg::Material::FRONT );
+		const osg::Vec4 &sCol = osgmat->getSpecularFrontAndBack()?osgmat->getSpecular( osg::Material::FRONT_AND_BACK ):osgmat->getSpecular( osg::Material::FRONT );
+		stateset->addUniform( new osg::Uniform("eCol"     , eCol) );
+		stateset->addUniform( new osg::Uniform("aCol"     , aCol) ); 
+		stateset->addUniform( new osg::Uniform("dCol"     , dCol) );
+		stateset->addUniform( new osg::Uniform("sCol"     , sCol) ); 
+	}
 
     stateset->setAttributeAndModes( p.program.get() );
 
