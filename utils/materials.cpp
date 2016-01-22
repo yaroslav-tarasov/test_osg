@@ -68,7 +68,7 @@ public:
     };
 
 public:
-    static inline const textures_t& Create(const mat::materials_t&  mats, std::string mat_name,std::string model_name)
+    static inline const textures_t& Create(const mat::materials_t&  mats, const std::string& mat_name,const std::string& model_name)
     {
         if (   mat_name.find("building") !=std::string::npos
             || mat_name.find("ground")   !=std::string::npos
@@ -203,7 +203,7 @@ FIXME(Все теже кривые плоскости)
         return th;
     }
 
-    static inline const textures_t&  texCreator(const mat::materials_t&  mats, std::string mat_name,std::string model_name)
+    static inline const textures_t&  texCreator(const mat::materials_t&  mats, const std::string& mat_name,const std::string& model_name)
     {
         texturesHolder& th = getTextureHolder();
 
@@ -497,11 +497,15 @@ programsHolder_base::program_t  createProgram(const std::string& mat_name, const
 }
 
 
-void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
+void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name,const mat::materials_t& m)
 {
-    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
-    programsHolder::program_t  p = programsHolder::Create(mat_name);
+    const std::string& mat_name_low = boost::to_lower_copy(mat_name);   
 
+    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
+    programsHolder::program_t  p = programsHolder::Create(mat_name_low);
+
+
+#if 0
     const osg::StateSet::UniformList& ul = stateset->getUniformList();
     for(osg::StateSet::UniformList::const_iterator itr = ul.begin();
         itr != ul.end();
@@ -509,12 +513,15 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
     {   
         std::string name = itr->first;
         // pcp->apply(*(itr->second.first));
-    }    
+    } 
+#endif   
 
+#if 0
     if (mat_name.find("tree")   !=std::string::npos
         || mat_name.find("building") !=std::string::npos 
         )
         node->setNodeMask(0);
+#endif
 
     FIXME(И еще немного хардкода как alpha2covrage оформить)
     if (       mat_name.find("ground")   !=std::string::npos   
@@ -536,19 +543,22 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
     //stateset->addUniform( new osg::Uniform("shadowTexture0", BASE_SHADOW_TEXTURE_UNIT) );
 
 	osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
-	if ( osgmat != NULL && mat_name=="statmat")
+	if ( osgmat != NULL && (mat_name.find("statmat") !=std::string::npos || mat_name_low.find("color") !=std::string::npos ))
 	{
 		const osg::Vec4 &eCol = osgmat->getEmissionFrontAndBack()?osgmat->getEmission( osg::Material::FRONT_AND_BACK ):osgmat->getEmission( osg::Material::FRONT );
 		const osg::Vec4 &aCol = osgmat->getAmbientFrontAndBack()?osgmat->getAmbient( osg::Material::FRONT_AND_BACK ):osgmat->getAmbient( osg::Material::FRONT );
 		const osg::Vec4 &dCol = osgmat->getDiffuseFrontAndBack()?osgmat->getDiffuse( osg::Material::FRONT_AND_BACK ):osgmat->getDiffuse( osg::Material::FRONT );
 		const osg::Vec4 &sCol = osgmat->getSpecularFrontAndBack()?osgmat->getSpecular( osg::Material::FRONT_AND_BACK ):osgmat->getSpecular( osg::Material::FRONT );
-		stateset->addUniform( new osg::Uniform("eCol"     , eCol) );
-		stateset->addUniform( new osg::Uniform("aCol"     , aCol) ); 
-		stateset->addUniform( new osg::Uniform("dCol"     , dCol) );
-		stateset->addUniform( new osg::Uniform("sCol"     , sCol) ); 
+        const float shininess = osgmat->getShininessFrontAndBack()?osgmat->getShininess( osg::Material::FRONT_AND_BACK ):osgmat->getShininess( osg::Material::FRONT );
+
+        stateset->addUniform( new osg::Uniform("eCol"     , eCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+		stateset->addUniform( new osg::Uniform("aCol"     , aCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
+		stateset->addUniform( new osg::Uniform("dCol"     , dCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+		stateset->addUniform( new osg::Uniform("sCol"     , sCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
+
 	}
 
-    stateset->setAttributeAndModes( p.program.get() );
+    stateset->setAttributeAndModes( p.program.get(), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     //if ( mat_name.find("panorama") !=std::string::npos )
     //{     
@@ -579,7 +589,7 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,std::string model_n
 }
 
 
-void createMaterialLite(osg::Node* node,osg::StateSet* stateset,std::string model_name,std::string mat_name,const mat::materials_t& m)
+void createMaterialLite(osg::Node* node,osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name,const mat::materials_t& m)
 {
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
    

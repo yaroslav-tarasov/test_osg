@@ -737,7 +737,7 @@ $endif
 \n           void main()
 \n           {
 \n               vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-\n               mat3 rotation = mat3(tangent, binormal, normal);
+\n               //mat3 rotation = mat3(tangent, binormal, normal);
 \n               vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
 \n               viewworld_matrix = inverse(gl_ModelViewMatrix);
 \n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
@@ -911,20 +911,17 @@ $endif
 \n           void main()
 \n           {
 \n               vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-\n               mat3 rotation = mat3(tangent, binormal, normal);
+\n               // mat3 rotation = mat3(tangent, binormal, normal);
 \n               vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
 \n               viewworld_matrix = inverse(gl_ModelViewMatrix);
 \n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 \n
 \n               v_out.tangent   = tangent;
-\n               v_out.binormal  = binormal;
+\n               v_out.binormal  = /*binormal*/cross(normal,tangent);
 \n               v_out.normal    = normal;
 \n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
 \n               v_out.viewpos   = viewpos.xyz;
 \n               v_out.texcoord  = gl_MultiTexCoord1.xy;
-\n               //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-\n               //mat4 EyePlane =  transpose(shadowMatrix0); 
-\n               //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
 \n               shadow_vs_main(viewpos);
 \n
 \n               SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -936,7 +933,7 @@ $endif
        const char* fs = {
        
        "#extension GL_ARB_gpu_shader5 : enable \n "
- 	   "//       default_mat \n"
+ 	   "//       static_mat \n"
 
        INCLUDE_UNIFORMS
 
@@ -980,11 +977,6 @@ $endif
 \n
 \n           void main (void)
 \n           {
-\n               // GET_SHADOW(f_in.viewpos, f_in);
-\n               //float shadow = 1.0; 
-\n               //if(ambient.a > 0.35)
-\n               //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
-\n               
 \n               float shadow =  shadow_fs_main(ambient.a);
 \n
 \n               // vec4 base = texture2D(colorTex, f_in.texcoord);
@@ -1042,8 +1034,8 @@ $endif
 \n               float night_factor = step(ambient.a, 0.35);
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
-\n               aFragColor = dCol;//vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-\n			   
+\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n			     
 \n           }
        )
 
@@ -1052,6 +1044,7 @@ $endif
        SHADERS_GETTER(get_shader, vs, fs)
 
        AUTO_REG_NAME(statmat, shaders::static_mat::get_shader)
+       AUTO_REG_NAME(color  , shaders::static_mat::get_shader)
 
     }  // ns static_mat	
 	

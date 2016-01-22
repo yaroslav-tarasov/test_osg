@@ -386,6 +386,7 @@ FIXME( Исправить структуру под mt)
         nl.push_back("building");
         nl.push_back("default");
         nl.push_back("plane");
+        nl.push_back("color");
         //nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
 
         if(name == "crow")

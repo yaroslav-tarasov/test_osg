@@ -72,45 +72,49 @@ public:
         bool ret = false;
         if ( stateset )
         {
-			osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
-			if ( osgmat != NULL && !ret )
-			{
-				float shininess = osgmat->getShininessFrontAndBack()?osgmat->getShininess( osg::Material::FRONT_AND_BACK ):osgmat->getShininess( osg::Material::FRONT );
-				_found_mat_name = "statmat";
-				_found_mat_names.insert("statmat");
-				ret = true;
-			}
-
             size_t tl_s = stateset->getTextureAttributeList().size();
+            const std::string&  name = stateset->getName();
+            const std::string&  name_low = boost::to_lower_copy(name);
 
             for(unsigned i = 0;i< tl_s;i++)
             {
-                osg::Texture* foundTexture = dynamic_cast<osg::Texture*>(
-                    stateset->getTextureAttribute(i, osg::StateAttribute::TEXTURE) );
+                osg::StateAttribute* ta = stateset->getTextureAttribute(i, osg::StateAttribute::TEXTURE);
+                osg::Texture* foundTexture = ta?ta->asTexture():nullptr;
 
                 if ( foundTexture )
                 {  
-                    std::string name = stateset->getName();
 
                     bool matching = searchForName.end() != std::find_if(searchForName.begin(),searchForName.end(),[&](const std::string& name_)->bool {
-                        return name.find(name_) !=std::string::npos; }
+                        return (name.find(name_) !=std::string::npos) || (name_low.find(name_) !=std::string::npos); }
                     );
 
                     if(matching)
                     {  
 						_found_mat_name = name;
 						_found_mat_names.insert(_found_mat_name);
+                         ret = true;
                     }
 					else
 					{
 						_found_mat_name = "default_" + name;
 						_found_mat_names.insert(_found_mat_name);
+                         ret = true;
 					}
 
-                    ret = true;
                 }
+
+
             }
 
+#if 1
+            osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
+            if ( osgmat != NULL && !ret )
+            {
+                _found_mat_name = "color_" + name;
+                _found_mat_names.insert(_found_mat_name);
+                ret = true;
+            }
+#endif
 
         }
 
