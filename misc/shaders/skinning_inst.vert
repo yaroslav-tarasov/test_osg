@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
  * OpenSceneGraph Public License for more details.
 */
-#extension GL_ARB_gpu_shader5 : enable 
+#extension GL_ARB_gpu_shader5       : enable 
 #extension GL_ARB_texture_rectangle : enable
 
 in vec4 boneWeight0;
@@ -21,6 +21,8 @@ in vec4 boneWeight3;
 
 uniform float osg_SimulationTime;
 uniform int   nbBonesPerVertex;
+uniform int   animationIndex;
+
 
 vec4    position;
 vec3    normal;
@@ -30,7 +32,7 @@ uniform sampler2DRect instanceMatrixTexture;
 
 mat4  getBoneMatrix ( int idx )
 {
-		int  animID = idx * 150 + int(osg_SimulationTime * (gl_InstanceID % 600 + 200) ) % 150;
+		int  animID = idx + 20 * (int(osg_SimulationTime * (gl_InstanceID % 600 + 200) ) % 150 /*+ 150*/);
 		vec2 animCoord = vec2((animID % 4096) * 4.0, animID / 4096);
 		return mat4(texture2DRect(animationTex, animCoord),
 					texture2DRect(animationTex, animCoord + vec2(1.0, 0.0)),
@@ -50,7 +52,7 @@ void computeAcummulatedNormalAndPosition(vec4 boneWeight)
         mat4 matrix = getBoneMatrix(matrixIndex);
         // correct for normal if no scale in bone
         mat3 matrixNormal = mat3(matrix);
-        position += matrixWeight * (matrix *     gl_Vertex ); 
+        position += matrixWeight * (matrix       * gl_Vertex ); 
         normal   += matrixWeight * (matrixNormal * gl_Normal );    
 
         boneWeight = boneWeight.zwxy;
@@ -86,11 +88,18 @@ void main( void )
 {
     
 	vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
-	mat4 instanceModelMatrix = mat4(texture2DRect(instanceMatrixTexture, instanceCoord),
-									texture2DRect(instanceMatrixTexture, instanceCoord + vec2(1.0, 0.0)),
-									texture2DRect(instanceMatrixTexture, instanceCoord + vec2(2.0, 0.0)),
-									texture2DRect(instanceMatrixTexture, instanceCoord + vec2(3.0, 0.0)));
+	//mat4 instanceModelMatrix = mat4(vec4(texture2DRect(instanceMatrixTexture, instanceCoord).xyz,0.0),
+	//								vec4(texture2DRect(instanceMatrixTexture, instanceCoord + vec2(1.0, 0.0)).xyz,0.0),
+	//								vec4(texture2DRect(instanceMatrixTexture, instanceCoord + vec2(2.0, 0.0)).xyz,0.0),
+	//								vec4(texture2DRect(instanceMatrixTexture, instanceCoord + vec2(3.0, 0.0)).xyz,1.0)
+	//								);
 	
+	mat4 instanceModelMatrix = mat4(vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (0, 0)).xyz,0.0),
+									vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (1, 0)).xyz,0.0),
+									vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (2, 0)).xyz,0.0),
+									vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (3, 0)).xyz,1.0)
+									);
+										
 	mat3 normalMatrix = mat3(instanceModelMatrix[0][0], instanceModelMatrix[0][1], instanceModelMatrix[0][2],
 							 instanceModelMatrix[1][0], instanceModelMatrix[1][1], instanceModelMatrix[1][2],
 							 instanceModelMatrix[2][0], instanceModelMatrix[2][1], instanceModelMatrix[2][2]);

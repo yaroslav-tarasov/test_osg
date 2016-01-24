@@ -315,7 +315,7 @@ FIXME( Исправить структуру под mt)
 		//
         osg::Node* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact);
 
-        if(lod_)  // Далеко не все модели имеют заданную структуру ха
+        if(lod_ && lod0 && lod3)  // Далеко не все модели имеют заданную структуру ха
         {
  		    avLod::LOD* lod = new avLod::LOD;
 
@@ -427,7 +427,7 @@ FIXME( Исправить структуру под mt)
 		}
 
 #if 1
-        if(fclone )
+        if(fclone)
         {
             object = /*dynamic_cast<osg::PositionAttitudeTransform *>*/(osg::clone(objCache[name].get(), copyop ));
         }

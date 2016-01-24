@@ -126,6 +126,7 @@
     <None Include="misc\shaders\headers\spot_lights.hlsl" />
     <None Include="misc\shaders\headers\utils.hlsl" />
     <None Include="misc\shaders\skinning.vert" />
+    <None Include="misc\shaders\skinning_inst.vert" />
     <None Include="misc\shaders\tess.frag" />
     <None Include="misc\shaders\tess.geo" />
     <None Include="misc\shaders\tess.vs" />

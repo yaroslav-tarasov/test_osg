@@ -249,6 +249,9 @@
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FrictionDustFx.vs">
       <Filter>Source Files\shaders\fx</Filter>
     </None>
+    <None Include="misc\shaders\skinning_inst.vert">
+      <Filter>Source Files\shaders\animation</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

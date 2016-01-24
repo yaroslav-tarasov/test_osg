@@ -15,21 +15,14 @@
 
 #include "InstancedData.h"
 
-#if 0
-mat4 decodeMatrix(vec4 m1, vec4 m2, vec4 m3)
-{
-	return mat4( vec4(m1.xyz,m1.w),
-				 vec4(m2.xyz,m2.w),
-				 vec4(m3.xyz,m3.w),
-				 vec4(0,0,0,1));
-}
-#endif
 
 namespace avAnimation {
 
 
 class  InstancedAnimationManager
 {
+
+#if 0
 	struct InstanceDataElement
 	{
 		osg::Vec4 world1;            // the world transform for this matrix row 1
@@ -43,6 +36,7 @@ class  InstancedAnimationManager
 		uint32_t attachmentSet;      // the id to determine which geo attachments get set
 		uint32_t lerpValue;          // lerp between frames
 	};
+#endif
 
 	AnimationDataType       anim_data_;
 	osgAnimation::BoneMap          bm_;
@@ -70,10 +64,10 @@ public:
 	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
 	{
         
-        size_t something_num = acmt.size() * acmt.begin()->second.size();
+        size_t total_anim_len = acmt.size() * acmt.begin()->second.size();
 
 		// create texture to encode all matrices
-		unsigned int height = ((something_num) / 4096u) + 1u;
+		unsigned int height = ((total_anim_len) / 4096u) + 1u;
 		osg::ref_ptr<osg::Image> image = new osg::Image;
 		image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
 		image->setInternalTextureFormat(GL_RGBA32F_ARB);
@@ -82,6 +76,7 @@ public:
 
         const AnimationChannelMatricesType&   mats = acmt;
 
+#if 0
 		unsigned int j = 0;
 		for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
 		{
@@ -94,18 +89,38 @@ public:
 			}
             idata_.bones.push_back(it_a->first);
 		}
+#endif
+		size_t anim_len= mats.begin()->second.size();
+
+		size_t j = 0;
+
+		for (size_t i = 0; i < anim_len; ++i )
+		for (auto it_a = mats.begin();it_a != mats.end(); ++it_a, ++j)
+		{
+			auto & vm = it_a->second;
+			osg::Matrixf matrix = vm[i];
+			float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
+			memcpy(data, matrix.ptr(), 16 * sizeof(float));
+		}
+
+
+		for (auto it_a = mats.begin();it_a != mats.end(); ++it_a)
+		{
+			idata_.bones.push_back(it_a->first);
+		}
+
 
 		osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
 		texture->setInternalFormat(GL_RGBA32F_ARB);
 		texture->setSourceFormat(GL_RGBA);
 		texture->setSourceType(GL_FLOAT);
-		texture->setTextureSize(4, something_num);
+		texture->setTextureSize(4, total_anim_len);
 		texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
 		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
 		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
         
-		idata_.data_num = something_num;
+		idata_.data_len = total_anim_len;
         idata_.data.resize(texture->getImage()->getTotalSizeInBytes());
         unsigned char* dest_ptr = &idata_.data[0];
         for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
@@ -117,6 +132,7 @@ public:
         return texture.release();
 	}
 
+#if 0
     osg::TextureRectangle* createAnimationTexture(size_t something_num)
     {
         // create texture to encode all matrices
@@ -153,6 +169,7 @@ public:
 
         return texture.release();
     }
+#endif
 
     const image_data& getImageData() const                
     {
@@ -232,12 +249,6 @@ namespace {
                     rig->setRigTransformImplementation(my_ptr);
                 }
             }
-
-#if 0
-            if (geom.getName() != std::string("BoundingBox")) // we disable compute of bounding box for all geometry except our bounding box
-                geom.setComputeBoundingBoxCallback(new osg::Drawable::ComputeBoundingBoxCallback);
-            //            geom.setInitialBound(new osg::Drawable::ComputeBoundingBoxCallback);
-#endif
         }
     };
 
@@ -262,34 +273,20 @@ int main_anim_test3( int argc, char** argv )
    osgViewer::Viewer viewer(arguments);
    //arguments.reportRemainingOptionsAsUnrecognized();
    viewer.apply(new osgViewer::SingleScreen(1));
+   viewer.setUpViewInWindow(0, 0, 5, 5);
+
 
    osg::ref_ptr<osg::Group> root = new osg::Group;
-   osg::ref_ptr<osg::Group> mt = new osg::Group;
 
-#if 1   
    auto anim_file = osgDB::readNodeFile("crow/idle.fbx")  ;
-
    auto anim_idle    = loadAnimation("flap");
    auto anim_running = loadAnimation("soar");
-#endif
+
 
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
    //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
       
    avAnimation::InstancedAnimationManager im(anim_file);   
-
-   osg::ref_ptr<osg::Image> image = osgDB::readImageFile("crow/crow_tex.dds");
-   osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image);
-   texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-   texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-   texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-   texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
-   texture->setUseHardwareMipMapGeneration(true);
-
-   osg::ref_ptr<osg::StateSet> stateSet = object_file->getOrCreateStateSet();
-   stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
-   stateSet->addUniform(new osg::Uniform("colorTexture", 0));
-   stateSet->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
 
    SetupRigGeometry switcher(true);
    object_file->accept(switcher);
@@ -303,27 +300,13 @@ int main_anim_test3( int argc, char** argv )
        );
 
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
+ 
 
-   mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
-   root->addChild(mt);
-  
-#if 1
-   for (int i =0;i<1/*300*/;i++)
-   {
-       osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
-       ph_ctrl->setName("phys_ctrl");
-       ph_ctrl->setUserValue("id",666 + i);
-       ph_ctrl->addChild( pat );
-
-       osg::Matrix trMatrix;
-       trMatrix.setTrans(osg::Vec3f(0.0 + i * 20,0.0 + i * 20, 20.0 + i * 1));
-       trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
-       ph_ctrl->setMatrix(trMatrix);
-
-       root->addChild(ph_ctrl);
-
-   }
-#endif
+	osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+	ph_ctrl->setName("phys_ctrl");
+	ph_ctrl->setUserValue("id",0);
+	ph_ctrl->addChild( pat );
+	root->addChild(ph_ctrl);
 
    using namespace avAnimation;
 
@@ -339,34 +322,41 @@ int main_anim_test3( int argc, char** argv )
 
        // We're safe at this point, so begin processing.
        mc.setPlayMode(osgAnimation::Animation::ONCE);
-       // mc.setDurationRatio(10.);
        mc.next();
        mc.play();
 
+	   viewer.setSceneData(root);
+
+	   const AnimtkViewerModelController::AnimationDurationMap& ad_map = mc.getDurations();
+
+	   for (auto it = ad_map.begin(); it!=ad_map.end(); ++it)
+	   {
+		   const std::string& cn       = mc.getCurrentAnimationName();
+
+		   for (double t=0.0;t<ad_map.at(cn);t+= ad_map.at(cn)/150.0 )
+		   {
+			   viewer.frame(t);
+		   }
+
+		   mc.stop();
+		   mc.next();
+		   mc.play();
+	   }
+
+
+	   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationTexture(switcher.my_ptr->anim_mat_data_);
+
+	   std::string filename = "data.row";
+	   {
+		   std::ofstream image_data_file(filename, std::ios_base::binary);
+		   auto bts = binary::wrap(im.getImageData());
+		   image_data_file.write(binary::raw_ptr(bts),binary::size(bts));
+	   }
+
+
    } else {
-       osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
+	   osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
-
-   viewer.setSceneData(root);
-
-
-   const std::string& cn             = mc.getCurrentAnimationName();
-   const AnimtkViewerModelController::AnimationDurationMap& ad_map = mc.getDurations();
-
-   for (double t=0.0;t<ad_map.at(cn);t+= ad_map.at(cn)/150.0 )
-   {
-       viewer.frame(t);
-   }
-
-   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationTexture(switcher.my_ptr->anim_mat_data_);
-
-   std::string filename = "data.row";
-   {
-       std::ofstream image_data_file(filename, std::ios_base::binary);
-       auto bts = binary::wrap(im.getImageData());
-       image_data_file.write(binary::raw_ptr(bts),binary::size(bts));
-   }
-
 
    return 0;
 }

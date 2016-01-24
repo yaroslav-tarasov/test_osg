@@ -906,6 +906,7 @@ $endif
 \n               vec3 viewpos;
 \n               vec4 shadow_view;
 \n               vec4 lightmap_coord;
+\n               vec2 detail_uv;
 \n           } v_out;
 \n
 \n           void main()
@@ -922,6 +923,7 @@ $endif
 \n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
 \n               v_out.viewpos   = viewpos.xyz;
 \n               v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n               v_out.detail_uv = gl_Vertex.xy;// * 0.03;
 \n               shadow_vs_main(viewpos);
 \n
 \n               SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
@@ -971,6 +973,7 @@ $endif
 \n               vec3 viewpos;
 \n               vec4 shadow_view;
 \n               vec4 lightmap_coord;
+\n               vec2 detail_uv;
 \n           } f_in;
 \n
 \n           out vec4  aFragColor;
@@ -986,6 +989,15 @@ $endif
 \n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
 \n               vec4  dif_tex_col  = dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
 \n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
+\n
+\n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
+\n                vec3 normal_noise = vec3(0.0);
+\n                if (detail_factor > 0.01)
+\n                {
+\n                    normal_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
+\n                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, normal_noise.ggg);
+\n                }
+\n                normal = normalize(0.8 * f_in.normal + (normal_noise.x * f_in.tangent + normal_noise.y * f_in.binormal));
 \n
 \n               // get dist to point and normalized to-eye vector
 \n               float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);

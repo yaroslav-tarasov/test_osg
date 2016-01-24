@@ -13,6 +13,7 @@
 
 #include "utils\visitors\find_node_visitor.h"
 
+#include "creators.h"
 #include "InstancedData.h"
 
 namespace
@@ -48,14 +49,14 @@ namespace
 class ComputeTextureBoundingBoxCallback : public osg::Drawable::ComputeBoundingBoxCallback
 {
 public:
-    ComputeTextureBoundingBoxCallback(std::vector<osg::Matrixd> instanceMatrices)
+    ComputeTextureBoundingBoxCallback(const std::vector<osg::Matrixd>& instanceMatrices)
         : m_instanceMatrices(instanceMatrices)
     {
     }
 
     virtual osg::BoundingBox computeBound(const osg::Drawable& drawable) const;
 private:
-    std::vector<osg::Matrixd> m_instanceMatrices;
+    const std::vector<osg::Matrixd>& m_instanceMatrices;
 };
 
 
@@ -103,7 +104,9 @@ class  InstancedAnimationManager
 	avAnimation::AnimationDataType anim_data_;
 	osgAnimation::BoneMap          bm_;
     image_data                     idata_;
-    std::vector<osg::Matrixd>      matrices_;
+    std::vector<osg::Matrixd>      instancesData_;
+	osg::ref_ptr<osg::TextureRectangle> texture_;
+
 private:
 	
 	inline osgAnimation::BoneMap getBoneMap(osg::Node* base_model)
@@ -120,16 +123,16 @@ private:
 public:
 
 	InstancedAnimationManager(osg::Node* base_model)
-		:bm_(getBoneMap(base_model))
+		: bm_(getBoneMap(base_model))
 	{}
 
-    inline void addMatrix(const osg::Matrixd& matrix) { matrices_.push_back(matrix); }
-    inline osg::Matrixd getMatrix(size_t index) const { return matrices_[index]; }
-    inline void clearMatrices() { matrices_.clear(); }
+    inline void addMatrix(const osg::Matrixd& matrix) { instancesData_.push_back(matrix); }
+    inline osg::Matrixd getMatrix(size_t index) const { return instancesData_[index]; }
+    inline void clearMatrices() { instancesData_.clear(); }
 
     osg::TextureRectangle* createAnimationTexture( image_data& idata)
 	{
-		size_t something_num = idata.data_num ;
+		size_t something_num = idata.data_len ;
 		
 		osg::ref_ptr<osg::Image> image = new osg::Image;
 		image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
@@ -154,16 +157,18 @@ public:
 
 		return texture.release();
 	}
+	
 
-    osg::TextureRectangle* createTextureHardwareInstancedGeode(osg::Geometry* geometry) const
+
+    osg::TextureRectangle* createTextureHardwareInstancedGeode(osg::Geometry* geometry) 
     {
         const unsigned int start = 0;
-        const unsigned int end = matrices_.size();
+        const unsigned int end = instancesData_.size();
 
         // first turn on hardware instancing for every primitive set
         for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
         {
-            geometry->getPrimitiveSet(i)->setNumInstances(matrices_.size());
+            geometry->getPrimitiveSet(i)->setNumInstances(instancesData_.size());
         }
 
         // we need to turn off display lists for instancing to work
@@ -171,37 +176,52 @@ public:
         geometry->setUseVertexBufferObjects(true);
 
         // create texture to encode all matrices
-        unsigned int height = ((/*end-start*/matrices_.size()) / 4096u) + 1u;
-        osg::ref_ptr<osg::Image> image = new osg::Image;
-        image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
-        image->setInternalTextureFormat(GL_RGBA32F_ARB);
+        unsigned int height = ((/*end-start*/instancesData_.size()) / 4096u) + 1u;
+		
+		osg::ref_ptr<osg::Image>       image = new osg::Image; 
+		image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
+		image->setInternalTextureFormat(GL_RGBA32F_ARB);
+		
 
-        for (unsigned int i = /*start*/0, j = 0; i < /*end*/matrices_.size(); ++i, ++j)
+        for (unsigned int i = /*start*/0, j = 0; i < /*end*/instancesData_.size(); ++i, ++j)
         {
-            osg::Matrixf matrix = matrices_[i];
+            const osg::Matrixf& matrix = instancesData_[i];
             float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
             memcpy(data, matrix.ptr(), 16 * sizeof(float));
         }
 
-        osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
-        texture->setInternalFormat(GL_RGBA32F_ARB);
-        texture->setSourceFormat(GL_RGBA);
-        texture->setSourceType(GL_FLOAT);
-        texture->setTextureSize(4, end-start);
-        texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-        texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+        texture_ = new osg::TextureRectangle(image);
+        texture_->setInternalFormat(GL_RGBA32F_ARB);
+        texture_->setSourceFormat(GL_RGBA);
+        texture_->setSourceType(GL_FLOAT);
+        texture_->setTextureSize(4, end-start);
+        texture_->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+        texture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+        texture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+        texture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
 
         // copy part of matrix list and create bounding box callback
-        std::vector<osg::Matrixd> matrices;
-        matrices.insert(matrices.begin(), matrices_.begin(), matrices_.end());
-        geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(matrices));
-        
-        return texture.release();
-    }
+        //std::vector<osg::Matrixd> matrices;
+        //matrices.insert(matrices.begin(), instancesData_.begin(), instancesData_.end());
+        geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(instancesData_));
 
-    const image_data& getImageData() const                
+		return texture_.get();
+	}
+
+	void setInstanceData(size_t idx, const osg::Matrixf& matrix)
+	{
+		instancesData_[idx] = matrix;
+		float * data = (float*)texture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+		memcpy(data, matrix.ptr(), 16 * sizeof(float));
+		texture_->dirtyTextureObject();
+	}
+
+	const  std::vector<osg::Matrixd>& getInstancedData() const      
+	{
+		return instancesData_;
+	}
+
+	const image_data& getImageData() const                
     {
         return idata_;
     }
@@ -327,7 +347,29 @@ inline osg::Node* loadAnimation(std::string aname)
 
 }
 
+class UpdateCallback  : public osg::NodeCallback
+{
+public:
+	typedef boost::function<void(const osg::Matrix&)> set_matrix_f;
 
+public:
+	UpdateCallback( set_matrix_f sm )
+	   : _set_matrix(sm) {}
+
+	  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
+	  {	
+		  traverse(node,nv);
+		  
+		  osg::Matrix trMatrix = node->asTransform()->asMatrixTransform()->getMatrix();
+		  trMatrix.setTrans(trMatrix.getTrans() + osg::Vec3f(0.1, 0.1, 0.1));
+		  // trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
+		  node->asTransform()->asMatrixTransform()->setMatrix(trMatrix);
+		  _set_matrix(trMatrix);
+	  }
+
+protected:
+	set_matrix_f _set_matrix;
+};
 
 int main_anim_test4( int argc, char** argv )
 {  
@@ -359,11 +401,17 @@ int main_anim_test4( int argc, char** argv )
    
    osg::Vec3 scale(2.0f, 2.0f, 2.0f);
 
+
+   const size_t x_num = 64; 
+   const size_t y_num = 64;
+
+   const size_t instances_num = x_num * y_num;
+
    // create some matrices
    srand(time(NULL));
-   for (unsigned int i = 0; i < 64; ++i)
+   for (unsigned int i = 0; i < x_num; ++i)
    {
-       for (unsigned int j = 0; j < 64; ++j)
+       for (unsigned int j = 0; j < y_num; ++j)
        {
            // get random angle and random scale
            double angle = (rand() % 360) / 180.0 * cg::pi;
@@ -479,7 +527,9 @@ int main_anim_test4( int argc, char** argv )
   
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
-  
+
+   osg::ref_ptr<osg::AnimationPathCallback> apcb = new osg::AnimationPathCallback;
+   apcb->setAnimationPath(creators::createAnimationPath(osg::Vec3(0.0,0.0,0.0), 50, 6));  
 #if 1
    for (int i =0;i<1/*300*/;i++)
    {
@@ -493,10 +543,20 @@ int main_anim_test4( int argc, char** argv )
        trMatrix.setRotate(osg::Quat(osg::inDegrees(0.0)  ,osg::Z_AXIS));
        ph_ctrl->setMatrix(trMatrix);
 
-       root->addChild(ph_ctrl);
+	   ph_ctrl->setUpdateCallback(apcb.get());
+       
+	   root->addChild(ph_ctrl);
 
    }
 #endif
+
+   for (int i =0;i<instances_num;i++)
+   {
+	   osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
+	   ph_ctrl->setMatrix(im.getInstancedData()[i]);
+	   root->addChild(ph_ctrl);
+	   ph_ctrl->addUpdateCallback(new UpdateCallback(boost::bind(&InstancedAnimationManager::setInstanceData,&im,i,_1)));
+   }
 
    switcher.my_ptr->setInstancedGeometry(geometry.get());
 
