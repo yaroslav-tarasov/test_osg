@@ -333,7 +333,7 @@ inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
     geo_position agp(target_pos, get_base());
 
     aircraft::settings_t as;
-    as.kind = "A319";//msg.model_name;
+    as.kind = msg.model_name; // "A319"; //
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
 }
@@ -349,7 +349,7 @@ inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& ms
     geo_position agp(target_pos, get_base());
 
     aircraft::settings_t as;
-    as.kind = "A319";//msg.model_name;
+    as.kind = msg.model_name; // "A319"; //
     as.custom_label = msg.custom_label;
 
     // geo_position agp(apos,quaternion(cpr(msg.course,0,0)));

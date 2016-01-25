@@ -40,7 +40,7 @@ void vis_node_impl::on_visual_object_created()
 
 	for (auto it=anim_queue_.begin(); it!=anim_queue_.end();++it )
 	{
-		on_animation(*it);
+		on_animation(*it, true);
 	}
 
 	anim_queue_.clear();
@@ -129,7 +129,7 @@ void vis_node_impl::pre_update(double time)
 	last_update_ = time;
 }
 
-void vis_node_impl::on_animation(msg::node_animation const& anim)
+void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 {
     LOG_ODS_MSG("vis_node_impl::on_animation: " << anim.name << "\n" );
 
@@ -165,7 +165,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
 
-    if ( manager_ )
+    if ( manager_.valid() )
     {   
             const osgAnimation::AnimationList& animations =
                 manager_->getAnimationList();
@@ -216,7 +216,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim)
     }
 	else
 	{
-		anim_queue_.push_back(anim);
+        if(!deffered)
+		    anim_queue_.push_back(anim);
+
+        FIXME(На этом этапе нет узлов это ошибка)
 	}
 }
 
@@ -273,7 +276,7 @@ void vis_node_impl::set_visibility  (bool visible)
 void vis_node_impl::init_disp()
 {                   
     msg_disp()
-        .add<msg::node_animation>(boost::bind(&vis_node_impl::on_animation , this, _1))
+        .add<msg::node_animation>(boost::bind(&vis_node_impl::on_animation , this, _1, false))
         .add<msg::visibility_msg>(boost::bind(&vis_node_impl::on_visibility, this, _1));
 }
 

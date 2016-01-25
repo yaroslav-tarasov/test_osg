@@ -11,6 +11,7 @@ namespace kernel
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async )
         : scene_( avScene::GetScene() )
         , loaded_(false)
+        , anim_manager_ (nullptr)
     {
 #ifdef ASYNC_OBJECT_LOADING
         scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
@@ -95,10 +96,12 @@ namespace kernel
 
 		   AnimationManagerFinder finder;
 		   node_->accept(finder);
-		   anim_manager_  = finder._am;  
 
 		   if(finder._am.valid())
+           {
+               anim_manager_  = finder._am;  
 			   node_->setUpdateCallback(finder._am.get());
+           }
 
            object_loaded_signal_(seed);
          }

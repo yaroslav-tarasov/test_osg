@@ -1515,7 +1515,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         return root;
     }
 
-    if (path == "adler" || path == "sheremetyevo" || path == "minsk" )
+    if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" )
     {
         //assert(_terrainRoot->removeChild(_terrainNode));
         //_terrainNode.release();

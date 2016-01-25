@@ -320,7 +320,14 @@ void EphemerisModel::_calculateIllumFactors()
     
     FIXME("Что-то новое");
     const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
-    _illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+    //_illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
+
+    FIXME (Нелепые цветные фантазии) 
+    osg::Vec4 diffuse (cFogDif*1.2f, 1.0);   
+    osg::Vec4 ambient (cFogAmb * 1.3 *(1 - 0.75 * _skyClouds->getOvercastCoef()), 1.0);      
+    osg::Vec4 specular (cFogSpec * 1.2, 1.0);     
+    _illumination = cg::luminance_crt(ambient + diffuse * fIllumDiffuseFactor);
+
 
     // when ambient is low - get it's color directly (to make more realistic fog at dusk/dawn)
     const float fFogDesatFactor = _skyDome->getAmbient()[0];
@@ -341,10 +348,12 @@ void EphemerisModel::_calculateIllumFactors()
     cMoonColor /= std::max(cMoonColor.x(), std::max(cMoonColor.y(), cMoonColor.z()));
     _skyMoon->setMoonReflColor(cMoonColor);
 
+#if 0
     FIXME(Свет здесь);
     osg::Vec4 diffuse  = osg::Vec4(cFogDif/**1.6f*/,1.0f);     //sls->getDiffuse();
     osg::Vec4 ambient  = osg::Vec4(cFogAmb/**1.2*/,1.0f);      //sls->getAmbient();
     osg::Vec4 specular = osg::Vec4(cFogSpec/**1.6*/,1.0f);     // sls->getSpecular();
+#endif
 
     ambient.w() = _illumination ;
     specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                 

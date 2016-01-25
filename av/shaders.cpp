@@ -195,6 +195,8 @@ namespace shaders
 	}                                                                                                      \
 	)
 #else
+
+#ifdef  ORIG_EPHEMERIS
 #define INCLUDE_PCF_EXT                                                                                    \
 	STRINGIFY (                                                                                            \
     \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
@@ -231,14 +233,61 @@ namespace shaders
 	\n            return PCF4E(depths, stpq, pcf_size) * aa * 0.4;                                         \
 	\n	}                                                                                                  \
 	\n	                                                                                                   \
-    \n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                              \
-	\n            return PCF4(depths, stpq, pcf_size) * aa * 0.4;                                      \
+    \n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                  \
+	\n            return PCF4(depths, stpq, pcf_size) * aa * 0.4;                                          \
 	}                                                                                                      \
 	                                                                                                       \
 	\n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
 	\n            return PCF(depths, stpq, pcf_size) * aa * 0.4;                                           \
 	}                                                                                                      \
 	)
+#else
+#define INCLUDE_PCF_EXT                                                                                    \
+    STRINGIFY (                                                                                            \
+    \n        float PCF4E(sampler2DShadow depths,vec4 stpq,ivec2 size){                                    \
+    \n            float result = 0.0;                                                                      \
+    \n            int   count = 0;                                                                         \
+    \n            float coeff;                                                                             \
+    \n            for(int x=-size.x; x<=size.x; x++){                                                      \
+    \n                for(int y=-size.y; y<=size.y; y++){                                                  \
+    \n                    count++;                                                                         \
+    \n                    result += textureProjOffset(depths, stpq, ivec2(x,y)) * .25;/*.r;*/              \
+    \n                }                                                                                    \
+    \n            }                                                                                        \
+    \n                                                                                                     \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0)) *.75;                                \
+    \n            return result/count;                                                                     \
+    }                                                                                                      \
+    \
+    \n        float PCF4(sampler2DShadow depths,vec4 stpq,ivec2 size){                                     \
+    \n            float result = 0.0;                                                                      \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,-1));/*.r;*/                           \
+    \n            result += textureProjOffset(depths, stpq, ivec2(0,1));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(1,0));/*.r;*/                            \
+    \n            result += textureProjOffset(depths, stpq, ivec2(-1,0));/*.r;*/                           \
+    \n            return result*.25;                                                                       \
+    }                                                                                                      \
+    \
+    \n        float PCF(sampler2DShadow depths,vec4 stpq,ivec2 size){                                      \
+    \n            return textureProj(depths, stpq);/*.r;*/                                                 \
+    }                                                                                                      \
+    const ivec2 pcf_size = ivec2(1,1);                                                                     \
+    \n                                                                                                     \
+    \n                                                                                                     \
+    \n        float PCF4E_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                 \
+    \n            return PCF4E(depths, stpq, pcf_size) * aa;                                               \
+    \n	}                                                                                                  \
+    \n	                                                                                                   \
+    \n        float PCF4_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                  \
+    \n            return PCF4(depths, stpq, pcf_size) * aa;                                                \
+    }                                                                                                      \
+    \
+    \n        float PCF_Ext(sampler2DShadow depths,vec4 stpq, float aa){                                   \
+    \n            return PCF(depths, stpq, pcf_size) * aa;                                                 \
+    }                                                                                                      \
+    )
+
+#endif
 #endif
 
 

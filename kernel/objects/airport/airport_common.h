@@ -335,6 +335,11 @@ inline string get_model(string icao_code)
         return "adler";
     else if (icao_code == "UMMS" || icao_code == "UMMM")
         return "minsk";
+    else if (icao_code == "UUOL"  )
+        return "lipetsk";
+    else if (icao_code == "URKE"  )
+        return "eisk";
+    
 
     return "";
 }
@@ -347,7 +352,8 @@ inline bool valid_icao(string icao_code)
            icao_code == "URSS" ||
            icao_code == "UHWW" ||
            icao_code == "UMMS" ||
-           icao_code == "UMMM"
+           icao_code == "UMMM" ||
+           icao_code == "UUOL" 
            ;     
 }
 
@@ -358,8 +364,6 @@ inline point_3f lights_offset(string icao_code)
         return point_3f(18, 17, .2f);
     else if (icao_code == "URSS")
         return point_3f(0 , 0 , .2f);
-    else if (icao_code == "UMMS")
-        return point_3f();
 
     return point_3f();
 }

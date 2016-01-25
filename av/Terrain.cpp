@@ -257,14 +257,18 @@ void  Terrain::create( const std::string& name )
         scene_name = "minsk.dae";  
         mat_file_name = "minsk.dae.mat.xml"; 
 	}
-
- 
+    else if(name == "lipetsk")
+    {
+        scene_name = "lipetsk.dae";  
+        mat_file_name = "lipetsk.dae.mat.xml"; 
+    }
+    else if(name == "eisk")
+    {
+        scene_name = "eisk.dae";  
+        mat_file_name = "eisk.dae.mat.xml"; 
+    } 
 
     osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
-
-    // Здесь был Минск
-    //osg::PositionAttitudeTransform* pat = scene->asTransform()->asPositionAttitudeTransform();
-    //pat->setAttitude( osg::Quat(osg::inDegrees(90.0),osg::X_AXIS,osg::inDegrees(/*-49.0 - 33.0*/0.0),osg::Y_AXIS,osg::inDegrees(0.0),osg::Z_AXIS));
 
     scene->setName("scene");
 
@@ -278,8 +282,6 @@ void  Terrain::create( const std::string& name )
     baseModel->addChild(scene);
 
 
-
-
     MaterialVisitor::namesList nl;
     nl.push_back("building");
     nl.push_back("tree");
@@ -290,6 +292,7 @@ void  Terrain::create( const std::string& name )
     nl.push_back("railing");
     nl.push_back("panorama");
     nl.push_back("plane");
+    nl.push_back("default");
 
     MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);

@@ -17,7 +17,7 @@ namespace nodes_management
         vis_node_impl( view * manager, binary::input_stream & stream );
 
     private:
-        void on_animation   (msg::node_animation const& m);
+        void on_animation   (msg::node_animation const& m, bool deffered = false);
         void on_visibility  (msg::visibility_msg const& m);
         void on_texture     (msg::node_texture_msg const& m) override;
 

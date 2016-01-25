@@ -111,7 +111,7 @@ struct client
 
         ADD_EVENT(time , state(0.0,/*time*/time,factor))
         ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
-        ADD_EVENT(120.0, fire_fight_msg_t(2))
+        // ADD_EVENT(120.0, fire_fight_msg_t(2))
         ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
         ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
@@ -152,6 +152,22 @@ struct client
                 //                                     <<  "\n");
            } 
          ));
+         
+         cg::point_3 poss[] = {cg::point_3(0.907 * 1000, -0.060 * 1000, 0.0), 
+                               cg::point_3(0.883 * 1000, -0.030 * 1000, 0.0),
+                               cg::point_3(0.9345 * 1000, -0.0915 * 1000, 0.0),
+                               cg::point_3(0.982 * 1000, -0.152 * 1000, 0.0),
+                               cg::point_3(0.962 * 1000, -0.124 * 1000, 0.0)
+         };
+
+
+
+        const cg::quaternion    orien (cg::cprf(49.0) );
+        for (int i = 0; i <5; i++)
+        {
+            ADD_EVENT(1.0  , create(10 + i,poss[i],orien, ok_aircraft, "SU25") ) // su_25tm
+        }
+
 
     }
 

@@ -63,7 +63,7 @@ namespace vehicle
 		visit_objects<aircraft::info_ptr>(collection_, [this, &burning_plane](aircraft::info_ptr air)->bool
 		{       
 			geo_point_3 tow_pos = geo_base_3(air->pos())(cg::rotation_3(cpr(air->orien().course, 0, 0)) * (point_3(0, 5., 0) ));
-			if (cg::distance2d(tow_pos, this->pos()) < 2500)
+			if (cg::distance2d(tow_pos, this->pos()) < 25)
 			{   
 				burning_plane = air;
 				return false;
