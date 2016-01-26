@@ -1006,5 +1006,8 @@
     <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="av\Trees.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

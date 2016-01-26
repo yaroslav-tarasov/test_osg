@@ -23,6 +23,7 @@ namespace creators
 		{
 			fpl_.push_back(cfg().path.data + "/models/" + name + "/");
 			fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
+            fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
 		};
 
 		osgDB::FilePathList fpl_;
@@ -387,6 +388,7 @@ FIXME( Исправить структуру под mt)
         nl.push_back("default");
         nl.push_back("plane");
         nl.push_back("color");
+        nl.push_back("tree");
         //nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
 
         if(name == "crow")

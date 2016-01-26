@@ -202,10 +202,6 @@ namespace avTerrain
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
-    const osg::Quat quat1(osg::inDegrees(90.0f), osg::X_AXIS,                      
-        osg::inDegrees(0.f)  , osg::Y_AXIS,
-        osg::inDegrees(0.f)  , osg::Z_AXIS ); 
-
 Terrain::Terrain (osg::Group* sceneRoot)
     : _lightsHandler(avScene::/*GlobalInfluence*/LocalInfluence)
     , _sceneRoot (sceneRoot)
@@ -230,7 +226,8 @@ void  Terrain::create( const std::string& name )
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
     high_res_timer                _hr_timer;
-    osg::MatrixTransform*         baseModel = new osg::MatrixTransform;
+    osg::ref_ptr<osg::PositionAttitudeTransform>   baseModel = new osg::PositionAttitudeTransform;
+
 
     float baseHeight = 0.0f; 
     
@@ -269,6 +266,11 @@ void  Terrain::create( const std::string& name )
     } 
 
     osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
+    
+    if (scene->asTransform())
+        baseModel = scene->asTransform()->asPositionAttitudeTransform();
+    else
+        baseModel->addChild(scene);
 
     scene->setName("scene");
 
@@ -277,9 +279,11 @@ void  Terrain::create( const std::string& name )
     if(lod3) 
         lod3->setNodeMask(0); 
 
+#if 0
     baseModel = new osg::MatrixTransform;
     baseModel->setMatrix(osg::Matrix::rotate(quat0));
     baseModel->addChild(scene);
+#endif
 
 
     MaterialVisitor::namesList nl;
@@ -310,7 +314,9 @@ void  Terrain::create( const std::string& name )
    {  
        baseModel->addChild( creators::createBase(osg::Vec3(center.x(), center.y(), baseHeight),radius*3));
    }
-
+    
+    baseModel->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+    // baseModel->setPosition(osg::Vec3(0.,0.f,0.)); 
     baseModel->setDataVariance(osg::Object::STATIC);
 
     OSG_WARN << "Время загрузки сцены: " << _hr_timer.set_point() << "\n";

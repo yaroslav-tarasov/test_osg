@@ -795,7 +795,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     
     //if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
     //        pssm->setUserLight(_ls->getLight());
-
+    
     addChild( _ephemerisNode.get() );
 //////////////////////////////////////////////////////    
     FIXME(Many light sources sm)
@@ -1525,6 +1525,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
         load("su_25tm",_terrainRoot, 15000);
+        
+        load("trees",_terrainRoot, 15000);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 

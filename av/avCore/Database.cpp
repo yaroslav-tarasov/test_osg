@@ -8,12 +8,14 @@
 namespace 
 {
 
+FIXME(Дублируем функционал)
 struct fpl_wrap 
 {
 	fpl_wrap(const std::string& name)
 	{
 		fpl_.push_back(cfg().path.data + "/models/" + name + "/");
 		fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
+        fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
 	};
 
 	osgDB::FilePathList fpl_;
@@ -30,6 +32,7 @@ void initDataPaths()
 	osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas");
+    osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\areas\\misc");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\sky");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\lib");  

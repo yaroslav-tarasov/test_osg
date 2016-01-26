@@ -240,6 +240,7 @@
     <ClCompile Include="av\scn_parser.cpp" />
     <ClCompile Include="av\shaders.cpp" />
     <ClCompile Include="av\Terrain.cpp" />
+    <ClCompile Include="av\Trees.cpp" />
     <ClCompile Include="av\Visual.cpp" />
     <ClCompile Include="core\cluster\net_layer\net_worker.cpp" />
     <ClCompile Include="core\cluster\net_layer\session_impl.cpp" />

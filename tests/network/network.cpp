@@ -162,11 +162,13 @@ struct client
 
 
 
+#if 0
         const cg::quaternion    orien (cg::cprf(49.0) );
         for (int i = 0; i <5; i++)
         {
             ADD_EVENT(1.0  , create(10 + i,poss[i],orien, ok_aircraft, "SU25") ) // su_25tm
         }
+#endif
 
 
     }
