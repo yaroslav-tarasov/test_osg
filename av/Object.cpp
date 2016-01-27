@@ -389,7 +389,7 @@ FIXME( Исправить структуру под mt)
         nl.push_back("plane");
         nl.push_back("color");
         nl.push_back("tree");
-        //nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
+        nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
 
         if(name == "crow")
         {

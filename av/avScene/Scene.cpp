@@ -384,11 +384,15 @@ class ReflectionCullCallback : public osg::NodeCallback
     }
 };
 
+const osg::Vec3  cameraPos (790,240,30);  //(470,950,100);
+// const osg::Vec3  cameraPos (1250.5,-170.5,30);  //(470,950,100);
+const osg::Vec3  lookToPos (934.5,-91.5,30);
+
 namespace avGUI {
 
 class  CustomManipulator : public osgGA::FirstPersonManipulator
 {
-
+    
 protected:
     virtual bool handleKeyDown( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& us )
     {
@@ -416,6 +420,35 @@ protected:
         if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_Down)
         {
             moveForward(-5);
+            us.requestRedraw();
+            return true;
+        }
+        if (ea.getKey() == osgGA::GUIEventAdapter::KEY_F5)
+        {
+            cg::polar_point_3 p(from_osg_vector3(lookToPos - cameraPos));
+            cg::quaternion orien(cpr(-80));
+            point_3 forward_dir = orien.rotate_vector(from_osg_vector3(lookToPos - cameraPos)) ;
+            setHomePosition(cameraPos, lookToPos + to_osg_vector3(forward_dir), osg::Z_AXIS);
+            home(0);
+            us.requestRedraw();
+            return true;
+        }
+        else
+        if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_F6)
+        {
+            setHomePosition(cameraPos, lookToPos, osg::Z_AXIS);
+            home(0);
+            us.requestRedraw();
+            return true;
+        }
+        if (ea.getKey() == osgGA::GUIEventAdapter:: KEY_F7)
+        {
+
+            cg::polar_point_3 p(from_osg_vector3(lookToPos - cameraPos));
+            cg::quaternion orien(cpr(80));
+            point_3 forward_dir = orien.rotate_vector(from_osg_vector3(lookToPos - cameraPos)) ;
+            setHomePosition(cameraPos, lookToPos + to_osg_vector3(forward_dir), osg::Z_AXIS);
+            home(0);
             us.requestRedraw();
             return true;
         }
@@ -758,7 +791,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         manip->home(0);
     }
 	else
-	{
+	{   
 	    manip->setHomePosition(osg::Vec3(470,950,100), osg::Vec3(0,0,100), osg::Z_AXIS);
         manip->home(0);
 	}
@@ -1524,9 +1557,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
-        load("su_25tm",_terrainRoot, 15000);
+        load("su_27",_terrainRoot, 15000, false);
+        load("mi_24",_terrainRoot, 15000, false);
         
-        load("trees",_terrainRoot, 15000);
+        // load("an_26",_terrainRoot, 15000, false);
+        // load("trees",_terrainRoot, 15000);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
@@ -1542,13 +1577,22 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 	
 	auto sig = [&](uint32_t seed)->void {object_loaded_signal_(seed);};
 
-    auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt)->osg::Node* {
+    auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt, bool async)->osg::Node* {
     
     bool clone = true;
 
     using namespace creators;
     
     creators::Object* obj = creators::createObject(path, clone);
+    
+    if( path == "su_27" )
+    {
+       osg::Matrix trMatrix;
+       trMatrix.setTrans(osg::Vec3d(971,50,0));
+       trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
+
+       mt_.back()->setMatrix(trMatrix);
+    }
 
     if(obj)
     {
@@ -1749,9 +1793,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
         }
 
-#ifndef ASYNC_OBJECT_LOADING
-        _terrainRoot->asGroup()->addChild(mt);
-#endif
+//#ifndef ASYNC_OBJECT_LOADING
+        if(!async)
+            _terrainRoot->asGroup()->addChild(mt);
+//#endif
 
 #if 1
 		FIXME("Жесть с анимацией, кто на ком стоял")
@@ -1787,11 +1832,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 #ifdef ASYNC_OBJECT_LOADING
     // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
     if(async)
-		dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()),boost::bind<void>(sig, seed));
+		dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
 	else
-		wf(seed, path,mt_.back().get());
+		wf(seed, path,mt_.back().get(),async);
 #else
-    wf(seed, path,mt_.back().get());
+    wf(seed, path,mt_.back().get(),async);
 #endif
 
     LogInfo("Scene::load exit " << path);

@@ -516,9 +516,9 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
     } 
 #endif   
 
-#if 0
-    if (mat_name.find("tree")   !=std::string::npos
-        || mat_name.find("building") !=std::string::npos 
+#if 1
+    if (/*mat_name.find("tree")   !=std::string::npos
+        ||*/ mat_name.find("building") !=std::string::npos 
         )
         node->setNodeMask(0);
 #endif

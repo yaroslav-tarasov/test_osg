@@ -109,17 +109,23 @@ struct client
         
         const double time = 0.0;
 
-        ADD_EVENT(time , state(0.0,/*time*/time,factor))
+        ADD_EVENT(time , state(0.0,time,factor))
+#if 0
         ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
-        // ADD_EVENT(120.0, fire_fight_msg_t(2))
+        ADD_EVENT(120.0, fire_fight_msg_t(2))
+#endif       
         ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
         ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 
+#if 0
         ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
         ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
-        
+#endif
+
+        ADD_EVENT(25.0 , state(0.0,25.,0.0))
+
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
@@ -135,9 +141,11 @@ struct client
         };
 
 
+#if 0
         runs_.insert(make_pair(_traj->base_length(),                                 
             boost::bind( run_f_, 1,_1,traj_offset)
             ));
+#endif
 
         runs_.insert(make_pair( _traj->base_length() - vehicle_prediction,
             [this] (double time)
@@ -153,20 +161,20 @@ struct client
            } 
          ));
          
-         cg::point_3 poss[] = {cg::point_3(0.907 * 1000, -0.060 * 1000, 0.0), 
-                               cg::point_3(0.883 * 1000, -0.030 * 1000, 0.0),
+         cg::point_3 poss[] = {cg::point_3(0.907 * 1000 , -0.060 * 1000, 0.0), 
+                               cg::point_3(0.883 * 1000 , -0.030 * 1000, 0.0),
                                cg::point_3(0.9345 * 1000, -0.0915 * 1000, 0.0),
-                               cg::point_3(0.982 * 1000, -0.152 * 1000, 0.0),
-                               cg::point_3(0.962 * 1000, -0.124 * 1000, 0.0)
+                               cg::point_3(0.982 * 1000 , -0.152 * 1000, 0.0),
+                               cg::point_3(0.962 * 1000 , -0.124 * 1000, 0.0)
          };
 
 
 
-#if 0
+#if 1
         const cg::quaternion    orien (cg::cprf(49.0) );
         for (int i = 0; i <5; i++)
         {
-            ADD_EVENT(1.0  , create(10 + i,poss[i],orien, ok_aircraft, "SU25") ) // su_25tm
+            ADD_EVENT(15.0 + i  , create(10 + i,poss[i],orien, ok_aircraft, "SU25") ) // su_25tm
         }
 #endif
 

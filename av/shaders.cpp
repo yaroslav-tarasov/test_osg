@@ -651,6 +651,8 @@ $endif
 
             INCLUDE_VS
             INCLUDE_COMPABILITY
+            
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 
@@ -707,6 +709,8 @@ $endif
             INCLUDE_VS
 //			INCLUDE_PCF_EXT
             INCLUDE_SCENE_PARAM
+            
+            SHADOW_INCLUDE
 
             STRINGIFY ( 
 
