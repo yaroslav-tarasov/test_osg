@@ -27,7 +27,9 @@
 #include "bada/bada_import.h"
 #include "GLDebugDrawer.h"
 
-bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
+namespace phys {
+    bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
+}
 
 #ifdef DEPRECATED
     #include "kernel/systems/systems_base.h"

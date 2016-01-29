@@ -1559,7 +1559,8 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 		
         load("su_27",_terrainRoot, 15000, false);
         load("mi_24",_terrainRoot, 15000, false);
-        
+        load("mig_29",_terrainRoot, 15000, false); 
+
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000);
 
@@ -1592,6 +1593,15 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
        trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
 
        mt_.back()->setMatrix(trMatrix);
+    }
+    
+    if( path == "mig_29" )
+    {
+        osg::Matrix trMatrix;
+        trMatrix.setTrans(osg::Vec3d(1000,25,0));
+        trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
+
+        mt_.back()->setMatrix(trMatrix);
     }
 
     if(obj)

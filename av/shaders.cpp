@@ -119,7 +119,7 @@ namespace shaders
 \n                vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
 \n                {                                                                                                \
 \n                    vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-\n                    return mix(/*textureCube*/texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
+\n                    return mix(texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
 \n                    /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
 \n                }                                                                                                \
 \n                                                                                                                 \
@@ -902,7 +902,7 @@ $endif
 \n
 \n             // Apply spot lights
 \n             vec3 vLightsSpecAddOn;
-\n               vec3 light_res;  
+\n             vec3 light_res;  
 \n                  
 \n               // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n             // vec3 lightmap_color = light_res ; 
@@ -1043,14 +1043,14 @@ $endif
 \n               vec4  dif_tex_col  = dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
 \n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
 \n
-\n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
-\n                vec3 normal_noise = vec3(0.0);
-\n                if (detail_factor > 0.01)
-\n                {
-\n                    normal_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
-\n                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, normal_noise.ggg);
-\n                }
-\n                normal = normalize(0.8 * f_in.normal + (normal_noise.x * f_in.tangent + normal_noise.y * f_in.binormal));
+\n               // float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
+\n               // vec3 normal_noise = vec3(0.0);
+\n               // if (detail_factor > 0.01)
+\n               // {
+\n               //     normal_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.6), vec3(-0.3));
+\n               //     dif_tex_col.rgb = hardlight(dif_tex_col.rgb, normal_noise.ggg);
+\n               // }
+\n               // normal = normalize(0.8 * f_in.normal + (normal_noise.x * f_in.tangent + normal_noise.y * f_in.binormal));
 \n
 \n               // get dist to point and normalized to-eye vector
 \n               float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);

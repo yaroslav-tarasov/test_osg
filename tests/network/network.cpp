@@ -124,7 +124,9 @@ struct client
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #endif
 
+#if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
+#endif
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
@@ -170,7 +172,7 @@ struct client
 
 
 
-#if 1
+#if 0
         const cg::quaternion    orien (cg::cprf(49.0) );
         for (int i = 0; i <5; i++)
         {
