@@ -9,6 +9,11 @@
 #include "Lights.h"
 #include "LightMaps.h"
 
+#if 0
+#ifdef SCREEN_TEXTURE
+#include "av/avScene/ScreenTextureManager.h"
+#endif
+#endif
 
 char vertexShaderSource[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
@@ -125,6 +130,7 @@ public:
 
 protected:
 
+
     void init()
     {
         _texture = creators::getTextureHolder().getLightMapTexture();
@@ -164,6 +170,18 @@ protected:
 
         pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
+#if 0
+#ifdef SCREEN_TEXTURE
+		// depth texture
+		avScene::ScreenTextureManager * pScrTexManager = avScene::Scene::GetInstance()->getScreenTextureManager();
+		_texNormals = pScrTexManager->request(RENDER_BIN_AFTER_MODELS, avScene::ScreenTexture::DEPTH_TEXTURE);
+		static const int g_nDepthTexUnit = 0;
+		pSS->setTextureAttribute(g_nDepthTexUnit, _texNormals->getTexture(avScene::ScreenTexture::NORMAL_TEXTURE));
+		pSS->addUniform(new osg::Uniform("DepthTexture", g_nDepthTexUnit));
+		pSS->addUniform(_texNormals->getSettings());
+#endif
+#endif
+
     }
 
     void traverse(osg::NodeVisitor& nv)
@@ -173,6 +191,10 @@ protected:
     }
 
     osg::ref_ptr<osg::Texture2D>         _texture;
+
+#if 0
+	osg::ref_ptr<avScene::ScreenTexture> _texNormals;
+#endif
 };
 
 // intersection points
