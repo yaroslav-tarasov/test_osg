@@ -1009,5 +1009,8 @@
     <ClCompile Include="av\Trees.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
+    <ClCompile Include="tests\mrt_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
