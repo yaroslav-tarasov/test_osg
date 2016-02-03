@@ -103,8 +103,8 @@ void Visual::Initialize()
     // OSG graphics context
     osg::ref_ptr<osg::GraphicsContext::Traits> pTraits = nullptr; //new osg::GraphicsContext::Traits();
 
-    float width = osg::DisplaySettings::instance()->getScreenWidth();
-    float height = osg::DisplaySettings::instance()->getScreenHeight();
+    float width    = osg::DisplaySettings::instance()->getScreenWidth();
+    float height   = osg::DisplaySettings::instance()->getScreenHeight();
     float distance = osg::DisplaySettings::instance()->getScreenDistance();
 
 #if 0

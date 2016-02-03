@@ -2041,7 +2041,9 @@ $if 0
 \n               }
 \n
 \n               
-\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               // aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               gl_FragData[0] = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               // gl_FragData[1] = vec4(normal, 1.0);
 \n            }
             )
  

@@ -26,19 +26,24 @@ const char* vertMrtCode = {
 
 	"uniform int width;\n"
 	"uniform int height;\n"
+    "varying vec3 normal, color, pos;\n"
 	"void main()\n"
 	"{\n"
-	"    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+    "   color = gl_Color.rgb;\n"
+    "   normal = normalize(gl_NormalMatrix * gl_Normal);\n"
+    "   pos = vec3(gl_ModelViewMatrix * gl_Vertex);\n"
+	"   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
 	"}\n"
 };
 
 const char* fragMrtCode = {
 
 	"uniform sampler2D defaultTex;\n"
-	"void main()\n"
+    "varying vec3 normal, color, pos;\n"
+    "void main()\n"
 	"{\n"
 	"    gl_FragData[0] = vec4(1.0,1.0,0.0,1.0); // texture2D(defaultTex, gl_TexCoord[0].xy);\n"
-	"    gl_FragData[1] = vec4(0.0,0.0,1.0,1.0); //texture2D(defaultTex, gl_TexCoord[0].yx);\n"
+	"    gl_FragData[1] = vec4(normal,1.0);      // texture2D(defaultTex, gl_TexCoord[0].yx);\n"
 	"}\n"
 };
 
@@ -77,21 +82,27 @@ const char* fragMrtCode = {
 		geode->getOrCreateStateSet()->addUniform( new osg::Uniform("width", (int)image->s()) );
 		geode->getOrCreateStateSet()->addUniform( new osg::Uniform("height", (int)image->t()) );
 
-
-
-
 		return geode;
 	}
 }
 
 #define NUM_TEXTURES 2
-const size_t tex_width = 800;
-const size_t tex_height = 600;
 
-osg::Camera* createCamera()
+osg::Camera* createCamera(float width, float depth)
 // now create the camera to do the multiple render to texture
 {
-	// textures to render to and to use for texturing of the final quad
+    const size_t tex_width  = width;
+    const size_t tex_height = depth;
+    osg::TextureRectangle*   depth_texture =  new osg::TextureRectangle();
+    depth_texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    depth_texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    depth_texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+    depth_texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+    depth_texture->setUseHardwareMipMapGeneration(false);
+    depth_texture->setInternalFormat(GL_DEPTH_COMPONENT);
+    depth_texture->setTextureSize(tex_width, tex_height);
+
+    // textures to render to and to use for texturing of the final quad
 	osg::TextureRectangle* textureRect[NUM_TEXTURES];/// = {0,0,0,0};
 
 	for (int i=0;i<NUM_TEXTURES;i++) {
@@ -139,6 +150,8 @@ osg::Camera* createCamera()
 
 	// tell the camera to use OpenGL frame buffer objects
 	camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+    
+    camera->attach(osg::Camera::BufferComponent(osg::Camera::DEPTH_BUFFER), depth_texture);
 
 	// attach the textures to use
 	for (int i=0; i<NUM_TEXTURES; i++) {
@@ -162,6 +175,9 @@ osg::Camera* createCamera()
 
 int main_mrt( int argc, char** argv )
 {
+    float width    = 1920; // osg::DisplaySettings::instance()->getScreenWidth();
+    float height   = 1200; // osg::DisplaySettings::instance()->getScreenHeight();
+    float distance = osg::DisplaySettings::instance()->getScreenDistance();
     
     osg::ref_ptr<osg::Group> root = new osg::Group;
     osg::ref_ptr<osg::Group> scene_parent = new osg::Group;
@@ -174,11 +190,12 @@ int main_mrt( int argc, char** argv )
 	scene_parent->getOrCreateStateSet()->setAttributeAndModes( program.get() );
 
     root->addChild(  scene_parent );
-	osg::ref_ptr<osg::Camera> camera = createCamera();
+	osg::ref_ptr<osg::Camera> camera = createCamera(width,height);
 	camera->addChild( scene  );
     root->addChild( camera );
 
     osgViewer::Viewer viewer;
+    viewer.apply(new osgViewer::SingleScreen(1));
     viewer.setSceneData( root.get() );
     viewer.addEventHandler( new osgViewer::StatsHandler );
     return viewer.run();
