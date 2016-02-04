@@ -274,10 +274,16 @@ void  Terrain::create( const std::string& name )
 
     scene->setName("scene");
 
+    auto lod0 =  findFirstNode(scene,"lod0");
     auto lod3 =  findFirstNode(scene,"lod3");
 
+#if 1  // ## TEST01
     if(lod3) 
         lod3->setNodeMask(0); 
+#else
+    if(lod0) 
+        lod0->setNodeMask(0); 
+#endif
 
 #if 0
     baseModel = new osg::MatrixTransform;

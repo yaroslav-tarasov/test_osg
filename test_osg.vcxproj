@@ -392,6 +392,8 @@
     <ClCompile Include="tests\test_boost_timer.cpp" />
     <ClCompile Include="tests\test_curves.cpp" />
     <ClCompile Include="tests\tex_test.cpp" />
+    <ClCompile Include="tests\visapp\main_modapp.cpp" />
+    <ClCompile Include="tests\visapp\main_visapp.cpp" />
     <ClCompile Include="utils\animation_handler.cpp" />
     <ClCompile Include="utils\async_load.cpp" />
     <ClCompile Include="utils\empty_scene.cpp" />

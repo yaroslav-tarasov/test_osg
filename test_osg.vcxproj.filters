@@ -159,6 +159,9 @@
     <Filter Include="Source Files\net_layer">
       <UniqueIdentifier>{8c039649-13e7-468d-8a45-acb9e36acd0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\separate">
+      <UniqueIdentifier>{f38fbb6c-d1dc-4d07-a478-00f1d6bdcd33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1011,6 +1014,12 @@
     </ClCompile>
     <ClCompile Include="tests\mrt_test.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\visapp\main_modapp.cpp">
+      <Filter>Source Files\tests\separate</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\visapp\main_visapp.cpp">
+      <Filter>Source Files\tests\separate</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
