@@ -53,6 +53,7 @@ namespace phys
         virtual ray_cast_vehicle::info_ptr create_ray_cast_vehicle  ( double mass, /*sensor_ptr s*/compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual aircraft::info_ptr         create_aircraft          ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
 		virtual aircraft::info_ptr         create_aircraft_pl       ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
+        virtual aircraft::info_ptr         create_helicopter_pl     ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual flock::info_ptr            create_flock_child       ( flock::params_t const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
 	    virtual aerostat::info_ptr         create_aerostat          ( aerostat::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
 	};

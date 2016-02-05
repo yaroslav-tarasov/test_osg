@@ -110,8 +110,8 @@ struct client
         const double time = 0.0;
 
         ADD_EVENT(time , state(0.0,time,factor))
-#if 0
-        ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length())/*point_3(0,250,0)*/,_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
+#if 1
+        ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(120.0, fire_fight_msg_t(2))
 #endif       
         ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
@@ -127,6 +127,7 @@ struct client
 #if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
 #endif
+        ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(

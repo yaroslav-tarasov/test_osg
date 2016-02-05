@@ -338,6 +338,23 @@ inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
 }
 
+inline object_info_ptr create_helicopter_phl(kernel::system* csys,create const& msg)
+{
+    // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
+
+    decart_position target_pos;
+
+    target_pos.pos   = msg.pos;
+    target_pos.orien = msg.orien;
+    geo_position agp(target_pos, get_base());
+
+    aircraft::settings_t as;
+    as.kind = "KA27"; // msg.model_name; // 
+    as.custom_label = msg.custom_label;
+
+    return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
+}
+
 inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& msg)
 {
     // cg::geo_point_3 apos(msg.lat,msg.lon,0.0);
@@ -405,6 +422,8 @@ object_info_ptr create_object( kernel::system* csys, create const& msg)
         return create_vehicle(csys, msg);
     else if ( msg.object_kind == ok_flock_of_birds)
         return create_flock_of_birds(csys, msg);
+    else if ( msg.object_kind == ok_helicopter)
+        return create_helicopter_phl(csys, msg); 
     else
         return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 

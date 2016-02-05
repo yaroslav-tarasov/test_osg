@@ -744,22 +744,6 @@ namespace bi
              return true;
          });
 
-         //kernel::visit_objects<aircraft_physless::control_ptr>(col,[this,&a_or_v](aircraft_physless::control_ptr a)->bool
-         //{
-         //    auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
-         //    uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
-
-         //    if( nm_id == this->selected_obj_id_)
-         //    {
-         //        selected_object_type_signal_(AIRCRAFT_TYPE);
-         //        auto traj = aircraft::int_control_ptr(a)->get_trajectory();
-         //        if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
-         //        a_or_v = true;
-         //        return false;
-         //    }
-         //    return true;
-         //});
-
          if(!a_or_v)
             selected_object_type_signal_(NONE_TYPE);
          

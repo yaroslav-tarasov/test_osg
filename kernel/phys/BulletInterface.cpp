@@ -17,6 +17,7 @@
 
 #include "aircraft_phys.h"
 #include "aircraft_phys_lite.h"
+#include "helicopter_phys_lite.h"
 #include "bvh_static_mesh.h"
 #include "static_convex.h"
 #include "ray_cast_vehicle.h"
@@ -903,6 +904,11 @@ aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params
 aircraft::info_ptr BulletInterface::create_aircraft_pl(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	
 	return  boost::make_shared<aircraft_physless::impl>(shared_from_this(),s,p,pos);
+}
+
+aircraft::info_ptr BulletInterface::create_helicopter_pl(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
+{    	
+    return  boost::make_shared<helicopter_physless::impl>(shared_from_this(),s,p,pos);
 }
 
 ray_cast_vehicle::info_ptr BulletInterface::create_ray_cast_vehicle(double mass,phys::compound_sensor_ptr s,const decart_position & pos)

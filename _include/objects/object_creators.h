@@ -42,9 +42,15 @@ namespace aircraft_physless
 {
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos);
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos);
 }
 
+namespace helicopter_physless
+{
+    using namespace kernel;
+
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos);
+}
 
 namespace airport
 {

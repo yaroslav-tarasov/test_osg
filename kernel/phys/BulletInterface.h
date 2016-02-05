@@ -41,6 +41,7 @@ public:
 
     aircraft::info_ptr          create_aircraft        (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
 	aircraft::info_ptr          create_aircraft_pl     (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
+    aircraft::info_ptr          create_helicopter_pl   (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
     ray_cast_vehicle::info_ptr  create_ray_cast_vehicle(double,phys::compound_sensor_ptr,const decart_position & pos) override;
     static_mesh_ptr             create_static_mesh     ( sensor_ptr s ) override;
     static_convex_ptr           create_static_convex   ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) override;

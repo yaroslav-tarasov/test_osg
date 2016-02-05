@@ -162,6 +162,12 @@
     <Filter Include="Source Files\tests\separate">
       <UniqueIdentifier>{f38fbb6c-d1dc-4d07-a478-00f1d6bdcd33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\helicopter_physless">
+      <UniqueIdentifier>{0dc21d71-62b2-4e0e-9465-4f161f360516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objects\helicopter_physless\sync_fms">
+      <UniqueIdentifier>{13257160-141d-4131-a903-c2cfea8429e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -385,6 +391,48 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\aerostat\aerostat_view.h">
       <Filter>Source Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_common.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_model.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_msg.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_state.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_view.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_visual.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\phys_helicopter_phl.h">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1020,6 +1068,42 @@
     </ClCompile>
     <ClCompile Include="tests\visapp\main_visapp.cpp">
       <Filter>Source Files\tests\separate</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.cpp">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_model.cpp">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_view.cpp">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_visual.cpp">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\phys_helicopter_phl.cpp">
+      <Filter>Source Files\objects\helicopter_physless</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.cpp">
+      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
