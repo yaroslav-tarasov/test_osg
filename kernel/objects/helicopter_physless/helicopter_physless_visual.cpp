@@ -100,11 +100,13 @@ namespace helicopter_physless
 		        ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
 
-            fill_nodes();
+
 
             deffered_init_ = false;
         }
 #endif
+        FIXME(Где инициализация?)
+		fill_nodes();
 
         if (smoke_object_ && engine_node_)
         {

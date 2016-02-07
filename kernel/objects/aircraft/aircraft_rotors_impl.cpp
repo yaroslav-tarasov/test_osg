@@ -12,16 +12,72 @@ namespace aircraft
             rotors_groups_[RG_FRONT] = boost::in_place(rotors_group_node/*, true*/);
             find_rotors(RG_FRONT, rotors_group_node);
         }
+
         if (auto rotors_group_node = nodes_manager_->find_node("rotorl"))
         {
             rotors_groups_[RG_REAR_LEFT] = boost::in_place(rotors_group_node/*, false*/);
             find_rotors(RG_REAR_LEFT, rotors_group_node);
         }
+
         if (auto rotors_group_node = nodes_manager_->find_node("rotorr"))
         {
             rotors_groups_[RG_REAR_RIGHT] = boost::in_place(rotors_group_node/*, false*/);
             find_rotors(RG_REAR_RIGHT, rotors_group_node);
         }
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorl1"))
+		{
+			rotors_groups_[RG_REAR_LEFT] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_LEFT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorr1"))
+		{
+			rotors_groups_[RG_REAR_RIGHT] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_RIGHT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorl2"))
+		{
+			rotors_groups_[RG_REAR_LEFT2] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_LEFT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorr2"))
+		{
+			rotors_groups_[RG_REAR_RIGHT2] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_RIGHT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorl3"))
+		{
+			rotors_groups_[RG_REAR_LEFT3] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_LEFT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotorr3"))
+		{
+			rotors_groups_[RG_REAR_RIGHT3] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_RIGHT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("mainrotor"))
+		{
+			rotors_groups_[RG_MAIN] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_MAIN_1, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("mainrotor1"))
+		{
+			rotors_groups_[RG_MAIN_1] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_MAIN_1, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("mainrotor2"))
+		{
+			rotors_groups_[RG_MAIN_2] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_MAIN_2, rotors_group_node);
+		}
 
     }
 

@@ -271,6 +271,7 @@ bool vis_node_impl::is_visible() const
 void vis_node_impl::set_visibility  (bool visible)
 {
     user_visible_ = visible;
+	need_update_ = true;
 }
 
 void vis_node_impl::init_disp()

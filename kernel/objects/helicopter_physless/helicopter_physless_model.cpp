@@ -35,7 +35,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
 	, ada_             (find_first_object<ada::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
-    , rotors_angular_speed_ (0)
+    , rotors_angular_speed_ (15)
     , shassi_anim_inited_(false)
 {
 
@@ -603,7 +603,7 @@ void model::check_rotors_malfunction()
             rotors_group.angular_speed(0);
         }
         else
-            rotors_group.angular_speed(rotors_angular_speed_);
+            rotors_group.angular_speed((ind==aircraft::RG_MAIN_2)? -rotors_angular_speed_:rotors_angular_speed_);
     });
 }
 

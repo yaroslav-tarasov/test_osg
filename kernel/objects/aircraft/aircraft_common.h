@@ -241,7 +241,7 @@ namespace aircraft
 
     enum rotors_group
     {
-        RG_FRONT = 0, RG_REAR_LEFT, RG_REAR_RIGHT, RG_TAIL
+        RG_FRONT = 0, RG_REAR_LEFT, RG_REAR_RIGHT, RG_REAR_LEFT2, RG_REAR_RIGHT2, RG_REAR_LEFT3, RG_REAR_RIGHT3, RG_TAIL, RG_MAIN, RG_MAIN_1=RG_MAIN, RG_MAIN_2, RG_LAST
     };
 
     struct rotors_support

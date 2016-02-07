@@ -21,7 +21,7 @@ namespace aircraft
 
     private:
         nodes_management::manager_ptr nodes_manager_;
-        optional<rotors_group_t>      rotors_groups_[3];
+        optional<rotors_group_t>      rotors_groups_[RG_LAST];
     };
 
 }
