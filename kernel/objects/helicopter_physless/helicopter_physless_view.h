@@ -20,13 +20,16 @@ struct craft_data
     craft_data()
         : settings_     (aircraft::settings_t())
         , state_        (aircraft::state_t())
+        , engines_state_(aircraft::ES_STOPPED)
+
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
     }
 
-    explicit craft_data(aircraft::settings_t const& settings, aircraft::state_t const& state)
+    explicit craft_data(aircraft::settings_t const& settings, aircraft::state_t const& state, aircraft::engine_state_t  engines_state = aircraft::ES_STOPPED)
         : settings_     (settings)
         , state_        (state)
+        , engines_state_(engines_state)
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
     }
@@ -35,14 +38,14 @@ protected:
     aircraft::settings_t              settings_;
     array<bool, aircraft::MF_SIZE>    malfunctions_;
     aircraft::state_t                 state_;       // Исключительно для задания начальных параметров 
-
+    aircraft::engine_state_t          engines_state_;
     REFL_INNER(craft_data)
         REFL_ENTRY(settings_    )
         REFL_ENTRY(malfunctions_)
+        REFL_ENTRY(engines_state_)
         REFL_ENTRY(state_       )
     REFL_END()
 };
-
 
 
 
@@ -105,6 +108,7 @@ protected:
     void unassign_fpl()     {};
     void set_kind           (std::string const& kind) override;
     void set_turbulence     (unsigned turb)           override;
+    void set_engine_state   (aircraft::engine_state_t state)    override;
 
 protected:
 	void set_state          (state_t const& st) /*override*/;
@@ -140,6 +144,8 @@ protected:
     virtual void on_atc_controls_changed() {}
     virtual void on_ipo_controls_changed() {}
     virtual void on_malfunction_changed (aircraft::malfunction_kind_t /*kind*/) {}
+    virtual void on_engine_state_changed ( aircraft::engine_state_t state  ) {}; 
+
     //virtual void on_assigned_fpl_changed();
     virtual void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/){}
     virtual void on_new_wheel_contact_effect(double /*time*/, point_3f /*vel*/, point_3f /*offset*/){}
@@ -154,6 +160,7 @@ private:
     void on_fpl                 (optional<uint32_t> const&  id);
 
     void on_malfunction         (msg::malfunction_msg   const&  m      );
+    void on_engine_state        (msg::engine_state_msg const& m);
     void on_contact_effect      (msg::contact_effect    const& eff     );
     void on_wheel_contact_effect(msg::wheel_contact_effect const& eff  );
     

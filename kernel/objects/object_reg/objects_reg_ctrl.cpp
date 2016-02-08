@@ -27,6 +27,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_atow)        (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
     void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg const& msg)   = &ctrl::inject_msg;
+    void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg_t const& msg)  = &ctrl::inject_msg;
 
     disp_
@@ -36,7 +37,9 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
 		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
-		
+	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
+        
+        	
         ;
 }
 
@@ -95,6 +98,21 @@ void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg)
 
 }
 
+void ctrl::inject_msg(net_layer::msg::engine_state_msg const& msg) 
+{
+    if(msg.ext_id>0 )                          
+    {
+        auto a = objects_[msg.ext_id];
+
+        if (aircraft::control_ptr pa = aircraft::control_ptr (a))
+        {
+            pa->set_engine_state((aircraft::engine_state_t)msg.state);
+        }
+    }
+
+}
+
+ 
 void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)  
 {
     if(ext_id>0 )                          

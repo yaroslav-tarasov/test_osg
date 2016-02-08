@@ -353,8 +353,10 @@ namespace sync_fsm
             wheel_node_pos.local().omega = omega_rel ;
 
             
+#if 0
             wnode->set_position(wheel_node_pos);
             chassis_node->set_position(chassis_node_pos);
+#endif
 
         });
 
@@ -375,7 +377,7 @@ namespace sync_fsm
             nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_speed = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
            
-            quaternion des_orien = rotor_node_pos.local().orien * quaternion(cpr(0,0,-cg::rad2grad() * angular_speed * dt));
+            quaternion des_orien = rotor_node_pos.local().orien * quaternion(cpr(cg::rad2grad() * angular_speed * dt,0,0));
 
             // const cg::transform_4 rotor_node_trans = cg::transform_4(cg::as_translation(-rotor_node_pos.local().pos), /*rpos.orien*/des_orien.rotation()); 
             point_3 omega_rel     = cg::get_rotate_quaternion(rotor_node_pos.local().orien,des_orien).rot_axis().omega() / (dt);
@@ -384,9 +386,9 @@ namespace sync_fsm
             rotor_node_pos.local().omega = omega_rel;
 
             rnode->set_position(rotor_node_pos);   
-
-            //if(rg.ang_speed != av)
-            if(rg.ang_speed>150)
+            
+            const double      abs_speed = abs(rg.ang_speed);
+            if(abs_speed>150)
             {
                 if(rg.dyn_rotor_node)
                 {
@@ -394,6 +396,45 @@ namespace sync_fsm
                     {
                         rg.dyn_rotor_node->set_visibility(true);
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && *(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(false);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
+                    }
+                }
+
+                if(rg.rotor_node)
+                {
+                    if(!rg.rotor_node->get_visibility() || rg.rotor_node->get_visibility() && *(rg.rotor_node->get_visibility()))
+                    {
+                        rg.rotor_node->set_visibility(false);
+                        rg.rotor_node->set_position(rg.rotor_node->position());
+                    }
+                }
+
+            }
+            else  if(abs_speed<15)
+            {
+                if(rg.dyn_rotor_node)
+                {
+                    if(!rg.dyn_rotor_node->get_visibility() || rg.dyn_rotor_node->get_visibility() && *(rg.dyn_rotor_node->get_visibility()))
+                    {
+                        rg.dyn_rotor_node->set_visibility(false);
+                        rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && !*(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(true);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
                     }
                 }
 
@@ -415,6 +456,15 @@ namespace sync_fsm
                     {
                         rg.dyn_rotor_node->set_visibility(false);
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && *(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(false);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
                     }
                 }
 

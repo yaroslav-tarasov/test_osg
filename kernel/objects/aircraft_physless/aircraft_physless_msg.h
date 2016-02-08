@@ -23,6 +23,7 @@ enum id
 {          
     am_settings      ,
     am_malfunction   ,
+    am_engines_state ,
     am_contact_effect,
     am_wheel_contact_effect,
     am_traj_assign   , 
@@ -49,6 +50,20 @@ struct malfunction_msg
     bool enabled;
 };
 
+struct engine_state_msg
+    : network::msg_id<am_engines_state>
+{
+    engine_state_msg() {}
+
+    engine_state_msg( aircraft::engine_state_t state)
+        : state(state)
+    {}
+    aircraft::engine_state_t      state;
+};
+
+REFL_STRUCT(engine_state_msg)
+    REFL_ENTRY(state)
+    REFL_END()
 //! сообщение 
 struct traj_assign_msg
     : network::msg_id<am_traj_assign>

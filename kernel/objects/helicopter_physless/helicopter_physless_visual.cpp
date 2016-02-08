@@ -106,7 +106,7 @@ namespace helicopter_physless
         }
 #endif
         FIXME(Где инициализация?)
-		fill_nodes();
+		// fill_nodes();
 
         if (smoke_object_ && engine_node_)
         {

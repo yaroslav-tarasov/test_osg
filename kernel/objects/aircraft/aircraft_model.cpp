@@ -246,6 +246,22 @@ void model::on_malfunction_changed( malfunction_kind_t kind )
     }
 }
 
+void model::on_engine_state_changed( aircraft::engine_state_t state )
+{
+    if (state == aircraft::ES_STOPPED)
+    {
+        set_rotors_angular_speed(0) ;
+    }
+    else if (state == aircraft::ES_LOW_THROTTLE)
+    {
+        set_rotors_angular_speed(10) ;
+    }
+    else if (state == aircraft::ES_FULL_THROTTLE)
+    {
+        set_rotors_angular_speed(160) ;
+    }
+}
+
 // TYV
 void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& contacts)
 {

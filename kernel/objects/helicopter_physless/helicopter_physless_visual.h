@@ -22,8 +22,7 @@ namespace helicopter_physless
         void update(double time);
 
     private:
-        void on_malfunction_changed     ( aircraft::malfunction_kind_t kind ) override;
-
+        void on_malfunction_changed  ( aircraft::malfunction_kind_t kind ) override;
     private:
         nm::node_info_ptr engine_node_;
         visual_object_ptr smoke_object_;

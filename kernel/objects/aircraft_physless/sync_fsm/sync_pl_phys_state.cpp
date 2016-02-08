@@ -385,8 +385,8 @@ namespace sync_fsm
 
             rnode->set_position(rotor_node_pos);   
 
-            //if(rg.ang_speed != av)
-            if(rg.ang_speed>150)
+            const double      abs_speed = abs(rg.ang_speed);
+            if(abs_speed>150)
             {
                 if(rg.dyn_rotor_node)
                 {
@@ -394,6 +394,45 @@ namespace sync_fsm
                     {
                         rg.dyn_rotor_node->set_visibility(true);
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+                
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && *(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(false);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
+                    }
+                }
+
+                if(rg.rotor_node)
+                {
+                    if(!rg.rotor_node->get_visibility() || rg.rotor_node->get_visibility() && *(rg.rotor_node->get_visibility()))
+                    {
+                        rg.rotor_node->set_visibility(false);
+                        rg.rotor_node->set_position(rg.rotor_node->position());
+                    }
+                }
+
+            }
+            else  if(abs_speed<15)
+            {
+                if(rg.dyn_rotor_node)
+                {
+                    if(!rg.dyn_rotor_node->get_visibility() || rg.dyn_rotor_node->get_visibility() && *(rg.dyn_rotor_node->get_visibility()))
+                    {
+                        rg.dyn_rotor_node->set_visibility(false);
+                        rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && !*(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(true);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
                     }
                 }
 
@@ -415,6 +454,15 @@ namespace sync_fsm
                     {
                         rg.dyn_rotor_node->set_visibility(false);
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+                    }
+                }
+                
+                if(rg.sag_rotor_node)
+                {
+                    if(!rg.sag_rotor_node->get_visibility() || rg.sag_rotor_node->get_visibility() && *(rg.sag_rotor_node->get_visibility()))
+                    {
+                        rg.sag_rotor_node->set_visibility(false);
+                        rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
                     }
                 }
 

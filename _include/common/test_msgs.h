@@ -54,6 +54,8 @@ namespace net_layer
             id_state            ,
 
             am_malfunction      ,
+            am_engines_state    ,
+
             vm_attach_tow       ,
             vm_detach_tow       ,
             vm_detach_tow_dc    ,
@@ -206,6 +208,37 @@ namespace net_layer
 
         typedef gen_msg<id_ready, uint16_t> ready_msg;
 
+    
+    enum engine_state_t
+    {
+        ES_STOPPED = 0 ,  
+        ES_LOW_THROTTLE = 1,
+        ES_HALF_THROTTLE,
+        ES_FULL_THROTTLE,
+        ES_FORSAGE,
+        ES_FULL_FORSAGE,
+
+        ES_SIZE
+    };
+
+    
+    struct engine_state_msg
+        : network::msg_id<am_engines_state>
+    {
+        engine_state_msg() {}
+
+        engine_state_msg(uint32_t id, engine_state_t state)
+            : ext_id      (id),state(state)
+        {}
+
+        uint32_t           ext_id;
+        engine_state_t      state;
+    };
+
+    REFL_STRUCT(engine_state_msg)
+        REFL_ENTRY(ext_id)
+        REFL_ENTRY(state)
+    REFL_END()
 
 // Типы и значения похожи/повторяют  внутренние для самолета
 //  , но они принципиально другие 

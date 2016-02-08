@@ -184,6 +184,18 @@ enum malfunction_kind_t
     MF_SIZE
 };
 
+enum engine_state_t
+{
+    ES_STOPPED = 0,
+    ES_LOW_THROTTLE = 1,
+    ES_HALF_THROTTLE,
+    ES_FULL_THROTTLE,
+    ES_FORSAGE,
+    ES_FULL_FORSAGE,
+
+    ES_SIZE
+};
+
 //! интерфейс, получение предсказания траектории
 struct tp_provider
 {
@@ -241,11 +253,14 @@ struct control
 //    virtual void assign_fpl  (fpl::info_ptr fpl_obj) = 0;
     virtual void unassign_fpl() = 0;
 //
-    virtual void set_kind(std::string const& kind) = 0;
+    virtual void set_kind      (std::string const& kind) = 0;
     virtual void set_turbulence(unsigned turb) = 0;
+
 //
 //    virtual void set_atc_controls(atc_controls_t const& controls) = 0 ;
 //    virtual void set_ipo_controls(ipo_controls_t const& controls) = 0 ;
+
+    virtual void set_engine_state(engine_state_t state) = 0;
 };
 
 //! интерфейс, управление ВС (со стороны пилота-оператора ?)

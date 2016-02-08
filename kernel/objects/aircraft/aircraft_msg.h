@@ -22,6 +22,7 @@ enum id
     am_phys_pos      ,
     am_atc_state     ,
     am_malfunction   ,
+    am_engines_state ,
     am_contact_effect,
     am_wheel_contact_effect,
     am_atc_controls  ,
@@ -63,6 +64,21 @@ struct malfunction_msg
     malfunction_kind_t kind;
     bool enabled;
 };
+
+struct engine_state_msg
+    : network::msg_id<am_engines_state>
+{
+    engine_state_msg() {}
+
+    engine_state_msg( engine_state_t state)
+        : state(state)
+    {}
+    engine_state_t      state;
+};
+
+REFL_STRUCT(engine_state_msg)
+    REFL_ENTRY(state)
+REFL_END()
 
 //! сообщение 
 struct traj_assign_msg

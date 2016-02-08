@@ -344,8 +344,8 @@ namespace sync_fsm
 
             rnode->set_position(rotor_node_pos);   
 
-            //if(rg.ang_speed != av)
-            if(rg.ang_speed>150)
+            const double      abs_speed = abs(rg.ang_speed);
+            if(abs_speed>150)
             {
                 if(rg.dyn_rotor_node)
                 {

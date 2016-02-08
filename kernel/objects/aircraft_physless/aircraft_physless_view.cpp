@@ -56,6 +56,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     msg_disp()
         .add<msg::settings_msg      >(boost::bind(&view::on_settings    , this, _1))
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
+        .add<msg::engine_state_msg  >(boost::bind(&view::on_engine_state, this, _1))
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
         
         .add<msg::local_meteo_msg   >(boost::bind(&view::on_local_meteo, this, _1))
@@ -220,6 +221,11 @@ aircraft::aircraft_fms::info_ptr view::get_fms() const
 void view::set_malfunction(aircraft::malfunction_kind_t kind, bool enabled)
 {
     set(msg::malfunction_msg(kind, enabled));
+}
+
+void view::set_engine_state(aircraft::engine_state_t state)
+{
+    set(msg::engine_state_msg(state));
 }
 
 void view::set_cmd_go_around(uint32_t cmd_id)
@@ -428,6 +434,12 @@ void view::on_malfunction(msg::malfunction_msg const& m)
 {
     malfunctions_[m.kind] = m.enabled;
     on_malfunction_changed(m.kind);
+}
+
+void view::on_engine_state(msg::engine_state_msg const& m)
+{
+    engines_state_ = m.state;
+    on_engine_state_changed(m.state);
 }
 
 void view::on_local_meteo(msg::local_meteo_msg const& m)

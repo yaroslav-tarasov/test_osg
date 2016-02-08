@@ -111,6 +111,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::fpl_msg           >(boost::bind(&view::on_fpl         , this, _1))
         .add<msg::atc_state_msg     >(boost::bind(&view::on_atc_state   , this, _1))
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
+        .add<msg::engine_state_msg  >(boost::bind(&view::on_engine_state, this, _1))
         .add<msg::atc_controls_msg  >(boost::bind(&view::on_atc_controls, this, _1))
         .add<msg::ipo_controls_msg  >(boost::bind(&view::on_ipo_controls, this, _1))
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
@@ -686,6 +687,11 @@ void view::set_malfunction(malfunction_kind_t kind, bool enabled)
     set(msg::malfunction_msg(kind, enabled));
 }
 
+void view::set_engine_state(engine_state_t state)
+{
+    set(msg::engine_state_msg(state));
+}
+
 void view::set_cmd_go_around(uint32_t cmd_id)
 { 
 #if 0
@@ -948,6 +954,12 @@ void view::on_malfunction(msg::malfunction_msg const& m)
 {
     malfunctions_[m.kind] = m.enabled;
     on_malfunction_changed(m.kind);
+}
+
+void view::on_engine_state(msg::engine_state_msg const& m)
+{
+    engines_state_ = m.state;
+    on_engine_state_changed(m.state);
 }
 
 void view::on_atc_controls(msg::atc_controls_msg const& controls)

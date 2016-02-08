@@ -35,7 +35,8 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
 	, ada_             (find_first_object<ada::info_ptr>(collection_))
     , fast_session_    (false)
     , nm_ang_smooth_   (2)
-    , rotors_angular_speed_ (15)
+    , rotors_angular_speed_ (0)
+    , desired_rotors_angular_speed_ (0)
     , shassi_anim_inited_(false)
 {
 
@@ -267,6 +268,22 @@ void model::on_malfunction_changed( aircraft::malfunction_kind_t kind )
     }
 }
 
+void model::on_engine_state_changed( aircraft::engine_state_t state )
+{
+    if (state == aircraft::ES_STOPPED)
+    {
+        set_rotors_angular_speed(0) ;
+    }
+    else if (state == aircraft::ES_LOW_THROTTLE)
+    {
+        set_rotors_angular_speed(10) ;
+    }
+    else if (state == aircraft::ES_FULL_THROTTLE)
+    {
+        set_rotors_angular_speed(160) ;
+    }
+}
+
 // TYV
 void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& contacts)
 {
@@ -394,8 +411,6 @@ void model::update_contact_effects(double time)
 
 
 }
-
-
 
 
 void model::sync_fms(bool force)
@@ -569,7 +584,8 @@ void model::set_nm_angular_smooth(double val)
 
 void model::set_rotors_angular_speed(double val)
 {
-    rotors_angular_speed_ = val;
+    // rotors_angular_speed_ = val;
+    desired_rotors_angular_speed_ = val;
 }
 
 
@@ -596,14 +612,19 @@ void model::check_rotors_malfunction()
     //if (!phys_aircraft_)
     //    return;
 
+    double ds = (desired_rotors_angular_speed_ - rotors_angular_speed_) *.01;
+    rotors_angular_speed_ +=  ds;
+
     rotors_->visit_groups([this](aircraft::rotors_group_t & rotors_group,size_t& ind)
     {
         if ( rotors_group.malfunction )
         {
             rotors_group.angular_speed(0);
         }
-        else
+        else 
+        {
             rotors_group.angular_speed((ind==aircraft::RG_MAIN_2)? -rotors_angular_speed_:rotors_angular_speed_);
+        }
     });
 }
 

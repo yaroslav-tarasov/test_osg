@@ -227,7 +227,6 @@ void model::set_desired_nm_orien(quaternion const& orien)
     desired_nm_orien_ = orien;
 }
 
-
 void model::on_malfunction_changed( aircraft::malfunction_kind_t kind ) 
 {
     if (kind == aircraft::MF_CHASSIS_FRONT)
@@ -266,6 +265,23 @@ void model::on_malfunction_changed( aircraft::malfunction_kind_t kind )
         //flight_manager_control_->set_controls(controls);
     }
 }
+
+void model::on_engine_state_changed( aircraft::engine_state_t state )
+{
+    if (state == aircraft::ES_STOPPED)
+    {
+        set_rotors_angular_speed(0) ;
+    }
+    else if (state == aircraft::ES_LOW_THROTTLE)
+    {
+        set_rotors_angular_speed(10) ;
+    }
+    else if (state == aircraft::ES_FULL_THROTTLE)
+    {
+        set_rotors_angular_speed(160) ;
+    }
+}
+
 
 // TYV
 void model::on_new_contact_effect(double /*time*/, std::vector<contact_t> const& contacts)
