@@ -192,12 +192,6 @@ struct client
     void send(void const* data, uint32_t size)
     {
         error_code_t ec;
-        srv_->send(&size, sizeof(uint32_t));
-        if (ec)
-        {
-            LogError("TCP send error: " << ec.message());
-            return;
-        }
 
         srv_->send(data, size);
         if (ec)

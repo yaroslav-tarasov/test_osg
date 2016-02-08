@@ -209,7 +209,7 @@ namespace net_layer
         typedef gen_msg<id_ready, uint16_t> ready_msg;
 
     
-    enum engine_state_t
+    enum engine_state_t : int16_t
     {
         ES_STOPPED = 0 ,  
         ES_LOW_THROTTLE = 1,

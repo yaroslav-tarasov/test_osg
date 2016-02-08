@@ -63,7 +63,7 @@ struct engine_state_msg
 
 REFL_STRUCT(engine_state_msg)
     REFL_ENTRY(state)
-    REFL_END()
+REFL_END()
 //! сообщение 
 struct traj_assign_msg
     : network::msg_id<am_traj_assign>

@@ -36,8 +36,9 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow        , this, _1))
         .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
-		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
 	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
+		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
+
         
         	
         ;
