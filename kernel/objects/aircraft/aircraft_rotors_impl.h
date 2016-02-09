@@ -22,6 +22,10 @@ namespace aircraft
     private:
         nodes_management::manager_ptr nodes_manager_;
         optional<rotors_group_t>      rotors_groups_[RG_LAST];
+
+    private:
+        DECL_LOGGER("rotors_support_impl");
+
     };
 
 }

@@ -30,7 +30,7 @@ namespace helicopter_physless
         visual_system* vsys = smoke_sfx_.vsys;
 
 #ifndef ASYNC_OBJECT_LOADING         
-        fill_nodes();
+        //fill_nodes();
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 #endif
@@ -47,12 +47,12 @@ namespace helicopter_physless
                 return true;
             }
             else
-                if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorsag"))
+                if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorstat"))
                 {
                     nm::vis_node_control_ptr(n)->set_visibility(false);
                     return true;
                 }
-                else if (boost::starts_with(n->name(), "rotor"))
+                else if (boost::starts_with(n->name(), "rotorsag"))
                 {
                     nm::vis_node_control_ptr(n)->set_visibility(true);
                     return true;
@@ -100,13 +100,11 @@ namespace helicopter_physless
 		        ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
 
-
-
             deffered_init_ = false;
         }
 #endif
         FIXME(Где инициализация?)
-		// fill_nodes();
+		//fill_nodes();
 
         if (smoke_object_ && engine_node_)
         {

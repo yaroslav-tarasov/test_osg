@@ -465,6 +465,11 @@ namespace sync_fsm
                     {
                         rg.sag_rotor_node->set_visibility(false);
                         rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
+#if 0
+                        force_log fl;       
+                        LOG_ODS_MSG( "phys_state2::sync_rotors(double dt) sag_rotor_node " << "id: " << id << "\n");
+#endif
+
                     }
                 }
 

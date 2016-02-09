@@ -41,6 +41,11 @@
 #include <osg/ValueObject>
 #include <osg/Depth>
 
+#include <osgAnimation/Channel>
+#undef RELATIVE
+#include <osgAnimation/MorphGeometry>
+#include <osgAnimation/BasicAnimationManager>
+
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
@@ -89,13 +94,15 @@
 #include <osgUtil/Simplifier>
 #include <osgUtil/SmoothingVisitor>
 
-
 #include <osgShadow/ShadowedScene>
 #include <osgShadow/ShadowMap>
 #include <osgShadow/SoftShadowMap>
 #include <osgShadow/LightSpacePerspectiveShadowMap>
 #include <osgShadow/ShadowTexture>
 #include <osgShadow/ViewDependentShadowMap>
+
+
+
 
 #include <osgFX/BumpMapping>
 

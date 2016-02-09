@@ -1105,5 +1105,8 @@
     <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
+    <ClCompile Include="tests\morph_geometry.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

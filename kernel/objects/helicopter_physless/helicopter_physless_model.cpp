@@ -614,7 +614,7 @@ void model::check_rotors_malfunction()
 
     double ds = (desired_rotors_angular_speed_ - rotors_angular_speed_) *.01;
     rotors_angular_speed_ +=  ds;
-
+    
     rotors_->visit_groups([this](aircraft::rotors_group_t & rotors_group,size_t& ind)
     {
         if ( rotors_group.malfunction )

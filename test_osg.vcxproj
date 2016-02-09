@@ -387,6 +387,7 @@
     <ClCompile Include="tests\main_scene.cpp" />
     <ClCompile Include="tests\main_shadows.cpp" />
     <ClCompile Include="tests\main_shadows_2.cpp" />
+    <ClCompile Include="tests\morph_geometry.cpp" />
     <ClCompile Include="tests\mrt_test.cpp" />
     <ClCompile Include="tests\MyGui\MYGUIManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

@@ -129,7 +129,11 @@ namespace aircraft
 
         nm::visit_sub_tree(it, [this, i](nm::node_info_ptr node)->bool
         {
-            std::string name = node->name();
+            const std::string& name = node->name();
+            const rotors_group t = static_cast<rotors_group>(i); 
+
+            LogInfo("rotors_support_impl::find_rotors: " << name << "group #" << i );
+           
             if (boost::starts_with(node->name(), "rotordyn"))
             {
                 this->rotors_groups_[i]->dyn_rotor_node  =  node;

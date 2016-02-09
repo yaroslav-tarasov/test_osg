@@ -183,7 +183,7 @@ namespace aircraft
 
     typedef polymorph_ptr<shassis_support> shassis_support_ptr;
 
-
+    FIXME(Логики маловато даешь еще)
     struct rotors_group_t
     {
         rotors_group_t(nm::node_control_ptr node)
@@ -216,6 +216,18 @@ namespace aircraft
                 pos.local().dpos = point_3();
                 pos.local().omega = point_3();
                 rotor_node->set_position(pos);
+            }
+            {
+                auto pos = dyn_rotor_node->position();
+                pos.local().dpos = point_3();
+                pos.local().omega = point_3();
+                dyn_rotor_node->set_position(pos);
+            }
+            {
+                auto pos = sag_rotor_node->position();
+                pos.local().dpos = point_3();
+                pos.local().omega = point_3();
+                sag_rotor_node->set_position(pos);
             }
         }
 
