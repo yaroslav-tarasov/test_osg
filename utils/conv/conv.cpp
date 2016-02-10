@@ -855,9 +855,10 @@ int main( int argc, char **argv )
             osg::notify(osg::NOTICE)<< "Error Occurred While Writing to "<< base_file_name + ".bullet"<< std::endl;
         }
 
-        std::ofstream filelogic(base_file_name + ".stbin", std::ios_base::binary);
-          
-        heilVisitor  hv(filelogic,offset);
+        std::ofstream filelogic( base_file_name + ".stbin", std::ios_base::binary );
+        std::ofstream logfile  ( base_file_name + std::string("_structure") + ".txt" );
+
+        heilVisitor  hv(filelogic, logfile, offset);
         hv.apply(*root.get());
 
 

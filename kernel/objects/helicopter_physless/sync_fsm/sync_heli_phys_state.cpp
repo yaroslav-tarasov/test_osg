@@ -373,7 +373,10 @@ namespace sync_fsm
             
             geo_position rpos;
 
-            const float ob_min = rg.ang_speed;
+            float  ob_min    = rg.ang_speed;
+            const double abs_speed = abs(rg.ang_speed);
+            ob_min = abs_speed>150?-20*cg::sign(ob_min):ob_min; // Перестаем крутить ротор на выской скорости 
+
             nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_speed = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
            
@@ -387,7 +390,7 @@ namespace sync_fsm
 
             rnode->set_position(rotor_node_pos);   
             
-            const double      abs_speed = abs(rg.ang_speed);
+
             if(abs_speed>150)
             {
                 if(rg.dyn_rotor_node)

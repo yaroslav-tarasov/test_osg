@@ -29,6 +29,7 @@ struct node_data
     cg::quaternion                 orien;
     /*cg::sphere_3 */cg::rectangle_3                  bound;
     std::vector<std::string>       victory_nodes;
+    std::vector<std::string>       node_ids;
 };
 
 struct collision_structure
@@ -64,6 +65,7 @@ REFL_STRUCT(node_data)
     REFL_ENTRY(orien        ) 
     REFL_ENTRY(bound        )
     REFL_ENTRY(victory_nodes)
+    REFL_ENTRY(node_ids)
 REFL_END()
 
 REFL_STRUCT(collision_volume)

@@ -133,6 +133,10 @@ struct client
         ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
         ADD_EVENT(60.0  , engine_state_msg(150 , ES_STOPPED) )
 
+        ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+        ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+        ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
+
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 

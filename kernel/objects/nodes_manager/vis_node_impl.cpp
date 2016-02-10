@@ -53,6 +53,7 @@ void vis_node_impl::fill_victory_nodes()
         
     if (vis_manager->visual_object())
     {
+        if(data_.node_ids.size() == 0)
         for (auto jt = data_.victory_nodes.begin(); jt != data_.victory_nodes.end(); ++jt)
         {
             if (*jt=="root")
@@ -65,14 +66,32 @@ void vis_node_impl::fill_victory_nodes()
             {
                 victory_nodes_.push_back(visnode);
 
-
-
                 FIXME(fill_victory_nodes Need to be realized)
                 //if (texture_ && visnode->as_root())
                 //    visnode->as_root()->set_base_texture(*texture_);
             }
         }
-        
+        else
+        for (auto jt = data_.node_ids.begin(); jt != data_.node_ids.end(); ++jt)
+        {
+            if (*jt=="root")
+            {
+                victory_nodes_.push_back(vis_manager->visual_object()->node().get());
+                continue;
+            }
+
+
+            if (auto visnode = findFirstNode(vis_manager->visual_object()->node().get(), *jt,
+                findNodeVisitor::exact, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN, findNodeVisitor::user_id
+                ))
+            {
+                victory_nodes_.push_back(visnode);
+
+                FIXME(fill_victory_nodes Need to be realized)
+                    //if (texture_ && visnode->as_root())
+                    //    visnode->as_root()->set_base_texture(*texture_);
+            }
+        }
     }
 }
 

@@ -23,26 +23,27 @@ class heilVisitor : public osg::NodeVisitor
     {  
 
     public:
-        heilVisitor(std::ofstream& filelogic, const cg::point_3& offset)  
-            :_level(0)
+        heilVisitor(std::ofstream& filelogic, std::ofstream& logfile, const cg::point_3& offset)  
+            :level_(0)
             , osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
-            , root_visited(false)
-            , lod_visited (false)
-			, got_lod(false)
-            , ostream_nodes(filelogic)
-            , damned_offset(offset)
-            , damned_offset_added(false)
+            , root_visited_(false)
+            , lod_visited_ (false)
+			, got_lod_(false)
+            , ostream_nodes_(filelogic)
+            , ostream_log_  (logfile)
+            , damned_offset_(offset)
+            , damned_offset_added_(false)
         {
             
             using namespace binary;
             // fill default
             //write(ostream_nodes, 1);
             auto d = wrap(binary::size_type(1));
-            ostream_nodes.write(raw_ptr(d), size(d));//1 transform before root
+            ostream_nodes_.write(raw_ptr(d), size(d));//1 transform before root
         }
 
         std::string spaces()
-        { return std::string(_level*2, ' '); }
+        { return std::string(level_*2, ' '); }
         
         size_t num_children(osg::Group& node)
         {
@@ -58,33 +59,46 @@ class heilVisitor : public osg::NodeVisitor
 
         void apply( osg::Node& node )
         {   
+
             using namespace binary;
             std::cout << spaces() << node.libraryName() << "::" << node.className() << " : " << node.getName() << std::endl;
             std::string node_name = boost::to_lower_copy(node.getName());
+            std::string str_user_id;
+            std::string str_user_id_cut;
+            bool need_add_id = false;
+
+            
+            if(node.getUserValue("dae_node_id",str_user_id))
+            { 
+                boost::to_lower(str_user_id);
+                str_user_id_cut = str_user_id.substr(0, str_user_id.find("_lod"));
+                need_add_id = node_name.length() != str_user_id.length();
+            }
+
             std::string name_cut = node_name.substr(0, node_name.find("_lod"));
             std::string name_first_part = name_cut.substr(0, name_cut.find("_")); 
             cg::point_3 offset;
 
             if(node_name == "root")
             {
-               root_visited = true;
-               offset = damned_offset;
+               root_visited_ = true;
+               offset = damned_offset_;
             }
             FIXME("XXX")
             
             //if(boost::starts_with(node_name,"lod") && name_cut == name_first_part && name_first_part != "lod0")
             //   return;
             
-            if(boost::starts_with(node_name,"lod") && lod_visited)
+            if(boost::starts_with(node_name,"lod") && lod_visited_)
                 return;
             else
                 if(boost::starts_with(node_name,"lod0"))
                 {
-                    lod_visited = true;
+                    lod_visited_ = true;
                 }
 				else if(boost::starts_with(node_name,"lod"))
                 {
-                    got_lod = true;
+                    got_lod_ = true;
                     if(node.asGroup())
                     {
                         for(unsigned i = 0; i<node.asGroup()->getNumChildren();++i)
@@ -95,19 +109,19 @@ class heilVisitor : public osg::NodeVisitor
                 }
 
 
-            if (root_visited && (node.asTransform() || node.asGroup() ))
+            if (root_visited_ && (node.asTransform() || node.asGroup() ))
             {
 
                 model_structure::node_data new_node;
             
-                binary::size_type  children_count = got_lod?1:(node.asGroup()?num_children(*node.asGroup()):0);
+                binary::size_type  children_count = got_lod_?1:(node.asGroup()?num_children(*node.asGroup()):0);
                 
                 if(node_name == "root")
                     children_count++;  // For damned_offset
 				
-                if(got_lod)
+                if(got_lod_)
                 {
-                    got_lod=false;
+                    got_lod_=false;
                 }
                 
                 bool mt = node.asTransform()!=nullptr;
@@ -122,44 +136,49 @@ class heilVisitor : public osg::NodeVisitor
                 const osg::BoundingBox bb = cbvs.getBoundingBox();
                 new_node.bound = cg::rectangle_3(cg::rectangle_3::point_t(bb.xMin(),bb.yMin(),bb.zMin()),cg::rectangle_3::point_t(bb.xMax(),bb.yMax(),bb.zMax()));
 
-
-                if (lod_visited && node_name.find("_lod")!= std::string::npos)
-                    std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut](const std::string name){new_node.victory_nodes.push_back(name_cut + "_" + name);});
+                if (lod_visited_ && node_name.find("_lod")!= std::string::npos)
+                    std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut,&str_user_id_cut,&need_add_id](const std::string name){
+                        new_node.victory_nodes.push_back(name_cut + "_" + name);
+                        if(need_add_id) 
+                            new_node.node_ids.push_back(str_user_id_cut + "_" + name + "_" + name_cut + "_" + name);
+                });
                 else
+                {
                     new_node.victory_nodes.push_back(name_cut);
-
+                    if(need_add_id) new_node.node_ids.push_back(str_user_id_cut + "_"  + name_cut);
+                }
                 new_node.name = name_cut; // логическое имя. Общее для все лодов
 
                 {
                     auto d = wrap(new_node);
-                    ostream_nodes.write(raw_ptr(d), size(d));
+                    ostream_nodes_.write(raw_ptr(d), size(d));
                 }
 
                 {
                     const binary::size_type  cc = children_count;
                     auto d = wrap(cc);// print root
-                    ostream_nodes.write(raw_ptr(d), size(d));
+                    ostream_nodes_.write(raw_ptr(d), size(d));
                 }
 
                 print_node(new_node, children_count);
 
                 
-                if(!damned_offset_added)
+                if(!damned_offset_added_)
                 {
                     model_structure::node_data do_node;
                     do_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
                     do_node.name =  "damned_offset";
 
-                    damned_offset_added = true;
+                    damned_offset_added_ = true;
 
                     {
                         auto d = wrap(do_node);
-                        ostream_nodes.write(raw_ptr(d), size(d));
+                        ostream_nodes_.write(raw_ptr(d), size(d));
                     }
 
                     {
                         auto d = wrap(0);// print root
-                        ostream_nodes.write(raw_ptr(d), size(d));
+                        ostream_nodes_.write(raw_ptr(d), size(d));
                     }
 
                     print_node(do_node,0);
@@ -167,9 +186,9 @@ class heilVisitor : public osg::NodeVisitor
 
             }
 
-            _level++;
+            level_++;
             traverse( node );
-            _level--;
+            level_--;
         }
 
 
@@ -177,15 +196,7 @@ class heilVisitor : public osg::NodeVisitor
         {
             std::cout << spaces() << geode.libraryName() << "::" << geode.className() << " : " << geode.getName() << std::endl;
             
-            std::stringstream cstr;
-
-            //cstr << std::setprecision(8) 
-            //    << "physics x:  "         << cur_pos.pos.x
-            //    << "\n" ;
-
-            //OutputDebugString(cstr.str().c_str());
-
-            _level++;
+            level_++;
             for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
             {
                 osg::Drawable* drawable = geode.getDrawable(i);
@@ -193,7 +204,7 @@ class heilVisitor : public osg::NodeVisitor
             }
 
             traverse( geode );
-            _level--;
+            level_--;
         }
 
         void inline print_node( model_structure::node_data &new_node, const binary::size_type children_count ) 
@@ -206,18 +217,22 @@ class heilVisitor : public osg::NodeVisitor
                 << spaces() << "   Translate =   ("         << new_node.pos.x  << " ," << new_node.pos.y << " ,"  << new_node.pos.z << " )" << "\n"
                 << spaces() << "   Rotate    =   ("         << new_node.orien.get_course()  << " ," << new_node.orien.get_pitch() << " ,"  << new_node.orien.get_roll() << " )" << "\n"
                 << spaces() << "   Logic children number: " << children_count  
-                << spaces() << "   visual nodes: "           << new_node.victory_nodes  << "\n";
-
+                << spaces() << "   visual nodes: "          << new_node.victory_nodes  << "\n"
+                << spaces() << "   visual nodes id:    "    << new_node.node_ids  << "\n";
+            
+            ostream_log_ << cstr.str();
+            
             OutputDebugStringA(cstr.str().c_str());
         }
 
-    protected:
-        unsigned int             _level;
-        std::ofstream&           ostream_nodes;
-        bool                     root_visited;
-        bool                     lod_visited;
-		bool                     got_lod;
+    private:
+        unsigned int             level_;
+        std::ofstream&           ostream_nodes_;
+        std::ofstream&           ostream_log_;
+        bool                     root_visited_;
+        bool                     lod_visited_;
+		bool                     got_lod_;
         std::vector<std::string> lods_;
-        cg::point_3              damned_offset;
-        bool                     damned_offset_added;   
+        cg::point_3              damned_offset_;
+        bool                     damned_offset_added_;   
     };

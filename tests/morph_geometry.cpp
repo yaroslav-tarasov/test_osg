@@ -59,7 +59,8 @@ void createMorphKeyframes( osgAnimation::FloatLinearChannel* ch )
 {
     osgAnimation::FloatKeyframeContainer* kfs = ch->getOrCreateSampler()->getOrCreateKeyframeContainer();
     kfs->push_back( osgAnimation::FloatKeyframe(0.0, 0.0) );
-    kfs->push_back( osgAnimation::FloatKeyframe(2.0, 1.0) );
+    kfs->push_back( osgAnimation::FloatKeyframe(0.5, 0.5) );
+    kfs->push_back( osgAnimation::FloatKeyframe(1.0, 1.0) );
 }
 
 int main_morph( int argc, char** argv )
@@ -69,9 +70,9 @@ int main_morph( int argc, char** argv )
     channel->setTargetName( "MorphCallback" );
     createMorphKeyframes( channel.get() );
     
-    auto rotor_node = osgDB::readNodeFile("./rotor/rotor.dae");
-    auto rotor_sagged   = findFirstNode(rotor_node ,"rotorsag",findNodeVisitor::not_exact);
-    auto rotor_static  = findFirstNode(rotor_node ,"rotorstat",findNodeVisitor::not_exact);
+    auto rotor_node   = osgDB::readNodeFile("./rotor/rotor.dae");
+    auto rotor_sagged = findFirstNode(rotor_node ,"rotorsag" ,findNodeVisitor::not_exact);
+    auto rotor_static = findFirstNode(rotor_node ,"rotorstat",findNodeVisitor::not_exact);
 
     findNodeByType< osg::Geode> geode_sagged_finder;  
     geode_sagged_finder.apply(*rotor_sagged);
@@ -105,10 +106,11 @@ int main_morph( int argc, char** argv )
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->addDrawable( morph.get() );
     geode->setUpdateCallback( new osgAnimation::UpdateMorph("MorphCallback") );
-    geode->getOrCreateStateSet()->setAttributeAndModes( new osg::Point(20.0f) );
+    //geode->getOrCreateStateSet()->setAttributeAndModes( new osg::Point(20.0f) );
     
     osg::ref_ptr<osg::Group> root = new osg::Group;
     root->addChild( geode.get() );
+    root->addChild(rotor_node);
     root->setUpdateCallback( manager.get() );
     
     osgViewer::Viewer viewer;
