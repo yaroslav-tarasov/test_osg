@@ -37,6 +37,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , nm_ang_smooth_   (2)
     , rotors_angular_speed_ (0)
     , desired_rotors_angular_speed_ (0)
+    , delta_ds_ (0)
     , shassi_anim_inited_(false)
 {
 
@@ -226,6 +227,11 @@ void model::set_desired_nm_pos  (geo_point_3 const& pos)
 void model::set_desired_nm_orien(quaternion const& orien)
 {
     desired_nm_orien_ = orien;
+}
+
+void   model::set_rotors_state(double target, double speed, rotor_state_t visible)
+{
+    set(msg::rotor_state_msg(target,speed,visible),false);
 }
 
 
@@ -611,10 +617,12 @@ void model::check_rotors_malfunction()
 {
     //if (!phys_aircraft_)
     //    return;
+    FIXME(Бред бредовый)
 
-    double ds = (desired_rotors_angular_speed_ - rotors_angular_speed_) *.01;
+    //double des_as = cg::abs(desired_rotors_angular_speed_ - rotors_angular_speed_)>50?desired_rotors_angular_speed_*.5:desired_rotors_angular_speed_;
+    double ds = (desired_rotors_angular_speed_ - rotors_angular_speed_) *.025;
     rotors_angular_speed_ +=  ds;
-    
+
     rotors_->visit_groups([this](aircraft::rotors_group_t & rotors_group,size_t& ind)
     {
         if ( rotors_group.malfunction )

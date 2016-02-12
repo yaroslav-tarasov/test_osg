@@ -49,7 +49,7 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
     msg_disp()
         .add<msg::go_to_pos_data            >(boost::bind(&model::on_go_to_pos              , this, _1))
         .add<msg::follow_route_msg_t        >(boost::bind(&model::on_follow_route           , this, _1))
-        .add<msg::follow_trajectory_msg_t        >(boost::bind(&model::on_follow_trajectory , this, _1))
+        .add<msg::follow_trajectory_msg_t   >(boost::bind(&model::on_follow_trajectory , this, _1))
         ;
 
     //create_phys_human();

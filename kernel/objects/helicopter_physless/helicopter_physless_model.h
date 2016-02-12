@@ -78,6 +78,8 @@ namespace helicopter_physless
         void                             set_desired_nm_pos  (geo_point_3 const& pos);
         void                             set_desired_nm_orien(quaternion const& orien);
         optional<ada::data_t> const&     fsettings() const;
+        
+        void                             set_rotors_state(double target, double speed, rotor_state_t visible);
 
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
@@ -133,6 +135,7 @@ namespace helicopter_physless
 
         double                                 rotors_angular_speed_;
         double                                 desired_rotors_angular_speed_;
+        double                                 delta_ds_;
 
         phys_aircraft_ptr                      phys_aircraft_;
 

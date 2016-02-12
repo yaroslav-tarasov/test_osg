@@ -155,13 +155,68 @@ Object* createObject(std::string name, bool fclone)
 			ModelReader mr;
 			data = mr.Load(object_file_name);
 			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.fpl_,osgDB::CASE_INSENSITIVE));
+
+#if 1
+            if(data->morphs.size()>0)
+            {
+                findNodeVisitor::nodeNamesList list_name;
+                const morph_params& mp = data->morphs["rotor_morph"];
+#if 0
+                list_name.push_back(mp.parent);
+                list_name.push_back(mp.source);
+                list_name.push_back(mp.target);
+#endif
+                findNodeVisitor findParents(mp.parent,findNodeVisitor::not_exact); 
+                object_file->accept(findParents);
+                
+                auto const& nl =  findParents.getNodeList();
+                int count_lod0 =  std::count_if(nl.begin(),nl.end(),
+                    [&](const osg::Node* nl)->bool {
+                        std::string ls = boost::to_lower_copy(nl->getName());
+                        return ls.find("lod0") !=std::string::npos;
+                });
+
+                for(int i=0;i<count_lod0;i++)
+                {
+                    auto source = findFirstNode(findParents.getNodeList()[i],mp.source,findNodeVisitor::not_exact);
+                    auto target = findFirstNode(findParents.getNodeList()[i],mp.target,findNodeVisitor::not_exact);
+
+                    source->setNodeMask(0);
+                    target->setNodeMask(0);
+
+                    findNodeByType< osg::Geode> geode_source_finder;  
+                    geode_source_finder.apply(*source);
+                    osg::Geode*    geode_source = dynamic_cast<osg::Geode*>(geode_source_finder.getLast()); 
+
+                    findNodeByType< osg::Geode> geode_target_finder;  
+                    geode_target_finder.apply(*target);
+                    osg::Geode*    geode_target = dynamic_cast<osg::Geode*>(geode_target_finder.getLast()); 
+
+                    osg::Geometry* geo_mesh_source = geode_source->getDrawable(0)->asGeometry();
+                    osg::Geometry* geo_mesh_target = geode_target->getDrawable(0)->asGeometry();
+
+                    osg::ref_ptr<osgAnimation::MorphGeometry> morph =
+                        new osgAnimation::MorphGeometry( *geo_mesh_source );
+
+                    morph->addMorphTarget( geo_mesh_target, 0.0);    
+                    morph->setName("rotor_morph");
+                    
+                    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+                    geode->addDrawable( morph.get() );
+                    geode->setUpdateCallback( new osgAnimation::UpdateMorph("MorphCallback") );
+                    geode->setName("rotor_morph");
+
+                    findParents.getNodeList()[i]->asGroup()->addChild(geode);
+                }
+
+            }
+#endif
 		}
 
-        bool airplane = findFirstNode(object_file ,"shassi_",findNodeVisitor::not_exact)!=nullptr;
-        bool vehicle  = findFirstNode(object_file ,"wheel",findNodeVisitor::not_exact)!=nullptr;
+        bool airplane = findFirstNode(object_file ,"shassi_"  ,findNodeVisitor::not_exact)!=nullptr;
+        bool vehicle  = findFirstNode(object_file ,"wheel"    ,findNodeVisitor::not_exact)!=nullptr;
         FIXME(Палец пол и потолок при определении модели)
         bool heli     = findFirstNode(object_file ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
-
 
 		osg::Node* engine = nullptr; 
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 

@@ -163,7 +163,7 @@ void visual::update(double time)
 			if (!tow_visual_object_)
 			{
 
-				std::string tow_type = "towbar"; // "towbar"  "tube"
+				const std::string tow_type = "towbar"; // "towbar"  "tube"
 				tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type, 0 ,  false) ;
 				ts_ = boost::make_shared<tow_support>(*tow_visual_object_, tow_type);
 			}
@@ -194,6 +194,14 @@ void visual::update(double time)
 				(*tow_visual_object_)->set_visible(true);
 			}
 		}
+        else
+        {
+            if(ts_)
+                ts_.reset();
+
+            if (tow_visual_object_ && *tow_visual_object_)
+                (*tow_visual_object_)->set_visible(false);
+        }
 		
 		if ( burning_plane_ )
 		{

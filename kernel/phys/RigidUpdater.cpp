@@ -25,6 +25,7 @@
 #include "common/simple_route.h"
 #include "flock_manager/flock_manager_common.h"
 #include "objects/aerostat/aerostat_common.h"
+#include "objects/human/human_common.h"
 
 #include "object_creators.h"
 

@@ -938,18 +938,15 @@ int _tmain(int argc, _TCHAR* argv[])
         printf("Invalid args.\n");
         exit(1);
     }
-    
-    std::string file = sourceFilePath(tstring(argv[1]));
-
+   
     try {
-		processModel(file);
+        std::string file = sourceFilePath(tstring(argv[1]));
+    	processModel(file);
 	}
 	catch (...) {
 		 printf("Something went wrong.\n");
 		 return 1;
 	}
-	
-	
 
 	return 0;
 }

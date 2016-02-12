@@ -12,6 +12,9 @@ FIXME(Это что за нафиг нужно  для object_creators )
 #include "objects/aerostat/aerostat_common.h"
 #include "common/aerostat.h"
 
+#include "objects/human/human_common.h"
+#include "common/human.h"
+
 #include "object_creators.h"
 
 #include "common/test_msgs.h"
@@ -317,6 +320,17 @@ void create_objects(const std::string & airport)
 
 		auto obj_aerostat = aerostat::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 	}
+#endif
+
+#if 1
+    {
+        human::settings_t vs;
+        vs.model = "human";
+        cg::geo_point_3 vpos(/*0.00055*/0.0,/*0.0009*/0.0,0.0);
+        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+
+        auto obj_aerostat = human::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+    }
 #endif
 }
 

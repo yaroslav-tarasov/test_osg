@@ -25,11 +25,20 @@
 
 namespace avCore
 {
-	typedef struct xml_model
+	struct morph_params
+    {
+        std::string  parent;
+        std::string  source;
+        std::string  target;
+    };
+
+    typedef struct xml_model
 	{
 		typedef std::map<std::string, std::string> animations_t; 
-		std::string   main_model;
-		animations_t  anims;
+        typedef std::map<std::string, morph_params>    morphs_t;
+		std::string    main_model;
+		animations_t   anims;
+        morphs_t       morphs;
 	} xml_model_t;
 
     struct ModelReader

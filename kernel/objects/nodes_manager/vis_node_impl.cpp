@@ -244,14 +244,6 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)
 {
-    force_log fl;
-    LOG_ODS_MSG( name() << "   vis_node_impl::on_visibility: " << m.visible  << "  rel_node()->name() " << rel_node()->name() << "\n" );
-    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-    {
-        force_log fl;
-        LOG_ODS_MSG( "   vis_node_impl::on_visibility: victory_nodes_" << (*(it))->getName() << "\n" );
-    }
-    
     user_visible_ = m.visible;
     need_update_ = true;
 }

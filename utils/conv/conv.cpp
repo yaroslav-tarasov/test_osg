@@ -854,6 +854,15 @@ int main( int argc, char **argv )
         {
             osg::notify(osg::NOTICE)<< "Error Occurred While Writing to "<< base_file_name + ".bullet"<< std::endl;
         }
+        
+        osg::Group* newroot =  dynamic_cast<osg::Group*>(findFirstNode(root,"Root")); 
+        if(newroot==nullptr)
+        {
+            newroot = new osg::Group; 
+            newroot->setName("Root");
+            newroot->addChild( root ); 
+            root = newroot;
+        }
 
         std::ofstream filelogic( base_file_name + ".stbin", std::ios_base::binary );
         std::ofstream logfile  ( base_file_name + std::string("_structure") + ".txt" );

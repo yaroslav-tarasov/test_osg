@@ -360,8 +360,6 @@ namespace sync_fsm
 
         });
 
-
-
         logger::need_to_log(false);
 	}
 
@@ -375,7 +373,7 @@ namespace sync_fsm
 
             float  ob_min    = rg.ang_speed;
             const double abs_speed = abs(rg.ang_speed);
-            ob_min = abs_speed>150?-20*cg::sign(ob_min):ob_min; // ѕерестаем крутить ротор на выской скорости 
+            ob_min = abs_speed>150?-20*cg::sign(ob_min):ob_min; // ѕерестаем крутить ротор на высокой скорости 
 
             nodes_management::node_position rotor_node_pos = rnode->position();
             const float angular_speed = ob_min * 2 * cg::pif/60.0; // 2000 и 3000 об/мин (30-50 об/с) 
@@ -390,8 +388,7 @@ namespace sync_fsm
 
             rnode->set_position(rotor_node_pos);   
             
-
-            if(abs_speed>150)
+            if(abs_speed>150.)
             {
                 if(rg.dyn_rotor_node)
                 {
@@ -399,6 +396,8 @@ namespace sync_fsm
                     {
                         rg.dyn_rotor_node->set_visibility(true);
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
+
+                        // self_.set_rotors_state(1.0,1.0);
                     }
                 }
 
@@ -420,8 +419,9 @@ namespace sync_fsm
                     }
                 }
 
+                self_.set_rotors_state(cg::clamp01(1 - abs_speed / 150.), 0.1, rs_dynamic);
             }
-            else  if(abs_speed<15)
+            else  if(abs_speed<15.)
             {
                 if(rg.dyn_rotor_node)
                 {
@@ -438,6 +438,8 @@ namespace sync_fsm
                     {
                         rg.sag_rotor_node->set_visibility(true);
                         rg.sag_rotor_node->set_position(rg.sag_rotor_node->position());
+
+                        // self_.set_rotors_state(abs_speed / 150. , 0.1);
                     }
                 }
 
@@ -450,6 +452,7 @@ namespace sync_fsm
                     }
                 }
 
+                self_.set_rotors_state(cg::clamp01(1 - abs_speed / 150.), 0.1, rs_sagged);
             }
             else
             {
@@ -483,8 +486,11 @@ namespace sync_fsm
                         rg.rotor_node->set_visibility(true);
                         rg.rotor_node->set_position(rg.rotor_node->position());
 
+                        // self_.set_rotors_state(1.0, 0.1);
                     }
                 }
+
+                self_.set_rotors_state(cg::clamp01(1 - abs_speed / 150.), 0.1, rs_static);
             }
         });
     }

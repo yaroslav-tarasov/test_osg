@@ -150,6 +150,7 @@ protected:
     virtual void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/){}
     virtual void on_new_wheel_contact_effect(double /*time*/, point_3f /*vel*/, point_3f /*offset*/){}
     
+    virtual void on_rotor_state(double /*target*/, double /*speed*/, rotor_state_t /*visible*/){};
 private:
     void                   on_provider_destroy();
     double                 len_for_cmd() const;
@@ -163,6 +164,7 @@ private:
     void on_engine_state        (msg::engine_state_msg const& m);
     void on_contact_effect      (msg::contact_effect    const& eff     );
     void on_wheel_contact_effect(msg::wheel_contact_effect const& eff  );
+    void on_rotor_state          (msg::rotor_state_msg const& msg);
     
     void on_traj_assign         (msg::traj_assign_msg const & tr       );
     void on_local_meteo         (msg::local_meteo_msg const&  msg      );

@@ -27,6 +27,7 @@ enum id
     am_contact_effect,
     am_wheel_contact_effect,
     am_traj_assign   , 
+    am_rotor_state    , 
     afm_state        ,
     afm_kind,
     afm_local_meteo,
@@ -35,6 +36,7 @@ enum id
 
 //! тела сообщений, сгенерированные специальным шаблоном
 typedef gen_msg<am_settings,     aircraft::settings_t>         settings_msg;
+
 
 //! сообщение "особый случай" (повреждение) ¬—
 struct malfunction_msg
@@ -80,6 +82,20 @@ struct traj_assign_msg
     {}
 
      fms::traj_data traj;
+};
+
+struct rotor_state_msg
+    : network::msg_id<am_rotor_state>
+{
+    rotor_state_msg() {}
+
+    rotor_state_msg(double target, double speed, uint16_t visible)
+        : target(target), speed(speed), visible(visible)
+    {}
+
+    double   target;
+    double   speed;
+    uint16_t visible;
 };
 
 //! сообщение 
@@ -130,6 +146,11 @@ REFL_STRUCT(traj_assign_msg)
     REFL_ENTRY(traj)
 REFL_END()
 
+REFL_STRUCT(rotor_state_msg)
+    REFL_ENTRY(target)
+    REFL_ENTRY(speed)
+    REFL_ENTRY(visible)
+REFL_END()
 
 REFL_STRUCT(malfunction_msg)
     REFL_ENTRY(kind)

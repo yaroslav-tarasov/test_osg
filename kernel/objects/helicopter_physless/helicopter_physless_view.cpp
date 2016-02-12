@@ -52,6 +52,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         }
     }
 
+    void (view::*on_rb) (msg::rotor_state_msg const& msg) = &view::on_rotor_state;
 
     msg_disp()
         .add<msg::settings_msg      >(boost::bind(&view::on_settings    , this, _1))
@@ -60,12 +61,13 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
         
         .add<msg::local_meteo_msg   >(boost::bind(&view::on_local_meteo, this, _1))
+        .add<msg::state_msg>         (boost::bind(&view::on_state, this, _1))
+        .add<msg::rotor_state_msg    >(boost::bind(on_rb, this, _1))
 
-        .add<msg::state_msg>   (boost::bind(&view::on_state, this, _1))
-                                           
         // just for recording visual effect to history 
         .add<msg::contact_effect        >(boost::bind(&view::on_contact_effect      , this, _1))
-        .add<msg::wheel_contact_effect  >(boost::bind(&view::on_wheel_contact_effect, this, _1));
+        .add<msg::wheel_contact_effect  >(boost::bind(&view::on_wheel_contact_effect, this, _1))
+        ;
 
     if(dict)
     {
@@ -458,6 +460,10 @@ void view::on_wheel_contact_effect(msg::wheel_contact_effect const& eff)
     on_new_wheel_contact_effect(eff.time, eff.vel, eff.offset);
 }
 
+void view::on_rotor_state(msg::rotor_state_msg const& msg)
+{
+    on_rotor_state(msg.target,msg.speed,static_cast<rotor_state_t>(msg.visible));
+}
 
 void view::update_len(double time)
 {

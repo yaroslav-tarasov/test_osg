@@ -31,6 +31,13 @@ namespace aerostat
 	object_info_ptr create(fake_objects_factory* sys, const settings_t& sett,  const geo_position& init_pos);
 }
 
+namespace human
+{
+    using namespace kernel;
+
+    object_info_ptr create(fake_objects_factory* sys, const settings_t& sett,  const geo_position& init_pos);
+}
+
 namespace simple_route
 {
     using namespace kernel;

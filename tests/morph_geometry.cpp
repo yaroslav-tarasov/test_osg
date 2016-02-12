@@ -59,8 +59,7 @@ void createMorphKeyframes( osgAnimation::FloatLinearChannel* ch )
 {
     osgAnimation::FloatKeyframeContainer* kfs = ch->getOrCreateSampler()->getOrCreateKeyframeContainer();
     kfs->push_back( osgAnimation::FloatKeyframe(0.0, 0.0) );
-    kfs->push_back( osgAnimation::FloatKeyframe(0.5, 0.5) );
-    kfs->push_back( osgAnimation::FloatKeyframe(1.0, 1.0) );
+    kfs->push_back( osgAnimation::FloatKeyframe(0.4, 1.0) );
 }
 
 int main_morph( int argc, char** argv )
@@ -70,9 +69,15 @@ int main_morph( int argc, char** argv )
     channel->setTargetName( "MorphCallback" );
     createMorphKeyframes( channel.get() );
     
+#if 0
     auto rotor_node   = osgDB::readNodeFile("./rotor/rotor.dae");
     auto rotor_sagged = findFirstNode(rotor_node ,"rotorsag" ,findNodeVisitor::not_exact);
     auto rotor_static = findFirstNode(rotor_node ,"rotorstat",findNodeVisitor::not_exact);
+#endif
+    
+    auto rotor_node   = osgDB::readNodeFile("./rotor/test.dae");
+    auto rotor_sagged = findFirstNode(rotor_node ,"pSphere3" ,findNodeVisitor::not_exact);
+    auto rotor_static = findFirstNode(rotor_node ,"pSphere2",findNodeVisitor::not_exact);
 
     findNodeByType< osg::Geode> geode_sagged_finder;  
     geode_sagged_finder.apply(*rotor_sagged);
@@ -83,7 +88,7 @@ int main_morph( int argc, char** argv )
     osg::Geode*    geode_stat = dynamic_cast<osg::Geode*>(geode_static_finder.getLast()); 
 
     osg::ref_ptr<osgAnimation::Animation> animation = new osgAnimation::Animation;
-    animation->setPlayMode( osgAnimation::Animation::PPONG );
+    animation->setPlayMode( osgAnimation::Animation::LOOP );
     animation->addChannel( channel.get() );
     
     osg::ref_ptr<osgAnimation::BasicAnimationManager> manager = new osgAnimation::BasicAnimationManager;
@@ -110,7 +115,9 @@ int main_morph( int argc, char** argv )
     
     osg::ref_ptr<osg::Group> root = new osg::Group;
     root->addChild( geode.get() );
+#if 0
     root->addChild(rotor_node);
+#endif
     root->setUpdateCallback( manager.get() );
     
     osgViewer::Viewer viewer;

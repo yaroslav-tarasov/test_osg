@@ -34,6 +34,16 @@ namespace avCore
                 }
             }	
 
+            for (pugi::xml_node morph = root.child("Morph"); morph; morph = morph.next_sibling())
+            {
+                for (pugi::xml_node params = morph.first_child(); params; params = params.next_sibling())
+                {
+                    morph_params& mp = data_.morphs[morph.attribute("name").as_string()] ;
+                    mp.parent = params.attribute("parent").as_string();
+                    mp.source = params.attribute("source").as_string();
+                    mp.target = params.attribute("target").as_string();
+                }
+            }	
         }
         else
             std::cerr << "File not found: " << full_path;

@@ -5,6 +5,13 @@
 
 namespace helicopter_physless
 {
+    enum rotor_state_t : uint16_t
+    {
+        rs_static,
+        rs_dynamic,
+        rs_sagged
+    };
+
     struct phys_aircraft
     {
         virtual void                 update            () = 0;

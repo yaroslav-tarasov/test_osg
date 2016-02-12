@@ -851,8 +851,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 /////////////////////////////////////////////////////////////////
 
     _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
-   
-
 
 #else  
   
@@ -1557,9 +1555,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
+#if 0 
         load("su_27",_terrainRoot, 15000, false);
         load("mi_24",_terrainRoot, 15000, false);
         load("mig_29",_terrainRoot, 15000, false); 
+#endif
 
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000);
@@ -1882,7 +1882,7 @@ void   Scene::onSetLights(bool on)
 	if (_lights.valid())
     {
         _lights->setNodeMask(on?0xffffffff:0);
-        LightManager::GetInstance()->setNodeMask(on?/*0xffffffff*/0x00010000:0);
+        LightManager::GetInstance()->setNodeMask(on?REFLECTION_MASK:0);
     }
 }
 

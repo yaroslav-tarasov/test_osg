@@ -67,6 +67,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::contact_effect        >(boost::bind(&view::on_contact_effect      , this, _1))
         .add<msg::wheel_contact_effect  >(boost::bind(&view::on_wheel_contact_effect, this, _1));
 
+    
+
     if(dict)
     {
         _state.dyn_state.pos     = state_.pos;
@@ -457,6 +459,7 @@ void view::on_wheel_contact_effect(msg::wheel_contact_effect const& eff)
 {
     on_new_wheel_contact_effect(eff.time, eff.vel, eff.offset);
 }
+
 
 
 void view::update_len(double time)

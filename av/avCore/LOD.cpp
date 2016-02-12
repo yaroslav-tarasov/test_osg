@@ -1,5 +1,8 @@
 #include "stdafx.h"
+
+#include "Global.h"
 #include "LOD.h"
+
 #include <osg/CullStack>
 
 #include <algorithm>
@@ -78,7 +81,7 @@ void LOD::traverse(osg::NodeVisitor& nv)
             {
                 if (_rangeList[i].first<=required_range && required_range<_rangeList[i].second)
                 {
-                    _children[i]->setNodeMask(/*0xffffffff*/0x00010000);// accept(nv);
+                    _children[i]->setNodeMask(/*0xffffffff*/REFLECTION_MASK);// accept(nv);
                 }
                 else
                 {

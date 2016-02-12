@@ -4,13 +4,14 @@
 
 #include "common/text_label.h"
 #include "ext/spark/SmokeNode.h"
-
+#include "common/morphs_support.h"
 
 namespace helicopter_physless
 {
 	const double visual::smoke_end_duration_  = 10;
 	const double visual::sparks_end_duration_ = 0.2;
 }
+
 
 namespace helicopter_physless
 {
@@ -99,6 +100,17 @@ namespace helicopter_physless
 		        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
 		        ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
+            
+            findNodeVisitor findMorph("rotor_morph",findNodeVisitor::not_exact); 
+            nm::vis_node_control_ptr(root())->vis_nodes()[0]->accept(findMorph);
+            
+            auto const& nl =  findMorph.getNodeList();
+            
+            if(nl.size()>0)
+            {
+                ms_ = boost::make_shared<visual_objects::morphs_support>();
+                std::for_each(nl.begin(),nl.end(),[&](osg::Node* node ){ms_->add(node);});
+            }
 
             deffered_init_ = false;
         }
@@ -194,6 +206,16 @@ namespace helicopter_physless
 				smoke_factor_ = 3;
 		}
 	}
+
+    void visual::on_rotor_state  (double target, double speed, rotor_state_t visible) 
+    {
+          if(ms_)
+          {
+              ms_->set_weight(0,target);
+              ms_->set_visibility( visible != rs_dynamic );
+          }
+    }
+
 }
 
 

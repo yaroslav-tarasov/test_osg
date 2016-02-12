@@ -8,7 +8,7 @@ namespace human
 struct settings_t
 {
     settings_t()
-        : model("remy")
+        : model("human")
         , debug_draw(false)
     {
     }

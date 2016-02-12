@@ -6,6 +6,7 @@
 namespace visual_objects
 {
     struct label_support;
+    struct morphs_support;
 }
 
 namespace helicopter_physless
@@ -23,6 +24,8 @@ namespace helicopter_physless
 
     private:
         void on_malfunction_changed  ( aircraft::malfunction_kind_t kind ) override;
+        void on_rotor_state           (double target, double speed, rotor_state_t visible) override;
+
     private:
         nm::node_info_ptr engine_node_;
         visual_object_ptr smoke_object_;
@@ -55,6 +58,7 @@ namespace helicopter_physless
         void fill_nodes();
     private:
         boost::shared_ptr<visual_objects::label_support>   ls_;
+        boost::shared_ptr<visual_objects::morphs_support>  ms_;
 
 	private: 
 		boost::function<void()>                       start_ ;
@@ -63,4 +67,4 @@ namespace helicopter_physless
 		static const double smoke_end_duration_;
 		static const double sparks_end_duration_;
 	};
-}
+}            
