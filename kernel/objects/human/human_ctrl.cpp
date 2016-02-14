@@ -26,7 +26,7 @@ namespace human
             if (nodes_manager_->get_model() != settings_.model)
                 nodes_manager_->set_model(settings_.model);
 
-			root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), quaternion(cpr(course(), 0, 0)), point_3()));
+			root_->set_position(geo_position(geo_point_3(pos(), 0), point_3(), orient(), point_3()));
         }
 
 	}
@@ -80,7 +80,7 @@ namespace human
         FIXME(Oooooooooooooo)
         geo_base_3 base = ::get_base();
 
-        return decart_position(base(geo_point_3(pos(),0)),cg::cpr(course(),0,0));
+        return decart_position(base(geo_point_3(pos(),0)),orient());
     };
 }
 

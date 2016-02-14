@@ -11,6 +11,7 @@
 #include "human_model_states.h"
 #include "common/aircraft.h"
 #include "common/airports_manager.h"
+#include "common/stdrandgen.h"
 
 namespace human
 {
@@ -67,16 +68,21 @@ private:
     void follow_route(std::string const& route);
     void detach_cur_route();
 
-    void update_model( double dt );
     void on_zone_created( size_t id );
     void on_zone_destroyed( size_t id );
-    void create_phys_human();
-    void sync_phys();
+    void create_phys();
+    void update_model( double dt );
+    void sync_phys(double dt);
     void sync_nodes_manager( double dt );
     void settings_changed();
 
 private:
     void go(cg::polar_point_2 const &dir) ;
+
+private:
+	void idle();
+	void walk();
+	void run();
 
 private:
     //PY_REG_STRUCT()
@@ -91,16 +97,9 @@ private:
 
 
 private:
-    model_system *    sys_;
-    optional<double> last_update_;
-    double max_speed_;
-    
     airports_manager::info_ptr airports_manager_;
     airport::info_ptr          airport_;
 
-    // FIXME Yeah we need it badly. ray_cast_human? yeah
-    //phys::ray_cast_human::info_ptr phys_human_;
-    optional<size_t> phys_zone_;
 
     cg::geo_base_3 root_next_pos_;
     cg::quaternion root_next_orien_;
@@ -121,12 +120,34 @@ private:
 
     model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
 
+	//  phys staff
+private:
+	model_system *                  sys_;
+	optional<double>                last_update_;
+	double max_speed_;
+	phys::character::info_ptr       phys_model_;
+	optional<size_t>                phys_zone_;
+
+	cg::geo_point_3                 desired_position_;
+	quaternion                      desired_orien_;
 
 private:
     double steer_course ;
+    
+	std_simple_randgen                      rnd_;
 
+	enum anim_state
+	{
+		as_idle,
+		as_walk,
+		as_run
+	};
+	
+	float                               _targetSpeed;
 
-	bool   start_follow_;
+	anim_state          anim_state_;
+
+	bool               start_follow_;
 };
 
 } // human

@@ -34,11 +34,15 @@ namespace avCore
 
     typedef struct xml_model
 	{
+		enum up_axis_t {X_UP,Y_UP,Z_UP,NEG_X_UP,NEG_Y_UP,NEG_Z_UP};
 		typedef std::map<std::string, std::string> animations_t; 
         typedef std::map<std::string, morph_params>    morphs_t;
 		std::string    main_model;
 		animations_t   anims;
         morphs_t       morphs;
+		float		   scale;
+		up_axis_t      axis_up;
+		osg::Vec3      pivot_point;
 	} xml_model_t;
 
     struct ModelReader

@@ -66,6 +66,7 @@ namespace bi
         on_collision_f                           _on_collision;
         osg::ref_ptr<debug_render>               _dbgDraw; 
         bool                                     _debug;
+		bool                                     _needDebugDrawer;
         
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
         osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer2;

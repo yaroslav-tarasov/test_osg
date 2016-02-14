@@ -13,3 +13,4 @@ for node in macros[0].childNodes:
 					print(node.nodeName + '  ' + node.childNodes[0].nodeValue)
 
 print(os.getenv('SIMEX_DIR','NOT_SET'))
+print(os.getenv('OSG_DIR','NOT_SET'))

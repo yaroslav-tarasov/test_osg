@@ -52,7 +52,9 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::follow_trajectory_msg_t   >(boost::bind(&model::on_follow_trajectory , this, _1))
         ;
 
-    //create_phys_human();
+	_targetSpeed = rnd_.random_range(/*settings._minSpeed*/6.f ,/* settings._maxSpeed*/10.f);
+
+	set_state(state_t(pos(), orient(), 0.0));
 }
 
 nodes_management::node_info_ptr model::get_root()
@@ -64,17 +66,26 @@ void model::update( double time )
 {   
     view::update(time);
 
-    // FIXME physics
-    //if (!phys_human_)
-    //{
-    //    create_phys_human();
-    //    sync_phys();
-    //}
+	if (!phys_model_)
+	{
+		create_phys();
+		sync_phys(0);
+	}
+    
+	if (cg::eq(speed(),0.0))
+		idle();
+	else if (speed()>1.0 )
+		walk();
+	else if(speed()>7.0)
+	    run();
+
 
     double dt = time - (last_update_ ? *last_update_ : 0);
 
     if (!cg::eq_zero(dt))
     {
+
+
         FIXME(Туфта жесткая) 
         if ( traj_ && start_follow_ && traj_->base_length() - time < -0.1 )
         {
@@ -84,7 +95,7 @@ void model::update( double time )
 
         update_model(dt);
 
-        sync_phys();
+        sync_phys(dt);
  
 		sync_nodes_manager(dt);
 
@@ -127,7 +138,7 @@ geo_position model::get_phys_pos() const
 
 #if 0
     cg::geo_base_3 base = phys_->get_base(*phys_zone_); 
-    decart_position cur_pos = phys_human_->get_position();
+    decart_position cur_pos = phys_model_->get_position();
     geo_position cur_glb_pos(cur_pos, base);
 
     return cur_glb_pos;
@@ -229,9 +240,9 @@ void model::set_max_speed(double max_speed)
 cg::geo_point_2 model::phys_pos() const
 {
     // FIXME physics
-    //if (phys_human_)
+    //if (phys_model_)
     //{
-    //    decart_position cur_pos = phys_human_->get_position();
+    //    decart_position cur_pos = phys_model_->get_position();
     //    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
     //    geo_position cur_glb_pos(cur_pos, base);
     //    return cur_glb_pos.pos;
@@ -239,10 +250,11 @@ cg::geo_point_2 model::phys_pos() const
     return pos();
 }
 
-void model::sync_phys()
+void model::sync_phys(double dt)
 {
+
 #if 0
-    if (!phys_human_ || !phys_)
+    if (!phys_model_ || !phys_)
         return;
 
 //        double const max_break_accel = aerotow_ ? 2 : 20;
@@ -251,7 +263,7 @@ void model::sync_phys()
 
     cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
-    decart_position cur_pos = phys_human_->get_position();
+    decart_position cur_pos = phys_model_->get_position();
     geo_position cur_glb_pos(cur_pos, base);
     double cur_speed = cg::norm(cur_pos.dpos);
     double cur_course = cur_pos.orien.cpr().course;
@@ -304,9 +316,9 @@ void model::sync_phys()
     }
 
 
-    phys_human_->set_steer(steer);
-    phys_human_->set_thrust(thrust);
-    phys_human_->set_brake(brake);
+    phys_model_->set_steer(steer);
+    phys_model_->set_thrust(thrust);
+    phys_model_->set_brake(brake);
 
     if (aerotow_)
     {
@@ -324,7 +336,40 @@ void model::sync_phys()
                  << "\n");
 
     logger::need_to_log(false);
+#else
+	if (!phys_model_ || !phys_)
+		return;
 
+	point_3     wind(0.0,0.0,0.0);
+
+	double const max_accel = 15;
+
+	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+
+	decart_position cur_pos = phys_model_->get_position();
+
+	geo_position cur_glb_pos(cur_pos, base);
+	double cur_speed  = cg::norm(cur_pos.dpos);
+	double cur_course = cur_pos.orien.cpr().course;
+	double cur_roll   = cur_pos.orien.cpr().roll;
+
+	// ?? cg::geo_direction
+
+	cg::polar_point_3 cp (cg::geo_base_3(desired_position_)(cur_glb_pos.pos));
+	cpr cpr_des =  cg::cpr(cp.course,cp.pitch);
+	quaternion  desired_orien_(cpr_des);  
+
+	point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
+	point_3 right_dir   =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
+	point_3 up_dir      =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
+
+    point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * /*_damping*/1.f * (dt);
+
+	//if(_targetSpeed > -1){
+	//	phys::character::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
+	//}
+
+	phys::character::control_ptr(phys_model_)->set_linear_velocity(forward_dir * speed() );
 #endif
     //if (settings_.debug_draw)
     //    send_cmd(msg::phys_pos_msg(cur_glb_pos.pos, cur_course));
@@ -333,34 +378,29 @@ void model::sync_phys()
 
 void model::sync_nodes_manager( double /*dt*/ )
 {
-    // FIXME physics    
-#if 0
-    if (phys_human_ && root_)
-    {
-        cg::geo_base_3 base = phys_->get_base(*phys_zone_);
-        decart_position bodypos = phys_human_->get_position();
-        decart_position root_pos = bodypos * body_transform_inv_;
+	if (phys_model_ && root_)
+	{
+		cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+		decart_position bodypos = phys_model_->get_position();
+		decart_position root_pos = bodypos /** body_transform_inv_*/;// FIXME Модельно зависимое решение 
 
-        geo_position pos(root_pos, base);
+		geo_position pos(root_pos, base);
 
-        // FIXME Глобальные локальные преобразования 
-        nodes_management::node_position root_node_pos = root_->position();
-        root_node_pos.global().pos = root_next_pos_;
-        root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
+		// FIXME Глобальные локальные преобразования 
+		nodes_management::node_position root_node_pos = root_->position();
+		root_node_pos.global().pos = root_next_pos_;
+		root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
 
-        root_node_pos.global().orien = root_next_orien_;
-        root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
+		root_node_pos.global().orien = root_next_orien_;
+		root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
 
-        // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
-        root_->set_position(root_node_pos);
+		// nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
+		root_->set_position(root_node_pos);
 
-        root_next_pos_ = pos.pos;
-        root_next_orien_ = pos.orien;
+		root_next_pos_ = pos.pos;
+		root_next_orien_ = pos.orien;
 
-        geo_position body_pos(phys_human_->get_position() * body_transform_inv_, base);
-
-    }
-#endif
+	}
 }
 
 void model::settings_changed()
@@ -373,10 +413,10 @@ void model::update_model( double dt )
     cg::geo_base_2 cur_pos = pos();
      // FIXME physics
 #if 0
-    if (phys_human_ && phys_) // callback to phys pos
+    if (phys_model_ && phys_) // callback to phys pos
     {
         cg::geo_base_3 base = phys_->get_base(*phys_zone_);
-        decart_position phys_pos = phys_human_->get_position();
+        decart_position phys_pos = phys_model_->get_position();
         geo_position glb_phys_pos(phys_pos, base);
 
         double dist = cg::distance((cg::geo_point_2 &)glb_phys_pos.pos, cur_pos);
@@ -392,7 +432,7 @@ void model::update_model( double dt )
         if (model_state_->end())
         {
             model_state_.reset();
-            set_state(state_t(pos(), course(), 0));
+            set_state(state_t(pos(), orient(), 0.0));
         }
     }
 }
@@ -408,58 +448,75 @@ void model::on_zone_destroyed( size_t id )
 #if 0
     if (phys_zone_ && *phys_zone_ == id)
     {
-        phys_human_.reset();
+        phys_model_.reset();
     }
 #endif
 }
 
-void model::create_phys_human()
+void model::create_phys()
 {
-    using namespace nodes_management;
+	if (!phys_ || !root_)
+		return;
 
-    if (!phys_ || !root_)
-        return;
+	phys_zone_ = phys_->get_zone(cg::geo_point_3(pos(), 0));
+	if (!phys_zone_)
+		return;
 
-    phys_zone_ = phys_->get_zone(cg::geo_point_3(pos(), 0));
-    if (!phys_zone_)
-        return;
+	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
-    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+	//phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
+	phys::compound_sensor_ptr s = phys::character::fill_cs(nodes_manager_); 
+	decart_position p(base(state_.pos), state_.orien);
 
-    //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
-#if 0
-    phys::compound_sensor_ptr s = phys::ray_cast_human::fill_cs(nodes_manager_);
-#endif
-
-    body_transform_inv_ =  cg::transform_4(); 
-    // FIXME TYV  сдается мне нефига не нужный код 
-    // В модели симекса съедается трансформ на геометрии, и Body оказывается востребованным
-    // get_relative_transform(nodes_manager_, body_node_).inverted();
-
-    phys::collision_ptr collision(phys_->get_system(*phys_zone_));
-
-    // TODO OR NOT
-    //auto isection = collision->intersect_first(base(cg::geo_point_3(pos(), 10.)), base(cg::geo_point_3(pos(), -10.)));
-
-    double height = 0;
-    //if (isection)   // TODO OR NOT
-    //    height += 10 - 20. * *isection;
-
-    cg::transform_4 veh_transform = cg::transform_4(as_translation(base(cg::geo_point_3(pos(), height))), cg::rotation_3(cg::cpr(course(), 0,0))) * body_transform_inv_.inverted();
-
-    //phys::box_sensor_t box(cg::rectangle_3(point_3(-2, -2, -1), point_3(2, 2, 1)));
-    decart_position p(veh_transform.translation(), cg::quaternion(veh_transform.rotation().cpr()));
-    //p.pos.z -= 0.2;
-    p.pos.z = 0;
-#if 0
-    phys_human_ = phys_->get_system(*phys_zone_)->create_ray_cast_human(cfg().model_params.human_mass, s, p);
-#endif
+	phys::character::params_t  params;
+	params.mass = 1;
+	phys_model_ = phys_->get_system(*phys_zone_)->create_character(params, s, p);
 
 }
 
 void model::go(cg::polar_point_2 const &offset)
 {
     model_state_ = boost::make_shared<go_to_pos_state>(cg::geo_offset(pos(), offset), boost::none, /*!!aerotow_*/false);
+}
+
+
+void model::idle()
+{
+	// auto const& settings = _spawner->settings();
+	if(anim_state_ != as_idle)
+	{ 
+		root_->play_animation("idle", 1.0 / rnd_.random_range(/*settings._minAnimationSpeed*/0.1f, /*settings._maxAnimationSpeed*/0.4f), -1., -1., 0.0);
+		anim_state_ = as_idle;
+	}
+
+	// desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+
+}
+
+void model::walk()
+{
+	// auto const& settings = _spawner->settings();
+	if(anim_state_ != as_walk)
+	{ 
+		root_->play_animation("walk", 1.0 / rnd_.random_range(/*settings._minAnimationSpeed*/0.5f, /*settings._maxAnimationSpeed*/1.f), -1., -1., 0.0);
+		anim_state_ = as_walk;
+	}
+
+	// desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+
+}
+
+void model::run()
+{
+	// auto const& settings = _spawner->settings();
+	if(anim_state_ != as_run)
+	{ 
+		root_->play_animation("run", 1.0 / rnd_.random_range(/*settings._minAnimationSpeed*/0.8f, /*settings._maxAnimationSpeed*/1.5f), -1., -1., 0.0);
+		anim_state_ = as_run;
+	}
+
+	// desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+
 }
 
 } // human 

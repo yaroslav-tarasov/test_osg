@@ -87,6 +87,7 @@ namespace bi
 		, _on_collision(on_collision)
 		, _dbgDraw     (nullptr)
 		, _debug       (cfg().debug.debug_drawer)
+		, _needDebugDrawer(false)
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(new _private)
@@ -151,9 +152,11 @@ namespace bi
                 _root->getParent(0)->addChild( dynamic_cast<avCollision::DebugRenderer*>(_dbgDraw.get())->getSceneGraph() );
             else
                 _root->addChild( dynamic_cast<avCollision::DebugRenderer*>(_dbgDraw.get())->getSceneGraph() );
+
+			_needDebugDrawer = true;
         }
 
-        if(_dbgDraw)
+        if(_dbgDraw && _d->_sys)
             _d->_sys->setDebugDrawer(_dbgDraw);
     }
 
@@ -482,9 +485,10 @@ namespace bi
         frame_timer ftm (view,_last_frame_time);
         if ( !view || !_root ) return false;
 
-#ifdef DEPRECATED_DEBUG_MODE
+#if 0
         switch ( ea.getEventType() )
         {
+#ifdef DEPRECATED_DEBUG_MODE
         case osgGA::GUIEventAdapter::KEYUP:
             if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Return )
             {
@@ -612,6 +616,7 @@ namespace bi
 
             }
             break;
+#endif
         case osgGA::GUIEventAdapter::FRAME:
             {
                 double dt = _hr_timer.set_point();
@@ -622,8 +627,15 @@ namespace bi
                     force_log fl;
                     LOG_ODS_MSG( "Simulation time differ from real time more the 0.1 sec  " << dt  << "  " <<  dt1 << "\n");
                }
+			   
+			   if(_dbgDraw && _d->_sys && _needDebugDrawer)
+			   {
+				   _d->_sys->setDebugDrawer(_dbgDraw);
+				   _needDebugDrawer = false;
+			   }
 
-                if( _dbgDraw)
+			   if( _dbgDraw && _d->_sys)
+			   {
                     _dbgDraw->BeginDraw();
 
 #ifdef DEPRECATED
@@ -645,8 +657,7 @@ namespace bi
                     itr->second->setMatrix( matrix );
                 }
 
-                if( _dbgDraw)
-                {
+
                     _d->_sys->debugDrawWorld();
                     _dbgDraw->EndDraw();
                 }
@@ -657,6 +668,7 @@ namespace bi
         default: break;
         }
 #endif
+
 
         return false;
     }

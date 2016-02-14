@@ -35,7 +35,7 @@ view::view( kernel::object_create_t const& oc, dict_copt dict)
 		;
 }
 
-geo_point_2 view::pos() const
+geo_point_3 view::pos() const
 {
 	return state_.pos;
 }

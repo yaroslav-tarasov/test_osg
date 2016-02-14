@@ -362,6 +362,7 @@
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
+    <ClCompile Include="kernel\phys\character_phys.cpp" />
     <ClCompile Include="kernel\phys\flock_child_phys.cpp" />
     <ClCompile Include="kernel\phys\GLDebugDrawer.cpp" />
     <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp" />

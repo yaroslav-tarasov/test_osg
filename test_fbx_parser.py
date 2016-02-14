@@ -3,16 +3,20 @@ import sys
 import os
 from xml.dom import minidom
 from xml.dom.minidom import getDOMImplementation
-from sets import Set
-
-filepath = r'C:\Work\OSG\OpenSceneGraph-3.2.1\build\bin\data\models\human\girl.fbx'
+try:
+    from sets import Set
+except ImportError:
+    Set = set
+    
+osg_dir = os.getenv('OSG_DIR','NOT_SET')
+filepath = osg_dir + r'\OpenSceneGraph-3.2.1\build\bin\data\models\human\elf.fbx'
 
 manager = fbx.FbxManager.Create()
 importer = fbx.FbxImporter.Create( manager, 'myImporter' )
 status = importer.Initialize( filepath )
 
-if status == False:
-    print 'FbxImporter initialization failed.'
+if status == False :
+    #print 'FbxImporter initialization failed.'
     #print 'Error: %s' % importer.GetLastErrorString()
     sys.exit()
 
@@ -69,7 +73,7 @@ def findTexturesOnNodes( node, textureDictionary, currentPath = [] ):
                     #print '\t\t\tTexture: %s' % texture.GetFileName()
                     wrap_mode = "repeat", "clamp"
                     textureFilename = texture.GetFileName()
-                    tex_type = ["DiffuseColor", "TransparentColor", "AmbientColor", "Incandscene", "Bump" ]
+                    tex_type = ["DiffuseColor", "NormalMap", "AmbientColor", "Incandscene","TransparentColor","SpecularColor","ShininessExponent"]
                     createTextureTag(doc, mat_tag, "%s" % tex_type.index(property.GetName())  , os.path.basename(textureFilename), wrap_mode[texture.GetWrapModeU()], wrap_mode[texture.GetWrapModeV()] )
     
     #print ''
@@ -86,7 +90,7 @@ root   = doc.documentElement
 
 findTexturesOnNodes( scene.GetRootNode(), textures )
 
-print doc.toprettyxml()
+print (doc.toprettyxml())
 
 with open(os.path.dirname(filepath) + "\\" + os.path.splitext(os.path.basename(filepath))[0] + ".dae.mat.xml", "w") as f:
     f.write(doc.toprettyxml(indent="  "))

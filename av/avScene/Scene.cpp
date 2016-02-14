@@ -1141,8 +1141,8 @@ void Scene::createObjects()
     //_terrainRoot->addChild(heli);
 
 
-    //if(_rigidUpdater.valid())
-    //    _rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
+	if(_rigidUpdater.valid())
+		_rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
     const std::string name = "a_319";
 
@@ -1560,7 +1560,6 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         load("mi_24",_terrainRoot, 15000, false);
         load("mig_29",_terrainRoot, 15000, false); 
 #endif
-
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000);
 

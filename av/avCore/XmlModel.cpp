@@ -23,9 +23,28 @@ namespace avCore
             pugi::xml_node root = doc.child("root");
 			
 			pugi::xml_node MainModel =  root.child("MainModel");
-			
+
 			data_.main_model = MainModel.attribute("path").as_string();
-            
+            data_.scale      = MainModel.attribute("scale").as_float(1.0);
+			std::string au_val = MainModel.attribute("axis_up").as_string("Z");
+			
+			for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling())
+			{			
+				data_.pivot_point = osg::Vec3(
+					pivot_node.attribute("x").as_double(0.0),
+					pivot_node.attribute("y").as_double(0.0),
+					pivot_node.attribute("z").as_double(0.0)
+					);
+			}
+
+			data_.axis_up    = (au_val=="X")?xml_model_t::X_UP:
+							   (au_val=="Y"?xml_model_t::Y_UP:
+							   (au_val=="Z"?xml_model_t::Z_UP:
+							   (au_val=="-X"?xml_model_t::NEG_X_UP:
+							   (au_val=="-Y"?xml_model_t::NEG_Y_UP:
+							   (au_val=="-Z"?xml_model_t::NEG_Z_UP:
+							   xml_model_t::Z_UP)))));
+
 			for (pugi::xml_node anim = root.child("Animation"); anim; anim = anim.next_sibling())
             {
                 for (pugi::xml_node file = anim.first_child(); file; file = file.next_sibling())
@@ -43,7 +62,10 @@ namespace avCore
                     mp.source = params.attribute("source").as_string();
                     mp.target = params.attribute("target").as_string();
                 }
-            }	
+            }
+
+			
+			
         }
         else
             std::cerr << "File not found: " << full_path;

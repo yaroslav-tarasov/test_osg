@@ -94,7 +94,7 @@ Object* createObject(std::string name, bool fclone)
 
     osg::CopyOp copyop;
 
-    if (name=="crow")
+    if (name=="crow" || name=="human" )
     {
        copyop =  osg::CopyOp::DEEP_COPY_ALL
            //& ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
@@ -155,7 +155,6 @@ Object* createObject(std::string name, bool fclone)
 			ModelReader mr;
 			data = mr.Load(object_file_name);
 			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.fpl_,osgDB::CASE_INSENSITIVE));
-
 #if 1
             if(data->morphs.size()>0)
             {
@@ -446,12 +445,25 @@ FIXME( Исправить структуру под mt)
         nl.push_back("tree");
         nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
 
-        if(name == "crow")
+        if(data)
         {
-            const double scale = /*0.2*/ 0.035;
-            pat->setScale(osg::Vec3(scale,scale,scale));
-            pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+            pat->setScale(osg::Vec3(data->scale,data->scale,data->scale));
         }
+
+		if(data)
+		if(data->axis_up == xml_model_t::Y_UP)
+		{
+		    pat->setAttitude(osg::Quat(osg::inDegrees(90.0),osg::X_AXIS));
+		}
+		else if(data->axis_up == xml_model_t::NEG_Y_UP)
+		{
+			pat->setAttitude(osg::Quat(osg::inDegrees(-90.0),osg::X_AXIS));
+		}
+		else if(data->axis_up == xml_model_t::NEG_Z_UP)
+		{	
+			pat->setPivotPoint(data->pivot_point);
+			pat->setAttitude(osg::Quat(osg::inDegrees(180.0),osg::X_AXIS));
+		}
 
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
         pat->accept(mv);

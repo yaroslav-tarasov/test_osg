@@ -21,9 +21,6 @@
     <Filter Include="Source Files\tests">
       <UniqueIdentifier>{baec0567-4405-4fd5-a2ed-21305b2b44e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\bada">
-      <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\systems">
       <UniqueIdentifier>{9debcb17-2ead-4d63-8cae-1087f2ec1b5d}</UniqueIdentifier>
     </Filter>
@@ -167,6 +164,9 @@
     </Filter>
     <Filter Include="Source Files\objects\helicopter_physless\sync_fms">
       <UniqueIdentifier>{13257160-141d-4131-a903-c2cfea8429e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\bada">
+      <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -611,7 +611,7 @@
       <Filter>Source Files\objects\ada</Filter>
     </ClCompile>
     <ClCompile Include="_include\bada\bada_import.cpp">
-      <Filter>Source Files\bada</Filter>
+      <Filter>Source Files\av\bada</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp">
       <Filter>Source Files\objects\meteo</Filter>
@@ -1107,6 +1107,9 @@
     </ClCompile>
     <ClCompile Include="tests\morph_geometry.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\character_phys.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@
 #include "objects/aircraft.h"
 #include "atc/position.h"
 #include "phys/flock.h"
+#include "phys/character.h"
 #include "phys/aerostat.h"
 
 namespace phys
@@ -55,7 +56,8 @@ namespace phys
 		virtual aircraft::info_ptr         create_aircraft_pl       ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual aircraft::info_ptr         create_helicopter_pl     ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual flock::info_ptr            create_flock_child       ( flock::params_t const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
-	    virtual aerostat::info_ptr         create_aerostat          ( aerostat::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
+		virtual character::info_ptr        create_character         (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos)  = 0;
+		virtual aerostat::info_ptr         create_aerostat          ( aerostat::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
 	};
 
     //! интерфейс коллизии, 
@@ -84,6 +86,11 @@ namespace phys
     {
         compound_sensor_ptr fill_cs(nm::manager_ptr manager);
     }
+
+	namespace character
+	{
+		compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+	}
 
 	namespace aerostat
 	{

@@ -796,7 +796,7 @@ $endif
 \n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 \n
 \n               v_out.tangent   = tangent;
-\n               v_out.binormal  = binormal;
+\n               v_out.binormal  = cross(tangent, normal);  //binormal;
 \n               v_out.normal    = normal;
 \n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
 \n               v_out.viewpos   = viewpos.xyz;
@@ -869,7 +869,7 @@ $endif
 \n               //bump = normalize(bump * 2.0 - 1.0);
 \n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
 \n               vec4  dif_tex_col  = texture2D(colorTex,f_in.texcoord, -1.0);
-\n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
+\n               float glass_factor = /*1.0 - dif_tex_col.a*/0;
 \n
 \n               // get dist to point and normalized to-eye vector
 \n               float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);

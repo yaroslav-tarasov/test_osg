@@ -95,7 +95,7 @@ void model::create_phys()
 
     //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
     phys::compound_sensor_ptr s = phys::flock::fill_cs(nodes_manager_); 
-    decart_position p(/*veh_transform.translation()*/base(state_.pos), /*cg::quaternion(veh_transform.rotation().cpr())*/state_.orien);
+    decart_position p(base(state_.pos), state_.orien);
     
     phys::flock::params_t  params;
     params.mass = 1;
