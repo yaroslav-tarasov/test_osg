@@ -38,7 +38,7 @@
 #include "av/avShadows/ParallelSplitShadowMap.h"
 #include "av/avSky/Sky.h"
 
-#include "Scene.h"
+#include "av/avScene/Scene.h"
 #include "av/avLights/Lights.h"
 #include "av/avLights/LightManager.h"
 #include "av/avLights/NavAid.h"

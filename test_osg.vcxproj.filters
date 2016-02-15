@@ -1111,5 +1111,11 @@
     <ClCompile Include="kernel\phys\character_phys.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
+    <ClCompile Include="tests\phys_viewer.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\DynamicCharacterController.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

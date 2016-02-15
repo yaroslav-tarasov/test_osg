@@ -383,6 +383,7 @@
     <ClCompile Include="tests\common\CommonFunctions.cpp" />
     <ClCompile Include="tests\creators.cpp" />
     <ClCompile Include="tests\dubins_test.cpp" />
+    <ClCompile Include="tests\DynamicCharacterController.cpp" />
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp" />
@@ -407,6 +408,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="tests\patch-lowlevel.cpp" />
+    <ClCompile Include="tests\phys_viewer.cpp" />
     <ClCompile Include="tests\render_points.cpp" />
     <ClCompile Include="tests\select_geometry.cpp" />
     <ClCompile Include="tests\shadow_map.cpp" />

@@ -81,7 +81,7 @@ protected:
 
 protected:
     //////////////////////////////////////
-    fms::trajectory_ptr                    traj_;
+    fms::trajectory_ptr                 traj_;
     /////////////////////////////////////
 
 #if 0

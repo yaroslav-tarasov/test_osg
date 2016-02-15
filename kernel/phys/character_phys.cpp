@@ -33,19 +33,25 @@ namespace phys
 		btScalar m12 = btScalar((params_.mass) /12);
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
-        btDefaultMotionState* motionState = new btDefaultMotionState(tr);
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), /*NULL*/motionState, &*chassis_shape_.get(), inertia);
+        // btDefaultMotionState* motionState = new btDefaultMotionState(tr);
+        FIXME(Вынести как-нибудь);
+
+        btDefaultMotionState* motionState =
+            new btDefaultMotionState(btTransform(btQuaternion(0.0,0.0,0.0), btVector3(0, 0, 0)));
+
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), NULL/*motionState*/, &*chassis_shape_.get(), inertia);
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
 
 		// FIXME TODO
+#if 1
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
-#if 0
+
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 #endif
 		//chassis_->setDamping(0.05f, 0.5f);
 		chassis_->setRestitution(0.1f);
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
-		chassis_->setFriction(0.3f);
+		chassis_->setFriction(0.f);
 
 		// sys_->dynamics_world()->addAction(this);
 
@@ -56,99 +62,16 @@ namespace phys
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
 	{
-        update_aerodynamics(deltaTimeStep);
+        update_action(deltaTimeStep);
 	}
 
-    void impl::update_aerodynamics(double dt)
+    void impl::update_action(double dt)
     {
         using namespace cg;
 
         if (!chassis_->isActive())
             return;
-#if 0
 
-        // special aircraft forces
-        point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
-        double speed = cg::norm(vel - wind_);
-
-        quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
-        point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
-        point_3 omega_loc = (!orien).rotate_vector(omega);
-        dcpr cur_dcpr = cg::rot_axis2dcpr(orien.cpr(), rot_axis(omega));
-
-        double const air_density = 1.225;
-//            double const g = 9.8;
-        double const q = 0.5 * air_density * speed * speed; // dynamic pressure
-
-        point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(point_3(0, 1, 0))) ;
-        point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(point_3(1, 0, 0))) ;
-        point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(point_3(0, 0, 1))) ;
-
-        point_3 vk = vel - wind_;
-        point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
-
-        point_3 Z = cg::normalized_safe(right_dir ^ Y);
-        point_3 X = cg::normalized_safe(Y ^ Z);
-
-        point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
-        double attack_angle = cg::rad2grad(cg::angle(Y_right_dir_proj, forward_dir)) * (-cg::sign(Y * up_dir));
-        double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
-
-
-        // drag - lift - slide
-        double drag = 0;
-        double lift = 0;
-        double liftAOA = 0;
-        double slide = 0;
-        if (speed > params_.min_aerodynamic_speed)
-        {
-            double Cd = params_.Cd0 + params_.Cd2 * cg::sqr(params_.Cl);
-
-            drag = Cd * params_.S * q;
-            lift = params_.Cl * params_.S * q;
-            liftAOA = params_.ClAOA * (attack_angle + params_.aa0) * params_.S * q;
-            slide = params_.Cs * slide_angle * params_.S * q;
-        }   
-
-        double M_roll = 0;
-        double M_course = 0;
-        double M_pitch = 0;
-
-        if (speed > params_.min_aerodynamic_speed)
-        {
-            M_roll += -params_.roll_sliding * slide_angle * q * params_.wingspan * params_.S;
-            M_roll += -params_.roll_omega_y * omega_loc.y * q * params_.wingspan * params_.S;
-            M_roll += params_.roll_omega_z * omega_loc.z * q * params_.wingspan * params_.S;
-
-            M_roll += params_.ailerons * ailerons_ * q * params_.wingspan * params_.S;
-
-            M_course += params_.course_sliding * slide_angle * q * params_.wingspan * params_.S;
-            M_course += -params_.course_omega_z * omega_loc.z * q * params_.wingspan * params_.S;
-            M_course += params_.course_omega_y * omega_loc.y * q * params_.wingspan * params_.S;
-            M_course += params_.rudder * rudder_ * q * params_.wingspan * params_.S;
-
-            M_pitch +=  params_.pitch_drag * q * params_.chord * params_.S;
-            M_pitch +=  params_.pitch_attack * attack_angle * q * params_.chord * params_.S;
-            M_pitch += -params_.pitch_omega_x * omega_loc.x * q * params_.chord * params_.S;
-            M_pitch += -params_.pitch_attack_derivative * (attack_angle - prev_attack_angle_) / dt * q * params_.chord * params_.S;
-
-            M_pitch += params_.elevator * elevator_ * q * params_.chord * params_.S;
-        }
-
-        point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
-        //chassis_->applyTorque(to_bullet_vector3(torq*cg::grad2rad()));
-        chassis_->applyTorqueImpulse(to_bullet_vector3(torq*(cg::grad2rad()*dt)));
-
-
-        point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
-
-        //LogTrace("lift " << lift << " liftAOA " << liftAOA << " drag " << drag << " thrust_ " << thrust_ );
-
-        //chassis_->applyCentralForce(to_bullet_vector3(force));
-        chassis_->applyCentralImpulse(to_bullet_vector3(force * dt));
-
-        prev_attack_angle_ = attack_angle;
-#endif
     }
 
 

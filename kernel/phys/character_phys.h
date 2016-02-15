@@ -45,7 +45,7 @@ namespace phys
        void   set_position(const decart_position& pos) override;
        void   set_linear_velocity  (point_3 const& v)  override;
        void   set_angular_velocity (point_3 const& a)  override;
-       void   update_aerodynamics(double dt)       /*override*/;
+       void   update_action(double dt)       /*override*/;
 
    // rigid_body_impl
    private:

@@ -53,8 +53,11 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         ;
 
 	_targetSpeed = rnd_.random_range(/*settings._minSpeed*/6.f ,/* settings._maxSpeed*/10.f);
+    
+    geo_point_3 init_pos = geo_point_3(pos(),10);
+	set_state(state_t(init_pos, cpr(0), 10.0)); 
+    desired_position_  =  pos();  
 
-	set_state(state_t(pos(), orient(), 0.0));
 }
 
 nodes_management::node_info_ptr model::get_root()
@@ -74,18 +77,17 @@ void model::update( double time )
     
 	if (cg::eq(speed(),0.0))
 		idle();
-	else if (speed()>1.0 )
-		walk();
-	else if(speed()>7.0)
-	    run();
+    else if (speed() > 0 && speed() < 1.8 )
+        walk();
+    else if(speed()>1.8)
+        run();
 
+   
 
     double dt = time - (last_update_ ? *last_update_ : 0);
 
     if (!cg::eq_zero(dt))
     {
-
-
         FIXME(Туфта жесткая) 
         if ( traj_ && start_follow_ && traj_->base_length() - time < -0.1 )
         {
@@ -341,7 +343,7 @@ void model::sync_phys(double dt)
 		return;
 
 	point_3     wind(0.0,0.0,0.0);
-
+    
 	double const max_accel = 15;
 
 	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
@@ -354,9 +356,10 @@ void model::sync_phys(double dt)
 	double cur_roll   = cur_pos.orien.cpr().roll;
 
 	// ?? cg::geo_direction
+    cg::geo_point_3 d_p = base(base(cur_glb_pos.pos) + cur_pos.dpos);
 
-	cg::polar_point_3 cp (cg::geo_base_3(desired_position_)(cur_glb_pos.pos));
-	cpr cpr_des =  cg::cpr(cp.course,cp.pitch);
+	cg::polar_point_3 cp (cg::geo_base_3(/*desired_position_*/d_p)(cur_glb_pos.pos));
+	cpr cpr_des =  cg::cpr(cp.course,0/*cp.pitch*/,0);
 	quaternion  desired_orien_(cpr_des);  
 
 	point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
@@ -365,11 +368,15 @@ void model::sync_phys(double dt)
 
     point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * /*_damping*/1.f * (dt);
 
-	//if(_targetSpeed > -1){
-	//	phys::character::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
-	//}
+#if 1
+	if(_targetSpeed > -1){
+		phys::character::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
+	}
 
-	phys::character::control_ptr(phys_model_)->set_linear_velocity(forward_dir * speed() );
+    FIXME(Перенести ограничение в более подходящее место)
+	phys::character::control_ptr(phys_model_)->set_linear_velocity(/*forward_dir*/ point_3(1.0, 1.0, /*0.001*/0.0)* cg::bound(speed(), 0.0,4.305556)  );
+#endif
+
 #endif
     //if (settings_.debug_draw)
     //    send_cmd(msg::phys_pos_msg(cur_glb_pos.pos, cur_course));

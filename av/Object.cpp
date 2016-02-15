@@ -61,7 +61,11 @@ Object::Object(osg::Node& node)
 
 void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 {
-    osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(anim_container->getUpdateCallback());
+    using namespace avAnimation;
+    AnimationManagerFinder finder;
+    anim_container->accept(finder);
+
+    osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get());
 	
 	_anim_containers.insert(make_pair(name,anim_container));
 	
