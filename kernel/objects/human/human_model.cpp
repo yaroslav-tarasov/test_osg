@@ -5,8 +5,6 @@
 //#include "common/collect_collision.h"
 #include "geometry/filter.h"
 #include "phys/sensor.h"
-//  FIXME
-// #include "phys/human.h"
 
 
 
@@ -53,11 +51,8 @@ model::model(kernel::object_create_t const& oc, dict_copt dict)
         ;
 
 	_targetSpeed = rnd_.random_range(/*settings._minSpeed*/6.f ,/* settings._maxSpeed*/10.f);
-    
-    geo_point_3 init_pos = geo_point_3(pos(),10);
-	set_state(state_t(init_pos, cpr(0), 10.0)); 
-    desired_position_  =  pos();  
 
+    set_state(state_t(cg::geo_point_3(pos(),0.1f),orien(),speed()));
 }
 
 nodes_management::node_info_ptr model::get_root()
@@ -72,7 +67,7 @@ void model::update( double time )
 	if (!phys_model_)
 	{
 		create_phys();
-		sync_phys(0);
+		sync_phys(0.01);
 	}
     
 	if (cg::eq(speed(),0.0))
@@ -208,11 +203,6 @@ void model::on_go_to_pos(msg::go_to_pos_data const& data)
     model_state_ = boost::make_shared<go_to_pos_state>(data.pos, data.course, /*!!aerotow_*/false);
 }
 
-// FIXME это лишнее работаем через см выше
-void model::go_to_pos(  cg::geo_point_2 pos, double course )
-{
-    model_state_ = boost::make_shared<go_to_pos_state>(pos, course, /*!!aerotow_*/false);
-}
 
 fms::trajectory_ptr  model::get_trajectory()
 {
@@ -241,14 +231,14 @@ void model::set_max_speed(double max_speed)
 
 cg::geo_point_2 model::phys_pos() const
 {
-    // FIXME physics
-    //if (phys_model_)
-    //{
-    //    decart_position cur_pos = phys_model_->get_position();
-    //    cg::geo_base_3 base = phys_->get_base(*phys_zone_);
-    //    geo_position cur_glb_pos(cur_pos, base);
-    //    return cur_glb_pos.pos;
-    //}
+    if (phys_model_)
+    {
+        decart_position cur_pos = phys_model_->get_position();
+        cg::geo_base_3 base = phys_->get_base(*phys_zone_);
+        geo_position cur_glb_pos(cur_pos, base);
+        return cur_glb_pos.pos;
+    }
+
     return pos();
 }
 
@@ -356,25 +346,37 @@ void model::sync_phys(double dt)
 	double cur_roll   = cur_pos.orien.cpr().roll;
 
 	// ?? cg::geo_direction
+#if 0
     cg::geo_point_3 d_p = base(base(cur_glb_pos.pos) + cur_pos.dpos);
-
 	cg::polar_point_3 cp (cg::geo_base_3(/*desired_position_*/d_p)(cur_glb_pos.pos));
-	cpr cpr_des =  cg::cpr(cp.course,0/*cp.pitch*/,0);
+#endif
+    
+    cg::polar_point_3 cp (cur_pos.dpos);
+	cpr cpr_des =  cg::cpr(cp.course);
 	quaternion  desired_orien_(cpr_des);  
 
 	point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
 	point_3 right_dir   =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
 	point_3 up_dir      =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 0, 1))) ;
 
-    point_3 omega_rel     =   cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * /*_damping*/1.f * (dt);
-
+    point_3 omega_rel   =  cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * /*_damping*/1.f * (dt);
+                                                                                                    
 #if 1
 	if(_targetSpeed > -1){
 		phys::character::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
 	}
 
+    force_log fl;
+
+    LOG_ODS_MSG( "sync_phys(double dt):  ===========================================================================\n x: "
+        << cur_pos.dpos.x << "    y: " << cur_pos.dpos.y << "    z: " << cur_pos.dpos.z << "\n"
+        << "cur_pos: " <<  cur_pos.pos.x << "    y: " << cur_pos.pos.y << "    z: " << cur_pos.pos.z << "\n"
+        << "cur_pos: " <<  cur_pos.pos.x << "    y: " << cur_pos.pos.y << "    z: " << cur_pos.pos.z << "\n"
+        << "speed: " <<  speed() << "    bound: " << cg::bound(speed(), 0.0,4.305556) << "\n"
+        );
+
     FIXME(Перенести ограничение в более подходящее место)
-	phys::character::control_ptr(phys_model_)->set_linear_velocity(/*forward_dir*/ point_3(1.0, 1.0, /*0.001*/0.0)* cg::bound(speed(), 0.0,4.305556)  );
+	//phys::character::control_ptr(phys_model_)->set_linear_velocity( point_3(0.0, 1.0, 0.0) * cg::bound(speed(), 0.0,4.305556)  );
 #endif
 
 #endif
@@ -389,7 +391,7 @@ void model::sync_nodes_manager( double /*dt*/ )
 	{
 		cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 		decart_position bodypos = phys_model_->get_position();
-		decart_position root_pos = bodypos /** body_transform_inv_*/;// FIXME Модельно зависимое решение 
+		decart_position root_pos = bodypos * body_transform_inv_;// FIXME Модельно зависимое решение 
 
 		geo_position pos(root_pos, base);
 
@@ -439,7 +441,7 @@ void model::update_model( double dt )
         if (model_state_->end())
         {
             model_state_.reset();
-            set_state(state_t(pos(), orient(), 0.0));
+            set_state(state_t(pos(), orien(), 0.0));
         }
     }
 }
@@ -473,10 +475,10 @@ void model::create_phys()
 
 	//phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
 	phys::compound_sensor_ptr s = phys::character::fill_cs(nodes_manager_); 
-	decart_position p(base(state_.pos), state_.orien);
+	decart_position p(base(pos()), orien());
 
 	phys::character::params_t  params;
-	params.mass = 1;
+	params.mass = 60;
 	phys_model_ = phys_->get_system(*phys_zone_)->create_character(params, s, p);
 
 }

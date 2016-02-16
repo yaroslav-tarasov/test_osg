@@ -27,31 +27,31 @@ namespace phys
 		btVector3 aabbMin,aabbMax;
 		chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
 
-		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);
-		btScalar dyy = btScalar((aabbMax.y() - aabbMin.y()) / 2);
-		btScalar dzz = btScalar((aabbMax.z() - aabbMin.z()) / 2);
+		btScalar dxx = 1.f; //btScalar((aabbMax.x() - aabbMin.x()) / 2);
+		btScalar dyy = 1.f; //btScalar((aabbMax.y() - aabbMin.y()) / 2);
+		btScalar dzz = 1.f; //btScalar((aabbMax.z() - aabbMin.z()) / 2);
 		btScalar m12 = btScalar((params_.mass) /12);
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
         // btDefaultMotionState* motionState = new btDefaultMotionState(tr);
         FIXME(Вынести как-нибудь);
 
+       
         btDefaultMotionState* motionState =
-            new btDefaultMotionState(btTransform(btQuaternion(0.0,0.0,0.0), btVector3(0, 0, 0)));
+            new btDefaultMotionState(to_bullet_transform(pos.pos, pos.orien.cpr())/*btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))*/);
 
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), NULL/*motionState*/, &*chassis_shape_.get(), inertia);
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), motionState, &*chassis_shape_.get(), inertia);
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
-
+        
 		// FIXME TODO
-#if 1
+#if 0
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
-
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 #endif
-		//chassis_->setDamping(0.05f, 0.5f);
-		chassis_->setRestitution(0.1f);
-		//chassis_->setActivationState(DISABLE_DEACTIVATION);
-		chassis_->setFriction(0.f);
+		// chassis_->setDamping(0.05f, 0.5f);
+		chassis_->setRestitution(0.0001f);
+		// chassis_->setActivationState(DISABLE_DEACTIVATION);
+		chassis_->setFriction(0.3f);
 
 		// sys_->dynamics_world()->addAction(this);
 

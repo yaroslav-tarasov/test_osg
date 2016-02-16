@@ -61,7 +61,6 @@ private:
     void on_follow_trajectory(uint32_t /*route_id*/);
 
 public:
-    void go_to_pos(  cg::geo_point_2 pos, double course );
     fms::trajectory_ptr  get_trajectory();
 
 private:
@@ -118,7 +117,7 @@ private:
     nodes_management::node_info_ptr body_node_;
 
 
-    model_state_ptr      model_state_; // В оригинале state_ и мне это не нравиться
+    model_state_ptr      model_state_; 
 
 	//  phys staff
 private:

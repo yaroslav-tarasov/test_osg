@@ -277,8 +277,6 @@ private:
 };
 
 
-#define MULTITHREADED
-
 struct mod_app
 {
     typedef boost::function<void(run const& msg)>                   on_run_f;

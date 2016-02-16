@@ -120,7 +120,7 @@ int main_phys_viewer( int argc, char** argv )
     osg::ref_ptr< osg::Node > rootModel( obj->getNode() );
     if( !rootModel.valid() )
     {
-        osg::notify( osg::FATAL ) << "mesh: Can't create flag mesh." << std::endl;
+        osg::notify( osg::FATAL ) << "mesh: Can't create mesh." << std::endl;
         return( 1 );
     }
     
@@ -129,9 +129,9 @@ int main_phys_viewer( int argc, char** argv )
     if(loaded)
     {
         const btTransform ct0 = cs_->getChildTransform(0);
-        //cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+        // cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
+        cs_->setLocalScaling( btVector3(0.13,0.13,0.13));
         addRigidBody( bw, cs_ );
-
     }
 
     root->addChild( rootModel.get() );

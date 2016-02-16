@@ -164,8 +164,12 @@ namespace net_layer
             ok_bus            ,
             ok_cleaner        ,
             ok_viewer         ,
-            ok_animal  = 0x200,
+            ok_character = 0x200,
             ok_flock_of_birds ,
+            ok_human,
+            ok_horse,
+            ok_cow,
+            ok_dog
             // ok_size
         };
 

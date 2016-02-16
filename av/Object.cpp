@@ -425,7 +425,7 @@ FIXME( Исправить структуру под mt)
         float dy = -ym / 4.f; 
         float dz = -zm / 4.f; 
         
-        if (object_file->asTransform())
+        if (object_file->asTransform() && object_file->asTransform()->asPositionAttitudeTransform())
         {
             pat = object_file->asTransform()->asPositionAttitudeTransform();
             pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));

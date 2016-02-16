@@ -64,8 +64,10 @@ namespace human
     {
         const std::string class_name = "human";
         const std::string unique_name = sys->generate_unique_name(class_name);
-
-        obj_create_data ocd(class_name, unique_name, dict::wrap(human_data(sett, state_t(/*init_pos.pos, init_pos.orien*/))));
+        
+        FIXME(Скорость присутствует)
+        
+        obj_create_data ocd(class_name, unique_name, dict::wrap(human_data(sett, state_t(init_pos.pos, init_pos.orien,cg::norm(init_pos.dpos)))));
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
 

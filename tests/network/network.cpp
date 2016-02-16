@@ -77,7 +77,7 @@ namespace
 {
 
     const  double traj_offset = 20.;
-    const  double vehicle_prediction = 0;
+    const  double vehicle_prediction = 120;
     const  double factor = 1.0; 
 
 } 
@@ -114,7 +114,7 @@ struct client
         ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(120.0, fire_fight_msg_t(2))
 #endif       
-        ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
+        ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()) + cg::point_3(10.0,10.0,0.0),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
         ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 
@@ -123,6 +123,8 @@ struct client
         ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #endif
+
+        ADD_EVENT(10.0  , create(31,_traj->kp_value(_traj->base_length()+120),_traj->curs_value(_traj->base_length()+120), ok_human, "human") )
 
 #if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
@@ -152,19 +154,19 @@ struct client
         };
 
 
-#if 0
         runs_.insert(make_pair(_traj->base_length(),                                 
             boost::bind( run_f_, 1,_1,traj_offset)
             ));
-#endif
 
         runs_.insert(make_pair( _traj->base_length() - vehicle_prediction,
             [this] (double time)
             {
                 double vtime = time + vehicle_prediction;
 
-                run_f_(2,vtime,0);
+                //run_f_(2,vtime,0);
                 //run_f_(3,vtime,0);
+
+                run_f_(31,vtime,0);
                //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
                 //                                     << "  y: " << _traj->kp_value(vtime).y 
                 //                                     << "  h: " << _traj->kp_value(vtime).z

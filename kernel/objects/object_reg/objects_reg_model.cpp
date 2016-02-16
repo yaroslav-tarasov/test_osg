@@ -6,6 +6,7 @@
 #include "objects\common\vehicle.h"
 #include "flock_manager\flock_manager_common.h"
 #include "objects\common\flock_manager.h"
+#include "objects\common\human.h"
 
 namespace objects_reg
 {
@@ -69,7 +70,14 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
              pf->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
              pf->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }        
-         
+         else if (human::model_control_ptr pf = human::model_control_ptr(a))
+         {
+             auto it = last_msg_.find(msg.ext_id);
+
+             pf->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+             pf->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
+         }       
+
          last_msg_[msg.ext_id] =  msg;
      }
 }
@@ -96,6 +104,10 @@ void model::on_object_created(object_info_ptr object)
         add_object(info);
     }
     else if (flock::manager::info_ptr info = object)
+    {
+        add_object(info);
+    }
+    else if (human::model_info_ptr info = object)
     {
         add_object(info);
     }

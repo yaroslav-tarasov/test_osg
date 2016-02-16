@@ -9,12 +9,11 @@ namespace phys
         struct params_t
         {
             params_t()
-                : length(0.0),mass(0.0),wingspan(0.0)
+                : length(0.0),mass(0.0)
             {}
 
             double length;
             double mass;
-            double wingspan;
         };  
 
         struct contact_info_t

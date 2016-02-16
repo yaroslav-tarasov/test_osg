@@ -322,12 +322,12 @@ void create_objects(const std::string & airport)
 	}
 #endif
 
-#if 1
+#if 0
     {
         human::settings_t vs;
         vs.model = "human";
-        cg::geo_point_3 vpos(0.00055,/*0.0009*/0.0,0.0);
-        geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+        cg::geo_point_3 vpos(0.00055,/*0.0009*/0.0,2.0);
+        geo_position vgp(vpos, point_3(0,10,0), quaternion(cpr(30,0,0)), point_3());
 
         auto obj_aerostat = human::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
     }
@@ -416,6 +416,22 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const&
     return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
 }
 
+inline object_info_ptr create_character(kernel::system* csys, create const& msg)
+{
+    decart_position target_pos;
+
+    target_pos.pos   = msg.pos;
+    target_pos.orien = msg.orien;
+    geo_position vgp(target_pos, get_base());
+
+    human::settings_t vs;
+    vs.model = msg.model_name;
+
+    return human::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
+}
+ 
+
+
 inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
 {
 	decart_position target_pos;
@@ -436,6 +452,8 @@ object_info_ptr create_object( kernel::system* csys, create const& msg)
         return create_vehicle(csys, msg);
     else if ( msg.object_kind == ok_flock_of_birds)
         return create_flock_of_birds(csys, msg);
+    else if ( msg.object_kind ==ok_human)
+        return create_character(csys, msg);
     else if ( msg.object_kind == ok_helicopter)
         return create_helicopter_phl(csys, msg); 
     else

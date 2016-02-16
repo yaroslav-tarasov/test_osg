@@ -282,7 +282,7 @@ namespace character
 			const btTransform ct0 = cs.cs_->getChildTransform(0);
 			cs.offset_ = from_bullet_vector3(ct0.getOrigin());
 			FIXME(Размер)
-				cs.cs_->setLocalScaling( btVector3(0.01,0.01,0.01));
+				cs.cs_->setLocalScaling( btVector3(0.13,0.13,0.13));
 		}
 		else
 			cs.cs_ = nullptr;
