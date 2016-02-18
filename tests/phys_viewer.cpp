@@ -71,9 +71,9 @@ btDiscreteDynamicsWorld* initPhysics()
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( 0.0, motionState, groundShape, btVector3(0.0, 0.0, 0.0) );
     btRigidBody* body = new btRigidBody(rigidInfo);
     dynamicsWorld->addRigidBody( body );
-    body->setFriction(1.3f); 
+    body->setFriction(/*1.3f*/0.99f); 
     body->setActivationState(DISABLE_SIMULATION);
-    body->setRestitution(0.5f);
+    body->setRestitution(/*0.5f*/0.1f);
     // body->setUserPointer(new rigid_body_user_info_t(rb_terrain));
 
     return( dynamicsWorld );
@@ -95,7 +95,7 @@ void addRigidBody( btDiscreteDynamicsWorld* dynamics_world_, btCompoundShape*   
     // btDefaultMotionState* motionState = new btDefaultMotionState(tr);
     
     btDefaultMotionState* motionState =
-        new btDefaultMotionState(btTransform(btQuaternion(0, cg::pi/2, 0), btVector3(0, 0, 0)));
+        new btDefaultMotionState(btTransform(btQuaternion(0, /*cg::pi/2*/0, 0), btVector3(0, 0, 0)));
     
     btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(mass), motionState, chassis_shape_, inertia);
 
@@ -130,7 +130,7 @@ int main_phys_viewer( int argc, char** argv )
     {
         const btTransform ct0 = cs_->getChildTransform(0);
         // cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
-        cs_->setLocalScaling( btVector3(0.13,0.13,0.13));
+        cs_->setLocalScaling( btVector3(0.013,0.013,0.013));
         addRigidBody( bw, cs_ );
     }
 
@@ -176,7 +176,7 @@ int main_phys_viewer( int argc, char** argv )
             dbgDraw->BeginDraw();
 
         const double currSimTime = viewer.getFrameStamp()->getSimulationTime();
-        bw->stepSimulation( currSimTime - prevSimTime/*0.0*/ );
+        bw->stepSimulation( currSimTime - prevSimTime/*0.0*//*0.1*/ );
         prevSimTime = currSimTime;
 
         if( dbgDraw != NULL )

@@ -92,8 +92,23 @@ struct client
 	bool create_v;
 	bool create_f;
 
-    client(endpoint peer)
-        : con_     (peer, boost::bind(&client::on_connected, this, _1, _2), tcp_error, tcp_error)
+    typedef std::vector<endpoint> endpoints;
+	
+	struct connect_helper
+	{
+		connect_helper(endpoints peers, client* cl)
+		{
+			for (auto it = peers.begin();it!= peers.end(); ++it )
+            {
+				cl->cons_[*it].reset(new async_connector(*it, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
+                LogInfo("Connecting to " << *it);
+			}
+
+		}
+	};
+
+    client(endpoints peers)
+        : connect_helper_ (peers, this)
         , period_  (/*4.*/.5)
         , timer_   (boost::bind(&client::update, this))
         , _traj    (fill_trajectory(krv::data_getter("log_minsk.txt")))
@@ -101,8 +116,6 @@ struct client
 	    , create_v (true)
 		, create_f (true)
     {
-        LogInfo("Connecting to " << peer);
-
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
             ;
@@ -200,14 +213,15 @@ struct client
     void send(void const* data, uint32_t size)
     {
         error_code_t ec;
-
-        srv_->send(data, size);
-        if (ec)
-        {
-            LogError("TCP send error: " << ec.message());
-            return;
-        }
-
+		for (auto it = peers_.begin();it!= peers_.end(); ++it )
+		{
+			(*it).second->send(data, size);
+			if (ec)
+			{
+				LogError("TCP send error: " << ec.message());
+				//return;
+			}
+		}
     }
 
 private:
@@ -215,7 +229,7 @@ private:
     {
         LogInfo("Connected to " << peer);
         
-        srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
+        peers_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
       
         binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
@@ -289,10 +303,11 @@ private:
     double                  period_;
 
 private:
-    async_connector         con_;
-    std::shared_ptr<tcp_fragment_wrapper>  srv_;
-
-    msg_dispatcher<network::endpoint>                                    disp_;
+    std::map< endpoint,unique_ptr<async_connector>>                      cons_;
+	std::map< endpoint, std::shared_ptr<tcp_fragment_wrapper> >         peers_;
+	connect_helper                                             connect_helper_;
+    
+	msg_dispatcher<network::endpoint>                                    disp_;
     net_layer::msg::container_msg::msgs_t                            messages_;
     size_t                                                      messages_size_;
 
@@ -332,8 +347,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
     try
     {
-        endpoint peer(std::string("127.0.0.1:45001"));
-        client c(peer);              
+        client::endpoints ep;
+		ep.emplace_back(endpoint(std::string("127.0.0.1:45001")));
+        client c(ep);              
         __main_srvc__->run();
     }
     catch(verify_error const&)

@@ -328,7 +328,7 @@ struct mod_app
             .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
             ;
 
-        vis_peers_.push_back(endpoint("127.0.0.1:45002"));
+        vis_peers_.push_back(endpoint(std::string("127.0.0.1:45002")));
 
         w_.reset (new net_worker( peer, vis_peers_
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)

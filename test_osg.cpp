@@ -9,8 +9,10 @@ int main( int argc, char** argv )
     cmd_line::arg_map am;
     if (!am.parse(cmd_line::naive_parser().add_arg("name", true), argc, argv))
     {
+#if 0
         LogError("Invalid command line");
         return 1;
+#endif
     }
 
     optional<std::string> name;
