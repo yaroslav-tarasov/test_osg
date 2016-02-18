@@ -36,7 +36,7 @@
 #include "av/avCore/DebugRenderer.h"
 
 #include "utils/krv_import.h"
-#include "tests/systems/test_systems.h"
+#include "tests/systems/factory_systems.h"
 
 ////  ifndef MULTITHREADED
 //#define DEPRECATED_DEBUG_MODE

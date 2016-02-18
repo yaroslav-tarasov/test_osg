@@ -13,7 +13,7 @@
 #include "common/test_msgs.h"
 #include "common/time_counter.h"
 #include "utils/high_res_timer.h"
-#include "tests/systems/test_systems.h"
+#include "tests/systems/factory_systems.h"
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
@@ -296,7 +296,6 @@ struct visapp
 
         disp_
             .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
-            //.add<run                   >(boost::bind(&visapp::on_run        , this, _1))
             .add<container_msg         >(boost::bind(&visapp::on_container  , this, _1))
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
@@ -406,7 +405,6 @@ private:
         
         if (reg_obj)
         {
-            // on_run_ = (boost::bind(&objects_reg::control::inject_msg , objects_reg::control_ptr(reg_obj).get(), _1));
             void (objects_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &objects_reg::control::inject_msg;
 
 			disp_
@@ -637,7 +635,7 @@ struct mod_app
         w_.reset (new net_worker( peer 
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
             , boost::bind(&mod_app::update, this, _1)
-            , boost::bind(&mod_app::on_timer, this, _1)
+            , net_worker::on_update_f() /*boost::bind(&mod_app::on_timer, this, _1)*/
             ));
 
 
@@ -676,7 +674,8 @@ private:
 
         create_objects(msg.icao_code);
         
-        end_of_load_();  //osg_vis_->EndSceneCreation();
+        if(end_of_load_)
+            end_of_load_();  //osg_vis_->EndSceneCreation();
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send(&bts[0], bts.size());

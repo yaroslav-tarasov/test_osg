@@ -19,6 +19,23 @@
 	</Animation>
 </root>
 
+<root>
+    <MainModel>
+        <File path="human.fbx" />
+        <Parameters axis_up="Y" scale="0.13" lod3="off" />
+        <Pivot x="0" y="8.26" z="0" />
+    </MainModel>
+    <Animation name="idle">
+        <File path="bashful.fbx" />
+    </Animation>
+    <Animation name="run">
+    <File path="medium_run.fbx" />
+        </Animation>
+    <Animation name="walk">
+        <File path="female_walk.fbx"/>
+    </Animation>
+</root>
+
 #endif
 
 
@@ -43,6 +60,7 @@ namespace avCore
 		float		   scale;
 		up_axis_t      axis_up;
 		osg::Vec3      pivot_point;
+        bool           lod3;
 	} xml_model_t;
 
     struct ModelReader

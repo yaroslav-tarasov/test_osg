@@ -24,10 +24,32 @@ namespace avCore
 			
 			pugi::xml_node MainModel =  root.child("MainModel");
 
-			data_.main_model = MainModel.attribute("path").as_string();
-            data_.scale      = MainModel.attribute("scale").as_float(1.0);
-			std::string au_val = MainModel.attribute("axis_up").as_string("Z");
+
+
 			
+            pugi::xml_node file_node = MainModel.child("File");
+            if(file_node)
+               data_.main_model  = file_node.attribute("path").as_string();
+            else
+               data_.main_model   = MainModel.attribute("path").as_string();
+            
+            std::string au_val;
+            data_.lod3 = true;
+
+            pugi::xml_node param_node = MainModel.child("Parameters");
+            if(param_node)
+            {
+                data_.scale = param_node.attribute("scale").as_float(1.0);
+                au_val      = param_node.attribute("axis_up").as_string("Z");
+                data_.lod3  = param_node.attribute("lod3").as_string("on")!=std::string("off");
+            }
+            else
+            {
+                data_.scale = MainModel.attribute("scale").as_float(1.0);
+                au_val      = MainModel.attribute("axis_up").as_string("Z");
+            }
+
+
 			for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling())
 			{			
 				data_.pivot_point = osg::Vec3(

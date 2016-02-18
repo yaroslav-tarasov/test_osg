@@ -77,7 +77,7 @@ namespace
 {
 
     const  double traj_offset = 20.;
-    const  double vehicle_prediction = 120;
+    const  double vehicle_prediction = 0;
     const  double factor = 1.0; 
 
 } 
@@ -114,9 +114,12 @@ struct client
         ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(120.0, fire_fight_msg_t(2))
 #endif       
+
+#if 1
         ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()) + cg::point_3(10.0,10.0,0.0),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
         ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
+#endif
 
 #if 0
         ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
@@ -124,7 +127,7 @@ struct client
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #endif
 
-        ADD_EVENT(10.0  , create(31,_traj->kp_value(_traj->base_length()+120),_traj->curs_value(_traj->base_length()+120), ok_human, "human") )
+        ADD_EVENT(10.0  , create(31,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_human, "human") )
 
 #if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
@@ -173,7 +176,8 @@ struct client
                 //                                     <<  "\n");
            } 
          ));
-         
+
+#if 0         
          cg::point_3 poss[] = {cg::point_3(0.907 * 1000 , -0.060 * 1000, 0.0), 
                                cg::point_3(0.883 * 1000 , -0.030 * 1000, 0.0),
                                cg::point_3(0.9345 * 1000, -0.0915 * 1000, 0.0),
@@ -182,8 +186,6 @@ struct client
          };
 
 
-
-#if 0
         const cg::quaternion    orien (cg::cprf(49.0) );
         for (int i = 0; i <5; i++)
         {

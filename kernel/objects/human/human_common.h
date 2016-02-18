@@ -30,6 +30,9 @@ REFL_END()
 struct state_t
 {
 	state_t()
+        : pos  (cg::geo_point_3())
+        , orien(cg::quaternion())
+        , speed(0.0)
 	{}
 
 	state_t(cg::geo_point_3 const& pos, cg::quaternion const& orien, double speed)

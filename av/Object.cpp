@@ -374,7 +374,7 @@ FIXME( Исправить структуру под mt)
 		//
         osg::Node* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact);
 
-        if(lod_ && lod0 && lod3)  // Далеко не все модели имеют заданную структуру ха
+        if(lod_ && lod0 && lod3 && (data?data->lod3:true))  // Далеко не все модели имеют заданную структуру ха
         {
  		    avLod::LOD* lod = new avLod::LOD;
 
@@ -384,6 +384,8 @@ FIXME( Исправить структуру под mt)
         }
         else
         {
+            if(lod3)
+                lod3->setNodeMask(0);
 #if 0
             osg::Node* named_node =  findFirstNode(object_file,name,findNodeVisitor::not_exact);
 
@@ -447,7 +449,7 @@ FIXME( Исправить структуру под mt)
         nl.push_back("plane");
         nl.push_back("color");
         nl.push_back("tree");
-        nl.push_back("rotor"); /// Хммммммммммммм раскоментарить и динамический убъется
+        nl.push_back("rotor"); 
 
         if(data)
         {

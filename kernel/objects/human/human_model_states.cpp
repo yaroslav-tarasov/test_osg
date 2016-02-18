@@ -213,7 +213,6 @@ follow_traj_state::follow_traj_state()
 
 void follow_traj_state::update(model * self, double dt)
 {
-#if 1
     cg::geo_base_2 cur_pos     = self->pos();
     double         cur_course  = self->orien().cpr().course;
     double         cur_speed   = self->speed();
@@ -231,11 +230,9 @@ void follow_traj_state::update(model * self, double dt)
 		geo_position gtp(target_pos, get_base());
 
 		self->set_state(state_t(gtp.pos, gtp.orien, *traj_->speed_value(tar_len)));
-		self->set_max_speed(15.0);
+		self->set_max_speed(4.305556);
 
 	}
-#endif
-
 }
 
 

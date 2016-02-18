@@ -42,10 +42,11 @@ namespace phys
        void   set_wind    (cg::point_3 const& wind)    override;
        void   apply_force (point_3 const& f)           override;
 
-       void   set_position(const decart_position& pos) override;
-       void   set_linear_velocity  (point_3 const& v)  override;
-       void   set_angular_velocity (point_3 const& a)  override;
-       void   update_action(double dt)       /*override*/;
+       void   set_position         (const decart_position& pos) override;
+       void   set_linear_velocity  (point_3 const& v)           override;
+       void   set_angular_velocity (point_3 const& a)           override;
+       void   update_action        (double dt)              /*override*/;
+       void   activate             (bool active)                override;
 
    // rigid_body_impl
    private:

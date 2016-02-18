@@ -13,7 +13,7 @@
 #include "common/test_msgs.h"
 #include "common/time_counter.h"
 #include "utils/high_res_timer.h"
-#include "tests/systems/test_systems.h"
+#include "tests/systems/factory_systems.h"
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
@@ -88,13 +88,12 @@ struct net_worker
      typedef boost::function<void(double time)>                     on_update_f;     
      
 
-     net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
+     net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , peer_       (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
-         , on_render_  (on_render)
          , done_       (false)
      {
           worker_thread_ = boost::thread(&net_worker::run, this);
@@ -148,12 +147,6 @@ private:
          
          boost::asio::io_service::work skwark(asi.get_service());
 
-         if(on_render_)
-             render_timer_ = ses_->create_timer ( 1/60.f,  [&](double time)
-                                                                 {
-                                                                     __main_srvc__->post(boost::bind(on_render_,time));
-                                                                 } , 1, false);
-
          calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
          
@@ -203,18 +196,19 @@ private:
      {
          uint32_t id = next_id();
          sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-             sock, boost::bind(&net_worker::on_recieve, this, _1, _2, id),
+             sock, boost::bind(&net_worker::on_recieve, this, _1,_2, peer),
              boost::bind(&net_worker::on_disconnected, this, _1, id),
-             boost::bind(&net_worker::on_error, this, _1, id)));        
+             boost::bind(&net_worker::on_error, this, _1, id)
+             ));        
          
          LogInfo("Client " << peer << " accepted");
      }
 
-     void on_recieve(const void* data, size_t size, uint32_t id)
+     void on_recieve(const void* data, size_t size, endpoint const& peer)
      {
-          __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
+         __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
      }
-     
+
      void do_receive(binary::bytes_ptr data/*, endpoint const& peer*/) 
      {
          if (on_receive_)
@@ -261,7 +255,7 @@ private:
 private:
     on_receive_f                                                on_receive_;
     on_update_f                                                 on_update_;
-    on_update_f                                                 on_render_;
+
 
 private:
     bool                                                        done_;
@@ -270,9 +264,7 @@ private:
     double                                                      period_;
 
 private:
-    net::timer_connection                                       render_timer_;
     net::timer_connection                                       calc_timer_ ;
-    net::timer_connection                                       ctrl_timer_;
     net::ses_srv*                                               ses_;
 };
 
@@ -399,18 +391,39 @@ private:
 
 struct visapp
 {
-    visapp( kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    visapp( const endpoint& peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
         : done_  (false)
         , props_ (props)
         , thread_(new boost::thread(boost::bind(&visapp::run, this)))
+        , msg_service_ (boost::bind(&visapp::push_back, this, _1))
+    {
+        w_.reset (new net_worker( peer 
+            , boost::bind(&visapp::on_recv,this, _1, _2)// boost::bind(&kernel::msg_service::on_remote_recv, &msg_service_, _1, false)
+            , boost::bind(&visapp::update, this, _1)
+            ));
+    }
+
+
+    ~visapp()
+    {
+
+        done();
+        thread_->join();
+        w_.reset();
+    }
+    
+    void on_recv(void const* data, size_t size)
     {
 
     }
 
-    ~visapp()
+    void update(double time)
+    {   
+    }
+
+    void push_back (binary::bytes_cref bytes)
     {
-        done();
-        thread_->join();
+        w_->send(bytes);
     }
 
     void run()
@@ -442,6 +455,13 @@ private:
 
     global_timer                           gt_;
 
+private:
+    msg_dispatcher<uint32_t>             disp_;
+    kernel::msg_service           msg_service_;
+
+private:
+    boost::scoped_ptr<net_worker>           w_;
+
 };
 
 
@@ -463,13 +483,13 @@ int main_visapp( int argc, char** argv )
     try
     {
 
-        endpoint peer(cfg().network.local_address);
+        endpoint peer(std::string("0.0.0.0:45002"));
 
         kernel::vis_sys_props props;
         props.base_point = ::get_base();
 
 
-        visapp  va(props);
+        visapp  va(peer, props);
 
         boost::system::error_code ec;
         __main_srvc__->run(ec);

@@ -38,7 +38,7 @@ namespace phys
 
        
         btDefaultMotionState* motionState =
-            new btDefaultMotionState(to_bullet_transform(pos.pos, pos.orien.cpr())/*btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))*/);
+            new btDefaultMotionState(to_bullet_transform(pos.pos, pos.orien)/*btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))*/);
 
 		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), motionState, &*chassis_shape_.get(), inertia);
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
@@ -49,9 +49,9 @@ namespace phys
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 #endif
 		// chassis_->setDamping(0.05f, 0.5f);
-		chassis_->setRestitution(0.0001f);
-		// chassis_->setActivationState(DISABLE_DEACTIVATION);
-		chassis_->setFriction(0.3f);
+		chassis_->setRestitution(0.1f);
+		chassis_->setActivationState(DISABLE_SIMULATION);
+		chassis_->setFriction(0.01f);
 
 		// sys_->dynamics_world()->addAction(this);
 
@@ -74,6 +74,10 @@ namespace phys
 
     }
 
+    void impl::activate(bool active)
+    {
+        chassis_->forceActivationState(active?DISABLE_DEACTIVATION:DISABLE_SIMULATION);
+    }
 
     void impl::debugDraw(btIDebugDraw* debugDrawer)
     {

@@ -36,9 +36,9 @@ struct state_msg_t
     }
 
     state_msg_t(state_t const& state)
-        : pos(state.pos)
-        , orien(orien)
-		, speed((float)state.speed)
+        : pos  (state.pos)
+        , orien(state.orien)
+		, speed(state.speed)
     {
     }
 

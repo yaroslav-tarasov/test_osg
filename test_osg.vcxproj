@@ -190,7 +190,9 @@
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h" />
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="tests\systems\test_systems.h" />
+    <ClInclude Include="tests\systems\factory_systems.h" />
+    <ClInclude Include="tests\systems\systems_impl.h" />
+    <ClInclude Include="tests\systems\systems_impl2.h" />
     <ClInclude Include="utils\empty_scene.h" />
     <ClInclude Include="utils\krv_import.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
@@ -415,8 +417,10 @@
     <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\SkyBox.cpp" />
     <ClCompile Include="tests\ssao\ffssao.cpp" />
+    <ClCompile Include="tests\systems\factory_systems.cpp" />
+    <ClCompile Include="tests\systems\systems_impl.cpp" />
+    <ClCompile Include="tests\systems\systems_impl2.cpp" />
     <ClCompile Include="tests\systems\test_objects1.cpp" />
-    <ClCompile Include="tests\systems\test_systems.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
     <ClCompile Include="tests\test_boost_timer.cpp" />

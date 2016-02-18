@@ -299,9 +299,6 @@
     <ClInclude Include="ext\spark\SmokeNode.h">
       <Filter>Source Files\spark</Filter>
     </ClInclude>
-    <ClInclude Include="tests\systems\test_systems.h">
-      <Filter>Source Files\tests\systems</Filter>
-    </ClInclude>
     <ClInclude Include="av\avLights\NavAid.h">
       <Filter>Header Files\av\lights</Filter>
     </ClInclude>
@@ -433,6 +430,15 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h">
       <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\systems\factory_systems.h">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\systems\systems_impl.h">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\systems\systems_impl2.h">
+      <Filter>Source Files\tests\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -835,9 +841,6 @@
     <ClCompile Include="tests\systems\test_objects1.cpp">
       <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
-    <ClCompile Include="tests\systems\test_systems.cpp">
-      <Filter>Source Files\tests\systems</Filter>
-    </ClCompile>
     <ClCompile Include="av\avLights\LightManager.cpp">
       <Filter>Source Files\av\lights</Filter>
     </ClCompile>
@@ -1116,6 +1119,15 @@
     </ClCompile>
     <ClCompile Include="tests\DynamicCharacterController.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\systems_impl.cpp">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\factory_systems.cpp">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\systems_impl2.cpp">
+      <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

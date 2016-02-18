@@ -125,6 +125,7 @@ private:
 	optional<double>                last_update_;
 	double max_speed_;
 	phys::character::info_ptr       phys_model_;
+    phys::character::control_ptr    phys_control_;
 	optional<size_t>                phys_zone_;
 
 	cg::geo_point_3                 desired_position_;

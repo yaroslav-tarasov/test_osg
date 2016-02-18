@@ -332,6 +332,8 @@ void model::sync_phys(double dt)
 	if (!phys_model_ || !phys_)
 		return;
 
+    phys_control_->activate(false);
+
 	point_3     wind(0.0,0.0,0.0);
     
 	double const max_accel = 15;
@@ -343,17 +345,19 @@ void model::sync_phys(double dt)
 	geo_position cur_glb_pos(cur_pos, base);
 	double cur_speed  = cg::norm(cur_pos.dpos);
 	double cur_course = cur_pos.orien.cpr().course;
-	double cur_roll   = cur_pos.orien.cpr().roll;
+	// double cur_roll   = cur_pos.orien.cpr().roll;
 
-	// ?? cg::geo_direction
 #if 0
     cg::geo_point_3 d_p = base(base(cur_glb_pos.pos) + cur_pos.dpos);
 	cg::polar_point_3 cp (cg::geo_base_3(/*desired_position_*/d_p)(cur_glb_pos.pos));
 #endif
     
-    cg::polar_point_3 cp (cur_pos.dpos);
+#if 0
+    cg::polar_point_3 cp (-cur_pos.dpos);
 	cpr cpr_des =  cg::cpr(cp.course);
-	quaternion  desired_orien_(cpr_des);  
+#endif
+
+	quaternion  desired_orien_(/*cpr_des*/cpr(orien().get_course() + 180));  
 
 	point_3 forward_dir = -cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
 	point_3 right_dir   =  cg::normalized_safe(cur_pos.orien.rotate_vector(point_3(1, 0, 0))) ;
@@ -362,21 +366,32 @@ void model::sync_phys(double dt)
     point_3 omega_rel   =  cg::get_rotate_quaternion(cur_glb_pos.orien, desired_orien_).rot_axis().omega() * /*_damping*/1.f * (dt);
                                                                                                     
 #if 1
-	if(_targetSpeed > -1){
-		phys::character::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
+	if(_targetSpeed > -1 && !cg::eq_zero(omega_rel)){
+		phys_control_->set_angular_velocity(omega_rel);
 	}
+
+    FIXME(Перенести ограничение в более подходящее место)
+    //phys_control_->set_linear_velocity( point_3(0.0, 1.0, 0.0) * cg::bound(speed(), 0.0,4.305556)  );
+	if(speed()>0.01)
+    {
+        phys_control_->activate(true);
+        phys_control_->set_linear_velocity( forward_dir * cg::bound(speed(), 0.0,4.305556) );
+        phys_control_->set_angular_velocity(omega_rel);
+    }
+
 
     force_log fl;
 
-    LOG_ODS_MSG( "sync_phys(double dt):  ===========================================================================\n x: "
-        << cur_pos.dpos.x << "    y: " << cur_pos.dpos.y << "    z: " << cur_pos.dpos.z << "\n"
-        << "cur_pos: " <<  cur_pos.pos.x << "    y: " << cur_pos.pos.y << "    z: " << cur_pos.pos.z << "\n"
-        << "cur_pos: " <<  cur_pos.pos.x << "    y: " << cur_pos.pos.y << "    z: " << cur_pos.pos.z << "\n"
-        << "speed: " <<  speed() << "    bound: " << cg::bound(speed(), 0.0,4.305556) << "\n"
-        );
+    LOG_ODS_MSG( "sync_phys(double dt):  ===========================================================================\n  "
+        << "cur_pos.dpos: x:"    <<  cur_pos.dpos.x << "    y: " << cur_pos.dpos.y << "    z: " << cur_pos.dpos.z << "\n"
+        << "cur_pos: "           <<  cur_pos.pos.x  << "    y: " << cur_pos.pos.y << "    z: "  << cur_pos.pos.z << "\n"
+        << "speed: "             <<  speed() << "    bound: " << cg::bound(speed(), 0.0,4.305556) << "\n"
+        << "cur_glb_pos.orien: course:" <<  cur_glb_pos.orien.cpr().course << "    pitch: " << cur_glb_pos.orien.cpr().pitch << "    roll: " << cur_glb_pos.orien.cpr().roll << "\n"
+        << "desired_orien_: "    <<  desired_orien_.cpr().course << "    y: "    << desired_orien_.cpr().pitch << "    z: " << desired_orien_.cpr().roll << "\n"
+        << "omega_rel: "         <<  omega_rel.x << "    y: " << omega_rel.y     << "    z: " << omega_rel.z << "\n"
 
-    FIXME(Перенести ограничение в более подходящее место)
-	//phys::character::control_ptr(phys_model_)->set_linear_velocity( point_3(0.0, 1.0, 0.0) * cg::bound(speed(), 0.0,4.305556)  );
+
+        );
 #endif
 
 #endif
@@ -458,6 +473,7 @@ void model::on_zone_destroyed( size_t id )
     if (phys_zone_ && *phys_zone_ == id)
     {
         phys_model_.reset();
+
     }
 #endif
 }
@@ -480,7 +496,7 @@ void model::create_phys()
 	phys::character::params_t  params;
 	params.mass = 60;
 	phys_model_ = phys_->get_system(*phys_zone_)->create_character(params, s, p);
-
+    phys_control_ =  phys::character::control_ptr(phys_model_);
 }
 
 void model::go(cg::polar_point_2 const &offset)

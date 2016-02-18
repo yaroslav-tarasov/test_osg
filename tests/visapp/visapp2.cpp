@@ -22,7 +22,7 @@
 #include "tests/osg_widget/OSGWidget.h"
 
 #include "av/Visual.h"
-#include "tests/systems/test_systems.h"
+#include "tests/systems/factory_systems.h"
 
 using network::endpoint;
 using network::async_acceptor;

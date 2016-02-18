@@ -41,7 +41,7 @@ namespace phys
             virtual void   set_linear_velocity (point_3 const& f)           = 0;
             virtual void   set_angular_velocity(point_3 const& a)           = 0;
             virtual void   set_position        (const decart_position& pos) = 0;
-
+            virtual void   activate            (bool active)                = 0;
         };
 
     }

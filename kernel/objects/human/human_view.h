@@ -56,10 +56,10 @@ protected:
     void on_traj_assign         (msg::traj_assign_msg const &m);
 
 public:
-    geo_point_3     pos () const;
+    geo_point_3     pos ()  const;
     cg::quaternion  orien() const {return state_.orien;}
-	double          speed()  const {return state_.speed;}
-    point_2         dpos() const {return point_2(cg::polar_point_2(1., state_.orien.cpr().course)) * state_.speed;}
+	double          speed() const {return state_.speed;}
+    point_2         dpos()  const {return point_2(cg::polar_point_2(1., state_.orien.cpr().course)) * state_.speed;}
 
 	//info
 public:
@@ -84,10 +84,9 @@ protected:
     fms::trajectory_ptr                 traj_;
     /////////////////////////////////////
 
-#if 1
 private:
     using human_data::state_;
-#endif
+
 };
 
 } // end of human
