@@ -91,7 +91,7 @@ struct net_worker
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
-         , mod_peer_       (peer)
+         , mod_peer_   (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
          , on_render_  (on_render)

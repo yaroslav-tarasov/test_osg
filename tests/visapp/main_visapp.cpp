@@ -416,7 +416,7 @@ struct visapp
         w_.reset();
     }
     
-    void on_recv(void const* data, size_t size, endpoint& peer )
+    void on_recv(void const* data, size_t size, const endpoint& peer )
     {
         if(peer.port == 45003)
            disp_.dispatch(data, size);
