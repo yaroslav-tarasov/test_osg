@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 
+#include "ipc/ipc.h"
+
 #include "common/cmd_line.h"
 
 #include "async_services/async_services.h"
@@ -349,6 +351,7 @@ int _tmain(int argc, _TCHAR* argv[])
     {
         client::endpoints ep;
 		ep.emplace_back(endpoint(std::string("127.0.0.1:45001")));
+        ep.emplace_back(endpoint(std::string("127.0.0.1:45003")));
         client c(ep);              
         __main_srvc__->run();
     }

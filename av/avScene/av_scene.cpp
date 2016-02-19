@@ -91,7 +91,7 @@ struct net_worker
      net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update, on_update_f on_render)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
-         , peer_       (peer)
+         , mod_peer_       (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
          , on_render_  (on_render)
@@ -142,7 +142,7 @@ private:
      {
          async_services_initializer asi(false);
 
-         acc_.reset(new  async_acceptor (peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
+         acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
          
          worker_service_ = &(asi.get_service());
          
@@ -255,7 +255,7 @@ private:
     boost::thread                                               worker_thread_;
     boost::asio::io_service*                                    worker_service_;
     std::shared_ptr<boost::asio::io_service::work>              work_;
-    const  endpoint                                             peer_;
+    const  endpoint                                             mod_peer_;
 
 
 private:

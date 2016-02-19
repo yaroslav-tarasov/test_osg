@@ -16,12 +16,11 @@
 namespace second
 {
 
-    impl::impl()
-        : _msys(nullptr)
+    impl::impl(remote_send_f rs)
+        : systems(rs)
+        , _msys(nullptr)
         , _csys(nullptr)
-        , _vsys(nullptr)
         , msg_service_    (boost::bind(&impl::push_back_all, this, _1))
-        , msg_service_vis_(boost::bind(&impl::push_back, this, _1))
     {
 
     }
@@ -35,7 +34,8 @@ namespace second
     void impl::push_back_all (binary::bytes_cref bytes)
     {
         queue_.push_back(bytes);
-        queue_vis_.push_back(bytes);
+        if(rs_) 
+            rs_(bytes, true);
     }
 
     void impl::push_back (binary::bytes_cref bytes)
@@ -53,18 +53,6 @@ namespace second
         }
     }
 
-    FIXME("Эту хренотень надо сделать частью сервиса")
-    void impl::update_vis_messages()
-    {
-        while(queue_vis_.size()>0)
-        {
-            if(queue_vis_.front().size()>0)
-                msg_service_vis_.on_remote_recv(queue_vis_.front(),true);
-
-            queue_vis_.pop_front();
-        }
-    }
-
     kernel::system_ptr impl::get_control_sys()
     { 
         if(!_csys)
@@ -74,13 +62,7 @@ namespace second
 
     kernel::system_ptr impl::get_visual_sys()   
     {
-        kernel::vis_sys_props props_;
-        props_.base_point = ::get_base();
-
-        FIXME(damn properties)
-            if (!_vsys)
-                _vsys = create_visual_system(msg_service_vis_, props_);
-        return  _vsys;
+        return  nullptr;
     }
 
     kernel::system_ptr impl::get_model_sys()    

@@ -84,13 +84,14 @@ namespace
 
 struct net_worker
 {
-     typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
+     typedef boost::function<void(const void* data, size_t size, endpoint peer)>   on_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
      
 
-     net_worker(const  endpoint &  peer, on_receive_f on_recv , on_update_f on_update)
+     net_worker(const  endpoint &  peer, const endpoint& mod_peer, on_receive_f on_recv , on_update_f on_update)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
+         , mod_peer_   (mod_peer)
          , peer_       (peer)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
@@ -141,19 +142,20 @@ private:
      {
          async_services_initializer asi(false);
 
-         acc_.reset(new  async_acceptor (peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
-         
+         acc_.reset(new  async_acceptor (peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45003")) ), tcp_error));
+         mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45002")) ), tcp_error));
+
          worker_service_ = &(asi.get_service());
          
          boost::asio::io_service::work skwark(asi.get_service());
 
          calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
-         
 		 boost::system::error_code ec;
          size_t ret = worker_service_->run(ec);
 
          acc_.reset();
+         mod_acc_.reset();
          sockets_.clear();
      }
 
@@ -194,7 +196,7 @@ private:
 
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
-         uint32_t id = next_id();
+         const uint32_t id = peer.port;
          sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
              sock, boost::bind(&net_worker::on_recieve, this, _1,_2, peer),
              boost::bind(&net_worker::on_disconnected, this, _1, id),
@@ -206,13 +208,13 @@ private:
 
      void on_recieve(const void* data, size_t size, endpoint const& peer)
      {
-         __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
+         __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size) , peer));
      }
 
-     void do_receive(binary::bytes_ptr data/*, endpoint const& peer*/) 
+     void do_receive(binary::bytes_ptr data , endpoint const& peer) 
      {
          if (on_receive_)
-             on_receive_(binary::raw_ptr(*data), binary::size(*data)/*, peer*/);
+             on_receive_(binary::raw_ptr(*data), binary::size(*data) , peer);
      }
 
      void on_disconnected(error_code const& ec)      
@@ -243,14 +245,15 @@ private:
      }
 
 private:
-    boost::scoped_ptr<async_acceptor>                           acc_   ;
+    boost::scoped_ptr<async_acceptor>                           acc_       ;
+    boost::scoped_ptr<async_acceptor>                           mod_acc_   ;
     std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
 private:
     boost::thread                                               worker_thread_;
     boost::asio::io_service*                                    worker_service_;
     std::shared_ptr<boost::asio::io_service::work>              work_;
+    const  endpoint                                             mod_peer_;
     const  endpoint                                             peer_;
-
 
 private:
     on_receive_f                                                on_receive_;
@@ -292,7 +295,7 @@ private:
     
     double internal_time(double time = -1.0)
     {
-        static double                 time_    = 0.0;
+        static double                 time_         = 0.0;
         static double                 prev_time_    = 0.0;
         static high_res_timer         hr_timer;
         static boost::recursive_mutex guard_;
@@ -332,10 +335,11 @@ struct visapp_impl
 {
     friend struct visapp;
 
-    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
-        : systems_  (get_systems())
-        , osg_vis_  (CreateVisual())
+    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv)
+        : osg_vis_  (CreateVisual())
+        , msg_srv_  (msg_srv)
         , vis_sys_  (create_vis(props/*, bytes*/))
+
     {   
 
     }
@@ -359,12 +363,6 @@ private:
 
     void on_render(double time)
     {   
-#if 0
-		force_log fl;       
-		LOG_ODS_MSG( "on_render(double time)= " << time  <<"\n");
-#endif
-
-		systems_->update_vis_messages();
         vis_sys_.update(time);
         osg_vis_->Render(time);
     }
@@ -376,14 +374,13 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        auto ptr = systems_->get_visual_sys();
+        // props.base_point = ::get_base();
 
-        return ptr;
+        return create_visual_system(msg_srv_, props);
     }
 
 private:
-
-    systems_ptr                                                 systems_;
+    kernel::msg_service&                                        msg_srv_;
     updater                                                     vis_sys_;
     IVisual*                                                    osg_vis_;
 
@@ -391,16 +388,23 @@ private:
 
 struct visapp
 {
-    visapp( const endpoint& peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
-        : done_  (false)
-        , props_ (props)
-        , thread_(new boost::thread(boost::bind(&visapp::run, this)))
+    visapp( const  endpoint &  peer, const endpoint& mod_peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+        : done_        (false)
+        , props_       (props)
+        , thread_      (new boost::thread(boost::bind(&visapp::run, this)))
         , msg_service_ (boost::bind(&visapp::push_back, this, _1))
     {
-        w_.reset (new net_worker( peer 
-            , boost::bind(&visapp::on_recv,this, _1, _2)// boost::bind(&kernel::msg_service::on_remote_recv, &msg_service_, _1, false)
+        
+        disp_
+            .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
+            .add<state                 >(boost::bind(&visapp::on_state      , this, _1))
+            ;
+
+        w_.reset (new net_worker( peer, mod_peer 
+            , boost::bind(&visapp::on_recv,this, _1, _2, _3)
             , boost::bind(&visapp::update, this, _1)
             ));
+
     }
 
 
@@ -412,13 +416,40 @@ struct visapp
         w_.reset();
     }
     
-    void on_recv(void const* data, size_t size)
+    void on_recv(void const* data, size_t size, endpoint& peer )
     {
-
+        if(peer.port == 45003)
+           disp_.dispatch(data, size);
+        else
+            msg_service_.on_remote_recv(binary::make_bytes(data,size),false);
     }
 
     void update(double time)
-    {   
+    {    
+        gt_.set_time(time);
+    }
+
+    void on_setup(setup const& msg)
+    {
+        w_->set_factor(0.0);
+#if 0
+        create_objects(msg.icao_code);
+
+        if(end_of_load_)
+            end_of_load_();  //osg_vis_->EndSceneCreation();
+
+
+        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
+        w_->send(&bts[0], bts.size());
+#endif
+
+    }
+
+    void on_state(state const& msg)
+    {
+        w_->set_factor(msg.factor);
+        w_->reset_time(msg.srv_time / 1000.0f);
+        gt_.set_time(/*time*/msg.srv_time / 1000.0f);
     }
 
     void push_back (binary::bytes_cref bytes)
@@ -428,8 +459,9 @@ struct visapp
 
     void run()
     {   
-        visapp_impl  va( props_);
+        visapp_impl  va( props_, msg_service_);
         end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
+        end_of_load_();
         while (!va.done() && !done_)
           va.on_render(gt_.get_time());
     }
@@ -483,13 +515,13 @@ int main_visapp( int argc, char** argv )
     try
     {
 
-        endpoint peer(std::string("0.0.0.0:45002"));
+        endpoint proxy_peer(std::string("0.0.0.0:45003"));
+        endpoint mod_peer(std::string("0.0.0.0:45002"));
 
         kernel::vis_sys_props props;
         props.base_point = ::get_base();
 
-
-        visapp  va(peer, props);
+        visapp  va(proxy_peer, mod_peer, props);
 
         boost::system::error_code ec;
         __main_srvc__->run(ec);

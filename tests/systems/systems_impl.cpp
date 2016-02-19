@@ -16,8 +16,9 @@
 namespace first
 {
 
-    impl::impl()
-        : _msys(nullptr)
+    impl::impl(remote_send_f rs)
+        : systems(rs)
+        , _msys(nullptr)
         , _csys(nullptr)
         , _vsys(nullptr)
         , msg_service_    (boost::bind(&impl::push_back_all, this, _1))

@@ -96,8 +96,10 @@ namespace bi
         using namespace kernel;
         
         // Только получение без создания  
+#if 0
         _d->_csys = get_systems()->get_control_sys();
         _d->_msys = get_systems()->get_model_sys();
+#endif
 
 #if 0
         _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));

@@ -6,7 +6,7 @@ namespace first
         public boost::enable_shared_from_this<impl>
     {
     public:
-        impl();
+        impl(remote_send_f rs);
 
         systems_ptr                get_this()  override;
 
@@ -15,10 +15,10 @@ namespace first
         void                       push_back (binary::bytes_cref bytes);
         virtual  void              update_messages();
         virtual  void              update_vis_messages();
-        virtual kernel::system_ptr get_control_sys()      override;
-        virtual kernel::system_ptr get_visual_sys()       override;
-        virtual kernel::system_ptr get_model_sys()        override;
-        virtual void               create_auto_objects()  override;                                                            
+        virtual kernel::system_ptr get_control_sys()                override;
+        virtual kernel::system_ptr get_visual_sys()                 override;
+        virtual kernel::system_ptr get_model_sys()                  override;
+        virtual void               create_auto_objects()            override;                                                            
 
 
         std::deque<binary::bytes_t>                           queue_;

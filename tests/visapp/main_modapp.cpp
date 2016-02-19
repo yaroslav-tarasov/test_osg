@@ -91,7 +91,7 @@ struct net_worker
      net_worker(const  endpoint &  peer, const std::vector<endpoint>& vis_peers , on_receive_f on_recv , on_update_f on_update)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
-         , peer_       (peer)
+         , mod_peer_       (peer)
          , vis_peers_  (vis_peers)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
@@ -117,14 +117,19 @@ struct net_worker
          done_ = true;
      }
 
-     void send(void const* data, uint32_t size)
+     void send_proxy(void const* data, uint32_t size)
      {
          worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)));
      }
      
-     void send (binary::bytes_cref bytes)
+     void send_proxy (binary::bytes_cref bytes)
      {
          worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+     }
+      
+     void send_clients (binary::bytes_cref bytes)
+     {
+         worker_service_->post(boost::bind(&net_worker::do_send_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
 
      void reset_time(double new_time)
@@ -142,7 +147,7 @@ private:
      {
          async_services_initializer asi(false);
 
-         acc_.reset(new  async_acceptor (peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
+         acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
          
          worker_service_ = &(asi.get_service());
          
@@ -189,6 +194,22 @@ private:
          error_code_t ec;
 
          srv_->send(binary::raw_ptr(*data), size);
+         if (ec)
+         {
+             LogError("TCP send error: " << ec.message());
+             return;
+         }
+
+     }
+
+     void do_send_clients(binary::bytes_ptr data)
+     {   
+         size_t size = binary::size(*data);
+         error_code_t ec;
+
+         for( auto it = vis_peers_.begin();it!=vis_peers_.end(); ++it )
+            sockets_[*it]->send(binary::raw_ptr(*data), size);
+
          if (ec)
          {
              LogError("TCP send error: " << ec.message());
@@ -286,7 +307,7 @@ private:
     boost::thread                                                  worker_thread_;
     boost::asio::io_service*                                      worker_service_;
     std::shared_ptr<boost::asio::io_service::work>                          work_;
-    const  endpoint                                                         peer_;
+    const  endpoint                                                         mod_peer_;
 
 private:
     std::shared_ptr<tcp_fragment_wrapper>                                    srv_;
@@ -315,7 +336,7 @@ struct mod_app
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
-        : systems_  (get_systems())
+        : systems_  (get_systems(systems::SECOND_IMPL, boost::bind(&mod_app::push_back, this, _1)))
         , ctrl_sys_ (systems_->get_control_sys())
         , mod_sys_  (systems_->get_model_sys  ())
         , end_of_load_(eol)
@@ -348,6 +369,11 @@ private:
     void on_timer(double time)
     {   
     }
+    
+    void push_back (binary::bytes_cref bytes)
+    {
+        w_->send_clients(bytes);
+    }
 
     void update(double time)
     {   
@@ -367,7 +393,7 @@ private:
             end_of_load_();  //osg_vis_->EndSceneCreation();
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
-        w_->send(&bts[0], bts.size());
+        w_->send_proxy(&bts[0], bts.size());
     }
 
     void on_state(state const& msg)
@@ -417,7 +443,7 @@ private:
 
         if (reg_obj_)
         {
-            void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send;
+            void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send_proxy;
 
             reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
         }
