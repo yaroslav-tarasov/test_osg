@@ -4,6 +4,7 @@
 
 #include "visual_object_impl.h"
 #include "av/avScene/Scene.h"
+#include "av/avCore/Utils.h"
 #include "animutils.h"
 
 namespace kernel
@@ -79,8 +80,8 @@ namespace kernel
 
     visual_object_impl::~visual_object_impl()
     {
-        scene_->removeChild(node_.get());
-
+        // scene_->removeChild(node_.get());
+        utils::RemoveNodeFromAllParents( node_.get() );
         // scene_->get_objects()->remove(node_.get());
     }
 

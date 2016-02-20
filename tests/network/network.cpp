@@ -127,7 +127,7 @@ struct client
         ADD_EVENT(time , state(0.0,time,factor))
 #if 1
         ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
-        ADD_EVENT(120.0, fire_fight_msg_t(2))
+        ADD_EVENT(70.0, fire_fight_msg_t(2))
 #endif       
 
 #if 1

@@ -128,8 +128,8 @@ namespace aircraft_physless
 
 				if (ss.smoke_sfx_weak_ptr_)
 				{
-					ss.smoke_sfx_weak_ptr_->setFactor(ss.smoke_factor_ * cg::clamp(0., smoke_end_duration_, 1., 0.)(time-ss.last_fire_time_));
-					ss.smoke_sfx_weak_ptr_->setIntensity(ss.smoke_factor_ * 2);
+					ss.smoke_sfx_weak_ptr_->setFactor      (ss.smoke_factor_ * cg::clamp(0., smoke_end_duration_, 1., 0.)(time-ss.last_fire_time_));
+					ss.smoke_sfx_weak_ptr_->setIntensity   (ss.smoke_factor_ * 2);
 					ss.smoke_sfx_weak_ptr_->setEmitWorldPos(pos);
 				}
 			}

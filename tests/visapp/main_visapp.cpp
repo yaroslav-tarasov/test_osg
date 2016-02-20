@@ -421,14 +421,33 @@ struct visapp
         if(peer.port == 45003)
            disp_.dispatch(data, size);
         else
-            msg_service_.on_remote_recv(binary::make_bytes(data,size),false);
+            queue_vis_.emplace_back(std::move(binary::make_bytes(data,size)));
+            // msg_service_.on_remote_recv(binary::make_bytes(data,size),false);
+        
+        
+    }
+    
+    void update_messages()
+    {
+        while(queue_vis_.size()>0)
+        {
+            if(queue_vis_.front().size()>0)
+                msg_service_.on_remote_recv(queue_vis_.front(),true);
+
+            queue_vis_.pop_front();
+        }
+    }
+
+    void push_back (binary::bytes_cref bytes)
+    {
+        w_->send(bytes);
     }
 
     void update(double time)
     {    
         gt_.set_time(time);
     }
-
+ 
     void on_setup(setup const& msg)
     {
         w_->set_factor(0.0);
@@ -452,10 +471,7 @@ struct visapp
         gt_.set_time(/*time*/msg.srv_time / 1000.0f);
     }
 
-    void push_back (binary::bytes_cref bytes)
-    {
-        w_->send(bytes);
-    }
+
 
     void run()
     {   
@@ -463,7 +479,10 @@ struct visapp
         end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
         end_of_load_();
         while (!va.done() && !done_)
+        {
+          update_messages();
           va.on_render(gt_.get_time());
+        }
     }
     
     void end_this()
@@ -490,6 +509,9 @@ private:
 private:
     msg_dispatcher<uint32_t>             disp_;
     kernel::msg_service           msg_service_;
+
+private:
+    std::deque<binary::bytes_t>     queue_vis_;
 
 private:
     boost::scoped_ptr<net_worker>           w_;

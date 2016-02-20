@@ -392,13 +392,12 @@ void  Terrain::create( const std::string& name )
 #endif
     // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
 
-#if 1
     fill_navids(
         lights_file(name), 
-        /*_lamps*/avScene::Scene::GetInstance()->getLamps(), 
+        /*_lamps*/avScene::Scene::GetInstance()->getLamps(),
         _sceneRoot, 
         lights_offset(name) ); 
-#endif
+
 
 
 

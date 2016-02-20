@@ -35,7 +35,6 @@ namespace
 {
     boost::asio::io_service* __main_srvc__ = 0;
 
-
     void tcp_error(error_code const& err)
     {
         LogError("Error happened: " << err);
@@ -91,7 +90,7 @@ struct net_worker
      net_worker(const  endpoint &  peer, const std::vector<endpoint>& vis_peers , on_receive_f on_recv , on_update_f on_update)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
-         , mod_peer_       (peer)
+         , mod_peer_   (peer)
          , vis_peers_  (vis_peers)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
@@ -103,13 +102,18 @@ struct net_worker
      ~net_worker()
      {
          //  delete  ses_;
-         //_workerService->post(boost::bind(&boost::asio::io_service::stop, _workerService));
-         worker_thread_.join();
+         
+         //worker_thread_.join();
      }
 
      boost::asio::io_service* GetService()
      {
          return worker_service_;
+     }
+     
+     void disconnect(error_code const& err)
+     {
+         worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
      }
 
      void done()
@@ -163,6 +167,8 @@ private:
          acc_.reset();
          sockets_.clear();
          srv_.reset();
+
+         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
      }
 
      uint32_t next_id()
@@ -172,22 +178,6 @@ private:
      }
 
      // from struct tcp_connection
-#if 0
-     void do_send(int id, binary::bytes_ptr data)
-     {   
-         size_t size = binary::size(*data);
-         error_code_t ec;
-
-         sockets_[id]->send(binary::raw_ptr(*data), size);
-         if (ec)
-         {
-             LogError("TCP send error: " << ec.message());
-             return;
-         }
-
-     }
-#endif
-
      void do_send(int id, binary::bytes_ptr data)
      {   
          size_t size = binary::size(*data);
@@ -241,7 +231,7 @@ private:
                  boost::bind(&net_worker::on_disconnected, this, _1, peer),
                  boost::bind(&net_worker::on_error, this, _1, peer)));  
 
-            con_.reset(  new async_connector(vis_peers_[0], boost::bind(&net_worker::on_connected, this, _1, _2), tcp_error, tcp_error));
+            con_.reset(  new async_connector(vis_peers_[0], boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
 
             LogInfo("Client " << peer << " accepted");
          }
@@ -276,7 +266,7 @@ private:
          // delete  ses_;
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
          delete  ses_;
-         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
+         //__main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
          // _workerThread.join();
      }
 
@@ -294,7 +284,7 @@ private:
         LogInfo("Connected to " << peer);
 
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-            sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), &tcp_error, &tcp_error));  
+            sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
 
     }
 

@@ -242,13 +242,28 @@ void visual::update(double time)
 					cg::geo_point_3 bp_geo_root = burning_plane_root->get_global_pos();
 					
 					geo_base_3 node_gpos = turret_node_->get_global_pos();
-					double dist = cg::norm(geo_base_3(root_pos)(/*burning_plane_->pos()*/bp_geo_root)); // node_gpos(burning_plane_->pos()
+					double dist = cg::norm(geo_base_3(root_pos)(bp_geo_root)); 
 					// double speed = cg::sqrt(dist*9.8/cg::abs(sin(2.0*cg::grad2rad()*15.0)) );
                     const double dt = (time - *fs_start_time_)/4.0;
                     double speed = cg::sqrt(dist*9.8/cg::abs(sin(cg::grad2rad()*15.0)) * 0.5 ) * ((dt)<1.0?dt:1.0);
+                    
+                    if (dist > 50.0)
+                    {
+                      if(!fs_stop_time_)
+                          fs_stop_time_ = time;
+                      
+                      const double dt = (time - *fs_stop_time_)/4.0;
+                      speed = cg::sqrt(dist*9.8/cg::abs(sin(cg::grad2rad()*15.0)) * 0.5 ) * ((dt)<1.0?(1.0-dt):0.0);
+                    }
 
 					// foam_stream_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
-					foam_stream_object_->set_visible(true);
+					if(fs_stop_time_ && cg::eq(speed, 0.0) )
+                    {
+                        foam_stream_object_->set_visible(false);
+                        burning_plane_.reset();
+                    }
+                    else
+                        foam_stream_object_->set_visible(true);
 
 					if (foam_stream_sfx_weak_ptr_)
 					{
