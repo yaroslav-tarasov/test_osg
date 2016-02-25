@@ -44,8 +44,6 @@ void create_objects(const std::string & airport)
 {
     const std::string icao_code = airport; 
 
-
-
     krv::data_getter              _krv_data_getter(data_file(icao_code));
     
     high_res_timer hr_timer;

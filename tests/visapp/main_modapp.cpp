@@ -11,12 +11,14 @@
 #include "kernel/msg_proxy.h"
 #include "kernel/systems/vis_system.h"
 #include "common/test_msgs.h"
+#include "common/test_msgs2.h"
 #include "common/time_counter.h"
 #include "utils/high_res_timer.h"
 #include "tests/systems/factory_systems.h"
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
+#include <boost/container/map.hpp>
 
 using network::endpoint;
 using network::async_acceptor;
@@ -85,15 +87,15 @@ struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
-     
+     typedef boost::function<void()>                                on_all_connected_f; 
 
-     net_worker(const  endpoint &  peer, const std::vector<endpoint>& vis_peers , on_receive_f on_recv , on_update_f on_update)
+     net_worker(const  endpoint &  peer,  on_receive_f on_recv , on_update_f on_update, on_all_connected_f on_all_connected)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , mod_peer_   (peer)
-         , vis_peers_  (vis_peers)
          , on_receive_ (on_recv)
          , on_update_  (on_update)
+         , on_all_connected_ (on_all_connected)
          , done_       (false)
      {
           worker_thread_ = boost::thread(&net_worker::run, this);
@@ -144,6 +146,17 @@ struct net_worker
      void set_factor(double factor)
      {
          ses_->set_factor(factor);
+     }
+
+     void vis_connect(const std::vector<endpoint>& vis_peers)
+     {
+         vis_peers_  = vis_peers;
+         for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+         {
+             (*it).port = 45002;
+             cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
+         }
+         
      }
 
 private:
@@ -198,7 +211,7 @@ private:
          error_code_t ec;
 
          for( auto it = vis_peers_.begin();it!=vis_peers_.end(); ++it )
-            sockets_[*it]->send(binary::raw_ptr(*data), size);
+            if(sockets_.find(*it)!=sockets_.end()) sockets_[*it]->send(binary::raw_ptr(*data), size);
 
          if (ec)
          {
@@ -207,6 +220,8 @@ private:
          }
 
      }
+
+
 
 private:
 
@@ -227,11 +242,10 @@ private:
          if (!srv_)
          {
              srv_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-                 sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer),
-                 boost::bind(&net_worker::on_disconnected, this, _1, peer),
-                 boost::bind(&net_worker::on_error, this, _1, peer)));  
+                 sock, boost::bind(&net_worker::on_recieve     , this, _1, _2, peer),
+                       boost::bind(&net_worker::on_disconnected, this, _1,     peer),
+                       boost::bind(&net_worker::on_error       , this, _1,     peer)));  
 
-            con_.reset(  new async_connector(vis_peers_[0], boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
 
             LogInfo("Client " << peer << " accepted");
          }
@@ -286,18 +300,20 @@ private:
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
 
+        if(on_all_connected_ && vis_peers_.size() == sockets_.size())
+            on_all_connected_();
     }
 
 private:
-    boost::scoped_ptr<async_connector>                                       con_;
-    std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
-    const std::vector<endpoint>&                                       vis_peers_;  
+    std::map< endpoint,unique_ptr<async_connector>>                                      cons_;
+    std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >               sockets_;
+    std::vector<endpoint>                                                           vis_peers_;  
 
 private:
-    boost::thread                                                  worker_thread_;
-    boost::asio::io_service*                                      worker_service_;
-    std::shared_ptr<boost::asio::io_service::work>                          work_;
-    const  endpoint                                                         mod_peer_;
+    boost::thread                                                               worker_thread_;
+    boost::asio::io_service*                                                   worker_service_;
+    std::shared_ptr<boost::asio::io_service::work>                                       work_;
+    const  endpoint                                                                  mod_peer_;
 
 private:
     std::shared_ptr<tcp_fragment_wrapper>                                    srv_;
@@ -306,7 +322,7 @@ private:
 private:
     on_receive_f                                                      on_receive_;
     on_update_f                                                        on_update_;
-
+    on_all_connected_f                                          on_all_connected_;
 private:
     bool                                                                    done_;
 
@@ -337,13 +353,13 @@ struct mod_app
             .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
             .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
             .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
+            .add<vis_peers             >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             ;
 
-        vis_peers_.push_back(endpoint(std::string("127.0.0.1:45002")));
-
-        w_.reset (new net_worker( peer, vis_peers_
+        w_.reset (new net_worker( peer 
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
             , boost::bind(&mod_app::update, this, _1)
+            , boost::bind(&mod_app::on_setup_deffered, this)
             ));
 
 
@@ -376,15 +392,22 @@ private:
     void on_setup(setup const& msg)
     {
         w_->set_factor(0.0);
-
-        create_objects(msg.icao_code);
         
+        setup_msg_ = msg;
+    }
+
+    void on_setup_deffered()
+    {
+        create_objects(setup_msg_.icao_code);
+
         if(end_of_load_)
             end_of_load_();  //osg_vis_->EndSceneCreation();
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_proxy(&bts[0], bts.size());
     }
+
+
 
     void on_state(state const& msg)
     {
@@ -400,6 +423,10 @@ private:
 
     }
 
+    void on_vis_peers(vis_peers const& msg)
+    {
+        w_->vis_connect(msg.eps);
+    }
 
     void inject_msg(const void* data, size_t size)
     {
@@ -453,6 +480,7 @@ private:
 private:
     on_container_f                                              on_cont_;
     boost::function<void()>                                 end_of_load_;
+    setup                                                     setup_msg_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 

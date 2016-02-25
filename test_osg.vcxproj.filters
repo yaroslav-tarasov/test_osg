@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\shaders">
-      <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\spark">
       <UniqueIdentifier>{75d8f66a-cf5f-44aa-be85-cb02bb353796}</UniqueIdentifier>
     </Filter>
@@ -144,12 +141,6 @@
     <Filter Include="Source Files\av\fx">
       <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\shaders\fx">
-      <UniqueIdentifier>{fd8681e9-0ef4-4610-bfc8-f0746d3626a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\shaders\animation">
-      <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\aerostat">
       <UniqueIdentifier>{85f57a9b-c35a-404f-840c-01d3ca96b6af}</UniqueIdentifier>
     </Filter>
@@ -168,98 +159,107 @@
     <Filter Include="Source Files\av\bada">
       <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\shaders">
+      <UniqueIdentifier>{680f57ac-61f3-4bd7-ae47-a25c971ef79e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\shaders\fx">
+      <UniqueIdentifier>{fd8681e9-0ef4-4610-bfc8-f0746d3626a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\shaders\animation">
+      <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <None Include="misc\shaders\tess_quad.tcs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess_quad.tes">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess_tri.tcs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess_tri.tes">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\grass.frag">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\grass.vert">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess.frag">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess.geo">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\tess.vs">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\headers\fog.hlsl">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\headers\scene_params.hlsl">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\headers\spot_lights.hlsl">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="misc\shaders\headers\utils.hlsl">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.fs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.gs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SmokeFX.vs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="misc\shaders\skinning.vert">
-      <Filter>Source Files\shaders\animation</Filter>
+      <Filter>Source Files\tests\shaders\animation</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.fs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.gs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\LandingDustFX.vs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.fs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.gs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.vs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FrictionDustFx.fs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FrictionDustFx.gs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FrictionDustFx.vs">
-      <Filter>Source Files\shaders\fx</Filter>
+      <Filter>Source Files\tests\shaders\fx</Filter>
     </None>
     <None Include="misc\shaders\skinning_inst.vert">
-      <Filter>Source Files\shaders\animation</Filter>
+      <Filter>Source Files\tests\shaders\animation</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -833,7 +833,7 @@
       <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\tests\shaders</Filter>
     </ClCompile>
     <ClCompile Include="ext\spark\SmokeNode.cpp">
       <Filter>Source Files\spark</Filter>

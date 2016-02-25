@@ -10,7 +10,9 @@
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "logger/logger.hpp"
+
 #include "common/test_msgs.h"
+#include "common/test_msgs2.h"
 
 #include "utils/krv_import.h"
 
@@ -90,22 +92,30 @@ struct client
 
     DECL_LOGGER("visa_control");
 	
-	bool create_a;
-	bool create_v;
-	bool create_f;
-
-    typedef std::vector<endpoint> endpoints;
+    typedef std::vector<std::pair<endpoint, bool> > endpoints;
 	
 	struct connect_helper
 	{
 		connect_helper(endpoints peers, client* cl)
 		{
-			for (auto it = peers.begin();it!= peers.end(); ++it )
+			std::set<network::address_v4> peer_addrs;
+            
+            for (auto it = peers.begin();it!= peers.end(); ++it )
             {
-				cl->cons_[*it].reset(new async_connector(*it, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
-                LogInfo("Connecting to " << *it);
+                if(!(*it).second)
+                    cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), [=](error_code const& err){}, [=](error_code const& err){}));
+                else
+                    cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
+                
+                peer_addrs.insert((*it).first.addr);
+                LogInfo("Connecting to " << (*it).first);
 			}
-
+            
+            for (auto it = peer_addrs.begin();it!= peer_addrs.end(); ++it )
+            {
+               cl->eps_.push_back(endpoint(*it,0));
+            }
+             
 		}
 	};
 
@@ -114,9 +124,6 @@ struct client
         , period_  (/*4.*/.5)
         , timer_   (boost::bind(&client::update, this))
         , _traj    (fill_trajectory(krv::data_getter("log_minsk.txt")))
-		, create_a (true)
-	    , create_v (true)
-		, create_f (true)
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -231,11 +238,21 @@ private:
     {
         LogInfo("Connected to " << peer);
         
+
         peers_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
-      
-        binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
-        send(&bts[0], bts.size());
+        
+        if (peer.port == 45001)
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(vis_peers(eps_)));
+            peers_[peer]->send(&bts[0], bts.size());
+            LogInfo("Send peers list to " << peer);
+        }
+
+        {
+            binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
+            peers_[peer]->send(&bts[0], bts.size());
+        }
 
     }
 
@@ -301,6 +318,9 @@ private:
     }
 
 private:
+    net_layer::msg::endpoints                               eps_;
+
+private:
     async_timer             timer_; 
     double                  period_;
 
@@ -350,8 +370,11 @@ int _tmain(int argc, _TCHAR* argv[])
     try
     {
         client::endpoints ep;
-		ep.emplace_back(endpoint(std::string("127.0.0.1:45001")));
-        ep.emplace_back(endpoint(std::string("127.0.0.1:45003")));
+		//ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.142:45001")), false));           // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));       // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45001")), false));       // VisApp
+
         client c(ep);              
         __main_srvc__->run();
     }

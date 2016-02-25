@@ -451,17 +451,6 @@ struct visapp
     void on_setup(setup const& msg)
     {
         w_->set_factor(0.0);
-#if 0
-        create_objects(msg.icao_code);
-
-        if(end_of_load_)
-            end_of_load_();  //osg_vis_->EndSceneCreation();
-
-
-        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
-        w_->send(&bts[0], bts.size());
-#endif
-
     }
 
     void on_state(state const& msg)

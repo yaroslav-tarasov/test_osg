@@ -9,7 +9,7 @@
 #include "objects/nodes_management.h"
 #include "helicopter_physless/helicopter_physless_common.h"
 
-#include "common/test_msgs.h"
+#include "common/meteo_local.h"
 #include "helicopter_physless_state.h"
 
 namespace helicopter_physless

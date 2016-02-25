@@ -4,38 +4,9 @@
 #include "network/msg_base.h"
 using network::gen_msg;
 
-// FIXME env or weather or meteo
-//////////////////////////////////////////
-namespace meteo 
-{
+#include "common/meteo_local.h"
 
-struct local_params
-{
-	float wind_speed, wind_azimuth, wind_gusts;
-	// cg::point_2f wind_dir;
-
-	local_params() 
-		: wind_speed(0)
-		, wind_azimuth(0)
-		, wind_gusts(0)
-	{}
-
-	local_params(float wind_speed, float wind_azimuth, float wind_gusts) 
-		: wind_speed  (wind_speed)
-		, wind_azimuth(wind_azimuth)
-		, wind_gusts  (wind_gusts)
-	{}
-};
-
-REFL_STRUCT(local_params)
-	REFL_ENTRY(wind_speed)
-	REFL_ENTRY(wind_azimuth)
-	REFL_ENTRY(wind_gusts)
-REFL_END()
-
-}
-//////////////////////////////////////////
-
+#include "test_msg_enum.h"
 
 // FIXME messages and namespaces
 
@@ -44,31 +15,11 @@ namespace net_layer
 
     namespace msg
     {
-        enum message_id
-        {
-            id_setup            ,
-            id_run              ,
-            id_create           ,
-            id_ready            ,
-
-            id_state            ,
-
-            am_malfunction      ,
-            am_engines_state    ,
-
-            vm_attach_tow       ,
-            vm_detach_tow       ,
-            vm_detach_tow_dc    ,
-			vm_fire_fight       ,
-
-            sm_container_msg
-        };
-
 
         struct setup
             : network::msg_id<id_setup>
         {
-            setup(std::string icao_code = "URSS")
+            setup(const std::string& icao_code = "URSS")
                 : icao_code (icao_code)
             {
             }
@@ -331,9 +282,6 @@ namespace net_layer
 
 
     }
-
-
-
 
 
 }

@@ -9,7 +9,7 @@
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
 
-#include "common/test_msgs.h"
+#include "common/meteo_local.h"
 #include "aircraft_physless_state.h"
 
 namespace aircraft_physless
