@@ -1934,6 +1934,15 @@ void Scene::onExit()
     _viewerPtr->setDone(true);
 }
 
+void Scene::setHomePosition(osg::Vec3d& eye, osg::Vec3d& center)
+{
+    osgGA::CameraManipulator* manip = _viewerPtr->getCameraManipulator();
+    if(manip)
+    { 
+        manip->setHomePosition(eye, center, osg::Z_AXIS);
+        manip->home(0);
+    }
+}
 
 // update pass
 void Scene::update( osg::NodeVisitor * nv )
@@ -1985,4 +1994,6 @@ void Scene::update( osg::NodeVisitor * nv )
 	  FIXME( "А третья координата?" );
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
 	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
+
+      _ephemerisNode->setTime();
 }

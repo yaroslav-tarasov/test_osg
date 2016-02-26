@@ -16,6 +16,9 @@
 
 #include "kernel/systems/visual_system/visual_object_impl.h"
 
+#include "geometry/camera.h"
+
+
 namespace kernel
 {
     typedef cg::range_t<obj_id_t>   id_range_t;
@@ -95,10 +98,10 @@ system_ptr create_model_system(msg_service& service, std::string const& script)
     return kernel::system_ptr(boost::make_shared<model_system_impl>(boost::ref(service), boost::ref(script)));
 }
 
-system_ptr create_visual_system(msg_service& service, vis_sys_props const& vsp ) 
+system_ptr create_visual_system(msg_service& service, IVisual* vis, vis_sys_props const& vsp ) 
 {
     LogInfo("Creating VISUAL system");
-    return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service), boost::ref(vsp)));
+    return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service),  vis, boost::ref(vsp)));
 }
 
 system_ptr create_ctrl_system( msg_service& service ) 
@@ -1199,6 +1202,7 @@ double model_system_impl::calc_step() const
 #pragma region visual system define
 
 
+
 struct visual_system_impl
     : visual_system
     , visual_system_props
@@ -1206,7 +1210,7 @@ struct visual_system_impl
     //, victory::widget_control
 {
 
-    visual_system_impl(msg_service& service,/* victory::IVictory *vis,*/ vis_sys_props const& props);
+    visual_system_impl(msg_service& service, IVisual *vis, vis_sys_props const& props);
 
 private:
     void update       (double time) override;
@@ -1228,30 +1232,37 @@ private:
     vis_sys_props const&    vis_props   () const;
     void                    update_props(vis_sys_props const&);
 
-
+private:
+    void            init_eye  ();
+    void            update_eye();
+    cg::camera_f    eye_camera() const;
     void            object_destroying(object_info_ptr object);
 
 private:
-    //DECL_LOGGER("vis_sys");
+    DECL_LOGGER("vis_sys");
 
 private:
     vis_sys_props           props_;
 
-    //victory::IVictoryPtr    victory_;
-    //victory::IScenePtr      scene_;
+    IVisual*                       vis_;
+    //victory::IScenePtr         scene_;
     //victory::IViewportPtr   viewport_;
 
     scoped_connection object_destroying_connection_;
 
+//private:
+//    void init_frustum_projection();
+
+private:
+    visual_control_ptr      eye_;
 
 
 };
 
 
-visual_system_impl::visual_system_impl(msg_service& service, /*victory::IVictory *vis,*/ vis_sys_props const& props)
+visual_system_impl::visual_system_impl(msg_service& service, IVisual *vis, vis_sys_props const& props)
     : fake_system_base(sys_visual, service, "objects.xml")
-    //, victory_   (vis)
-
+    , vis_   (vis)
     //, scene_    (vis->create_scene())
     //, viewport_ (vis->create_viewport())
 
@@ -1277,13 +1288,13 @@ vis_sys_props const& visual_system_impl::vis_props() const
 void visual_system_impl::update_props(vis_sys_props const& props)
 {
     props_ = props;
-    //init_eye();
+    init_eye();
 }
 
 void visual_system_impl::load_exercise(dict_cref dict)
 {
     fake_system_base::load_exercise(dict);
-    //init_eye();
+    init_eye();
 }
 
 visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/, bool async )
@@ -1296,12 +1307,48 @@ visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr
     return boost::make_shared<visual_object_impl>( parent, res, seed, async);
 }
 
+void visual_system_impl::init_eye()
+{
+    // no eye is selected if camera name is incorrect to show problem visually!!!
+    // please don't change selection logic
+    eye_ = (!props_.channel.camera_name.empty()) 
+        ? find_object<visual_control_ptr>(this, props_.channel.camera_name)
+        : find_first_object<visual_control_ptr>(this) ;
+#if 0
+    if (!eye_ && !props_.channel.camera_name.empty())
+        LogWarn("Can't find camera: " << props_.channel.camera_name);
 
+    viewport_->SetClarityScale(props_.channel.pixel_scale);
+    viewport_->set_geom_corr(props_.channel.cylindric_geom_corr ? victory::IViewport::explicit_cylinder : victory::IViewport::no_geom_corr);
+
+    init_frustum_projection();
+#endif
+    update_eye();
+
+}
+
+void visual_system_impl::update_eye()
+{
+    const auto & cam = /*debug_eye_ ? debug_eye_camera() :*/ eye_camera();
+    //viewport_->SetPosition(cam.position(), cam.orientation());
+}
+
+cg::camera_f visual_system_impl::eye_camera() const
+{
+    typedef cg::rotation_3f rot_f;
+
+    cg::camera_f cam = eye_ 
+        ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))
+        : cg::camera_f();
+
+    cam.set_orientation((rot_f(cam.orientation()) * rot_f(cprf(props_.channel.course))).cpr());
+    return cam;
+}
 
 void visual_system_impl::object_destroying(object_info_ptr object)
 {
-    //if (eye_ == object)
-    //    eye_.reset();
+    if (eye_ == object)
+        eye_.reset();
     //else if (debug_eye_ && debug_eye_->track_object == object)
     //    debug_eye_.reset();
 }

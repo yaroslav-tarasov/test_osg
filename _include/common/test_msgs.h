@@ -58,6 +58,22 @@ namespace net_layer
             REFL_ENTRY(srv_time )
             REFL_ENTRY(factor )
         REFL_END()
+        
+        struct props_updated
+            : network::msg_id<id_props_updated>
+        {
+            props_updated(string properties = "")
+                : properties (properties)
+            {
+            }
+
+            string properties;
+        };
+        
+        REFL_STRUCT(props_updated)
+            REFL_ENTRY(properties)
+        REFL_END()
+
 
         struct run
             : network::msg_id<id_run>

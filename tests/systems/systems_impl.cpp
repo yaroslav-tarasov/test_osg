@@ -80,7 +80,7 @@ namespace first
 
         FIXME(damn properties)
             if (!_vsys)
-                _vsys = create_visual_system(msg_service_vis_, props_);
+                _vsys = create_visual_system(msg_service_vis_, nullptr, props_);
         return  _vsys;
     }
 

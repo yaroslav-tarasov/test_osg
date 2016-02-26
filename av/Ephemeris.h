@@ -27,9 +27,10 @@ namespace avSky
        float                   GetSunIntensity() const override;
        const osg::Vec3f &      GetFogColor    () const override;
 
-    protected:      
+    public:
        void                    setTime         ();
        void                    setSummerTime   ();
+    protected:
        void                    setIllumination ( float illum );
        void                    setStarFieldMask( osg::Node::NodeMask nm );  
        void                    cull            ( osg::NodeVisitor * pNV );

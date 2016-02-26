@@ -13,6 +13,9 @@ namespace net_layer
             id_ready            ,
 
             id_state            ,
+            id_props_updated    ,
+            id_vis_peers        ,
+
 
             am_malfunction      ,
             am_engines_state    ,
@@ -22,8 +25,8 @@ namespace net_layer
             vm_detach_tow_dc    ,
             vm_fire_fight       ,
 
-            sm_container_msg    ,
-            id_vis_peers        
+            sm_container_msg    
+       
         };
     }
 

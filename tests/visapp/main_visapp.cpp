@@ -18,6 +18,9 @@
 
 #include "net_layer/net_worker.h"
 
+#include "reflection/proc/prop_tree.h"
+
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -338,7 +341,7 @@ struct visapp_impl
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv)
         : osg_vis_  (CreateVisual())
         , msg_srv_  (msg_srv)
-        , vis_sys_  (create_vis(props/*, bytes*/))
+        , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/))
 
     {   
 
@@ -358,6 +361,11 @@ struct visapp_impl
     {
         osg_vis_->EndSceneCreation();
     }
+    
+    void update_property(kernel::vis_sys_props const& props)
+    {
+        kernel::visual_system_props_ptr(vis_sys_.get_sys())->update_props(props);
+    }
 
 private:
 
@@ -369,14 +377,14 @@ private:
 
 private:
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, IVisual* vis/*, binary::bytes_cref bytes*/)
     {
         using namespace binary;
         using namespace kernel;
 
         // props.base_point = ::get_base();
 
-        return create_visual_system(msg_srv_, props);
+        return create_visual_system(msg_srv_, vis, props);
     }
 
 private:
@@ -388,16 +396,18 @@ private:
 
 struct visapp
 {
-    visapp( const  endpoint &  peer, const endpoint& mod_peer, kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    visapp( const  endpoint &  peer, const endpoint& mod_peer)
         : done_        (false)
-        , props_       (props)
         , thread_      (new boost::thread(boost::bind(&visapp::run, this)))
         , msg_service_ (boost::bind(&visapp::push_back, this, _1))
     {
         
+        props_.base_point = ::get_base();
+
         disp_
             .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
             .add<state                 >(boost::bind(&visapp::on_state      , this, _1))
+            .add<props_updated         >(boost::bind(&visapp::on_props_updated   , this, _1))
             ;
 
         w_.reset (new net_worker( peer, mod_peer 
@@ -484,16 +494,21 @@ struct visapp
     {
         done_ = true;
     }
+    
+   
+    void on_props_updated(props_updated const& msg)
+    {
+        std::stringstream is(msg.properties);
+        prop_tree::read_from(is, props_); 
+    }
+
+private:
+    kernel::vis_sys_props               props_;
 
 private:
     bool                                 done_;
-private:
-    kernel::vis_sys_props               props_;
     std::unique_ptr<boost::thread>     thread_;
     boost::function<void()>       end_of_load_;
-private:
-
-    global_timer                           gt_;
 
 private:
     msg_dispatcher<uint32_t>             disp_;
@@ -501,6 +516,9 @@ private:
 
 private:
     std::deque<binary::bytes_t>     queue_vis_;
+
+private:
+    global_timer                           gt_;
 
 private:
     boost::scoped_ptr<net_worker>           w_;
@@ -527,12 +545,9 @@ int main_visapp( int argc, char** argv )
     {
 
         endpoint proxy_peer(std::string("0.0.0.0:45003"));
-        endpoint mod_peer(std::string("0.0.0.0:45002"));
+        endpoint mod_peer  (std::string("0.0.0.0:45002"));
 
-        kernel::vis_sys_props props;
-        props.base_point = ::get_base();
-
-        visapp  va(proxy_peer, mod_peer, props);
+        visapp  va(proxy_peer, mod_peer);
 
         boost::system::error_code ec;
         __main_srvc__->run(ec);

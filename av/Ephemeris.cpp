@@ -285,6 +285,7 @@ namespace avSky
 						avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection -= cg::point_3f(0,.5,0);
 						return true;
 					}
+
                 }
                 return false;
             } 
@@ -385,12 +386,12 @@ namespace avSky
         time_t seconds = time(0L);
         struct tm *_tm = localtime(&seconds);
         osgEphemeris::DateTime dt;
-        dt.setYear( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
-        dt.setMonth( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
+        dt.setYear      ( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
+        dt.setMonth     ( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
         dt.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
-        dt.setHour( _tm->tm_hour );
-        dt.setMinute( _tm->tm_min );
-        dt.setSecond( _tm->tm_sec );
+        dt.setHour      ( _tm->tm_hour );
+        dt.setMinute    ( _tm->tm_min );
+        dt.setSecond    ( _tm->tm_sec );
         _d->_ephemerisModel->setDateTime( dt );
     }
     
@@ -399,12 +400,12 @@ namespace avSky
         time_t seconds = time(0L);
         struct tm *_tm = localtime(&seconds);
         osgEphemeris::DateTime dt;
-        dt.setYear( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
-        dt.setMonth( 6 ); // DateTime numbers months from 1 to 12, not 0 to 11
+        dt.setYear      ( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
+        dt.setMonth     ( 6 ); // DateTime numbers months from 1 to 12, not 0 to 11
         dt.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
-        dt.setHour( _tm->tm_hour );
-        dt.setMinute( _tm->tm_min );
-        dt.setSecond( _tm->tm_sec );
+        dt.setHour      ( _tm->tm_hour );
+        dt.setMinute    ( _tm->tm_min );
+        dt.setSecond    ( _tm->tm_sec );
         _d->_ephemerisModel->setDateTime( dt );
     }
 

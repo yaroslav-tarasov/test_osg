@@ -16,6 +16,9 @@
 
 #include "utils/krv_import.h"
 
+#include "kernel/systems.h"
+#include "reflection/proc/prop_tree.h"
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -107,7 +110,9 @@ struct client
                 else
                     cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
                 
-                peer_addrs.insert((*it).first.addr);
+                if((*it).first.port == 45003)
+                    peer_addrs.insert((*it).first.addr);
+
                 LogInfo("Connecting to " << (*it).first);
 			}
             
@@ -248,6 +253,16 @@ private:
             peers_[peer]->send(&bts[0], bts.size());
             LogInfo("Send peers list to " << peer);
         }
+        
+        
+        {
+            kernel::vis_sys_props props;
+            std::stringstream os;
+            prop_tree::write_to(os, props); 
+            
+            binary::bytes_t bts =  std::move(wrap_msg(props_updated(os.str())));
+            peers_[peer]->send(&bts[0], bts.size());
+        }
 
         {
             binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
@@ -370,10 +385,17 @@ int _tmain(int argc, _TCHAR* argv[])
     try
     {
         client::endpoints ep;
-		//ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.142:45001")), false));           // VisApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));       // VisApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45001")), false));       // VisApp
+		ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
+#if 0
+//        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));           // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.141:45003")), false));       // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.142:45003")), false));       // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.143:45003")), false));       // VisApp
+
+#else
+        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));         // VisApp
+        //ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));       // VisApp
+#endif
 
         client c(ep);              
         __main_srvc__->run();

@@ -115,7 +115,7 @@ struct net_worker
      
      void disconnect(error_code const& err)
      {
-         worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+         //worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
      }
 
      void done()

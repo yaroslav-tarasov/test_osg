@@ -221,9 +221,7 @@ struct SetupRigGeometry : public osg::NodeVisitor
                 {
                     //rig->setSkeleton(_skel.get());
                     //rig->computeMatrixFromRootSkeleton();
-
                 }
-
 
             }
         }
