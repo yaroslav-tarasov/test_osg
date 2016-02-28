@@ -1475,73 +1475,77 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         osg::MatrixTransform* root = nullptr;
         
         osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-
-        auto label = findFirstNode(phys_ctrl,"text_label");
-        if( label == nullptr)
-        {
-            const osg::Quat quat0(osg::inDegrees(90.0f), osg::X_AXIS,                      
-                                  osg::inDegrees(0.f)  , osg::Y_AXIS,
-                                  osg::inDegrees(90.f) , osg::Z_AXIS ); 
-            
-            const osg::Quat quat1(osg::inDegrees(90.0f)  , osg::X_AXIS,                      
-                                  osg::inDegrees(0.f)    , osg::Y_AXIS,
-                                  osg::inDegrees(-90.f)  , osg::Z_AXIS ); 
-            
-            // double radius = phys_ctrl->computeBound().radius();
-            osg::ComputeBoundsVisitor cbv;
-            parent->accept( cbv );
-            const osg::BoundingBox& bb = cbv.getBoundingBox();
-
-            osg::Matrix mat; 
-            mat.setTrans(-offset/2);
-
-            root = new osg::MatrixTransform(mat);
-            root->setName("root");
-            phys_ctrl?phys_ctrl->asGroup()->addChild(root):nullptr;
+		
+		if(phys_ctrl)
+		{
+			auto label = findFirstNode(phys_ctrl,"text_label");
         
-            std::string timesFont("fonts/times.ttf");
+			if( label == nullptr)
+			{
+				const osg::Quat quat0(osg::inDegrees(90.0f), osg::X_AXIS,                      
+									  osg::inDegrees(0.f)  , osg::Y_AXIS,
+									  osg::inDegrees(90.f) , osg::Z_AXIS ); 
+            
+				const osg::Quat quat1(osg::inDegrees(90.0f)  , osg::X_AXIS,                      
+									  osg::inDegrees(0.f)    , osg::Y_AXIS,
+									  osg::inDegrees(-90.f)  , osg::Z_AXIS ); 
+            
+				// double radius = phys_ctrl->computeBound().radius();
+				osg::ComputeBoundsVisitor cbv;
+				parent->accept( cbv );
+				const osg::BoundingBox& bb = cbv.getBoundingBox();
 
-            osg::ref_ptr<osgText::Text> updateText = new osgText::Text;
-            updateText->setDataVariance(osg::Object::DYNAMIC);
+				osg::Matrix mat; 
+				mat.setTrans(-offset/2);
 
-            std::string font("fonts/times.ttf");
-            //std::string font("fonts/arial.ttf");
-
-            updateText->setFont(font);
-            updateText->setFontResolution(110,120);
-            //updateText->setAlignment(osgText::Text::RIGHT_CENTER);
-            //updateText->setAxisAlignment(osgText::Text::XZ_PLANE);
-            //updateText->setCharacterSize((bb.zMax()-bb.zMin())*1.0f);
-            //updateText->setPosition(bb.center()-osg::Vec3((bb.xMax()-bb.xMin()),-(bb.yMax()-bb.yMin())*0.5f,(bb.zMax()-bb.zMin())*0.1f));
-            //updateText->setColor(osg::Vec4(0.37f,0.48f,0.67f,1.0f)); // Neil's original OSG colour
-            updateText->setColor(osg::Vec4(0.20f,0.45f,0.60f,1.0f)); 
-
-
-            osg::Geode* geode = new osg::Geode();
-            osg::StateSet* stateset = geode->getOrCreateStateSet();
-            stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-            stateset->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-            geode->setName("text_label");
-            geode->addDrawable( updateText );
+				root = new osg::MatrixTransform(mat);
+				root->setName("root");
+				phys_ctrl?phys_ctrl->asGroup()->addChild(root):nullptr;
         
-            updateText->setName("text_label");
-            updateText->setCharacterSize(1.8f);
-            updateText->setFont(timesFont);
-            updateText->setColor(osg::Vec4(1.0f,1.0f,0.0f,1.0f));
-            updateText->setText("The label");
-            updateText->setPosition(osg::Vec3(0,0,(bb.zMax() - bb.zMin())));
-            updateText->setRotation(quat0);
-            updateText->setAlignment(osgText::TextBase::CENTER_TOP);
-            auto cpText = osg::clone(updateText.get(), osg::CopyOp::DEEP_COPY_ALL);
-            cpText->setRotation(quat1);
-            geode->addDrawable( cpText );
+				std::string timesFont("fonts/times.ttf");
 
-            root->addChild(geode);
-        }
-        else
-        {
-           root = label->getParent(0)->asTransform()->asMatrixTransform();
-        }
+				osg::ref_ptr<osgText::Text> updateText = new osgText::Text;
+				updateText->setDataVariance(osg::Object::DYNAMIC);
+
+				std::string font("fonts/times.ttf");
+				//std::string font("fonts/arial.ttf");
+
+				updateText->setFont(font);
+				updateText->setFontResolution(110,120);
+				//updateText->setAlignment(osgText::Text::RIGHT_CENTER);
+				//updateText->setAxisAlignment(osgText::Text::XZ_PLANE);
+				//updateText->setCharacterSize((bb.zMax()-bb.zMin())*1.0f);
+				//updateText->setPosition(bb.center()-osg::Vec3((bb.xMax()-bb.xMin()),-(bb.yMax()-bb.yMin())*0.5f,(bb.zMax()-bb.zMin())*0.1f));
+				//updateText->setColor(osg::Vec4(0.37f,0.48f,0.67f,1.0f)); // Neil's original OSG colour
+				updateText->setColor(osg::Vec4(0.20f,0.45f,0.60f,1.0f)); 
+
+
+				osg::Geode* geode = new osg::Geode();
+				osg::StateSet* stateset = geode->getOrCreateStateSet();
+				stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+				stateset->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
+				geode->setName("text_label");
+				geode->addDrawable( updateText );
+        
+				updateText->setName("text_label");
+				updateText->setCharacterSize(1.8f);
+				updateText->setFont(timesFont);
+				updateText->setColor(osg::Vec4(1.0f,1.0f,0.0f,1.0f));
+				updateText->setText("The label");
+				updateText->setPosition(osg::Vec3(0,0,(bb.zMax() - bb.zMin())));
+				updateText->setRotation(quat0);
+				updateText->setAlignment(osgText::TextBase::CENTER_TOP);
+				auto cpText = osg::clone(updateText.get(), osg::CopyOp::DEEP_COPY_ALL);
+				cpText->setRotation(quat1);
+				geode->addDrawable( cpText );
+
+				root->addChild(geode);
+			}
+			else
+			{
+			   root = label->getParent(0)->asTransform()->asMatrixTransform();
+			}
+		}
 
         return root;
     }
@@ -1934,7 +1938,7 @@ void Scene::onExit()
     _viewerPtr->setDone(true);
 }
 
-void Scene::setHomePosition(osg::Vec3d& eye, osg::Vec3d& center)
+void Scene::setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center)
 {
     osgGA::CameraManipulator* manip = _viewerPtr->getCameraManipulator();
     if(manip)
@@ -1994,6 +1998,7 @@ void Scene::update( osg::NodeVisitor * nv )
 	  FIXME( "А третья координата?" );
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
 	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
-
-      _ephemerisNode->setTime();
+	  
+	  FIXME( "Время для окрю обст." );
+      //_ephemerisNode->setTime();
 }

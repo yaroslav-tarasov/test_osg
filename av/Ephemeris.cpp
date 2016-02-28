@@ -393,6 +393,14 @@ namespace avSky
         dt.setMinute    ( _tm->tm_min );
         dt.setSecond    ( _tm->tm_sec );
         _d->_ephemerisModel->setDateTime( dt );
+		avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
+		vTime.Day    = _tm->tm_mday;
+        vTime.Year   = _tm->tm_year + 1900;
+		vTime.Hour   = _tm->tm_hour;
+		vTime.Month  = _tm->tm_mon + 1;
+		vTime.Minute = _tm->tm_min;
+		vTime.Second = _tm->tm_sec;
+
     }
     
     void Ephemeris::setSummerTime()
@@ -406,7 +414,14 @@ namespace avSky
         dt.setHour      ( _tm->tm_hour );
         dt.setMinute    ( _tm->tm_min );
         dt.setSecond    ( _tm->tm_sec );
-        _d->_ephemerisModel->setDateTime( dt );
+		_d->_ephemerisModel->setDateTime( dt );
+		avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
+		vTime.Day    = _tm->tm_mday + 1;
+		vTime.Year   = _tm->tm_year + 1900;
+		vTime.Hour   = _tm->tm_hour;
+		vTime.Month  = _tm->tm_mon + 1;
+		vTime.Minute = _tm->tm_min;
+		vTime.Second = _tm->tm_sec;
     }
 
     void Ephemeris::setSkyDomeRadius(double radius)

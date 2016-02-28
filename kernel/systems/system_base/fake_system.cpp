@@ -1331,6 +1331,7 @@ void visual_system_impl::update_eye()
 {
     const auto & cam = /*debug_eye_ ? debug_eye_camera() :*/ eye_camera();
     //viewport_->SetPosition(cam.position(), cam.orientation());
+	vis_->SetPosition(cam.position(), cg::quaternion(cam.orientation()));
 }
 
 cg::camera_f visual_system_impl::eye_camera() const
@@ -1339,8 +1340,9 @@ cg::camera_f visual_system_impl::eye_camera() const
 
     cg::camera_f cam = eye_ 
         ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))
-        : cg::camera_f();
-
+        //: cg::camera_f();
+		: cg::camera_f(point_3f(470,950,100), cprf(0,0,0));
+	
     cam.set_orientation((rot_f(cam.orientation()) * rot_f(cprf(props_.channel.course))).cpr());
     return cam;
 }

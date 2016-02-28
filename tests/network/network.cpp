@@ -89,6 +89,20 @@ namespace
 
 } 
 
+inline optional<geo_point_3> kta_position( string icao_code )
+{
+	if (icao_code == "UUEE")
+		return geo_point_3(55.9724 , 37.4131 , 0.);
+	else if (icao_code == "URSS")
+		return geo_point_3(43.44444, 39.94694, 0.);
+	else if (icao_code == "UHWW")
+		return geo_point_3(43.397928957854155, 132.14877916666666, 17.);
+	else if (icao_code == "UUOB")
+		return geo_point_3(50. + 38. / 60. + 38. / 3600., 36. + 35. / 60. + 24. / 3600., 0.);
+
+	return optional<geo_point_3>();
+}
+
 
 struct client
 {
@@ -257,9 +271,11 @@ private:
         
         {
             kernel::vis_sys_props props;
-            std::stringstream os;
+			props.base_point = *kta_position( "URSS" );
+			props.channel.course =60;
+			std::stringstream os;
             prop_tree::write_to(os, props); 
-            
+		   
             binary::bytes_t bts =  std::move(wrap_msg(props_updated(os.str())));
             peers_[peer]->send(&bts[0], bts.size());
         }
@@ -387,14 +403,14 @@ int _tmain(int argc, _TCHAR* argv[])
         client::endpoints ep;
 		ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
 #if 0
-//        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));           // VisApp
+//        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));         // VisApp
         ep.emplace_back(make_pair(endpoint(std::string("192.9.206.141:45003")), false));       // VisApp
         ep.emplace_back(make_pair(endpoint(std::string("192.9.206.142:45003")), false));       // VisApp
         ep.emplace_back(make_pair(endpoint(std::string("192.9.206.143:45003")), false));       // VisApp
 
 #else
-        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));         // VisApp
-        //ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));       // VisApp
+        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));           // VisApp
+        //ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));     // VisApp
 #endif
 
         client c(ep);              

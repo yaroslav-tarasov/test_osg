@@ -109,7 +109,8 @@ public:
     inline const IlluminationParameters & GetIlluminationParameters() const { return m_IlluminationParameters; }
     inline const EnvironmentParameters &  GetEnvironmentParameters()  const { return m_EnvironmentParameters;  }
     inline const TimeParameters &         GetTimeParameters()         const { return m_TimeParameters;         }
-    
+    inline TimeParameters &               GetTimeParameters()               { return m_TimeParameters;         }
+
     void setIllumination (float Illumination)              { m_IlluminationParameters.Illumination = Illumination; if(ic_) ic_(Illumination); }
     void setVisibleRange (float VisibleRange,float ExpDensity)              { if(vrc_)  vrc_(VisibleRange,ExpDensity); }
     void setCallBacks    (const OnIlluminationChangeF& ic, const OnVisibleRangeChangeF& vrc) {ic_ = ic; vrc_=vrc; } 

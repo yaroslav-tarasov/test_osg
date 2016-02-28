@@ -66,3 +66,10 @@ namespace airport
 
     object_info_ptr create(fake_objects_factory* sys,const settings_t& sett);
 }
+
+namespace camera
+{
+	using namespace kernel;
+
+	object_info_ptr create(fake_objects_factory* sys);
+}

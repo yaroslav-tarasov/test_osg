@@ -60,6 +60,10 @@ void create_objects(const std::string & airport)
     force_log fl5;       
     LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
 
+	{
+		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()));
+	}
+
     if(false)
     {
         std::string class_name = "aircraft";
@@ -279,8 +283,6 @@ void create_objects(const std::string & airport)
 
 	//	auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 	}
-
-
 
     //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_csys.get());
     //auto vvv = find_object<vehicle::control_ptr>(col,"vehicle 0");

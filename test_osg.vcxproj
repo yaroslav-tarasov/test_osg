@@ -311,6 +311,9 @@
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
+    <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
+    <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />
     <ClCompile Include="kernel\objects\common\object_creators.cpp" />
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />

@@ -272,6 +272,13 @@ void Visual::CreateScene()
 }
 
 
+void   Visual::SetPosition (const cg::point_3f& pos, const cg::quaternion&  orien)
+{
+	point_3 forward_dir(0.0,1.0,0.0);
+	point_3 look_dir = orien.rotate_vector(forward_dir + pos);
+	avScene::GetScene()->setHomePosition(to_osg_vector3(pos),to_osg_vector3(look_dir));
+}
+
 
 void Visual::EndSceneCreation()
 {

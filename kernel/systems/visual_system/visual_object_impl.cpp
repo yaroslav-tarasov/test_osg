@@ -56,7 +56,7 @@ namespace kernel
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
         node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed, async);
 
-		if(!async)
+		if(!async && node_ )
 		{
 
         root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);

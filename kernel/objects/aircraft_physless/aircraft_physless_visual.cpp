@@ -90,7 +90,8 @@ namespace aircraft_physless
 		{ 
 			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
-			ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+			if(label_object_->root())
+				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 		}
 #endif
 

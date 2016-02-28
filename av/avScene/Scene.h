@@ -100,7 +100,7 @@ namespace avScene {
         inline ScreenTextureManager*                getScreenTextureManager() const;
         inline osg::Group*                          getTerrainRoot() const { return _terrainRoot.get(); } 
         
-        void                                        setHomePosition(osg::Vec3d& eye, osg::Vec3d& center);
+        void                                        setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center);
 
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0, bool async=true);
 

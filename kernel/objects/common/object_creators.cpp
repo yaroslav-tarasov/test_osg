@@ -15,6 +15,7 @@
 #include "flock_manager/flock_manager_view.h"
 #include "aerostat/aerostat_view.h"
 #include "human/human_view.h"
+#include "camera/camera_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
@@ -189,5 +190,25 @@ namespace airport
 
         return sys->create_object(ocd);	
     }
+
+}
+
+namespace camera
+{
+	using namespace kernel;
+
+	object_info_ptr create(fake_objects_factory* sys)
+	{
+		const std::string class_name = "camera";
+		const std::string unique_name = sys->generate_unique_name(class_name);
+		camera_object::binoculars_t  data;
+		obj_create_data ocd(class_name, unique_name, dict::wrap(data));
+
+		ocd
+			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+			;
+
+		return sys->create_object(ocd);	
+	}
 
 }

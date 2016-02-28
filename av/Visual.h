@@ -24,6 +24,9 @@ public:
 
     virtual osgViewer::Viewer* GetViewer() const    override;
 
+//  viewport	
+	virtual void   SetPosition (const cg::point_3f&, const cg::quaternion&) override ;
+
 private:
     Visual();
     virtual  ~Visual();

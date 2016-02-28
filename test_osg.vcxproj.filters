@@ -168,6 +168,9 @@
     <Filter Include="Source Files\tests\shaders\animation">
       <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\camera">
+      <UniqueIdentifier>{aaad1b01-c0bc-4c91-af55-1200691d31ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1128,6 +1131,15 @@
     </ClCompile>
     <ClCompile Include="tests\systems\systems_impl2.cpp">
       <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_view.cpp">
+      <Filter>Source Files\objects\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_vis.cpp">
+      <Filter>Source Files\objects\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp">
+      <Filter>Source Files\objects\camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

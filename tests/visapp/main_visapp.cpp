@@ -388,18 +388,20 @@ private:
     }
 
 private:
+	IVisual*                                                    osg_vis_;
     kernel::msg_service&                                        msg_srv_;
     updater                                                     vis_sys_;
-    IVisual*                                                    osg_vis_;
+
 
 };
 
 struct visapp
 {
     visapp( const  endpoint &  peer, const endpoint& mod_peer)
-        : done_        (false)
-        , thread_      (new boost::thread(boost::bind(&visapp::run, this)))
-        , msg_service_ (boost::bind(&visapp::push_back, this, _1))
+        : done_          (false)
+        , thread_        (new boost::thread(boost::bind(&visapp::run, this)))
+        , msg_service_   (boost::bind(&visapp::push_back, this, _1))
+		, need_to_update_(false)
     {
         
         props_.base_point = ::get_base();
@@ -447,6 +449,15 @@ struct visapp
             queue_vis_.pop_front();
         }
     }
+	
+	void update_properties(visapp_impl& vi)
+	{
+		if (need_to_update_)
+		{
+			vi.update_property(props_);
+			need_to_update_ = false;
+		}
+	}
 
     void push_back (binary::bytes_cref bytes)
     {
@@ -480,6 +491,7 @@ struct visapp
         while (!va.done() && !done_)
         {
           update_messages();
+		  update_properties(va);
           va.on_render(gt_.get_time());
         }
     }
@@ -499,12 +511,13 @@ struct visapp
     void on_props_updated(props_updated const& msg)
     {
         std::stringstream is(msg.properties);
-        prop_tree::read_from(is, props_); 
+        prop_tree::read_from(is, props_);
+		need_to_update_ = true;
     }
 
 private:
     kernel::vis_sys_props               props_;
-
+	bool								need_to_update_;
 private:
     bool                                 done_;
     std::unique_ptr<boost::thread>     thread_;
