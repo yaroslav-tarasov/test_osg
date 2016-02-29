@@ -71,5 +71,5 @@ namespace camera
 {
 	using namespace kernel;
 
-	object_info_ptr create(fake_objects_factory* sys);
+	object_info_ptr create(fake_objects_factory* sys, boost::optional<std::string> name=boost::none);
 }

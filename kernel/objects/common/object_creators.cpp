@@ -197,10 +197,10 @@ namespace camera
 {
 	using namespace kernel;
 
-	object_info_ptr create(fake_objects_factory* sys)
+	object_info_ptr create(fake_objects_factory* sys, boost::optional<std::string> name)
 	{
 		const std::string class_name = "camera";
-		const std::string unique_name = sys->generate_unique_name(class_name);
+		const std::string unique_name = name?*name:sys->generate_unique_name(class_name);
 		camera_object::binoculars_t  data;
 		obj_create_data ocd(class_name, unique_name, dict::wrap(data));
 

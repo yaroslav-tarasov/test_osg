@@ -61,7 +61,7 @@ void create_objects(const std::string & airport)
     LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
 
 	{
-		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()));
+		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()), std::string("camera 0"));
 	}
 
     if(false)
