@@ -26,16 +26,16 @@ struct visual_object_impl
 #ifdef ASYNC_OBJECT_LOADING
 private:
     void object_loaded( uint32_t seed );
-    uint32_t                          seed_;
 #endif
+    uint32_t                            seed_;
     bool                              loaded_;
 
 private:
-    osg::observer_ptr<avScene::Scene> scene_;
-    osg::ref_ptr<osg::Node>           node_;
-    osg::ref_ptr<osg::Node>           root_;
+    osg::observer_ptr<avScene::Scene>                        scene_;
+    osg::ref_ptr<osg::Node>                                   node_;
+    osg::ref_ptr<osg::Node>                                   root_;
     osg::ref_ptr<osgAnimation::BasicAnimationManager> anim_manager_;
-    nm::node_control_ptr              parent_;
+    nm::node_control_ptr                                    parent_;
 
 };
 

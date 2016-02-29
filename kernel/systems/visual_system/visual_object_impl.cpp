@@ -14,32 +14,36 @@ namespace kernel
         , loaded_(false)
         , anim_manager_ (nullptr)
     {
-#ifdef ASYNC_OBJECT_LOADING
-        scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
-        node_ = scene_->load(res, nullptr, seed, async);
         seed_ =  seed;
-#endif
+
 		if(!async)
 		{
-        node_ = scene_->load(res, nullptr, seed, async);
-        root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
-        loaded_ = true;
+            node_ = scene_->load(res, nullptr, seed, async);
+            root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+            loaded_ = true;
 
 #if 1
-        using namespace avAnimation;
+            using namespace avAnimation;
 
-        AnimationManagerFinder finder;
-        node_->accept(finder);
-        anim_manager_  = finder._am;  
+            AnimationManagerFinder finder;
+            node_->accept(finder);
+            anim_manager_  = finder._am;  
 
-        if(finder._am.valid())
-            node_->setUpdateCallback(finder._am.get());
+            if(finder._am.valid())
+                node_->setUpdateCallback(finder._am.get());
 #endif
 
 #if 0
-        SetupRigGeometry switcher(true, *node_.get());
+            SetupRigGeometry switcher(true, *node_.get());
 #endif
-		}     
+		}
+        else
+        {
+#ifdef ASYNC_OBJECT_LOADING  
+            scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
+#endif
+            node_ = scene_->load(res, nullptr, seed, async);
+        }
 
     }
 
@@ -80,8 +84,8 @@ namespace kernel
 
     visual_object_impl::~visual_object_impl()
     {
-        // scene_->removeChild(node_.get());
-        utils::RemoveNodeFromAllParents( node_.get() );
+        if(node_.get())
+            utils::RemoveNodeFromAllParents( node_.get() );
         // scene_->get_objects()->remove(node_.get());
     }
 

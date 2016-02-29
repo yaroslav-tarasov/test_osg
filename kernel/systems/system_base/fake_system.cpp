@@ -414,44 +414,6 @@ auto fake_system_base::generate_object_id() -> obj_id_t
     return id;
 }
 
-//object_info_ptr   fake_system_base::create_object  (std::string const& name)
-//{   
-//    object_info_ptr obj;
-//    //msgs_blocker    mb(*this);
-//
-//    //{
-//    //    locks::bool_lock l(create_object_lock_);
-//    //    obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
-//    //}
-//
-//    uint32_t id       = generate_object_id();
-//
-//    auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
-//    auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
-//
-//    kernel::object_create_t oc(/*hierarchy_class*/nullptr, this, id, name, std::vector<object_info_ptr>(), msg_service, block_msgs);
-//
-//    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(name);
-//    
-//    if(fp)
-//        fp(oc);
-//
-//    if (obj)
-//        fire_object_created(obj);
-//    
-//    if (obj == nullptr)
-//    {
-//        LogError("Unable to load object " << name);
-//        return obj;
-//    }
-//
-//    register_obj_id(id);
-//
-//    return obj;
-//}
-
-
-
 void fake_system_base::on_session_loaded() 
 {
     session_loaded_signal_() ;

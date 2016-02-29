@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
     <ClCompile Include="..\..\kernel\fms\trajectory.cpp" />
+    <ClCompile Include="configurer_impl.cpp" />
     <ClCompile Include="network.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

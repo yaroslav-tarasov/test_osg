@@ -149,13 +149,17 @@ struct net_worker
      }
 
      void vis_connect(const std::vector<endpoint>& vis_peers)
-     {
+     {  
          vis_peers_  = vis_peers;
-         for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+         worker_service_->post([this]()
          {
-             (*it).port = 45002;
-             cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
-         }
+             for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+             {
+                 (*it).port = 45002;
+                 cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
+             }
+         } );
+
          
      }
 
@@ -401,7 +405,7 @@ private:
         create_objects(setup_msg_.icao_code);
 
         if(end_of_load_)
-            end_of_load_();  //osg_vis_->EndSceneCreation();
+            end_of_load_();  
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_proxy(&bts[0], bts.size());
@@ -509,10 +513,6 @@ int main_modapp( int argc, char** argv )
     {
 
         endpoint peer(cfg().network.local_address);
-
-        kernel::vis_sys_props props;
-        props.base_point = ::get_base();
-
         mod_app ma(peer,boost::function<void()>());
 
         boost::system::error_code ec;

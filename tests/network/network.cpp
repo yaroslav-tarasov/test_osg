@@ -19,6 +19,8 @@
 #include "kernel/systems.h"
 #include "reflection/proc/prop_tree.h"
 
+#include  "configurer.h"
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -113,19 +115,21 @@ struct client
 	
 	struct connect_helper
 	{
-		connect_helper(endpoints peers, client* cl)
+		connect_helper(const endpoints& peers, client* cl)
 		{
 			std::set<network::address_v4> peer_addrs;
             
             for (auto it = peers.begin();it!= peers.end(); ++it )
             {
                 if(!(*it).second)
+                {
                     cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), [=](error_code const& err){}, [=](error_code const& err){}));
-                else
-                    cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
-                
-                if((*it).first.port == 45003)
                     peer_addrs.insert((*it).first.addr);
+                }
+                else
+                {
+                    cl->cons_[(*it).first].reset(new async_connector((*it).first, boost::bind(&client::on_connected, cl, _1, _2), tcp_error, tcp_error));
+                }
 
                 LogInfo("Connecting to " << (*it).first);
 			}
@@ -138,27 +142,124 @@ struct client
 		}
 	};
 
+    struct net_configurer
+    {
+       struct host_props
+       {
+           net_layer::host_t                    host;
+           net_layer::application_t              app;
+           net_layer::configuration_t::task     task;
+       };
+
+       typedef  std::vector< host_props >  hosts_props_t;
+
+       net_configurer(endpoints& peers)
+           : cfgr_    (net_layer::create_configurator(123)) 
+       {
+           cfgr_->load_config("C:/Work/OSG/OpenSceneGraph-3.2.1/bin/1vis.ncfg", cfg_);
+           refill_peers(peers);
+       }
+       
+       net_layer::hosts_t const& hosts() const
+       {
+             return  cfgr_->hosts();
+       }
+       
+       net_layer::configuration_t const&  configuration() const
+       {
+           return  cfg_;
+       }
+
+       net_layer::applications_t  const&  applications () const
+       {
+            return cfgr_->applications();
+       }
+
+       hosts_props_t& get_visas()
+       {
+           net_layer::configuration_t const& cfg =  configuration();
+
+           for (auto it = cfg.tasks.begin();it!= cfg.tasks.end();++it)
+           {
+               host_props hp; 
+               auto app  = applications ()[(*it).app_id];
+
+               if(app.name == "visapp")
+               {
+                    auto phosts = hosts();
+                    hp.host = phosts[(*it).host_id];
+                    hp.app  = app;
+                    hp.task = *it;
+                    hp_.emplace_back(std::move(hp));
+               }
+
+           }
+
+           return hp_;
+       }
+
+    private:
+
+        void refill_peers(endpoints& peers)
+        {
+            net_layer::configuration_t const& cfg =  configuration();
+            
+            endpoints peers_out;
+
+            for (auto it = cfg.tasks.begin();it!= cfg.tasks.end();++it)
+            {
+                auto app  = applications ()[(*it).app_id];
+                //size_t port = 0;              
+                
+                if(app.name == "visapp")
+                {
+                    auto phosts = hosts();
+                    auto host = phosts[(*it).host_id];
+                    endpoint ep (host.ip + ":45003");
+                    peers_out.emplace_back(make_pair(std::move(ep),false));    
+                } else if(app.name == "modapp")
+                {
+                    auto phosts = hosts();
+                    auto host = phosts[(*it).host_id];
+                    endpoint ep (host.ip + ":45001");
+                    peers_out.emplace_back(make_pair(std::move(ep),true));    
+                }                
+            }
+
+            if(peers_out.size()>0)
+               peers = std::move(peers_out);
+        }
+
+    private:
+        net_layer::configurator_ptr                                            cfgr_;
+        net_layer::configuration_t                                              cfg_;
+        hosts_props_t                                                            hp_;
+    };
+
     client(endpoints peers)
-        : connect_helper_ (peers, this)
-        , period_  (/*4.*/.5)
-        , timer_   (boost::bind(&client::update, this))
-        , _traj    (fill_trajectory(krv::data_getter("log_minsk.txt")))
+        : net_cfgr_ (boost::make_shared<net_configurer>(peers))  
+        , connect_helper_ (peers, this)
+        , period_   (/*4.*/.5)
+        , timer_    (boost::bind(&client::update, this))
+        , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
+  
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
             ;
-        
+
         const double time = 0.0;
+
 
         ADD_EVENT(time , state(0.0,time,factor))
 #if 1
-        ADD_EVENT(1.0  , create(1,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_aircraft, "A319") )
+        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(70.0, fire_fight_msg_t(2))
 #endif       
 
-#if 1
-        ADD_EVENT(10.0 , create(2,_traj->kp_value(_traj->base_length()) + cg::point_3(10.0,10.0,0.0),_traj->curs_value(_traj->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
-        ADD_EVENT(10.0 , create(3,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()),ok_flock_of_birds,"crow")) 
+#if 0
+        ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
+        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 #endif
 
@@ -168,7 +269,7 @@ struct client
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #endif
 
-        ADD_EVENT(10.0  , create(31,_traj->kp_value(_traj->base_length()),_traj->curs_value(_traj->base_length()), ok_human, "human") )
+        ADD_EVENT(10.0  , create(31,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_human, "human") )
 
 #if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
@@ -186,9 +287,9 @@ struct client
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
-                ,_traj->kp_value    (time)
-                ,_traj->curs_value  (time)
-                ,*_traj->speed_value(time)
+                ,traj_->kp_value    (time)
+                ,traj_->curs_value  (time)
+                ,*traj_->speed_value(time)
                 , time + traj_offset
                 , false
                 , meteo::local_params()
@@ -198,11 +299,11 @@ struct client
         };
 
 
-        runs_.insert(make_pair(_traj->base_length(),                                 
+        runs_.insert(make_pair(traj_->base_length(),                                 
             boost::bind( run_f_, 1,_1,traj_offset)
             ));
 
-        runs_.insert(make_pair( _traj->base_length() - vehicle_prediction,
+        runs_.insert(make_pair( traj_->base_length() - vehicle_prediction,
             [this] (double time)
             {
                 double vtime = time + vehicle_prediction;
@@ -270,14 +371,23 @@ private:
         
         
         {
-            kernel::vis_sys_props props;
-			props.base_point = *kta_position( "URSS" );
-			props.channel.course =60;
-			std::stringstream os;
-            prop_tree::write_to(os, props); 
-		   
-            binary::bytes_t bts =  std::move(wrap_msg(props_updated(os.str())));
-            peers_[peer]->send(&bts[0], bts.size());
+            net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+
+            for (auto it = hp.begin(); it!=hp.end(); ++it )
+            {
+                if((*it).host.ip==peer.addr.to_string())
+                {
+                    // kernel::vis_sys_props props;
+                    // props.base_point = *kta_position( "URSS" );
+                    // props.channel.course = 60 ;
+                    // std::stringstream os;
+                    // prop_tree::write_to(os, props); 
+
+                    binary::bytes_t bts =  std::move(wrap_msg(props_updated(/*os.str()*/(*it).task.properties)));
+                    peers_[peer]->send(&bts[0], bts.size());
+                }
+            }		   
+
         }
 
         {
@@ -348,8 +458,12 @@ private:
         timer_.wait(boost::posix_time::microseconds(int64_t(1e6 * period_)));
     }
 
+
+private: 
+    boost::shared_ptr<net_configurer>                                net_cfgr_;
+
 private:
-    net_layer::msg::endpoints                               eps_;
+    net_layer::msg::endpoints                                            eps_;
 
 private:
     async_timer             timer_; 
@@ -366,15 +480,15 @@ private:
 
 private:
     
-    fms::trajectory_ptr                              _traj;
+    fms::trajectory_ptr                                                  traj_;
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
-    time_queue_msgs_t                                msgs_;
-    boost::function<void(uint32_t,double,double)>   run_f_;
+    time_queue_msgs_t                                                    msgs_;
+    boost::function<void(uint32_t,double,double)>                       run_f_;
 
-    typedef boost::function<void(double /*time*/)>    run_f;
+    typedef boost::function<void(double /*time*/)>   run_f;
 
     typedef std::multimap<double, run_f>  time_queue_run_t;
-    time_queue_run_t                                  runs_;
+    time_queue_run_t                                                     runs_;
 
 
 

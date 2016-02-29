@@ -496,12 +496,6 @@ struct visapp
         }
     }
     
-    void end_this()
-    {
-        if(end_of_load_)
-            end_of_load_();
-    }
-
     void done()
     {
         done_ = true;
@@ -512,6 +506,9 @@ struct visapp
     {
         std::stringstream is(msg.properties);
         prop_tree::read_from(is, props_);
+        
+        FIXME(Чего-то со свойствами надо делать);
+        props_.base_point = ::get_base();
 		need_to_update_ = true;
     }
 
