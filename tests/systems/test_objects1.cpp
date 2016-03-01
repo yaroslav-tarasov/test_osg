@@ -62,7 +62,7 @@ void create_objects(const std::string & airport)
 
 #if 0
 	{
-		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()));
+		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()), std::string("camera 0"));
 	}
 #endif
 

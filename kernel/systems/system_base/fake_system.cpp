@@ -351,7 +351,8 @@ void fake_system_base::on_msg(binary::bytes_cref bytes)
 
 //! базовая функция загрузки упражнения
 void fake_system_base::load_exercise(dict_cref dict)
-{
+{   
+	exercise_loaded_signal_();
 }
 
 void fake_system_base::save_exercise(dict_ref dict, bool safe_key) const
