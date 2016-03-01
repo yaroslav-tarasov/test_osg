@@ -8,6 +8,8 @@ using network::gen_msg;
 
 #include "test_msg_enum.h"
 
+#include "common/environment.h"
+
 // FIXME messages and namespaces
 
 namespace net_layer
@@ -296,7 +298,24 @@ namespace net_layer
         REFL_ENTRY(msgs)
     REFL_END()
 
+	struct environment_msg
+		: network::msg_id<id_environment>
+	{
+		environment_msg( const environment::weather_t & weather)
+			: weather (weather)
+		{
+		}
 
+		environment_msg()
+		{
+		}
+
+		environment::weather_t   weather;
+	};
+
+	REFL_STRUCT(environment_msg)
+		REFL_SER(weather)
+    REFL_END()
 
     }
 

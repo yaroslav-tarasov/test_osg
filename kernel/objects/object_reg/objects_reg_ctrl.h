@@ -53,7 +53,8 @@ protected:
     remote_send_f                                                      send_;
 private:
     network::msg_dispatcher<uint32_t>                                  disp_;
-
+	boost::function<kernel::object_info_ptr 
+		(kernel::system*, net_layer::msg::create const&)>                 f_;
 private:
     connection_holder                                           conn_holder_;
 };

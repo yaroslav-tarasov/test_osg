@@ -132,7 +132,7 @@ void LightningLayer::_buildStateSet()
     _colorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
     _colorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));
     _densityUniform    = new osg::Uniform("density",    _clDensity);
-    _mvpUniform              = new osg::Uniform("MVP",        _clRotation);
+    _mvpUniform        = new osg::Uniform("MVP",        _clRotation);
 
     sset->addUniform( new osg::Uniform("Lightning", 1) );
     sset->addUniform(_colorFrontUniform.get());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "reflection/proc/binary.h"
+#include "objects/environment_fwd .h"
 
 namespace environment
 {

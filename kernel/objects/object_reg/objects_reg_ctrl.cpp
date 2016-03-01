@@ -3,7 +3,9 @@
 
 #include "objects_reg_ctrl.h"
 
-#include "objects\vehicle.h"
+#include "objects/vehicle.h"
+#include "objects/common/airport.h"
+#include "objects/environment.h"
 
 #include "common/test_msgs.h"
 
@@ -42,10 +44,17 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         
         	
         ;
+
+	f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create const&)>( "create_object");
+
 }
 
 void ctrl::on_object_created(object_info_ptr object)
 {
+	if(airport::info_ptr(object))
+		airports_[object->object_id()]=object;
+
+	environment::control_ptr ec = find_first_child<environment::control_ptr    >(object);
 }
 
 void ctrl::on_object_destroying(object_info_ptr object)
@@ -54,7 +63,14 @@ void ctrl::on_object_destroying(object_info_ptr object)
     if ( a != objects_.end())
     {
         objects_.erase(object->object_id());
-    }
+    } else
+	{
+		auto a = airports_.find(object->object_id());
+		if ( a != airports_.end())
+		{
+			airports_.erase(object->object_id());
+		}
+	}
 }
 
 void ctrl::inject_msg(const void* data, size_t size)
@@ -176,11 +192,10 @@ void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 
 void ctrl::create_object(net_layer::msg::create const& msg)
 {
-	auto fp = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create const&)>( "create_object");
 	kernel::object_info_ptr  a = nullptr;
 
-	if(fp)
-		a = fp(sys_, msg);
+	if(f_)
+		a = f_(sys_, msg);
 
 	if (a)
     {
