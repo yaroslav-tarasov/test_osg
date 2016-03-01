@@ -158,7 +158,8 @@ enum objects_t{
 
 #include "utils/high_res_timer.h"
 
-#include "av/avEnvironmentParams.h"
+#include "common/ref_counter.h"
+#include "av/avScene.h"
 
 
 

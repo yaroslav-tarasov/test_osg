@@ -573,6 +573,11 @@ Scene::~Scene()
 {
 }
 
+av::environment_weather* Scene::get_env_weather() const
+{
+    return avCore::GetEnvironment();
+}
+
 avSky::ISky*  Scene::getSky()
 { 
 #ifdef ORIG_EPHEMERIS

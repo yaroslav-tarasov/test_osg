@@ -507,7 +507,7 @@ struct visapp_impl
 
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
         : systems_  (get_systems())
-        , osg_vis_  (CreateVisual())
+        , osg_vis_  (av::CreateVisual())
         , vis_sys_  (create_vis(props/*, bytes*/))
     {   
 
@@ -558,7 +558,7 @@ private:
 
     systems_ptr                                                 systems_;
     updater                                                     vis_sys_;
-    IVisual*                                                    osg_vis_;
+    av::IVisualPtr                                              osg_vis_;
 
 };
 

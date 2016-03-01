@@ -448,6 +448,11 @@ inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
 	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,vgp);
 }
 
+inline object_info_ptr create_camera(kernel::system* csys, create const& msg)
+{
+    return camera::create(dynamic_cast<fake_objects_factory*>(csys));
+}
+
 object_info_ptr create_object( kernel::system* csys, create const& msg)
 {
     if(msg.object_kind & ok_vehicle)
@@ -459,10 +464,7 @@ object_info_ptr create_object( kernel::system* csys, create const& msg)
     else if ( msg.object_kind == ok_helicopter)
         return create_helicopter_phl(csys, msg); 
     else if( msg.object_kind == ok_camera)
-    {
-        return camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(csys).get()));
-    }
-
+        return create_camera(csys, msg);
     else
         return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 

@@ -52,6 +52,7 @@ namespace avWeather
     //
 
     class Weather : public osg::Node
+                  
     {
 
     public:

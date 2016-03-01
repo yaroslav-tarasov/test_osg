@@ -156,7 +156,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("C:/Work/OSG/OpenSceneGraph-3.2.1/bin/1vis.ncfg", cfg_);
+           cfgr_->load_config("1vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -517,6 +517,7 @@ int _tmain(int argc, _TCHAR* argv[])
     try
     {
         client::endpoints ep;
+#if 0
 		ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
 #if 0
 //        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));         // VisApp
@@ -527,6 +528,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #else
         ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));           // VisApp
         //ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));     // VisApp
+#endif
 #endif
 
         client c(ep);              

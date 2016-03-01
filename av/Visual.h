@@ -1,6 +1,9 @@
 #pragma once 
 #include "IVisual.h"
 
+namespace av
+{
+
 
 
 class  Visual : public IVisual
@@ -21,7 +24,7 @@ public:
     virtual bool   Done()                           override;
     virtual void   SetDone(bool )                   override;
 
-
+    virtual IScenePtr          GetScene() const     override;
     virtual osgViewer::Viewer* GetViewer() const    override;
 
 //  viewport	
@@ -41,3 +44,5 @@ private:
     osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
 
 };
+
+}

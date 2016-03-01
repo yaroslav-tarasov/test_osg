@@ -79,7 +79,8 @@ namespace avScene {
     //
    
 
-    class VISUAL_API Scene : public osg::Group
+    class VISUAL_API Scene : public osg::Group, 
+                             public av::IScene
     {
 
     public:
@@ -105,6 +106,11 @@ namespace avScene {
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0, bool async=true);
 
         static std::string                          zoneToReload(){return zone_to_reload_;}
+    
+    private: // IScene interface declaration
+        av::environment_weather*                    get_env_weather() const override;
+
+    
     private:
 
         Scene();

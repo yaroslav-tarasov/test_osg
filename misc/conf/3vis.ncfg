@@ -1,0 +1,39 @@
+sessions
+{
+    0 vises
+}
+tasks
+{
+    0
+    {
+        name visapp
+        app_id 4
+        host_id 3
+        session vises
+        properties "base_point\n{\n    lat 55.9724\n    lon 37.4131\n    height 0\n}\nchannel\n{\n    hfov 60\n    hdeflection 0\n    course -80\n    pixel_scale 1\n    camera_name \"\"\n    cylindric_geom_corr false\n}\nwindow\n{\n    ltcorner\n    {\n        x 0\n        y 0\n    }\n    size\n    {\n        x 500\n        y 500\n    }\n    fullscreen false\n}\n"
+    }
+    1
+    {
+        name visapp
+        app_id 4
+        host_id 4
+        session vises
+        properties "base_point\n{\n    lat 55.9724\n    lon 37.4131\n    height 0\n}\nchannel\n{\n    hfov 60\n    hdeflection 0\n    course 0\n    pixel_scale 1\n    camera_name \"\"\n    cylindric_geom_corr false\n}\nwindow\n{\n    ltcorner\n    {\n        x 0\n        y 0\n    }\n    size\n    {\n        x 500\n        y 500\n    }\n    fullscreen false\n}\n"
+    }
+    2
+    {
+        name visapp
+        app_id 4
+        host_id 5
+        session vises
+        properties "base_point\n{\n    lat 55.9724\n    lon 37.4131\n    height 0\n}\nchannel\n{\n    hfov 80\n    hdeflection 0\n    course 80\n    pixel_scale 1\n    camera_name \"\"\n    cylindric_geom_corr false\n}\nwindow\n{\n    ltcorner\n    {\n        x 0\n        y 0\n    }\n    size\n    {\n        x 500\n        y 500\n    }\n    fullscreen false\n}\n"
+    }
+    3
+    {
+        name modapp
+        app_id 0
+        host_id 0
+        session vises
+        properties ""
+    }
+}

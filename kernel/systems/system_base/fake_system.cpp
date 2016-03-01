@@ -98,7 +98,7 @@ system_ptr create_model_system(msg_service& service, std::string const& script)
     return kernel::system_ptr(boost::make_shared<model_system_impl>(boost::ref(service), boost::ref(script)));
 }
 
-system_ptr create_visual_system(msg_service& service, IVisual* vis, vis_sys_props const& vsp ) 
+system_ptr create_visual_system(msg_service& service, av::IVisualPtr vis, vis_sys_props const& vsp ) 
 {
     LogInfo("Creating VISUAL system");
     return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service),  vis, boost::ref(vsp)));
@@ -1173,7 +1173,7 @@ struct visual_system_impl
     //, victory::widget_control
 {
 
-    visual_system_impl(msg_service& service, IVisual *vis, vis_sys_props const& props);
+    visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props);
 
 private:
     void update       (double time) override;
@@ -1202,13 +1202,17 @@ private:
     void            object_destroying(object_info_ptr object);
 
 private:
+    av::IVisualPtr            visual  () override;
+    av::IScenePtr             scene   () override;
+
+private:
     DECL_LOGGER("vis_sys");
 
 private:
     vis_sys_props           props_;
 
-    IVisual*                       vis_;
-    //victory::IScenePtr         scene_;
+    av::IVisualPtr                     vis_;
+    av::IScenePtr                    scene_;
     //victory::IViewportPtr   viewport_;
 
     scoped_connection object_destroying_connection_;
@@ -1223,16 +1227,26 @@ private:
 };
 
 
-visual_system_impl::visual_system_impl(msg_service& service, IVisual *vis, vis_sys_props const& props)
+visual_system_impl::visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props)
     : fake_system_base(sys_visual, service, "objects.xml")
     , vis_   (vis)
-    //, scene_    (vis->create_scene())
+    , scene_ (vis->GetScene())
     //, viewport_ (vis->create_viewport())
 
     , props_(props)
     , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&visual_system_impl::object_destroying, this, _1)))
 {
     LogInfo("Create Visual Subsystem");
+}
+
+av::IVisualPtr   visual_system_impl::visual()
+{
+    return  vis_;
+}
+
+av::IScenePtr    visual_system_impl::scene()
+{
+    return scene_;
 }
 
 void visual_system_impl::update(double time)

@@ -1,0 +1,88 @@
+0
+{
+	name modapp
+	icon_path ""
+	single_session true
+    prop_lib ""
+    prop_function ""
+}
+1
+{
+	name arm_chief
+	icon_path ""
+	single_session true
+    prop_lib "app_settings"
+    prop_function "arm_chief_properties"
+}
+2
+{
+	name arm_atc
+	icon_path ""
+	single_session true
+    prop_lib "app_settings"
+    prop_function "arm_atc_properties"
+}
+3
+{
+	name arm_ipo
+	icon_path ""
+	single_session true
+    prop_lib "app_settings"
+    prop_function "arm_ipo_properties"
+}
+4
+{
+	name visapp
+	icon_path ""
+	single_session true
+    prop_lib "app_settings"
+    prop_function "visapp_properties"
+}
+5
+{
+	name atc_gate_app
+	icon_path ""
+	single_session true
+    prop_lib ""
+    prop_function ""
+}
+6
+{
+	name vcs_gate
+	icon_path ""
+	single_session true
+    prop_lib ""
+    prop_function ""
+}
+7
+{
+	name vcs_terminal
+	icon_path ""
+	single_session true
+    prop_lib "app_settings"
+    prop_function "vcs_terminal_properties"
+}
+8
+{
+	name dman_gate_test
+	icon_path ""
+	single_session true
+    prop_lib ""
+    prop_function ""
+}
+9
+{
+    name lighting_ctrl
+    icon_path ""
+    single_session true
+    prop_lib ""
+    prop_function ""
+}
+10
+{
+    name lighting_terminal
+    icon_path ""
+    single_session true
+    prop_lib "app_settings"
+    prop_function "lighting_terminal_properties"
+}

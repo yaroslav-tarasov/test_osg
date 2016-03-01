@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "victory/vtVictoryFwd.h"
+#include "av/avVisualFwd.h"
 #include "common/event.h"
 #include "kernel/systems.h"
 
@@ -30,8 +30,8 @@ struct visual_system
 	virtual visual_object_ptr       create_visual_object(std::string const & res, uint32_t seed = 0, bool async=false) = 0;
 	virtual visual_object_ptr       create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed = 0, bool async=false ) = 0;
 #endif
-	//virtual victory::IVictoryPtr    victory () = 0;
-    //virtual victory::IScenePtr      scene   () = 0;
+	virtual av::IVisualPtr            visual  () = 0;
+    virtual av::IScenePtr             scene   () = 0;
     //virtual victory::IViewportPtr   viewport() = 0;
 };
 

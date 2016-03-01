@@ -34,6 +34,11 @@ namespace
 	};
 }
 
+namespace av
+{
+
+
+
 Visual * Visual::m_pInstance = nullptr;
 
 
@@ -372,10 +377,17 @@ double Visual::GetInternalTime()
     return -1;
 }
 
+IScenePtr Visual::GetScene(void) const
+{
+    return avScene::GetScene();
+}
 
 IVisual *  CreateVisual()
 {
     IVisual * iv = Visual::CreateInstance();
     iv->Initialize();
     return iv;
+}
+
+
 }

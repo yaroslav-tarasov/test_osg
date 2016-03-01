@@ -339,7 +339,7 @@ struct visapp_impl
     friend struct visapp;
 
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv)
-        : osg_vis_  (CreateVisual())
+        : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
         , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/))
 
@@ -377,7 +377,7 @@ private:
 
 private:
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, IVisual* vis/*, binary::bytes_cref bytes*/)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis/*, binary::bytes_cref bytes*/)
     {
         using namespace binary;
         using namespace kernel;
@@ -388,7 +388,7 @@ private:
     }
 
 private:
-	IVisual*                                                    osg_vis_;
+	av::IVisualPtr                                              osg_vis_;
     kernel::msg_service&                                        msg_srv_;
     updater                                                     vis_sys_;
 
