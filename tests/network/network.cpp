@@ -250,6 +250,8 @@ struct client
 
         const double time = 0.0;
 
+         
+        ADD_EVENT(0.0  , create(1500,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_camera, "camera 0") )
 
         ADD_EVENT(time , state(0.0,time,factor))
 #if 1
@@ -257,7 +259,7 @@ struct client
         ADD_EVENT(70.0, fire_fight_msg_t(2))
 #endif       
 
-#if 0
+#if 1
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
         ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 

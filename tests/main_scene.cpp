@@ -230,7 +230,7 @@ private:
     public:  
         handler(avSky::CloudsLayer* skyClouds) 
               : _skyClouds  (skyClouds)
-              , _currCloud  (avSky::cirrus)
+              , _currCloud  (av::weather_params::cirrus)
               {}
 
         virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
@@ -242,9 +242,9 @@ private:
                     if(_skyClouds)
                     {
                         int cc = _currCloud;cc++;
-                        _currCloud = static_cast<avSky::cloud_type>(cc);
-                        if(_currCloud >= avSky::clouds_types_num)
-                            _currCloud = avSky::none;
+                        _currCloud = static_cast<av::weather_params::cloud_type>(cc);
+                        if(_currCloud >= av::weather_params::clouds_types_num)
+                            _currCloud = av::weather_params::none;
                 
                         _skyClouds->setCloudsTexture(_currCloud);
                     }
@@ -270,7 +270,7 @@ private:
 
     private:
         osg::ref_ptr<avSky::CloudsLayer>                  _skyClouds;
-        avSky::cloud_type                                 _currCloud;
+        av::weather_params::cloud_type                    _currCloud;
     };
 
 private:

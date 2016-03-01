@@ -19,7 +19,7 @@ public:
     // set clouds 2 color scheme
     void setCloudsColors( const osg::Vec3f & vFrontColor, const osg::Vec3f & vBackColor );
     // set clouds texture
-    bool setCloudsTexture( cloud_type cl_type );
+    bool setCloudsTexture( av::weather_params::cloud_type cl_type );
     // set density
     bool setCloudsDensity( float density );
 
@@ -48,9 +48,9 @@ private:
 private:
 
     // input
-    float        _clDensity;
-    cloud_type   _clType;
-    osg::Matrixf _clRotation;
+    float                         _clDensity;
+    av::weather_params::cloud_type   _clType;
+    osg::Matrixf                 _clRotation;
 
 };
 

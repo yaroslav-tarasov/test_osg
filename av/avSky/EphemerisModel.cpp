@@ -383,7 +383,7 @@ void EphemerisModel::SetClouds( int nType, float fCloudIntensity )
         osg::Texture2D * pTexture = new osg::Texture2D(osgDB::readImageFile(szBuffer,new osgDB::Options));//utils::GetDatabase()->LoadTexture(szBuffer);
         _skyDome->setCloudsTexture(pTexture);
 
-        _skyClouds->setCloudsTexture(static_cast<avSky::cloud_type>(_nCloudsType));
+        _skyClouds->setCloudsTexture(static_cast<av::weather_params::cloud_type>(_nCloudsType));
         _skyClouds->setCloudsDensity(fCloudIntensity);
         _needsToUpdate = true;
     }

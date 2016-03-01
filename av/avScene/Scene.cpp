@@ -193,7 +193,7 @@ class DebugHMIHandler : public osgGA::GUIEventHandler
 
 public:  
     DebugHMIHandler(avSky::Sky* sky) 
-        : _currCloud  (avSky::cirrus)
+        : _currCloud  (av::weather_params::cirrus)
         , _intensivity(0.1)
         , _sky(sky)
     {}
@@ -210,9 +210,9 @@ public:
                 //if(_skyClouds)
                 {
                     int cc = _currCloud;cc++;
-                    _currCloud = static_cast<avSky::cloud_type>(cc);
-                    if(_currCloud >= avSky::clouds_types_num)
-                        _currCloud = avSky::none;
+                    _currCloud = static_cast<av::weather_params::cloud_type>(cc);
+                    if(_currCloud >= av::weather_params::clouds_types_num)
+                        _currCloud = av::weather_params::none;
                     
                     avCore::GetEnvironment()->m_WeatherParameters.CloudType = _currCloud;
                 }
@@ -323,7 +323,7 @@ public:
     } 
 
 private:
-    avSky::cloud_type                                  _currCloud;
+    av::weather_params::cloud_type                      _currCloud;
     float                                             _intensivity;
     avSky::Sky *                                      _sky;
 

@@ -60,9 +60,11 @@ void create_objects(const std::string & airport)
     force_log fl5;       
     LOG_ODS_MSG( "create_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
 
+#if 0
 	{
 		auto obj_camera = camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()));
 	}
+#endif
 
     if(false)
     {
@@ -456,6 +458,11 @@ object_info_ptr create_object( kernel::system* csys, create const& msg)
         return create_character(csys, msg);
     else if ( msg.object_kind == ok_helicopter)
         return create_helicopter_phl(csys, msg); 
+    else if( msg.object_kind == ok_camera)
+    {
+        return camera::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(csys).get()));
+    }
+
     else
         return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 

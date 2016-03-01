@@ -137,7 +137,7 @@ namespace avSky
         public:  
             handler(Ephemeris *ephem) 
                 : _ephem(ephem) 
-                , _currCloud  (avSky::cirrus)
+                , _currCloud  (av::weather_params::cirrus)
                 , _intensity(0.1)
             {}
 
@@ -158,9 +158,9 @@ namespace avSky
                         if(_skyClouds)
                         {
                             int cc = _currCloud;cc++;
-                            _currCloud = static_cast<avSky::cloud_type>(cc);
-                            if(_currCloud >= avSky::clouds_types_num)
-                                _currCloud = avSky::none;
+                            _currCloud = static_cast<av::weather_params::cloud_type>(cc);
+                            if(_currCloud >= av::weather_params::clouds_types_num)
+                                _currCloud = av::weather_params::none;
 
                             _skyClouds->setCloudsTexture(_currCloud);
                         }
@@ -292,7 +292,7 @@ namespace avSky
 
         private:
             osg::ref_ptr<Ephemeris>                           _ephem;
-            avSky::cloud_type                                 _currCloud;
+            av::weather_params::cloud_type                    _currCloud;
             float                                             _intensity;
         };
 

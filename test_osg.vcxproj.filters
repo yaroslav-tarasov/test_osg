@@ -171,6 +171,9 @@
     <Filter Include="Source Files\objects\camera">
       <UniqueIdentifier>{aaad1b01-c0bc-4c91-af55-1200691d31ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\environment">
+      <UniqueIdentifier>{6c9e9556-c70e-4344-8687-0f1b10c720de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1140,6 +1143,12 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp">
       <Filter>Source Files\objects\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\environment\environment_view.cpp">
+      <Filter>Source Files\objects\environment</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\environment\environment_visual.cpp">
+      <Filter>Source Files\objects\environment</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

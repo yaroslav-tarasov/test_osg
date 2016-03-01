@@ -23,7 +23,7 @@ CloudsLayer::CloudsLayer(osg::Group * pScene)
     // geometry creation
     _createGeometry();
 
-    setCloudsTexture(cirrus);
+    setCloudsTexture(av::weather_params::cirrus);
     setCloudsDensity(1.0);
 }
 
@@ -67,7 +67,7 @@ void CloudsLayer::setRotationSiderealTime( float rot_deg )
 // get overcast coef for color modulation
 float CloudsLayer::getOvercastCoef() const
 {
-    static const std::array<float, clouds_types_num> type_impact = {
+    static const std::array<float, av::weather_params::clouds_types_num> type_impact = {
         0.f,
         0.4f,
         0.2f,
@@ -78,9 +78,9 @@ float CloudsLayer::getOvercastCoef() const
 }
 
 // set clouds texture
-bool CloudsLayer::setCloudsTexture( cloud_type cl_type )
+bool CloudsLayer::setCloudsTexture( av::weather_params::cloud_type cl_type )
 {
-    static const std::array<std::string const, clouds_types_num> tex_names = {
+    static const std::array<std::string const, av::weather_params::clouds_types_num> tex_names = {
         "images/sky/clouds_none.dds",
         "images/sky/clouds_cloudy.dds",
         "images/sky/clouds_cirrus.dds",

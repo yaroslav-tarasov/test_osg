@@ -318,6 +318,8 @@
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
+    <ClCompile Include="kernel\objects\environment\environment_view.cpp" />
+    <ClCompile Include="kernel\objects\environment\environment_visual.cpp" />
     <ClCompile Include="kernel\objects\flock_child\flock_child_ctrl.cpp" />
     <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp" />
     <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp" />

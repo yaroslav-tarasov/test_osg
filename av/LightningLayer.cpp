@@ -66,7 +66,8 @@ void LightningLayer::setRotationSiderealTime( float rot_deg )
 
 bool LightningLayer::loadTextures()
 {
-    static const std::array<std::string const, clouds_types_num> tex_names = {
+    FIXME (row const)
+    static const std::array<std::string const, 4> tex_names = {
         "images/lightning/FlashImgBranch1.dds",
         "images/lightning/FlashImgBranch2.dds",
         "images/lightning/FlashImgBranch3.dds",

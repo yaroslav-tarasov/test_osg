@@ -122,6 +122,7 @@ namespace net_layer
         enum object_kind_t : int16_t
         {
             ok_none           ,
+            ok_camera         ,
             ok_aircraft = 0x10,
             ok_helicopter     ,
             ok_aerostat       ,
