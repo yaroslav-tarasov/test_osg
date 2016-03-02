@@ -13,8 +13,8 @@ namespace avCore
 
         struct WeatherParameters
         {
-            int   CloudType;
-            float CloudDensity;
+            uint16_t   CloudType;
+            float      CloudDensity;
 
             float FogDensity;
             float RainDensity;

@@ -33,4 +33,10 @@ void ctrl::ex_settings_changed()
         set(msg::start_time(new_start_time)) ;
 }
 
+void ctrl::set_weather(const weather_t& w)  
+{
+    settings_.weather = w; 
+    set(msg::settings_msg(settings_)) ;
+}
+
 } // environment

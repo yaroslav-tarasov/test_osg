@@ -124,7 +124,11 @@ namespace avSky
             
           
             _ephem->_lightDirUniform->set( lightpos * _ephem->getModelViewMatrix() /*osg::Vec4(lightDir,1.)*/);
-
+            
+            _skyClouds->setCloudsTexture(
+                    static_cast<av::weather_params::cloud_type>(
+                    avCore::GetEnvironment()->GetWeatherParameters().CloudType
+                ));
                     
        }
 
@@ -144,8 +148,8 @@ namespace avSky
             virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
             {
 
-                auto _fogLayer =   _ephem->_d->_fogLayer;
-                auto _skyClouds  = _ephem->_d->_cloudsLayer;
+                auto _fogLayer      = _ephem->_d->_fogLayer;
+                auto _skyClouds     = _ephem->_d->_cloudsLayer;
 				auto _skyLightning  = _ephem->_d->_lightningLayer;
 
                 auto ephem       = _ephem->_d->_ephemerisModel;

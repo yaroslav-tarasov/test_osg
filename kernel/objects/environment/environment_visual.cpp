@@ -156,7 +156,9 @@ namespace environment
 
             airport::info_ptr ainfo = vinfo;
             Assert(ainfo);
+#if 0
             airport_ = ani_->navigation_info()->get_airport(ainfo->name());
+#endif
         }
     }
 
@@ -186,7 +188,7 @@ namespace environment
         
         FIXME (Èםעונפויס ך ןמדמהו)
         //sys_->scene()->get_env_weather()->set_environment(env);
-        //sys_->scene()->get_env_weather()->set_weather(wth) ;
+        sys_->scene()->get_env_weather()->SetWeather(wth) ;
     }   
 
     void visual::on_start_time_changed()

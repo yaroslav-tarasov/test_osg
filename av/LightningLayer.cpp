@@ -23,7 +23,7 @@ LightningLayer::LightningLayer(osg::Group * pScene)
     // geometry creation
     _createGeometry();
     loadTextures();
-   setDensity(1.0);
+    setDensity(1.0);
 }
 
 // set clouds 2 color scheme

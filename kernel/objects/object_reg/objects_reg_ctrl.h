@@ -31,12 +31,15 @@ private:
     void inject_msg   (net_layer::msg::malfunction_msg   const& msg); 
 	void inject_msg   (net_layer::msg::fire_fight_msg_t  const& msg); 
     void inject_msg   (net_layer::msg::engine_state_msg  const& msg);
+    void inject_msg   (net_layer::msg::environment_msg   const& msg);
 
     virtual void inject_msg   (const void* data, size_t size);
 	virtual void create_object(net_layer::msg::create const& msg);
     virtual void set_sender   (remote_send_f s) override;
 
     // info
+private:
+    // 
 private:
 
     // base_presentation

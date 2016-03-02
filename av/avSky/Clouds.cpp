@@ -111,7 +111,7 @@ bool Clouds::Initialize()
 //////////////////////////////////////////////////////////////////////////
 bool Clouds::PreUpdate()
 {
-    int iCloudType = utils::GetEnvironment()->GetWeatherParameters().CloudType;
+    int   iCloudType     = utils::GetEnvironment()->GetWeatherParameters().CloudType;
     float fCloudsDensity = utils::GetEnvironment()->GetWeatherParameters().CloudDensity;
 	float fTime = (float)fmod( utils::GetTimer()->GetSimulationTime(), 1000.0 );
 

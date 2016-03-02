@@ -21,6 +21,8 @@
 
 #include  "configurer.h"
 
+#include "av/avEnvironmentParams.h"
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -156,7 +158,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("1vis.ncfg", cfg_);
+           cfgr_->load_config("3vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -254,6 +256,55 @@ struct client
         ADD_EVENT(0.0  , create(1500,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_camera, "camera 0") )
 
         ADD_EVENT(time , state(0.0,time,factor))
+        
+        environment::weather_t  weather; 
+        weather.fog_density  = 0.4f; 
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
+        weather.wind_dir     = cg::point_2f(2.0, 4.0);
+        ADD_EVENT(2.0, environment_msg(weather))
+        
+        weather.fog_density  = 0.75f; 
+        weather.wind_speed  = 20.0f;
+        weather.wind_dir    = cg::point_2f(1.0,0.0);
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
+        ADD_EVENT(18.0, environment_msg(weather))
+
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
+        ADD_EVENT(20.0, environment_msg(weather))
+
+        weather.wind_speed  = 20.0f;
+        weather.wind_dir    = cg::point_2f(-1.0,0.0);
+        weather.rain_density  = 0.2f;
+        ADD_EVENT(25.0, environment_msg(weather))
+        weather.rain_density  = 0.5f;
+        ADD_EVENT(30.0, environment_msg(weather))
+        weather.rain_density  = 0.75f;
+        ADD_EVENT(35.0, environment_msg(weather))
+        weather.rain_density  = 1.0f;
+        ADD_EVENT(45.0, environment_msg(weather))
+
+        weather.wind_speed  = 10.0f;
+        weather.wind_dir    = cg::point_2f(1.0,1.0);
+        weather.rain_density  = 0.75f;
+        ADD_EVENT(50.0, environment_msg(weather))
+        weather.rain_density  = 0.45f;
+        ADD_EVENT(55.0, environment_msg(weather))
+        weather.rain_density  = 0.2f;
+        ADD_EVENT(57.0, environment_msg(weather))
+        
+        weather.fog_density  = 1.0f; 
+        weather.rain_density  = 0.1f;
+        ADD_EVENT(60.0, environment_msg(weather))
+        
+        weather.rain_density  = 0.0f;
+        ADD_EVENT(80.0, environment_msg(weather))
+        
+        weather.fog_density  = 0.2f;
+        weather.wind_speed  = 0.0f;
+        weather.wind_dir    = cg::point_2f(1.0,1.0);
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
+        ADD_EVENT(80.0, environment_msg(weather))
+
 #if 1
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(70.0, fire_fight_msg_t(2))
@@ -261,7 +312,7 @@ struct client
 
 #if 1
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
-        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,250.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 #endif
 

@@ -25,12 +25,13 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 {
 
     void (ctrl::*on_run)         (net_layer::msg::run const& msg)               = &ctrl::inject_msg;
-    void (ctrl::*on_container)   (net_layer::msg::container_msg const& msg)     = &ctrl::inject_msg;
+    void (ctrl::*on_container)   (net_layer::msg::container_msg    const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_atow)        (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
-    void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg const& msg)   = &ctrl::inject_msg;
+    void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg_t const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
 
     disp_
         .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
@@ -40,8 +41,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
 	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
 		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
-
         
+        .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
         	
         ;
 
@@ -54,7 +55,7 @@ void ctrl::on_object_created(object_info_ptr object)
 	if(airport::info_ptr(object))
 		airports_[object->object_id()]=object;
 
-	environment::control_ptr ec = find_first_child<environment::control_ptr    >(object);
+
 }
 
 void ctrl::on_object_destroying(object_info_ptr object)
@@ -112,6 +113,22 @@ void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg)
 			pa->set_malfunction((aircraft::malfunction_kind_t)msg.kind,msg.enabled);
 		}
 	}
+
+}
+
+void ctrl::inject_msg(net_layer::msg::environment_msg const& msg) 
+{
+    if( airports_.size()>0 )                          
+    {
+        auto a = airports_.begin()->second;
+
+        environment::control_ptr ec = find_first_child<environment::control_ptr    >(a);
+
+        if (ec)
+        {
+            ec->set_weather(msg.weather);
+        }
+    }
 
 }
 

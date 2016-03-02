@@ -15,15 +15,18 @@ namespace environment
     private:
         ctrl(kernel::object_create_t const& oc, dict_copt dict);
 
-private:
-    ctrl(kernel::object_create_t const& oc, istream_opt  stream);
+    private:
+        ctrl(kernel::object_create_t const& oc, istream_opt  stream);
 
-private:
-    void settings_edited    ();
-    void ex_settings_changed();
+    private:
+        void set_weather(const weather_t&) override;
 
-private:
-    scoped_connection ex_settings_changed_connection_ ;
+    private:
+        void settings_edited    ();
+        void ex_settings_changed();
+
+    private:
+        scoped_connection ex_settings_changed_connection_ ;
 };
 
 } // environment

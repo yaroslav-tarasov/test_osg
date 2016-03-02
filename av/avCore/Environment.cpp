@@ -59,17 +59,23 @@ void Environment::SetEnvironment( environment_params const & p )
 
 environment_params const & Environment::GetEnvironment() const
 {
-    environment_params ep;
+    static environment_params ep;
     ep.air_humidity    = m_EnvironmentParameters.AirHumidity;
     ep.air_temperature = m_EnvironmentParameters.AirTemperature;
     return ep;
 }
 
 // global weather params
-void Environment::SetWeather( weather_params const & p )
+void Environment::SetWeather( weather_params const & wp )
 {
-    m_EnvironmentParameters.WindDirection  = cg::point_3f(p.wind_dir);
-    m_EnvironmentParameters.WindSpeed      = p.wind_speed;
+    m_EnvironmentParameters.WindDirection  = cg::point_3f(wp.wind_dir);
+    m_EnvironmentParameters.WindSpeed      = wp.wind_speed;
+    m_WeatherParameters.FogDensity         = wp.fog_density;
+    m_WeatherParameters.RainDensity        = wp.rain_density;
+    m_WeatherParameters.SnowDensity        = wp.snow_density;
+    m_WeatherParameters.HailDensity        = wp.hail_density;
+    m_WeatherParameters.CloudDensity       = wp.clouds_density;
+    m_WeatherParameters.CloudType          = wp.clouds_type;
 }
 
 weather_params const & Environment::GetWeather() const
@@ -83,6 +89,9 @@ weather_params const & Environment::GetWeather() const
      wp.snow_density    = m_WeatherParameters.SnowDensity;
      wp.hail_density    = m_WeatherParameters.HailDensity;
      wp.clouds_density  = m_WeatherParameters.CloudDensity;
+
+     wp.clouds_type     = 
+         static_cast<av::weather_params::cloud_type>(m_WeatherParameters.CloudType);
 
      return wp;
 }

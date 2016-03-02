@@ -312,6 +312,7 @@
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
+    <ClCompile Include="kernel\objects\airport\airport_vis.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />

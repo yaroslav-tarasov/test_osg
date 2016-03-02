@@ -1156,5 +1156,8 @@
     <ClCompile Include="kernel\objects\environment\environment_ctrl.cpp">
       <Filter>Source Files\objects\environment</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_vis.cpp">
+      <Filter>Source Files\objects\airport</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

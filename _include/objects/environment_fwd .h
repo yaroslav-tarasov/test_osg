@@ -6,6 +6,7 @@ namespace environment
 {
     struct info;
     struct control;
+    struct weather_t;
 
     typedef polymorph_ptr<info>                 info_ptr;
     typedef boost::weak_ptr<info>               info_wptr;
