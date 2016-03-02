@@ -2733,6 +2733,8 @@ $if 0
 		    const float fOneOver2Pi = 0.5 / 3.141593;
 			const float fTwoOverPi  = 2.0 / 3.141593;   
             const float fCoeff      = 20.0; 
+            const float fCoeffLightTime = 0.98;  // cos(0.04 * fCoeffTime);/*0.98;*/
+            const float fCoeffLightBackTime = 0.90; //cos(0.0902 * fCoeffTime);/*0.90;*/
 
 			in block                                    
 			{                                           
@@ -2762,8 +2764,8 @@ $if 0
                 float a = mix(1.0, 0.0, abs(0.5 * fOneOver2PiMulAtan) + 0.5);
                 vec4  b = vec4(cl_color.rgb * frontColor, cl_color.a * density);
 
-                aFragColor = vec4( a * ( step (0.98, f_in.cos_time[0] ) + step (0.98, f_in.cos_time[2] )) ) 
-                                 + b * ( step (0.90, f_in.cos_time[1] ) + step (0.90, f_in.cos_time[3] ));
+                aFragColor = vec4( a * ( step (fCoeffLightTime, f_in.cos_time[0] ) + step (fCoeffLightTime, f_in.cos_time[2] )) ) 
+                                 + b * ( step (fCoeffLightBackTime, f_in.cos_time[1] ) + step (fCoeffLightBackTime, f_in.cos_time[3] ));
                 
 
 			}
