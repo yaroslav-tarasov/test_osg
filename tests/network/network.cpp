@@ -158,7 +158,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("3vis.ncfg", cfg_);
+           cfgr_->load_config("1vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -258,13 +258,13 @@ struct client
         ADD_EVENT(time , state(0.0,time,factor))
         
         environment::weather_t  weather; 
-        weather.fog_density  = 0.4f; 
+        weather.fog_density  = 0.2f; 
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
         weather.wind_dir     = cg::point_2f(2.0, 4.0);
 
         ADD_EVENT(2.0, environment_msg(weather))
         
-        weather.fog_density  = 0.75f; 
+        weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
         weather.wind_dir    = cg::point_2f(1.0,0.0);
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
@@ -295,13 +295,13 @@ struct client
         weather.rain_density  = 0.2f;
         ADD_EVENT(57.0, environment_msg(weather))
         
-        weather.fog_density  = 1.0f; 
+        weather.fog_density  = 0.45f; 
         weather.rain_density  = 0.1f;
         ADD_EVENT(60.0, environment_msg(weather))
         
+        weather.fog_density  = 0.40f;
+        ADD_EVENT(70.0, environment_msg(weather)) 
         weather.rain_density  = 0.0f;
-        ADD_EVENT(80.0, environment_msg(weather))
-        
         weather.fog_density  = 0.2f;
         weather.wind_speed  = 0.0f;
         weather.wind_dir    = cg::point_2f(1.0,1.0);

@@ -49,6 +49,7 @@ namespace avSky
                 return;            
             
             const osg::Light* sls = _ephem->_d->_ephemerisModel->getSunLightSource()->getLight();
+			const avCore::Environment::WeatherParameters & cWeatherParameters = avCore::GetEnvironment()->GetWeatherParameters();
 
             // Sun color and altitude little bit dummy 
 
@@ -106,19 +107,19 @@ namespace avSky
             auto fog_color = cg::lerp01(/*cFogAmb*/cFogDif/*osg::Vec4f(_globalDiffuse,1.0)*/, osg::Vec4f(illumination,illumination,illumination,1.0),fFogDesatFactor );
 
             // save fog
-            _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());
-            //data_.fog_exp_coef = _fogLayer->getFogExp2Coef();
+            //_fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), _fogLayer->getFogDensity());
+            // data_.fog_exp_coef = _fogLayer->getFogExp2Coef();
 
             const float fCloudLum = cg::max(0.06f, illumination);
             _skyClouds->setCloudsColors(osg::Vec3f(fCloudLum,fCloudLum,fCloudLum), osg::Vec3f(fCloudLum,fCloudLum,fCloudLum));
             _skyClouds->setRotationSiderealTime(-float(fmod(data->localSiderealTime / 24.0, 1.0)) * 360.0f);
             _skyClouds->setCloudsTexture(
                 static_cast<av::weather_params::cloud_type>(
-                avCore::GetEnvironment()->GetWeatherParameters().CloudType
+                cWeatherParameters.CloudType
                 ));
 
              ambient.w() = illumination;
-             specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                    
+             specular.w() = cWeatherParameters.RainDensity;                    
 
             _ephem->_specularUniform->set(specular);
             _ephem->_ambientUniform->set(ambient);
@@ -126,7 +127,13 @@ namespace avSky
           
             _ephem->_lightDirUniform->set( lightpos * _ephem->getModelViewMatrix() /*osg::Vec4(lightDir,1.)*/);
 
-                    
+			  
+			// Update fog density (unit value - must somehow correspond to real physical values inside)
+			// Fog color is computed afterwards in SkyDome, based on sun intensity and so on, saved also there
+			// Global Hail, Rain and Snow also affects fog density, snow especially
+			const float
+				fPrecipitationFogImpact = 0.7f * powf(osg::maximum(cWeatherParameters.SnowDensity, osg::maximum(cWeatherParameters.RainDensity * 0.8f, cWeatherParameters.HailDensity * 0.5f)), 0.5f);
+            _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), cg::lerp01( fPrecipitationFogImpact, 1.f, cWeatherParameters.FogDensity));        
        }
 
         osgGA::GUIEventHandler* getHandler() {return _handler.get()/*.release()*/;};
