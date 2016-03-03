@@ -5,6 +5,7 @@
 #include "LightningLayer.h"
 
 #include "utils/materials.h"
+#include "utils/callbacks.h"
 
 //
 // Global namespace
@@ -15,15 +16,20 @@ namespace avSky
 
 // constructor
 LightningLayer::LightningLayer(osg::Group * pScene)
-    : _clDensity(0.f)
+    : _clDensity       (0.f)
+    , _flashTargetTime (-1.f)
+    , _flash (false)
 {
      
     // state set composing
     _buildStateSet();
     // geometry creation
     _createGeometry();
-    loadTextures();
+    _loadTextures();
     setDensity(1.0);
+
+    // update visitor is set just to notify parent that we need update traversal
+    setUpdateCallback(Utils::makeNodeCallback(this, &LightningLayer::update));
 }
 
 // set clouds 2 color scheme
@@ -46,14 +52,40 @@ bool LightningLayer::setDensity( float density )
    return false;
 }
 
-// movement
-void LightningLayer::setRotationSiderealTime( float rot_deg )
+// update pass
+void LightningLayer::update( osg::NodeVisitor * nv )
 {
-    //_clRotation = cg::transform_4f(
-    //    cg::translation_3f(),
-    //    cg::rotation_3f(cg::rot_axisf(cg::point_3f(0, 0, 1), rot_deg)),
-    //    cg::scale_3f());
+    double currTime = nv->getFrameStamp()->getSimulationTime();
+    if(_flash)
+    {
+        _flashTargetTime = currTime;
+        _flashUniform->set(osg::Vec2f(1.f, 1.f));
+        _flash = false;
+    }
+    else if ( _flashTargetTime > 0.0 )  
+    {
+        if(_flashTargetTime + 0.1 < currTime  && _flashTargetTime + 0.2 > currTime)
+        {
+            _flashUniform->set(osg::Vec2f(1.f, 2.f));
+        }
+        else if(_flashTargetTime + 0.2 < currTime )
+        {
+            _flashUniform->set(osg::Vec2f(0.f, 0.f));
+            _flashTargetTime =-1.0;
+        }
+    }
 
+}
+
+// flash it
+void LightningLayer::flash( )
+{
+    _flash = true;
+}
+
+// movement
+void LightningLayer::setRotation( float rot_deg )
+{
     const osg::Quat quat0(osg::inDegrees(0.0f), osg::X_AXIS,                      
         osg::inDegrees(0.f)  , osg::Y_AXIS,
         osg::inDegrees(rot_deg)  , osg::Z_AXIS ); 
@@ -64,7 +96,7 @@ void LightningLayer::setRotationSiderealTime( float rot_deg )
 }
 
 
-bool LightningLayer::loadTextures()
+bool LightningLayer::_loadTextures()
 {
     FIXME (row const)
     static const std::array<std::string const, 4> tex_names = {
@@ -130,16 +162,17 @@ void LightningLayer::_buildStateSet()
 //#endif
 
     _colorFrontUniform = new osg::Uniform("frontColor", osg::Vec3f(1.f, 1.f, 1.f));
-    _colorBackUniform  = new osg::Uniform("backColor",  osg::Vec3f(1.f, 1.f, 1.f));
-    _densityUniform    = new osg::Uniform("density",    _clDensity);
-    _mvpUniform        = new osg::Uniform("MVP",        _clRotation);
+    _colorBackUniform  = new osg::Uniform("backColor" , osg::Vec3f(1.f, 1.f, 1.f));
+    _densityUniform    = new osg::Uniform("density"   , _clDensity);
+    _mvpUniform        = new osg::Uniform("MVP"       , _clRotation);
+    _flashUniform      = new osg::Uniform("flash"     , osg::Vec2f(0.f, 0.f));
 
     sset->addUniform( new osg::Uniform("Lightning", 1) );
     sset->addUniform(_colorFrontUniform.get());
     sset->addUniform(_colorBackUniform.get());
     sset->addUniform(_densityUniform.get());
     sset->addUniform(_mvpUniform.get());
-
+    sset->addUniform(_flashUniform.get());
 
     return;
 }

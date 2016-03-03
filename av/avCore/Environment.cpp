@@ -76,6 +76,7 @@ void Environment::SetWeather( weather_params const & wp )
     m_WeatherParameters.HailDensity        = wp.hail_density;
     m_WeatherParameters.CloudDensity       = wp.clouds_density;
     m_WeatherParameters.CloudType          = wp.clouds_type;
+    m_WeatherParameters.LightningIntencity = wp.lightning_intensity;
 }
 
 weather_params const & Environment::GetWeather() const
@@ -92,7 +93,9 @@ weather_params const & Environment::GetWeather() const
 
      wp.clouds_type     = 
          static_cast<av::weather_params::cloud_type>(m_WeatherParameters.CloudType);
-
+     
+     wp.lightning_intensity  = m_WeatherParameters.LightningIntencity;
+     
      return wp;
 }
 

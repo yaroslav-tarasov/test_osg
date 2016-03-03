@@ -5,11 +5,11 @@
 #include "async_load.h"
 #include "utils/callbacks.h"
 
-namespace utils
+namespace Utils
 {
     LoadManager::LoadManager()
     {
-        setUpdateCallback(utils::makeNodeCallback(this, &LoadManager::update));
+        setUpdateCallback(Utils::makeNodeCallback(this, &LoadManager::update));
     }
 
     // Use a thread to call osgDB::readNodeFile.

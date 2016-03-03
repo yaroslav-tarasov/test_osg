@@ -85,7 +85,7 @@ namespace kernel
     visual_object_impl::~visual_object_impl()
     {
         if(node_.get())
-            utils::RemoveNodeFromAllParents( node_.get() );
+            Utils::RemoveNodeFromAllParents( node_.get() );
         // scene_->get_objects()->remove(node_.get());
     }
 

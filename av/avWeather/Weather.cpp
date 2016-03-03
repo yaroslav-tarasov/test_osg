@@ -83,8 +83,8 @@ Weather::Weather()
     , m_pPrecipitations(PrecipitationNumOf)
 {
     // callbacks
-    setUpdateCallback(utils::makeNodeCallback(this, &Weather::update));
-    setCullCallback(utils::makeNodeCallback(this, &Weather::cull));
+    setUpdateCallback(Utils::makeNodeCallback(this, &Weather::update));
+    setCullCallback(Utils::makeNodeCallback(this, &Weather::cull));
 
     // base set up
     setCullingActive(false);
@@ -410,7 +410,7 @@ void Weather::cull(osg::NodeVisitor * nv)
 
     // get screen clarity
     const float
-        fScrClarity = utils::GetScreenClarity(pCV);
+        fScrClarity = Utils::GetScreenClarity(pCV);
     // get magic illumination
     const float
         fIllum = avScene::GetScene()->getSky() ? avScene::GetScene()->getSky()->GetSunIntensity() : 1.0f,

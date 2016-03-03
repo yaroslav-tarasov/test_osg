@@ -42,7 +42,7 @@ static const LightManagerMessageMap g_MessageMap(&g_MessageTable[0], &g_MessageT
 LightManager::LightManager()
 {
     setDataVariance(DYNAMIC);
-    setUpdateCallback(utils::makeNodeCallback(this, &LightManager::update));
+    setUpdateCallback(Utils::makeNodeCallback(this, &LightManager::update));
 }
 
 LightManager::~LightManager()

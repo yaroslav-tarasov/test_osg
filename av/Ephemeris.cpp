@@ -8,7 +8,7 @@
 #include "av/CloudLayer.h"
 #include "av/LightningLayer.h"
 #include "av/EnvRenderer.h"
-
+#include "av/avCore/Environment.h"
 
 #include <osgEphemeris/EphemerisModel.h>  
 
@@ -35,20 +35,22 @@ namespace avSky
             : EphemerisUpdateCallback( "EphemerisDataUpdateCallback" )
             , _ephem      (ephem)
             , _handler    (new handler(_ephem.get()))
+
+
         {}
 
         void operator()( osgEphemeris::EphemerisData *data )
         {
-            const osg::Light* sls = _ephem->_d->_ephemerisModel->getSunLightSource()->getLight();
-
-            osg::ref_ptr<FogLayer>    _fogLayer  = _ephem->_d->_fogLayer;
-            osg::ref_ptr<CloudsLayer> _skyClouds = _ephem->_d->_cloudsLayer;
+            auto _fogLayer      = _ephem->_d->_fogLayer;
+            auto _skyClouds     = _ephem->_d->_cloudsLayer;
+            auto _skyLightning  = _ephem->_d->_lightningLayer;
 
             if(!_fogLayer || !_skyClouds)
-                return;
+                return;            
+            
+            const osg::Light* sls = _ephem->_d->_ephemerisModel->getSunLightSource()->getLight();
 
             // Sun color and altitude little bit dummy 
-
 
             osg::Vec4 lightpos = sls->getPosition();
             osg::Vec3 lightDir = sls->getDirection();
@@ -109,26 +111,21 @@ namespace avSky
 
             const float fCloudLum = cg::max(0.06f, illumination);
             _skyClouds->setCloudsColors(osg::Vec3f(fCloudLum,fCloudLum,fCloudLum), osg::Vec3f(fCloudLum,fCloudLum,fCloudLum));
-
             _skyClouds->setRotationSiderealTime(-float(fmod(data->localSiderealTime / 24.0, 1.0)) * 360.0f);
-             
-            
+            _skyClouds->setCloudsTexture(
+                static_cast<av::weather_params::cloud_type>(
+                avCore::GetEnvironment()->GetWeatherParameters().CloudType
+                ));
 
-             
              ambient.w() = illumination;
              specular.w() = avCore::GetEnvironment()->GetWeatherParameters().RainDensity;                    
 
             _ephem->_specularUniform->set(specular);
             _ephem->_ambientUniform->set(ambient);
             _ephem->_diffuseUniform->set(diffuse);
-            
           
             _ephem->_lightDirUniform->set( lightpos * _ephem->getModelViewMatrix() /*osg::Vec4(lightDir,1.)*/);
-            
-            _skyClouds->setCloudsTexture(
-                    static_cast<av::weather_params::cloud_type>(
-                    avCore::GetEnvironment()->GetWeatherParameters().CloudType
-                ));
+
                     
        }
 
@@ -289,6 +286,12 @@ namespace avSky
 						avCore::GetEnvironment()->m_EnvironmentParameters.WindDirection -= cg::point_3f(0,.5,0);
 						return true;
 					}
+                    else
+                    if (ea.getKey() == osgGA::GUIEventAdapter::KEY_F11)
+                    {
+                        _skyLightning->flash();
+                        return true;
+                    }
 
                 }
                 return false;
@@ -298,11 +301,13 @@ namespace avSky
             osg::ref_ptr<Ephemeris>                           _ephem;
             av::weather_params::cloud_type                    _currCloud;
             float                                             _intensity;
+
         };
 
     private:
-        osg::ref_ptr<Ephemeris>                    _ephem;
-        osg::ref_ptr<handler>                      _handler;
+        osg::ref_ptr<Ephemeris>         _ephem;
+        osg::ref_ptr<handler>           _handler;
+    
 
     };
 
@@ -311,6 +316,7 @@ namespace avSky
         : _d          (new data)
         , _sceneRoot  (sceneRoot)
         , _terrainNode(terrainNode)
+        , _flash_last (0.0)
     {
         Initialize();    
         
@@ -328,7 +334,7 @@ namespace avSky
         pSceneSS->addUniform(_lightDirUniform.get());
 
         // callbacks setup
-        setCullCallback(utils::makeNodeCallback(this, &Ephemeris::cull, true));
+        setCullCallback(Utils::makeNodeCallback(this, &Ephemeris::cull, true));
     }
 
     bool Ephemeris::Initialize()
@@ -338,12 +344,12 @@ namespace avSky
         _d->_ephemerisModel->setAutoDateTime( false );
 
         // Set some acceptable defaults.
-        double latitude = 43.4444;                                  // Adler, RF
+        double latitude  = 43.4444;                                  // Adler, RF
         double longitude = 39.9469;
         
         double radius = 20000;                                      // Default radius in case no files were loaded above
         
-        setSummerTime();
+        // setSummerTime();
 
         osg::BoundingSphere bs = _terrainNode.valid()?_terrainNode->getBound():osg::BoundingSphere();
         if (bs.valid())                                             // If the bs is not valid then the radius is -1
@@ -367,7 +373,7 @@ namespace avSky
 		_d->_lightningLayer = new avSky::LightningLayer(_sceneRoot->asGroup());
 		_d->_ephemerisModel->asGroup()->addChild(_d->_lightningLayer.get());
 		_d->_lightningLayer->setColors( osg::Vec3f(1.0,1.0,1.0), osg::Vec3f(1.0,1.0,1.0) );
-        _d->_lightningLayer->setRotationSiderealTime(270);
+        _d->_lightningLayer->setRotation(270);
 
         _d->_eCallback = new EphemerisDataUpdateCallback(this);
         _d->_ephemerisModel->setEphemerisUpdateCallback( _d->_eCallback );
@@ -387,23 +393,29 @@ namespace avSky
 
     void Ephemeris::setTime()
     {
-        time_t seconds = time(0L);
-        struct tm *_tm = localtime(&seconds);
-        osgEphemeris::DateTime dt;
-        dt.setYear      ( _tm->tm_year + 1900 ); // DateTime uses _actual_ year (not since 1900)
-        dt.setMonth     ( _tm->tm_mon + 1 ); // DateTime numbers months from 1 to 12, not 0 to 11
-        dt.setDayOfMonth( _tm->tm_mday + 1 ); // DateTime numbers days from 1 to 31, not 0 to 30
-        dt.setHour      ( _tm->tm_hour );
-        dt.setMinute    ( _tm->tm_min );
-        dt.setSecond    ( _tm->tm_sec );
+        avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
+
+        osgEphemeris::DateTime dt = _d->_ephemerisModel->getDateTime();
+
+        dt.setYear      ( vTime.Year );  // DateTime uses _actual_ year (not since 1900)
+        dt.setMonth     ( vTime.Month ); // DateTime numbers months from 1 to 12, not 0 to 11
+        dt.setDayOfMonth( vTime.Day );   // DateTime numbers days from 1 to 31, not 0 to 30
+        dt.setHour      ( vTime.Hour );
+        dt.setMinute    ( vTime.Minute );
+        dt.setSecond    ( vTime.Second  );
         _d->_ephemerisModel->setDateTime( dt );
-		avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
-		vTime.Day    = _tm->tm_mday;
-        vTime.Year   = _tm->tm_year + 1900;
-		vTime.Hour   = _tm->tm_hour;
-		vTime.Month  = _tm->tm_mon + 1;
-		vTime.Minute = _tm->tm_min;
-		vTime.Second = _tm->tm_sec;
+
+   // Расколбас в отсутствие true в при инициализации
+        osgEphemeris::DateTime dt2 = _d->_ephemerisModel->getDateTime();
+#if 1
+        force_log fl;       
+        LOG_ODS_MSG( "Ephemeris::setTime() =  " << dt.getYear() << "  "
+            << dt.getMonth() << "  "
+            << dt.getDayOfMonth() << "  "
+            << dt.getHour() << "  "
+            << dt.getMinute() << "  "
+            << dt.getSecond() << "  "  << "\n");
+#endif
 
     }
     
@@ -464,6 +476,21 @@ namespace avSky
         avAssert(pCV);
         
         _mv = *pCV->getModelViewMatrix();
+        
+        const avCore::Environment::WeatherParameters &  wp =  avCore::GetEnvironment()->GetWeatherParameters();
+
+        if(!cg::eq_zero(wp.LightningIntencity))
+        {
+            osgEphemeris::DateTime dt = _d->_ephemerisModel->getDateTime();
+            const uint32_t sec = dt.getSecond();
+            const uint32_t den = uint32_t(cg::ceil(/*wp.LightningIntencity*/0.4 * 10.f));
+            uint32_t res = sec % den;
+            if( res ==0 && _flash_last != res)  
+            {
+                _d->_lightningLayer->flash();
+            }
+            _flash_last = res;
+        }
 
         // cull down
 

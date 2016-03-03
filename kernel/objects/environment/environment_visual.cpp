@@ -185,7 +185,8 @@ namespace environment
         wth.hail_density   = settings_.weather.hail_density ;
         wth.clouds_type    = (av::weather_params::cloud_type)settings_.weather.clouds_type ;
         wth.clouds_density = settings_.weather.clouds_density ;
-        
+        wth.lightning_intensity = settings_.weather.lightning_intensity ;
+
         FIXME (Èםעונפויס ך ןמדמהו)
         //sys_->scene()->get_env_weather()->set_environment(env);
         sys_->scene()->get_env_weather()->SetWeather(wth) ;

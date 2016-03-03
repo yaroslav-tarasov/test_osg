@@ -26,7 +26,7 @@
 using namespace osg;
 
 
-namespace utils
+namespace Utils
 {
 
 

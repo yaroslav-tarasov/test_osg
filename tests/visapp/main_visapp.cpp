@@ -382,8 +382,6 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        // props.base_point = ::get_base();
-
         return create_visual_system(msg_srv_, vis, props);
     }
 

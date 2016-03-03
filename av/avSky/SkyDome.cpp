@@ -165,8 +165,8 @@ void SkyDome::_buildStateSet()
     sset->addUniform(_sunRaysUniform.get());
 
     // load sun textures
-    utils::SetTextureUniform("Sky/Sun_a.dds", "SunDiscTexture", _sunDiscTextureUnit, sset, osg::Texture::CLAMP_TO_EDGE);
-    utils::SetTextureUniform("Sky/SunRays_a.dds", "SunRaysTexture", _sunRaysTextureUnit, sset, osg::Texture::CLAMP_TO_EDGE);
+    Utils::SetTextureUniform("Sky/Sun_a.dds", "SunDiscTexture", _sunDiscTextureUnit, sset, osg::Texture::CLAMP_TO_EDGE);
+    Utils::SetTextureUniform("Sky/SunRays_a.dds", "SunRaysTexture", _sunRaysTextureUnit, sset, osg::Texture::CLAMP_TO_EDGE);
 
     // clouds intensity uniform
     _cloudsDensityUniform = new osg::Uniform("CloudsDensity", osg::Vec3f());
@@ -323,8 +323,8 @@ void SkyDome::updateSkyTexture()
     };
 
     static PrecomputedInfo precomputedInfo;
-    static utils::LookupTable<float, float> acosf_to_1_0_lut(-1.0f, 1.0f, 256, acosf_to_1_0);
-    static utils::LookupTable<float, float> scale_luminance_lut(0.0f, 1.0f, 512, scale_luminance_func);
+    static Utils::LookupTable<float, float> acosf_to_1_0_lut(-1.0f, 1.0f, 256, acosf_to_1_0);
+    static Utils::LookupTable<float, float> scale_luminance_lut(0.0f, 1.0f, 512, scale_luminance_func);
 
     // desaturation vector
     static const osg::Vec3f vDesaturationColor(0.299f, 0.587f, 0.114f);
@@ -341,7 +341,7 @@ void SkyDome::updateSkyTexture()
         const float phiSun  = static_cast<float>(osg::DegreesToRadians(_sunAzimuth));
         const float thetaSun = static_cast<float>(osg::DegreesToRadians(_sunAltitude));
 
-        cg::point_3f vSunDir = utils::celestialUnitVector(phiSun, thetaSun);
+        cg::point_3f vSunDir = Utils::celestialUnitVector(phiSun, thetaSun);
         _sunDirection.set(vSunDir.x, vSunDir.y, vSunDir.z);
 
         // sunset attenuation factor

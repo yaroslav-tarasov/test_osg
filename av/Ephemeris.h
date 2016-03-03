@@ -41,11 +41,13 @@ namespace avSky
         osg::ref_ptr<data>             _d;
         osg::ref_ptr<osg::Node>        _sceneRoot;  
         osg::ref_ptr<osg::Node>        _terrainNode;
-        float                          _illum; 
         osg::ref_ptr<osg::Uniform>     _specularUniform;
         osg::ref_ptr<osg::Uniform>     _ambientUniform;
         osg::ref_ptr<osg::Uniform>     _diffuseUniform;
         osg::ref_ptr<osg::Uniform>     _lightDirUniform; 
         osg::Matrixd                   _mv; 
+        float                          _illum; 
+    private:
+        float                           _flash_last;
     };
 }

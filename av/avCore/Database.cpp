@@ -172,7 +172,7 @@ std::string LoadShader(const std::string& name)
 namespace avCore
 {
 
-using namespace utils;
+using namespace Utils;
 
 Database* Database::s_pDatabase = NULL;
 

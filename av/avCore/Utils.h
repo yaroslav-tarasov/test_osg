@@ -6,7 +6,7 @@
 // Module namespace
 //
 
-namespace utils
+namespace Utils
 {
     void        ShowMouseCursor( bool bShow );
     bool        GetMouseCursorShowState();
@@ -221,7 +221,7 @@ template<class T, class U> T safe_cast(U p)
 #define svReleaseMem( val ) if ( val != NULL ) { delete val; val = NULL; }
 #define svReleaseMemBuffer( val ) if ( val != NULL ) { delete[] val; val = NULL; }
 
-namespace utils
+namespace Utils
 {
     bool        replace(std::string& str, const std::string& from, const std::string& to);
     uint16_t    replaceAll(std::string& str, const std::string& from, const std::string& to);

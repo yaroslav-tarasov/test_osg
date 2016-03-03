@@ -17,18 +17,18 @@ private:
     utils::uint    m_nLayerID;
     virtual void    operator () (osg::Uniform* uniform, osg::NodeVisitor* nv)
     {
-        float fCloudsDensity = utils::GetEnvironment()->GetWeatherParameters().CloudDensity;
+        const WeatherParameters &  wp =  utils::GetEnvironment()->GetWeatherParameters();
 
         switch( m_nLayerID )
         {
         case 0:
-            uniform->set( osg::Vec4( 0.0, clamp( fCloudsDensity * 0.333f, 0.0f, 1.0f ), 1, 1 ) );
+            uniform->set( osg::Vec4( 0.0, clamp( wp.CloudsDensity * 0.333f, 0.0f, 1.0f ), 1, 1 ) );
             break;
         case 1:
-            uniform->set( osg::Vec4( 2500.0, clamp( (fCloudsDensity-0.333f) * 3.333f, 0.0f, 1.0f ), -2, 2 ) );
+            uniform->set( osg::Vec4( 2500.0, clamp( (wp.CloudsDensity-0.333f) * 3.333f, 0.0f, 1.0f ), -2, 2 ) );
             break;
         case 2:
-            uniform->set( osg::Vec4( 5000.0, clamp( (fCloudsDensity-0.666f) * 3.333f, 0.0f, 1.0f ), 3, -3 ) );
+            uniform->set( osg::Vec4( 5000.0, clamp( (wp.CloudsDensity-0.666f) * 3.333f, 0.0f, 1.0f ), 3, -3 ) );
             break;
         default:
             avError( _T("Unknown clouds layer") );

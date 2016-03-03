@@ -60,7 +60,7 @@ namespace bi
     class RigidUpdater;
 }
 
-namespace utils
+namespace Utils
 {
     struct  LoadNodeThread;
 }
@@ -180,7 +180,7 @@ namespace avScene {
 		LandingDustSfxNode *           ld_sfx_weak_ptr_;
 		FoamStreamSfxNode *            fs_sfx_weak_ptr_;
     private:
-        utils::LoadNodeThread*                          _lnt;
+        Utils::LoadNodeThread*                          _lnt;
         std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
 
     private:

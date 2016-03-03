@@ -85,7 +85,7 @@ SparksFx::SparksFx()
 	pCurStateSet->addUniform( _effectData.get() );
 	
 	
-	setCullCallback(utils::makeNodeCallback(this, &SparksFx::cull));
+	setCullCallback(Utils::makeNodeCallback(this, &SparksFx::cull));
     // exit
     return;
 }

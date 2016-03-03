@@ -123,7 +123,7 @@ void ShadowMap::init(int width, int height)
     cf->setMode(osg::CullFace::FRONT);
     _camera->getStateSet()->setAttributeAndModes(cf.get(), osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     
-    _camera->setCullCallback(utils::makeNodeCallback(this, [this](osg::NodeVisitor * pNV)->void {this->osg::Group::traverse(*pNV);},true));
+    _camera->setCullCallback(Utils::makeNodeCallback(this, [this](osg::NodeVisitor * pNV)->void {this->osg::Group::traverse(*pNV);},true));
     
 }
 

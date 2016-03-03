@@ -96,7 +96,7 @@ SmokeFx::SmokeFx()
     pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/smoke_atlas.dds", osg::Texture::REPEAT));
 
 	
-	setCullCallback(utils::makeNodeCallback(this, &SmokeFx::cull));
+	setCullCallback(Utils::makeNodeCallback(this, &SmokeFx::cull));
     // exit
     return;
 }

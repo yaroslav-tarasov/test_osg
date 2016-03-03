@@ -38,9 +38,9 @@ EphemerisModel::EphemerisModel( osg::Group * scene )
     _ephemerisEngine = new EphemerisEngine(this);
 
     // set our update callback
-    setUpdateCallback(utils::makeNodeCallback(this, &EphemerisModel::update));
+    setUpdateCallback(Utils::makeNodeCallback(this, &EphemerisModel::update));
    
-    setCullCallback(utils::makeNodeCallback(this, &EphemerisModel::cull, true));
+    setCullCallback(Utils::makeNodeCallback(this, &EphemerisModel::cull, true));
 
 
     // create skydome, etc

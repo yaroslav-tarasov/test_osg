@@ -21,6 +21,7 @@ namespace environment
 
             , clouds_type(2)
             , clouds_density(1.f)
+            , lightning_intensity (0.0f)
         {}
 
         float air_temperature;
@@ -37,6 +38,8 @@ namespace environment
 
         unsigned clouds_type;
         float clouds_density;
+        
+        float lightning_intensity;
     };
 
     struct lighting_t
@@ -80,6 +83,8 @@ REFL_STRUCT(weather_t)
 
     REFL_ENUM(clouds_type, ("None", "Cloudy", "Cirrus", "Overcast", NULL))
     REFL_NUM(clouds_density, 0.f, 1.f, 0.01f)
+    REFL_NUM(lightning_intensity, 0.f, 1.f, 0.01f)
+
 REFL_END()
 
 REFL_STRUCT(lighting_t)

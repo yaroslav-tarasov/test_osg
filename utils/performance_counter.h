@@ -2,7 +2,7 @@
 
 #include <winbase.h>
 
-namespace utils {
+namespace Utils {
 
 
 struct PerformaceCounter

@@ -2688,6 +2688,94 @@ $if 0
 			out block
 			{
 				vec3 pos;
+			} v_out;
+
+			void main()
+			{
+				v_out.pos = gl_Vertex.xyz;
+				mat4 im = inverse(gl_ModelViewMatrix * MVP);
+				vec3 vLocalSpaceCamPos = im[3].xyz;
+
+                gl_Position =  gl_ModelViewProjectionMatrix * MVP * vec4(vLocalSpaceCamPos.xyz + gl_Vertex.xyz, 1.0);
+				gl_Position.z = 0.0;
+			}       
+			)
+		};
+
+
+		const char* fs = {
+
+			"#extension GL_ARB_gpu_shader5 : enable  \n"
+  		    "//       lightning_mat \n"
+
+			STRINGIFY ( 
+            
+
+
+			uniform sampler2D Lightning;
+
+			// uniforms for sundisc and sunrays
+			uniform vec3  frontColor;
+			uniform vec3  backColor;
+			uniform float density;
+            uniform vec2  flash;
+
+			)
+
+			STRINGIFY ( 
+
+
+		    const float fOneOver2Pi = 0.5 / 3.141593;
+			const float fTwoOverPi  = 2.0 / 3.141593;   
+            const float fCoeff      = 20.0; 
+
+			in block                                    
+			{                                           
+				vec3 pos;                               
+			} f_in;                                     
+
+
+			out vec4  aFragColor;
+
+			void main (void)                              
+			{
+				// get point direction
+				vec3 vPnt = normalize(f_in.pos);
+
+                float fOneOver2PiMulAtan = fOneOver2Pi * atan(vPnt.y, vPnt.x);
+
+				// calculate texel coords based on polar angles
+				vec2 vTexCoord = vec2(fCoeff * fOneOver2PiMulAtan + 0.5, 1.0 - fTwoOverPi * acos(abs(vPnt.z)));
+
+				// get clouds color
+				vec4 cl_color = textureLod(Lightning, vTexCoord, 0.0);
+
+				// make fogging
+				// aFragColor = vec4(cl_color.rgb * frontColor, cl_color.a * density);
+                
+                //step(abs(fOneOver2PiMulAtan) + 0.5, 1.0 )
+                float a = mix(1.0, 0.0, abs(0.5 * fOneOver2PiMulAtan) + 0.5);
+                vec4  b = vec4(cl_color.rgb * frontColor, cl_color.a * density);
+
+                aFragColor = vec4( a * flash.x + b * flash.y);
+                
+
+			}
+			)
+
+		};   
+
+		const char* vs_auto = {  
+			"#extension GL_ARB_gpu_shader5 : enable \n"
+  		    "//       lightning_mat \n"
+
+			INCLUDE_COMPABILITY
+
+			STRINGIFY ( 
+			uniform mat4 MVP;
+			out block
+			{
+				vec3 pos;
                 vec4 cos_time;
 			} v_out;
 
@@ -2708,7 +2796,7 @@ $if 0
 		};
 
 
-		const char* fs = {
+		const char* fs_auto = {
 
 			"#extension GL_ARB_gpu_shader5 : enable  \n"
   		    "//       lightning_mat \n"
@@ -2772,7 +2860,6 @@ $if 0
 			)
 
 		};   
-
 		SHADERS_GETTER(get_shader,vs, fs)
 
 	    AUTO_REG_NAME(lightning, shaders::lightning_mat::get_shader)

@@ -23,7 +23,7 @@ namespace avScene
            tex_->setImage(osgDB::readImageFile("Images/particle.rgb"));
        }
 	   
-	   setCullCallback(utils::makeNodeCallback(this, &NavAidGroup::cull));
+	   setCullCallback(Utils::makeNodeCallback(this, &NavAidGroup::cull));
        
 	   _createStateSet();
     }

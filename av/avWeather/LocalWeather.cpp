@@ -83,20 +83,20 @@ void LocalWeather::SetPrecipitationDensityPortion(PrecipitationType pType, float
     switch (m_ptType)
     {
     case PrecipitationSnow:
-        fFogDensity = utils::ConvertTraineeDensityToExpSceneFog(0.65f * fFogDensity);
+        fFogDensity = Utils::ConvertTraineeDensityToExpSceneFog(0.65f * fFogDensity);
         fFogDownScale = cg::lerp_clamp(m_fMaxH, 50.f, 500.f, 0.90f, 0.20f);
         break;
     case PrecipitationRain:
-        fFogDensity = utils::ConvertTraineeDensityToExpSceneFog(0.60f * fFogDensity);
+        fFogDensity = Utils::ConvertTraineeDensityToExpSceneFog(0.60f * fFogDensity);
         fFogDownScale = cg::lerp_clamp(m_fMaxH, 50.f, 500.f, 0.90f, 0.20f);
         break;
     case PrecipitationHail:
-        fFogDensity = utils::ConvertTraineeDensityToExpSceneFog(0.55f * fFogDensity);
+        fFogDensity = Utils::ConvertTraineeDensityToExpSceneFog(0.55f * fFogDensity);
         fFogDownScale = cg::lerp_clamp(m_fMaxH, 50.f, 500.f, 0.90f, 0.20f);
         break;
     case PrecipitationFog:
         fFogDownScale = cg::lerp_clamp(m_fMaxH, 20.f, 200.f, 1.0f, 10.0f);
-        fFogDensity = utils::ConvertTraineeDensityToExpSceneFog(m_fDensity) / fFogDownScale;
+        fFogDensity = Utils::ConvertTraineeDensityToExpSceneFog(m_fDensity) / fFogDownScale;
         break;
     }
 

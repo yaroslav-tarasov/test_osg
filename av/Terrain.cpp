@@ -214,7 +214,7 @@ Terrain::Terrain (osg::Group* sceneRoot)
     //
 
     // callbacks setup
-    setCullCallback(utils::makeNodeCallback(this, &Terrain::cull, true));
+    setCullCallback(Utils::makeNodeCallback(this, &Terrain::cull, true));
 
 }
 

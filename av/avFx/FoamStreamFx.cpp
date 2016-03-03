@@ -17,7 +17,7 @@
 //
 
 using namespace avFx;
-using namespace utils;
+using namespace Utils;
 
 
 //
@@ -98,7 +98,7 @@ FoamStreamFx::FoamStreamFx()
     pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/smoke_atlas.dds", osg::Texture::REPEAT));
 
 	
-	setCullCallback(utils::makeNodeCallback(this, &FoamStreamFx::cull));
+	setCullCallback(Utils::makeNodeCallback(this, &FoamStreamFx::cull));
     // exit
     return;
 }
@@ -263,6 +263,6 @@ void FoamStreamFx::cull( osg::NodeVisitor * pNV )
 
 void FoamStreamFx::setTrackNode(osg::Node* node)
 {
-	_tracker = new utils::NodeTracker;
+	_tracker = new Utils::NodeTracker;
 	_tracker->setTrackNode(node);
 }

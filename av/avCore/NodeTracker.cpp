@@ -5,7 +5,7 @@
 
 #include "NodeTracker.h"
 
-using namespace utils;
+using namespace Utils;
 
 
 void NodeTracker::setTrackNode(osg::Node* node)

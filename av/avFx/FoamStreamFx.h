@@ -9,7 +9,7 @@
 #include "Fx.h"
 #include "BoundInfo.h"
 
-namespace utils
+namespace Utils
 {
 	class  NodeTracker;
 }
@@ -136,7 +136,7 @@ namespace avFx
         // AABB data for clipping
         osg::BoundingBox					  _aabbEllipsoid;
 		osg::Geometry *                       _geom;
-		osg::ref_ptr<utils::NodeTracker>      _tracker;
+		osg::ref_ptr<Utils::NodeTracker>      _tracker;
     };
 
 }

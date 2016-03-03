@@ -94,7 +94,7 @@ FrictionDustFx::FrictionDustFx()
     pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/smoke_puff_atlas.dds", osg::Texture::REPEAT));
 
 	
-	setCullCallback(utils::makeNodeCallback(this, &FrictionDustFx::cull));
+	setCullCallback(Utils::makeNodeCallback(this, &FrictionDustFx::cull));
     // exit
     return;
 }

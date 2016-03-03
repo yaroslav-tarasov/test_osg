@@ -803,7 +803,7 @@ int main( int argc, char **argv )
         auto to_lower = std::bind(&boost::to_lower_copy<std::string>,std::placeholders::_1,std::locale());
 
         // all names to lower
-        utils::CommonVisitor<osg::Node> names_lower(
+        Utils::CommonVisitor<osg::Node> names_lower(
             [=](osg::Node& n)->void {
                 n.setName(to_lower(n.getName()));
         }); 

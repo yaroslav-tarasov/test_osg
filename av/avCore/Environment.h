@@ -15,6 +15,8 @@ namespace avCore
         {
             uint16_t   CloudType;
             float      CloudDensity;
+            float      LightningIntencity;
+
 
             float FogDensity;
             float RainDensity;
@@ -29,6 +31,7 @@ namespace avCore
             WeatherParameters()
                 : CloudType(0) // 2
                 , CloudDensity(0.0f)
+                , LightningIntencity(0.0f)
                 , FogDensity(0.0f)
                 , RainDensity(0.0f)
                 , SnowDensity(0.0f)

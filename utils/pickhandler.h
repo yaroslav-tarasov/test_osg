@@ -147,7 +147,7 @@ public:
                     //if(id)
                     selected_node_signal_(id);
 
-                    _selectionBox->setUpdateCallback(utils::makeNodeCallback(_selectionBox.get(), [this,parent,hit](osg::NodeVisitor * pNV)->void {
+                    _selectionBox->setUpdateCallback(Utils::makeNodeCallback(_selectionBox.get(), [this,parent,hit](osg::NodeVisitor * pNV)->void {
                         osg::ComputeBoundsVisitor cbv;
                         parent->accept( cbv );
                         const osg::BoundingBox& bb = cbv.getBoundingBox();

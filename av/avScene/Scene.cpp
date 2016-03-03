@@ -546,7 +546,7 @@ Scene::Scene()
     _environmentNode = new Group();
     addChild(_environmentNode.get());
 
-    _loadManager = new utils::LoadManager();
+    _loadManager = new Utils::LoadManager();
     addChild(_loadManager);
 
     // Common nodes for scene etc.
@@ -565,7 +565,7 @@ Scene::Scene()
     // disable alpha writes for whole bunch
     pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
 
-    setUpdateCallback(utils::makeNodeCallback(this, &Scene::update));
+    setUpdateCallback(Utils::makeNodeCallback(this, &Scene::update));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1850,7 +1850,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 #ifdef ASYNC_OBJECT_LOADING
     // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
     if(async)
-		dynamic_cast<utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
+		dynamic_cast<Utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
 	else
 		wf(seed, path,mt_.back().get(),async);
 #else
@@ -1959,6 +1959,16 @@ void Scene::update( osg::NodeVisitor * nv )
       const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 	  const double lt = nv->getFrameStamp()->getSimulationTime();
 
+      avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
+      bool bsetup =  (vTime.Second != unsigned(lt) % 60) || (vTime.Minute != unsigned(lt / 60.0)  % 60); 
+      
+      vTime.Hour   = 10 + unsigned(lt / 3600.0)  % 24;
+      vTime.Minute = unsigned(lt / 60.0)  % 60;
+      vTime.Second = unsigned(lt) % 60;
+
+      if(bsetup)
+        _ephemerisNode->setTime();
+
 	  if(_time_panel)
       {
           _time_panel->set_time(lt * 1000.f);
@@ -2004,6 +2014,5 @@ void Scene::update( osg::NodeVisitor * nv )
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
 	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
 	  
-	  FIXME( "Время для окрю обст." );
-      //_ephemerisNode->setTime();
+
 }

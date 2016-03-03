@@ -1,6 +1,6 @@
 #pragma once
 
-namespace utils
+namespace Utils
 {
     // Use a thread to call osgDB::readNodeFile.
     struct  LoadNodeThread : public OpenThreads::Thread

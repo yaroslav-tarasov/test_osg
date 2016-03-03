@@ -57,7 +57,7 @@ using namespace avScene;
 Lights::Lights()
 {
     // update visitor is set just to notify parent that we need update traversal
-    setUpdateCallback(utils::makeNodeCallback(this, &Lights::update));
+    setUpdateCallback(Utils::makeNodeCallback(this, &Lights::update));
 
     // base set up
     setCullingActive(false);

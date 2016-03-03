@@ -10,9 +10,6 @@ class LightningLayer : public osg::Geode
 {
 public:
 
-
-public:
-
     // constructor
     LightningLayer(osg::Group * sceneRoot);
 
@@ -23,13 +20,25 @@ public:
     bool setDensity( float density );
 
     // set rotation by sidereal time
-    void setRotationSiderealTime( float rot_deg );
+    void setRotation( float rot_deg );
 
     // get overcast coefficient
     float getDensity() const {return _clDensity;} 
+    
+    void flash();
 
 private:
-	bool loadTextures();
+
+    // update callback
+    void update( osg::NodeVisitor * nv );
+
+private:
+    // create geometry
+    void _createGeometry();
+    // create state set
+    void _buildStateSet();
+
+    bool _loadTextures();
 
 private:
 
@@ -40,11 +49,7 @@ private:
     osg::ref_ptr<osg::Uniform> _colorFrontUniform;
     osg::ref_ptr<osg::Uniform> _colorBackUniform;
     osg::ref_ptr<osg::Uniform> _densityUniform;
-    
-    // create geometry
-    void _createGeometry();
-    // create state set
-    void _buildStateSet();
+    osg::ref_ptr<osg::Uniform> _flashUniform;
 
 private:
 
@@ -52,6 +57,8 @@ private:
     float        _clDensity;
     osg::Matrixf _clRotation;
 
+    float        _flashTargetTime;
+    bool         _flash;
 };
 
 }

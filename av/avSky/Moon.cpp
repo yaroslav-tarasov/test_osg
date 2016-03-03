@@ -17,7 +17,7 @@ MoonSphere::MoonSphere()
 // control
 void MoonSphere::setDirection( float fAzimuth, float fElevation )
 {
-    const cg::point_3f vMoonDir = utils::celestialUnitVector(fAzimuth, fElevation);
+    const cg::point_3f vMoonDir = Utils::celestialUnitVector(fAzimuth, fElevation);
     m_moonVectorUniform->set(osg::Vec3f(vMoonDir.x, vMoonDir.y, vMoonDir.z));
 }
 

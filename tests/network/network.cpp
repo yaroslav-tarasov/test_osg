@@ -89,7 +89,7 @@ namespace
 
     const  double traj_offset = 20.;
     const  double vehicle_prediction = 0;
-    const  double factor = 1.0; 
+    const  double factor = 2.0; 
 
 } 
 
@@ -158,7 +158,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("1vis.ncfg", cfg_);
+           cfgr_->load_config("3vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -261,6 +261,7 @@ struct client
         weather.fog_density  = 0.4f; 
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
         weather.wind_dir     = cg::point_2f(2.0, 4.0);
+
         ADD_EVENT(2.0, environment_msg(weather))
         
         weather.fog_density  = 0.75f; 
@@ -277,6 +278,7 @@ struct client
         weather.rain_density  = 0.2f;
         ADD_EVENT(25.0, environment_msg(weather))
         weather.rain_density  = 0.5f;
+        weather.lightning_intensity  = 0.75f;
         ADD_EVENT(30.0, environment_msg(weather))
         weather.rain_density  = 0.75f;
         ADD_EVENT(35.0, environment_msg(weather))
@@ -289,6 +291,7 @@ struct client
         ADD_EVENT(50.0, environment_msg(weather))
         weather.rain_density  = 0.45f;
         ADD_EVENT(55.0, environment_msg(weather))
+        weather.lightning_intensity  = 0.0f;
         weather.rain_density  = 0.2f;
         ADD_EVENT(57.0, environment_msg(weather))
         

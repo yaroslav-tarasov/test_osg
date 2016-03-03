@@ -48,9 +48,11 @@ namespace av
         } clouds_type;
         float clouds_density;
 
+        float lightning_intensity;
+
         weather_params() : wind_speed(0), wind_gusts(0),
             fog_density(0), rain_density(0), snow_density(0), hail_density(0),
-            clouds_type(cirrus), clouds_density(1) {}
+            clouds_type(cirrus), clouds_density(1.f),lightning_intensity(0.f) {}
     };
 
     // illumination data to use in external logics on CPU side

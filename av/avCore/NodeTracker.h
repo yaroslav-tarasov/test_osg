@@ -1,6 +1,6 @@
 #pragma once 
 
-namespace utils
+namespace Utils
 {
 
 	class  NodeTracker : public osg::Object

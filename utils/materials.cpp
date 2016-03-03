@@ -338,16 +338,16 @@ std::string osg_modification(uint16_t version, const std::string& prog)
           };
 
           uint16_t cattr = 13; 
-          cattr = utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"))>0?1:0;
-          cattr = utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"))>0?2:cattr;
-          cattr = utils::replaceAll(source,std::string("gl_Color"), std::string("osg_Color"))>0?3:cattr;
-          cattr = utils::replaceAll(source,std::string("gl_SecondaryColor"), std::string("osg_SecondaryColor"))>0?4:cattr;
-          cattr = utils::replaceAll(source,std::string("gl_FogCoord"), std::string("osg_FogCoord"))>0?5:cattr;
-          cattr = utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"))>0?8:cattr;
+          cattr = Utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"))>0?1:0;
+          cattr = Utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"))>0?2:cattr;
+          cattr = Utils::replaceAll(source,std::string("gl_Color"), std::string("osg_Color"))>0?3:cattr;
+          cattr = Utils::replaceAll(source,std::string("gl_SecondaryColor"), std::string("osg_SecondaryColor"))>0?4:cattr;
+          cattr = Utils::replaceAll(source,std::string("gl_FogCoord"), std::string("osg_FogCoord"))>0?5:cattr;
+          cattr = Utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"))>0?8:cattr;
 
-          utils::replaceAll(source,std::string("gl_ModelViewMatrix"), std::string("osg_ModelViewMatrix"));
-          utils::replaceAll(source,std::string("gl_ModelViewProjectionMatrix"), std::string("osg_ModelViewProjectionMatrix"));
-          utils::replaceAll(source,std::string("gl_ProjectionMatrix"), std::string("osg_ProjectionMatrix"));
+          Utils::replaceAll(source,std::string("gl_ModelViewMatrix"), std::string("osg_ModelViewMatrix"));
+          Utils::replaceAll(source,std::string("gl_ModelViewProjectionMatrix"), std::string("osg_ModelViewProjectionMatrix"));
+          Utils::replaceAll(source,std::string("gl_ProjectionMatrix"), std::string("osg_ProjectionMatrix"));
           
           std::string header;
           for (uint16_t i =0;i< cattr; ++i )
@@ -408,7 +408,7 @@ public:
         {
             std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
                 + preprocessorDefinitions                                                     + "\n " 
-                + osg_modification(version,utils::format(*shader_text));
+                + osg_modification(version,Utils::format(*shader_text));
             return new osg::Shader( static_cast<osg::Shader::Type>(t), prog );
 
         }

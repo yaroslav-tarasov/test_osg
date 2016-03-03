@@ -8,7 +8,7 @@
 #include <osgUtil/IntersectionVisitor>
 #include <osgUtil/PlaneIntersector>
 
-using namespace utils;
+using namespace Utils;
 
 #undef foreach
 
@@ -17,7 +17,7 @@ using namespace utils;
 
 //////////////////////////////////////////////////////////////////////////
 static bool s_bMouseShowed = true;
-bool utils::GetMouseCursorShowState()
+bool Utils::GetMouseCursorShowState()
 {
     return s_bMouseShowed;
 }
@@ -62,7 +62,7 @@ static __forceinline void _vectorZeroClamp( osg::Vec3f & vVec )
 }
 
 // distance to axis-aligned bounding box
-float utils::GetDistanceToAABBSqr( const osg::Vec3f & vPos, const osg::BoundingBox & aabb )
+float Utils::GetDistanceToAABBSqr( const osg::Vec3f & vPos, const osg::BoundingBox & aabb )
 {
     const osg::Vec3f vBoxCenter = aabb.center();
     const osg::Vec3f vBoxHalf = aabb._max - vBoxCenter;
@@ -78,7 +78,7 @@ float utils::GetDistanceToAABBSqr( const osg::Vec3f & vPos, const osg::BoundingB
 
 
 /////////////////////////////////////////////////////////////////////
-void utils::DisableCulling( osg::Node* pNode )
+void Utils::DisableCulling( osg::Node* pNode )
 {
     pNode->setCullingActive( false );
     if ( pNode->asGroup() )
@@ -200,7 +200,7 @@ static void _postprocessModelInternal(osg::Node * pNode, const postProcRecData &
     }
 }
 
-void utils::PostprocessModel( osg::Node * pNode )
+void Utils::PostprocessModel( osg::Node * pNode )
 {
     avAssert( pNode );
 
@@ -213,7 +213,7 @@ void utils::PostprocessModel( osg::Node * pNode )
 }
 
 //////////////////////////////////////////////////////////////////////////
-void utils::SetDynamicNode( osg::Node* pNode, bool bDynamicChildren /*= true*/ )
+void Utils::SetDynamicNode( osg::Node* pNode, bool bDynamicChildren /*= true*/ )
 {
     avAssert( pNode );
     pNode->setDataVariance( osg::Object::DYNAMIC );
@@ -232,7 +232,7 @@ void utils::SetDynamicNode( osg::Node* pNode, bool bDynamicChildren /*= true*/ )
 }
 
 //////////////////////////////////////////////////////////////////////////
-void utils::RemoveNodeFromAllParents( osg::Node* pNode )
+void Utils::RemoveNodeFromAllParents( osg::Node* pNode )
 {
     avAssert( pNode );
 
@@ -244,7 +244,7 @@ void utils::RemoveNodeFromAllParents( osg::Node* pNode )
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool utils::SetTextureUniform( const char* szTextureName, const char* szUniformName, int nID, osg::StateSet* pStateSet,
+bool Utils::SetTextureUniform( const char* szTextureName, const char* szUniformName, int nID, osg::StateSet* pStateSet,
                                osg::Texture::WrapMode eWrapMode /*= osg::Texture::REPEAT*/, const osgDB::Options* options )
 {
     avAssert( szTextureName && szUniformName && nID >= 0 && pStateSet );
@@ -264,7 +264,7 @@ bool utils::SetTextureUniform( const char* szTextureName, const char* szUniformN
 }
 
 //////////////////////////////////////////////////////////////////////////
-float utils::GetScreenClarity( osgUtil::CullVisitor * pCV )
+float Utils::GetScreenClarity( osgUtil::CullVisitor * pCV )
 {
     // get screen pixel clarity
     const osg::Matrix & P = *pCV->getProjectionMatrix();
@@ -285,7 +285,7 @@ float utils::GetScreenClarity( osgUtil::CullVisitor * pCV )
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool utils::IsPowerOf2( unsigned int nValue )
+bool Utils::IsPowerOf2( unsigned int nValue )
 {
     // More examples how to test if number is power of 2 you can find on:
     // http://www.acetheinterview.com/cgi-bin/answers.cgi?action=answers&number=4&topic=000007.ubb&q_id=7
@@ -293,7 +293,7 @@ bool utils::IsPowerOf2( unsigned int nValue )
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool utils::CheckIfAFileExists( const std::string& cAbsolutePath )
+bool Utils::CheckIfAFileExists( const std::string& cAbsolutePath )
 {
     return ( GetFileAttributesA( cAbsolutePath.c_str() ) != INVALID_FILE_ATTRIBUTES );
 }
@@ -628,7 +628,7 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
-osg::BoundingBox utils::CalculateModelAABB( osg::Node * pNode )
+osg::BoundingBox Utils::CalculateModelAABB( osg::Node * pNode )
 {
     AABBCalculationVisitor aabb_visitor;
     pNode->accept(aabb_visitor);
@@ -637,7 +637,7 @@ osg::BoundingBox utils::CalculateModelAABB( osg::Node * pNode )
 
 
 //////////////////////////////////////////////////////////////////////////
-float utils::ConvertTraineeDensityToExpSceneFog( float fTraineeDensity, float * fVisDistPtr )
+float Utils::ConvertTraineeDensityToExpSceneFog( float fTraineeDensity, float * fVisDistPtr )
 {
     // calculate real visibility distance somehow
     static const double dLN256 = log(256.0);
@@ -652,7 +652,7 @@ float utils::ConvertTraineeDensityToExpSceneFog( float fTraineeDensity, float * 
 }
 
 //////////////////////////////////////////////////////////////////////////
-float utils::ConvertTraineeDensityToExpReflFog( float fTraineeDensity, float * fVisDistPtr )
+float Utils::ConvertTraineeDensityToExpReflFog( float fTraineeDensity, float * fVisDistPtr )
 {
     // calculate real visibility distance somehow
     static const double dLN256 = log(256.0);
@@ -666,7 +666,7 @@ float utils::ConvertTraineeDensityToExpReflFog( float fTraineeDensity, float * f
     return float(dLN256 / double(fRealVisDist));
 }
 
-float utils::GetHorizontalIntersectionRadius( osg::Node* pNode, float fHeight )
+float Utils::GetHorizontalIntersectionRadius( osg::Node* pNode, float fHeight )
 {
     float Radius ( 0.0f );
 
@@ -713,7 +713,7 @@ float utils::GetHorizontalIntersectionRadius( osg::Node* pNode, float fHeight )
 }
 
 
-namespace utils
+namespace Utils
 {
     bool replace(std::string& str, const std::string& from, const std::string& to) {
         size_t start_pos = str.find(from);

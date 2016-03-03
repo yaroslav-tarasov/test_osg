@@ -290,13 +290,11 @@ void visual::update(double time)
             (*tow_visual_object_)->set_visible(false);
     }
 
-#if 1
-	if (foam_stream_object_ && time > last_fs_time_ + fs_end_duration_ + foam_stream_sfx_weak_ptr_->getMaxParticleLifetime())
+	if (foam_stream_object_ && time > last_fs_time_ /*+ fs_end_duration_ + foam_stream_sfx_weak_ptr_->getMaxParticleLifetime()*/)
 	{
 		foam_stream_sfx_weak_ptr_ = nullptr;
 		foam_stream_object_.reset();
 	}
-#endif
 }
 
 

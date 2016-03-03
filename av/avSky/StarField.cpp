@@ -72,7 +72,7 @@ void StarField::_buildGeometry()
     pStarsColors->resize(m_aStars.size());
     for (unsigned i = 0; i < m_aStars.size(); ++i)
     {
-        const cg::point_3f vStarDir(utils::celestialUnitVector(m_aStars[i].right_ascension, m_aStars[i].declination));
+        const cg::point_3f vStarDir(Utils::celestialUnitVector(m_aStars[i].right_ascension, m_aStars[i].declination));
         pStarsVerts->at(i) = osg::Vec4(vStarDir.x, vStarDir.y, vStarDir.z, 1.6f - m_aStars[i].magnitude * 0.15f);
         // random color
         cg::point_3f cStarRandomColor;
