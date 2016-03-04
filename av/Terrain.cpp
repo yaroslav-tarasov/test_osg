@@ -44,7 +44,8 @@ namespace
             return osg::Vec3f(0 , 0 , .2f);
         else if (name == "minsk")
             return osg::Vec3f(0 , 0 , .5f);
-
+        else if (name == "eisk")
+            return osg::Vec3f(0 , 0 , 0.5f);
         return osg::Vec3f();
     }
 
@@ -56,7 +57,8 @@ namespace
             return "sochi.scn";
         else if (name == "minsk")
             return "minsk.scn";
-
+        else if (name == "eisk")
+            return "eisk.scn";
         return "";
     }
 

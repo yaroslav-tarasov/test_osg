@@ -365,7 +365,7 @@ inline object_info_ptr create_helicopter_phl(kernel::system* csys,create const& 
     geo_position agp(target_pos, get_base());
 
     aircraft::settings_t as;
-    as.kind = "KA27"; // msg.model_name; // 
+    as.kind = msg.model_name;  
     as.custom_label = msg.custom_label;
 
     return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,agp);
