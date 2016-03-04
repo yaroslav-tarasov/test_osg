@@ -1571,6 +1571,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 #endif
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000);
+        // load("ka_50",_terrainRoot, 15000, false);
 
          /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 

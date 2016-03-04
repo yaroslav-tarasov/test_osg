@@ -308,6 +308,11 @@ struct client
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
         ADD_EVENT(80.0, environment_msg(weather))
 
+        weather.fog_density  = 0.2f;
+        weather.wind_speed  = 0.0f;
+        weather.wind_dir    = cg::point_2f(1.0,1.0);
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
+        ADD_EVENT(90.0, environment_msg(weather))
 #if 1
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319") )
         ADD_EVENT(70.0, fire_fight_msg_t(2))
@@ -332,6 +337,17 @@ struct client
 #endif
         ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
         
+        ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(11.0  , create(151,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(12.0  , create(151,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(13.0  , create(151,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(14.0  , create(151,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(15.0  , create(151,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(16.0  , create(151,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(17.0  , create(151,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(18.0  , create(151,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(19.0  , create(151,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50") )
+
         ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
         ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
         ADD_EVENT(60.0  , engine_state_msg(150 , ES_STOPPED) )

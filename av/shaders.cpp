@@ -1100,7 +1100,7 @@ $endif
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
 \n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-\n			     
+\n			     // aFragColor = vec4(1.0,0.0,0.0,1.0);
 \n           }
        )
 

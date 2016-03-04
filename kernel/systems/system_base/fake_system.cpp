@@ -346,7 +346,9 @@ void fake_system_base::update (double time)
 
 void fake_system_base::on_msg(binary::bytes_cref bytes)
 {
-    msg_disp_.dispatch_bytes(bytes);
+    FIXME (Проскакивает такая хрень)
+    if(bytes.size()>0)
+        msg_disp_.dispatch_bytes(bytes);
 }
 
 //! базовая функция загрузки упражнения
