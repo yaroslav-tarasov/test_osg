@@ -39,7 +39,7 @@ namespace Utils
         
     }
 
-    void LoadManager::load ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work , LoadNodeThread::set_signal_f s)
+    void LoadManager::load ( osg::MatrixTransform* mt, LoadNodeThread::worker_f work , LoadNodeThread::set_signal_f s)
     {
         threads_.push_back(new LoadNodeThread(work,s));
     }

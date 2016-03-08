@@ -13,7 +13,7 @@
 
 #include "utils\visitors\find_node_visitor.h"
 
-#include "InstancedData.h"
+#include "av/avCore/InstancedData.h"
 
 
 namespace avAnimation {
@@ -284,7 +284,6 @@ int main_anim_test3( int argc, char** argv )
 
 
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
-   //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
       
    avAnimation::InstancedAnimationManager im(anim_file);   
 
@@ -300,7 +299,6 @@ int main_anim_test3( int argc, char** argv )
        );
 
    pat->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3(0.5,0.5,0.5));
- 
 
 	osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
 	ph_ctrl->setName("phys_ctrl");
@@ -346,7 +344,7 @@ int main_anim_test3( int argc, char** argv )
 
 	   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationTexture(switcher.my_ptr->anim_mat_data_);
 
-	   std::string filename = "data.row";
+	   std::string filename = "crow/data.row";
 	   {
 		   std::ofstream image_data_file(filename, std::ios_base::binary);
 		   auto bts = binary::wrap(im.getImageData());

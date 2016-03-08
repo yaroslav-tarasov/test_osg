@@ -25,6 +25,10 @@ namespace creators
 		  std::map<std::string, osg::ref_ptr<osg::Node> >   _anim_containers;
 		  osgAnimation::AnimationMap                        _animations;
 		  osg::ref_ptr<osgAnimation::BasicAnimationManager> _manager;
+
+	  //  Settings
+	  private:
+		  bool												_hw_instanced;
 	  };
 
 	  Object*    createObject(std::string name, bool fclone=true);

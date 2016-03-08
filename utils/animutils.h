@@ -190,15 +190,24 @@ struct SkeletonFinder : public osg::NodeVisitor
 struct SetupRigGeometry : public osg::NodeVisitor
 {
     bool _hardware;
-    osg::ref_ptr<osgAnimation::Skeleton> _skel;
+	
+	typedef boost::function<osgAnimation::RigTransformHardware*()>              rth_creator_f;
+	
+	rth_creator_f           _creator;
 
-    SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
+#if 0
+    osg::ref_ptr<osgAnimation::Skeleton> _skel;
+#endif
+
+    explicit SetupRigGeometry( bool hardware = true,  rth_creator_f const&  cr = 0) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware),  _creator(cr) {}
     
-    SetupRigGeometry( bool hardware, osg::Node& node ) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) 
+    SetupRigGeometry( bool hardware, osg::Node& node, rth_creator_f const&  cr = 0 ) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware),  _creator(cr) 
     {
+#if 0
          SkeletonFinder sf;
          node.accept(sf);
          _skel = sf._skel;
+#endif
 
          node.accept(*this);
     }
@@ -215,13 +224,15 @@ struct SetupRigGeometry : public osg::NodeVisitor
             osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
             if (rig)
             {
-                rig->setRigTransformImplementation(new avAnimation::RigTransformHardware);
+                rig->setRigTransformImplementation(_creator?_creator():new avAnimation::RigTransformHardware);
 
+#if 0
                 if(_skel)
                 {
                     //rig->setSkeleton(_skel.get());
                     //rig->computeMatrixFromRootSkeleton();
                 }
+#endif
 
             }
         }

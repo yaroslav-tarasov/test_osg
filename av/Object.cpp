@@ -1,12 +1,17 @@
 #include "stdafx.h"
 #include "av/precompiled.h"
 
+#include <osgAnimation/RigGeometry>
+#include <osgAnimation/RigTransformHardware>
+#include <osgAnimation/BoneMapVisitor>
+
 #include "Object.h"
 #include "avCore/LOD.h"
 #include "avLights/Lights.h"
 #include "avLights/LightManager.h"
 #include "avCore/Utils.h"
 #include "avCore/XmlModel.h"
+#include "avCore/InstancedAnimationManager.h"
 
 #include "materials.h"
 
@@ -86,6 +91,20 @@ void  releaseObjectCache()
       objCache.clear();
 }
 
+
+
+static OpenThreads::Mutex& getMutex()
+{
+	static OpenThreads::Mutex   _mutex;
+	return _mutex;
+}
+
+static OpenThreads::Mutex& getReadFileMutex()
+{
+	static OpenThreads::Mutex   _mutex;
+	return _mutex;
+}
+
 Object* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
@@ -124,7 +143,10 @@ Object* createObject(std::string name, bool fclone)
             ;
     }
 
-	if(( it = objCache.find(name))!=objCache.end() )
+    OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getMutex());
+	it = objCache.find(name);
+
+	if( it !=objCache.end() )
 	{
 		if(fclone)
 		    object = osg::clone(it->second.get(), copyop);
@@ -151,6 +173,7 @@ Object* createObject(std::string name, bool fclone)
 			if(object_file_name.empty())
 				return nullptr;
 
+			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
 			object_file = osgDB::readNodeFile(object_file_name);
 
 		}
@@ -158,6 +181,7 @@ Object* createObject(std::string name, bool fclone)
 		{
 			ModelReader mr;
 			data = mr.Load(object_file_name);
+			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
 			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.fpl_,osgDB::CASE_INSENSITIVE));
 #if 1
             if(data->morphs.size()>0)
@@ -214,6 +238,7 @@ Object* createObject(std::string name, bool fclone)
 
             }
 #endif
+			bool hw_inst = data->hw_instanced;
 		}
 
         bool airplane = findFirstNode(object_file ,"shassi_"  ,findNodeVisitor::not_exact)!=nullptr;
@@ -487,11 +512,12 @@ FIXME( Исправить структуру под mt)
         }
 #endif
 
-
 		objCache[name] = object = new Object(*pat);
-
+		
+#if 1
 		if(data)
-		{
+		{			
+			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
 			const xml_model_t::animations_t&  anims = data->anims;
 			for(auto it = anims.begin();it!= anims.end();++it)
 			{
@@ -500,6 +526,7 @@ FIXME( Исправить структуру под mt)
 					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
 			}
 		}
+#endif
 
 #if 1
         if(fclone)
@@ -512,6 +539,10 @@ FIXME( Исправить структуру под mt)
 
 
 	}
+	
+	avAnimation::SetupRigGeometry switcher(true, *(object->getNode()),data?(data->hw_instanced?
+										  [&]()->osgAnimation::RigTransformHardware* {return new avCore::RigTransformHardware;}
+										  :avAnimation::SetupRigGeometry::rth_creator_f() ):avAnimation::SetupRigGeometry::rth_creator_f() );
 
     pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
 

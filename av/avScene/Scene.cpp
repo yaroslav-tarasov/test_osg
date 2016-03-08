@@ -1817,7 +1817,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             _terrainRoot->asGroup()->addChild(mt);
 //#endif
 
-#if 1
+#if 0
 		FIXME("Жесть с анимацией, кто на ком стоял")
 	    using namespace avAnimation;
 		if(path=="crow")

@@ -5,11 +5,11 @@ namespace Utils
     // Use a thread to call osgDB::readNodeFile.
     struct  LoadNodeThread : public OpenThreads::Thread
     {
-        typedef boost::function<osg::Node * ()> on_work_f  ; 
+        typedef boost::function<osg::Node * ()> worker_f  ; 
 		typedef boost::function<void ()       > set_signal_f  ;
 
-        LoadNodeThread( on_work_f work, LoadNodeThread::set_signal_f s )
-            : _work( work )
+        LoadNodeThread( worker_f work, LoadNodeThread::set_signal_f s )
+            : _worker( work )
             , _node(nullptr)
 			, _sig (s)
         {
@@ -21,38 +21,38 @@ namespace Utils
 
         void run()
         {
+			// 
+            // OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getMutex());
 
-          OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getMutex());
-
-            if( _work )
-               _node = _work();
+            if( _worker )
+               _node = _worker();
         }
 
-        static OpenThreads::Mutex& getMutex()
-        {
-            static OpenThreads::Mutex   _mutex;
-            return _mutex;
-        }
+		static OpenThreads::Mutex& getMutex()
+		{
+			static OpenThreads::Mutex   _mutex;
+			return _mutex;
+		}
 
-        on_work_f                       _work;
-        osg::ref_ptr< osg::Node >       _node;
-	    set_signal_f                     _sig;
+		worker_f                      _worker;
+		osg::ref_ptr< osg::Node >       _node;
+		set_signal_f                     _sig;
 
 
 
 	};
 
-    class LoadManager 
-        : public osg::Node
-    {
+	class LoadManager 
+		: public osg::Node
+	{
 
-    public:
+	public:
 
-        LoadManager();
-        void   update  ( osg::NodeVisitor * nv );
-        void   load    ( osg::MatrixTransform* mt, LoadNodeThread::on_work_f work, LoadNodeThread::set_signal_f s );
+		LoadManager();
+		void   update  ( osg::NodeVisitor * nv );
+		void   load    ( osg::MatrixTransform* mt, LoadNodeThread::worker_f work, LoadNodeThread::set_signal_f s );
 
-        std::deque<LoadNodeThread*>               threads_;
-    };
-          
+		std::deque<LoadNodeThread*>               threads_;
+	};
+
 }

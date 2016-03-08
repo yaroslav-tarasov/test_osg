@@ -918,8 +918,8 @@ $endif
 \n               float night_factor = step(ambient.a, 0.35);
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
-\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-\n			   
+\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
+\n			     //aFragColor = vec4(1.0,0.0,0.0,1.0);
 \n           }
        )
 
@@ -1740,9 +1740,9 @@ $endif
 \n
 \n             // Apply spot lights
 \n             vec3 vLightsSpecAddOn;
-\n               vec3 light_res;  
+\n             vec3 light_res;  
 \n                  
-\n               // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n             // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n             // vec3 lightmap_color = light_res ; 
 \n
 \n             GET_LIGHTMAP(f_in.viewpos, f_in);

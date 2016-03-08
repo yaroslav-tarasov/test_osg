@@ -107,8 +107,12 @@ namespace kernel
                anim_manager_  = finder._am;  
 			   node_->setUpdateCallback(finder._am.get());
            }
-
-           object_loaded_signal_(seed);
+		   
+#if 0
+		   SetupRigGeometry switcher(true, *node_.get());
+#endif
+           
+		   object_loaded_signal_(seed);
          }
     }
 #endif

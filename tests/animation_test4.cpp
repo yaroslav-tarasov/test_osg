@@ -14,7 +14,7 @@
 #include "utils\visitors\find_node_visitor.h"
 
 #include "creators.h"
-#include "InstancedData.h"
+#include "av/avCore/InstancedData.h"
 
 namespace
 {
@@ -325,6 +325,7 @@ namespace {
                 if (rig)
                 {        
                     my_ptr = new MyRigTransformHardware;
+					FIXME(А больше Drawables?)
                     rig->setRigTransformImplementation(my_ptr);
                 }
             }
@@ -397,7 +398,7 @@ int main_anim_test4( int argc, char** argv )
    auto object_file = osgDB::readNodeFile("crow/flap.fbx");
    //auto object_file = osgDB::readNodeFile("crow/crow_model.fbx");
 
-   InstancedAnimationManager im(anim_file);  
+   InstancedAnimationManager im(/*anim_file*/object_file);  
    
    osg::Vec3 scale(2.0f, 2.0f, 2.0f);
 
@@ -432,7 +433,7 @@ int main_anim_test4( int argc, char** argv )
        }
    }
 
-   std::string filename = "data.row";
+   std::string filename = "crow/data.row";
 
    image_data rd;
 
@@ -528,9 +529,10 @@ int main_anim_test4( int argc, char** argv )
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
 
+#if 1 // Move flock away
    osg::ref_ptr<osg::AnimationPathCallback> apcb = new osg::AnimationPathCallback;
    apcb->setAnimationPath(creators::createAnimationPath(osg::Vec3(0.0,0.0,0.0), 50, 6));  
-#if 1
+
    for (int i =0;i<1/*300*/;i++)
    {
        osg::ref_ptr<osg::MatrixTransform> ph_ctrl = new osg::MatrixTransform;
@@ -546,7 +548,6 @@ int main_anim_test4( int argc, char** argv )
 	   ph_ctrl->setUpdateCallback(apcb.get());
        
 	   root->addChild(ph_ctrl);
-
    }
 #endif
 

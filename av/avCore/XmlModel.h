@@ -36,6 +36,10 @@
     </Animation>
 </root>
 
+<MainModel path="crow.dae" >
+	<Parameters axis_up="Y" scale="0.02" hw_instanced="yes" />
+</MainModel>
+
 #endif
 
 
@@ -61,6 +65,7 @@ namespace avCore
 		up_axis_t      axis_up;
 		osg::Vec3      pivot_point;
         bool           lod3;
+		bool		   hw_instanced;
 	} xml_model_t;
 
     struct ModelReader

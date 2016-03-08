@@ -35,13 +35,16 @@ namespace avCore
             
             std::string au_val;
             data_.lod3 = true;
+			data_.hw_instanced = false;
 
+			
             pugi::xml_node param_node = MainModel.child("Parameters");
             if(param_node)
             {
-                data_.scale = param_node.attribute("scale").as_float(1.0);
-                au_val      = param_node.attribute("axis_up").as_string("Z");
-                data_.lod3  = param_node.attribute("lod3").as_string("on")!=std::string("off");
+                data_.scale        = param_node.attribute("scale").as_float(1.0);
+                au_val			   = param_node.attribute("axis_up").as_string("Z");
+                data_.lod3		   = param_node.attribute("lod3").as_string("on")!=std::string("off");
+				data_.hw_instanced = param_node.attribute("hw_instanced").as_string("no")==std::string("yes");
             }
             else
             {

@@ -207,6 +207,7 @@
     <ClCompile Include="av\avCore\Database.cpp" />
     <ClCompile Include="av\avCore\DebugRenderer.cpp" />
     <ClCompile Include="av\avCore\Environment.cpp" />
+    <ClCompile Include="av\avCore\InstancedAnimationManager.cpp" />
     <ClCompile Include="av\avCore\LOD.cpp" />
     <ClCompile Include="av\avCore\Logo.cpp" />
     <ClCompile Include="av\avCore\NodeTracker.cpp" />
@@ -442,6 +443,7 @@
     <ClCompile Include="utils\materials.cpp" />
     <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp" />
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="utils\workqueue.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />
     <ClCompile Include="stdafx.cpp">

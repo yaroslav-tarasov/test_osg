@@ -89,7 +89,7 @@ namespace
 
     const  double traj_offset = 20.;
     const  double vehicle_prediction = 0;
-    const  double factor = 2.0; 
+    const  double factor = 1.0; 
 
 } 
 
