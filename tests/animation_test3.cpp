@@ -67,10 +67,10 @@ namespace {
             osg::Vec4Array* arr = getVertexAttrib(i);
             image_data::weights_t  w;
             w.resize( arr->size() * image_data_.divisor);
-            for (int j = 0; j < arr->size(); j+=4)
+            for (int j = 0; j < arr->size(); j++)
             {
                 for (int z = 0; z<image_data_.divisor; ++z ) 
-                    w[j + z]=(*arr)[j]._v[z];
+                    w[j*image_data_.divisor + z]=(*arr)[j]._v[z];
             } 
 
             image_data_.bonesWeights.emplace_back(std::move(w));

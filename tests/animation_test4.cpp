@@ -337,8 +337,8 @@ namespace {
         }
     };
 
-#if 0
-bool initSkinning(osg::Geometry& geom, int bonesPerVertex )
+#if 1
+bool initSkinning(osg::Geometry& geom, const image_data& id )
 {
     osg::Geometry& source = geom;
     osg::Vec3Array* positionSrc = dynamic_cast<osg::Vec3Array*>(source.getVertexArray());
@@ -352,18 +352,25 @@ bool initSkinning(osg::Geometry& geom, int bonesPerVertex )
     cSkinningProg->setName("SkinningShader");
 
     int attribIndex = 11;
-    int nbAttribs = getNumVertexAttrib();
+    int nbAttribs = id.bonesWeights.size();
     for (int i = 0; i < nbAttribs; i++)
     {
-        std::stringstream ss;
+        osg::ref_ptr<osg::Vec4Array> array = new osg::Vec4Array(osg::Array::BIND_PER_VERTEX);
+		const image_data::weights_t&  w = id.bonesWeights[i];
+		for (int j = 0; j < w.size(); j+=id.divisor)
+		{
+			array->push_back(osg::Vec4(w.at(j),w.at(j+1),w.at(j+2),w.at(j+3)));
+		}		
+		
+		std::stringstream ss;
         ss << "boneWeight" << i;
         cSkinningProg->addBindAttribLocation(ss.str(), attribIndex + i);
-        geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
+        geom.setVertexAttribArray(attribIndex + i, array);
         OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
     }
 
     osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
-    ss->addUniform(new osg::Uniform("nbBonesPerVertex", bonesPerVertex));
+    ss->addUniform(new osg::Uniform("nbBonesPerVertex", id.bonesPerVertex));
     ss->setAttributeAndModes(cSkinningProg.get());
 
     return true;
@@ -544,8 +551,10 @@ int main_anim_test4( int argc, char** argv )
    stateSet->addUniform(new osg::Uniform("colorTexture", 0));
    stateSet->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
 
+#if 0
    SetupRigGeometry switcher(true);
    object_file->accept(switcher);
+#endif
 
    auto pat = new osg::PositionAttitudeTransform; 
    pat->addChild(object_file);
@@ -590,7 +599,8 @@ int main_anim_test4( int argc, char** argv )
 	   ph_ctrl->addUpdateCallback(new UpdateCallback(boost::bind(&InstancedAnimationManager::setInstanceData,&im,i,_1)));
    }
 
-   switcher.my_ptr->setInstancedGeometry(geometry.get());
+   //switcher.my_ptr->setInstancedGeometry(geometry.get());
+   initSkinning(*geometry.get(),rd);
 
    using namespace avAnimation;
 
