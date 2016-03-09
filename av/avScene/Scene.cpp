@@ -1615,7 +1615,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     if(obj)
     {
-        osg::Node* obj_node = obj->getNode();
+        osg::Node* obj_node = obj->getInstancedNode(); //obj->getNode();
         
         mt->addChild( obj_node );
 
@@ -1629,7 +1629,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             osg::Node* pat =  findFirstNode(mt,"pat"          ,findNodeVisitor::not_exact);
             osg::Node* hd  =  findFirstNode(mt,"headlight"    ,findNodeVisitor::not_exact);
 
-            const auto offset =  pat->asTransform()->asPositionAttitudeTransform()->getPosition();
+            const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3d(0.0,0.0,0.0);
 
             if(sl)
             {
@@ -1705,7 +1705,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             }
 
             findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
-            root->accept(findNodes);
+            if(root) root->accept(findNodes);
 
             findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 

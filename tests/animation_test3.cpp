@@ -15,6 +15,106 @@
 
 #include "av/avCore/InstancedData.h"
 
+namespace {
+
+    struct MyRigTransformHardware : public osgAnimation::RigTransformHardware
+    {
+
+        avAnimation::AnimationChannelMatricesType       anim_mat_data_;
+        image_data                                      image_data_;
+
+        void operator()(osgAnimation::RigGeometry& geom);
+        bool init(osgAnimation::RigGeometry& geom);
+        void computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry);
+    };
+
+    void MyRigTransformHardware::operator()(osgAnimation::RigGeometry& geom)
+    {
+        if (_needInit)
+            if (!init(geom))
+                return;
+        MyRigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
+    }
+
+    void MyRigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
+    {
+        const size_t palSize = _bonePalette.size();
+        for (size_t i = 0; i < palSize; i++)
+        {
+            osg::ref_ptr<osgAnimation::Bone> bone = _bonePalette[i].get();
+            const osg::Matrix& invBindMatrix = bone->getInvBindMatrixInSkeletonSpace();
+            const osg::Matrix& boneMatrix = bone->getMatrixInSkeletonSpace();
+            osg::Matrix resultBoneMatrix = invBindMatrix * boneMatrix;
+            osg::Matrix result =  transformFromSkeletonToGeometry * resultBoneMatrix * invTransformFromSkeletonToGeometry;
+            anim_mat_data_[i].first = bone->getName();
+            anim_mat_data_[i].second.push_back(result);
+            if (!_uniformMatrixPalette->setElement(i, result))
+                OSG_WARN << "RigTransformHardware::computeUniformMatrixPalette can't set uniform at " << i << " elements" << std::endl;
+        }
+    }
+
+    bool MyRigTransformHardware::init(osgAnimation::RigGeometry& geom)
+    {
+        bool binit = osgAnimation::RigTransformHardware::init(geom);
+
+        if(binit)
+            anim_mat_data_.resize(_bonePalette.size());
+
+        int nbAttribs = getNumVertexAttrib();
+        image_data_.divisor = 4;
+        for (int i = 0; i < nbAttribs; i++)
+        {
+            osg::Vec4Array* arr = getVertexAttrib(i);
+            image_data::weights_t  w;
+            w.resize( arr->size() * image_data_.divisor);
+            for (int j = 0; j < arr->size(); j+=4)
+            {
+                for (int z = 0; z<image_data_.divisor; ++z ) 
+                    w[j + z]=(*arr)[j]._v[z];
+            } 
+
+            image_data_.bonesWeights.emplace_back(std::move(w));
+        }
+
+        return binit;
+    }
+
+
+    struct SetupRigGeometry : public osg::NodeVisitor
+    {
+        bool _hardware;
+        osg::ref_ptr<MyRigTransformHardware> my_ptr;
+
+        SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
+
+        void apply(osg::Geode& geode)
+        {
+            for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
+                apply(*geode.getDrawable(i));
+        }
+        void apply(osg::Drawable& geom)
+        {
+            if (_hardware) {
+                osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
+                if (rig)
+                {        
+                    my_ptr = new MyRigTransformHardware;
+                    rig->setRigTransformImplementation(my_ptr);
+                }
+            }
+        }
+    };
+
+
+    inline osg::Node* loadAnimation(std::string aname)
+    {
+        auto anim = osgDB::readNodeFile("crow/" + aname + ".fbx");
+        anim->setName(aname);
+        return  anim;
+    }
+
+}
+
 
 namespace avAnimation {
 
@@ -61,9 +161,11 @@ public:
 	{}
 
 
-	osg::TextureRectangle* createAnimationTexture( const AnimationChannelMatricesType& acmt)
+	osg::TextureRectangle* createAnimationData( const MyRigTransformHardware& rth)
 	{
-        
+        const AnimationChannelMatricesType& acmt = rth.anim_mat_data_;
+        int bonesPerVertex = rth.getNumBonesPerVertex();
+
         size_t total_anim_len = acmt.size() * acmt.begin()->second.size();
 
 		// create texture to encode all matrices
@@ -129,6 +231,10 @@ public:
             dest_ptr += itr.size();
         }
 
+        idata_.bonesWeights = rth.image_data_.bonesWeights;
+        idata_.divisor = rth.image_data_.divisor;
+        idata_.bonesPerVertex = bonesPerVertex;
+
         return texture.release();
 	}
 
@@ -179,88 +285,7 @@ public:
 
 }
 
-namespace {
 
-    struct MyRigTransformHardware : public osgAnimation::RigTransformHardware
-    {
-
-        avAnimation::AnimationChannelMatricesType       anim_mat_data_;
-
-        void operator()(osgAnimation::RigGeometry& geom);
-        bool init(osgAnimation::RigGeometry& geom);
-        void computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry);
-    };
-
-    void MyRigTransformHardware::operator()(osgAnimation::RigGeometry& geom)
-    {
-        if (_needInit)
-            if (!init(geom))
-                return;
-        MyRigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
-    }
-    
-    void MyRigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
-    {
-        const size_t palSize = _bonePalette.size();
-        for (size_t i = 0; i < palSize; i++)
-        {
-            osg::ref_ptr<osgAnimation::Bone> bone = _bonePalette[i].get();
-            const osg::Matrix& invBindMatrix = bone->getInvBindMatrixInSkeletonSpace();
-            const osg::Matrix& boneMatrix = bone->getMatrixInSkeletonSpace();
-            osg::Matrix resultBoneMatrix = invBindMatrix * boneMatrix;
-            osg::Matrix result =  transformFromSkeletonToGeometry * resultBoneMatrix * invTransformFromSkeletonToGeometry;
-            anim_mat_data_[i].first = bone->getName();
-            anim_mat_data_[i].second.push_back(result);
-            if (!_uniformMatrixPalette->setElement(i, result))
-                OSG_WARN << "RigTransformHardware::computeUniformMatrixPalette can't set uniform at " << i << " elements" << std::endl;
-        }
-    }
-
-    bool MyRigTransformHardware::init(osgAnimation::RigGeometry& geom)
-    {
-        bool binit = osgAnimation::RigTransformHardware::init(geom);
-
-        if(binit)
-            anim_mat_data_.resize(_bonePalette.size());
-
-        return binit;
-    }
-
-
-    struct SetupRigGeometry : public osg::NodeVisitor
-    {
-        bool _hardware;
-        osg::ref_ptr<MyRigTransformHardware> my_ptr;
-        
-        SetupRigGeometry( bool hardware = true) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN), _hardware(hardware) {}
-
-        void apply(osg::Geode& geode)
-        {
-            for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
-                apply(*geode.getDrawable(i));
-        }
-        void apply(osg::Drawable& geom)
-        {
-            if (_hardware) {
-                osgAnimation::RigGeometry* rig = dynamic_cast<osgAnimation::RigGeometry*>(&geom);
-                if (rig)
-                {        
-                    my_ptr = new MyRigTransformHardware;
-                    rig->setRigTransformImplementation(my_ptr);
-                }
-            }
-        }
-    };
-
-
-inline osg::Node* loadAnimation(std::string aname)
-{
-    auto anim = osgDB::readNodeFile("crow/" + aname + ".fbx");
-    anim->setName(aname);
-    return  anim;
-}
-
-}
 
 int main_anim_test3( int argc, char** argv )
 {  
@@ -342,7 +367,7 @@ int main_anim_test3( int argc, char** argv )
 	   }
 
 
-	   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationTexture(switcher.my_ptr->anim_mat_data_);
+	   osg::ref_ptr<osg::TextureRectangle> tex = im.createAnimationData(*switcher.my_ptr);
 
 	   std::string filename = "crow/data.row";
 	   {

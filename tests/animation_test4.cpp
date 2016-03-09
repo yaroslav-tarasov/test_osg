@@ -233,8 +233,7 @@ namespace {
 
     struct MyRigTransformHardware : public osgAnimation::RigTransformHardware
     {
-        avAnimation::AnimationChannelMatricesType       anim_mat_data_;
-        osg::ref_ptr<osg::Geometry>        inst_geom_;
+        osg::ref_ptr<osg::Geometry>                     inst_geom_;
 
         void operator()(osgAnimation::RigGeometry& geom);
         bool init(osgAnimation::RigGeometry& geom);
@@ -251,7 +250,7 @@ namespace {
             else if (!init(*inst_geom_.get()))
                 return;
 
-        MyRigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
+        // MyRigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
     }
     
     void MyRigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
@@ -299,7 +298,7 @@ namespace {
         }
 
         osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
-        ss->addUniform(getMatrixPaletteUniform());
+        // ss->addUniform(getMatrixPaletteUniform());
         ss->addUniform(new osg::Uniform("nbBonesPerVertex", getNumBonesPerVertex()));
         ss->setAttributeAndModes(cSkinningProg.get());
 
@@ -338,6 +337,38 @@ namespace {
         }
     };
 
+#if 0
+bool initSkinning(osg::Geometry& geom, int bonesPerVertex )
+{
+    osg::Geometry& source = geom;
+    osg::Vec3Array* positionSrc = dynamic_cast<osg::Vec3Array*>(source.getVertexArray());
+    if (!positionSrc)
+    {
+        OSG_WARN << "RigTransformHardware no vertex array in the geometry " << geom.getName() << std::endl;
+        return false;
+    }
+
+    osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
+    cSkinningProg->setName("SkinningShader");
+
+    int attribIndex = 11;
+    int nbAttribs = getNumVertexAttrib();
+    for (int i = 0; i < nbAttribs; i++)
+    {
+        std::stringstream ss;
+        ss << "boneWeight" << i;
+        cSkinningProg->addBindAttribLocation(ss.str(), attribIndex + i);
+        geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
+        OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
+    }
+
+    osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
+    ss->addUniform(new osg::Uniform("nbBonesPerVertex", bonesPerVertex));
+    ss->setAttributeAndModes(cSkinningProg.get());
+
+    return true;
+}
+#endif
 
 inline osg::Node* loadAnimation(std::string aname)
 {

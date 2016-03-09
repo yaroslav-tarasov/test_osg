@@ -15,16 +15,20 @@ REFL_END()
 
 struct image_data
 {
-    int                         s;
-    int                         t;
-    int                         r;
-    GLenum                      pixelFormat;
-    GLenum                      type;
-    GLint                       internalFormat;
-    uint32_t                    data_len;
-    std::vector<unsigned char>  data;
-    std::vector<std::string>    bones;
-    std::vector<image_data>     animations;
+    typedef std::vector<double>      weights_t;
+
+    int                              s;
+    int                              t;
+    int                              r;
+    GLenum                           pixelFormat;
+    GLenum                           type;
+    GLint                            internalFormat;
+    uint32_t                         data_len;
+    std::vector<unsigned char>       data;
+    std::vector<std::string>         bones;
+    int                              bonesPerVertex;
+    std::vector<weights_t>           bonesWeights;
+    uint32_t                         divisor;
 
     image_data ()
     {}
@@ -49,8 +53,10 @@ REFL_STRUCT(image_data)
     REFL_ENTRY(type)
     REFL_ENTRY(data_len)
     REFL_ENTRY(data)
+    REFL_ENTRY(bonesPerVertex)
+    REFL_ENTRY(bonesWeights)
+    REFL_ENTRY(divisor)
     REFL_ENTRY(bones)
-    REFL_ENTRY(animations)
 REFL_END()
 
 namespace avAnimation

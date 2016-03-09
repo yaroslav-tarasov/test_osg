@@ -24,8 +24,6 @@ namespace avCore
 			
 			pugi::xml_node MainModel =  root.child("MainModel");
 
-
-
 			
             pugi::xml_node file_node = MainModel.child("File");
             if(file_node)

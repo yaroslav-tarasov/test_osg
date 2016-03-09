@@ -330,23 +330,27 @@ struct client
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #endif
 
+#if 0
         ADD_EVENT(10.0  , create(31,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_human, "human") )
+#endif
 
 #if 0
         ADD_EVENT(25.0 , state(0.0,25.,0.0))
 #endif
         ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
         
+#if 0
         ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(11.0  , create(151,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(12.0  , create(151,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(13.0  , create(151,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(14.0  , create(151,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(15.0  , create(151,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(16.0  , create(151,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(17.0  , create(151,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(18.0  , create(151,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(19.0  , create(151,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(11.0  , create(153,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(12.0  , create(154,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(13.0  , create(155,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(14.0  , create(156,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(15.0  , create(157,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(16.0  , create(158,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(17.0  , create(159,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(18.0  , create(160,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50") )
+        ADD_EVENT(19.0  , create(161,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50") )
+#endif
 
         ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
         ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
@@ -384,6 +388,7 @@ struct client
                 //run_f_(3,vtime,0);
 
                 run_f_(31,vtime,0);
+
                //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
                 //                                     << "  y: " << _traj->kp_value(vtime).y 
                 //                                     << "  h: " << _traj->kp_value(vtime).z

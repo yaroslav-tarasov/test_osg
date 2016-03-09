@@ -43,26 +43,32 @@ namespace {
 
 // constructor and destructor
 Object::Object()
+    : _hw_instanced (false)
 {
+}
+
+Object::Object(osg::Node& node)
+    : _node (&node)
+    , _hw_instanced (false)
+{
+    using namespace avAnimation;
+    AnimationManagerFinder finder;
+    _node->accept(finder);
+    _manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get()); 
 }
 
 Object::Object(const Object& object,const osg::CopyOp& copyop)
 	: osg::Object(object,copyop)
-	, _node       (copyop(object._node.get()))
+	, _node            (copyop(object._node.get()))
 	, _anim_containers (object._anim_containers)
-	, _manager    (object._manager)
+	, _manager         (object._manager)
+    , _inst_manager    (object._inst_manager)
+    , _hw_instanced    (object._hw_instanced)
+    , _name            (object._name)
 {
 
 }
 
-Object::Object(osg::Node& node)
-	: _node (&node)
-{
-	using namespace avAnimation;
-	AnimationManagerFinder finder;
-	_node->accept(finder);
-	_manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get()); 
-}
 
 void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 {
@@ -84,6 +90,42 @@ void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 		_manager->registerAnimation(*it);
 
 	}
+}
+
+void  Object::setupInstanced()
+{
+    if(!(_inst_manager.valid()))
+    {
+        fpl_wrap fpl(_name);
+        
+        std::string anim_file_name =  osgDB::findFileInPath("data.row", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+
+        _inst_manager = new InstancedAnimationManager(_node.get(), anim_file_name);
+        
+        avAnimation::SetupRigGeometry switcher(true, *(_node.get()),
+            [this]()->osgAnimation::RigTransformHardware* {
+                avCore::RigTransformHardware* rth =  new avCore::RigTransformHardware;  
+                rth->setInstancedGeometry(_inst_manager->getInstGeometry());
+                return rth;
+        }
+
+        );
+
+        _hw_instanced = true;
+    }
+}
+
+osg::Node*   Object::getInstancedNode() 
+{
+    if(_hw_instanced)
+    {
+       osg::Group* gr = new osg::Group;
+       gr->addChild(_inst_manager->getInstGeode());
+       //gr->addChild(_node.get());
+       return gr;
+    }
+    else
+        return _node.get(); 
 }
 
 void  releaseObjectCache()
@@ -144,16 +186,30 @@ Object* createObject(std::string name, bool fclone)
     }
 
     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getMutex());
+
 	it = objCache.find(name);
 
 	if( it !=objCache.end() )
 	{
-		if(fclone)
-		    object = osg::clone(it->second.get(), copyop);
-		else
-			object = it->second.get();
+        if(it->second.get()->hwInstanced())
+        {
+            // Make fake node, and fake object
+            pat = new osg::PositionAttitudeTransform;
+            osg::Group* root = new osg::Group; 
+            root->setName("Root");
+            pat->addChild(root);
 
-        pat = object->getNode()->asTransform()->asPositionAttitudeTransform();
+            object = new Object(*pat);
+        }
+        else
+        {
+            if(fclone)
+                object = osg::clone(it->second.get(), copyop);
+            else
+                object = it->second.get();
+
+            pat = object->getNode()->asTransform()->asPositionAttitudeTransform();
+        }
 	}
 	else
 	{
@@ -238,7 +294,6 @@ Object* createObject(std::string name, bool fclone)
 
             }
 #endif
-			bool hw_inst = data->hw_instanced;
 		}
 
         bool airplane = findFirstNode(object_file ,"shassi_"  ,findNodeVisitor::not_exact)!=nullptr;
@@ -514,6 +569,7 @@ FIXME( Исправить структуру под mt)
 
 		objCache[name] = object = new Object(*pat);
 		
+        object->setName(name);
 #if 1
 		if(data)
 		{			
@@ -531,20 +587,31 @@ FIXME( Исправить структуру под mt)
 #if 1
         if(fclone)
         {
-            object = /*dynamic_cast<osg::PositionAttitudeTransform *>*/(osg::clone(objCache[name].get(), copyop ));
+            object = osg::clone(objCache[name].get(), copyop );
         }
         else
             pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name]->getNode());
 #endif
-
+        if(data && data->hw_instanced)
+        {
+            object->setupInstanced();
+        }
 
 	}
 	
-	avAnimation::SetupRigGeometry switcher(true, *(object->getNode()),data?(data->hw_instanced?
-										  [&]()->osgAnimation::RigTransformHardware* {return new avCore::RigTransformHardware;}
-										  :avAnimation::SetupRigGeometry::rth_creator_f() ):avAnimation::SetupRigGeometry::rth_creator_f() );
+    if(!object->hwInstanced())
+    {
+        FIXME("human тоже хочет hardware, надо помочь")
+        if ( name =="human" )
+            avAnimation::SetupRigGeometry switcher(false, *object->getNode(),
+            [=]()->osgAnimation::RigTransformHardware* { return new osgAnimation::RigTransformHardware;});
+        else
+            avAnimation::SetupRigGeometry switcher(true, *object->getNode());
+    }
 
-    pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
+    if(pat)
+        pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
+
 
 	return object;
 }

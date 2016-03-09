@@ -7,7 +7,8 @@
 
 <?xml version="1.0"?>
 <root>
-	<MainModel path="crow.dae" axis_up="Y"/>
+	<MainModel path="crow.dae" axis_up="Y" scale ="0.025"/>
+
 	<Animation name="flap">
 	<File path="flap.fbx" />
 	</Animation>

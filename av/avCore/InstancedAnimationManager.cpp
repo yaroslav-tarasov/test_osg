@@ -60,7 +60,7 @@ void RigTransformHardware::operator()(osgAnimation::RigGeometry& geom)
 		else if (!init(*inst_geom_.get()))
 			return;
 
-	RigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
+	avCore::RigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
 }
 
 void RigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
@@ -120,11 +120,27 @@ bool RigTransformHardware::init(osg::Geometry& geom)
 
 namespace avCore
 {
+    InstancedAnimationManager::InstancedAnimationManager() 
+    {
 
-	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model)
-		: bm_(getBoneMap(base_model))
+    }
+
+    InstancedAnimationManager::InstancedAnimationManager(const InstancedAnimationManager& object,const osg::CopyOp& copyop)
+        : osg::Object(object,copyop)
+    {
+    
+    }
+
+	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model, const std::string anim_file_name)
+		: bm_(_getBoneMap(base_model))
 		, src_model_    (base_model)
-	{}
+	{ 
+
+        _initData();
+        _loadAnimationData(anim_file_name);
+
+        instGeode_  = _createGeode();
+    }
 
 
 	osg::TextureRectangle* InstancedAnimationManager::createAnimationTexture( image_data& idata)
@@ -157,7 +173,7 @@ namespace avCore
 
 
 
-	osg::TextureRectangle* InstancedAnimationManager::createTextureHardwareInstancedGeode(osg::Geometry* geometry) 
+	osg::TextureRectangle* InstancedAnimationManager::_createTextureHardwareInstancedGeode(osg::Geometry* geometry) 
 	{
 		const unsigned int start = 0;
 		const unsigned int end = instancesData_.size();
@@ -187,25 +203,25 @@ namespace avCore
 			memcpy(data, matrix.ptr(), 16 * sizeof(float));
 		}
 
-		texture_ = new osg::TextureRectangle(image);
-		texture_->setInternalFormat(GL_RGBA32F_ARB);
-		texture_->setSourceFormat(GL_RGBA);
-		texture_->setSourceType(GL_FLOAT);
-		texture_->setTextureSize(4, end-start);
-		texture_->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-		texture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-		texture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-		texture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+		instTexture_ = new osg::TextureRectangle(image);
+		instTexture_->setInternalFormat(GL_RGBA32F_ARB);
+		instTexture_->setSourceFormat(GL_RGBA);
+		instTexture_->setSourceType(GL_FLOAT);
+		instTexture_->setTextureSize(4, end-start);
+		instTexture_->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+		instTexture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+		instTexture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+		instTexture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
 
 		// copy part of matrix list and create bounding box callback
 		//std::vector<osg::Matrixd> matrices;
 		//matrices.insert(matrices.begin(), instancesData_.begin(), instancesData_.end());
 		geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(instancesData_));
 
-		return texture_.get();
+		return instTexture_.get();
 	}
 	
-	osgAnimation::BoneMap InstancedAnimationManager::getBoneMap(osg::Node* base_model)
+	osgAnimation::BoneMap InstancedAnimationManager::_getBoneMap(osg::Node* base_model)
 	{
 		findNodeByType< osgAnimation::Skeleton> s_finder;  
 		s_finder.apply(*base_model);
@@ -219,18 +235,18 @@ namespace avCore
 	void InstancedAnimationManager::setInstanceData(size_t idx, const osg::Matrixf& matrix)
 	{
 		instancesData_[idx] = matrix;
-		float * data = (float*)texture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+		float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
 		memcpy(data, matrix.ptr(), 16 * sizeof(float));
-		texture_->dirtyTextureObject();
+		instTexture_->dirtyTextureObject();
 	}
 
 
-	osg::Geode* InstancedAnimationManager::createGeode()
+	osg::Geode* InstancedAnimationManager::_createGeode()
 	{
 		findNodeByType< osg::Geode> geode_finder;  
 		geode_finder.apply(*src_model_);
 
-		osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));
+		osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
 		osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
 
 		osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
@@ -242,10 +258,10 @@ namespace avCore
 		osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
 		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
-		instTexture_ = createTextureHardwareInstancedGeode(geometry);
+		/*instTexture_ =*/  _createTextureHardwareInstancedGeode(geometry);
 
 		geode->addDrawable(geometry);
-
+        instGeometry_  = geometry;
 #if 0
 		pSS->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 		pSS->addUniform(new osg::Uniform("colorTex", 0));
@@ -258,17 +274,46 @@ namespace avCore
 		pSS->setTextureAttributeAndModes(1, instTexture_.get(), osg::StateAttribute::ON);
 		pSS->addUniform(new osg::Uniform("instanceMatrixTexture", 1));
 
-		return gnode;
+		return geode.release();
 	}
 
-	bool  InstancedAnimationManager::loadAnimationData(std::string const&  filename)
+    void  InstancedAnimationManager::_initData()
+    {
+        const size_t x_num = 64; 
+        const size_t y_num = 64;
+
+        // create some matrices
+        srand(time(NULL));
+        for (unsigned int i = 0; i < x_num; ++i)
+        {
+            for (unsigned int j = 0; j < y_num; ++j)
+            {
+                // get random angle and random scale
+                double angle = (rand() % 360) / 180.0 * cg::pi;
+                double scale = static_cast<double>(rand() % 10) / 10.0 ;
+
+                // calculate position
+                osg::Vec3 position(i * 70, j * 70, 0.0f);
+                osg::Vec3 jittering((rand() % 100) * 2.f, (rand() % 100) * 2.f, (rand() % 100) * 2.f);
+                position += jittering;
+                position.z() *= 2.0f;
+                position.x() *= 2.0f;
+                position.y() *= 2.0f;
+
+                osg::Matrixd modelMatrix = osg::Matrixd::scale(scale, scale, scale) 
+                    * osg::Matrixd::rotate(angle, osg::Vec3d(0.0, 0.0, 1.0), angle, osg::Vec3d(0.0, 1.0, 0.0), angle, osg::Vec3d(1.0, 0.0, 0.0)) 
+                    * osg::Matrixd::translate(position);
+                addMatrix(modelMatrix);
+            }
+        }
+    }
+
+
+	bool  InstancedAnimationManager::_loadAnimationData(std::string const&  filename)
 	{
 		image_data rd;
 
 		std::ifstream image_data_file(filename, std::ios_base::binary);
-
-		osg::ref_ptr<osg::TextureRectangle> animTex;
-		osg::ref_ptr<osg::TextureRectangle> instTex;
 
 		if (image_data_file.good())
 		{
@@ -276,7 +321,7 @@ namespace avCore
 			data.resize(boost::filesystem::file_size(filename));
 			image_data_file.read(data.data(), data.size());
 			binary::unwrap(data, rd);
-			animTex = createAnimationTexture(rd);
+			animTexture_ = createAnimationTexture(rd);
 			return true;
 		}
 
