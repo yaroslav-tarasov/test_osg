@@ -17,29 +17,66 @@
 
 #include "animutils.h"
 
-using namespace avCore;
 
-namespace creators
+namespace avCore
 {
+    namespace {
+        struct fpl_wrap 
+        {
+            fpl_wrap(const std::string& name)
+            {
+                fpl_.push_back(cfg().path.data + "/models/" + name + "/");
+                fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
+                fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
+            };
 
-	struct fpl_wrap 
-	{
-		fpl_wrap(const std::string& name)
-		{
-			fpl_.push_back(cfg().path.data + "/models/" + name + "/");
-			fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
-            fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
-		};
-
-		osgDB::FilePathList fpl_;
-	};
+            osgDB::FilePathList fpl_;
+        };
+    }
 
 
-namespace {
-	typedef std::map< std::string, osg::ref_ptr<Object> > objectMap; 
-	
-	objectMap objCache;
-}
+
+    ObjectManager& ObjectManager::get()
+    {
+        static ObjectManager  m;
+        return m;
+    }
+
+    void ObjectManager::Register(const std::string& name, Object* obj )
+    {
+        objCache_[name] = obj;
+    }
+
+    void ObjectManager::Register( Object* obj )
+    {
+        objClones_.push_back(obj);
+    }
+
+    boost::optional<objectMap::value_type> ObjectManager::Find(const std::string& name)
+    {
+        auto it = objCache_.find(name);
+        if (objCache_.end()!=it)
+            return *it;
+
+        return boost::none;
+    }
+
+    void ObjectManager::releaseAll()
+    {
+        objCache_.clear();
+        objClones_.clear();
+    }
+    
+    bool ObjectManager::PreUpdate()
+    {
+
+         return true;
+    }
+
+    void  releaseObjectCache()
+    {
+        ObjectManager::get().releaseAll();
+    }
 
 // constructor and destructor
 Object::Object()
@@ -47,26 +84,28 @@ Object::Object()
 {
 }
 
-Object::Object(osg::Node& node)
+Object::Object(osg::Node& node , const std::string  & name)
     : _node (&node)
     , _hw_instanced (false)
+    , _name(name) 
 {
     using namespace avAnimation;
     AnimationManagerFinder finder;
     _node->accept(finder);
-    _manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get()); 
+    _manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get());
+    ObjectManager::get().Register(name,this);
 }
 
 Object::Object(const Object& object,const osg::CopyOp& copyop)
 	: osg::Object(object,copyop)
-	, _node            (copyop(object._node.get()))
-	, _anim_containers (object._anim_containers)
-	, _manager         (object._manager)
+	, _node            (copyop.getCopyFlags() == osg::CopyOp::SHALLOW_COPY?nullptr:copyop(object._node.get()))
+	, _anim_containers (copyop.getCopyFlags() == osg::CopyOp::SHALLOW_COPY?AnimationContainersType():object._anim_containers)
+	, _manager         (copyop.getCopyFlags() == osg::CopyOp::SHALLOW_COPY?nullptr:object._manager)
     , _inst_manager    (object._inst_manager)
     , _hw_instanced    (object._hw_instanced)
     , _name            (object._name)
 {
-
+     ObjectManager::get().Register(this);
 }
 
 
@@ -102,36 +141,55 @@ void  Object::setupInstanced()
 
         _inst_manager = new InstancedAnimationManager(_node.get(), anim_file_name);
         
+        // Двойная регистрация кэш и клоны, для спец узла (последствия?)
+        ObjectManager::get().Register(this);
+
+#if 0
         avAnimation::SetupRigGeometry switcher(true, *(_node.get()),
             [this]()->osgAnimation::RigTransformHardware* {
                 avCore::RigTransformHardware* rth =  new avCore::RigTransformHardware;  
                 rth->setInstancedGeometry(_inst_manager->getInstGeometry());
                 return rth;
         }
-
         );
+#endif
 
         _hw_instanced = true;
     }
+}
+
+static OpenThreads::Mutex& getInstanceMutex()
+{
+    static OpenThreads::Mutex   _mutex;
+    return _mutex;
+}
+
+// FIXME брррррррр
+bool   Object::parentMainInstancedNode(osg::Group* parent) 
+{
+    if(_hw_instanced)
+    {
+        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getInstanceMutex());
+        if(_inst_manager->getInstGeode()->getNumParents()==0)
+            parent->addChild(_inst_manager->getInstGeode());
+
+        return true;
+    }
+
+    return false;
 }
 
 osg::Node*   Object::getInstancedNode() 
 {
     if(_hw_instanced)
     {
-       osg::Group* gr = new osg::Group;
-       gr->addChild(_inst_manager->getInstGeode());
-       //gr->addChild(_node.get());
-       return gr;
+       return _inst_manager->getInstancedNode();
     }
     else
         return _node.get(); 
 }
 
-void  releaseObjectCache()
-{
-      objCache.clear();
-}
+
 
 
 
@@ -152,7 +210,6 @@ Object* createObject(std::string name, bool fclone)
 	fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
 	Object*    object      = nullptr;
-	objectMap::iterator it;
     boost::optional<xml_model_t> data;
 
     osg::PositionAttitudeTransform* pat;
@@ -187,24 +244,20 @@ Object* createObject(std::string name, bool fclone)
 
     OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getMutex());
 
-	it = objCache.find(name);
+	auto it = ObjectManager::get().Find(name);
 
-	if( it !=objCache.end() )
+	if( it )
 	{
         if(it->second.get()->hwInstanced())
         {
-            // Make fake node, and fake object
-            pat = new osg::PositionAttitudeTransform;
-            osg::Group* root = new osg::Group; 
-            root->setName("Root");
-            pat->addChild(root);
-
-            object = new Object(*pat);
+            object = osg::clone(it->second.get());
         }
         else
         {
             if(fclone)
+            {
                 object = osg::clone(it->second.get(), copyop);
+            }
             else
                 object = it->second.get();
 
@@ -301,7 +354,7 @@ Object* createObject(std::string name, bool fclone)
         FIXME(Палец пол и потолок при определении модели)
         bool heli     = findFirstNode(object_file ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
 
-		osg::Node* engine = nullptr; 
+
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 
 		osg::Node* lod3 =  findFirstNode(object_file,"Lod3"); 
 
@@ -315,140 +368,11 @@ Object* createObject(std::string name, bool fclone)
         }
 
         root->setUserValue("id",reinterpret_cast<uint32_t>(&*root));
-		// object_file->setName(name);
 	
-		// И какой engine мы найдем?
-		//engine =  findFirstNode(object_file,"engine",findNodeVisitor::not_exact);
-		//if (engine) engine_geode = engine->asGroup()->getChild(0);
+        //
+        //  Здесь были огни
+        //
 
-		// FIXME Ну и огни в отдельный функционал
-#if 0
-#if 0
-		auto CreateLight = [=](const osg::Vec4& fcolor,const std::string& name,osg::NodeCallback* callback)->osg::Geode* {
-			osg::ref_ptr<osg::ShapeDrawable> shape1 = new osg::ShapeDrawable();
-			shape1->setShape( new osg::Sphere(osg::Vec3(0.0f, 0.0f, 0.0f), 0.2f) );
-			osg::Geode* light = new osg::Geode;
-			light->addDrawable( shape1.get() );
-			dynamic_cast<osg::ShapeDrawable *>(light->getDrawable(0))->setColor( fcolor );
-			light->setUpdateCallback(callback);
-			light->setName(name);
-			const osg::StateAttribute::GLModeValue value = osg::StateAttribute::PROTECTED|osg::StateAttribute::OVERRIDE| osg::StateAttribute::OFF;
-			light->getOrCreateStateSet()->setAttribute(new osg::Program(),value);
-			light->getOrCreateStateSet()->setTextureAttributeAndModes( 0, new osg::Texture2D(), value );
-			light->getOrCreateStateSet()->setTextureAttributeAndModes( 1, new osg::Texture2D(), value );
-			light->getOrCreateStateSet()->setMode( GL_LIGHTING, value );
-			return light;
-		};
-
-		osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
-		osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
-		osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
-		osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
-
-		auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
-			auto g_point =  findFirstNode(object_file,root.c_str());
-			if(g_point)  
-			{
-				g_point->asGroup()->addChild(child);
-			}
-			return g_point;
-		};
-
-		auto tail       = addAsChild("tail",white_light);
-		auto strobe_r   = addAsChild("strobe_r",white_light);
-		auto strobe_l   = addAsChild("strobe_l",white_light);
-
-		auto port       = addAsChild("port",green_light);
-		auto star_board = addAsChild("starboard",red_light);
-#else  
-        findNodeVisitor::nodeNamesList list_name;
-
-        osgSim::LightPointNode* obj_light =  new osgSim::LightPointNode;
-
-        const char* names[] =
-        {
-            "port",
-            "starboard",
-            "tail",
-            "steering_lamp",
-            "strobe_",
-            "landing_lamp",
-            "back_tail",
-            "headlight"
-            // "navaid_",
-        };
-
-        for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
-        {
-            list_name.push_back(names[i]);
-        }
-
-        findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
-        root->accept(findNodes);
-        
-        findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
-        
-        auto shift_phase = cg::rand(cg::range_2(0, 255));
-        
-        osgSim::Sector* sector = new osgSim::AzimSector(-osg::inDegrees(45.0),osg::inDegrees(45.0),osg::inDegrees(90.0));
-        
-        for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
-        {
-             osgSim::LightPoint pnt;
-             bool need_to_add = false;
-
-             if((*it)->getName() == "tail")
-             { 
-                 pnt._color      = white_color;
-                 need_to_add     = true;
-             }
-
-             if((*it)->getName() == "port")
-             {   
-                 pnt._color      = green_color;
-                 need_to_add     = true;
-                 pnt._sector = sector;
-             }
-
-             if((*it)->getName() == "starboard") 
-             {
-                 pnt._color = red_color;
-                 need_to_add     = true;
-                 pnt._sector = sector;
-             }
-            
-             
-             if(boost::starts_with((*it)->getName(), "strobe_")) 
-             {
-                 pnt._color  = white_color;
-                 pnt._blinkSequence = new osgSim::BlinkSequence;
-                 pnt._blinkSequence->addPulse( 0.05,
-                     osg::Vec4( 1., 1., 1., 1. ) );
-
-                 pnt._blinkSequence->addPulse( 1.5,
-                     osg::Vec4( 0., 0., 0., 0. ) );
-
-                 pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
-
-                 pnt._blinkSequence->setPhaseShift(shift_phase);
-                 need_to_add     = true;
-             }
-
-             pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
-             pnt._radius = 0.2f;
-             if(need_to_add)
-                 obj_light->addLightPoint(pnt);
-        }
-
-//И чего тут делать с огнями и колбеками
-FIXME( Исправить структуру под mt)
-#ifndef ASYNC_OBJECT_LOADING
-        if(wln_list.size()>0)
-            object_file->asGroup()->addChild(obj_light);
-#endif
-
-#endif
-#endif
         //
 		//  А здесь будет чертов некошерный лод
 		//
@@ -522,14 +446,6 @@ FIXME( Исправить структуру под mt)
             pat->setPosition(osg::Vec3(0.,airplane?dy:0.f,0.)); // FIXME Дурацкое смещение и не понятно чего с ним делать
 
         }
-        
-        MaterialVisitor::namesList nl;
-        nl.push_back("building");
-        nl.push_back("default");
-        nl.push_back("plane");
-        nl.push_back("color");
-        nl.push_back("tree");
-        nl.push_back("rotor"); 
 
         if(data)
         {
@@ -550,9 +466,19 @@ FIXME( Исправить структуру под mt)
 			pat->setPivotPoint(data->pivot_point);
 			pat->setAttitude(osg::Quat(osg::inDegrees(180.0),osg::X_AXIS));
 		}
+        
+        MaterialVisitor::namesList nl;
+        nl.push_back("building");
+        nl.push_back("default");
+        nl.push_back("plane");
+        nl.push_back("color");
+        nl.push_back("tree");
+        nl.push_back("rotor"); 
 
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
-        pat->accept(mv);
+        if(!(data && data->hw_instanced))
+            pat->accept(mv);
+        
         pat->setName("pat");
         
 
@@ -567,11 +493,11 @@ FIXME( Исправить структуру под mt)
         }
 #endif
 
-		objCache[name] = object = new Object(*pat);
+		/*objCache[name] =*/ object = new Object(*pat, name);
 		
         object->setName(name);
 #if 1
-		if(data)
+		if(data && !data->hw_instanced)
 		{			
 			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
 			const xml_model_t::animations_t&  anims = data->anims;
@@ -584,18 +510,17 @@ FIXME( Исправить структуру под mt)
 		}
 #endif
 
-#if 1
-        if(fclone)
-        {
-            object = osg::clone(objCache[name].get(), copyop );
-        }
-        else
-            pat = dynamic_cast<osg::PositionAttitudeTransform *>(objCache[name]->getNode());
-#endif
         if(data && data->hw_instanced)
         {
             object->setupInstanced();
         }
+        else
+            if(fclone)
+            {
+                object = osg::clone(object, copyop );
+            }
+            else
+                pat = dynamic_cast<osg::PositionAttitudeTransform *>(object->getNode());
 
 	}
 	
