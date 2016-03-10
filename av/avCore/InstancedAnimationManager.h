@@ -9,7 +9,7 @@ namespace avCore
 	{
 	public:
 		typedef std::vector<osg::Matrixd>              InstancedDataType;
-        typedef std::vector< osg::ref_ptr<osg::Node> > InstancedNodesVectorType;
+        typedef std::vector< std::pair<osg::ref_ptr<osg::Node>,osg::ref_ptr<osg::Node>> > InstancedNodesVectorType;
 	public:
         
         META_Object(avCore,InstancedAnimationManager);

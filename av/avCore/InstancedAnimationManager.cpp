@@ -304,26 +304,36 @@ namespace avCore
         osg::Group* root = new osg::Group;
         const unsigned  inst_id = inst_id_gen_.create();
         root->setUserValue("inst_id", inst_id);
-        inst_nodes_.push_back(root);
+        inst_nodes_.push_back(make_pair(root,nullptr));
         return root; 
     }
 
     bool InstancedAnimationManager::commit()
     {
-        
-        // findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-
-#if 0
+        bool bcommit = false;
         for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
         {
-            instancesData_[idx] = matrix;
-            float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
-            memcpy(data, matrix.ptr(), 16 * sizeof(float));
+            auto & nd = inst_nodes_[idx];
+			if(!nd.second)
+				nd.second = findFirstNode(nd.first,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+
+			if(nd.second)
+			{
+			  osg::Matrix matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
+			  matrix.setTrans(osg::Vec3f(0.1, 0.1, 0.1));
+			  instancesData_[idx] = matrix;
+              float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+              memcpy(data, matrix.ptr(), 16 * sizeof(float));
+			  bcommit = true;
+			}
             
         } 
+
+#if 0
+		if(bcommit)
+          instTexture_->dirtyTextureObject();
 #endif
 
-        instTexture_->dirtyTextureObject();
         return true;
     }
  

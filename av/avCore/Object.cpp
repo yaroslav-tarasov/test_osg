@@ -185,6 +185,10 @@ osg::Node*   Object::getNode()
 
 bool Object::PreUpdate()
 {
+	if(_hw_instanced && _inst_manager.valid() && _node.valid())
+	{
+		_inst_manager->commit();
+	}
     return true;
 }
 

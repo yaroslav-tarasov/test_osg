@@ -37,7 +37,7 @@
 
 #include "utils/visitors/ComputeTriMeshVisitor.h"
 
-#include "av/Object.h"
+#include "av/avCore/Object.h"
 
 namespace phys {
     bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
