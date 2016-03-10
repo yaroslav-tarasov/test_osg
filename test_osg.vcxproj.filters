@@ -449,6 +449,9 @@
     <ClInclude Include="kernel\objects\environment\environment_ctrl.h">
       <Filter>Source Files\objects\environment</Filter>
     </ClInclude>
+    <ClInclude Include="av\avCore\Object.h">
+      <Filter>Source Files\av\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -464,9 +467,6 @@
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\Ephemeris.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Object.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="av\PreRender.cpp">
@@ -1163,6 +1163,9 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\InstancedAnimationManager.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Object.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
   </ItemGroup>

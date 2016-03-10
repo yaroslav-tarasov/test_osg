@@ -10,6 +10,7 @@
 #include "utils/visitors/find_node_visitor.h"
 #include "utils/materials.h"
 
+
 namespace
 {
 	class ComputeTextureBoundingBoxCallback : public osg::Drawable::ComputeBoundingBoxCallback
@@ -49,74 +50,6 @@ namespace
 
 }
 
-namespace avCore
-{
-
-void RigTransformHardware::operator()(osgAnimation::RigGeometry& geom)
-{
-	if (_needInit)
-		if (!init(geom))
-			return;
-		else if (!init(*inst_geom_.get()))
-			return;
-
-	avCore::RigTransformHardware::computeMatrixPaletteUniform(geom.getMatrixFromSkeletonToGeometry(), geom.getInvMatrixFromSkeletonToGeometry());
-}
-
-void RigTransformHardware::computeMatrixPaletteUniform(const osg::Matrix& transformFromSkeletonToGeometry, const osg::Matrix& invTransformFromSkeletonToGeometry)
-{
-	const size_t palSize = _bonePalette.size();
-	for (size_t i = 0; i < palSize; i++)
-	{
-		osg::ref_ptr<osgAnimation::Bone> bone = _bonePalette[i].get();
-		const osg::Matrix& invBindMatrix = bone->getInvBindMatrixInSkeletonSpace();
-		const osg::Matrix& boneMatrix = bone->getMatrixInSkeletonSpace();
-		osg::Matrix resultBoneMatrix = invBindMatrix * boneMatrix;
-		osg::Matrix result =  transformFromSkeletonToGeometry * resultBoneMatrix * invTransformFromSkeletonToGeometry;
-		if (!_uniformMatrixPalette->setElement(i, result))
-			OSG_WARN << "RigTransformHardware::computeUniformMatrixPalette can't set uniform at " << i << " elements" << std::endl;
-	}
-}
-
-bool RigTransformHardware::init(osgAnimation::RigGeometry& geom)
-{
-	return osgAnimation::RigTransformHardware::init(geom);
-}
-
-bool RigTransformHardware::init(osg::Geometry& geom)
-{
-	osg::Geometry& source = geom;
-	osg::Vec3Array* positionSrc = dynamic_cast<osg::Vec3Array*>(source.getVertexArray());
-	if (!positionSrc)
-	{
-		OSG_WARN << "RigTransformHardware no vertex array in the geometry " << geom.getName() << std::endl;
-		return false;
-	}
-
-	osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
-	cSkinningProg->setName("SkinningShader");
-
-	int attribIndex = 11;
-	int nbAttribs = getNumVertexAttrib();
-	for (int i = 0; i < nbAttribs; i++)
-	{
-		std::stringstream ss;
-		ss << "boneWeight" << i;
-		cSkinningProg->addBindAttribLocation(ss.str(), attribIndex + i);
-		geom.setVertexAttribArray(attribIndex + i, getVertexAttrib(i));
-		OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
-	}
-
-	osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
-	ss->addUniform(getMatrixPaletteUniform());
-	ss->addUniform(new osg::Uniform("nbBonesPerVertex", getNumBonesPerVertex()));
-	ss->setAttributeAndModes(cSkinningProg.get());
-
-	return true;
-}
-
-}
-
 
 namespace avCore
 {
@@ -133,7 +66,7 @@ namespace avCore
 
 	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model, const std::string anim_file_name)
 		: bm_(_getBoneMap(base_model))
-		, src_model_    (base_model)
+		, src_model_     (base_model)
 	{ 
 
         _initData();
@@ -145,8 +78,6 @@ namespace avCore
 
 	osg::TextureRectangle* InstancedAnimationManager::createAnimationTexture( image_data& idata)
 	{
-		size_t something_num = idata.data_len ;
-
 		osg::ref_ptr<osg::Image> image = new osg::Image;
 		image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
 
@@ -154,14 +85,14 @@ namespace avCore
 		texture->setInternalFormat(GL_RGBA32F_ARB);
 		texture->setSourceFormat(GL_RGBA);
 		texture->setSourceType(GL_FLOAT);
-		texture->setTextureSize(4, something_num);
+		texture->setTextureSize(4, idata.data_len);
 		texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
 		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
 		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
 		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
 
-		idata_.data.resize(texture->getImage()->getTotalSizeInBytes());
-		unsigned char* dest_ptr = &idata_.data[0];
+		image_data_.data.resize(texture->getImage()->getTotalSizeInBytes());
+		unsigned char* dest_ptr = &image_data_.data[0];
 		for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
 		{
 			memcpy(dest_ptr, itr.data(), itr.size());
@@ -259,28 +190,32 @@ namespace avCore
 		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
 		/*instTexture_ =*/  _createTextureHardwareInstancedGeode(geometry);
+        
+        _initSkinning(*geometry.get(), image_data_ );
 
 		geode->addDrawable(geometry);
         instGeometry_  = geometry;
 #if 0
-		pSS->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
-		pSS->addUniform(new osg::Uniform("colorTex", 0));
+		pSS->setTextureAttributeAndModes(BASE_COLOR_TEXTURE_UNIT, texture, osg::StateAttribute::ON);
+		pSS->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
 		//pSS->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
 #endif
+        
+        pSS->setTextureAttributeAndModes(BASE_HW_INST_TEXTURE_UNIT, instTexture_.get(), osg::StateAttribute::ON);
+        pSS->addUniform(new osg::Uniform("instanceMatrixTexture", BASE_HW_INST_TEXTURE_UNIT));
 
-		pSS->setTextureAttributeAndModes(6, animTexture_.get(), osg::StateAttribute::ON);
-		pSS->addUniform(new osg::Uniform("animationTex", 6));
+		pSS->setTextureAttributeAndModes(BASE_HW_ANIMATION_TEXTURE_UNIT, animTexture_.get(), osg::StateAttribute::ON);
+		pSS->addUniform(new osg::Uniform("animationTex", BASE_HW_ANIMATION_TEXTURE_UNIT));
 
-		pSS->setTextureAttributeAndModes(1, instTexture_.get(), osg::StateAttribute::ON);
-		pSS->addUniform(new osg::Uniform("instanceMatrixTexture", 1));
+
 
 		return geode.release();
 	}
 
     void  InstancedAnimationManager::_initData()
     {
-        const size_t x_num = 64; 
-        const size_t y_num = 64;
+        const size_t x_num = 8; // 64; 
+        const size_t y_num = 8; // 64;
 
         // create some matrices
         srand(time(NULL));
@@ -311,8 +246,6 @@ namespace avCore
 
 	bool  InstancedAnimationManager::_loadAnimationData(std::string const&  filename)
 	{
-		image_data rd;
-
 		std::ifstream image_data_file(filename, std::ios_base::binary);
 
 		if (image_data_file.good())
@@ -320,13 +253,78 @@ namespace avCore
 			binary::bytes_t data;
 			data.resize(boost::filesystem::file_size(filename));
 			image_data_file.read(data.data(), data.size());
-			binary::unwrap(data, rd);
-			animTexture_ = createAnimationTexture(rd);
+			binary::unwrap(data, image_data_);
+			animTexture_ = createAnimationTexture(image_data_);
 			return true;
 		}
 
 		return false;
 	}
 
+    bool InstancedAnimationManager::_initSkinning(osg::Geometry& geom, const image_data& id )
+    {
+        osg::Geometry& source = geom;
+        osg::Vec3Array* positionSrc = dynamic_cast<osg::Vec3Array*>(source.getVertexArray());
+        if (!positionSrc)
+        {
+            OSG_WARN << "InstancedAnimationManager no vertex array in the geometry " << geom.getName() << std::endl;
+            return false;
+        }
 
- }
+        osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
+        cSkinningProg->setName("SkinningShader");
+
+        int attribIndex = 11;
+        int nbAttribs = id.bonesWeights.size();
+        for (int i = 0; i < nbAttribs; i++)
+        {
+            osg::ref_ptr<osg::Vec4Array> array = new osg::Vec4Array(osg::Array::BIND_PER_VERTEX);
+            const image_data::weights_t&  w = id.bonesWeights[i];
+            for (int j = 0; j < w.size(); j+=id.divisor)
+            {
+                array->push_back(osg::Vec4(w.at(j),w.at(j+1),w.at(j+2),w.at(j+3)));
+            }		
+
+            std::stringstream ss;
+            ss << "boneWeight" << i;
+            cSkinningProg->addBindAttribLocation(ss.str(), attribIndex + i);
+            geom.setVertexAttribArray(attribIndex + i, array);
+            OSG_INFO << "set vertex attrib " << ss.str() << std::endl;
+        }
+
+        osg::ref_ptr<osg::StateSet> ss = geom.getOrCreateStateSet();
+        ss->addUniform(new osg::Uniform("nbBonesPerVertex", id.bonesPerVertex));
+        ss->setAttributeAndModes(cSkinningProg.get());
+
+        return true;
+    }
+             
+    osg::Node *  InstancedAnimationManager::getInstancedNode()
+    {  
+        osg::Group* root = new osg::Group;
+        const unsigned  inst_id = inst_id_gen_.create();
+        root->setUserValue("inst_id", inst_id);
+        inst_nodes_.push_back(root);
+        return root; 
+    }
+
+    bool InstancedAnimationManager::commit()
+    {
+        
+        // findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+
+#if 0
+        for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
+        {
+            instancesData_[idx] = matrix;
+            float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+            memcpy(data, matrix.ptr(), 16 * sizeof(float));
+            
+        } 
+#endif
+
+        instTexture_->dirtyTextureObject();
+        return true;
+    }
+ 
+}

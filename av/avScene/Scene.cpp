@@ -44,9 +44,9 @@
 #include "av/avLights/NavAid.h"
 #include "av/Terrain.h"
 #include "av/Ephemeris.h"
-#include "av/Object.h"
 #include "av/avWeather/Weather.h" 
 #include "av/avScene/ScreenTextureManager.h"
+#include "av/avCore/Object.h"
 
 #include "application/panels/vis_settings_panel.h"
 #include "application/panels/time_panel.h"
@@ -522,7 +522,7 @@ void Scene::Release()
         // Release scene
         _scenePtr = NULL;
 
-        creators::releaseObjectCache();
+        avCore::releaseObjectCache();
     }
 
 
@@ -1593,7 +1593,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     using namespace creators;
     
-    creators::Object* obj = creators::createObject(path, clone);
+    avCore::Object* obj = avCore::createObject(path, clone);
     
     if( path == "su_27" )
     {
@@ -1615,7 +1615,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     if(obj)
     {
-        osg::Node* obj_node = obj->getInstancedNode(); //obj->getNode();
+        if(obj->hwInstanced())
+        {
+             obj->parentMainInstancedNode(_terrainRoot->asGroup());
+        }
+
+        osg::Node* obj_node = obj->getNode();
         
         mt->addChild( obj_node );
 

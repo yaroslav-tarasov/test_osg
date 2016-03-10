@@ -6,12 +6,12 @@
 #include <osgAnimation/BoneMapVisitor>
 
 #include "Object.h"
-#include "avCore/LOD.h"
-#include "avLights/Lights.h"
-#include "avLights/LightManager.h"
-#include "avCore/Utils.h"
-#include "avCore/XmlModel.h"
-#include "avCore/InstancedAnimationManager.h"
+#include "av/avCore/LOD.h"
+#include "av/avLights/Lights.h"
+#include "av/avLights/LightManager.h"
+#include "av/avCore/Utils.h"
+#include "av/avCore/XmlModel.h"
+#include "av/avCore/InstancedAnimationManager.h"
 
 #include "materials.h"
 
@@ -52,7 +52,7 @@ namespace avCore
         objClones_.push_back(obj);
     }
 
-    boost::optional<objectMap::value_type> ObjectManager::Find(const std::string& name)
+    boost::optional<ObjectMap::value_type> ObjectManager::Find(const std::string& name)
     {
         auto it = objCache_.find(name);
         if (objCache_.end()!=it)
@@ -69,7 +69,11 @@ namespace avCore
     
     bool ObjectManager::PreUpdate()
     {
-
+        for ( ObjectMap::iterator cIt = objCache_.begin(); cIt != objCache_.end(); ++cIt )
+        {
+            if ( cIt->second->PreUpdate() == false )
+                return false;
+        } 
          return true;
     }
 
@@ -144,16 +148,6 @@ void  Object::setupInstanced()
         // Двойная регистрация кэш и клоны, для спец узла (последствия?)
         ObjectManager::get().Register(this);
 
-#if 0
-        avAnimation::SetupRigGeometry switcher(true, *(_node.get()),
-            [this]()->osgAnimation::RigTransformHardware* {
-                avCore::RigTransformHardware* rth =  new avCore::RigTransformHardware;  
-                rth->setInstancedGeometry(_inst_manager->getInstGeometry());
-                return rth;
-        }
-        );
-#endif
-
         _hw_instanced = true;
     }
 }
@@ -179,7 +173,7 @@ bool   Object::parentMainInstancedNode(osg::Group* parent)
     return false;
 }
 
-osg::Node*   Object::getInstancedNode() 
+osg::Node*   Object::getNode() 
 {
     if(_hw_instanced)
     {
@@ -189,8 +183,10 @@ osg::Node*   Object::getInstancedNode()
         return _node.get(); 
 }
 
-
-
+bool Object::PreUpdate()
+{
+    return true;
+}
 
 
 static OpenThreads::Mutex& getMutex()
@@ -414,10 +410,6 @@ Object* createObject(std::string name, bool fclone)
         osg::ComputeBoundsVisitor cbv;
         object_file->accept( cbv );
         const osg::BoundingBox& bb = cbv.getBoundingBox();
-        /*
-        float xm = bb.xMax() - bb.xMin();
-        float ym = bb.yMax() - bb.yMin();
-        float zm = bb.zMax() - bb.zMin();*/   
         
         float xm = abs(bb.xMax()) + abs(bb.xMin());
         float ym = abs(bb.yMax()) + abs(bb.yMin());
@@ -495,8 +487,6 @@ Object* createObject(std::string name, bool fclone)
 
 		/*objCache[name] =*/ object = new Object(*pat, name);
 		
-        object->setName(name);
-#if 1
 		if(data && !data->hw_instanced)
 		{			
 			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
@@ -508,7 +498,6 @@ Object* createObject(std::string name, bool fclone)
 					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
 			}
 		}
-#endif
 
         if(data && data->hw_instanced)
         {

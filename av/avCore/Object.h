@@ -27,15 +27,17 @@ namespace avCore
 		  
 	    META_Object(osg, Object);
 
-        inline osg::Node*  getNode() { return _node.get(); }
-        inline void        setName(const std::string& name ) {_name = name;}           
-		inline void        addAnimation(const std::string& name, osg::Node*);
-        osg::Node*         getInstancedNode() ;
-        bool               hwInstanced(){ return _hw_instanced;};
-        bool               parentMainInstancedNode(osg::Group* parent); 
+        bool         PreUpdate();
+        osg::Node*   getNode();
+
+        inline void  setName(const std::string& name ) {_name = name;}           
+		inline void  addAnimation(const std::string& name, osg::Node*);
+        inline bool  hwInstanced() const { return _hw_instanced;};
+        
+        bool         parentMainInstancedNode(osg::Group* parent); 
       
     private:
-        void               setupInstanced();
+        void         setupInstanced();
 
 
 	private:
@@ -46,32 +48,32 @@ namespace avCore
         osg::ref_ptr<avCore::InstancedAnimationManager>   _inst_manager;
 	//  Settings
 	private:
-		bool												_hw_instanced;
+		bool											  _hw_instanced;
         std::string                                       _name;
 	};
 
-    typedef std::map< std::string, osg::ref_ptr<Object> > objectMap; 
-	typedef std::vector< osg::ref_ptr<Object> >           objectClones; 
+    typedef std::map< std::string, osg::ref_ptr<Object> > ObjectMap; 
+	typedef std::vector< osg::ref_ptr<Object> >           ObjectClones; 
 
     struct ObjectManager
     {
         friend class Object;
         friend Object* createObject(std::string name, bool fclone);
 
-        void Register( Object* obj );
-        
-        boost::optional<objectMap::value_type> Find(const std::string& name);
-        void releaseAll();
-        bool PreUpdate();
+
+        boost::optional<ObjectMap::value_type> Find(const std::string& name);
+        void           releaseAll();
+        bool           PreUpdate();
         
         static ObjectManager& get();
     
     private:
-        void Register(const std::string& name, Object* obj );
+        void           Register( Object* obj );
+        void           Register(const std::string& name, Object* obj );
         ObjectManager(){};
     private:
-        objectMap     objCache_;
-        objectClones  objClones_;
+        ObjectMap     objCache_;
+        ObjectClones  objClones_;
     };
 
 

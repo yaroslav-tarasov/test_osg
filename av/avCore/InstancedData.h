@@ -15,7 +15,7 @@ REFL_END()
 
 struct image_data
 {
-    typedef std::vector<double>      weights_t;
+    typedef std::vector<float>       weights_t;
 
     int                              s;
     int                              t;

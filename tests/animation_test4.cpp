@@ -546,6 +546,7 @@ int main_anim_test4( int argc, char** argv )
 #endif   
 
    
+#if 0
    osg::ref_ptr<osg::StateSet> stateSet = object_file->getOrCreateStateSet();
    stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
    stateSet->addUniform(new osg::Uniform("colorTexture", 0));
@@ -568,8 +569,9 @@ int main_anim_test4( int argc, char** argv )
   
    mt->addChild(creators::createBase(osg::Vec3(0,0,0),1000));        
    root->addChild(mt);
+#endif
 
-#if 1 // Move flock away
+#if 0 // Move flock away
    osg::ref_ptr<osg::AnimationPathCallback> apcb = new osg::AnimationPathCallback;
    apcb->setAnimationPath(creators::createAnimationPath(osg::Vec3(0.0,0.0,0.0), 50, 6));  
 
@@ -602,6 +604,7 @@ int main_anim_test4( int argc, char** argv )
    //switcher.my_ptr->setInstancedGeometry(geometry.get());
    initSkinning(*geometry.get(),rd);
 
+#if 0
    using namespace avAnimation;
 
    AnimationManagerFinder finder;
@@ -623,7 +626,7 @@ int main_anim_test4( int argc, char** argv )
    } else {
        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
    }
-
+#endif
 
    viewer.addEventHandler( new osgViewer::StatsHandler );
    viewer.setSceneData(root);

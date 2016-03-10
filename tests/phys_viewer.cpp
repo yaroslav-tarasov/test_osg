@@ -116,7 +116,7 @@ int main_phys_viewer( int argc, char** argv )
     
     std::string         model_name = "human";
     
-    auto obj = creators::createObject(model_name);
+    auto obj = avCore::createObject(model_name);
     osg::ref_ptr< osg::Node > rootModel( obj->getNode() );
     if( !rootModel.valid() )
     {

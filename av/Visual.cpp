@@ -3,6 +3,10 @@
 
 #include "avScene/Scene.h"
 #include "avCore/Logo.h"
+#include "avCore/Object.h"
+
+
+using namespace avCore;
 
 namespace
 {
@@ -134,7 +138,7 @@ void Visual::Initialize()
     pTraits->height = 1200;//rect.bottom - rect.top + 1;
 #endif    
 
-    Database::initDataPaths();
+    ::Database::initDataPaths();
 	avCore::Database::Create();
 
 	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*/
@@ -333,6 +337,11 @@ struct frame_limiter
     double       _minFrameTime;
 };
 
+void Visual::PreUpdate   (double ref_time)
+{
+     ObjectManager::get().PreUpdate();
+}
+
 void  Visual::Render(double ref_time)
 {
     static bool run_once = false;
@@ -343,7 +352,7 @@ void  Visual::Render(double ref_time)
         {
             osgViewer::Viewer& viewer =  *_viewerPtr.get(); 
 
-            viewer.setReleaseContextAtEndOfFrameHint(false);
+            _viewerPtr->setReleaseContextAtEndOfFrameHint(false);
 
             viewer.realize();
 
@@ -351,16 +360,16 @@ void  Visual::Render(double ref_time)
 
         }
 
-        auto viewer =  _viewerPtr;
+        PreUpdate   (ref_time);
 
-        if (!viewer->done())
+        if (!_viewerPtr->done())
         {
             //frame_limiter fr(0);
 
 			if(ref_time<0.0)
-				viewer->frame();
+				_viewerPtr->frame();
 			else
-				viewer->frame(ref_time);
+				_viewerPtr->frame(ref_time);
         }
     }
 }

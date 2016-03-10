@@ -11,21 +11,21 @@ class  Visual : public IVisual
 public:
     static Visual * CreateInstance();
 
-    virtual void   Initialize()                      override;
-    virtual void   Deinitialize()                    override;
+    void   Initialize()                      override;
+    void   Deinitialize()                    override;
 
-    virtual void   Update(double ref_time)           override;
-    virtual void   Render(double ref_time)           override;
+    void   Update(double ref_time)           override;
+    void   Render(double ref_time)           override;
 
-    virtual double GetInternalTime()                override;
-    virtual void   CreateScene()                    override;
-    virtual void   EndSceneCreation()               override;
+    double GetInternalTime ()               override;
+    void   CreateScene     ()               override;
+    void   EndSceneCreation()               override;
                                         
-    virtual bool   Done()                           override;
-    virtual void   SetDone(bool )                   override;
+    bool   Done   ()                        override;
+    void   SetDone(bool )                   override;
 
-    virtual IScenePtr          GetScene() const     override;
-    virtual osgViewer::Viewer* GetViewer() const    override;
+    IScenePtr          GetScene () const    override;
+    osgViewer::Viewer* GetViewer() const    override;
 
 //  viewport	
 	virtual void   SetPosition (const cg::point_3f&, const cg::quaternion&) override ;
@@ -35,7 +35,7 @@ private:
     virtual  ~Visual();
     
     void InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraitsPtr);
-
+    void PreUpdate       (double ref_time);
 private:
     bool            m_bInitialized;
     static Visual * m_pInstance;
