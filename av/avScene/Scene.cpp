@@ -1620,7 +1620,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
              obj->parentMainInstancedNode(_terrainRoot->asGroup());
         }
 
-        osg::Node* obj_node = obj->getNode();
+        osg::Node* obj_node = obj->getOrCreateNode();
         
         mt->addChild( obj_node );
 

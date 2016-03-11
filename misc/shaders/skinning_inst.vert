@@ -121,7 +121,7 @@ void main( void )
     normal = gl_NormalMatrix * normalMatrix * normal;
 
     mat3 rotation = mat3(tangent, binormal, normal);
-    vec4 viewpos = gl_ModelViewMatrix * position;
+    vec4 viewpos = gl_ModelViewMatrix * instanceModelMatrix * position;
     viewworld_matrix = inverse(gl_ModelViewMatrix);
 
     v_out.tangent   = tangent;

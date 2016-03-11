@@ -335,7 +335,7 @@ struct client
 #endif
 
 #if 0
-        ADD_EVENT(25.0 , state(0.0,25.,0.0))
+        ADD_EVENT(89.0 , state(0.0,89.,0.0))
 #endif
         ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
         

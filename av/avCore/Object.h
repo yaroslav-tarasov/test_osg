@@ -28,7 +28,7 @@ namespace avCore
 	    META_Object(osg, Object);
 
         bool         PreUpdate();
-        osg::Node*   getNode();
+        osg::Node*   getOrCreateNode();
 
         inline void  setName(const std::string& name ) {_name = name;}           
 		inline void  addAnimation(const std::string& name, osg::Node*);
@@ -38,7 +38,7 @@ namespace avCore
       
     private:
         void         setupInstanced();
-
+        inline osg::Node*   getNode() { return _node.get();}
 
 	private:
 		osg::ref_ptr<osg::Node>                           _node;

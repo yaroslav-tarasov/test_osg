@@ -2,6 +2,8 @@
 
 #include "av/precompiled.h"
 
+#include <osgUtil/Tessellator>
+
 #include "avScene/Scene.h"
 #include "Terrain.h"
 #include "avLights/LightManager.h"
@@ -308,6 +310,20 @@ void  Terrain::create( const std::string& name )
 
     MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
     scene->accept(mv);
+    
+    if(name == "eisk")
+    {
+        findNodeByType< osg::Geode> geode_finder;  
+        geode_finder.apply(*scene);
+
+        osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
+        osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
+
+        osgUtil::Tessellator tscx;
+        tscx.setBoundaryOnly(true);
+        tscx.setWindingType( osgUtil::Tessellator::TESS_WINDING_ODD); // tessellation - ODD, only show boundary.
+        tscx.retessellatePolygons(*mesh);
+    } 
 
 
     // All solid objects

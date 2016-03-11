@@ -173,7 +173,7 @@ bool   Object::parentMainInstancedNode(osg::Group* parent)
     return false;
 }
 
-osg::Node*   Object::getNode() 
+osg::Node*   Object::getOrCreateNode() 
 {
     if(_hw_instanced)
     {
@@ -472,7 +472,7 @@ Object* createObject(std::string name, bool fclone)
         nl.push_back("rotor"); 
 
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
-        if(!(data && data->hw_instanced))
+        //if(!(data && data->hw_instanced))
             pat->accept(mv);
         
         pat->setName("pat");
@@ -527,9 +527,13 @@ Object* createObject(std::string name, bool fclone)
             avAnimation::SetupRigGeometry switcher(true, *object->getNode());
     }
 
+#if 0
     if(pat)
         pat->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
+#endif
 
+    if(object->getNode())
+        object->getNode()->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
 
 	return object;
 }

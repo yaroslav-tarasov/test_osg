@@ -919,7 +919,8 @@ $endif
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
 \n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), dif_tex_col.a);
-\n			     //aFragColor = vec4(1.0,0.0,0.0,1.0);
+\n			     aFragColor = vec4(dif_tex_col);
+\n               //aFragColor = vec4(1.0,0.0,0.0,1.0);
 \n           }
        )
 
@@ -1707,7 +1708,7 @@ $endif
 \n               //bump = normalize(bump * 2.0 - 1.0);
 \n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
 \n               vec4  dif_tex_col  = texture2D(colorTex,f_in.texcoord, -1.0);
-\n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
+\n               float glass_factor = /*1.0 - dif_tex_col.a*/ 0;
 \n
 \n               // get dist to point and normalized to-eye vector
 \n               float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
@@ -1757,7 +1758,7 @@ $endif
 \n               vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
 \n               aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), 1.0);
-\n			     aFragColor = vec4(1.0,0.0,0.0,1.0);
+\n			     //aFragColor = vec4(1.0,0.0,0.0,1.0);
 \n           }
        )
 

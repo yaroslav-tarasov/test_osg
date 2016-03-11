@@ -117,7 +117,7 @@ int main_phys_viewer( int argc, char** argv )
     std::string         model_name = "human";
     
     auto obj = avCore::createObject(model_name);
-    osg::ref_ptr< osg::Node > rootModel( obj->getNode() );
+    osg::ref_ptr< osg::Node > rootModel( obj->getOrCreateNode() );
     if( !rootModel.valid() )
     {
         osg::notify( osg::FATAL ) << "mesh: Can't create mesh." << std::endl;

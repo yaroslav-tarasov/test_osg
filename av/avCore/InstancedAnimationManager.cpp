@@ -11,26 +11,28 @@
 #include "utils/materials.h"
 
 
+using namespace avCore;
+
 namespace
 {
 	class ComputeTextureBoundingBoxCallback : public osg::Drawable::ComputeBoundingBoxCallback
 	{
 	public:
-		ComputeTextureBoundingBoxCallback(const std::vector<osg::Matrixd>& instanceMatrices)
+		ComputeTextureBoundingBoxCallback(const InstancedAnimationManager::InstancedDataType& instanceMatrices)
 			: m_instanceMatrices(instanceMatrices)
 		{
 		}
 
-		virtual osg::BoundingBox computeBound(const osg::Drawable& drawable) const;
+		virtual osg::BoundingBox computeBound(const osg::Drawable& drawable) const override;
 	private:
-		const std::vector<osg::Matrixd>& m_instanceMatrices;
+		const InstancedAnimationManager::InstancedDataType& m_instanceMatrices;
 	};
 
 
 	osg::BoundingBox ComputeTextureBoundingBoxCallback::computeBound(const osg::Drawable& drawable) const
 	{
 		osg::BoundingBox bounds;
-		const osg::Geometry* geometry = dynamic_cast<const osg::Geometry*>(&drawable);
+		const osg::Geometry* geometry = drawable.asGeometry();
 
 		if (!geometry)
 			return bounds;
@@ -65,8 +67,8 @@ namespace avCore
     }
 
 	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model, const std::string anim_file_name)
-		: bm_(_getBoneMap(base_model))
-		, src_model_     (base_model)
+        : /*bm_(_getBoneMap(base_model))
+          ,*/ src_model_     (base_model)
 	{ 
 
         _initData();
@@ -147,7 +149,8 @@ namespace avCore
 		// copy part of matrix list and create bounding box callback
 		//std::vector<osg::Matrixd> matrices;
 		//matrices.insert(matrices.begin(), instancesData_.begin(), instancesData_.end());
-		geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(instancesData_));
+		// Этим тоже можно fps убить 
+        //geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(instancesData_));
 
 		return instTexture_.get();
 	}
@@ -189,12 +192,12 @@ namespace avCore
 		osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
 		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
+
 		/*instTexture_ =*/  _createTextureHardwareInstancedGeode(geometry);
         
         _initSkinning(*geometry.get(), image_data_ );
 
 		geode->addDrawable(geometry);
-        instGeometry_  = geometry;
 #if 0
 		pSS->setTextureAttributeAndModes(BASE_COLOR_TEXTURE_UNIT, texture, osg::StateAttribute::ON);
 		pSS->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
@@ -214,8 +217,8 @@ namespace avCore
 
     void  InstancedAnimationManager::_initData()
     {
-        const size_t x_num = 8; // 64; 
-        const size_t y_num = 8; // 64;
+        const size_t x_num = 16; 
+        const size_t y_num = 16;
 
         // create some matrices
         srand(time(NULL));
@@ -225,7 +228,7 @@ namespace avCore
             {
                 // get random angle and random scale
                 double angle = (rand() % 360) / 180.0 * cg::pi;
-                double scale = static_cast<double>(rand() % 10) / 10.0 ;
+                double scale = 0.02 + (static_cast<double>(rand() % 10) / 1000.0 - 0.005);
 
                 // calculate position
                 osg::Vec3 position(i * 70, j * 70, 0.0f);
@@ -301,9 +304,19 @@ namespace avCore
              
     osg::Node *  InstancedAnimationManager::getInstancedNode()
     {  
+        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(mutex_);
+
         osg::Group* root = new osg::Group;
         const unsigned  inst_id = inst_id_gen_.create();
         root->setUserValue("inst_id", inst_id);
+
+#if 0
+        osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform; 
+        pat->addChild(root);
+        pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+        pat->setName("pat");
+#endif
+
         inst_nodes_.push_back(make_pair(root,nullptr));
         return root; 
     }
@@ -314,25 +327,42 @@ namespace avCore
         for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
         {
             auto & nd = inst_nodes_[idx];
+            auto & inst_data = instancesData_[idx];
 			if(!nd.second)
-				nd.second = findFirstNode(nd.first,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-
-			if(nd.second)
 			{
-			  osg::Matrix matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
-			  matrix.setTrans(osg::Vec3f(0.1, 0.1, 0.1));
-			  instancesData_[idx] = matrix;
+                nd.second = findFirstNode(nd.first,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+                if(nd.second)
+                {  
+                    // inst_nodes_[idx].first->asTransform()->asPositionAttitudeTransform()->setScale(inst_data.getScale());
+                }
+            }
+
+            if(nd.second)
+			{
+			  osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
+              osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
+                                         * osg::Matrix::rotate(osg::inDegrees(90.0f),1.0f,0.0f,0.0f)
+                                         * osg::Matrixf::rotate(matrix.getRotate()) 
+                                         * osg::Matrixf::translate(matrix.getTrans());
+
+			  instancesData_[idx] = modelMatrix;
+
               float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
-              memcpy(data, matrix.ptr(), 16 * sizeof(float));
+              memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
 			  bcommit = true;
 			}
             
         } 
 
-#if 0
 		if(bcommit)
-          instTexture_->dirtyTextureObject();
-#endif
+        {
+            instTexture_->dirtyTextureObject();
+            auto & dl = instGeode_->getDrawableList();
+            for(auto it = dl.begin(); it!= dl.end() ; ++it)
+            { 
+                (*it)->dirtyBound();
+            }
+        }
 
         return true;
     }

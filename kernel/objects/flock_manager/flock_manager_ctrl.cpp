@@ -46,7 +46,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     : view(oc,dict)
 {
 
-	settings_._childAmount = 64;
+	settings_._childAmount = 16 * 16;
 }
 
 void ctrl::update( double time )
