@@ -10,7 +10,7 @@
 #include "SkyBox.h"
 #include "av/FogLayer.h"
 #include "av/CloudLayer.h"
-#include "av/PreRender.h"
+#include "av/avCore/PreRender.h"
 #include "av/EnvRenderer.h"
 
 

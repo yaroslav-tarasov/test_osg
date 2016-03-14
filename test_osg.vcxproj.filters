@@ -156,9 +156,6 @@
     <Filter Include="Source Files\objects\helicopter_physless\sync_fms">
       <UniqueIdentifier>{13257160-141d-4131-a903-c2cfea8429e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\av\bada">
-      <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\camera">
       <UniqueIdentifier>{aaad1b01-c0bc-4c91-af55-1200691d31ae}</UniqueIdentifier>
     </Filter>
@@ -173,6 +170,15 @@
     </Filter>
     <Filter Include="Source Files\shaders\animation">
       <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\terrain">
+      <UniqueIdentifier>{dc97bf27-9180-43f9-bc0e-8bdd540d0da8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\sky\orig_ephemeris">
+      <UniqueIdentifier>{5cc526fa-f273-4a1e-9202-a83765c19f1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bada">
+      <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -452,6 +458,33 @@
     <ClInclude Include="av\avCore\Object.h">
       <Filter>Source Files\av\core</Filter>
     </ClInclude>
+    <ClInclude Include="av\avTerrain\Grass.h">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avTerrain\Grass2.h">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avTerrain\Terrain.h">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avTerrain\Trees.h">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\PreRender.h">
+      <Filter>Source Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\CloudLayer.h">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\Ephemeris.h">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\FogLayer.h">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\LightningLayer.h">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -460,19 +493,7 @@
     <ClCompile Include="test_osg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="av\CloudLayer.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="av\EnvRenderer.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Ephemeris.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\PreRender.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Terrain.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="tests\bump_mapping.cpp">
@@ -626,7 +647,7 @@
       <Filter>Source Files\objects\ada</Filter>
     </ClCompile>
     <ClCompile Include="_include\bada\bada_import.cpp">
-      <Filter>Source Files\av\bada</Filter>
+      <Filter>Source Files\bada</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp">
       <Filter>Source Files\objects\meteo</Filter>
@@ -778,9 +799,6 @@
     <ClCompile Include="tests\render_points.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="av\FogLayer.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="av\avSky\CelestialBodies.cpp">
       <Filter>Source Files\av\sky</Filter>
     </ClCompile>
@@ -804,12 +822,6 @@
     </ClCompile>
     <ClCompile Include="av\avSky\StarField.cpp">
       <Filter>Source Files\av\sky</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Grass.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="av\Grass2.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="tests\grass_test.cpp">
       <Filter>Source Files\tests</Filter>
@@ -906,9 +918,6 @@
     </ClCompile>
     <ClCompile Include="av\avScene\ScreenTexture.cpp">
       <Filter>Source Files\av\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="av\LightningLayer.cpp">
-      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="tests\ssao\ffssao.cpp">
       <Filter>Source Files\tests</Filter>
@@ -1069,9 +1078,6 @@
     <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="av\Trees.cpp">
-      <Filter>Source Files\av</Filter>
-    </ClCompile>
     <ClCompile Include="tests\mrt_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
@@ -1167,6 +1173,33 @@
     </ClCompile>
     <ClCompile Include="av\avCore\Object.cpp">
       <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avTerrain\Grass.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avTerrain\Grass2.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avTerrain\Terrain.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avTerrain\Trees.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\PreRender.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avSky\CloudLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avSky\Ephemeris.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avSky\FogLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avSky\LightningLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

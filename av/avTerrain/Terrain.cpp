@@ -4,24 +4,25 @@
 
 #include <osgUtil/Tessellator>
 
-#include "avScene/Scene.h"
-#include "Terrain.h"
-#include "avLights/LightManager.h"
-
 #include "visitors/find_tex_visitor.h"
 #include "visitors/find_animation.h"
 #include "visitors/ct_visitor.h"
 #include "visitors/materials_visitor.h"
 
-#include "shaders.h"
-
 #include "utils/high_res_timer.h"
 #include "utils/callbacks.h"
 #include "utils/materials.h"
 
-#include "av/Grass.h"
-#include "av/Grass2.h"
-#include "avLights/NavAid.h"
+#include "av/avScene/Scene.h"
+#include "av/avLights/LightManager.h"
+#include "av/avLights/NavAid.h"
+
+#include "av/shaders.h"
+#include "Terrain.h"
+#include "Grass.h"
+#include "Grass2.h"
+
+
 
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"

@@ -4,9 +4,9 @@
 
 #include "Ephemeris.h" 
 
-#include "av/FogLayer.h"
-#include "av/CloudLayer.h"
-#include "av/LightningLayer.h"
+#include "av/avSky/FogLayer.h"
+#include "av/avSky/CloudLayer.h"
+#include "av/avSky/LightningLayer.h"
 #include "av/EnvRenderer.h"
 #include "av/avCore/Environment.h"
 

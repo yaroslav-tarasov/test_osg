@@ -5,7 +5,7 @@
 #include "visitors/find_tex_visitor.h"
 #include "creators.h"
 #include "av/FogLayer.h"
-#include "av/Prerender.h"
+#include "av/avCore/Prerender.h"
 
 osg::Image* createSpotLight( const osg::Vec4& centerColor, const osg::Vec4& bgColor, unsigned int size, float power )
 {

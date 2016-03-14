@@ -2,7 +2,7 @@
 #include "visitors/info_visitor.h"
 #include "visitors/find_tex_visitor.h"
 #include "creators.h"
-#include "av/Terrain.h"
+#include "av/avTerrain/Terrain.h"
 
 
 int main_grass_test( int argc, char** argv )

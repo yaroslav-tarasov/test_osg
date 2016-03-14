@@ -9,13 +9,12 @@
 #include "phys/RigidUpdater.h"
 #endif
 
-#include "av/avCore/Logo.h"
-
-
 #include <osg/GLObjects>
 
 #include "av/avAnimation/AnimTest.h"
-#include "av/PreRender.h"
+
+#include "av/avCore/Logo.h"
+#include "av/avCore/PreRender.h"
 
 //Degree precision versus length
 //
@@ -39,13 +38,17 @@
 #include "av/avSky/Sky.h"
 
 #include "av/avScene/Scene.h"
+#include "av/avScene/ScreenTextureManager.h"
+
 #include "av/avLights/Lights.h"
 #include "av/avLights/LightManager.h"
 #include "av/avLights/NavAid.h"
-#include "av/Terrain.h"
+
+#include "av/avTerrain/Terrain.h"
+
 #include "av/Ephemeris.h"
 #include "av/avWeather/Weather.h" 
-#include "av/avScene/ScreenTextureManager.h"
+
 #include "av/avCore/Object.h"
 
 #include "application/panels/vis_settings_panel.h"
