@@ -339,7 +339,7 @@ struct client
 #endif
         ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
         
-#if 0
+#if 1
         ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50") )
         ADD_EVENT(11.0  , create(153,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50") )
         ADD_EVENT(12.0  , create(154,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50") )

@@ -296,9 +296,6 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
       <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
     </ClInclude>
-    <ClInclude Include="av\Grass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="av\Visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -6,7 +6,7 @@
 
 #include "EphemerisModel.h"
 
-#include "av/CloudLayer.h"
+#include "av/avSky/CloudLayer.h"
 
 //
 // Global namespaces

@@ -73,14 +73,14 @@ namespace first
         return  _csys;
     }
 
-    kernel::system_ptr impl::get_visual_sys()   
+    kernel::system_ptr impl::get_visual_sys(av::IVisualPtr vis)   
     {
         kernel::vis_sys_props props_;
         props_.base_point = ::get_base();
 
         FIXME(damn properties)
             if (!_vsys)
-                _vsys = create_visual_system(msg_service_vis_, nullptr, props_);
+                _vsys = create_visual_system(msg_service_vis_, vis, props_);
         return  _vsys;
     }
 

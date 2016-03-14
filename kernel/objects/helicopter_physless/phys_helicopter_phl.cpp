@@ -14,7 +14,7 @@ namespace sp = std::placeholders;
 namespace helicopter_physless
 {
 
-    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
+    phys_model_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
                                     phys::system_ptr phys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
                                     nodes_management::manager_ptr nodes_manager, 

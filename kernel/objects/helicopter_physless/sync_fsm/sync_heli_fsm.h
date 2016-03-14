@@ -57,7 +57,7 @@ namespace helicopter_physless
             
             virtual void switch_sync_state    (state_ptr state) = 0;
             virtual void freeze_position      () = 0;
-            virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;
+            virtual void set_phys_model(phys_model_ptr phys_model) = 0;
             virtual void set_nm_angular_smooth(double val) = 0;
             
             virtual fms::trajectory_ptr get_trajectory() const = 0;  

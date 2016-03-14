@@ -119,13 +119,13 @@ void model::update( double time )
 
     using namespace aircraft;
 
-    if (phys_aircraft_)
+    if (phys_model_)
     {
         bool has_malfunction = false;
         if (malfunction(MF_CHASSIS_FRONT) || malfunction(MF_CHASSIS_REAR_LEFT) || malfunction(MF_CHASSIS_REAR_RIGHT))
             has_malfunction = true;
 
-        phys_aircraft_->set_malfunction(has_malfunction);
+        phys_model_->set_malfunction(has_malfunction);
     }
 
     last_update_ = time;
@@ -365,12 +365,12 @@ void model::update_shassi_anim (double time)
 void model::update_contact_effects(double time)
 {
 
-    if (!phys_aircraft_)
+    if (!phys_model_)
         return;
 
     using namespace aircraft;
 
-    auto contacts = std::move(phys_aircraft_->get_body_contacts());
+    auto contacts = std::move(phys_model_->get_body_contacts());
     if (!contacts.empty())
     {
         vector<msg::contact_effect::contact_t> contacts_to_send;
@@ -385,7 +385,7 @@ void model::update_contact_effects(double time)
     {
         bool has_contact = false;
         for (size_t  i = 0 ; i < shassis.phys_wheels.size(); ++i)
-            if (this->phys_aircraft_->has_wheel_contact(shassis.phys_wheels[i]))
+            if (this->phys_model_->has_wheel_contact(shassis.phys_wheels[i]))
                 has_contact = true;
 
         if (has_contact)
@@ -393,8 +393,8 @@ void model::update_contact_effects(double time)
             //             double skid = this->phys_aircraft_->wheel_skid_info(shassis.phys_wheels[0]);
             if (!shassis.landing_dust)
             {
-                geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
-                geo_position body_pos = this->phys_aircraft_->get_position();
+                geo_position wpos = this->phys_model_->get_wheel_position(shassis.phys_wheels[0]);
+                geo_position body_pos = this->phys_model_->get_position();
                 cg::point_3 loc_omega = (!body_pos.orien).rotate_vector(wpos.omega);
                 cg::point_3 vel = body_pos.dpos - body_pos.orien.rotate_vector(cg::point_3(loc_omega.x,0,0) * cg::grad2rad()) * shassis.radius;
 
@@ -422,7 +422,7 @@ void model::update_contact_effects(double time)
 void model::sync_fms(bool force)
 {
 #if 1	
-    if (!phys_aircraft_)
+    if (!phys_model_)
         return ;
 
 	geo_position fmspos = fms_pos();
@@ -480,7 +480,7 @@ void model::on_object_destroying(object_info_ptr object)
 
 phys::rigid_body_ptr model::get_rigid_body() const
 {
-	return phys_aircraft_ ? phys_aircraft_->get_rigid_body() : phys::rigid_body_ptr();
+	return phys_model_ ? phys_model_->get_rigid_body() : phys::rigid_body_ptr();
 }
 
 point_3 model::tow_offset() const
@@ -496,7 +496,7 @@ bool model::tow_attached() const
 geo_position model::get_phys_pos() const
 {
     // TODO
-    return phys_aircraft_->get_position();
+    return phys_model_->get_position();
 }
 
 double model::rotors_angular_speed() const
@@ -511,9 +511,9 @@ void model::set_tow_attached(optional<uint32_t> attached, boost::function<void()
 
     tow_attached_ = attached;
     tow_invalid_callback_ = tow_invalid_callback;
-    if (phys_aircraft_)
+    if (phys_model_)
     {
-        phys_aircraft_->attach_tow(attached);
+        phys_model_->attach_tow(attached);
         traj_.reset();
     }
 
@@ -525,16 +525,16 @@ void model::set_steer( double steer )
 {   
     Assert(tow_attached_);
 
-    if (phys_aircraft_)
-        phys_aircraft_->set_steer(steer);
+    if (phys_model_)
+        phys_model_->set_steer(steer);
 }
 
 void model::set_brake( double brake )
 {   
     Assert(tow_attached_);
 
-    if (phys_aircraft_)
-        phys_aircraft_->set_brake(brake);
+    if (phys_model_)
+        phys_model_->set_brake(brake);
 }
 
  
@@ -573,14 +573,14 @@ void model::freeze_position()
     root_->set_position(root_node_pos);
 }
 
-void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
+void model::set_phys_model(phys_model_ptr phys_aircraft)
 {
     if (!phys_aircraft)
     {
 		if (tow_attached_ && tow_invalid_callback_)
 		tow_invalid_callback_();
     }
-    phys_aircraft_ = phys_aircraft;
+    phys_model_ = phys_aircraft;
 }
 
 void model::set_nm_angular_smooth(double val)
@@ -597,7 +597,7 @@ void model::set_rotors_angular_speed(double val)
 
 void model::check_wheel_brake()
 {
-    if (!phys_aircraft_)
+    if (!phys_model_)
         return;
 
     using namespace aircraft; 
@@ -606,9 +606,9 @@ void model::check_wheel_brake()
     {
         if (shassis_group.opened && shassis_group.malfunction && !shassis_group.broken)
         {
-            bool has_contact = shassis_group.check_contact(this->phys_aircraft_);
+            bool has_contact = shassis_group.check_contact(this->phys_model_);
             if (has_contact)
-                shassis_group.broke(this->phys_aircraft_);
+                shassis_group.broke(this->phys_model_);
         }
     });
 }

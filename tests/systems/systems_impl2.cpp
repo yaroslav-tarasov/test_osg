@@ -60,7 +60,7 @@ namespace second
         return  _csys;
     }
 
-    kernel::system_ptr impl::get_visual_sys()   
+    kernel::system_ptr impl::get_visual_sys(av::IVisualPtr)   
     {
         return  nullptr;
     }

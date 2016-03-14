@@ -12,7 +12,7 @@ namespace helicopter_physless
         rs_sagged
     };
 
-    struct phys_aircraft
+    struct phys_model
     {
         virtual void                 update            () = 0;
         virtual void                 attach_tow        ( bool attached ) = 0;
@@ -33,10 +33,10 @@ namespace helicopter_physless
         virtual size_t               get_zone          () const = 0;
         virtual void                 set_malfunction   ( bool malfunction ) = 0;
         virtual void                 freeze            ( bool freeze ) = 0;
-        virtual ~phys_aircraft() {}
+        virtual ~phys_model() {}
     };
 
 
-    typedef polymorph_ptr<phys_aircraft> phys_aircraft_ptr;
+    typedef polymorph_ptr<phys_model> phys_model_ptr;
 
 } // aircraft

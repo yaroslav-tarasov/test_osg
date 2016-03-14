@@ -37,6 +37,8 @@
 #include "av/avShadows/ParallelSplitShadowMap.h"
 #include "av/avSky/Sky.h"
 
+#include "av/avSky/Ephemeris.h"
+
 #include "av/avScene/Scene.h"
 #include "av/avScene/ScreenTextureManager.h"
 
@@ -46,7 +48,6 @@
 
 #include "av/avTerrain/Terrain.h"
 
-#include "av/Ephemeris.h"
 #include "av/avWeather/Weather.h" 
 
 #include "av/avCore/Object.h"

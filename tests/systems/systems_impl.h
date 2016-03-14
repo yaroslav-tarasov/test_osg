@@ -16,7 +16,7 @@ namespace first
         virtual  void              update_messages();
         virtual  void              update_vis_messages();
         virtual kernel::system_ptr get_control_sys()                override;
-        virtual kernel::system_ptr get_visual_sys()                 override;
+        virtual kernel::system_ptr get_visual_sys(av::IVisualPtr vis) override;
         virtual kernel::system_ptr get_model_sys()                  override;
         virtual void               create_auto_objects()            override;                                                            
 

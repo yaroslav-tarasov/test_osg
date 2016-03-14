@@ -167,7 +167,6 @@
     <ClInclude Include="av\avTerrain\Grass2.h" />
     <ClInclude Include="av\avTerrain\Terrain.h" />
     <ClInclude Include="av\avTerrain\Trees.h" />
-    <ClInclude Include="av\Grass.h" />
     <ClInclude Include="av\IVisual.h" />
     <ClInclude Include="av\Visual.h" />
     <ClInclude Include="ext\spark\SmokeNode.h" />

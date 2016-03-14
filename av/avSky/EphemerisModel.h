@@ -16,7 +16,7 @@
 #include "SkyDome.h"
 #include "StarField.h"
 #include "Moon.h"
-#include "av/FogLayer.h"
+#include "av/avSky/FogLayer.h"
 
 #include "EphemerisData.h"
 #include "EphemerisEngine.h"

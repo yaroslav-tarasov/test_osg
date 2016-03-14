@@ -413,14 +413,14 @@ private:
 #endif
     }
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis/*, binary::bytes_cref bytes*/)
     {
         using namespace binary;
         using namespace kernel;
 
         //systems_factory_ptr sys_fab = nfi::function<systems_factory_ptr()>("systems", "create_system_factory")();
         auto ptr = // /*sys_fab->*/create_visual_system(msg_service_, /*vw_->get_victory(),*/ props);
-                   get_systems()->get_visual_sys();
+                   get_systems()->get_visual_sys(vis);
         //dict_t dic;
         //binary::unwrap(bytes, dic);
 
@@ -508,7 +508,7 @@ struct visapp_impl
     visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
         : systems_  (get_systems())
         , osg_vis_  (av::CreateVisual())
-        , vis_sys_  (create_vis(props/*, bytes*/))
+        , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/))
     {   
 
     }
@@ -544,12 +544,12 @@ private:
 
 private:
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis/*, binary::bytes_cref bytes*/)
     {
         using namespace binary;
         using namespace kernel;
 
-        auto ptr = systems_->get_visual_sys();
+        auto ptr = systems_->get_visual_sys(vis);
 
         return ptr;
     }
@@ -557,8 +557,9 @@ private:
 private:
 
     systems_ptr                                                 systems_;
-    updater                                                     vis_sys_;
     av::IVisualPtr                                              osg_vis_;
+    updater                                                     vis_sys_;
+
 
 };
 

@@ -8,8 +8,8 @@
 #include "visitors/info_visitor.h"
 
 #include "SkyBox.h"
-#include "av/FogLayer.h"
-#include "av/CloudLayer.h"
+#include "av/avSky/FogLayer.h"
+#include "av/avSky/CloudLayer.h"
 #include "av/avCore/PreRender.h"
 #include "av/EnvRenderer.h"
 
@@ -1111,6 +1111,7 @@ int main_scene( int argc, char** argv )
 
         return viewer.run();
     }
+
 
     return 1;
 }

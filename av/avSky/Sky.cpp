@@ -2,7 +2,7 @@
 #include "av/precompiled.h"
 #include "Sky.h"
 #include "EphemerisModel.h"
-#include "av/CloudLayer.h"
+#include "av/avSky/CloudLayer.h"
 #include "av/EnvRenderer.h"
 
 using namespace avSky;
