@@ -138,25 +138,8 @@ void LightManager::update( osg::NodeVisitor * nv )
         const cg::point_3f position = transform.treat_point(light.position );
         const cg::vector_3 direction = transform.treat_vector(light.direction);
         
-        cg::range_2f spotFalloff = light.spotFalloff;
-
-        FIXME(radians degrees)
-#if 0
-        //const cg::point_3f world_light_dir = mv_.treat_vector(spot.view_dir, false);
-        //// angle corrected
-        //auto corrected_spot = spot;
-        //if (!corrected_spot.angle_falloff.empty())
-        //    corrected_spot.angle_falloff |= cg::lerp01(spot.angle_falloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
-        
-        const cg::point_3f world_light_dir = transform.treat_vector(light.direction, false);
-        // angle corrected
-
-        if (!spotFalloff.empty())
-            spotFalloff |= cg::lerp01(spotFalloff.hi(), 65.f, cg::bound(-world_light_dir.z, 0.f, 1.f));
-#endif
-
         lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight,
-            position, direction, light.distanceFalloff, spotFalloff, 
+            position, direction, light.distanceFalloff, light.spotFalloff, 
             light.color, 0.60f, 0.35f);
     }
 

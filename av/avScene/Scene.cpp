@@ -683,8 +683,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     settings_->clouds[0].y = 1000.0f;
     settings_->clouds[0].height = 100.0f;
     settings_->clouds[0].p_type = avWeather::/*PrecipitationRain*/PrecipitationFog;
-    FIXME("Меньше 0.5 нефига нет, чет не сильно нормально") 
-    settings_->clouds[0].intensity = 0.75f;
+    settings_->clouds[0].intensity = 0.51f;
     settings_->intensity = 0.0f;
 
     if(true) _viewerPtr->addEventHandler( 
