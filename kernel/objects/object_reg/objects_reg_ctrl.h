@@ -33,9 +33,11 @@ private:
     void inject_msg   (net_layer::msg::engine_state_msg  const& msg);
     void inject_msg   (net_layer::msg::environment_msg   const& msg);
 
-    virtual void inject_msg   (const void* data, size_t size);
-	virtual void create_object(net_layer::msg::create const& msg);
-    virtual void set_sender   (remote_send_f s) override;
+    virtual void inject_msg     ( const void* data, size_t size      ) override;
+	virtual void create_object  ( net_layer::msg::create const& msg  ) override;
+    virtual void destroy_object ( net_layer::msg::destroy_msg const& msg ) override;
+    
+	virtual void set_sender     (remote_send_f s)                    override;
 
     // info
 private:
@@ -58,6 +60,7 @@ private:
     network::msg_dispatcher<uint32_t>                                  disp_;
 	boost::function<kernel::object_info_ptr 
 		(kernel::system*, net_layer::msg::create const&)>                 f_;
+	kernel::system*                                                     _sys;
 private:
     connection_holder                                           conn_holder_;
 };

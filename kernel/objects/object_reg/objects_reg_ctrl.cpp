@@ -22,6 +22,7 @@ AUTO_REG_NAME(aircraft_reg_ext_ctrl, ctrl::create);
 
 ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     : view(oc,dict)
+	, _sys(oc.sys)
 {
 
     void (ctrl::*on_run)         (net_layer::msg::run const& msg)               = &ctrl::inject_msg;
@@ -73,6 +74,16 @@ void ctrl::on_object_destroying(object_info_ptr object)
 		}
 	}
 }
+
+void ctrl::destroy_object( net_layer::msg::destroy_msg const& msg)
+{
+	auto a = objects_.find(msg);
+	if ( a != objects_.end())
+	if (object_info_ptr info = object_info_ptr(a->second))
+		object_collection_ptr(_sys)->destroy_object(info->object_id()) ;
+	
+}
+
 
 void ctrl::inject_msg(const void* data, size_t size)
 {

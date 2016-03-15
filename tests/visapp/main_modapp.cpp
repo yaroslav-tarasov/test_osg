@@ -356,6 +356,7 @@ struct mod_app
         disp_
             .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
             .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
+			.add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
             .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
             .add<vis_peers             >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             ;
@@ -426,6 +427,14 @@ private:
         LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
 
     }
+
+	void on_destroy(destroy_msg const& msg)
+	{
+		reg_obj_->destroy_object(msg);
+
+		// LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
+
+	}
 
     void on_vis_peers(vis_peers const& msg)
     {

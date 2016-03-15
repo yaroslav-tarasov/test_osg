@@ -10,6 +10,7 @@ namespace net_layer
             id_setup            ,
             id_run              ,
             id_create           ,
+			id_destroy          ,
             id_ready            ,
 
             id_state            ,

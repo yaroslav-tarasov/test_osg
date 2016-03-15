@@ -180,7 +180,9 @@ namespace net_layer
             REFL_ENTRY( custom_label  )
         REFL_END()
 
-        typedef gen_msg<id_ready, uint16_t> ready_msg;
+		typedef gen_msg<id_destroy, uint32_t> destroy_msg;
+        
+		typedef gen_msg<id_ready, uint16_t> ready_msg;
 
     
     enum engine_state_t : int16_t
