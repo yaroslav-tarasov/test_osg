@@ -14,6 +14,8 @@ struct visual_object
     virtual osg::ref_ptr<osg::Node> node() const = 0;
     virtual osg::ref_ptr<osg::Node> root() const = 0;
     virtual osg::ref_ptr<osgAnimation::BasicAnimationManager> animation_manager() const = 0;
+    virtual osg::Node* get_node(const std::string& name) const = 0;
+
 
     virtual void set_visible(bool visible) = 0;
     DECLARE_EVENT(object_loaded, (uint32_t) );

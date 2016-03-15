@@ -187,7 +187,7 @@ bool Object::PreUpdate()
 {
 	if(_hw_instanced && _inst_manager.valid() && _node.valid())
 	{
-		_inst_manager->commit();
+		_inst_manager->commitInstancePositions();
 	}
     return true;
 }
@@ -205,12 +205,29 @@ static OpenThreads::Mutex& getReadFileMutex()
 	return _mutex;
 }
 
+struct helper_t
+{
+    helper_t(const std::string& name)
+        : name (name)
+    {}
+    
+    ~helper_t()
+    {
+        OSG_WARN << "createObject : " << name << "  time: "<< hr_timer.set_point() << "\n";
+    }
+    
+    high_res_timer hr_timer;
+    std::string    name;
+};
+
 Object* createObject(std::string name, bool fclone)
 {
 	fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
 	Object*    object      = nullptr;
     boost::optional<xml_model_t> data;
+    
+    helper_t h(name);
 
     osg::PositionAttitudeTransform* pat;
 

@@ -6,31 +6,45 @@
 #include "av/avScene/Scene.h"
 #include "av/avCore/Utils.h"
 #include "animutils.h"
+#include "utils/visitors/cache_nodes_visitor.h"
 
 namespace kernel
 {
+    struct visual_object_impl::private_t
+    {
+        private_t()
+            : scene_( avScene::GetScene() )
+            , anim_manager_ (nullptr) 
+        {}
+
+        CacheNodesVisitor::CacheMapType            cache;
+        osg::observer_ptr<avScene::Scene>                        scene_;
+        osg::ref_ptr<osg::Node>                                   node_;
+        osg::ref_ptr<osg::Node>                                   root_;
+        osg::ref_ptr<osgAnimation::BasicAnimationManager> anim_manager_;
+    };
+
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async )
-        : scene_( avScene::GetScene() )
-        , loaded_(false)
-        , anim_manager_ (nullptr)
+        : loaded_(false)
+        , p_  (make_shared<private_t>())
     {
         seed_ =  seed;
 
 		if(!async)
 		{
-            node_ = scene_->load(res, nullptr, seed, async);
-            root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+            p_->node_ = p_->scene_->load(res, nullptr, seed, async);
+            p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
             loaded_ = true;
 
 #if 1
             using namespace avAnimation;
 
             AnimationManagerFinder finder;
-            node_->accept(finder);
-            anim_manager_  = finder._am;  
+            p_->node_->accept(finder);
+            p_->anim_manager_  = finder._am;  
 
             if(finder._am.valid())
-                node_->setUpdateCallback(finder._am.get());
+                p_->node_->setUpdateCallback(finder._am.get());
 #endif
 
 #if 0
@@ -40,40 +54,39 @@ namespace kernel
         else
         {
 #ifdef ASYNC_OBJECT_LOADING  
-            scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
+            p_->scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
 #endif
-            node_ = scene_->load(res, nullptr, seed, async);
+            p_->node_ = p_->scene_->load(res, nullptr, seed, async);
         }
 
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async )
-                        : scene_ ( avScene::GetScene() )
-                        , parent_(parent)
-                        , loaded_(false)
+        : loaded_(false)
+        , p_  (make_shared<private_t>())
     {
 #ifdef ASYNC_OBJECT_LOADING           
-        scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
+        p_->scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
         seed_ =  seed;
 #endif
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
-        node_ = scene_->load(res,vn.size()>0?vn[0]:nullptr, seed, async);
+        p_->node_ = p_->scene_->load(res,vn.size()>0?vn[0]:nullptr, seed, async);
 
-		if(!async && node_ )
+		if(!async && p_->node_ )
 		{
 
-        root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact);
+        p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
 
 		using namespace avAnimation;
 
 #if 1
 		AnimationManagerFinder finder;
-		node_->accept(finder);
-		anim_manager_  = finder._am;  
+		p_->node_->accept(finder);
+		p_->anim_manager_  = finder._am;  
 
 		if(finder._am.valid())
-			node_->setUpdateCallback(finder._am.get());
+			p_->node_->setUpdateCallback(finder._am.get());
 #endif
 
 #if 0
@@ -84,8 +97,8 @@ namespace kernel
 
     visual_object_impl::~visual_object_impl()
     {
-        if(node_.get())
-            Utils::RemoveNodeFromAllParents( node_.get() );
+        if(p_->node_.get())
+            Utils::RemoveNodeFromAllParents( p_->node_.get() );
         // scene_->get_objects()->remove(node_.get());
     }
 
@@ -94,22 +107,24 @@ namespace kernel
     {
          if(seed_==seed)
          {
-           root_ = findFirstNode(node_,"root",findNodeVisitor::not_exact); 
+           p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact); 
            loaded_ = true;
 
 		   using namespace avAnimation;
 
 		   AnimationManagerFinder finder;
-		   node_->accept(finder);
+		   p_->node_->accept(finder);
 
 		   if(finder._am.valid())
            {
-               anim_manager_  = finder._am;  
-			   node_->setUpdateCallback(finder._am.get());
+               p_->anim_manager_  = finder._am;  
+			   p_->node_->setUpdateCallback(finder._am.get());
            }
-		   
+
+           CacheNodesVisitor cnv(p_->cache);
+           node()->accept(cnv);
 #if 0
-		   SetupRigGeometry switcher(true, *node_.get());
+		   SetupRigGeometry switcher(true, *p_->node_.get());
 #endif
            
 		   object_loaded_signal_(seed);
@@ -119,22 +134,31 @@ namespace kernel
 
     osg::ref_ptr<osg::Node> visual_object_impl::node() const
     {
-        return node_;
+        return p_->node_;
     }
     
     osg::ref_ptr<osg::Node> visual_object_impl::root() const
     {
-        return root_;
+        return p_->root_;
     }
     
+    osg::Node* visual_object_impl::get_node(const std::string& name) const 
+    {
+          CacheNodesVisitor::CacheMapType::iterator it;
+          if( (it = p_->cache.find(name)) != p_->cache.end())
+            return it->second.get();
+          else
+            return nullptr;
+    }
+
     osg::ref_ptr<osgAnimation::BasicAnimationManager> visual_object_impl::animation_manager() const
     {
-        return anim_manager_;
+        return p_->anim_manager_;
     }
 
     void visual_object_impl::set_visible(bool visible)
     {
         if(loaded_)
-            node_->setNodeMask(visible?/*0xffffffff*/0x00010000:0);
+            p_->node_->setNodeMask(visible?/*0xffffffff*/0x00010000:0);
     }
 }

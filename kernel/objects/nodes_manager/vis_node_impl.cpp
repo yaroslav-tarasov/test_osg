@@ -50,19 +50,21 @@ void vis_node_impl::fill_victory_nodes()
 {
     visual* vis_manager = dynamic_cast<visual*>(manager_);
     victory_nodes_.clear();
-        
-    if (vis_manager->visual_object())
+    auto vo = vis_manager->visual_object();
+
+    if (vo)
     {
         if(data_.node_ids.size() == 0)
         for (auto jt = data_.victory_nodes.begin(); jt != data_.victory_nodes.end(); ++jt)
         {
             if (*jt=="root")
             {
-                 victory_nodes_.push_back(vis_manager->visual_object()->node().get());
+                 victory_nodes_.push_back(vo->node().get());
                  continue;
             }
 
-            if (auto visnode = findFirstNode(vis_manager->visual_object()->node().get(), *jt))
+            // if (auto visnode = findFirstNode(vo->node().get(), *jt))
+            if (auto visnode = vo->get_node(*jt))
             {
                 victory_nodes_.push_back(visnode);
 
@@ -76,14 +78,15 @@ void vis_node_impl::fill_victory_nodes()
         {
             if (*jt=="root")
             {
-                victory_nodes_.push_back(vis_manager->visual_object()->node().get());
+                victory_nodes_.push_back(vo->node().get());
                 continue;
             }
 
 
-            if (auto visnode = findFirstNode(vis_manager->visual_object()->node().get(), *jt,
-                findNodeVisitor::exact, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN, findNodeVisitor::user_id
-                ))
+            //if (auto visnode = findFirstNode(vo->node().get(), *jt,
+            //    findNodeVisitor::exact, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN, findNodeVisitor::user_id
+            //    ))
+            if (auto visnode = vo->get_node(*jt))
             {
                 victory_nodes_.push_back(visnode);
 
@@ -93,6 +96,7 @@ void vis_node_impl::fill_victory_nodes()
             }
         }
     }
+
 }
 
 void vis_node_impl::extrapolated_position_reseted()

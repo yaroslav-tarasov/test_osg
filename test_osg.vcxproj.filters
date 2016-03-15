@@ -482,6 +482,9 @@
     <ClInclude Include="av\avSky\LightningLayer.h">
       <Filter>Source Files\av\sky\orig_ephemeris</Filter>
     </ClInclude>
+    <ClInclude Include="utils\LoadManager.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1197,6 +1200,9 @@
     </ClCompile>
     <ClCompile Include="av\avSky\LightningLayer.cpp">
       <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\LoadManager.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

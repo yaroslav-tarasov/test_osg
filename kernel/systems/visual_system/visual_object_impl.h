@@ -20,6 +20,7 @@ struct visual_object_impl
     osg::ref_ptr<osg::Node> node() const override;
     osg::ref_ptr<osg::Node> root() const override;
     osg::ref_ptr<osgAnimation::BasicAnimationManager> animation_manager() const override;
+    osg::Node* get_node(const std::string& name) const override;
 
     void set_visible(bool visible)       override;
 
@@ -31,12 +32,11 @@ private:
     bool                              loaded_;
 
 private:
-    osg::observer_ptr<avScene::Scene>                        scene_;
-    osg::ref_ptr<osg::Node>                                   node_;
-    osg::ref_ptr<osg::Node>                                   root_;
-    osg::ref_ptr<osgAnimation::BasicAnimationManager> anim_manager_;
+
     nm::node_control_ptr                                    parent_;
 
+    struct private_t;
+    boost::shared_ptr<private_t> p_;
 };
 
 } // kernel

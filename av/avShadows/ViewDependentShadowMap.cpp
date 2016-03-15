@@ -179,8 +179,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 #if 1
     if (!_polytope.empty())
     {
+#if 0
         OSG_INFO<<"Pushing custom Polytope"<<std::endl;
-
+#endif
         osg::CullingSet& cs = cv->getProjectionCullingStack().back();
 
         cs.setFrustum(_polytope);
@@ -195,7 +196,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 #if 1
     if (!_polytope.empty())
     {
+#if 0
         OSG_INFO<<"Popping custom Polytope"<<std::endl;
+#endif
         cv->popCullingSet();
     }
 #endif
@@ -213,7 +216,9 @@ void VDSMCameraCullCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
         osg::Matrixd projection = *(cv->getProjectionMatrix());
 
+#if 0
         OSG_INFO<<"RTT Projection matrix "<<projection<<std::endl;
+#endif
 
         osg::Matrix::value_type left, right, bottom, top, zNear, zFar;
         osg::Matrix::value_type epsilon = 1e-6;
@@ -413,7 +418,9 @@ void ViewDependentShadowMap::LightData::setLightData(osg::RefMatrix* lm, const o
 #endif
         if (lightMatrix.valid())
         {
+#if 0
             OSG_INFO<<"   Light matrix "<<*lightMatrix<<std::endl;
+#endif
             osg::Matrix lightToLocalMatrix(*lightMatrix * osg::Matrix::inverse(modelViewMatrix) );
             lightDir = osg::Matrix::transform3x3( lightDir, lightToLocalMatrix );
             lightDir.normalize();
@@ -424,7 +431,9 @@ void ViewDependentShadowMap::LightData::setLightData(osg::RefMatrix* lm, const o
     }
     else
     {
+#if 0
         OSG_INFO<<"   Positional light, lightPos="<<lightPos<<std::endl;
+#endif
         lightDir = light->getDirection();
         lightDir.normalize();
         if (lightMatrix.valid())
@@ -1626,7 +1635,9 @@ osg::Polytope ViewDependentShadowMap::computeLightViewFrustumPolytope(Frustum& f
 
 bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, LightData& positionedLight, osg::Matrixd& projectionMatrix, osg::Matrixd& viewMatrix)
 {
+#if 0
     OSG_INFO<<"standardShadowMapCameraSettings()"<<std::endl;
+#endif
 
     osg::Vec3d lightSide;
 
@@ -1636,7 +1647,9 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
     double gamma_v = acos(dotProduct_v);
     if (gamma_v<osg::DegreesToRadians(settings->getPerspectiveShadowMapCutOffAngle()) || gamma_v>osg::DegreesToRadians(180.0-settings->getPerspectiveShadowMapCutOffAngle()))
     {
+#if 0
         OSG_INFO<<"View direction and Light direction below tolerance"<<std::endl;
+#endif
         osg::Vec3d viewSide = osg::Matrixd::transform3x3(frustum.modelViewMatrix, osg::Vec3d(1.0,0.0,0.0));
         lightSide = positionedLight.lightDir ^ (viewSide ^ positionedLight.lightDir);
         lightSide.normalize();
@@ -1792,7 +1805,9 @@ bool ViewDependentShadowMap::computeShadowCameraSettings(Frustum& frustum, Light
 
             if (fov>fovMAX)
             {
+#if 0
                 OSG_INFO<<"Clampping fov = "<<fov<<std::endl;
+#endif
                 fov=fovMAX;
             }
 
@@ -2135,7 +2150,10 @@ struct RenderLeafBounds
         }
         else
         {
+            FIXME(√де-то это получаем, и это не good);
+#if 0
             OSG_INFO<<"bb invalid"<<std::endl;
+#endif
         }
     }
 

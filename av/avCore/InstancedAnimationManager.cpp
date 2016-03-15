@@ -55,7 +55,10 @@ namespace
 
 namespace avCore
 {
+
+
     InstancedAnimationManager::InstancedAnimationManager() 
+        : inst_num_ (0)
     {
 
     }
@@ -67,8 +70,8 @@ namespace avCore
     }
 
 	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model, const std::string anim_file_name)
-        : /*bm_(_getBoneMap(base_model))
-          ,*/ src_model_     (base_model)
+        : src_model_     (base_model)
+        , inst_num_ (0)
 	{ 
 
         _initData();
@@ -122,7 +125,9 @@ namespace avCore
 		geometry->setUseVertexBufferObjects(true);
 
 		// create texture to encode all matrices
-		unsigned int height = ((/*end-start*/instancesData_.size()) / 4096u) + 1u;
+        const size_t fixed_data_size =   4096u;
+
+		unsigned int height = ((/*end-start*//*instancesData_.size()*/fixed_data_size) / texture_row_data_size) + 1u;
 
 		osg::ref_ptr<osg::Image>       image = new osg::Image; 
 		image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
@@ -132,7 +137,7 @@ namespace avCore
 		for (unsigned int i = /*start*/0, j = 0; i < /*end*/instancesData_.size(); ++i, ++j)
 		{
 			const osg::Matrixf& matrix = instancesData_[i];
-			float * data = (float*)image->data((j % 4096u) *4u, j / 4096u);
+			float * data = (float*)image->data((j % texture_row_data_size) *4u, j / texture_row_data_size);
 			memcpy(data, matrix.ptr(), 16 * sizeof(float));
 		}
 
@@ -169,7 +174,7 @@ namespace avCore
 	void InstancedAnimationManager::setInstanceData(size_t idx, const osg::Matrixf& matrix)
 	{
 		instancesData_[idx] = matrix;
-		float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+		float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
 		memcpy(data, matrix.ptr(), 16 * sizeof(float));
 		instTexture_->dirtyTextureObject();
 	}
@@ -321,7 +326,7 @@ namespace avCore
         return root; 
     }
 
-    bool InstancedAnimationManager::commit()
+    void InstancedAnimationManager::commitInstancePositions()
     {
         bool bcommit = false;
         for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
@@ -347,7 +352,7 @@ namespace avCore
 
 			  instancesData_[idx] = modelMatrix;
 
-              float * data = (float*)instTexture_->getImage(0)->data((idx % 4096u) *4u, idx / 4096u);
+              float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
               memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
 			  bcommit = true;
 			}
@@ -361,10 +366,21 @@ namespace avCore
             for(auto it = dl.begin(); it!= dl.end() ; ++it)
             { 
                 (*it)->dirtyBound();
+                        
+                if(inst_num_ != inst_nodes_.size())
+                {
+                    auto geometry = (*it)->asGeometry();
+                    // first turn on hardware instancing for every primitive set
+                    for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
+                    {
+                        geometry->getPrimitiveSet(i)->setNumInstances(inst_nodes_.size());
+                    }
+                }
+
             }
         }
-
-        return true;
+        
+        inst_num_ = inst_nodes_.size();
     }
  
 }

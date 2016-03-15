@@ -30,6 +30,7 @@ private:
 private:
     kernel::visual_system * sys_;
     visual_object_ptr visual_object_;
+
 };
 
 } // nodes_management

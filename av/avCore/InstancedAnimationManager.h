@@ -20,7 +20,7 @@ namespace avCore
 
 		InstancedAnimationManager   (osg::Node* base_model, const std::string anim_file);
 
-        bool                        commit();
+        void                        commitInstancePositions();
 
 		inline void                 addMatrix(const osg::Matrixf& matrix) { instancesData_.push_back(matrix); }
 		inline osg::Matrixf         getMatrix(size_t index) const         { return instancesData_[index]; }
@@ -42,8 +42,6 @@ namespace avCore
 		osgAnimation::BoneMap       _getBoneMap(osg::Node* base_model);
         void                        _initData();
 	private:
-		// osgAnimation::BoneMap                    bm_;
-
 		osg::observer_ptr<osg::Node>             src_model_;
 
      // Instanced staff   
@@ -52,6 +50,7 @@ namespace avCore
         image_data                               image_data_;
         InstancedDataType                        instancesData_;
         InstancedNodesVectorType                 inst_nodes_; 
+        size_t                                   inst_num_;
 		osg::ref_ptr<osg::TextureRectangle>      animTexture_;
 		osg::ref_ptr<osg::TextureRectangle>      instTexture_;
     private:
@@ -59,7 +58,9 @@ namespace avCore
 
     private:
         OpenThreads::Mutex                       mutex_;
+    private: 
 
+        static size_t  const  texture_row_data_size =   4096u;
 	};
 
 }

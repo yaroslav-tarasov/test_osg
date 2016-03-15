@@ -205,6 +205,7 @@
     <ClInclude Include="tests\systems\systems_impl2.h" />
     <ClInclude Include="utils\empty_scene.h" />
     <ClInclude Include="utils\krv_import.h" />
+    <ClInclude Include="utils\LoadManager.h" />
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
@@ -449,6 +450,7 @@
     <ClCompile Include="utils\animation_handler.cpp" />
     <ClCompile Include="utils\async_load.cpp" />
     <ClCompile Include="utils\empty_scene.cpp" />
+    <ClCompile Include="utils\LoadManager.cpp" />
     <ClCompile Include="utils\materials.cpp" />
     <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp" />
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />

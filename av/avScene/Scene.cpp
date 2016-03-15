@@ -63,7 +63,7 @@
 #include "tests/creators.h"
 
 #include "utils/async_load.h"
-
+#include "utils/LoadManager.h"
 
 #include "av/avFx/SmokeFx.h"
 #include "av/avFx/SparksFx.h"
@@ -547,11 +547,11 @@ Scene* Scene::GetInstance()
 Scene::Scene()
 	: smoke_sfx_weak_ptr_(nullptr)
 {      
+    _loadManager = new avCore::LoadManager();
+    addChild(_loadManager);
+
     _environmentNode = new Group();
     addChild(_environmentNode.get());
-
-    _loadManager = new Utils::LoadManager();
-    addChild(_loadManager);
 
     // Common nodes for scene etc.
     _commonNode = new Group();
@@ -1587,6 +1587,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         mt_.back()->setUserValue("id",seed);
         mt_.back()->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
     }
+
+    high_res_timer hr_timer;
+
 	
 	auto sig = [&](uint32_t seed)->void {object_loaded_signal_(seed);};
 
@@ -1857,14 +1860,15 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
 
 #ifdef ASYNC_OBJECT_LOADING
-    // _lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>( wf, seed,path,mt_.back().get()) );
     if(async)
-		dynamic_cast<Utils::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
+		dynamic_cast<avCore::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
 	else
 		wf(seed, path,mt_.back().get(),async);
 #else
     wf(seed, path,mt_.back().get(),async);
 #endif
+    
+    OSG_WARN << "Scene::load: " << hr_timer.set_point() << "\n";
 
     LogInfo("Scene::load exit " << path);
 
