@@ -21,13 +21,13 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
     , _spawner              (find_first_object<manager::info_ptr>(collection_))
-    , _init                 (_spawner._empty())
+    , _init                 (false)
 {
 
     if (nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this))
     {
         root_ = nodes_manager_->get_node(0);
-        conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed_internal, this));
+        // conn_holder() << nodes_manager_->subscribe_model_changed(boost::bind(&view::on_model_changed_internal, this));
     }
 
     msg_disp()
@@ -76,7 +76,7 @@ void view::update(double time)
     if (!_init)
     {
         _spawner = find_first_object<manager::info_ptr>(collection_);
-        _init = _spawner._empty();
+        _init = _spawner.expired();
     }
 }
 

@@ -25,6 +25,7 @@ private:
     // base_presentation
 private:
     void update(double time) override;
+	void pre_update(double time) override;
 
     // base_view_presentation
 private:

@@ -832,7 +832,9 @@ void BulletInterface::update( double step )
         d_->_dw->stepSimulation( btScalar(step), /*10*/cfg().model_params.msys_step/cfg().model_params.bullet_step, btScalar(cfg().model_params.bullet_step) ); 
     }
 
+
     checkForCollisionEvents();
+
 }
 
 

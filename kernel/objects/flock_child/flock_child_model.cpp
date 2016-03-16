@@ -35,10 +35,23 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
 	start_ = boost::bind(&model::wander, this, 0.0f );
 }
 
+void model::pre_update(double time)
+{
+	view::pre_update(time);
+
+	if( _init && _spawner.expired() && phys_model_)
+	{
+		phys_model_.reset();
+		nodes_manager_.reset();
+	    root_.reset();
+		dynamic_cast<kernel::object_collection*>(sys_)->destroy_object(object_info_ptr(this)->object_id());
+	}
+}
+
 void model::update(double time)
 {
     view::update(time);
-	
+
 	if(start_)
 	{
 		start_();

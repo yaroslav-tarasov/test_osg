@@ -88,12 +88,15 @@ void ctrl::on_object_destroying(object_info_ptr object)
 
     if (object->object_id() == this->object_id())
     {
-        // roamers_.erase(air);
-        for (auto it=roamers_.begin(); it!=roamers_.end();++it)
-        {
-            _obj_col->destroy_object(object_info_ptr(*it)->object_id());
-        }
-        
+
+		while (  roamers_.size()>0  )
+		{
+			auto it = roamers_.begin();
+			uint32_t oid = object_info_ptr(*it)->object_id();
+			roamers_.erase(it);
+			//_obj_col->destroy_object(object_info_ptr(*it)->object_id());
+		}
+     
         
     }
 }

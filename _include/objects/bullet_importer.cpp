@@ -50,6 +50,7 @@ bool loadBulletFile(std::string name, btCompoundShape*& compoundShape)
      
     compoundShapeMap::iterator it;
 
+
     if(( it = compoundShapeCache.find(name))!=compoundShapeCache.end() )
     {
          compoundShape = compoundShapeCache[name];
@@ -87,6 +88,7 @@ bool loadBulletFile(std::string name, btCompoundShape*& compoundShape)
                 //    trimeshShape = (btBvhTriangleMeshShape*)import.getCollisionShapeByName(meshName);
                 compoundShape = (btCompoundShape*)import.getCollisionShapeByName("lod3");
                 compoundShapeCache[name] = compoundShape;
+
             }
 
             return true;
