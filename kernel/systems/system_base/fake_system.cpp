@@ -1350,8 +1350,9 @@ private:
     void update       (double time) override;
 
 private:
+    void            object_destroying(object_info_ptr object);
 
-
+private:
     scoped_connection object_destroying_connection_;
 
 
@@ -1361,7 +1362,7 @@ private:
 
 ctrl_system_impl::ctrl_system_impl(msg_service& service)
     : fake_system_base(sys_ext_ctrl, service, "objects.xml")
-    //, object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&ctrl_system_impl::object_destroying, this, _1)))
+    , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&ctrl_system_impl::object_destroying, this, _1)))
 {
     LogInfo("Create Control Subsystem");
 }
@@ -1369,6 +1370,10 @@ ctrl_system_impl::ctrl_system_impl(msg_service& service)
 void ctrl_system_impl::update(double time)
 {
     fake_system_base::update(time);
+}
+
+void ctrl_system_impl::object_destroying(object_info_ptr object)
+{
 }
 
 #pragma  endregion

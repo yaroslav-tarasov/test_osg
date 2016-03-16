@@ -55,32 +55,41 @@ void ctrl::on_object_created(object_info_ptr object)
 {
 	if(airport::info_ptr(object))
 		airports_[object->object_id()]=object;
-
-
 }
 
 void ctrl::on_object_destroying(object_info_ptr object)
 {    
-    auto a = objects_.find(object->object_id());
-    if ( a != objects_.end())
+    e2o_t::iterator it =  std::find_if(e2o_.begin(),e2o_.end(),[&](const e2o_value_t& vt) { return vt.second == object->object_id(); });
+    
+    if(it != e2o_.end())
     {
-        objects_.erase(object->object_id());
-    } else
-	{
-		auto a = airports_.find(object->object_id());
-		if ( a != airports_.end())
-		{
-			airports_.erase(object->object_id());
-		}
-	}
+        auto a = regs_objects_.find(it->second);
+        if ( a != regs_objects_.end())
+        {
+            a->second.reset();
+            regs_objects_.erase(a);
+        } else
+        {
+            auto a = airports_.find(it->second);
+            if ( a != airports_.end())
+            {
+                a->second.reset();
+                airports_.erase(a);
+            }
+        }
+    }
 }
 
 void ctrl::destroy_object( net_layer::msg::destroy_msg const& msg)
 {
-	auto a = objects_.find(msg);
-	if ( a != objects_.end())
-	if (object_info_ptr info = object_info_ptr(a->second))
-		object_collection_ptr(_sys)->destroy_object(info->object_id()) ;
+    auto a = regs_objects_.find(msg);
+	if ( a != regs_objects_.end())
+    {  
+        size_t oid = a->second->object_id();
+        a->second.reset();
+        regs_objects_.erase(a);
+		dynamic_cast<kernel::object_collection*>(_sys)->destroy_object(oid) ;
+    }
 	
 }
 
@@ -117,7 +126,7 @@ void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg)
 {
 	if(msg.ext_id>0 )                          
 	{
-		auto a = objects_[msg.ext_id];
+		auto a = regs_objects_[msg.ext_id];
 
 		if (aircraft::aircraft_ipo_control_ptr pa = aircraft::aircraft_ipo_control_ptr (a))
 		{
@@ -147,7 +156,7 @@ void ctrl::inject_msg(net_layer::msg::engine_state_msg const& msg)
 {
     if(msg.ext_id>0 )                          
     {
-        auto a = objects_[msg.ext_id];
+        auto a = regs_objects_[msg.ext_id];
 
         if (aircraft::control_ptr pa = aircraft::control_ptr (a))
         {
@@ -162,7 +171,7 @@ void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)
 {
     if(ext_id>0 )                          
     {
-        auto a = objects_[ext_id];
+        auto a = regs_objects_[ext_id];
 
         if (vehicle::control_ptr pv = vehicle::control_ptr(a))
         {
@@ -176,7 +185,7 @@ void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)
 {
     if(ext_id>0 )                          
     {
-        auto a = objects_[ext_id];
+        auto a = regs_objects_[ext_id];
 
         if (vehicle::control_ptr pv = vehicle::control_ptr(a))
         {
@@ -196,7 +205,7 @@ void ctrl::inject_msg(net_layer::msg::fire_fight_msg_t  const& ext_id)
 {
 	if(ext_id>0 )                          
 	{
-		auto v = objects_[ext_id];
+		auto v = regs_objects_[ext_id];
 
 		if (vehicle::control_ptr pv = vehicle::control_ptr(v))
 		{
@@ -228,7 +237,7 @@ void ctrl::create_object(net_layer::msg::create const& msg)
 	if (a)
     {
 		e2o_[msg.ext_id] = a->object_id();
-        objects_[msg.ext_id] = a;
+        regs_objects_[msg.ext_id] = a;
     }
 }
 

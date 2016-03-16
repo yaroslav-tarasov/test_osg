@@ -253,10 +253,16 @@ struct client
         const double time = 0.0;
 
          
+#if 0
         ADD_EVENT(0.0  , create(1500,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_camera, "camera 0") )
+#endif
 
         ADD_EVENT(time , state(0.0,time,factor))
+
+        ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(25.0 , destroy_msg(333)) 
         
+#if 0
         environment::weather_t  weather; 
         weather.fog_density  = 0.2f; 
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
@@ -362,6 +368,7 @@ struct client
         ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
         ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
         ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
+#endif
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(

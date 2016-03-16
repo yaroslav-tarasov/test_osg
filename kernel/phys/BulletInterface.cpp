@@ -417,7 +417,7 @@ namespace phys
         btIDebugDraw*                         _dd;
 
         bt_vehicle_raycaster_ptr              vehicle_raycaster_;
-        std::vector<rigid_body_impl *>	      rigid_bodies_;
+        std::set<rigid_body_impl *>           rigid_bodies_;
         
         void CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1 , on_collision_f  on_collision_) 
         {
@@ -473,7 +473,9 @@ BulletInterface::BulletInterface()
     d_->_dw->getSolverInfo().m_splitImpulse = false;
     d_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
 
-    d_->_dw->setInternalTickCallback(internal_tick_callback);    
+ #if 0
+   d_->_dw->setInternalTickCallback(internal_tick_callback); 
+#endif   
 
 
     d_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*d_->_dw));
@@ -753,9 +755,12 @@ void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
 
 void BulletInterface::registerBody(int id)
 {
+#if 0
     FIXME(Больной вопрос меняем способ передачи информации)
     if(d_->rigid_bodies_.size() > 0) 
-    d_->_actors[id]._body  = d_->rigid_bodies_.back()->get_body().get();
+         d_->_actors[id]._body  = d_->rigid_bodies_.back()->get_body().get();
+#endif
+    assert(false);
 }
 
 void BulletInterface::createShape(osg::Node* node,int id, double mass)
@@ -908,13 +913,13 @@ phys::bt_vehicle_raycaster_ptr BulletInterface::vehicle_raycaster() const
 
 void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 {
-	// rigid_bodies_.insert(rb);
-    d_->rigid_bodies_.push_back(rb);
+	d_->rigid_bodies_.insert(rb);
+    // d_->rigid_bodies_.push_back(rb);
 }
 
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
-	//rigid_bodies_.erase(rb);
+	d_->rigid_bodies_.erase(rb);
     // FIXME  пока не удаляем
     FIXME("Нету удаления, а надо бы особенно для сомолей")
 }

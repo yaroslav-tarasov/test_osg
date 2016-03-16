@@ -13,8 +13,8 @@ namespace flock
 			virtual ~info() {}
 		};
 
-		typedef polymorph_ptr<info> info_ptr;
-
+		typedef polymorph_ptr<info>     info_ptr;
+        typedef boost::weak_ptr<info>  info_wptr;
 
         struct model_ext_control
         {

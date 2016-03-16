@@ -43,7 +43,7 @@ void view::on_object_destroying(object_info_ptr object)
 {
     base_view_presentation::on_object_destroying(object) ;
 
-    if (auto air = child::info_ptr(object))
+    if (child::info_ptr air = child::info_ptr(object))
     {
         roamers_.erase(air);
     }

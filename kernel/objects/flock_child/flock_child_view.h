@@ -49,6 +49,10 @@ protected:
     // base_presentation
 protected:
     void update(double time) override;
+    
+    // base_view_presentation
+protected:
+    void on_child_removing   (object_info_ptr child)  override ;
 
     //info
 protected:
@@ -71,7 +75,8 @@ protected:
 
     std_simple_randgen                      rnd_;
 
-    manager::info_ptr                   _spawner;
+    manager::info_wptr                   _spawner;
+    bool                                 _init;
 
 	float                               _targetSpeed;
 };

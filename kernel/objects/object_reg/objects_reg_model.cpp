@@ -34,7 +34,7 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
 {
      if(msg.ext_id>0 )                          
      {
-         auto a = objects_[msg.ext_id];
+         auto a = regs_objects_[msg.ext_id];
          
          if(auto pa = aircraft::model_ext_control_ptr(a))
          {
@@ -115,10 +115,10 @@ void model::on_object_created(object_info_ptr object)
 
 void model::on_object_destroying(object_info_ptr object)
 {
-	auto a = objects_.find(object->object_id());
-	if ( a != objects_.end())
+	auto a = regs_objects_.find(object->object_id());
+	if ( a != regs_objects_.end())
 	{
-		objects_.erase(object->object_id());
+		regs_objects_.erase(object->object_id());
 	}
 }
 
@@ -126,7 +126,7 @@ bool model::add_object(object_info_ptr object)
 {
 	size_t id = object->object_id();
 
-	objects_[id] = object;
+	regs_objects_[id] = object;
 
 	return true;
 }

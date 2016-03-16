@@ -43,7 +43,8 @@ object_info_ptr ctrl::create(kernel::object_create_t const& oc, dict_copt dict)
 AUTO_REG_NAME(flock_manager_ext_ctrl, ctrl::create);
 
 ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
-    : view(oc,dict)
+    : view    (oc,dict)
+    , _obj_col(dynamic_cast<kernel::object_collection*>(oc.sys))
 {
 
 	settings_._childAmount = 7 * 7;
@@ -74,11 +75,27 @@ void ctrl::update( double time )
 			child_pos.orien = state_.orien;
 			geo_position vgp(child_pos, get_base());
 
-			roamers_.insert(child::create(of,vs,vgp));
+			/*roamers_.insert(*/child::create(of,vs,vgp)/*)*/;
 
 		}
 	}
 
+}
+
+void ctrl::on_object_destroying(object_info_ptr object)
+{
+    base_view_presentation::on_object_destroying(object) ;
+
+    if (object->object_id() == this->object_id())
+    {
+        // roamers_.erase(air);
+        for (auto it=roamers_.begin(); it!=roamers_.end();++it)
+        {
+            _obj_col->destroy_object(object_info_ptr(*it)->object_id());
+        }
+        
+        
+    }
 }
 
 } // manager

@@ -50,8 +50,11 @@ protected:
 
 protected:
     typedef size_t  extern_id_t;
+    typedef std::unordered_map<extern_id_t, object_id_t> e2o_t;
+    typedef std::unordered_map<extern_id_t, object_id_t>::value_type e2o_value_t;
 
-    std::unordered_map<extern_id_t, object_id_t>                        e2o_;
+
+    e2o_t                                                               e2o_;
     std::deque<net_layer::msg::run>                                  buffer_;
     std::deque<bytes_t>                                            messages_;
     

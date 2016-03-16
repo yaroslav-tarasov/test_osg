@@ -149,12 +149,14 @@ void base_view_presentation::object_destroying(kernel::object_info_ptr object)
     on_object_destroying(object); 
 }
 
+
+FIXME("И таки да, это херь никогда не вызывается")
 void base_view_presentation::append_child( kernel::object_info_ptr object )
 {
     objects_.push_back(object);
     child_appended_signal_(object);
 }
-
+FIXME("И таки да, это херь никогда не вызывается")
 void base_view_presentation::remove_child( kernel::object_info_ptr object )
 {
     child_removing_signal_(object);

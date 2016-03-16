@@ -77,8 +77,10 @@ void model::on_child_removing(object_info_ptr child)
 {
     view::on_child_removing(child);
 
+#if 0
     if (nodes_manager_ == child)
         nodes_manager_.reset();
+#endif
 }
 
 
@@ -109,28 +111,32 @@ void model::update_model( double time, double dt )
 
     if (phys_ && phys_model_) // callback to phys pos
     {
-        const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
-        decart_position phys_pos = phys_model_->get_position();
-        geo_position glb_phys_pos(phys_pos, base);
-        auto const& settings = _spawner->settings();
+        manager::info_ptr spawner = _spawner.lock();
+        if(spawner)
+        {
+            const cg::geo_base_3& base = phys_->get_base(*phys_zone_);
+            decart_position phys_pos = phys_model_->get_position();
+            geo_position glb_phys_pos(phys_pos, base);
+            auto const& settings = spawner->settings();
 
-        double dist = cg::distance(glb_phys_pos.pos, desired_position_/*cur_pos*/);
+            double dist = cg::distance(glb_phys_pos.pos, desired_position_/*cur_pos*/);
 
-        //Soar Timeout - Limits how long a bird can soar
-        if(_soar && settings._soarMaxTime > 0){ 		
-            if(_soarTimer >settings._soarMaxTime){
-                flap();
-                _soarTimer = 0;
-            }else {
-                _soarTimer+=dt;
+            //Soar Timeout - Limits how long a bird can soar
+            if(_soar && settings._soarMaxTime > 0){ 		
+                if(_soarTimer >settings._soarMaxTime){
+                    flap();
+                    _soarTimer = 0;
+                }else {
+                    _soarTimer+=dt;
+                }
             }
-        }
 
-        if(!_landingSpotted && dist < settings._waypointDistance +_stuckCounter){
-            wander(0);	//create a new waypoint
-            _stuckCounter=0;
-        }else{
-            _stuckCounter += dt;
+            if(!_landingSpotted && dist < settings._waypointDistance +_stuckCounter){
+                wander(0);	//create a new waypoint
+                _stuckCounter=0;
+            }else{
+                _stuckCounter += dt;
+            }
         }
     }
 
@@ -228,71 +234,84 @@ void model::sync_nodes_manager( double /*dt*/ )
 
 void model::flap()
 {
-	auto const& settings = _spawner->settings();
-    if(flock_state_ != fl_flap)
-	{ 
-		
-	    root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
-       _dived = false;
-	   flock_state_ = fl_flap;
-	}
-    
-	desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+    manager::info_ptr spawner = _spawner.lock();
+    if(spawner)
+    {
+        auto const& settings = spawner->settings();
+        if(flock_state_ != fl_flap)
+        { 
 
+            root_->play_animation("flap", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., 0.0);
+            _dived = false;
+            flock_state_ = fl_flap;
+        }
+
+        desired_position_ = geo_base_3(spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+    }
 }
 
 void model::soar()
 {
-    auto const& settings = _spawner->settings();
-	if(flock_state_ != fl_soar)
-	{ 
-		auto const& settings = _spawner->settings();
-		root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
-		_soar = true;
+    manager::info_ptr spawner = _spawner.lock();
+    if(spawner)
+    {
+        auto const& settings = spawner->settings();
+	    if(flock_state_ != fl_soar)
+	    { 
+		    root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
+		    _soar = true;
 	
-		flock_state_ = fl_soar;
-	}
+		    flock_state_ = fl_soar;
+	    }
 
-    desired_position_ = geo_base_3(_spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+        desired_position_ = geo_base_3(spawner->pos())(rnd_.inside_unit_sphere () * settings._spawnSphere) ;
+    }
 }
 
 void model::dive()
 {
-    auto const& settings = _spawner->settings();
-	if(flock_state_ != fl_dive)
-	{ 	
-		auto const& settings = _spawner->settings();
-		root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
+    manager::info_ptr spawner = _spawner.lock();
+    if(spawner)
+    {
+        auto const& settings = spawner->settings();
+	    if(flock_state_ != fl_dive)
+	    { 	
+		    root_->play_animation("soar", 1.0 / rnd_.random_range(settings._minAnimationSpeed, settings._maxAnimationSpeed), -1., -1., /*1.5*/0.0);
 
-		_dived = true;
-		 flock_state_ = fl_dive;
-	}
+		    _dived = true;
+		     flock_state_ = fl_dive;
+	    }
 
-	cg::point_3 pos_us = rnd_.inside_unit_sphere () * settings._spawnSphere; 
-	pos_us.z = rnd_.random_range(-settings._spawnSphere *.5 , settings._spawnSphere *.5) - settings._diveValue; 
-    desired_position_ = geo_base_3(_spawner->pos())(pos_us) ;
+	    cg::point_3 pos_us = rnd_.inside_unit_sphere () * settings._spawnSphere; 
+	    pos_us.z = rnd_.random_range(-settings._spawnSphere *.5 , settings._spawnSphere *.5) - settings._diveValue; 
+        desired_position_ = geo_base_3(spawner->pos())(pos_us) ;
+    }
 }
 
 void model::wander(float delay)
 {
-	auto const& settings = _spawner->settings();
+    manager::info_ptr spawner = _spawner.lock();
+    if(spawner)
+    {
+        auto const& settings = spawner->settings();
 
-	// yield(WaitForSeconds(delay));
-	_damping = rnd_.random_range(settings._minDamping, settings._maxDamping);
-	_targetSpeed = rnd_.random_range(settings._minSpeed, settings._maxSpeed);
-	_lerpCounter = 0;
+	    // yield(WaitForSeconds(delay));
+	    _damping = rnd_.random_range(settings._minDamping, settings._maxDamping);
+	    _targetSpeed = rnd_.random_range(settings._minSpeed, settings._maxSpeed);
+	    _lerpCounter = 0;
 	
-	double r = rnd_.random_range(0.0, 1.0);
+	    double r = rnd_.random_range(0.0, 1.0);
 
-	if(/*!settings._soarAnimation.empty() &&*/!_flatFlyDown && !_dived && r < settings._soarFrequency){
-		soar();
-	}else if(!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._diveFrequency){	
-		dive();
-	}else{
-		if(!_landing){
-			flap();
-		}
-	}
+	    if(/*!settings._soarAnimation.empty() &&*/!_flatFlyDown && !_dived && r < settings._soarFrequency){
+		    soar();
+	    }else if(!_flatFlyDown && !_dived && rnd_.random_range(0.0, 1.0) < settings._diveFrequency){	
+		    dive();
+	    }else{
+		    if(!_landing){
+			    flap();
+		    }
+	    }
+    }
 }
 
 }

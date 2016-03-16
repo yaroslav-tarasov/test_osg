@@ -30,8 +30,8 @@ struct view
 protected:
     typedef size_t  object_id_t;
 
-    std::unordered_map<object_id_t, kernel::object_info_ptr>  objects_;
-	std::unordered_map<object_id_t, kernel::object_info_ptr>  airports_;
+    std::unordered_map<object_id_t, kernel::object_info_ptr>  regs_objects_;
+	std::unordered_map<object_id_t, kernel::object_info_ptr>      airports_;
 };
 
 } // end of objects_reg
