@@ -16,13 +16,13 @@ char vertexShaderSource[] =
     "attribute vec3 color ; \n"
     "out block  \n"
     "{          \n"
-    "    vec3 color;               \n"
+    "    vec4 color;               \n"
     "} v_out;                      \n"
     "\n"
     "void main(void) \n"
     "{ \n"
     "\n"
-    "    v_out.color = color; \n"
+	"    v_out.color = vec4(color, 1.0); \n"
     "    gl_Position =   gl_ModelViewProjectionMatrix *gl_Vertex;\n"
     "}\n";
 
@@ -43,8 +43,8 @@ char fragmentShaderSource[] =  {
 \n
 \n    void main()
 \n    {
-\n        // FragColor = f_in.color;
-\n        FragColor = vec4(1.0f, 0.0, 0.0, 1.0f);
+\n        FragColor = f_in.color;
+\n        //FragColor = vec4(1.0f, 0.0, 0.0, 1.0f);
 \n    }
 \n
     )                                                                                                             
@@ -512,8 +512,8 @@ void _private::_createArrays()
 {
 
     lcolor_ = new osg::Vec3Array();
-    _geom->setVertexAttribArray(3, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
-    _geom->setVertexAttribNormalize(3, false);
+    _geom->setVertexAttribArray(1, lcolor_.get(),osg::Array::BIND_PER_VERTEX);
+    _geom->setVertexAttribNormalize(1, false);
     
     indices_ = new osg::UIntArray();
     
