@@ -329,6 +329,12 @@ namespace avCore
     void InstancedAnimationManager::commitInstancePositions()
     {
         bool bcommit = false;
+        size_t inst_counter=0;
+
+        inst_nodes_.erase(std::remove_if(inst_nodes_.begin(), inst_nodes_.end(),
+                                        [](const InstancedNodesVectorType::value_type& v){return v.second && (v.second->getNumParents()==0);})
+                                        , inst_nodes_.end());
+
         for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
         {
             auto & nd = inst_nodes_[idx];
@@ -336,13 +342,9 @@ namespace avCore
 			if(!nd.second)
 			{
                 nd.second = findFirstNode(nd.first,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-                if(nd.second)
-                {  
-                    // inst_nodes_[idx].first->asTransform()->asPositionAttitudeTransform()->setScale(inst_data.getScale());
-                }
             }
 
-            if(nd.second)
+            if(nd.second && nd.second->getNumParents()>0)
 			{
 			  osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
               osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
@@ -355,32 +357,39 @@ namespace avCore
               float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
               memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
 			  bcommit = true;
+              inst_counter++;
 			}
             
         } 
 
-		if(bcommit)
+        if (inst_num_!=inst_counter)
+             bcommit = true;
+		
+        if(bcommit)
         {
             instTexture_->dirtyTextureObject();
-            auto & dl = instGeode_->getDrawableList();
+            auto & dl = instGeode_->getDrawableList(); 
+            instGeode_->setNodeMask(inst_counter>0?REFLECTION_MASK:0);
+
             for(auto it = dl.begin(); it!= dl.end() ; ++it)
             { 
                 (*it)->dirtyBound();
                         
-                if(inst_num_ != inst_nodes_.size())
+                //if(inst_counter != inst_nodes_.size())
+                if (inst_num_!=inst_counter)
                 {
                     auto geometry = (*it)->asGeometry();
                     // first turn on hardware instancing for every primitive set
                     for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
                     {
-                        geometry->getPrimitiveSet(i)->setNumInstances(inst_nodes_.size());
+                        geometry->getPrimitiveSet(i)->setNumInstances(inst_counter);
                     }
                 }
 
             }
         }
         
-        inst_num_ = inst_nodes_.size();
+        inst_num_ = inst_counter;
     }
  
 }

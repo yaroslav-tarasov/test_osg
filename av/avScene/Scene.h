@@ -5,6 +5,7 @@
 #include "application/panels_fwd.h"
 
 #include "av/avLights/LightMaps.h"
+#include "av/avCore/DecalRender.h"
 #include "av/ISky.h"
 #include "av/avFx/Fx.h"
 
@@ -157,6 +158,8 @@ namespace avScene {
         std::vector<osg::ref_ptr<osg::Node>>        _lamps;
         osg::ref_ptr<Lights>                        _lights;                                            
         ILightMapRendererPtr                        _light_map;
+
+        avCore::IDecalRendererPtr                   _decal_map;
 
         app::vis_settings_panel_ptr                 _vis_settings_panel;
         app::time_panel_ptr                         _time_panel;

@@ -88,6 +88,16 @@ void view::on_child_removing(object_info_ptr child)
         nodes_manager_.reset() ;
 }
 
+void view::on_object_destroying(object_info_ptr object)
+{
+    base_view_presentation::on_object_destroying(object) ;
+
+    if (object->object_id() == this->object_id())
+    {
+        remove_child(nodes_manager_);
+    }
+}
+
 }
 
 } // flock 

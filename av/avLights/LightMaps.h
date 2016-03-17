@@ -6,9 +6,6 @@ typedef osg::ref_ptr<osg::Texture2D> ITexturePtr;
 
 struct LightMapRenderer : osg::Group
 {
-    // set camera frustum and calculate all transformations
-    virtual void SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode ) = 0;
-
     // get matrix
     virtual cg::matrix_4f const & GetViewTextureMatrix() const = 0; 
     // get night mode

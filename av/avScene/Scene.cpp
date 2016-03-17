@@ -923,12 +923,24 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     createObjects();
 
-#if 1 
-
     _light_map = createLightMapRenderer(this);
     addChild( _light_map );
 
-#endif                                               
+#if 1
+    _decal_map = avCore::createDecalRenderer(this);
+    addChild( _decal_map );
+
+    std::vector<cg::point_2f> pnts;
+    pnts.emplace_back(cg::point_2f(0.f,0.f));
+    pnts.emplace_back(cg::point_2f(10.f, 10.f));
+    pnts.emplace_back(cg::point_2f(20.f, 30.f));
+    pnts.emplace_back(cg::point_2f(30.f, 40.f));
+    pnts.emplace_back(cg::point_2f(40.f, 50.f));
+    pnts.emplace_back(cg::point_2f(50.f, 60.f));
+
+
+    _decal_map->AddPolyline(pnts, cg::colorf(0.80f, 0.80f, 0.80f), 1.0f );
+#endif
 
     FIXME(140 shaders version needed);
 

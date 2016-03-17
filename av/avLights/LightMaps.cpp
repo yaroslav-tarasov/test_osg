@@ -15,6 +15,8 @@
 #endif
 #endif
 
+namespace {
+
 char vertexShaderSource[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
     "uniform mat4 mvp_matrix; \n"
@@ -91,6 +93,7 @@ char fragmentShaderSource[] =  {
     )                                                                                                             
 };
 
+}
 
 class CameraCullCallback : public osg::NodeCallback
 {
@@ -528,7 +531,6 @@ osg::Geometry * _private::_createGeometry()
     setCullingActive(false);
     setDataVariance(osg::Object::DYNAMIC);
 
-    // create tetrahedron around viewer (just to fill the whole volume)
     osg::Geometry * geom = new osg::Geometry;
     geom->setComputeBoundingBoxCallback(pDummyBBCompute);
     

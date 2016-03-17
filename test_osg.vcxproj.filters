@@ -171,14 +171,14 @@
     <Filter Include="Source Files\shaders\animation">
       <UniqueIdentifier>{1b9ccf73-92df-476c-9935-8bb7891de88f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\av\terrain">
-      <UniqueIdentifier>{dc97bf27-9180-43f9-bc0e-8bdd540d0da8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\av\sky\orig_ephemeris">
       <UniqueIdentifier>{5cc526fa-f273-4a1e-9202-a83765c19f1b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\bada">
       <UniqueIdentifier>{6c8fb2fe-5ba7-4980-8553-1c244511cc12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\terrain">
+      <UniqueIdentifier>{dc97bf27-9180-43f9-bc0e-8bdd540d0da8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1203,6 +1203,9 @@
     </ClCompile>
     <ClCompile Include="utils\LoadManager.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\DecalRender.cpp">
+      <Filter>Source Files\av\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

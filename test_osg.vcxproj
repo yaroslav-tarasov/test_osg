@@ -216,6 +216,7 @@
     <ClCompile Include="av\avAnimation\XFileParser.cpp" />
     <ClCompile Include="av\avCore\Database.cpp" />
     <ClCompile Include="av\avCore\DebugRenderer.cpp" />
+    <ClCompile Include="av\avCore\DecalRender.cpp" />
     <ClCompile Include="av\avCore\Environment.cpp" />
     <ClCompile Include="av\avCore\InstancedAnimationManager.cpp" />
     <ClCompile Include="av\avCore\LOD.cpp" />

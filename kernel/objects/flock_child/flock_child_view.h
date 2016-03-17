@@ -53,6 +53,7 @@ protected:
     // base_view_presentation
 protected:
     void on_child_removing   (object_info_ptr child)  override ;
+    void on_object_destroying( object_info_ptr object ) override;
 
     //info
 protected:

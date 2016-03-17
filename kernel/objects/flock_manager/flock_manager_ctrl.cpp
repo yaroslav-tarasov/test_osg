@@ -94,7 +94,7 @@ void ctrl::on_object_destroying(object_info_ptr object)
 			auto it = roamers_.begin();
 			uint32_t oid = object_info_ptr(*it)->object_id();
 			roamers_.erase(it);
-			//_obj_col->destroy_object(object_info_ptr(*it)->object_id());
+			_obj_col->destroy_object(oid);
 		}
      
         
