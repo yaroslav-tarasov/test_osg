@@ -134,11 +134,19 @@ private:
         texs_.detailsTex->setMaxAnisotropy(16.0f);
 
         texs_.decalTex = new osg::Texture2D;
-        texs_.decalTex->setTextureSize(1024, 1024);
-        texs_.decalTex->setInternalFormat( GL_RGBA );
-        texs_.decalTex->setBorderWidth( 0 );
-        texs_.decalTex->setFilter( osg::Texture::MIN_FILTER, osg::Texture::NEAREST );
-        texs_.decalTex->setFilter( osg::Texture::MAG_FILTER, osg::Texture::NEAREST );
+        texs_.decalTex->setTextureSize(1024,1024);
+        texs_.decalTex->setInternalFormat(/*GL_RGBA*//*GL_RGBA16F*/GL_RGBA8);
+        texs_.decalTex->setSourceFormat(GL_RGBA);
+        texs_.decalTex->setSourceType(GL_UNSIGNED_BYTE);
+        texs_.decalTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+        texs_.decalTex->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+        texs_.decalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+        texs_.decalTex->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+        texs_.decalTex->setBorderColor(osg::Vec4d(0,0,0,0));
+        //texs_.decalTex->setBorderWidth( 0 );
+        texs_.decalTex->setUseHardwareMipMapGeneration(true);
+        texs_.decalTex->setNumMipmapLevels(5);
+        texs_.detailsTex->setMaxAnisotropy(16.0f);
 
         // create and setup the texture object
         texs_.envTex = new osg::TextureCubeMap;

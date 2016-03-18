@@ -120,16 +120,16 @@ protected:
         // attach the texture and use it as the color buffer.
         attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, true, 0, 0);
 
-        osg::StateSet * pSS = /*_camera->*/getOrCreateStateSet();
-        pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
+        osg::StateSet * pSS = getOrCreateStateSet();
+        pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         pSS->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         pSS->setMode(GL_DEPTH_CLAMP_NV, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         pSS->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);
         
         FIXME( invalid operation after BlendEquation)
-        osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::ALPHA_MAX);
-        //pSS->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-        pSS->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE,osg::BlendFunc::ONE, osg::BlendFunc::ONE), osg::StateAttribute::ON);
+        osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::FUNC_ADD);
+        pSS->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+        pSS->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE,osg::BlendFunc::ZERO, osg::BlendFunc::ONE, osg::BlendFunc::ZERO), osg::StateAttribute::ON);
 
         pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
@@ -147,7 +147,6 @@ protected:
 class _private : public DecalRenderer
 {
  
-    friend struct DecalCullCallback;
     friend IDecalRendererPtr createDecalRenderer(osg::Group * sceneRoot);
 
 public: // IDecalRenderer
@@ -199,8 +198,6 @@ protected:
     cg::matrix_4f                        proj_matr_;
     cg::matrix_4f                        tex_matr_;
 
-    cg::frustum_clipper                  lightmap_clipper_;
-
     ITexturePtr                          color_buf_;
     unsigned                             _tex_dim;
     
@@ -228,57 +225,6 @@ IDecalRendererPtr createDecalRenderer(osg::Group * sceneRoot)
 {
     return new _private(sceneRoot);
 }
-
-
-struct DecalCullCallback : public osg::NodeCallback
-{
-    DecalCullCallback(_private * p)
-        : p_(p)
-    {
-
-    }
-
-    virtual void operator()( osg::Node * pNode, osg::NodeVisitor * pNV )
-    {
-
-        osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
-        osg::Group * pNodeAsGroup = static_cast<osg::Group *>(pNode);
-        avAssert(pCV && pNodeAsGroup);
-
-        const  osg::Camera* cam = avScene::GetScene()->getCamera();
-
-        double  m_fLeft(-1.0f)
-            , m_fRight(+1.0f)
-            , m_fBottom(-1.0f)
-            , m_fTop(+1.0f)
-            , m_fNear(1.0f)
-            , m_fFar(1000.0f);
-
-        cam->getProjectionMatrixAsFrustum(m_fLeft, m_fRight, m_fBottom, m_fTop, m_fNear, m_fFar);
-
-        osg::Vec3f eye, center, up;
-        cam->getViewMatrixAsLookAt(eye, center, up);
-
-        const cg::point_3f  vPosition(from_osg_vector3(pCV->getViewPoint()));
-        auto dir = cg::polar_point_3f(from_osg_vector3(center - eye));
-        const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
-
-        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
-        frustum_.camera() = cg::camera_f(vPosition, rOrientation);
-
-        p_->SetupProjection(frustum_, cg::range_2f(500.f, 2250.f));
-
-        p_->cull( pCV );
-        p_->UpdateTextureMatrix(true);
-
-        // go down
-        pNV->traverse(*pNode);
-    }
-private:
-
-    _private*           p_;
-
-};
 
 void _private::SetVisible( bool vis )
 {
@@ -373,7 +319,7 @@ void _private::traverse(osg::NodeVisitor& nv)
     
     const avCore::Environment::IlluminationParameters & cIlluminationParameters = avCore::GetEnvironment()->GetIlluminationParameters();
     FIXME(Дистанция хардкод)
-    SetupProjection(frustum_, cg::range_2f(500.f, 2250.f));
+    SetupProjection(frustum_, cg::range_2f(500.f, 2250.f));  // cg::range_2f(500.f, 2250.f)
 
     cull( cv );
     
@@ -422,7 +368,6 @@ osg::Geometry * _private::_createGeometry()
 _private::_private(osg::Group * sceneRoot)
     : tex_dim_(0)
     , we_see_smth_(false)
-    , lightmap_clipper_(cg::matrix_4f())
     , _NeedToUpdateFBO(false)
 {
 
@@ -492,8 +437,6 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, cg::range_2f
     // ok, we see smth
     we_see_smth_ = true;
     proj_matr_ = (*clpt_mat_).second * (*clpt_mat_).first;
-    // frustum
-    lightmap_clipper_ = cg::frustum_clipper(proj_matr_);
     // texture matrix
     tex_matr_ = cg::xyzw_to_strq_remap_matrix(1.0f, 1.0f) * (proj_matr_ * mv_.inverse_matrix());
 }

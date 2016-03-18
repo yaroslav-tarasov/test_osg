@@ -131,7 +131,7 @@ namespace avScene {
     
     private:
         void                                        update( osg::NodeVisitor * nv );
-
+        void                                        setupDecals();
 	private:
         static osg::ref_ptr<Scene>                  _scenePtr;
 

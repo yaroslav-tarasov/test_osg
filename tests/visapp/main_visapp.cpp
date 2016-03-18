@@ -105,9 +105,8 @@ struct net_worker
      
      ~net_worker()
      {
-         //  delete  ses_;
-         //_workerService->post(boost::bind(&boost::asio::io_service::stop, _workerService));
          worker_thread_.join();
+         delete  ses_;
      }
 
      boost::asio::io_service* GetService()
@@ -157,9 +156,13 @@ private:
 		 boost::system::error_code ec;
          size_t ret = worker_service_->run(ec);
 
+
          acc_.reset();
          mod_acc_.reset();
+         calc_timer_.reset();
          sockets_.clear();
+
+         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
      }
 
      uint32_t next_id()
@@ -233,11 +236,11 @@ private:
          LogInfo("Client " << sock_id << " disconnected with error: " << ec.message() );
          sockets_.erase(sock_id);
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
-         // delete  ses_;
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+#if 0
          delete  ses_;
          __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
-         // _workerThread.join();
+#endif
      }
 
      void on_error(boost::system::error_code const& ec, uint32_t sock_id)

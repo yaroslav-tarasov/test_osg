@@ -1983,7 +1983,6 @@ $if 0
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
 \n
-\n
 \n				  vec4 bump = texture2D(normalTex, f_in.texcoord).xyzw;
 \n 
 \n                rainy_value *= step (0.5, bump.w ) * bump.w;
@@ -1996,8 +1995,6 @@ $if 0
 \n                // APPLY_DECAL(f_in, dif_tex_col);
 \n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
 \n                dif_tex_col.rgb = fma(dif_tex_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);     
-\n                
-\n
 \n
 \n                // get dist to point and normalized to-eye vector
 \n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);

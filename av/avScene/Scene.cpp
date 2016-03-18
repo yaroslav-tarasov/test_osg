@@ -930,15 +930,8 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _decal_map = avCore::createDecalRenderer(this);
     addChild( _decal_map );
 
-    std::vector<cg::point_2f> pnts;
-    pnts.emplace_back(cg::point_2f(0.f,0.f));
-    pnts.emplace_back(cg::point_2f(0.f, 10.f));
-    pnts.emplace_back(cg::point_2f(5.f, 10.f));
-    pnts.emplace_back(cg::point_2f(10.f, 10.f));
-	pnts.emplace_back(cg::point_2f(0.f, 10.f));
-	pnts.emplace_back(cg::point_2f(-5.f, 10.f));   
+    setupDecals();
 
-    _decal_map->AddPolyline(pnts, cg::colorf(0.80f, 0.80f, 0.80f), 0.5f );
 #endif
 
     FIXME(140 shaders version needed);
@@ -2038,5 +2031,37 @@ void Scene::update( osg::NodeVisitor * nv )
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
 	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
 	  
+}
+
+void Scene::setupDecals() 
+{
+    std::vector<cg::point_2f> pnts;
+    pnts.emplace_back(cg::point_2f(0.f,0.f));
+    pnts.emplace_back(cg::point_2f(0.f, 10.f));
+    pnts.emplace_back(cg::point_2f(5.f, 10.f));
+    pnts.emplace_back(cg::point_2f(10.f, 10.f));
+    pnts.emplace_back(cg::point_2f(0.f, 10.f));
+    pnts.emplace_back(cg::point_2f(-5.f, 10.f));   
+    
+    
+    std::array<cg::transform_3f,10> trs;
+    trs[0] = cg::as_translation(cg::point_2f(100,100));
+    trs[1] = cg::as_translation(cg::point_2f(150,150));
+    trs[2] = cg::as_translation(cg::point_2f(200,300));
+    trs[3] = cg::as_translation(cg::point_2f(210,150));
+    trs[4] = cg::as_translation(cg::point_2f(50,60));
+    trs[5] = cg::as_translation(cg::point_2f(0,0));
+    trs[6] = cg::as_translation(cg::point_2f(20,0));
+    trs[7] = cg::as_translation(cg::point_2f(40,0));
+    trs[8] = cg::as_translation(cg::point_2f(0,40));
+    trs[9] = cg::as_translation(cg::point_2f(0,80));
+
+    std::array< std::vector<cg::point_2f>,10> pnts_array;
+    for (int i = 0;i < pnts_array.size(); ++i )
+    {
+        pnts_array[i].resize(pnts.size());
+        std::transform(pnts.begin(), pnts.end(), pnts_array[i].begin(), [=]( const cg::point_2f & val)->cg::point_2f { return val  * trs[i];});
+        _decal_map->AddPolyline(pnts_array[i], cg::colorf(0.80f, 0.80f, 0.80f), 0.5f );
+    }
 
 }
