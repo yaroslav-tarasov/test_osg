@@ -108,7 +108,6 @@ namespace avCore
         LoadManager::Task* cur_task = nullptr;
         while ( (cur_task = finished_.try_pop()) != nullptr )
         {
-            cur_task->_node = cur_task->_worker();
             if(cur_task->_node.valid())
             {
                 high_res_timer hr_timer;

@@ -20,7 +20,7 @@ AUTO_REG_NAME(flock_child_view, view::create);
 view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
-    , _spawner              (find_first_object<manager::info_ptr>(collection_))
+    , _spawner              (find_object<manager::info_ptr>(collection_, manager_id()))
     , _init                 (false)
 {
 
@@ -34,7 +34,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1));
 }
 
-geo_point_3 view::pos() const
+geo_point_3 const& view::pos() const
 {
     return state_.pos;
 }
@@ -42,6 +42,12 @@ geo_point_3 view::pos() const
 std::string const& view::name() const
 {
     return settings_.model;
+}
+
+
+uint32_t  view::manager_id() const
+{
+	return parent_id;
 }
 
 settings_t const& view::settings() const
@@ -75,7 +81,7 @@ void view::update(double time)
 {
     if (!_init)
     {
-        _spawner = find_first_object<manager::info_ptr>(collection_);
+        _spawner = find_object<manager::info_ptr>(collection_, parent_id);
         _init = _spawner.expired();
     }
 }

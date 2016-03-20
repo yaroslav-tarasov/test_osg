@@ -259,10 +259,12 @@ struct client
 
         ADD_EVENT(time , state(0.0,time,factor))
 
+#if 1
         ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
         ADD_EVENT(25.0 , destroy_msg(333)) 
+#endif
         
-#if 0
+#if 1
         environment::weather_t  weather; 
         weather.fog_density  = 0.2f; 
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
@@ -346,7 +348,7 @@ struct client
 #if 0
         ADD_EVENT(89.0 , state(0.0,89.,0.0))
 #endif
-        ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
+
         
 #if 1
         ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50") )
@@ -361,14 +363,17 @@ struct client
         ADD_EVENT(19.0  , create(161,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50") )
 #endif
 
-        ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-        ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-        ADD_EVENT(60.0  , engine_state_msg(150 , ES_STOPPED) )
-
-        ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-        ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-        ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
 #endif
+        
+		ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
+
+		ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+		ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+		ADD_EVENT(60.0  , engine_state_msg(150 , ES_STOPPED) )
+
+		ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+		ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+		ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(

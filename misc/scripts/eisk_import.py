@@ -1,8 +1,15 @@
 import maya.cmds as cmds
+import ntpath
 
-main_path = "C:\\Vis\\Eisk_4\\"
+main_dir = "C:\\Vis\\Eisk_4\\"
 
-inputfile = open(main_path +'eisk.scn')
+xxx_logic = [ ("kaponir", -90), ("eisk", 180), ("tramplin",180) ]
+
+basicFilter = "*.scn"
+path = cmds.fileDialog2(fileFilter=basicFilter, dialogStyle=2)
+
+main_dir = ntpath.dirname(path[0])
+inputfile = open(path[0])
 
 lands_counter = 0
 light_masts   = 0
@@ -24,25 +31,33 @@ for line in inputfile:
     if tokens[0]=="LCustom:" :
             filename = land_line[1].split('.')
             # Грузим только obj
-            print main_path + "Land\\" + land_line[1]
-            if lands_counter>0: 
+            print main_dir + "\\Land\\" + land_line[1]
+            if lands_counter>0:
+                 xxx = list(filter(lambda x: x[0] in land_line[1], xxx_logic))
+                 course = 180
+                 if xxx != [] :
+                     course = xxx[0][1]
+                     print course
                  idx = files_loaded.count(filename[0]) 
                  obj_name = filename[0] + idx.__str__()
-                 cmds.file(main_path + "Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
+                 cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
                  cmds.setAttr( obj_name + '.rotatePivot', 0, 0, 0, type="double3")
                  cmds.setAttr( obj_name + '.scalePivot', 0, 0, 0, type="double3")
-                 cmds.setAttr( obj_name + '.rotate', 90, 0, -180, type="double3")
+                 cmds.setAttr( obj_name + '.rotate', 90, 0, course, type="double3")
                  cmds.makeIdentity( obj_name , apply=True, translate=True, rotate=True, scale=True, n=0)
                  cmds.setAttr( obj_name + '.translate', float(tokens[2]) , float(tokens[3]), 0, type="double3")
-                 cmds.setAttr( obj_name + '.rotate', 0, 0, float(tokens[1]), type="double3")
+                 cmds.setAttr( obj_name + '.rotate', 0, 0, -float(tokens[1]), type="double3")
                  
                  files_loaded.append(filename[0])
             else:
                  files_loaded.append(filename[0])
-                 cmds.file(main_path + "Land\\" + filename[0] + ".obj",o=True,f=True,typ="OBJ")  
+                 cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj",o=True,f=True,typ="OBJ")  
                  cmds.selectType( q=True, cv=True )
                  nodes = cmds.ls( geometry=True )
                  cmds.group( nodes, n='root')
+                 cmds.setAttr('root.rotatePivot', 0, 0, 0, type="double3")
+                 cmds.setAttr('root.scalePivot', 0, 0, 0, type="double3")
+                 cmds.setAttr('root.rotate', 90, 0, 180 - float(tokens[1]), type="double3")
                  cmds.makeIdentity( 'root' , apply=True, translate=True, rotate=True, scale=True, n=0)
             lands_counter+=1
     if tokens[0]=="SpotLight:" :
@@ -70,6 +85,4 @@ cmds.viewClipPlane( 'perspShape', acp=True, fcp=100000.0 )
 #cmds.group( nodes, n='root')
 
 
-cmds.setAttr('root.rotatePivot', 0, 0, 0, type="double3")
-cmds.setAttr('root.scalePivot', 0, 0, 0, type="double3")
-cmds.setAttr('root.rotate', 90, 0, 187, type="double3")
+

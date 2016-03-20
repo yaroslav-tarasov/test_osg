@@ -17,12 +17,12 @@ using namespace kernel;
 
 namespace child 
 {
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(fake_objects_factory* sys, uint32_t   parent_id, const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "flock_child";
         const std::string unique_name = sys->generate_unique_name(class_name);
 
-        obj_create_data ocd(class_name, unique_name, dict::wrap(child_data(sett, state_t(init_pos.pos, init_pos.orien))));
+        obj_create_data ocd(class_name, unique_name, dict::wrap(child_data(sett, state_t(init_pos.pos, init_pos.orien), parent_id)));
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
 
@@ -75,7 +75,7 @@ void ctrl::update( double time )
 			child_pos.orien = state_.orien;
 			geo_position vgp(child_pos, get_base());
 
-			/*roamers_.insert(*/child::create(of,vs,vgp)/*)*/;
+			/*roamers_.insert(*/child::create(of, this->object_id(),vs,vgp)/*)*/;
 
 		}
 	}

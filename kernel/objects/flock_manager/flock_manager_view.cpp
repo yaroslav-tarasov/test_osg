@@ -35,7 +35,8 @@ void view::on_object_created(object_info_ptr object)
 
     if (auto air = child::info_ptr(object))
     {
-        roamers_.insert(air);
+		if(air->manager_id() == object_id())
+			roamers_.insert(air);
     }
 }
 
@@ -45,7 +46,8 @@ void view::on_object_destroying(object_info_ptr object)
 
     if (child::info_ptr air = child::info_ptr(object))
     {
-        roamers_.erase(air);
+      	if(air->manager_id() == object_id())
+			roamers_.erase(air);
     }
 }
 

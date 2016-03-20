@@ -16,9 +16,9 @@ class CacheNodesVisitor : public osg::NodeVisitor
             bool ret = searchNode.getUserValue("dae_node_id", value);
             
             if ( ret && value != searchNode.getName())
-                cache_.insert(std::make_pair(value,&searchNode));
+                cache_.insert(std::make_pair(std::move(boost::to_lower_copy(value)),&searchNode));
             else
-               cache_.insert(std::make_pair(searchNode.getName(),&searchNode));
+               cache_.insert(std::make_pair(std::move(boost::to_lower_copy(searchNode.getName())),&searchNode));
 
             traverse(searchNode);    
         } 

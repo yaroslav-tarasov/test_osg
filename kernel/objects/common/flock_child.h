@@ -13,8 +13,9 @@ namespace flock
     {
         virtual ~info() {}
 
-        virtual geo_point_3 pos() const = 0;
-        virtual std::string const& name() const = 0;
+        virtual geo_point_3 const& pos()        const = 0;
+        virtual std::string const& name()       const = 0;
+		virtual uint32_t           manager_id()  const = 0;
     };
 
     struct vis_info

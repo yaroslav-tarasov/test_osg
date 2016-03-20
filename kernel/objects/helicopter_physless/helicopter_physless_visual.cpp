@@ -112,6 +112,8 @@ namespace helicopter_physless
                 ms_ = boost::make_shared<visual_objects::morphs_support>();
                 std::for_each(nl.begin(),nl.end(),[&](osg::Node* node ){ms_->add(node);});
             }
+			
+			fill_nodes();
 
             deffered_init_ = false;
         }

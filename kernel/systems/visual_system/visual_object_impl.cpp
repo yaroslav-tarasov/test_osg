@@ -17,7 +17,7 @@ namespace kernel
             , anim_manager_ (nullptr) 
         {}
 
-        CacheNodesVisitor::CacheMapType            cache;
+        CacheNodesVisitor::CacheMapType                          cache_;
         osg::observer_ptr<avScene::Scene>                        scene_;
         osg::ref_ptr<osg::Node>                                   node_;
         osg::ref_ptr<osg::Node>                                   root_;
@@ -121,7 +121,7 @@ namespace kernel
 			   p_->node_->setUpdateCallback(finder._am.get());
            }
 
-           CacheNodesVisitor cnv(p_->cache);
+           CacheNodesVisitor cnv(p_->cache_);
            node()->accept(cnv);
 #if 0
 		   SetupRigGeometry switcher(true, *p_->node_.get());
@@ -145,7 +145,7 @@ namespace kernel
     osg::Node* visual_object_impl::get_node(const std::string& name) const 
     {
           CacheNodesVisitor::CacheMapType::iterator it;
-          if( (it = p_->cache.find(name)) != p_->cache.end())
+          if( (it = p_->cache_.find(name)) != p_->cache_.end())
             return it->second.get();
           else
             return nullptr;

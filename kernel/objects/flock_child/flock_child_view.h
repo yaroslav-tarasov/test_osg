@@ -7,6 +7,19 @@
 #include "common/flock_manager.h"
 #include "common/stdrandgen.h"
 
+namespace kernel
+{
+	template<class T>
+	T find_object(object_collection const* collection, uint32_t id)
+	{
+		for (auto it = collection->root_objects().begin(); it != collection->root_objects().end(); ++it)
+			if (it->second->object_id() == id)
+				if (T ptr = it->second)
+					return ptr;
+
+		return T();
+	}
+}
 
 namespace flock
 {
@@ -20,19 +33,22 @@ struct child_data
     {
     }
 
-    child_data(settings_t const& settings, state_t const& state)
+    child_data(settings_t const& settings, state_t const& state, uint32_t   parent_id)
         : settings_(settings)
         , state_   (state  )
+		, parent_id(parent_id)
     {
     }
 
 protected:
     settings_t settings_;
     state_t    state_;
+	uint32_t   parent_id;
 
     REFL_INNER(child_data)
         REFL_ENTRY(settings_)
         REFL_ENTRY(state_)
+		REFL_ENTRY(parent_id)
     REFL_END()
 };
 
@@ -57,8 +73,9 @@ protected:
 
     //info
 protected:
-    geo_point_3        pos () const;
+    geo_point_3 const& pos () const;
     std::string const& name() const;
+	uint32_t           manager_id()  const;
 
 protected:
     settings_t const& settings() const;
