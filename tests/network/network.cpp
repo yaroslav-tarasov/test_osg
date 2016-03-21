@@ -260,18 +260,20 @@ struct client
         ADD_EVENT(time , state(0.0,time,factor))
 
 #if 1
-        ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "")) 
         ADD_EVENT(25.0 , destroy_msg(333)) 
 #endif
         
-#if 1
+
         environment::weather_t  weather; 
         weather.fog_density  = 0.2f; 
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
         weather.wind_dir     = cg::point_2f(2.0, 4.0);
 
         ADD_EVENT(2.0, environment_msg(weather))
-        
+
+#if 0
+
         weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
         weather.wind_dir    = cg::point_2f(1.0,0.0);
@@ -322,17 +324,19 @@ struct client
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
         ADD_EVENT(90.0, environment_msg(weather))
 #if 1
-        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319") )
+        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
         ADD_EVENT(70.0, fire_fight_msg_t(2))
 #endif       
 
 #if 1
-        ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka")) // "niva_chevrolet"
-        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
+        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","")) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 
-        ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow")) 
+        ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "")) 
 		ADD_EVENT(52.0 , destroy_msg(3)) 
+
+        ADD_EVENT(80.0 , destroy_msg(4)) 
 #endif
 
 #if 0
@@ -349,23 +353,36 @@ struct client
         ADD_EVENT(89.0 , state(0.0,89.,0.0))
 #endif
 
-        
-#if 1
-        ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(11.0  , create(153,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(12.0  , create(154,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(13.0  , create(155,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(14.0  , create(156,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(15.0  , create(157,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(16.0  , create(158,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(17.0  , create(159,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(18.0  , create(160,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50") )
-        ADD_EVENT(19.0  , create(161,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50") )
-#endif
 
 #endif
-        
-		ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27") )
+
+#if 1
+        ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50", "151") )
+        ADD_EVENT(11.0  , create(152,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50", "152") )
+#if 0
+        ADD_EVENT(12.0  , create(153,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50", "153") )
+        ADD_EVENT(13.0  , create(154,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50", "154") )
+        ADD_EVENT(14.0  , create(155,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50", "155") )
+        ADD_EVENT(15.0  , create(156,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50", "156") )
+        ADD_EVENT(16.0  , create(157,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50", "157") )
+        ADD_EVENT(17.0  , create(158,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50", "158") )
+        ADD_EVENT(18.0  , create(159,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50", "159") )
+        ADD_EVENT(19.0  , create(160,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50", "160") )
+#endif
+
+        for (int i=0;i<2;i++)
+        {
+            ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
+                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+        }
+
+#endif
+
+
+
+#if 0
+		ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27", "150") )
 
 		ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
 		ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
@@ -374,6 +391,7 @@ struct client
 		ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
 		ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
 		ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
+#endif
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(

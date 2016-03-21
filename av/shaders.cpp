@@ -972,7 +972,7 @@ $endif
 \n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 \n
 \n               v_out.tangent   = tangent;
-\n               v_out.binormal  = /*binormal*/cross(normal,tangent);
+\n               v_out.binormal  = binormal;//cross(normal,tangent);
 \n               v_out.normal    = normal;
 \n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
 \n               v_out.viewpos   = viewpos.xyz;
@@ -1041,7 +1041,7 @@ $endif
 \n               //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
 \n               //bump = normalize(bump * 2.0 - 1.0);
 \n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
-\n               vec4  dif_tex_col  = dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
+\n               vec4  dif_tex_col  = vec4(0.50, 0.50, 0.5, 1.0); // dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
 \n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
 \n
 \n               // float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);
@@ -1102,6 +1102,7 @@ $endif
 \n
 \n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n			     // aFragColor = vec4(1.0,0.0,0.0,1.0);
+\n               // aFragColor = vec4(bump,1.0);    
 \n           }
        )
 

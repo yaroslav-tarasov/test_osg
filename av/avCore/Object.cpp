@@ -344,18 +344,23 @@ Object* createObject(std::string name, bool fclone)
                     findNodeByType< osg::Geode> geode_target_finder;  
                     geode_target_finder.apply(*target);
                     osg::Geode*    geode_target = dynamic_cast<osg::Geode*>(geode_target_finder.getLast()); 
-
-                    osg::Geometry* geo_mesh_source = geode_source->getDrawable(0)->asGeometry();
-                    osg::Geometry* geo_mesh_target = geode_target->getDrawable(0)->asGeometry();
-
-                    osg::ref_ptr<osgAnimation::MorphGeometry> morph =
-                        new osgAnimation::MorphGeometry( *geo_mesh_source );
-
-                    morph->addMorphTarget( geo_mesh_target, 0.0);    
-                    morph->setName("rotor_morph");
                     
                     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-                    geode->addDrawable( morph.get() );
+                    
+                    for(int i =0 ; i<  geode_source->getNumDrawables(); ++i)
+                    {
+                        osg::Geometry* geo_mesh_source = geode_source->getDrawable(i)->asGeometry();
+                        osg::Geometry* geo_mesh_target = geode_target->getDrawable(i)->asGeometry();
+
+                        osg::ref_ptr<osgAnimation::MorphGeometry> morph =
+                            new osgAnimation::MorphGeometry( *geo_mesh_source );
+
+                        morph->addMorphTarget( geo_mesh_target, 0.0);    
+                        morph->setName("rotor_morph");
+                        geode->addDrawable( morph.get() );
+                    }
+
+
                     geode->setUpdateCallback( new osgAnimation::UpdateMorph("MorphCallback") );
                     geode->setName("rotor_morph");
 
@@ -489,7 +494,6 @@ Object* createObject(std::string name, bool fclone)
         nl.push_back("rotor"); 
 
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
-        //if(!(data && data->hw_instanced))
             pat->accept(mv);
         
         pat->setName("pat");

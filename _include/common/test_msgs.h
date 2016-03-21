@@ -154,12 +154,13 @@ namespace net_layer
             {
             }
 
-            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name)
+            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name, const std::string& custom_label)
                 : ext_id      (id)
                 , pos (pos)
                 , orien (orien)
                 , object_kind (ok)
 				, model_name (model_name)
+                , custom_label (custom_label)
             {
             }
 
