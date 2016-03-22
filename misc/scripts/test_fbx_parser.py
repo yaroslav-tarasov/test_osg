@@ -9,15 +9,15 @@ except ImportError:
     Set = set
     
 osg_dir = os.getenv('OSG_DIR','NOT_SET')
-filepath = osg_dir + r'\OpenSceneGraph-3.2.1\build\bin\data\models\human\elf.fbx'
+filepath = osg_dir + r'\OpenSceneGraph-3.2.1\build\bin\ka_50_lp\ka_50.fbx'
 
 manager = fbx.FbxManager.Create()
 importer = fbx.FbxImporter.Create( manager, 'myImporter' )
 status = importer.Initialize( filepath )
 
 if status == False :
-    #print 'FbxImporter initialization failed.'
-    #print 'Error: %s' % importer.GetLastErrorString()
+    print ('FbxImporter initialization failed.')
+    #print ('Error: %s' % importer.GetLastErrorString())
     sys.exit()
 
 scene = fbx.FbxScene.Create( manager, 'myScene' )
