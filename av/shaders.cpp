@@ -616,7 +616,7 @@ $endif
 \n            vec3 light_res;  
 \n                  
 \n            // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
-\n          // vec3 lightmap_color = light_res ; 
+\n            // vec3 lightmap_color = light_res ; 
 \n
 \n            GET_LIGHTMAP(f_in.viewpos, f_in);
 \n
@@ -630,7 +630,6 @@ $endif
 \n            vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
 \n            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0); // vec4(1.0,0.0,0.0,1.0); //
-            
         }
     )
 
@@ -1041,7 +1040,7 @@ $endif
 \n               //vec3 bump = texture2D(normalTex, f_in.texcoord).xyz;
 \n               //bump = normalize(bump * 2.0 - 1.0);
 \n               vec3  normal       = normalize(bump.x * f_in.tangent + bump.y * f_in.binormal + bump.z * f_in.normal);
-\n               vec4  dif_tex_col  = vec4(0.50, 0.50, 0.5, 1.0); // dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
+\n               vec4  dif_tex_col  = dCol; // texture2D(colorTex,f_in.texcoord, -1.0);
 \n               float glass_factor = 1.0 - dif_tex_col.a /*0*/;
 \n
 \n               // float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.02);

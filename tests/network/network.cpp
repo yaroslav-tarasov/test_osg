@@ -370,6 +370,11 @@ struct client
         ADD_EVENT(19.0  , create(160,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50", "160") )
 #endif
 
+#if 1
+        ADD_EVENT(12.0  , create(171,point_3(30,200,5),cg::cpr(0), ok_helicopter, "L39", "171") )
+        ADD_EVENT(13.0  , create(172,point_3(40,180,5),cg::cpr(0), ok_helicopter, "L39", "172") )
+        ADD_EVENT(14.0  , create(173,point_3(50,160,5),cg::cpr(0), ok_helicopter, "L39", "173") )
+#endif
         for (int i=0;i<2;i++)
         {
             ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
