@@ -47,7 +47,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     , _obj_col(dynamic_cast<kernel::object_collection*>(oc.sys))
 {
 
-	settings_._childAmount = 7 * 7;
+	// settings_._childAmount = 7 * 7;
 }
 
 void ctrl::update( double time )

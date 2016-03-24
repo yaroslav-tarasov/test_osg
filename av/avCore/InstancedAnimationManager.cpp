@@ -367,7 +367,9 @@ namespace avCore
 		
         if(bcommit)
         {
-            instTexture_->dirtyTextureObject();
+            //instTexture_->dirtyTextureObject();
+            instTexture_->getImage(0)->dirty();
+
             auto & dl = instGeode_->getDrawableList(); 
             instGeode_->setNodeMask(inst_counter>0?REFLECTION_MASK:0);
 

@@ -150,17 +150,19 @@ namespace net_layer
             create()
                 : ext_id (0)
                 , pos (pos)
-                , orien (orien) 
+                , orien (orien)
+                , num_instances (1)
             {
             }
 
-            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name, const std::string& custom_label)
+            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name, const std::string& custom_label, uint16_t  num_instances = 1)
                 : ext_id      (id)
                 , pos (pos)
                 , orien (orien)
                 , object_kind (ok)
 				, model_name (model_name)
                 , custom_label (custom_label)
+                , num_instances (num_instances)
             {
             }
 
@@ -170,6 +172,7 @@ namespace net_layer
             object_kind_t       object_kind;
 			std::string         model_name;
             std::string         custom_label;
+            uint16_t            num_instances;
         };
 
         REFL_STRUCT(create)
@@ -179,6 +182,7 @@ namespace net_layer
 			REFL_ENTRY( object_kind )
             REFL_ENTRY( model_name  )
             REFL_ENTRY( custom_label  )
+            REFL_ENTRY( num_instances )
         REFL_END()
 
 		typedef gen_msg<id_destroy, uint32_t> destroy_msg;

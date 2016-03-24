@@ -413,7 +413,8 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const&
     geo_position vgp(target_pos, get_base());
     
     flock::manager::settings_t vs;
-    vs.model = "crow";
+    vs.model        = "crow";
+    vs._childAmount = msg.num_instances;
 
     return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,vgp);
 }

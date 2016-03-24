@@ -1974,22 +1974,26 @@ void Scene::setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center)
 void Scene::update( osg::NodeVisitor * nv )
 {
       const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
-	  const double lt = nv->getFrameStamp()->getSimulationTime();
+	  double lt = nv->getFrameStamp()->getSimulationTime();
+      
+      if(_time_panel)
+      {
+          _time_panel->set_time(lt * 1000.f);
+      }
+
+      lt *= 500;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
       bool bsetup =  (vTime.Second != unsigned(lt) % 60) || (vTime.Minute != unsigned(lt / 60.0)  % 60); 
       
-      vTime.Hour   = 10 + unsigned(lt / 3600.0)  % 24;
+      vTime.Hour   = 4 + unsigned(lt / 3600.0)  % 24;
       vTime.Minute = unsigned(lt / 60.0)  % 60;
       vTime.Second = unsigned(lt) % 60;
 
       if(bsetup)
         _ephemerisNode->setTime();
 
-	  if(_time_panel)
-      {
-          _time_panel->set_time(lt * 1000.f);
-      }
+
 
 	  if (smoke_sfx_weak_ptr_)
 	  {
