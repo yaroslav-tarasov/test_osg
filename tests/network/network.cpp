@@ -274,7 +274,7 @@ struct client
 
         ADD_EVENT(2.0, environment_msg(weather))
 
-#if 0
+#if 1
 
         weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
@@ -332,14 +332,13 @@ struct client
 
 #if 1
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
-        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
 
+#if 0
+        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
-#if 0
 		ADD_EVENT(52.0 , destroy_msg(3)) 
-
         ADD_EVENT(80.0 , destroy_msg(4)) 
 #endif
 
@@ -363,10 +362,10 @@ struct client
 #endif
 
 #if 1
-        ADD_EVENT(10.0  , create(151,point_3(10,250,20),cg::cpr(0), ok_helicopter, "KA50", "151") )
-        ADD_EVENT(11.0  , create(152,point_3(20,220,20),cg::cpr(0), ok_helicopter, "KA50", "152") )
+        ADD_EVENT(10.0  , create(151,point_3(-403,165,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
+        ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
 #if 0
-        ADD_EVENT(12.0  , create(153,point_3(30,200,20),cg::cpr(0), ok_helicopter, "KA50", "153") )
+        ADD_EVENT(12.0  , create(153,point_3(-182,507,0),cg::cpr(173), ok_helicopter, "KA50", "153") )
         ADD_EVENT(13.0  , create(154,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50", "154") )
         ADD_EVENT(14.0  , create(155,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50", "155") )
         ADD_EVENT(15.0  , create(156,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50", "156") )
@@ -377,23 +376,23 @@ struct client
 #endif
 
 #if 1
-        ADD_EVENT(12.0  , create(171,point_3(30,200,5),cg::cpr(0), ok_helicopter, "L39", "171") )
-        ADD_EVENT(13.0  , create(172,point_3(40,180,5),cg::cpr(0), ok_helicopter, "L39", "172") )
-        ADD_EVENT(14.0  , create(173,point_3(50,160,5),cg::cpr(0), ok_helicopter, "L39", "173") )
+        ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
+        ADD_EVENT(13.0  , create(172,point_3(322,400,0),cg::cpr(173), ok_aircraft, "L39", "172") )
+        ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )
 #endif
         for (int i=0;i<2;i++)
         {
             ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
-                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
-                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+            ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+            ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
         }
 
 #endif
 
 
 
-#if 0
-		ADD_EVENT(1.0  , create(150,point_3(0,250,0),cg::cpr(0), ok_helicopter, "KA27", "150") )
+#if 1
+		ADD_EVENT(1.0  , create(150,point_3(202,405,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
 		ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
 		ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )

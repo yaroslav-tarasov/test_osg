@@ -1,7 +1,5 @@
-import maya.cmds as cmds
+﻿import maya.cmds as cmds
 import ntpath
-
-main_dir = "C:\\Vis\\Eisk_4\\"
 
 xxx_logic = [ ("kaponir", -90), ("eisk", 180), ("tramplin",180) ]
 
@@ -39,12 +37,18 @@ for line in inputfile:
                      course = xxx[0][1]
                      print course
                  idx = files_loaded.count(filename[0]) 
-                 obj_name = filename[0] + idx.__str__()
-                 cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
+                 obj_name = filename[0]
+                 if idx>0 :
+                    obj_name = filename[0] + idx.__str__()
+                    cmds.duplicate(filename[0], n=obj_name, rc=True, instanceLeaf=True)
+                 else:
+                    cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
+
                  cmds.setAttr( obj_name + '.rotatePivot', 0, 0, 0, type="double3")
                  cmds.setAttr( obj_name + '.scalePivot', 0, 0, 0, type="double3")
                  cmds.setAttr( obj_name + '.rotate', 90, 0, course, type="double3")
-                 cmds.makeIdentity( obj_name , apply=True, translate=True, rotate=True, scale=True, n=0)
+                 if idx==0 :
+                    cmds.makeIdentity( obj_name , apply=True, translate=True, rotate=True, scale=True, n=0)
                  cmds.setAttr( obj_name + '.translate', float(tokens[2]) , float(tokens[3]), 0, type="double3")
                  cmds.setAttr( obj_name + '.rotate', 0, 0, -float(tokens[1]), type="double3")
                  
@@ -62,7 +66,7 @@ for line in inputfile:
             lands_counter+=1
     if tokens[0]=="SpotLight:" :
             node_name = "lightmast_%d" % light_masts
-            cmds.createNode( 'transform', n=node_name  )  # , p='root'
+            cmds.createNode( 'transform', n=node_name , p='root')
             light_masts +=1
             cmds.setAttr( node_name + '.translateX', float(tokens[3]))
             cmds.setAttr( node_name + '.translateY', float(tokens[4]))
@@ -71,14 +75,14 @@ for line in inputfile:
             cmds.setAttr( node_name + '.displayLocalAxis', 1)
     if tokens[0]=="SECTOR:" :
             node_name = "sector_%d" % sectors
-            cmds.createNode( 'transform', n=node_name  ) # , p='root'
+            cmds.createNode( 'transform', n=node_name  , p='root')
             sectors +=1
             cmds.setAttr( node_name + '.translateX', float(tokens[2]))
             cmds.setAttr( node_name + '.translateY', float(tokens[3]))
             cmds.setAttr( node_name + '.translateZ', float(tokens[5]))
             cmds.setAttr( node_name + '.rotate', 0, 0, float(tokens[4]), type="double3")
             cmds.setAttr( node_name + '.displayLocalAxis', 1)	
-			
+
 cmds.viewClipPlane( 'perspShape', acp=True, fcp=100000.0 )
 #cmds.selectType( q=True, cv=True )
 #nodes = cmds.ls( geometry=True )

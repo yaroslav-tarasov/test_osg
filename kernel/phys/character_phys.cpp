@@ -25,7 +25,11 @@ namespace phys
 		btTransform  tr;
 		tr.setIdentity();
 		btVector3 aabbMin,aabbMax;
-		chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
+#if 0
+        chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
+#else
+        chassis_shape_->getAabb(tr,aabbMin,aabbMax);
+#endif
 
 		btScalar dxx = 1.f; //btScalar((aabbMax.x() - aabbMin.x()) / 2);
 		btScalar dyy = 1.f; //btScalar((aabbMax.y() - aabbMin.y()) / 2);
@@ -40,7 +44,7 @@ namespace phys
         btDefaultMotionState* motionState =
             new btDefaultMotionState(to_bullet_transform(pos.pos, pos.orien)/*btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))*/);
 
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), motionState, &*chassis_shape_.get(), inertia);
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(params_.mass), motionState, chassis_shape_/*&*chassis_shape_.get()*/, inertia);
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
         
 		// FIXME TODO

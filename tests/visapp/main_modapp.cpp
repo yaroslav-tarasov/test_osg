@@ -103,9 +103,8 @@ struct net_worker
      
      ~net_worker()
      {
-         //  delete  ses_;
-         
-         //worker_thread_.join();
+         worker_thread_.join();
+         delete  ses_;
      }
 
      boost::asio::io_service* GetService()
@@ -182,8 +181,8 @@ private:
          size_t ret = worker_service_->run(ec);
 
          acc_.reset();
+         calc_timer_.reset();
          sockets_.clear();
-         srv_.reset();
 
          __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
      }
@@ -282,10 +281,18 @@ private:
          sockets_.erase(peer);
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
          // delete  ses_;
+         worker_service_->post([this]()
+         {
+             for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+             {
+                 cons_[*it].reset();
+             }
+         } );
+
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+#if 0
          delete  ses_;
-         //__main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
-         // _workerThread.join();
+#endif
      }
 
      void on_error(boost::system::error_code const& ec, endpoint const& peer)
@@ -335,7 +342,6 @@ private:
 
 private:
     net::timer_connection                                            calc_timer_ ;
-    net::timer_connection                                             ctrl_timer_;
     net::ses_srv*                                                            ses_;
 };
 

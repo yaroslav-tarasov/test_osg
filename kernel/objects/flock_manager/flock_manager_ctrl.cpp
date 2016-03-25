@@ -9,7 +9,6 @@ FIXME(Создание множества дочерних объектов и клонирование)
 #include "flock_child/flock_child_view.h"
 #include "nodes_manager/nodes_manager_view.h"
 
-
 namespace flock
 {
 

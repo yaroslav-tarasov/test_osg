@@ -73,7 +73,11 @@ namespace phys
 	   void has_contact(rigid_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel);
 
    private:
+#if 0
        compound_shape_proxy                   chassis_shape_;
+#else 
+       btCompoundShape*                       chassis_shape_;
+#endif
        rigid_body_proxy                       chassis_;
        raycast_vehicle_proxy                  raycast_veh_;
        polymorph_ptr<rigid_body_user_info_t>  self_;
