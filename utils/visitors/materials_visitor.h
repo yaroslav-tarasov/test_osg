@@ -56,8 +56,14 @@ public:
         for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
         {
             ret |= findTexture( &geode, geode.getDrawable(i)->getStateSet() );
+			
             if (ret)
-                _cr(&geode, geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
+			{
+				if(!geode.getDrawable(i)->getStateSet()) 
+					OSG_WARN << "Stateset = 0 at " <<" geode: " << geode.getName() << " drawable: " << geode.getDrawable(i)->getName();
+				else
+					_cr(&geode, geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
+			}
         }
 
         if(ret && _cm)

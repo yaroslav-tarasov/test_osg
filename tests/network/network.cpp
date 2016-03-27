@@ -375,10 +375,16 @@ struct client
         ADD_EVENT(19.0  , create(160,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50", "160") )
 #endif
 
-#if 1
+#if 0
         ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
         ADD_EVENT(13.0  , create(172,point_3(322,400,0),cg::cpr(173), ok_aircraft, "L39", "172") )
         ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )
+#endif
+
+#if 1
+		ADD_EVENT(12.0  , create(176,point_3(156,387,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
+		ADD_EVENT(13.0  , create(177,point_3(322,400,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
+		ADD_EVENT(14.0  , create(178,point_3(587,437,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
 #endif
         for (int i=0;i<2;i++)
         {

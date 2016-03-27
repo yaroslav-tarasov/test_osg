@@ -41,6 +41,8 @@ inline std::string get_model(std::string const& kind)
         return "ka_50";
     else if (kind == "L39")
         return "l_39";
+	else if (kind == "AN140")
+		return "an_140";
     else if (kind == "SU25")
         return "su_25tm";
     else

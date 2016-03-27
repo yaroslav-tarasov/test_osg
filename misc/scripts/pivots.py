@@ -28,13 +28,18 @@ cmds.xform(nodes,  cp=True)
 #  For strut pivot point onto top
 #
 import maya.cmds as cmds
+nodes = cmds.ls( tr=True )
+shassi_nodes = [ x for x in nodes if 'shassi_' in x]
 
-bbx = cmds.xform('strut_f_lod0', q=True, bb=True, ws=True) # world space
-centerX = (bbx[0] + bbx[3]) / 2.0
-centerY = (bbx[1] + bbx[4]) / 2.0
-centerZ = (bbx[2] + bbx[5]) / 2.0
-
-cmds.xform('shassi_f_lod0',  piv=[centerX,centerY,bbx[5]])
+for sn in shassi_nodes :
+    shassi_children = cmds.listRelatives(sn) 
+    strut_nodes = [ x for x in shassi_children if 'strut_' in x]
+    for str_node in strut_nodes :
+        bbx = cmds.xform(str_node, q=True, bb=True, ws=True) # world space
+        centerX = (bbx[0] + bbx[3]) / 2.0
+        centerY = (bbx[1] + bbx[4]) / 2.0
+        centerZ = (bbx[2] + bbx[5]) / 2.0
+        cmds.xform(sn,  piv=[centerX,centerY,bbx[5]])
 
 ####################################
 ## List all Relatives for node 
@@ -55,7 +60,7 @@ for anim_group in nodes :
 #  Add lights to airplane
 #  Model must be normalized Z-up, Y-forward  
 #  Port and starboard 
-#  Port is the left-hand side of or direction from a vessel,
+#  Port is the left-hand side of or direction from a craft,
 #  facing forward. Starboard is the right-hand side, facing forward.
 
 import maya.cmds as cmds

@@ -1061,7 +1061,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 	ld_sfx_weak_ptr_ = nullptr;
-#if 0 
+#if 1 
 	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
 	ld_sfx_weak_ptr_ = dynamic_cast<LandingDustSfxNode*>(ld);
 
@@ -1974,21 +1974,21 @@ void Scene::setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center)
 void Scene::update( osg::NodeVisitor * nv )
 {
       const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
-	  double lt = nv->getFrameStamp()->getSimulationTime();
+	  const double lt = nv->getFrameStamp()->getSimulationTime();
       
       if(_time_panel)
       {
           _time_panel->set_time(lt * 1000.f);
       }
 
-      lt *= 500;
+      const double et = lt * 500;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
-      bool bsetup =  (vTime.Second != unsigned(lt) % 60) || (vTime.Minute != unsigned(lt / 60.0)  % 60); 
+      bool bsetup =  (vTime.Second != unsigned(et) % 60) || (vTime.Minute != unsigned(et / 60.0)  % 60); 
       
-      vTime.Hour   = 4 + unsigned(lt / 3600.0)  % 24;
-      vTime.Minute = unsigned(lt / 60.0)  % 60;
-      vTime.Second = unsigned(lt) % 60;
+      vTime.Hour   = 4 + unsigned(et / 3600.0)  % 24;
+      vTime.Minute = unsigned(et / 60.0)  % 60;
+      vTime.Second = unsigned(et) % 60;
 
       if(bsetup)
         _ephemerisNode->setTime();
