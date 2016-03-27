@@ -14,15 +14,27 @@ print pivot
 cmds.createNode( 'transform', n='transform1' )
 cmds.setAttr( 'transform1' + '.translate', centerX , centerY, centerZ, type="double3")
 
-######################################
-###   Central pivot
+###########################################
+###   Central pivot for wheels and rotors
 ###
 
 import maya.cmds as cmds
 
 nodes = cmds.ls( tr=True )
-nodes = [ x for x in nodes if 'wheel_' in x]
+nodes = [ x for x in nodes if 'wheel_' in x or 'rotor' in x]
 cmds.xform(nodes,  cp=True)
+
+nodes = cmds.ls( tr=True )
+rotors_nodes = [ x for x in nodes if ('rotor_' in x or 'rotorl' in x or 'rotorr' in x or 'rotorf' in x) and not ('|' in x)  ]
+
+for rn in rotors_nodes :
+    bbx = cmds.xform(rn, q=True, bb=True, ws=True) # world space
+    piv = [(bbx[0] + bbx[3]) / 2.0, (bbx[1] + bbx[4]) / 2.0, (bbx[2] + bbx[5]) / 2.0]
+    cmds.setAttr( rn + '.translate'     , piv[0], piv[1], piv[2], type="double3")
+    
+    rn_children = cmds.listRelatives(rn) 
+    for rn_child in rn_children :
+            cmds.setAttr( rn + '|' + rn_child + '.translate', -piv[0], -piv[1], -piv[2], type="double3")
 
 #####################################
 #  For strut pivot point onto top

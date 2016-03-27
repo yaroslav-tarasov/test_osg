@@ -385,6 +385,13 @@ struct client
 		ADD_EVENT(12.0  , create(176,point_3(156,387,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
 		ADD_EVENT(13.0  , create(177,point_3(322,400,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
 		ADD_EVENT(14.0  , create(178,point_3(587,437,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
+
+		for (int i=0;i<3;i++)
+		{
+			ADD_EVENT(20.0 + i  , engine_state_msg(176 + i , ES_LOW_THROTTLE)  )
+			ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
+			ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
+		}
 #endif
         for (int i=0;i<2;i++)
         {

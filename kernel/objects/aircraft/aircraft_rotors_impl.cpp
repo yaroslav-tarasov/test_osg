@@ -25,6 +25,18 @@ namespace aircraft
             find_rotors(RG_REAR_RIGHT, rotors_group_node);
         }
 
+		if (auto rotors_group_node = nodes_manager_->find_node("rotor_l"))
+		{
+			rotors_groups_[RG_REAR_LEFT] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_LEFT, rotors_group_node);
+		}
+
+		if (auto rotors_group_node = nodes_manager_->find_node("rotor_r"))
+		{
+			rotors_groups_[RG_REAR_RIGHT] = boost::in_place(rotors_group_node/*, false*/);
+			find_rotors(RG_REAR_RIGHT, rotors_group_node);
+		}
+
 		if (auto rotors_group_node = nodes_manager_->find_node("rotorl1"))
 		{
 			rotors_groups_[RG_REAR_LEFT] = boost::in_place(rotors_group_node/*, false*/);
