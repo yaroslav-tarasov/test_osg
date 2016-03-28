@@ -60,9 +60,13 @@ public:
             if (ret)
 			{
 				if(!geode.getDrawable(i)->getStateSet()) 
+                {
 					OSG_WARN << "Stateset = 0 at " <<" geode: " << geode.getName() << " drawable: " << geode.getDrawable(i)->getName();
+                }
 				else
+                {
 					_cr(&geode, geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
+                }
 			}
         }
 

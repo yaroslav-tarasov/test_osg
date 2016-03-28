@@ -512,7 +512,12 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
 
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name_low);
-
+    
+#if 0
+    force_log fl;
+    LOG_ODS_MSG( "createMaterial for node: " << node->getName()  << " stateset " << stateset->getName() << " material name " << mat_name << 
+                 " low = "<< mat_name_low <<  "\n");
+#endif
 
 #if 0
     const osg::StateSet::UniformList& ul = stateset->getUniformList();
