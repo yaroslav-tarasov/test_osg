@@ -414,7 +414,7 @@ namespace avSky
 
    // Расколбас в отсутствие true в при инициализации
         osgEphemeris::DateTime dt2 = _d->_ephemerisModel->getDateTime();
-#if 1
+#if 0
         force_log fl;       
         LOG_ODS_MSG( "Ephemeris::setTime() =  " << dt.getYear() << "  "
             << dt.getMonth() << "  "

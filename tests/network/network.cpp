@@ -327,13 +327,12 @@ struct client
         ADD_EVENT(90.0, environment_msg(weather))
 #if 1
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
-        ADD_EVENT(70.0, fire_fight_msg_t(2))
 #endif       
 
-#if 1
+#if 0
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
-
+        ADD_EVENT(70.0, fire_fight_msg_t(2))
 #if 0
         ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
@@ -361,7 +360,7 @@ struct client
 
 #endif
 
-#if 1
+#if 0
         ADD_EVENT(10.0  , create(151,point_3(-403,165,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
         ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
 #if 0
@@ -404,7 +403,7 @@ struct client
 
 
 
-#if 1
+#if 0
 		ADD_EVENT(1.0  , create(150,point_3(202,405,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
 		ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )

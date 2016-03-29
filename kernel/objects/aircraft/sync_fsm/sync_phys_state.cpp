@@ -170,7 +170,7 @@ namespace sync_fsm
 
                 {
 
-                    //force_log fl;
+                    force_log fl;
 
                     LOG_ODS_MSG(
                         "curr_pods_len:  "                << traj_->cur_len() 

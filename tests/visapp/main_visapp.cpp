@@ -468,6 +468,8 @@ struct visapp
     void update(double time)
     {    
         gt_.set_time(time);
+        force_log fl;       
+        LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
     }
  
     void on_setup(setup const& msg)
@@ -480,6 +482,8 @@ struct visapp
         w_->set_factor(msg.factor);
         w_->reset_time(msg.srv_time / 1000.0f);
         gt_.set_time(/*time*/msg.srv_time / 1000.0f);
+        force_log fl;       
+        LOG_ODS_MSG( " void visapp::on_state(double time) " << msg.srv_time / 1000.0f << "\n");
     }
 
 

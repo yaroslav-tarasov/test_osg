@@ -112,42 +112,20 @@ void vis_node_impl::pre_update(double time)
 	if (!time_)
         return;
 
-    double dt = time - *time_;
+    if(!(extrapolated_position_.is_local()))
+    {    
+        force_log fl; 
 
-#if 0
-    if(!extrapolated_position_.is_static() && !extrapolated_position_.is_local())
-    {
-
+        double dt = time - *time_;
+        
         LOG_ODS_MSG( "vis_node_impl::pre_update(double time) [ " << name() << " ]:    dt=" << dt 
-                     << "   node type: " << (extrapolated_position_.is_local()?"local":"global")
-                     << "   time: " << time
-                     << "   time_: " << *time_
-                     << "\n" );
-#if 0        
-        nm::visit_sub_tree(manager_->get_node_tree_iterator(node_id()), [this](nm::node_info_ptr n)->bool
-        {
-            static int i = 0;
-            force_log fl;
-
-            if(i++ < 3 )
-            {
-                // dynamic_cast<vis_node_impl *>(n.get())->sync_position();
-                LOG_ODS_MSG( "vis_node_impl::pre_update(double time)  " << n->name() << "\n" );
-            }
-            else
-            {
-                i = 0;
-                return false;
-            }
-
-            return true;
-        });
-#endif
+            << "   time: " << time
+            << "   time_: " << *time_
+            << "\n" );
 
     }
-#endif
 
-    sync_position(dt);
+    sync_position();
 
 	last_update_ = time;
 }
@@ -303,7 +281,7 @@ void vis_node_impl::init_disp()
         .add<msg::visibility_msg>(boost::bind(&vis_node_impl::on_visibility, this, _1));
 }
 
-void vis_node_impl::sync_position(double dt)
+void vis_node_impl::sync_position()
 {
     if (!need_update_)
         return;
@@ -341,14 +319,6 @@ void vis_node_impl::sync_position(double dt)
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
 
-            //LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "\n" );
-            //LOG_ODS_MSG( "vis_node_impl::sync_position():   extrapolated_position_.global().pos :   dx:  "
-            //    <<  extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat
-            //    << "    dy: "  << extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon
-            //    << "    dvx: " << (extrapolated_position_.global().pos.lat   - prev_extrapolated_position_.global().pos.lat) / (dt?dt:1.0) / 0.00001
-            //    << "    dvy: " << (extrapolated_position_.global().pos.lon - prev_extrapolated_position_.global().pos.lon) / (dt?dt:1.0) / 0.00001
-            //    << "\n" );
-            
             prev_extrapolated_position_  = extrapolated_position_;
         }
     }

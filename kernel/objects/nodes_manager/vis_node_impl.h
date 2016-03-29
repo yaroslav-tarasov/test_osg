@@ -30,7 +30,7 @@ namespace nodes_management
     private:
         void fill_victory_nodes();
         void extrapolated_position_reseted() override; 
-        void sync_position(double dt=0);
+        void sync_position();
 
         // vis_node_info
     private:
