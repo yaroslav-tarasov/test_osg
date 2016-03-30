@@ -56,7 +56,7 @@ namespace aircraft_physless
 
     void phys_aircraft_impl::update()
     {     
-        sync_phys(0.1);
+        sync_phys(/*0.1*/0.05);
     }
 
     void phys_aircraft_impl::attach_tow(bool attached)
@@ -280,7 +280,7 @@ namespace aircraft_physless
         phys_aircraft_->reset_suspension();
     }
 
-    void phys_aircraft_impl::sync_phys(double dt)
+    void phys_aircraft_impl::sync_phys(double /*dt*/)
     {
         if (!phys_aircraft_)
             return;
