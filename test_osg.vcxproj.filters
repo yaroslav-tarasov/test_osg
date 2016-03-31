@@ -1207,5 +1207,8 @@
     <ClCompile Include="av\avCore\DecalRender.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
+    <ClCompile Include="tests\sparse_texture.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

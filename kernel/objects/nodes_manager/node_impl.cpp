@@ -78,8 +78,8 @@ void node_impl::pre_update(double time)
         {
             extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos * dt);
             extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
-            force_log fl;
-            LOG_ODS_MSG( "node_impl::pre_update(double time):   extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "  dt=" << dt 
+            //force_log fl;
+            LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << "  extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "  dt=" << dt 
                 << " dpos.x " << position_.global().dpos.x
                 << " dpos.y " << position_.global().dpos.y
                 << " dpos.z " << position_.global().dpos.z

@@ -395,8 +395,9 @@ private:
     void update(double time)
     {   
         systems_->update_messages();
-        mod_sys_->update(time);
         ctrl_sys_->update(time);
+        systems_->update_messages();
+        mod_sys_->update(time);
     }
 
 

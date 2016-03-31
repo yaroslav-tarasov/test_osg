@@ -95,7 +95,6 @@ public:
 //  node_impl
     osg::Node*                  as_osg_node() {return node_.get();}
 #endif
-
 protected:
     view *      manager_;
     uint32_t    node_id_;

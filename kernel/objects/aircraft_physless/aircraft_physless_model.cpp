@@ -144,15 +144,15 @@ void model::sync_nm_root(double dt)
     // 
     FIXME(Если раскоментарить отлично синхронизируемся)
 
-    root_node_pos.global().pos = desired_pos;
+    //root_node_pos.global().pos = desired_pos;
 
     root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
     root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
     
 
 
-    force_log fl;
-    LOG_ODS_MSG( "model::sync_nm_root: " << settings_.kind <<  " root_node_pos.global().pos :   x:  "  <<   root_node_pos.global().pos.lat << "    y: " <<  root_node_pos.global().pos.lon 
+    //force_log fl;
+    LOG_ODS_MSG( "model::sync_nm_root: " << settings_.kind <<  " root_node_pos..global().pos :   x:  "  <<   root_node_pos.global().pos.lat << "    y: " <<  root_node_pos.global().pos.lon 
         << " dpos.x " << root_node_pos.global().dpos.x
         << " dpos.y " << root_node_pos.global().dpos.y
         << " dpos.z " << root_node_pos.global().dpos.z

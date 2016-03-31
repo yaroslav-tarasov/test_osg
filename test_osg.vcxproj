@@ -436,6 +436,7 @@
     <ClCompile Include="tests\shadow_map.cpp" />
     <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\SkyBox.cpp" />
+    <ClCompile Include="tests\sparse_texture.cpp" />
     <ClCompile Include="tests\ssao\ffssao.cpp" />
     <ClCompile Include="tests\systems\factory_systems.cpp" />
     <ClCompile Include="tests\systems\systems_impl.cpp" />
