@@ -53,6 +53,26 @@ for sn in shassi_nodes :
         centerZ = (bbx[2] + bbx[5]) / 2.0
         cmds.xform(sn,  piv=[centerX,centerY,bbx[5]])
 
+#####################################
+# Working only for "clear" copy of LOD0 
+#
+import maya.cmds as cmds
+def renameNodes( parent ) :
+    lod3_children = cmds.listRelatives(parent) 
+    nodes_to_rename = [ x for x in lod3_children if 'lod0' in x.lower()]
+    for rn in nodes_to_rename :
+        renameNodes( cmds.rename( parent + '|'+ rn, rn.replace('0','3')))
+
+nodes = cmds.ls( tr=True )
+
+lod3_node =   [ x for x in nodes if x.lower() == 'lod3' ]
+lod3_children = cmds.listRelatives(lod3_node) 
+nodes_to_rename = [ x for x in lod3_children if 'lod0' in x.lower()]
+for rn in nodes_to_rename :
+    renameNodes(cmds.rename( lod3_node[0] + '|'+ rn, rn.replace('0','3')))
+
+
+
 ####################################
 ## List all Relatives for node 
 
@@ -77,9 +97,9 @@ for anim_group in nodes :
 
 import maya.cmds as cmds
 
-def createLights( positions={}, orients = {} ):
+def createLights( root_node, positions={}, orients = {} ):
     for key, val in positions.iteritems() :
-        nn = cmds.createNode( 'transform', n=key, p='root' )
+        nn = cmds.createNode( 'transform', n=key, p=root_node )
         cmds.setAttr( nn + '.translate'     , positions[key][0], positions[key][1], positions[key][2], type="double3")
         cmds.setAttr( nn + '.rotate'        , orients[key][0], orients[key][1], orients[key][2], type="double3")
         cmds.setAttr( nn + '.displayLocalAxis', 1)	
@@ -90,7 +110,10 @@ orients = { 'port' : [-90,0,0], 'starboard' : [-90,0,0], 'tail' : [-90,0,0], 'st
 
 print( [x + ''.join(str(y)) for x, y in orients.iteritems()] )
 
-bbx = cmds.xform('root', q=True, bb=True, ws=True) # world space
+nodes = cmds.ls( tr=True )
+root_node =   [ x for x in nodes if x.lower() == 'root' ][0]
+
+bbx = cmds.xform(root_node, q=True, bb=True, ws=True) # world space
 plane_centerX = (bbx[0] + bbx[3]) / 2.0
 plane_centerY = (bbx[1] + bbx[4]) / 2.0
 plane_centerZ = (bbx[2] + bbx[5]) / 2.0
@@ -105,5 +128,5 @@ positions = { 'port' : [bbx[0] , plane_centerY, plane_centerZ], 'starboard' : [b
               'tail' : [plane_centerX , bbx[1], bbx[5]], 'steering_lamp' : [ags_f_centerX,ags_bbx[4],ags_f_centerZ + ags_f_centerZ/4], 'landing_lamp' : [bbx[3]/6.0 , plane_centerY, plane_centerZ],
               'landing_lamp1' : [bbx[0]/6.0 , plane_centerY, plane_centerZ], 'back_tail' : [plane_centerX , bbx[1], bbx[5]], 'strobe_r' : [bbx[3] , plane_centerY, plane_centerZ], 'strobe_l' : [bbx[0] , plane_centerY, plane_centerZ]  }
 
-createLights(positions,orients)
+createLights(root_node, positions,orients)
 

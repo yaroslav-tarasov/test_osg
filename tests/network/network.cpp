@@ -244,6 +244,7 @@ struct client
         , period_   (/*4.*/.5)
         , timer_    (boost::bind(&client::update, this))
         , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
+        , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
   
     {
         disp_
@@ -269,13 +270,14 @@ struct client
 
         environment::weather_t  weather; 
         weather.fog_density  = 0.2f; 
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
+        weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
         weather.wind_dir     = cg::point_2f(2.0, 4.0);
 
         ADD_EVENT(2.0, environment_msg(weather))
 
 #if 1
 
+#if 1
         weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
         weather.wind_dir    = cg::point_2f(1.0,0.0);
@@ -325,6 +327,9 @@ struct client
         weather.wind_dir    = cg::point_2f(1.0,1.0);
         weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
         ADD_EVENT(90.0, environment_msg(weather))
+#endif
+
+
 #if 1
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
 #endif       
@@ -361,17 +366,17 @@ struct client
 #endif
 
 #if 1
-        ADD_EVENT(10.0  , create(151,point_3(-403,165,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
+        ADD_EVENT(10.0  , create(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
         ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
 #if 0
-        ADD_EVENT(12.0  , create(153,point_3(-182,507,0),cg::cpr(173), ok_helicopter, "KA50", "153") )
-        ADD_EVENT(13.0  , create(154,point_3(40,180,20),cg::cpr(0), ok_helicopter, "KA50", "154") )
-        ADD_EVENT(14.0  , create(155,point_3(50,160,20),cg::cpr(0), ok_helicopter, "KA50", "155") )
-        ADD_EVENT(15.0  , create(156,point_3(60,140,20),cg::cpr(0), ok_helicopter, "KA50", "156") )
-        ADD_EVENT(16.0  , create(157,point_3(70,120,20),cg::cpr(0), ok_helicopter, "KA50", "157") )
-        ADD_EVENT(17.0  , create(158,point_3(80,100,20),cg::cpr(0), ok_helicopter, "KA50", "158") )
-        ADD_EVENT(18.0  , create(159,point_3(90,80,20) ,cg::cpr(0), ok_helicopter, "KA50", "159") )
-        ADD_EVENT(19.0  , create(160,point_3(100,60,20),cg::cpr(0), ok_helicopter, "KA50", "160") )
+        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(173), ok_helicopter, "KA50", "153") )
+        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(0)  , ok_helicopter, "KA50", "154") )
+        ADD_EVENT(14.0  , create(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+        ADD_EVENT(15.0  , create(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+        ADD_EVENT(16.0  , create(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+        ADD_EVENT(17.0  , create(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+        ADD_EVENT(18.0  , create(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+        ADD_EVENT(19.0  , create(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
 #if 1
@@ -402,25 +407,38 @@ struct client
 #endif
 
 
-
 #if 1
 		ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
-		ADD_EVENT(20.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-		ADD_EVENT(40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-		ADD_EVENT(60.0  , engine_state_msg(150 , ES_STOPPED) )
+		ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+		ADD_EVENT(traj2_->base_length() + 40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+		ADD_EVENT(traj2_->length()              , engine_state_msg(150 , ES_STOPPED) )
 
-		ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-		ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-		ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
+		//ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+		//ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+		//ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
 #endif
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
-                ,traj_->kp_value    (time)
-                ,traj_->curs_value  (time)
-                ,*traj_->speed_value(time)
+                , traj_->kp_value    (time)
+                , traj_->curs_value  (time)
+                , *traj_->speed_value(time)
+                , time + traj_offset
+                , false
+                , meteo::local_params()
+                )));
+
+            this->send(&msg[0], msg.size());
+        };
+
+        run_f2_ = [this](uint32_t id, double time, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                id 
+                , traj2_->kp_value    (time)
+                , traj2_->curs_value  (time)
+                , *traj2_->speed_value(time)
                 , time + traj_offset
                 , false
                 , meteo::local_params()
@@ -430,8 +448,12 @@ struct client
         };
 
 
-        runs_.insert(make_pair(traj_->base_length(),                                 
-            boost::bind( run_f_, 1,_1,traj_offset)
+        runs_.insert(make_pair(traj_->base_length(),
+            boost::bind( run_f_ , 1,_1,traj_offset)
+            ));
+
+        runs_.insert(make_pair(traj2_->base_length(),
+            boost::bind( run_f2_, 150,_1,traj_offset)
             ));
 
         runs_.insert(make_pair( traj_->base_length() - vehicle_prediction,
@@ -613,9 +635,15 @@ private:
 private:
     
     fms::trajectory_ptr                                                  traj_;
+    fms::trajectory_ptr                                                 traj2_;
+    
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
     time_queue_msgs_t                                                    msgs_;
-    boost::function<void(uint32_t,double,double)>                       run_f_;
+    
+    typedef boost::function<void(uint32_t,double,double)>           run_wrap_f;
+
+    run_wrap_f                                                          run_f_;
+    run_wrap_f                                                         run_f2_;
 
     typedef boost::function<void(double /*time*/)>   run_f;
 

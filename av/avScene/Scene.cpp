@@ -877,15 +877,12 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
-
-
-#if 1
 	//
 	// Create weather
 	//
 	_Weather = new avWeather::Weather();
 	_environmentNode->addChild( _Weather.get() );
-#endif
+
 
     LightManager::Create();
 
@@ -935,7 +932,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
     FIXME(140 shaders version needed);
-
 
     osgViewer::Viewer::Windows windows;
     _viewerPtr->getWindows(windows);

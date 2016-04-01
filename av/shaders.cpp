@@ -119,8 +119,8 @@ namespace shaders
 \n                vec3 apply_scene_fog( const in vec3 view_pos, const in vec3 color )                              \
 \n                {                                                                                                \
 \n                    vec3 view_vec_fog = (mat3(viewworld_matrix) * view_pos) * vec3(1.0, 1.0, 0.8);               \
-\n                    return mix(texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));    \
-\n                    /*return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));*/   \
+\n                    /*return mix(texture(envTex, view_vec_fog).rgb, color, fog_decay_factor(view_vec_fog));*/    \
+\n                    return mix(textureLod(envTex, view_vec_fog, 3.0).rgb, color, fog_decay_factor(view_vec_fog));   \
 \n                }                                                                                                \
 \n                                                                                                                 \
 \n                vec3 apply_clear_fog( const in vec3 view_pos, const in vec3 color )                              \
@@ -1982,7 +1982,7 @@ $if 0
 \n                    concrete_noise = detail_factor * fma(texture2D(detailTex, f_in.detail_uv).rgb, vec3(0.48), vec3(-0.24));
 \n                    dif_tex_col = hardlight(dif_tex_col, concrete_noise.bbb);
 \n                }
-\n
+\n                // normalTex = noiseTex
 \n				  vec4 bump = texture2D(normalTex, f_in.texcoord).xyzw;
 \n 
 \n                rainy_value *= step (0.5, bump.w ) * bump.w;
@@ -2034,13 +2034,14 @@ $if 0
 \n               {
 \n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
 \n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 5.0), 0.45, 0.05));
-\n                   vec3 cube_color = texture(envTex, refl_vec_world).rgb;
+\n                   vec3 cube_color = texture(envTex, refl_vec_world).rgb; // vec3(0.0);// 
 \n                   result = mix(result, lightmap_color + cube_color, fresnel * rainy_value) + (fma(fresnel, 0.5, 0.5) * rainy_value) * specular_color;
 \n               }
 \n
 \n               
-\n               // aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
-\n               gl_FragData[0] = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+\n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);    
+\n               //aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), 1.0);    
+\n               //gl_FragData[0] = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n               // gl_FragData[1] = vec4(normal, 1.0);
 \n            }
             )
