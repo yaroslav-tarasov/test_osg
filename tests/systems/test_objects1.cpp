@@ -451,7 +451,7 @@ inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
 
 inline object_info_ptr create_camera(kernel::system* csys, create const& msg)
 {
-    return camera::create(dynamic_cast<fake_objects_factory*>(csys));
+	return camera::create(dynamic_cast<fake_objects_factory*>(csys), msg.model_name);
 }
 
 object_info_ptr create_object( kernel::system* csys, create const& msg)

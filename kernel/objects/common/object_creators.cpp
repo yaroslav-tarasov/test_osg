@@ -203,8 +203,8 @@ namespace camera
 	{
 		const std::string class_name = "camera";
 		const std::string unique_name = name?*name:sys->generate_unique_name(class_name);
-		camera_object::binoculars_t  data;
-		obj_create_data ocd(class_name, unique_name, dict::wrap(data));
+		/*camera_object::binoculars_t  data;*/
+		obj_create_data ocd(class_name, unique_name/*, dict::wrap(data)*/);
 
 		ocd
 			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))

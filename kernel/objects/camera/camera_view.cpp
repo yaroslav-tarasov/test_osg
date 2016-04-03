@@ -20,7 +20,6 @@ cpr view::orien() const
     return root()->position().global().orien.cpr();
 }
 
-//! конструктор базового представления камеры
 view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
