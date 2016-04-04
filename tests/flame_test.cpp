@@ -6,21 +6,29 @@
 
 namespace
 {
+	const size_t size_x = 200;//1980;
+	const size_t size_z = 200;//1200;
+
     void createDAIGeometry( osg::Geometry& geom, int nInstances=1 )
     {
-        const float halfDimX( 1980 );
-        const float halfDimZ( 1200 );
+        const float halfDimX( size_x / 2.0 );
+        const float halfDimZ( size_z / 2.0);
 
         osg::Vec3Array* v = new osg::Vec3Array;
         v->resize( 4 );
         geom.setVertexArray( v );
 
         // Geometry for a single quad.
+#if 0
         (*v)[ 0 ] = osg::Vec3( -halfDimX, 0., 0. );
         (*v)[ 1 ] = osg::Vec3( halfDimX, 0., 0. );
         (*v)[ 2 ] = osg::Vec3( halfDimX, 0., halfDimZ*2.0f );
         (*v)[ 3 ] = osg::Vec3( -halfDimX, 0., halfDimZ*2.0f );
-
+#endif
+		(*v)[ 0 ] = osg::Vec3(  0., 0., 0. );
+		(*v)[ 1 ] = osg::Vec3( halfDimX*2.0f, 0., 0. );
+		(*v)[ 2 ] = osg::Vec3( halfDimX*2.0f, 0., halfDimZ*2.0f );
+		(*v)[ 3 ] = osg::Vec3( 0., 0., halfDimZ*2.0f );
 
         // create color array data (each corner of our triangle will have one color component)
         osg::Vec4Array* pColors = new osg::Vec4Array;
@@ -73,18 +81,25 @@ int main_flame_test( int argc, char** argv )
     osg::StateSet * pSceneSS = root->getOrCreateStateSet();
 
     osg::Geode*		geodeGrass = new osg::Geode();	
-    osg::ref_ptr<osg::Geometry> geomGrass = createGeometry();
+    osg::ref_ptr<osg::Geometry> geom = createGeometry();
 
     geodeGrass->setCullingActive( false );   
-    geodeGrass->addDrawable( geomGrass.get() );
+    geodeGrass->addDrawable( geom.get() );
 
     root->addChild(geodeGrass);
 
+	pSceneSS->addUniform(new osg::Uniform("iResolution"  , osg::Vec2(size_x,size_z)));
 
     osg::ref_ptr<osg::Program> cFlameProg = creators::createProgram("flame").program; 
     cFlameProg->setName("FlameShader");
     pSceneSS->setAttributeAndModes(cFlameProg.get());
+	pSceneSS->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
+	// setup blending
+	osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+	pSceneSS->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
 
+	osg::BlendEquation* pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
+	pSceneSS->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
     viewer.apply(new osgViewer::SingleScreen(1));
     // Add some useful handlers to see stats, wireframe and onscreen help

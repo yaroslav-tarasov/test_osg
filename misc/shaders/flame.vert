@@ -14,7 +14,7 @@ void main()
     vec4 viewpos     = gl_ModelViewMatrix * gl_Vertex;
     viewworld_matrix = inverse(gl_ModelViewMatrix);
     gl_Position      = gl_ModelViewProjectionMatrix *  gl_Vertex;
-    fragCoord        = vec2(gl_Vertex.zx);
+    fragCoord        = vec2(gl_Vertex.xz);
 	//fragCoord        = viewpos.xy;
     // gl_Position.z = 0;
 }       

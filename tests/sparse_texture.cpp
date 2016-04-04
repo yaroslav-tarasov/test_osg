@@ -109,7 +109,12 @@ int main_sparse_texture( int argc, char** argv )
 	teapot->addDrawable( new TeapotDrawable(1.0f) );
 	root->addChild(teapot);
     
-    
+#if 0
+	glm::ivec3 PageSize;
+	glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSize.x);
+	glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSize.y);
+	glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSize.z);   
+#endif
 
     osgViewer::Viewer viewer(arguments);
 

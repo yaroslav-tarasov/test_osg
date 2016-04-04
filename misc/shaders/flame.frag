@@ -1,9 +1,7 @@
 
 uniform float		osg_SimulationTime;
 uniform float		osg_FrameTime;
-
-const vec2  iResolution = vec2(1980,1200);
-
+uniform vec2		iResolution;
 
 float noise(vec3 p) //Thx to Las^Mercury
 {
@@ -71,7 +69,9 @@ void main()
 	
 	vec4 col = mix(vec4(1.,.5,.1,1.), vec4(0.1,.5,1.,1.), p.y*.02+.4);
 	
-	fragColor = mix(vec4(0.), col, pow(glow*2.,4.));
+	vec4 c_out = mix(vec4(0.), col, pow(glow*2.,4.));
+	fragColor = c_out;
+	//fragColor = vec4( c_out.xyz, length(c_out.xyz) );
 	//fragColor = mix(vec4(1.), mix(vec4(1.,.5,.1,1.),vec4(0.1,.5,1.,1.),p.y*.02+.4), pow(glow*2.,4.));
 
 }
