@@ -1643,6 +1643,22 @@ $endif
         //AUTO_REG_NAME(sea, shaders::sea_mat::get_shader)
     }
 
+    namespace flame_mat
+    {
+
+        const char* vs =  STRINGIFY(
+            \n#include "data/materials/flame/flame.vert"
+            );
+
+        const char* fs =  STRINGIFY(
+            \n#include "data/materials/flame/flame.frag"
+            );
+
+        SHADERS_GETTER(get_shader, vs, fs)
+
+        AUTO_REG_NAME(flame, shaders::flame_mat::get_shader)
+    }
+
     namespace skinning_mat
     {
 

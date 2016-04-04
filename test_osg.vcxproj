@@ -119,12 +119,15 @@
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs" />
+    <None Include="misc\shaders\flame.frag" />
+    <None Include="misc\shaders\flame.vert" />
     <None Include="misc\shaders\grass.frag" />
     <None Include="misc\shaders\grass.vert" />
     <None Include="misc\shaders\headers\fog.hlsl" />
     <None Include="misc\shaders\headers\scene_params.hlsl" />
     <None Include="misc\shaders\headers\spot_lights.hlsl" />
     <None Include="misc\shaders\headers\utils.hlsl" />
+    <None Include="misc\shaders\sea.frag" />
     <None Include="misc\shaders\skinning.vert" />
     <None Include="misc\shaders\skinning_inst.vert" />
     <None Include="misc\shaders\tess.frag" />
@@ -407,6 +410,7 @@
     <ClCompile Include="tests\dubins_test.cpp" />
     <ClCompile Include="tests\DynamicCharacterController.cpp" />
     <ClCompile Include="tests\exp_test.cpp" />
+    <ClCompile Include="tests\flame_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp" />
     <ClCompile Include="tests\main_shadows.cpp" />

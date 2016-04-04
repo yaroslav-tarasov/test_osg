@@ -273,6 +273,15 @@
     <None Include="misc\shaders\skinning_inst.vert">
       <Filter>Source Files\shaders\animation</Filter>
     </None>
+    <None Include="misc\shaders\flame.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\flame.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="misc\shaders\sea.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -1208,6 +1217,9 @@
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
     <ClCompile Include="tests\sparse_texture.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\flame_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>

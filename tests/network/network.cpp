@@ -368,9 +368,10 @@ struct client
 #if 1
         ADD_EVENT(10.0  , create(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
         ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
+
+        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
+        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
 #if 0
-        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(173), ok_helicopter, "KA50", "153") )
-        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(0)  , ok_helicopter, "KA50", "154") )
         ADD_EVENT(14.0  , create(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
         ADD_EVENT(15.0  , create(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
         ADD_EVENT(16.0  , create(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
@@ -397,7 +398,7 @@ struct client
 			ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
 		}
 #endif
-        for (int i=0;i<2;i++)
+        for (int i=0;i<4;i++)
         {
             ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
             ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
