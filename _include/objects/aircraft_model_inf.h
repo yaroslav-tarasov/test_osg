@@ -3,10 +3,6 @@
 // Вариация продолжение для aircraft.h
 namespace aircraft
 {
-    //enum malfunction_kind_t
-    //struct info
-    //struct control
-
 
     struct int_control
     {

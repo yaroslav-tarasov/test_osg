@@ -1563,7 +1563,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         //assert(_terrainRoot->removeChild(_terrainNode));
         //_terrainNode.release();
         _terrainNode =  new avTerrain::Terrain (this);
-        _terrainNode->create(path);
+        _terrainNode->Create(path);
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		

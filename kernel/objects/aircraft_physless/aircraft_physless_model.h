@@ -81,7 +81,7 @@ namespace aircraft_physless
 
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
-        void set_phys_aircraft(phys_aircraft_ptr phys_aircraft);
+        void set_phys_aircraft(aircraft::phys_aircraft_ptr phys_aircraft);
         void set_nm_angular_smooth(double val);
     private:
         void update_model();
@@ -133,7 +133,7 @@ namespace aircraft_physless
 
         double                                 rotors_angular_speed_;
 
-        phys_aircraft_ptr                      phys_aircraft_;
+        aircraft::phys_aircraft_ptr            phys_aircraft_;
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;

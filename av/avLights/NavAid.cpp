@@ -20,11 +20,11 @@ namespace avScene
        if(usePointSprites_ && !tex_.valid())
        {
            tex_ = new osg::Texture2D();
-           tex_->setImage(osgDB::readImageFile("Images/particle.rgb"));
+           tex_->setImage(osgDB::readImageFile("images/particle.rgb"));
        }
-	   
+
 	   setCullCallback(Utils::makeNodeCallback(this, &NavAidGroup::cull));
-       
+
 	   _createStateSet();
     }
 

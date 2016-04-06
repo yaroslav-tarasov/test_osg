@@ -3,7 +3,7 @@
 
 
 //#include "objects/helicopter_physless.h"
-#include "helicopter_physless/helicopter_physless_common.h"
+//#include "helicopter_physless/helicopter_physless_common.h"
 
 #include "sync_heli_phys_state.h"
 #include "sync_heli_transition_phys_fms.h"
@@ -17,7 +17,7 @@ namespace helicopter_physless
 
         struct phys_state2 : state_t
         {
-            phys_state2(self_t &self, phys_model_ptr phys_aircraft, geo_base_3 const& base)
+            phys_state2(self_t &self, aircraft::phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
                 : self_(self)
                 , desired_speed_(aircraft::min_desired_velocity())
                 , on_ground_(false)
@@ -52,7 +52,7 @@ namespace helicopter_physless
             self_t &self_;
             geo_base_3 base_;
             size_t zone_;
-            phys_model_ptr phys_aircraft_;
+            phys_aircraft_ptr phys_aircraft_;
             bool on_ground_;
 
 
@@ -60,7 +60,7 @@ namespace helicopter_physless
         };
 
 
-        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_model_ptr phys_aircraft, geo_base_3 const& base)
+        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
         {
                 return boost::make_shared<phys_state2>(self,phys_aircraft,base);
         }
@@ -249,15 +249,22 @@ namespace sync_fsm
                 );           
             }
 #endif
+            geo_position pha_pos = phys_aircraft_->get_position();
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = traj_->curs_value(tar_len);
+            target_pos.orien = cpr(target_pos.orien.get_course(),-target_pos.orien.get_pitch(),target_pos.orien.get_roll());
             geo_position gtp(target_pos, get_base());
-       
+
+            const double step = cg::distance2d(pha_pos.pos, gtp.pos);
 
             self_.set_desired_nm_pos(gtp.pos);
             self_.set_desired_nm_orien(gtp.orien);
-            
+
+            force_log fl;       
+            LOG_ODS_MSG( "phys_state2::update " << step  << "\n" 
+                );   
+
             phys_aircraft_->go_to_pos(gtp.pos, gtp.orien);
 			phys_aircraft_->update();
         }

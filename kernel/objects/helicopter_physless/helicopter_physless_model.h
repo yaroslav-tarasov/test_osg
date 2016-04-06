@@ -83,7 +83,7 @@ namespace helicopter_physless
 
         void switch_sync_state(sync_fsm::state_ptr state);
         void freeze_position();
-        void set_phys_model(phys_model_ptr phys_aircraft);
+        void set_phys_model(aircraft::phys_aircraft_ptr phys_aircraft);
         void set_nm_angular_smooth(double val);
     private:
         void update_model();
@@ -137,7 +137,7 @@ namespace helicopter_physless
         double                                 desired_rotors_angular_speed_;
         double                                 delta_ds_;
 
-        phys_model_ptr                      phys_model_;
+        aircraft::phys_aircraft_ptr            phys_model_;
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;

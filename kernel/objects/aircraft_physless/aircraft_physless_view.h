@@ -8,6 +8,8 @@
 
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 #include "common/meteo_local.h"
 #include "aircraft_physless_state.h"

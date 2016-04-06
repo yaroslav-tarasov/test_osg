@@ -18,6 +18,7 @@
 
 #include "geometry/camera.h"
 
+#include "common/randgen.h"
 
 namespace kernel
 {
@@ -528,12 +529,12 @@ inline object_info_ptr create_object(kernel::object_create_t oc, dict_copt dict 
         function_name = class_name + "_" + sys_name(oc.sys->kind());
     }
 
-    auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(function_name);
+    //auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(function_name);
     auto fp_d = fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt dict)>(function_name);
 
-    if(fp)
-        return fp(oc);
-    else if(fp_d)
+    /*    if(fp)
+    return fp(oc);
+    else*/ if(fp_d)
         return fp_d(oc,dict);
     else
         return fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt)>(/*lib_name,*/ class_name+"_view")(boost::cref(oc), dict);
@@ -1320,7 +1321,7 @@ cg::camera_f visual_system_impl::eye_camera() const
     cg::camera_f cam = eye_ 
         ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))
         //: cg::camera_f();
-		: cg::camera_f(point_3f(-470,950,100), cprf(-120,0,0));
+		: cg::camera_f(point_3f(470,950,100), cprf(120,0,0));
 	
     cam.set_orientation((rot_f(cam.orientation()) * rot_f(cprf(props_.channel.course))).cpr());
     return cam;

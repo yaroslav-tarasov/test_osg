@@ -11,6 +11,10 @@
 
 #include "targetver.h"
 
+//////////////////////////////////
+//  Common includes
+//
+
 #include "common/boost.h"
 #include "common/stl.h"
 
@@ -24,9 +28,11 @@
 
 #include "common/misc.h"
 
-#define ORIG_EPHEMERIS
-#define SCREEN_TEXTURE
 
+
+//////////////////////////////////
+//  osgBullet, osgWorks libs
+//
 
 #ifndef _DEBUG
 #pragma comment(lib, "osgwTools.lib")
@@ -42,50 +48,50 @@
 
 #pragma warning(disable:4996)
 
+//////////////////////////////////
+// Test and debug defines
+//
 
+#define ORIG_EPHEMERIS
+#define SCREEN_TEXTURE
 // #define DEVELOP_SHADOWS
 #define TEST_SHADOWS_FROM_OSG
 // #define EXPERIMENTAL_RGB_CAM
 
-#include "nfi/fn_reg.h"
+/////////////////////////////////
+//  Core utils 
+//
 
+#include "logger/logger.hpp"
+#include "nfi/fn_reg.h"
+#include "config/config.h"
+
+#include "cpp_utils/polymorph_ptr.h"
+#include "utils/high_res_timer.h"
+#include "common/ref_counter.h"
+
+#include <tinyxml2/tinyxml2.h>
+#include "xml/tixml_xinclude.h"
+
+/////////////////////////////////
+//  CG-Lib
+//
 #include "common/meta.h"
 #include "cg_math.h"
 
 #include "common/points.h"
 #include "common/util.h"
+#include "geometry/dup_points.h"
 #include "geometry/xmath.h"
 
-////////////////////////////////
-
-
-#include "common/event.h"
-
-#include "atc/position.h"
-#include "impl/local_position.h" // FIXME объекты надо прятать 
-
-#include "geometry/dup_points.h"
-
-#include "cpp_utils/polymorph_ptr.h"
-#include "objects/nodes_management.h"
-
-namespace nm = nodes_management;
-namespace sp = std::placeholders;
+////////////////////////////////////////////
+//  Temp stub 
+//
 
 inline cg::geo_base_3 get_base()
 {
     return cg::geo_base_3(cg::geo_point_3(0.0,0.0,0));
 }
-
-#include "fms/trajectory.h"
-
-#include "phys/phys_sys_fwd.h"
-
-#include "objects/aircraft_model_inf.h"
-#include "kernel/systems/mod_system.h"
-
-#include "osg_helpers.h"
-
 
 namespace boost {
 namespace python {
@@ -103,10 +109,22 @@ namespace python {
 
 }
 
+template<typename T>
+inline double get_wheel_radius(T node)
+{  
+    //const double radius = 0.75 * node->get_bound().radius ;
+    return /*0.75 **/ (node->get_bound().size().z / 2.);
+}
 
-#include "aircraft/aircraft_common.h"
-#include "vehicle/vehicle_common.h"
-#include "airport/airport_common.h"
+enum objects_t{
+    NONE_TYPE    ,
+    AIRCRAFT_TYPE,
+    VEHICLE_TYPE
+};
+
+#include "nodes_management_fwd.h"
+
+namespace nm = nodes_management;
 
 namespace vehicle
 {
@@ -133,40 +151,40 @@ namespace aircraft
     inline static   double                 min_radius() {return 18.75;}; 
     inline static   double                 step()       {return 2.0;}; 
 }
+////////////////////////////////
+//  Common includes
+//
 
-#include <tinyxml2/tinyxml2.h>
-#include "xml/tixml_xinclude.h"
+#include "common/event.h"
+#include "kernel/systems/mod_system.h"
+#include "phys/phys_sys_fwd.h"
 
-#include "config/config.h"
+////////////////////////////////////////////
+//  Cg to osg and vice versa
+//
+
+#include "osg_helpers.h"
+
+////////////////////////////////////////////
+//  Common includes (wrong place)
+//
+
+#include "impl/local_position.h" // FIXME объекты надо прятать 
+#include "fms/trajectory.h" 
+#include "objects/aircraft_model_inf.h"
+#include "objects/nodes_management.h"
 
 
-template<typename T>
-inline double get_wheel_radius(T node)
-{  
-   //const double radius = 0.75 * node->get_bound().radius ;
-   return /*0.75 **/ (node->get_bound().size().z / 2.);
-}
 
-enum objects_t{
-    NONE_TYPE    ,
-    AIRCRAFT_TYPE,
-    VEHICLE_TYPE
-};
+////////////////////////////////////////////
+//  av 
+//
 
 #include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
-
-#include "utils/high_res_timer.h"
-
-#include "common/ref_counter.h"
 #include "av/avScene.h"
 
 
-
-
 #endif // precompile_header
-
-
-//#define OSG_NODE_IMPL
 
 

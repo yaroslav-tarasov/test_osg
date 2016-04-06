@@ -136,7 +136,7 @@ Cloud::Cloud(size_t nID)
             fCurRadScale = osg::square(1.0f - fCurH * fCurH);
 
         // when going up - less particles needed
-        size_t nParticlesCurLayer = ceil(fCurRadScale * g_nLayerParticlsCount);
+        size_t nParticlesCurLayer = cg::ceil(fCurRadScale * g_nLayerParticlsCount);
 
         // resize arrays by new layer
         m_paEllipsePointPos->resize(nParticlesCollected + nParticlesCurLayer);

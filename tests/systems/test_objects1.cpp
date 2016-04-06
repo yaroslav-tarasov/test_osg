@@ -11,6 +11,9 @@ FIXME(Это что за нафиг нужно  для object_creators )
 #include "common/flock_manager.h"
 #include "objects/aerostat/aerostat_common.h"
 #include "common/aerostat.h"
+#include "vehicle/vehicle_common.h"
+#include "airport/airport_common.h"
+#include "aircraft/aircraft_common.h"
 
 #include "objects/human/human_common.h"
 #include "common/human.h"

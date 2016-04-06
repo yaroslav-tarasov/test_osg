@@ -2,27 +2,9 @@
 
 #include <sys/stat.h>
 
+#include "Database.h"
 #include "Utils.h"
 #include "Timer.h"
-
-namespace 
-{
-
-FIXME(Дублируем функционал)
-struct fpl_wrap 
-{
-	fpl_wrap(const std::string& name)
-	{
-		fpl_.push_back(cfg().path.data + "/models/" + name + "/");
-		fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
-        fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
-	};
-
-	osgDB::FilePathList fpl_;
-};
-
-
-}
 
 namespace Database
 {

@@ -2,12 +2,15 @@
 #include "precompiled_objects.h"
 
 #include "flock_manager_ctrl.h"
+#include "common/randgen.h"
 
 //       Для создания дочерних объектов (чет фуфел какой-то)
 FIXME(Создание множества дочерних объектов и клонирование)
 #include "kernel/systems/fake_system.h"
 #include "flock_child/flock_child_view.h"
 #include "nodes_manager/nodes_manager_view.h"
+
+
 
 namespace flock
 {

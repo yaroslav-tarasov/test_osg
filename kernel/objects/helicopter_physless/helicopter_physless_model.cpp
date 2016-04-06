@@ -573,7 +573,7 @@ void model::freeze_position()
     root_->set_position(root_node_pos);
 }
 
-void model::set_phys_model(phys_model_ptr phys_aircraft)
+void model::set_phys_model(aircraft::phys_aircraft_ptr phys_aircraft)
 {
     if (!phys_aircraft)
     {

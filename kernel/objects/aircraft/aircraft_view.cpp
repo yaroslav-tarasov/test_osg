@@ -3,6 +3,8 @@
 
 #include "aircraft_view.h"
 #include "aircraft_common.h"
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 #include "kernel/object_info.h"
 #if 0

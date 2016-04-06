@@ -20,22 +20,6 @@
 
 namespace avCore
 {
-    namespace {
-        struct fpl_wrap 
-        {
-            fpl_wrap(const std::string& name)
-            {
-                fpl_.push_back(cfg().path.data + "/models/" + name + "/");
-                fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
-                fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
-            };
-
-            osgDB::FilePathList fpl_;
-        };
-    }
-
-
-
     ObjectManager& ObjectManager::get()
     {
         static ObjectManager  m;
@@ -139,7 +123,7 @@ void  Object::setupInstanced()
 {
     if(!(_inst_manager.valid()))
     {
-        fpl_wrap fpl(_name);
+        ::Database::fpl_wrap fpl(_name);
         
         std::string anim_file_name =  osgDB::findFileInPath("data.row", fpl.fpl_,osgDB::CASE_INSENSITIVE);
 
@@ -222,7 +206,7 @@ struct helper_t
 
 Object* createObject(std::string name, bool fclone)
 {
-	fpl_wrap fpl(name);
+	::Database::fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
 	Object*    object      = nullptr;
     boost::optional<xml_model_t> data;
@@ -347,10 +331,10 @@ Object* createObject(std::string name, bool fclone)
                     
                     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
                     
-                    for(int i =0 ; i<  geode_source->getNumDrawables(); ++i)
+                    for(int gc =0 ; gc<  geode_source->getNumDrawables(); ++gc)
                     {
-                        osg::Geometry* geo_mesh_source = geode_source->getDrawable(i)->asGeometry();
-                        osg::Geometry* geo_mesh_target = geode_target->getDrawable(i)->asGeometry();
+                        osg::Geometry* geo_mesh_source = geode_source->getDrawable(gc)->asGeometry();
+                        osg::Geometry* geo_mesh_target = geode_target->getDrawable(gc)->asGeometry();
 
                         osg::ref_ptr<osgAnimation::MorphGeometry> morph =
                             new osgAnimation::MorphGeometry( *geo_mesh_source );

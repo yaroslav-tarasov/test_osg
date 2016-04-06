@@ -1,6 +1,8 @@
 #pragma once
 
 #include "aircraft_fwd.h"
+#include "objects/aircraft.h"
+#include "objects/aircraft_fms.h"
 
 #include "phys/phys_sys_fwd.h"
 #include "atc/position.h"

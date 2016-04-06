@@ -14,11 +14,9 @@ namespace utils
      {
      public:
          Terrain (osg::Group *);
-         /*osg::Node* */ 
-         void create( const std::string& name );
+         void Create( const std::string& name );
 		 void setGrassMapFactor(float value);
-     //protected:
-     //    void fill_navids(std::string file, std::vector<osg::ref_ptr<osg::Node>>& cur_lamps, osg::Group* parent, osg::Vec3f const& offset);
+
      private:
          void cull( osg::NodeVisitor * pNV );
      private:

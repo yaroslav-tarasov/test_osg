@@ -1,6 +1,8 @@
 #pragma once
 
 #include "helicopter_physless/helicopter_physless_msg.h"
+#include "phys/aircraft.h"
+#include "aircraft/aircraft_common.h"
 
 
 namespace helicopter_physless
@@ -12,7 +14,8 @@ namespace helicopter_physless
         rs_sagged
     };
 
-    struct phys_model
+#if 0
+    struct phys_aircraft
     {
         virtual void                 update            () = 0;
         virtual void                 attach_tow        ( bool attached ) = 0;
@@ -37,6 +40,7 @@ namespace helicopter_physless
     };
 
 
-    typedef polymorph_ptr<phys_model> phys_model_ptr;
+    typedef polymorph_ptr<phys_aircraft> phys_aircraft_ptr;
+#endif
 
 } // aircraft

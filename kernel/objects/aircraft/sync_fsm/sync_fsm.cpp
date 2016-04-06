@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "aircraft/aircraft_common.h"
 #include "precompiled_objects.h"
 
 #include "sync_none_state.h"

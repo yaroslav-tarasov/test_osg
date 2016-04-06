@@ -3,6 +3,8 @@
 
 #include "aircraft_model.h"
 #include "aircraft_common.h"
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 #include "sync_fsm/sync_phys_state.h"
 #include "sync_fsm/sync_none_state.h"

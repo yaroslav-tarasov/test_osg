@@ -9,7 +9,7 @@ namespace sync_fsm
 {
     struct transition_fms_phys_state : state_t
     {
-        transition_fms_phys_state(self_t &self, phys_model_ptr phys_aircraft, geo_base_3 const& base, double time)
+        transition_fms_phys_state(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base, double time)
             : self_(self)
             , phys_aircraft_(phys_aircraft)
             , base_(base)
@@ -27,7 +27,7 @@ namespace sync_fsm
         geo_base_3 base_;
         size_t zone_;
 
-        phys_model_ptr phys_aircraft_;
+        phys_aircraft_ptr phys_aircraft_;
     };
 
 }

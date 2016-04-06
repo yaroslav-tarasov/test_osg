@@ -42,7 +42,7 @@ int main_grass_test( int argc, char** argv )
     pSceneSS->addUniform(_lightDirUniform.get());
 
     osg::ref_ptr<avTerrain::Terrain> _terrainNode =  new avTerrain::Terrain (root);
-    _terrainNode->create(scene_name);
+    _terrainNode->Create(scene_name);
     
     root->addChild(_terrainNode);
     root->addChild(plane[0]);

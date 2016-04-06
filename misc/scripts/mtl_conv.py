@@ -1,4 +1,4 @@
-import ntpath
+﻿import ntpath
 
 def isnumeric(s):
     '''Returns True for all non-unicode numbers'''

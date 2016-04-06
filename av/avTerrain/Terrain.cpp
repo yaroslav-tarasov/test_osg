@@ -223,10 +223,11 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 }
 
-void  Terrain::create( const std::string& name )
+void  Terrain::Create( const std::string& cFileName )
 {
+    Database::fpl_wrap  fpl(cFileName);
 
-    auto wf =  [this](std::string name)->osg::Node* {
+    auto wf =  [this](std::string cFileName)->osg::Node* {
  
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
@@ -238,39 +239,39 @@ void  Terrain::create( const std::string& name )
     
     high_res_timer hr_timer;
 
-    if(name != "empty" && !name.empty() )
+    if(cFileName != "empty" && !cFileName.empty() )
     {
 
     std::string scene_name;
     std::string mat_file_name;
 
-    if(name == "sheremetyevo")
+    if(cFileName == "sheremetyevo")
     {
         scene_name =    "sheremetyevo.osgb";//"sheremetyevo.open.osgb";//"sheremetyevo.osgb"; 
         mat_file_name = "sheremetyevo.dae.mat.xml"; //"sheremetyevo.open.dae.mat.xml"; 
     }
-    else if(name == "adler")
+    else if(cFileName == "adler")
     {
         scene_name = "adler.osgb";  
         mat_file_name = "adler.open.dae.mat.xml"; 
     }
-	else if(name == "minsk")
+	else if(cFileName == "minsk")
 	{
         scene_name = "minsk.dae";  
         mat_file_name = "minsk.dae.mat.xml"; 
 	}
-    else if(name == "lipetsk")
+    else if(cFileName == "lipetsk")
     {
         scene_name = "lipetsk.dae";  
         mat_file_name = "lipetsk.dae.mat.xml"; 
     }
-    else if(name == "eisk")
+    else if(cFileName == "eisk")
     {
         scene_name = "eisk.dae";  
         mat_file_name = "eisk.dae.mat.xml"; 
     } 
 
-    osg::Node* scene = osgDB::readNodeFile(name + "/"+ scene_name);  
+    osg::Node* scene = osgDB::readNodeFile(cFileName + "/"+ scene_name);  
     
     if (scene->asTransform())
         baseModel = scene->asTransform()->asPositionAttitudeTransform();
@@ -309,11 +310,12 @@ void  Terrain::create( const std::string& name )
     nl.push_back("plane");
     nl.push_back("default");
 
-    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + name + "/"+mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,cFileName,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + cFileName + "/"+mat_file_name));
     scene->accept(mv);
     
 
-    if(name == "eisk")
+    FIXME(Test code)
+    if(cFileName == "eisk")
     {
         findNodeByType< osg::Geode> geode_finder;  
         geode_finder.apply(*scene);
@@ -407,20 +409,19 @@ void  Terrain::create( const std::string& name )
 
 #ifdef ASYNC_OBJECT_LOADING
     //_lnt =   new utils::LoadNodeThread ( boost::bind<osg::Node*>(wf, name) );
-	wf(name);
+	wf(cFileName);
 #else
-    wf(name);
+    wf(cFileName);
 #endif
-    // osgDB::writeNodeFile(*movingModel,"test_osg_struct.osgt");
-
-    fill_navids(
-        lights_file(name), 
-        /*_lamps*/avScene::Scene::GetInstance()->getLamps(),
-        _sceneRoot, 
-        lights_offset(name) ); 
-
-
-
+    
+    std::string scn_file_name =  osgDB::findFileInPath(lights_file(cFileName), fpl.fpl_,osgDB::CASE_INSENSITIVE);
+    
+    if(!scn_file_name.empty())
+        fill_navids(
+            scn_file_name, 
+            avScene::Scene::GetInstance()->getLamps(),
+            _sceneRoot, 
+            lights_offset(cFileName) ); 
 
 }
 

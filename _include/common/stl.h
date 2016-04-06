@@ -41,3 +41,7 @@ using std::make_pair;
 
 using std::move;
 using std::forward;
+
+using ::ceil;
+
+namespace sp = std::placeholders;

@@ -12,7 +12,6 @@
 client_interface_ptr create_client();
 
 using namespace boost;
-// using namespace cg;
 using std::string;
 using std::vector;
 using boost::property_tree::ptree;

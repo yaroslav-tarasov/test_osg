@@ -1,15 +1,14 @@
 #pragma once
 
-
-
 //#include "../common/phys_sys.h"
 //#include "meteo/meteo.h"
 
-//using namespace cg;
 
 // #include "geometry/primitives.h"
 #include "atc/position.h"
 #include "aircraft/aircraft_common.h" 
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 namespace phys
 {

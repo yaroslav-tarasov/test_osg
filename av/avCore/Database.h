@@ -4,6 +4,18 @@ namespace Database
 {
     std::string LoadShader   (const std::string& name);
     void        initDataPaths();
+    
+    struct fpl_wrap 
+    {
+        fpl_wrap(const std::string& name)
+        {
+            fpl_.push_back(cfg().path.data + "/models/" + name + "/");
+            fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
+            fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
+        };
+
+        osgDB::FilePathList fpl_;
+    };
 
 } // ns Database
 

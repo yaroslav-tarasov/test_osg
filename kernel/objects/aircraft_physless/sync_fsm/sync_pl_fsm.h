@@ -6,6 +6,8 @@
 #include "../../common/airports_manager.h"
 #include "../../common/aircraft_fms.h"
 #include "../../common/phys_sys.h"
+#include "../../common/chassis_common.h"
+#include "../../common/rotors_common.h"
 
 namespace aircraft_physless
 {
@@ -55,7 +57,7 @@ namespace aircraft_physless
             
             virtual void switch_sync_state    (state_ptr state) = 0;
             virtual void freeze_position      () = 0;
-            virtual void set_phys_aircraft(phys_aircraft_ptr phys_aircraft) = 0;
+            virtual void set_phys_aircraft(aircraft::phys_aircraft_ptr phys_aircraft) = 0;
             virtual void set_nm_angular_smooth(double val) = 0;
             
             virtual fms::trajectory_ptr get_trajectory() const = 0;  

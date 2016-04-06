@@ -17,7 +17,7 @@ namespace aircraft_physless
 
         struct phys_state2 : state_t
         {
-            phys_state2(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+            phys_state2(self_t &self, aircraft::phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
                 : self_(self)
                 , desired_speed_(aircraft::min_desired_velocity())
                 , on_ground_(false)
@@ -52,7 +52,7 @@ namespace aircraft_physless
             self_t &self_;
             geo_base_3 base_;
             size_t zone_;
-            phys_aircraft_ptr phys_aircraft_;
+            aircraft::phys_aircraft_ptr phys_aircraft_;
             bool on_ground_;
 
 
@@ -60,7 +60,7 @@ namespace aircraft_physless
         };
 
 
-        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+        sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, aircraft::phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
         {
                 return boost::make_shared<phys_state2>(self,phys_aircraft,base);
         }

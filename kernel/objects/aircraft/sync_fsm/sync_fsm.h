@@ -5,6 +5,8 @@
 #include "../../common/airports_manager.h"
 #include "../../common/phys_sys.h"
 #include "../../common/aircraft_fms.h"
+#include "../../common/chassis_common.h"
+#include "../../common/rotors_common.h"
 
 namespace aircraft
 {

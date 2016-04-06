@@ -2,7 +2,10 @@
 
 #include "atc/position.h"
 //#include "objects/helicopter_physless.h"
+#include "aircraft/aircraft_common.h"
 #include "helicopter_physless_common.h" 
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 namespace phys
 {
@@ -15,9 +18,9 @@ namespace helicopter_physless
     using namespace aircraft;
 
     struct phys_aircraft_impl
-        : phys_model
+        : phys_aircraft
     {
-        static phys_model_ptr create(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
+        static phys_aircraft_ptr create(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
  /*                                      meteo::meteo_cursor_ptr meteo_cursor, */
                                        nodes_management::manager_ptr nodes_manager, 
                                        geo_position const& initial_position, 

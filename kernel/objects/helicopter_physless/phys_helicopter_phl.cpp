@@ -7,14 +7,12 @@
 #include "phys/phys_sys.h"
 
 
-using namespace cg;
-
-namespace sp = std::placeholders;
+//using namespace cg;
 
 namespace helicopter_physless
 {
 
-    phys_model_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
+    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
                                     phys::system_ptr phys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
                                     nodes_management::manager_ptr nodes_manager, 

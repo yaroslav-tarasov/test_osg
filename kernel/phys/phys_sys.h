@@ -7,6 +7,7 @@
 #include "phys/flock.h"
 #include "phys/character.h"
 #include "phys/aerostat.h"
+#include "phys/aircraft.h"
 
 namespace phys
 {

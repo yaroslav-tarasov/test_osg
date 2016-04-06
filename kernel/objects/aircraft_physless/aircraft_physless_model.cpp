@@ -3,6 +3,8 @@
 
 #include "aircraft_physless_model.h"
 #include "aircraft_physless_common.h"
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 #include "sync_fsm/sync_pl_phys_state.h"
 #include "sync_fsm/sync_pl_none_state.h"
@@ -578,7 +580,7 @@ void model::freeze_position()
     root_->set_position(root_node_pos);
 }
 
-void model::set_phys_aircraft(phys_aircraft_ptr phys_aircraft)
+void model::set_phys_aircraft(aircraft::phys_aircraft_ptr phys_aircraft)
 {
     if (!phys_aircraft)
     {

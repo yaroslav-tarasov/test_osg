@@ -2,7 +2,10 @@
 
 #include "atc/position.h"
 //#include "objects/aircraft_physless.h"
-#include "aircraft_physless_common.h" 
+#include "aircraft/aircraft_common.h"
+// #include "aircraft_physless_common.h" 
+#include "common/chassis_common.h"
+#include "common/rotors_common.h"
 
 namespace phys
 {

@@ -7,6 +7,7 @@
 #include "flock_manager\flock_manager_common.h"
 #include "objects\common\flock_manager.h"
 #include "objects\common\human.h"
+#include "objects\common\aircraft.h"
 
 namespace objects_reg
 {

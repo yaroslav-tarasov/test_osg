@@ -6,6 +6,8 @@
 #include "../../common/airports_manager.h"
 #include "../../common/aircraft_fms.h"
 #include "../../common/phys_sys.h"
+#include "../../common/chassis_common.h"
+#include "../../common/rotors_common.h"
 
 namespace helicopter_physless
 {
@@ -57,7 +59,7 @@ namespace helicopter_physless
             
             virtual void switch_sync_state    (state_ptr state) = 0;
             virtual void freeze_position      () = 0;
-            virtual void set_phys_model(phys_model_ptr phys_model) = 0;
+            virtual void set_phys_model(aircraft::phys_aircraft_ptr phys_model) = 0;
             virtual void set_nm_angular_smooth(double val) = 0;
             
             virtual fms::trajectory_ptr get_trajectory() const = 0;  

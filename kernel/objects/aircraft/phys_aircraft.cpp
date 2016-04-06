@@ -8,10 +8,6 @@
 #include "phys/phys_sys.h"
 
 
-using namespace cg;
-
-namespace sp = std::placeholders;
-
 namespace aircraft
 {
 #if 0

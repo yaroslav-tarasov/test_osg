@@ -47,8 +47,7 @@ namespace fn_reg
     typename cpp_utils::func_pointer<signature>::type
         function( std::string const& function_name)
     {
-        // FIXME TODO
-        // DECL_LOGGER("nfi");
+        DECL_LOGGER("nfi");
 
         boost::any func = extract_function( function_name);
 
@@ -63,8 +62,7 @@ namespace fn_reg
         }
         catch(boost::bad_any_cast const&)
         {
-            // FIXME TODO
-            // LogError("function type mismatch: " << function_name << " in " << lib_name);
+            LogError("function type mismatch: " << function_name /*<< " in " << lib_name*/);
         }
 
         return nullptr;
