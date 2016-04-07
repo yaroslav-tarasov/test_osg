@@ -245,7 +245,8 @@ struct client
         , timer_    (boost::bind(&client::update, this))
         , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
-  
+        , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
+        , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin.txt")))
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -393,8 +394,11 @@ struct client
 
 #if 1
         ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
-        ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
-        ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )
+        //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
+        //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )   ]
+        ADD_EVENT(13.0  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
+        ADD_EVENT(14.0  , create(172,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "L39", "172") )
+        
 #endif
 
 #if 1
@@ -453,6 +457,42 @@ struct client
 
             this->send(&msg[0], msg.size());
         };
+
+        run_f_trp_ = [this](uint32_t id, double time, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                id 
+                , traj_trp_->kp_value    (time)
+                , traj_trp_->curs_value  (time)
+                , *traj_trp_->speed_value(time)
+                , time 
+                , false
+                , meteo::local_params()
+                )));
+
+            this->send(&msg[0], msg.size());
+        };
+
+        run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                id 
+                , traj_pos_->kp_value    (time)
+                , traj_pos_->curs_value  (time)
+                , *traj_pos_->speed_value(time)
+                , time + traj_offset
+                , false
+                , meteo::local_params()
+                )));
+
+            this->send(&msg[0], msg.size());
+        };
+
+        runs_.insert(make_pair(traj_->base_length(),
+            boost::bind( run_f_trp_ , 172,_1,traj_offset)
+            ));
+
+        runs_.insert(make_pair(traj2_->base_length(),
+            boost::bind( run_f_pos_, 173,_1,traj_offset)
+            ));
 
 
         runs_.insert(make_pair(traj_->base_length(),
@@ -643,7 +683,10 @@ private:
     
     fms::trajectory_ptr                                                  traj_;
     fms::trajectory_ptr                                                 traj2_;
-    
+    fms::trajectory_ptr                                              traj_pos_;
+    fms::trajectory_ptr                                              traj_trp_;
+
+
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
     time_queue_msgs_t                                                    msgs_;
     
@@ -651,12 +694,14 @@ private:
 
     run_wrap_f                                                          run_f_;
     run_wrap_f                                                         run_f2_;
+    run_wrap_f                                                      run_f_trp_;
+    run_wrap_f                                                      run_f_pos_;
+                                                          
 
     typedef boost::function<void(double /*time*/)>   run_f;
 
     typedef std::multimap<double, run_f>  time_queue_run_t;
     time_queue_run_t                                                     runs_;
-
 
 
 };

@@ -1977,12 +1977,14 @@ void Scene::update( osg::NodeVisitor * nv )
           _time_panel->set_time(lt * 1000.f);
       }
 
-      const double et = lt * 500;
+      const unsigned base_hour = 10;
+      const unsigned time_coeff   = 1; // 500; 
+      const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
       bool bsetup =  (vTime.Second != unsigned(et) % 60) || (vTime.Minute != unsigned(et / 60.0)  % 60); 
       
-      vTime.Hour   = 4 + unsigned(et / 3600.0)  % 24;
+      vTime.Hour   = base_hour + unsigned(et / 3600.0)  % 24;
       vTime.Minute = unsigned(et / 60.0)  % 60;
       vTime.Second = unsigned(et) % 60;
 
