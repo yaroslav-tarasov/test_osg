@@ -89,7 +89,7 @@ namespace avScene {
         static void                                 Release();
         static Scene*                               GetInstance();
         
-        //FIXME TODO // virtual bool                PreUpdate();
+        virtual bool                                PreUpdate();
 
         inline osgViewer::Viewer*                   GetViewer();
         inline osg::Group*                          getEphemerisNode();
@@ -109,7 +109,7 @@ namespace avScene {
         static std::string                          zoneToReload(){return zone_to_reload_;}
     
     private: // IScene interface declaration
-        av::environment_weather*                    get_env_weather() const override;
+        av::environment_weather*                    getEnvWeather() const override;
 
     
     private:

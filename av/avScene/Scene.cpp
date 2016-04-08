@@ -577,7 +577,7 @@ Scene::~Scene()
 {
 }
 
-av::environment_weather* Scene::get_env_weather() const
+av::environment_weather* Scene::getEnvWeather() const
 {
     return avCore::GetEnvironment();
 }
@@ -1718,7 +1718,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
             if(root) root->accept(findNodes);
 
-            findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+            const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
             auto shift_phase = cg::rand(cg::range_2(0, 255));
 
@@ -2033,6 +2033,17 @@ void Scene::update( osg::NodeVisitor * nv )
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
 	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
 	  
+}
+
+bool Scene::PreUpdate()
+{
+    bool ret = true;
+    if (auto lm = dynamic_cast<avCore::LoadManager*>(_loadManager.get()))
+    {
+        ret &= lm->PreUpdate();
+    }
+
+    return ret;
 }
 
 void Scene::setupDecals() 

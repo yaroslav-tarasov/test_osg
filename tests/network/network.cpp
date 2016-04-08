@@ -246,7 +246,7 @@ struct client
         , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
-        , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin.txt")))
+        , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -464,7 +464,7 @@ struct client
                 , traj_trp_->kp_value    (time)
                 , traj_trp_->curs_value  (time)
                 , *traj_trp_->speed_value(time)
-                , time 
+                , time + traj_offset
                 , false
                 , meteo::local_params()
                 )));
@@ -486,11 +486,11 @@ struct client
             this->send(&msg[0], msg.size());
         };
 
-        runs_.insert(make_pair(traj_->base_length(),
-            boost::bind( run_f_trp_ , 172,_1,traj_offset)
+        runs_.insert(make_pair(traj_trp_->base_length(),
+            boost::bind( run_f_trp_ , /*172*/178, _1, /*traj_offset*/0)
             ));
 
-        runs_.insert(make_pair(traj2_->base_length(),
+        runs_.insert(make_pair(traj_pos_->base_length(),
             boost::bind( run_f_pos_, 173,_1,traj_offset)
             ));
 

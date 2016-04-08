@@ -1,6 +1,6 @@
 ﻿import ntpath
 
-path = "C:/Work/prj/test_osg/data/log_e_su_vzlet_tramplin.txt"
+path = "C:/Work/prj/test_osg/data/log_e_su_vzlet_tramplin5.txt"
 inputfile = open(path)
 outputfile = open(path+"_out.txt",'w')
 

@@ -339,6 +339,9 @@ struct frame_limiter
 
 void Visual::PreUpdate   (double ref_time)
 {
+     if(avScene::GetScene())
+         avScene::GetScene()->PreUpdate();
+
      ObjectManager::get().PreUpdate();
 }
 

@@ -89,7 +89,7 @@ namespace avCore
     LoadManager::LoadManager()
         : load_thread_(new LoadNodeThread(this))
     {
-        setUpdateCallback(Utils::makeNodeCallback(this, &LoadManager::update));
+        // setUpdateCallback(Utils::makeNodeCallback(this, &LoadManager::update));
     }
 
     LoadManager::~LoadManager()
@@ -97,6 +97,15 @@ namespace avCore
          load_thread_->stop();
     }
     
+    bool LoadManager::PreUpdate()
+    {
+        bool ret = true;
+        
+        update(nullptr);
+
+        return ret;
+    }
+
     // Use a thread to call osgDB::readNodeFile.
     void LoadManager::update( osg::NodeVisitor *  )
     {
@@ -104,16 +113,21 @@ namespace avCore
 
         if (scene == NULL)
             return;
-
+        
+        double dt = 0;
+        high_res_timer hr_timer;
+ 
         LoadManager::Task* cur_task = nullptr;
-        while ( (cur_task = finished_.try_pop()) != nullptr )
+        while ( dt < 0.5 && ((cur_task = finished_.try_pop()) != nullptr))
         {
             if(cur_task->_node.valid())
             {
-                high_res_timer hr_timer;
+                //
                 scene->getTerrainRoot()->addChild(cur_task->_node);
                 cur_task->_sig();
             }
+
+            dt += hr_timer.get_delta();
         }
     }
 

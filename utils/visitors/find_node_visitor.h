@@ -41,7 +41,7 @@ public:
 
 
     // return a reference to the list of nodes we found
-    nodeListType& getNodeList() { return foundNodeList; }
+    const nodeListType& getNodeList() const { return foundNodeList; }
 
 private:
 

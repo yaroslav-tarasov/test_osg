@@ -19,6 +19,7 @@ namespace avCore
         ~LoadManager();
 		void   update  ( osg::NodeVisitor * nv );
 		void   load    ( osg::MatrixTransform* mt, worker_f work, set_signal_f s );
+        virtual bool                                PreUpdate();
 
     private:
         struct Task;

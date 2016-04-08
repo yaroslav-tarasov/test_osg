@@ -67,7 +67,9 @@ namespace av
     // interface declaration
     struct IScene /*: ref_counter*/
     {
-        virtual environment_weather*    get_env_weather         () const = 0;
+        virtual environment_weather*    getEnvWeather         () const = 0;
+        
+        virtual bool                    PreUpdate() = 0;
 #if 0
         virtual debug_render_ptr        get_scene_debug_renderer() const = 0;
 #endif

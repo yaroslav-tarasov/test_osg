@@ -189,7 +189,7 @@ namespace environment
 
         FIXME (Èםעונפויס ך ןמדמהו)
         //sys_->scene()->get_env_weather()->set_environment(env);
-        sys_->scene()->get_env_weather()->SetWeather(wth) ;
+        sys_->scene()->getEnvWeather()->SetWeather(wth) ;
     }   
 
     void visual::on_start_time_changed()

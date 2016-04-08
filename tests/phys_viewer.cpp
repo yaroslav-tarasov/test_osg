@@ -114,7 +114,7 @@ int main_phys_viewer( int argc, char** argv )
     osg::Group* launchHandlerAttachPoint = new osg::Group;
     root->addChild( launchHandlerAttachPoint );
     
-    std::string         model_name = "human";
+    std::string         model_name = "eisk";
     
     auto obj = avCore::createObject(model_name);
     osg::ref_ptr< osg::Node > rootModel( obj->getOrCreateNode() );
@@ -125,7 +125,7 @@ int main_phys_viewer( int argc, char** argv )
     }
     
     btCompoundShape*        cs_;
-    bool loaded = phys::loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs_);
+    bool loaded = phys::loadBulletFile(cfg().path.data + "/areas/" + model_name + "/" + model_name + ".bullet",  cs_);
     if(loaded)
     {
         const btTransform ct0 = cs_->getChildTransform(0);
