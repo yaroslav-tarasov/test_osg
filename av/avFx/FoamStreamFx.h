@@ -108,7 +108,7 @@ namespace avFx
 			base_cpu_particle(sp, lt, age), start_time(st), start_vel(sv), factor(f), randoms(rand) {}
 		};
 
-		typedef cpu_part_queue<cpu_particle>    foam_cpu_queue;
+		typedef cpu_part_queue<cpu_particle>   foam_cpu_queue;
 		sfx_pos_time_emitter<foam_cpu_queue>   emitter_;
 
 		// gpu part queue

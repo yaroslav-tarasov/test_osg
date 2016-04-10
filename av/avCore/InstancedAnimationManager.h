@@ -7,9 +7,26 @@ namespace avCore
 {
 	class  InstancedAnimationManager  : public osg::Object       
 	{
+		struct instanced_nodes_vector_t
+		{
+			instanced_nodes_vector_t()
+				: parented(false)
+			{}
+
+			instanced_nodes_vector_t(osg::Node* first, osg::Node* second )
+				: parented(false)
+				, first   (first)
+				, second  (second)
+			{}
+
+			osg::ref_ptr<osg::Node> first;
+		    osg::ref_ptr<osg::Node> second;
+			bool                    parented;
+		};
+
+		typedef std::vector< instanced_nodes_vector_t > InstancedNodesVectorType;
 	public:
 		typedef std::vector<osg::Matrixf>              InstancedDataType;
-        typedef std::vector< std::pair<osg::ref_ptr<osg::Node>,osg::ref_ptr<osg::Node>> > InstancedNodesVectorType;
 	public:
         
         META_Object(avCore,InstancedAnimationManager);
@@ -43,7 +60,7 @@ namespace avCore
         void                        _initData();
 	private:
 		osg::observer_ptr<osg::Node>             src_model_;
-
+		osg::Quat                                 src_quat_;
      // Instanced staff   
         osg::ref_ptr<osg::Geode>                 instGeode_;
 

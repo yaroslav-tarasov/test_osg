@@ -468,7 +468,7 @@ struct visapp
     void update(double time)
     {    
         gt_.set_time(time);
-        force_log fl;       
+        //force_log fl;       
         LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
     }
  

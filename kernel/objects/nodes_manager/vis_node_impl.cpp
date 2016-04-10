@@ -114,7 +114,7 @@ void vis_node_impl::pre_update(double time)
 
     if(!(extrapolated_position_.is_local()))
     {    
-        force_log fl; 
+        //force_log fl; 
 
         double dt = time - *time_;
         

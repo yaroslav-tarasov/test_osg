@@ -118,7 +118,7 @@ namespace avCore
         high_res_timer hr_timer;
  
         LoadManager::Task* cur_task = nullptr;
-        while ( dt < 0.5 && ((cur_task = finished_.try_pop()) != nullptr))
+        while ( dt < 0.01 && ((cur_task = finished_.try_pop()) != nullptr))
         {
             if(cur_task->_node.valid())
             {
@@ -129,6 +129,12 @@ namespace avCore
 
             dt += hr_timer.get_delta();
         }
+
+		if(dt>0)
+		{
+			force_log fl;
+			LOG_ODS_MSG("LoadManager::update( osg::NodeVisitor *  )" << dt << "\n");
+		}
     }
 
     void LoadManager::load ( osg::MatrixTransform* mt, worker_f work , set_signal_f s)

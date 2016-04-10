@@ -247,8 +247,9 @@ void visual::update(double time)
 					// double speed = cg::sqrt(dist*9.8/cg::abs(sin(2.0*cg::grad2rad()*15.0)) );
                     const double dt = (time - *fs_start_time_)/4.0;
                     double speed = cg::sqrt(dist*9.8/cg::abs(sin(cg::grad2rad()*15.0)) * 0.5 ) * ((dt)<1.0?dt:1.0);
+
                     
-                    if (dist > 50.0)
+					if (dist > 50.0)
                     {
                       if(!fs_stop_time_)
                           fs_stop_time_ = time;

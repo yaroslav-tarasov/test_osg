@@ -197,7 +197,9 @@ struct helper_t
     
     ~helper_t()
     {
-        OSG_WARN << "createObject : " << name << "  time: "<< hr_timer.set_point() << "\n";
+		force_log fl;
+
+		LOG_ODS_MSG( "createObject : "  << name << "  time: "<< hr_timer.set_point() << "\n");
     }
     
     high_res_timer hr_timer;

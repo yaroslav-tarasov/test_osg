@@ -825,7 +825,7 @@ int main( int argc, char **argv )
         findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
         root->accept(findNodes);
 
-        findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+        const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
         for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
         {

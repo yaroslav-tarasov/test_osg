@@ -78,6 +78,17 @@ namespace avCore
         _loadAnimationData(anim_file_name);
 
         instGeode_  = _createGeode();
+
+		auto tr = src_model_->asTransform();
+	    if(tr->asPositionAttitudeTransform())
+		{
+			src_quat_ = tr->asPositionAttitudeTransform()->getAttitude();
+		}
+		
+		if(tr->asMatrixTransform())
+		{
+			src_quat_ = tr->asMatrixTransform()->getMatrix().getRotate();
+		}
     }
 
 
@@ -322,7 +333,7 @@ namespace avCore
         pat->setName("pat");
 #endif
 
-        inst_nodes_.push_back(make_pair(root,nullptr));
+        inst_nodes_.push_back(instanced_nodes_vector_t(root,nullptr));
         return root; 
     }
 
@@ -332,7 +343,7 @@ namespace avCore
         size_t inst_counter=0;
 
         inst_nodes_.erase(std::remove_if(inst_nodes_.begin(), inst_nodes_.end(),
-                                        [](const InstancedNodesVectorType::value_type& v){return v.second && (v.second->getNumParents()==0);})
+                                        [](const InstancedNodesVectorType::value_type& v){return v.second && (v.second->getNumParents()==0) && v.parented;})
                                         , inst_nodes_.end());
 
         for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
@@ -346,11 +357,11 @@ namespace avCore
 
             if(nd.second && nd.second->getNumParents()>0)
 			{
+			  nd.parented  = true;
 			  osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
               osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
-                                         * osg::Matrix::rotate(osg::inDegrees(90.0f),1.0f,0.0f,0.0f)
-                                         * osg::Matrixf::rotate(matrix.getRotate()) 
-                                         * osg::Matrixf::translate(matrix.getTrans());
+                                       * osg::Matrix::rotate(src_quat_ * matrix.getRotate())
+                                       * osg::Matrixf::translate(matrix.getTrans());
 
 			  instancesData_[idx] = modelMatrix;
 
