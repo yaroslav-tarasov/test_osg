@@ -99,7 +99,7 @@ namespace vehicle
 {
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "vehicle";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -135,7 +135,7 @@ namespace aircraft_physless
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -156,7 +156,7 @@ namespace helicopter_physless
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos)
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "helicopter_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -199,12 +199,15 @@ namespace camera
 {
 	using namespace kernel;
 
-	object_info_ptr create(fake_objects_factory* sys, boost::optional<std::string> name)
+	object_info_ptr create(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
 	{
 		const std::string class_name = "camera";
 		const std::string unique_name = name?*name:sys->generate_unique_name(class_name);
-		/*camera_object::binoculars_t  data;*/
-		obj_create_data ocd(class_name, unique_name/*, dict::wrap(data)*/);
+		// camera_object::binoculars_t  data;
+        camera_object::camera_data  data;
+        data.cam_orien = init_pos.orien;
+        data.cam_pos   = init_pos.pos;
+		obj_create_data ocd(class_name, unique_name, dict::wrap(data));
 
 		ocd
 			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))

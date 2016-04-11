@@ -256,7 +256,8 @@ struct client
 
          
 #if 1
-        ADD_EVENT(0.0  , create(1500,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1500, point_3f(-2225.61,-543.767, 16 ), quaternion(cprf(-6.0492,0,0)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(470,950,100), quaternion(cprf(120,0,0)) , ok_camera, "camera 1", "") )
 #endif
 
         ADD_EVENT(time , state(0.0,time,factor))
@@ -485,6 +486,47 @@ struct client
 
             this->send(&msg[0], msg.size());
         };
+        
+        runs_once_.insert(make_pair( 1,
+            [this]( double time )->void {
+
+                client::net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+
+                for (auto it = hp.begin(); it!=hp.end(); ++it )
+                {
+                    for (auto it_p = peers_.begin(); it_p!=peers_.end();++it_p)
+                        if((*it).host.ip==it_p->first.addr.to_string())
+                        {
+                            binary::bytes_t bts =  std::move(network::wrap_msg(props_updated((*it).task.properties)));
+                            it_p->second->send(&bts[0], bts.size());
+                        }
+                }	
+        }
+        ));
+
+        runs_once_.insert(make_pair( 25,
+            [this]( double time )->void {
+
+            client::net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+
+            for (auto it = hp.begin(); it!=hp.end(); ++it )
+            {
+                for (auto it_p = peers_.begin(); it_p!=peers_.end();++it_p)
+                if((*it).host.ip==it_p->first.addr.to_string())
+                {
+                    kernel::vis_sys_props props;
+                    std::stringstream is((*it).task.properties);
+                    prop_tree::read_from(is, props);
+                    props.channel.camera_name = "camera 1";
+                    std::stringstream os;
+                    prop_tree::write_to(os, props); 
+
+                    binary::bytes_t bts =  std::move(network::wrap_msg(props_updated(os.str())));
+                    it_p->second->send(&bts[0], bts.size());
+                }
+            }	
+        }
+        ));
 
         runs_.insert(make_pair(traj_trp_->base_length(),
             boost::bind( run_f_trp_ , /*172*/178, _1, /*traj_offset*/0)
@@ -570,7 +612,7 @@ private:
             LogInfo("Send peers list to " << peer);
         }
         
-        
+
         {
             net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
 
@@ -629,6 +671,18 @@ private:
             if (it->first <= time) {
                 it->second(time);
             }
+        }
+
+        std::vector<time_queue_run_t::iterator> to_delete;
+        for(time_queue_run_t::iterator it = runs_once_.begin(); it != runs_once_.end(); ++it ) {
+            if (it->first <= time) {
+                it->second(time);
+                to_delete.push_back(it);
+            }
+        }
+        
+        for(auto it = to_delete.begin(); it != to_delete.end(); ++it ) {
+             runs_once_.erase(*it);
         }
 
 #if 0
@@ -702,7 +756,7 @@ private:
 
     typedef std::multimap<double, run_f>  time_queue_run_t;
     time_queue_run_t                                                     runs_;
-
+    time_queue_run_t                                                runs_once_;
 
 };
 

@@ -16,6 +16,8 @@ namespace camera_object
 		: view          (oc, dict)
 		, magnification_(1.)
 	{
+        if(mng())
+            root()->set_position(geo_position(cam_pos, cam_orien));
 	}
 
 
@@ -32,4 +34,4 @@ namespace camera_object
 
 }
 
-AUTO_REG_NAME(camera_visual, camera_object::ctrl::create);
+AUTO_REG_NAME(camera_ext_ctrl, camera_object::ctrl::create);

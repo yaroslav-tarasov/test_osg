@@ -85,20 +85,60 @@ namespace
 namespace
 {
 
+
+
+
+
 struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size, endpoint peer)>   on_receive_f;
-     typedef boost::function<void(double time)>                     on_update_f;     
-     
+     typedef boost::function<void(const void* data, size_t size)>                  on_ses_receive_f;
 
-     net_worker(const  endpoint &  peer, const endpoint& mod_peer, on_receive_f on_recv , on_update_f on_update)
+     typedef boost::function<void(double time)>                                    on_update_f;     
+
+     struct ses_helper
+     {
+         ses_helper (net_worker* nw)
+             : nw_ (nw)
+         {}
+
+         void on_accepted(network::tcp::socket& sock, endpoint const& peer)
+         {
+             const uint32_t id = peer.port;
+             socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock 
+                 , boost::bind(&ses_helper::on_recieve, this, _1,_2, peer)
+                 , boost::bind(&net_worker::on_disconnected, nw_, _1, id)
+                 , boost::bind(&net_worker::on_error, nw_, _1, id)
+                 ));        
+
+             LogInfo("Client " << peer << " accepted");
+         }
+
+         void on_recieve(const void* data, size_t size, endpoint const& peer)
+         {
+             __main_srvc__->post(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
+         }
+
+         void do_recieve(binary::bytes_ptr data )
+         {
+             if (nw_->on_ses_recv_)
+                 nw_->on_ses_recv_(binary::raw_ptr(*data), binary::size(*data));
+         }
+
+         std::shared_ptr<tcp_fragment_wrapper>   socket_;
+         net_worker*                             nw_;
+     };
+
+     net_worker(const  endpoint &  peer, const endpoint& mod_peer, on_receive_f on_recv ,on_ses_receive_f on_ses_recv , on_update_f on_update)
          : period_     (0.05)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , mod_peer_   (mod_peer)
          , peer_       (peer)
          , on_receive_ (on_recv)
+         , on_ses_recv_ (on_ses_recv)
          , on_update_  (on_update)
          , done_       (false)
+         , ses_helper_ (this)
      {
           worker_thread_ = boost::thread(&net_worker::run, this);
      }
@@ -144,7 +184,7 @@ private:
      {
          async_services_initializer asi(false);
 
-         acc_.reset(new  async_acceptor (peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45003")) ), tcp_error));
+         ses_acc_.reset(new  async_acceptor (peer_, boost::bind(&ses_helper::on_accepted, ses_helper_, _1, endpoint(std::string("0.0.0.0:45003")) ), tcp_error));
          mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45002")) ), tcp_error));
 
          worker_service_ = &(asi.get_service());
@@ -157,7 +197,7 @@ private:
          size_t ret = worker_service_->run(ec);
 
 
-         acc_.reset();
+         ses_acc_.reset();
          mod_acc_.reset();
          calc_timer_.reset();
          sockets_.clear();
@@ -203,10 +243,10 @@ private:
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
          const uint32_t id = peer.port;
-         sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-             sock, boost::bind(&net_worker::on_recieve, this, _1,_2, peer),
-             boost::bind(&net_worker::on_disconnected, this, _1, id),
-             boost::bind(&net_worker::on_error, this, _1, id)
+         sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
+             , boost::bind(&net_worker::on_recieve, this, _1,_2, peer)
+             , boost::bind(&net_worker::on_disconnected, this, _1, id)
+             , boost::bind(&net_worker::on_error, this, _1, id)
              ));        
          
          LogInfo("Client " << peer << " accepted");
@@ -251,9 +291,11 @@ private:
      }
 
 private:
-    boost::scoped_ptr<async_acceptor>                           acc_       ;
+    boost::scoped_ptr<async_acceptor>                           ses_acc_       ;
     boost::scoped_ptr<async_acceptor>                           mod_acc_   ;
     std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
+    
+    ses_helper                                                  ses_helper_;
 private:
     boost::thread                                               worker_thread_;
     boost::asio::io_service*                                    worker_service_;
@@ -263,6 +305,7 @@ private:
 
 private:
     on_receive_f                                                on_receive_;
+    on_ses_receive_f                                            on_ses_recv_;
     on_update_f                                                 on_update_;
 
 
@@ -406,6 +449,7 @@ struct visapp
     {
         
         props_.base_point = ::get_base();
+        props_.channel.camera_name = "camera 0";
 
         disp_
             .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
@@ -415,6 +459,7 @@ struct visapp
 
         w_.reset (new net_worker( peer, mod_peer 
             , boost::bind(&visapp::on_recv,this, _1, _2, _3)
+            , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0)
             , boost::bind(&visapp::update, this, _1)
             ));
 
@@ -509,10 +554,12 @@ struct visapp
    
     void on_props_updated(props_updated const& msg)
     {
+        kernel::vis_sys_props props;
         std::stringstream is(msg.properties);
-        prop_tree::read_from(is, props_);
+        prop_tree::read_from(is, props);
         
         FIXME(Чего-то со свойствами надо делать);
+        props_ = props;
         props_.base_point = ::get_base();
 		need_to_update_ = true;
     }

@@ -28,7 +28,9 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     , mng_   (find_first_child<nodes_management::manager_ptr>(this))
 {
     if (mng_ && !dict)
+    {
         mng_->set_model("");
+    }
 
     msg_disp()
         .add<msg::binoculars_msg>(boost::bind(&view::on_binoculars, this, _1));
@@ -54,13 +56,13 @@ nodes_management::node_control_ptr view::root() const
 
 binoculars_t const& view::binoculars() const
 {
-    return obj_data();
+    return obj_data().bins;
 }
 
 //! обработчик сообщения бинокля
 void view::on_binoculars(msg::binoculars_msg const& msg)
 {
-    obj_data() = msg.binoculars;
+    obj_data().bins = msg.binoculars;
     on_new_binoculars();
 }
 
@@ -68,23 +70,23 @@ void view::binocular_on(unsigned target_id, double zoom)
 {
     if (kernel::object_info_ptr info = collection_->get_object(target_id))
     {
-        binoculars_t new_binoc = obj_data();
+        binoculars_t new_binoc = obj_data().bins;
 
         new_binoc.target = info->name();
         new_binoc.zoom   = zoom ;
         new_binoc.active = true ;
 
-        if (new_binoc != obj_data())
+        if (new_binoc != obj_data().bins)
             set(msg::binoculars_msg(new_binoc)) ;
     }
 }
 
 void view::binocular_off()
 {
-    binoculars_t new_binoc = obj_data();
+    binoculars_t new_binoc = obj_data().bins;
     new_binoc.active = false;
 
-    if (new_binoc != obj_data())
+    if (new_binoc != obj_data().bins)
         set(msg::binoculars_msg(new_binoc)) ;
 }
 

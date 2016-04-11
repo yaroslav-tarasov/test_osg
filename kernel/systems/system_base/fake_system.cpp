@@ -354,12 +354,85 @@ void fake_system_base::on_msg(binary::bytes_cref bytes)
 
 //! базовая функция загрузки упражнения
 void fake_system_base::load_exercise(dict_cref dict)
-{   
-	exercise_loaded_signal_();
+{
+    //profiler::reset();
+
+    LogTrace("Loading exercise by " << sys_name(kind_));
+    time_counter tc;
+
+    for (auto it = objects_.begin(); it != objects_.end(); ++it)
+        base_presentation_ptr(it->second.lock())->reset_parent();
+    root_objects_.clear();
+    objects_     .clear();
+
+    dict_t const* objs = dict.find("objects");
+    Assert(objs);
+
+    // loading objects in proper order 
+    // first: auto objects (according to their dependencies), later all other objects
+    // "автоматические" объекты
+    std::map<string, const dict_t*> auto_objects;
+    // обычные (остальные) объекты
+    vector<const dict_t*>           usual_objects;
+
+    // проход по "объектам" упражнения, загрузка
+    for (auto it = objs->children().begin(); it != objs->children().end(); ++it)
+    {
+        auto class_obj = root_->find_class(dict::read_dict<string>(it->second, "hierarchy_class_name"));
+
+        if (class_obj->check_attribute("auto", "true"))
+            auto_objects[class_obj->name()] = &(it->second);
+        else 
+            usual_objects.push_back(&(it->second));
+    }
+
+    // некая сортировка объектов с учетом их зависимостей(???)
+    vector<string> const& ordered_auto_objects = auto_object_order();
+
+    //profiler::add_dsc("preparation");
+    // создание авто объектов, загрузка иерархий
+    for (auto it = ordered_auto_objects.begin(); it != ordered_auto_objects.end(); ++it)
+    {
+        auto dsc = auto_objects.find(*it); 
+
+        if (dsc != auto_objects.end())
+            load_object_hierarchy(*(dsc->second));
+
+        //profiler::add_dsc(("loading " + *it).c_str());
+    }
+
+    // создание и загрузка обычных объектов
+    for (auto it = usual_objects.begin(); it != usual_objects.end(); ++it)
+    {
+        dict_t const& d = *(*it);
+        string name = dict::read_dict<string>(d, "name");
+
+        load_object_hierarchy(d);
+        //profiler::add_dsc(("loading " + name).c_str());
+    }
+
+    exercise_loaded_signal_();
+    //profiler::add_dsc("signal firing");
+    LogInfo("Exercise loaded in " << tc.to_double(tc.time()) << " seconds");
+
+    //profiler::out_times((sys_name(kind_) + " sys: loading exercise").c_str());
 }
 
 void fake_system_base::save_exercise(dict_ref dict, bool safe_key) const
 {
+    time_counter tc;
+
+    dict_t& objs = dict.add_child("objects");
+
+    for (auto it = root_objects_.begin(); it != root_objects_.end(); ++it)
+    {
+        object_info_ptr info = it->second;
+        string branch_name = info->name() + "_" + lexical_cast<string>(info->object_id());
+
+        save_object_hierarchy(it->second, objs.add_child(branch_name.c_str()), safe_key);
+    }
+
+    LogInfo("Exercise saved in " << tc.to_double(tc.time()));
 }
 
 optional<double>  fake_system_base::update_time() const
@@ -1257,7 +1330,7 @@ void visual_system_impl::update(double time)
     fake_system_base::update(time);
 
     //scene_->update(time);
-    //update_eye();
+    update_eye();
 }
 
 vis_sys_props const& visual_system_impl::vis_props() const
@@ -1294,15 +1367,17 @@ void visual_system_impl::init_eye()
     eye_ = (!props_.channel.camera_name.empty()) 
         ? find_object<visual_control_ptr>(this, props_.channel.camera_name)
         : find_first_object<visual_control_ptr>(this) ;
-#if 0
+
     if (!eye_ && !props_.channel.camera_name.empty())
         LogWarn("Can't find camera: " << props_.channel.camera_name);
 
+#if 0
     viewport_->SetClarityScale(props_.channel.pixel_scale);
     viewport_->set_geom_corr(props_.channel.cylindric_geom_corr ? victory::IViewport::explicit_cylinder : victory::IViewport::no_geom_corr);
 
     init_frustum_projection();
 #endif
+
     update_eye();
 
 }
@@ -1320,9 +1395,7 @@ cg::camera_f visual_system_impl::eye_camera() const
 
     cg::camera_f cam = eye_ 
         ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))
-        //: cg::camera_f();
-        : cg::camera_f(point_3f(-2225.61,-543.767, 16 ), cprf(-6.0492,0,0));
-		// : cg::camera_f(point_3f(470,950,100), cprf(120,0,0));
+        : cg::camera_f(point_3f(0,0,100), cprf(-90));
     
     cam.set_orientation((rot_f(cam.orientation()) * rot_f(cprf(props_.channel.course))).cpr());
     return cam;

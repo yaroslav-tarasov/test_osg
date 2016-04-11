@@ -6,7 +6,7 @@ namespace aircraft
     
     struct settings_t;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const /*cg::geo_point_3*/geo_position& init_pos);
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos);
 }
 
 namespace vehicle
@@ -15,7 +15,7 @@ namespace vehicle
     
     struct settings_t;
 
-    object_info_ptr create(fake_objects_factory* sys, const settings_t& sett, const /*cg::geo_point_3*/geo_position& init_pos);
+    object_info_ptr create(fake_objects_factory* sys, const settings_t& sett, const geo_position& init_pos);
 }
 
 namespace flock
@@ -88,5 +88,5 @@ namespace camera
 {
 	using namespace kernel;
 
-	object_info_ptr create(fake_objects_factory* sys, boost::optional<std::string> name=boost::none);
+	object_info_ptr create(fake_objects_factory* sys, const geo_position& init_pos, boost::optional<std::string> name=boost::none);
 }

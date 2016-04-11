@@ -35,9 +35,9 @@ public:
 
     virtual ~node_impl()
     {
-#ifndef DEPRECATED
-        childs_callbacks_.clear();
-#endif
+//#ifndef DEPRECATED
+//        childs_callbacks_.clear();
+//#endif
     }
 
 public:
@@ -90,11 +90,14 @@ protected:
 private:
     void init_disp();
 
+#if 0
 #ifndef DEPRECATED
 public:
 //  node_impl
     osg::Node*                  as_osg_node() {return node_.get();}
 #endif
+#endif
+
 protected:
     view *      manager_;
     uint32_t    node_id_;
@@ -108,7 +111,7 @@ protected:
     mutable node_position                         prev_extrapolated_position_;
     mutable optional<node_info_ptr>               rel_node_;
 #ifndef DEPRECATED
-    std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
+    //std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
     osg::ref_ptr<osg::Node>                       node_;
     mutable std::string                           name_;
 #endif

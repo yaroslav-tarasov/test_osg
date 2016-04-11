@@ -44,6 +44,20 @@ REFL_STRUCT(binoculars_t)
     REFL_NUM  (zoom, .1, 40., .1)
 REFL_END()
 
+struct camera_data
+{
+    binoculars_t      bins;
+    quaternion   cam_orien;
+    geo_point_3    cam_pos;
+};
+
+REFL_STRUCT(camera_data)
+    REFL_ENTRY(bins)
+    REFL_ENTRY(cam_orien )
+    REFL_ENTRY(cam_pos)
+REFL_END()
+
+
 namespace msg 
 {
 //! сообщение бинокля

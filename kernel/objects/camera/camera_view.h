@@ -7,7 +7,7 @@ namespace camera_object
 
 struct view
     : base_view_presentation        
-    , obj_data_holder<binoculars_t> 
+    , obj_data_holder<camera_data> 
 {
     static object_info_ptr create(object_create_t const& oc, dict_copt dict);
 

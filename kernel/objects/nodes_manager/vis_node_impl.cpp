@@ -171,17 +171,6 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
             const osgAnimation::AnimationList& animations =
                 manager_->getAnimationList();
 
-    #if 0
-            if(childs_callbacks_.size()==0)
-            {
-                for (int i =0; i < node_->asGroup()->getNumChildren();++i)
-                {
-                    auto child_node = node_->asGroup()->getChild(i); 
-                    childs_callbacks_.push_back(child_node->getUpdateCallback());
-                }
-            }
-    #endif
-		
 		    const bool f = anim.name == "clip1";
 		
 		    const bool need_to_stop_now = current_anim != anim.name && cg::eq_zero(anim.cross_fade);
