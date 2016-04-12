@@ -27,7 +27,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     //, py_reg_(oc.sys->kind() == sys_model)
     , mng_   (find_first_child<nodes_management::manager_ptr>(this))
 {
-    if (mng_ && !dict)
+    if (mng_ /*&& !dict*/)  // FIXME Полюбому нет объекта
     {
         mng_->set_model("");
     }

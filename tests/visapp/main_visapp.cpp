@@ -476,13 +476,7 @@ struct visapp
     
     void on_recv(void const* data, size_t size, const endpoint& peer )
     {
-        if(peer.port == 45003)
-           disp_.dispatch(data, size);
-        else
-            queue_vis_.emplace_back(std::move(binary::make_bytes(data,size)));
-            // msg_service_.on_remote_recv(binary::make_bytes(data,size),false);
-        
-        
+        queue_vis_.emplace_back(std::move(binary::make_bytes(data,size)));
     }
     
     void update_messages()

@@ -1329,8 +1329,8 @@ void visual_system_impl::update(double time)
 {
     fake_system_base::update(time);
 
-    //scene_->update(time);
-    update_eye();
+    // scene_->update(time);
+    // update_eye();
 }
 
 vis_sys_props const& visual_system_impl::vis_props() const

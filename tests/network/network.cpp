@@ -57,7 +57,7 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     fms::trajectory::curses_t      crs;
     fms::trajectory::speed_t       vls;
 
-    const unsigned start_idx = 0/*11*/;
+    const unsigned start_idx = 0;
     cg::point_2 prev(kdg.kd_[start_idx].x,kdg.kd_[start_idx].y);
     double tlength = 0;
     for(auto it = kdg.kd_.begin() + start_idx; it!= kdg.kd_.end();++it )
@@ -65,11 +65,11 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
         auto p = cg::point_2(it->x,it->y);
         auto dist = cg::distance(prev,p);
         tlength += dist;
-        crs.insert (std::make_pair(/*tlength*/it->time,cpr(it->fiw,it->tg, it->kr )));
-        kpts.insert(std::make_pair(/*tlength*/it->time,cg::point_3(p,it->h)));
+        crs.insert (std::make_pair(it->time,cpr(it->fiw,it->tg, it->kr )));
+        kpts.insert(std::make_pair(it->time,cg::point_3(p,it->h)));
 
         if(it != kdg.kd_.begin())
-            vls.insert(std::make_pair(/*tlength*/it->time,dist/(it->time - std::prev(it)->time)));
+            vls.insert(std::make_pair(it->time,dist/(it->time - std::prev(it)->time)));
 
         prev = p;
     }
@@ -77,6 +77,23 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     return fms::trajectory::create(kpts,crs,vls);
 }
 
+inline fms::trajectory_ptr fill_trajectory ()
+{
+
+    fms::trajectory::keypoints_t  kpts;
+    fms::trajectory::curses_t      crs;
+    fms::trajectory::speed_t       vls;
+
+    const unsigned start_idx = 0;
+
+    crs.insert (std::make_pair(26.0,cpr(20)));
+    kpts.insert(std::make_pair(26.0,point_3f(48.89,411.65,28.50)));
+
+    crs.insert (std::make_pair(59.0,cpr(180)));
+    kpts.insert(std::make_pair(59.0,point_3f(300.89,411.65,28.50)));
+
+    return fms::trajectory::create(kpts,crs,vls);
+}
 
 
 #define ADD_EVENT(time, msg)                                   \
@@ -158,7 +175,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("1vis.ncfg", cfg_);
+           cfgr_->load_config("3vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -211,7 +228,6 @@ struct client
             for (auto it = cfg.tasks.begin();it!= cfg.tasks.end();++it)
             {
                 auto app  = applications ()[(*it).app_id];
-                //size_t port = 0;              
                 
                 if(app.name == "visapp")
                 {
@@ -241,12 +257,13 @@ struct client
     client(endpoints peers)
         : net_cfgr_ (boost::make_shared<net_configurer>(peers))  
         , connect_helper_ (peers, this)
-        , period_   (/*4.*/.5)
+        , period_   (.5)
         , timer_    (boost::bind(&client::update, this))
         , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))
+        , traj_cam_ (fill_trajectory())
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -256,8 +273,8 @@ struct client
 
          
 #if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(-2225.61,-543.767, 16 ), quaternion(cprf(-6.0492,0,0)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(470,950,100), quaternion(cprf(120,0,0)) , ok_camera, "camera 1", "") )
+        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51,-524.20, 21 ), quaternion(cprf(-5.10,0,0)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(48.89,411.65,28.50), quaternion(cprf(130, 0, 0)) , ok_camera, "camera 1", "") )
 #endif
 
         ADD_EVENT(time , state(0.0,time,factor))
@@ -527,6 +544,24 @@ struct client
             }	
         }
         ));
+        
+        runs_.insert(make_pair(traj_cam_->base_length(),
+                    [this](double time)->void {
+                        uint32_t id =  1501;
+                        double traj_offset = 0.0;
+                        binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                            id 
+                            , traj_cam_->kp_value    (time)
+                            , traj_cam_->curs_value  (time)
+                            , *traj_cam_->speed_value(time)
+                            , time + traj_offset
+                            , false
+                            , meteo::local_params()
+                            )));
+
+                        this->send(&msg[0], msg.size());
+                }
+            ));
 
         runs_.insert(make_pair(traj_trp_->base_length(),
             boost::bind( run_f_trp_ , /*172*/178, _1, /*traj_offset*/0)
@@ -739,7 +774,7 @@ private:
     fms::trajectory_ptr                                                 traj2_;
     fms::trajectory_ptr                                              traj_pos_;
     fms::trajectory_ptr                                              traj_trp_;
-
+    fms::trajectory_ptr                                              traj_cam_;
 
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
     time_queue_msgs_t                                                    msgs_;

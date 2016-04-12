@@ -29,12 +29,6 @@ namespace shaders
 "\n    /*const*/ float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.075, 1.5), 0.0, 1.0); \\"   \
 "\n    vec3 lightmap_color = lightmap_data.rgb * lightmap_height_fade;                                           "   \
 "\n                                                                                                              "   \
-"\n$define GET_LIGHTMAP(viewpos, in_frag) \\"                                                                        \
-"\n    /*const*/ float height_world_lm = in_frag.lightmap_coord.z; \\"                                               \
-"\n    /*const*/ vec4 lightmap_data = textureProj(ViewLightMap, in_frag.lightmap_coord).rgba; \\"                    \
-"\n    /*const*/ float lightmap_height_fade = clamp(fma(lightmap_data.w - height_world_lm, 0.4, 0.75), 0.0, 1.0); \\"\
-"\n    vec3 lightmap_color = lightmap_data.rgb * lightmap_height_fade;                                           "   \
-"\n                                                                                                              "   \
 "\n$define LIGHTMAP_SHADOW_TRICK(shadow_force) \\"                                                                   \
 "\n    /*const*/ float lm_shadow_omit_coef = clamp(fma(lightmap_data.w, -0.2, 1.6), 0.0, 1.0); \\"                   \
 "\n    lightmap_color *= fma(mix(shadow_force, 1.0, lm_shadow_omit_coef), 0.7, 0.3);                             "   \
@@ -1816,7 +1810,7 @@ $endif
 \n            attribute vec3 binormal;
 \n            out mat4 viewworld_matrix;
 \n
-\n            uniform mat4 decal_matrix;
+\n            uniform mat4 decal_matrix;        
 \n
 \n            out block
 \n            {
