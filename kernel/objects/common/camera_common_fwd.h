@@ -4,7 +4,14 @@
 
 namespace camera_object
 {
-    struct model_info;
+	struct info;
+	struct control;
+
+	typedef polymorph_ptr<info>    info_ptr;
+	typedef boost::weak_ptr<info>  info_wptr;
+	typedef polymorph_ptr<control> control_ptr;    
+	
+	struct model_info;
     struct model_control;
     struct model_ext_control;
 

@@ -14,6 +14,10 @@ namespace camera_object
 	private:
 		ctrl(object_create_t const& oc, dict_copt dict);
 
+	private:
+		fms::trajectory_ptr  get_trajectory();
+		void set_trajectory(fms::trajectory_ptr  traj);
+
 		// visual_control
 	private:
 		geo_point_3 pos  () const override;

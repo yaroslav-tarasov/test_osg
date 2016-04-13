@@ -63,12 +63,13 @@ namespace msg
 //! сообщение бинокля
 enum num_id
 {
-    ni_binocaular,
+    ni_binocular,
+	ni_traj_assign
 };
 
 //! тело сообщения бинокля
 struct binoculars_msg
-    : network::msg_id<ni_binocaular>
+    : network::msg_id<ni_binocular>
 {
     binoculars_msg()
     {
@@ -84,6 +85,26 @@ struct binoculars_msg
 
 REFL_STRUCT(binoculars_msg)
     REFL_ENTRY(binoculars)
+REFL_END()
+
+struct traj_assign_msg
+	: network::msg_id<ni_traj_assign>
+{
+	traj_assign_msg() {}
+
+	traj_assign_msg(const fms::traj_data& traj)
+		: traj(traj)
+	{}
+
+	traj_assign_msg(const fms::traj_data&& traj)
+		: traj(move(traj))
+	{}
+
+	fms::traj_data traj;
+};
+
+REFL_STRUCT(traj_assign_msg)
+	REFL_ENTRY(traj)
 REFL_END()
 
 } // namespace msg

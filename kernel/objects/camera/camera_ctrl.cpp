@@ -31,6 +31,17 @@ namespace camera_object
 		return view::orien(); 
 	}
 
+	void ctrl::set_trajectory(fms::trajectory_ptr  traj)
+	{
+		traj_ = traj;
+		fms::traj_data data(*traj);
+		set(msg::traj_assign_msg(data));
+	}
+
+	fms::trajectory_ptr  ctrl::get_trajectory()
+	{
+		return traj_;
+	} 
 }
 
 AUTO_REG_NAME(camera_ext_ctrl, camera_object::ctrl::create);

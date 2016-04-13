@@ -10,8 +10,11 @@ namespace camera_object
         virtual ~info() {}
     };
 
-    typedef polymorph_ptr<info>     info_ptr;
-    typedef boost::weak_ptr<info>  info_wptr;
+	struct control
+	{
+		virtual ~control() {}
+	};
+
 
     struct model_ext_control
     {

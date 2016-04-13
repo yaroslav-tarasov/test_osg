@@ -51,6 +51,9 @@ private:
 
 private:
     nodes_management::manager_ptr mng_;
+
+protected:
+	fms::trajectory_ptr                         traj_;
 };
 
 } // camera_object

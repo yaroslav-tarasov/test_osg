@@ -34,6 +34,7 @@ namespace camera_object
         }
 
         traj_->append(time, pos, orien, speed);
+		last_traj_update_ = last_update_;
     }
 
 
