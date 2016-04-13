@@ -1,13 +1,15 @@
 #pragma once 
 #include "camera_common.h"
 #include "objects/nodes_management.h"
+#include "common/camera_common.h"
 
 namespace camera_object
 {
 
 struct view
     : base_view_presentation        
-    , obj_data_holder<camera_data> 
+    , obj_data_holder<camera_data>
+    , info
 {
     static object_info_ptr create(object_create_t const& oc, dict_copt dict);
 

@@ -8,6 +8,7 @@
 #include "objects\common\flock_manager.h"
 #include "objects\common\human.h"
 #include "objects\common\aircraft.h"
+#include "objects\common\camera_common.h"
 
 namespace objects_reg
 {
@@ -78,6 +79,12 @@ void model::on_inject_msg(net_layer::msg::run const& msg)
              pf->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
              pf->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth );         
          }       
+         else if (camera_object::model_ext_control_ptr pf = camera_object::model_ext_control_ptr(a))
+         {
+             auto it = last_msg_.find(msg.ext_id);
+
+             pf->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
+         } 
 
          last_msg_[msg.ext_id] =  msg;
      }
@@ -109,6 +116,10 @@ void model::on_object_created(object_info_ptr object)
         add_object(info);
     }
     else if (human::model_info_ptr info = object)
+    {
+        add_object(info);
+    }
+    else if (camera_object::info_ptr info = object)
     {
         add_object(info);
     }

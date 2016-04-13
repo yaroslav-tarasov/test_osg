@@ -149,10 +149,10 @@ struct net_worker
 
      void vis_connect(const std::vector<endpoint>& vis_peers)
      {  
-         vis_peers_  = vis_peers;
+         modapp_peers_  = vis_peers;
          worker_service_->post([this]()
          {
-             for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+             for (auto it = modapp_peers_.begin(); it!= modapp_peers_.end(); ++it )
              {
                  (*it).port = 45002;
                  cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
@@ -213,7 +213,7 @@ private:
          size_t size = binary::size(*data);
          error_code_t ec;
 
-         for( auto it = vis_peers_.begin();it!=vis_peers_.end(); ++it )
+         for( auto it = modapp_peers_.begin();it!=modapp_peers_.end(); ++it )
             if(sockets_.find(*it)!=sockets_.end()) sockets_[*it]->send(binary::raw_ptr(*data), size);
 
          if (ec)
@@ -283,7 +283,7 @@ private:
          // delete  ses_;
          worker_service_->post([this]()
          {
-             for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+             for (auto it = modapp_peers_.begin(); it!= modapp_peers_.end(); ++it )
              {
                  cons_[*it].reset();
              }
@@ -311,14 +311,14 @@ private:
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
 
-        if(on_all_connected_ && vis_peers_.size() == sockets_.size())
+        if(on_all_connected_ && modapp_peers_.size() == sockets_.size())
             on_all_connected_();
     }
 
 private:
     std::map< endpoint,unique_ptr<async_connector>>                                      cons_;
     std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >               sockets_;
-    std::vector<endpoint>                                                           vis_peers_;  
+    std::vector<endpoint>                                                           modapp_peers_;  
 
 private:
     boost::thread                                                               worker_thread_;

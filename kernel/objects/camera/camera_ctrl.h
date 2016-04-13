@@ -19,7 +19,6 @@ namespace camera_object
 		geo_point_3 pos  () const override;
 		cpr         orien() const override;
 
-
 	private:
 		double magnification_;
 

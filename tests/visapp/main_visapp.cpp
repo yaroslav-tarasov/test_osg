@@ -243,13 +243,19 @@ private:
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
          const uint32_t id = peer.port;
-         sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
-             , boost::bind(&net_worker::on_recieve, this, _1,_2, peer)
-             , boost::bind(&net_worker::on_disconnected, this, _1, id)
-             , boost::bind(&net_worker::on_error, this, _1, id)
-             ));        
-         
-         LogInfo("Client " << peer << " accepted");
+         if(sockets_.size()==0)
+         {
+             sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
+                 , boost::bind(&net_worker::on_recieve, this, _1,_2, peer)
+                 , boost::bind(&net_worker::on_disconnected, this, _1, id)
+                 , boost::bind(&net_worker::on_error, this, _1, id)
+                 ));        
+             LogInfo("Client " << peer << " accepted");
+         }
+         else
+         {
+             LogInfo("Client " << peer << " rejected");
+         }
      }
 
      void on_recieve(const void* data, size_t size, endpoint const& peer)
@@ -277,10 +283,6 @@ private:
          sockets_.erase(sock_id);
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
-#if 0
-         delete  ses_;
-         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
-#endif
      }
 
      void on_error(boost::system::error_code const& ec, uint32_t sock_id)

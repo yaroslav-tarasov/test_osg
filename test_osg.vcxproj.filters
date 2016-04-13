@@ -494,6 +494,9 @@
     <ClInclude Include="utils\LoadManager.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="kernel\objects\camera\camera_model.h">
+      <Filter>Source Files\objects\camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1221,6 +1224,9 @@
     </ClCompile>
     <ClCompile Include="tests\flame_test.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_model.cpp">
+      <Filter>Source Files\objects\camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -89,8 +89,8 @@ inline fms::trajectory_ptr fill_trajectory ()
     crs.insert (std::make_pair(26.0,cpr(20)));
     kpts.insert(std::make_pair(26.0,point_3f(48.89,411.65,28.50)));
 
-    crs.insert (std::make_pair(59.0,cpr(180)));
-    kpts.insert(std::make_pair(59.0,point_3f(300.89,411.65,28.50)));
+    crs.insert (std::make_pair(59.0,cpr(350)));
+    kpts.insert(std::make_pair(59.0,point_3f(-2383.51,-524.20, 21)));
 
     return fms::trajectory::create(kpts,crs,vls);
 }
@@ -175,7 +175,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("3vis.ncfg", cfg_);
+           cfgr_->load_config("1vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -262,7 +262,8 @@ struct client
         , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
-        , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))
+        , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
+        , traj_trp2_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
         , traj_cam_ (fill_trajectory())
     {
         disp_
@@ -271,10 +272,12 @@ struct client
 
         const double time = 0.0;
 
-         
+        //Camera: ÊÄÏ        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
+        //Camera: ÊÄÏ_óòê -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
+
 #if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51,-524.20, 21 ), quaternion(cprf(-5.10,0,0)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(48.89,411.65,28.50), quaternion(cprf(130, 0, 0)) , ok_camera, "camera 1", "") )
+        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51,-524.20, 21 ), quaternion(cprf(cg::rad2grad() * -5.10/*,cg::rad2grad() *- =0.07,cg::rad2grad() * 0.57*/)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(48.89,411.65,28.50), quaternion(cprf(cg::rad2grad() *-2.14/*, cg::rad2grad() * -0.13, cg::rad2grad() * 0.66*/)) , ok_camera, "camera 1", "") )
 #endif
 
         ADD_EVENT(time , state(0.0,time,factor))
@@ -351,7 +354,7 @@ struct client
 
 #if 1
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
-#endif       
+#endif                                                                                                                              0
 
 #if 1
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
@@ -415,7 +418,7 @@ struct client
         //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
         //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )   ]
         ADD_EVENT(13.0  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
-        ADD_EVENT(14.0  , create(172,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "L39", "172") )
+        ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
         
 #endif
 
@@ -490,6 +493,22 @@ struct client
             this->send(&msg[0], msg.size());
         };
 
+        run_wrap_f run_f_trp2 = [this](uint32_t id, double time, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                id 
+                , traj_trp2_->kp_value    (time)
+                , traj_trp2_->curs_value  (time)
+                , *traj_trp2_->speed_value(time)
+                , time + traj_offset
+                , false
+                , meteo::local_params()
+                )));
+
+            this->send(&msg[0], msg.size());
+        };
+        
+        
+        
         run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
@@ -565,6 +584,10 @@ struct client
 
         runs_.insert(make_pair(traj_trp_->base_length(),
             boost::bind( run_f_trp_ , /*172*/178, _1, /*traj_offset*/0)
+            ));
+
+        runs_.insert(make_pair(traj_trp2_->base_length(),
+            boost::bind( run_f_trp2 , 172, _1, /*traj_offset*/0)
             ));
 
         runs_.insert(make_pair(traj_pos_->base_length(),
@@ -774,6 +797,7 @@ private:
     fms::trajectory_ptr                                                 traj2_;
     fms::trajectory_ptr                                              traj_pos_;
     fms::trajectory_ptr                                              traj_trp_;
+    fms::trajectory_ptr                                             traj_trp2_;
     fms::trajectory_ptr                                              traj_cam_;
 
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;

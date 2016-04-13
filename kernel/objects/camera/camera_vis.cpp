@@ -60,6 +60,7 @@ cpr vis::orien() const
     return view::orien(); 
 }
 
+
 //
 void vis::on_new_binoculars()
 {

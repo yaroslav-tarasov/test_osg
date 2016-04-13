@@ -184,6 +184,7 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h" />
+    <ClInclude Include="kernel\objects\camera\camera_model.h" />
     <ClInclude Include="kernel\objects\environment\environment_ctrl.h" />
     <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h" />
     <ClInclude Include="kernel\objects\flock_child\flock_child_model.h" />
@@ -329,6 +330,7 @@
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_vis.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\camera\camera_model.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />
     <ClCompile Include="kernel\objects\common\object_creators.cpp" />

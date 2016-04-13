@@ -31,7 +31,6 @@ namespace camera_object
 		return view::orien(); 
 	}
 
-
 }
 
 AUTO_REG_NAME(camera_ext_ctrl, camera_object::ctrl::create);
