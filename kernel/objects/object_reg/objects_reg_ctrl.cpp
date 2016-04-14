@@ -6,6 +6,7 @@
 #include "objects/vehicle.h"
 #include "objects/common/airport.h"
 #include "objects/environment.h"
+#include "objects/common/camera_common.h"
 
 #include "common/test_msgs.h"
 
@@ -33,6 +34,9 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg_t const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
+
+    
 
     disp_
         .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
@@ -42,7 +46,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
 	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
 		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
-        
+        .add<net_layer::msg::traj_assign_msg       >(boost::bind(on_traj_assign , this, _1)) 
         .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
         	
         ;
@@ -136,6 +140,21 @@ void ctrl::inject_msg(net_layer::msg::malfunction_msg const& msg)
 
 }
 
+
+void ctrl::inject_msg(net_layer::msg::traj_assign_msg const& msg) 
+{
+    if(msg.ext_id>0 )                          
+    {
+        auto a = regs_objects_[msg.ext_id];
+
+        if (camera_object::control_ptr pa = a)
+        {
+            pa->set_trajectory(msg.traj);
+        }
+    }
+
+}
+
 void ctrl::inject_msg(net_layer::msg::environment_msg const& msg) 
 {
     if( airports_.size()>0 )                          
@@ -158,7 +177,7 @@ void ctrl::inject_msg(net_layer::msg::engine_state_msg const& msg)
     {
         auto a = regs_objects_[msg.ext_id];
 
-        if (aircraft::control_ptr pa = aircraft::control_ptr (a))
+        if (aircraft::control_ptr pa = a)
         {
             pa->set_engine_state((aircraft::engine_state_t)msg.state);
         }
@@ -173,7 +192,7 @@ void ctrl::inject_msg(net_layer::msg::attach_tow_msg_t  const& ext_id)
     {
         auto a = regs_objects_[ext_id];
 
-        if (vehicle::control_ptr pv = vehicle::control_ptr(a))
+        if (vehicle::control_ptr pv = a)
         {
             pv->attach_tow();
             conn_holder_ << pv->subscribe_detach_tow(boost::bind(&ctrl::on_detach_tow,this,ext_id, _1));
@@ -187,7 +206,7 @@ void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)
     {
         auto a = regs_objects_[ext_id];
 
-        if (vehicle::control_ptr pv = vehicle::control_ptr(a))
+        if (vehicle::control_ptr pv = a)
         {
             pv->detach_tow();
             cg::point_3 cur_pos = pv->get_local_position().pos;
@@ -207,7 +226,7 @@ void ctrl::inject_msg(net_layer::msg::fire_fight_msg_t  const& ext_id)
 	{
 		auto v = regs_objects_[ext_id];
 
-		if (vehicle::control_ptr pv = vehicle::control_ptr(v))
+		if (vehicle::control_ptr pv = v)
 		{
 			pv->fire_fight();
 		}

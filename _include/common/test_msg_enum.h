@@ -17,6 +17,7 @@ namespace net_layer
             id_props_updated    ,
             id_vis_peers        ,
 
+            id_traj_assign      ,
 
             am_malfunction      ,
             am_engines_state    ,

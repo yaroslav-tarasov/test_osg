@@ -202,7 +202,28 @@ namespace net_layer
         ES_SIZE
     };
 
-    
+    struct traj_assign_msg
+        : network::msg_id<id_traj_assign>
+    {
+        traj_assign_msg() {}
+
+        traj_assign_msg(uint32_t ext_id,const fms::traj_data& traj)
+            : ext_id      (ext_id),traj(traj)
+        {}
+
+        traj_assign_msg(uint32_t ext_id,const fms::traj_data&& traj)
+            : ext_id      (ext_id),traj(move(traj))
+        {}
+
+        uint32_t           ext_id;
+        fms::traj_data     traj;
+    };
+
+    REFL_STRUCT(traj_assign_msg)
+        REFL_ENTRY(ext_id)
+        REFL_ENTRY(traj)
+    REFL_END()
+
     struct engine_state_msg
         : network::msg_id<am_engines_state>
     {

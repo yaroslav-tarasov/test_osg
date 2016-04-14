@@ -26,7 +26,7 @@ namespace camera_object
         optional<quaternion>                   desired_nm_orien_;
 
         optional<double>                       last_update_;
-        optional<double>                       last_traj_update_;
+
 
         double                                 nm_ang_smooth_;
 

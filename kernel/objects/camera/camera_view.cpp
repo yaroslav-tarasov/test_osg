@@ -33,7 +33,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     }
 
     msg_disp()
-        .add<msg::binoculars_msg>(boost::bind(&view::on_binoculars, this, _1));
+        .add<msg::binoculars_msg>(boost::bind(&view::on_binoculars, this, _1))
+        .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1));
 }
 
 void view::on_child_removing(kernel::object_info_ptr child)
@@ -89,6 +90,19 @@ void view::binocular_off()
     if (new_binoc != obj_data().bins)
         set(msg::binoculars_msg(new_binoc)) ;
 }
+
+void view::on_traj_assign(msg::traj_assign_msg const &m)
+{
+    double len =0;
+    if(traj_.get())
+        len = traj_->cur_len();
+
+    traj_ = fms::trajectory::create(m.traj);
+    traj_->set_cur_len(len);
+    traj_end_ = traj_->length();
+
+}
+
 
 
 } // camera_object

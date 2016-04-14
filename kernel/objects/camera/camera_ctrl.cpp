@@ -37,6 +37,12 @@ namespace camera_object
 		fms::traj_data data(*traj);
 		set(msg::traj_assign_msg(data));
 	}
+    
+    void ctrl::set_trajectory(const fms::traj_data&  traj_data)
+    {
+        // traj_ = traj;
+        set(msg::traj_assign_msg(traj_data));
+    }
 
 	fms::trajectory_ptr  ctrl::get_trajectory()
 	{

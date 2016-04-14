@@ -34,7 +34,6 @@ namespace camera_object
         }
 
         traj_->append(time, pos, orien, speed);
-		last_traj_update_ = last_update_;
     }
 
 
@@ -65,6 +64,16 @@ namespace camera_object
         {
             traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0/*traj_->cur_len() + dt*/);
             const double  tar_len = traj_->cur_len();
+            if (traj_end_ &&  *traj_end_ <= tar_len)
+            {
+                traj_.reset();
+                traj_end_.reset();
+                nodes_management::node_position root_node_pos = root()->position();
+                desired_nm_pos_   = root_node_pos.global().pos;
+                desired_nm_orien_ = root_node_pos.global().orien;
+                return;
+            }
+
             decart_position target_pos;
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));

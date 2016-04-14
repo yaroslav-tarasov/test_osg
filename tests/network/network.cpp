@@ -77,24 +77,58 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     return fms::trajectory::create(kpts,crs,vls);
 }
 
-inline fms::trajectory_ptr fill_trajectory ()
+namespace camera_moving
 {
 
-    fms::trajectory::keypoints_t  kpts;
-    fms::trajectory::curses_t      crs;
-    fms::trajectory::speed_t       vls;
+    inline fms::trajectory_ptr fill_trajectory ()
+    {
 
-    const unsigned start_idx = 0;
+        fms::trajectory::keypoints_t  kpts;
+        fms::trajectory::curses_t      crs;
+        fms::trajectory::speed_t       vls;
 
-    crs.insert (std::make_pair(26.0,cpr(20)));
-    kpts.insert(std::make_pair(26.0,point_3f(48.89,411.65,28.50)));
+        crs.insert (std::make_pair(26.0,cpr(/*20*/cg::rad2grad() *-2.14)));
+        kpts.insert(std::make_pair(26.0,point_3f(48.89,411.65,28.50)));
 
-    crs.insert (std::make_pair(59.0,cpr(350)));
-    kpts.insert(std::make_pair(59.0,point_3f(-2383.51,-524.20, 21)));
+        crs.insert (std::make_pair(59.0,cpr(cg::rad2grad() * -5.10)));
+        kpts.insert(std::make_pair(59.0,point_3f(-2383.51,-524.20, 21)));
 
-    return fms::trajectory::create(kpts,crs,vls);
+        return fms::trajectory::create(kpts,crs,vls);
+    }
+
+    inline fms::trajectory_ptr fill_reverse_trajectory ()
+    {
+
+        fms::trajectory::keypoints_t  kpts;
+        fms::trajectory::curses_t      crs;
+        fms::trajectory::speed_t       vls;
+
+        crs.insert (std::make_pair(163.0,cpr(/*20*/cg::rad2grad() *-2.14)));
+        kpts.insert(std::make_pair(163.0,point_3f(48.89,411.65,28.50)));
+
+        crs.insert (std::make_pair(130.0,cpr(cg::rad2grad() * -5.10)));
+        kpts.insert(std::make_pair(130.0,point_3f(-2383.51,-524.20, 21)));
+
+        return fms::trajectory::create(kpts,crs,vls);
+    }
+
+    inline fms::trajectory_ptr fill_orient_trajectory ()
+    {
+
+        fms::trajectory::keypoints_t  kpts;
+        fms::trajectory::curses_t      crs;
+        fms::trajectory::speed_t       vls;
+
+        crs.insert (std::make_pair(240.0,cpr(cg::rad2grad() *-2.14)));
+        kpts.insert(std::make_pair(240.0,point_3f(48.89,411.65,28.50)));
+
+        crs.insert (std::make_pair(360.0,cpr(cg::rad2grad() * -4.14)));
+        kpts.insert(std::make_pair(360.0,point_3f(48.89,411.65,28.50)));
+
+        return fms::trajectory::create(kpts,crs,vls);
+    }
+
 }
-
 
 #define ADD_EVENT(time, msg)                                   \
   msgs_.insert(make_pair(time,                                 \
@@ -264,7 +298,8 @@ struct client
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
         , traj_trp2_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
-        , traj_cam_ (fill_trajectory())
+        , traj_cam_         (camera_moving::fill_trajectory())
+        , traj_cam_reverse_ (camera_moving::fill_reverse_trajectory ())
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -427,12 +462,15 @@ struct client
 		ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
 		ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
 
-		for (int i=0;i<3;i++)
+		for (int i=0;i<2;i++)
 		{
 			ADD_EVENT(20.0 + i  , engine_state_msg(176 + i , ES_LOW_THROTTLE)  )
 			ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
 			ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
 		}
+
+        ADD_EVENT(20.0  , engine_state_msg(178, ES_LOW_THROTTLE)  )
+        ADD_EVENT(40.0  , engine_state_msg(178, ES_FULL_THROTTLE) )
 #endif
 
 
@@ -564,6 +602,7 @@ struct client
         }
         ));
         
+#if 0
         runs_.insert(make_pair(traj_cam_->base_length(),
                     [this](double time)->void {
                         uint32_t id =  1501;
@@ -581,9 +620,15 @@ struct client
                         this->send(&msg[0], msg.size());
                 }
             ));
+#endif
 
-        runs_.insert(make_pair(traj_trp_->base_length(),
-            boost::bind( run_f_trp_ , /*172*/178, _1, /*traj_offset*/0)
+        ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
+        ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
+        ADD_EVENT(239.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
+
+
+        runs_.insert(make_pair(traj_trp_->base_length() + 30,
+            boost::bind( run_f_trp_ , 178, _1, /*traj_offset*/30)
             ));
 
         runs_.insert(make_pair(traj_trp2_->base_length(),
@@ -799,6 +844,7 @@ private:
     fms::trajectory_ptr                                              traj_trp_;
     fms::trajectory_ptr                                             traj_trp2_;
     fms::trajectory_ptr                                              traj_cam_;
+    fms::trajectory_ptr                                      traj_cam_reverse_;
 
     typedef std::multimap<double, bytes_t>  time_queue_msgs_t;
     time_queue_msgs_t                                                    msgs_;

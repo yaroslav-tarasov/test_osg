@@ -28,11 +28,15 @@ protected:
     nodes_management::node_control_ptr  root() const;
 
 protected:
+
+
+protected:
     binoculars_t const& binoculars() const;
     virtual void on_new_binoculars() {}
 
 private:
-    void on_binoculars(msg::binoculars_msg const&);
+    void on_binoculars (msg::binoculars_msg const&);
+    void on_traj_assign(msg::traj_assign_msg const &);
 
 private:
     void binocular_on(unsigned target_id, double zoom);
@@ -54,6 +58,7 @@ private:
 
 protected:
 	fms::trajectory_ptr                         traj_;
+    optional<double>                        traj_end_;
 };
 
 } // camera_object

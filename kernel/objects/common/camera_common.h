@@ -12,6 +12,7 @@ namespace camera_object
 
 	struct control
 	{
+        virtual void set_trajectory(const fms::traj_data&  traj_data) =0;
 		virtual ~control() {}
 	};
 
