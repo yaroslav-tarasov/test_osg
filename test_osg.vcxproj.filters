@@ -1228,5 +1228,8 @@
     <ClCompile Include="kernel\objects\camera\camera_model.cpp">
       <Filter>Source Files\objects\camera</Filter>
     </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_visual.cpp">
+      <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

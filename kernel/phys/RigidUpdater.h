@@ -35,7 +35,7 @@ namespace bi
 
         bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
         
-        void setTrajectoryDrawer(TrajectoryDrawer * drawer)
+        void setTrajectoryDrawer(Utils::TrajectoryDrawer * drawer)
         {
            _trajectory_drawer =  drawer;
         }
@@ -68,8 +68,8 @@ namespace bi
         bool                                     _debug;
 		bool                                     _needDebugDrawer;
         
-        osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer;
-        osg::ref_ptr<TrajectoryDrawer>           _trajectory_drawer2;
+        osg::ref_ptr<Utils::TrajectoryDrawer>           _trajectory_drawer;
+        osg::ref_ptr<Utils::TrajectoryDrawer>           _trajectory_drawer2;
 
 #ifdef DEPRECATED
 		aircrafts_t                              _aircrafts;

@@ -257,11 +257,8 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(left, right, bottom, top, zNear, zFar);
 #endif
 
-
     _viewerPtr->getCamera()->setCullingMode(osg::CullSettings::ENABLE_ALL_CULLING);    
    // _viewerPtr->getCamera()->setSmallFeatureCullingPixelSize(5.0F);
-    
-
 
     //_viewerPtr->setSceneData( this );
     _viewerPtr->setThreadingModel(osgViewer::Viewer::SingleThreaded /*ThreadPerCamera*/);

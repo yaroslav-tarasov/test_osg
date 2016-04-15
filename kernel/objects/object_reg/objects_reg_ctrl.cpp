@@ -100,7 +100,6 @@ void ctrl::destroy_object( net_layer::msg::destroy_msg const& msg)
 
 void ctrl::inject_msg(const void* data, size_t size)
 {
-    // disp_.dispatch(data, size);
     binary::bytes_t msg (bytes_raw_ptr(data), bytes_raw_ptr(data) + size);
     messages_.push_back(std::move(msg));
 }

@@ -63,15 +63,24 @@ namespace av
     };
     // typedef boost::intrusive_ptr<environment_weather> environment_weather_ptr;
 
+    // interface declaration
+    struct ITrajectoryDrawer /*: ref_counter*/
+    {
+        virtual void set(const fms::trajectory_ptr traj,const cg::coloraf& color) = 0;
+    };
 
     // interface declaration
     struct IScene /*: ref_counter*/
     {
         virtual environment_weather*    getEnvWeather         () const = 0;
-        
+
+
         virtual bool                    PreUpdate() = 0;
 #if 0
         virtual debug_render_ptr        get_scene_debug_renderer() const = 0;
 #endif
+        virtual ITrajectoryDrawer*      GetTrajectoryDrawer() const = 0; 
     };
+
+
 }

@@ -297,7 +297,7 @@ struct client
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
-        , traj_trp2_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
+        , traj_trp2_(fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
         , traj_cam_         (camera_moving::fill_trajectory())
         , traj_cam_reverse_ (camera_moving::fill_reverse_trajectory ())
     {

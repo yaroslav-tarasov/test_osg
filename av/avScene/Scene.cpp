@@ -16,6 +16,8 @@
 #include "av/avCore/Logo.h"
 #include "av/avCore/PreRender.h"
 
+#include "trajectory_drawer.h"
+
 //Degree precision versus length
 //
 //          decimal                                                                               N/S or E/W    E/W at    E/W at       E/W at
@@ -582,6 +584,11 @@ av::environment_weather* Scene::getEnvWeather() const
     return avCore::GetEnvironment();
 }
 
+av::ITrajectoryDrawer*    Scene::GetTrajectoryDrawer() const 
+{
+    return _trajectory_drawer.get();
+}
+
 avSky::ISky*  Scene::getSky()
 { 
 #ifdef ORIG_EPHEMERIS
@@ -1069,6 +1076,8 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 #endif
+     
+   _trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
 
     return true;
 }
@@ -1372,7 +1381,7 @@ void Scene::createObjects()
         conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
 
         conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
-        _rigidUpdater->setTrajectoryDrawer(new TrajectoryDrawer(this,TrajectoryDrawer::LINES));
+        _rigidUpdater->setTrajectoryDrawer(new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES));
     }
 #endif
 

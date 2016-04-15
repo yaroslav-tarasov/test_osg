@@ -91,7 +91,7 @@ namespace bi
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
 		, _d(new _private)
-		, _trajectory_drawer2(new TrajectoryDrawer(root,TrajectoryDrawer::LINES))
+		, _trajectory_drawer2(new Utils::TrajectoryDrawer(root,Utils::TrajectoryDrawer::LINES))
 	{
         using namespace kernel;
         

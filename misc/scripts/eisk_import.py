@@ -106,10 +106,10 @@ for line in inputfile:
                      course = xxx[0][1]
                      print course
                  idx = files_loaded.count(filename[0]) 
-                 obj_name = filename[0]
+                 obj_name = filename[0] + "_tr"
                  if idx>0 :
-                    obj_name = filename[0] + idx.__str__()
-                    cmds.duplicate(filename[0], n=obj_name, rc=True, instanceLeaf=True)
+                    obj_name = filename[0] + "_tr" + idx.__str__()
+                    cmds.duplicate(filename[0] + "_tr" , n=obj_name, rc=True, instanceLeaf=True)
                  else:
                     cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
 

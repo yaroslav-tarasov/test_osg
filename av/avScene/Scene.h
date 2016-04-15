@@ -64,6 +64,7 @@ namespace bi
 namespace Utils
 {
     struct  LoadNodeThread;
+    class TrajectoryDrawer;
 }
 
 
@@ -110,7 +111,7 @@ namespace avScene {
     
     private: // IScene interface declaration
         av::environment_weather*                    getEnvWeather() const override;
-
+        av::ITrajectoryDrawer*                      GetTrajectoryDrawer() const override; 
     
     private:
 
@@ -134,6 +135,8 @@ namespace avScene {
         void                                        setupDecals();
 	private:
         static osg::ref_ptr<Scene>                  _scenePtr;
+
+        osg::ref_ptr<Utils::TrajectoryDrawer>       _trajectory_drawer;
 
         osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
         osg::ref_ptr<osg::Group>                    _commonNode;

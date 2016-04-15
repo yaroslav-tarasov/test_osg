@@ -383,6 +383,7 @@
     <ClCompile Include="kernel\objects\object_reg\objects_reg_ctrl.cpp" />
     <ClCompile Include="kernel\objects\object_reg\objects_reg_model.cpp" />
     <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp" />
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_visual.cpp" />
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp" />
     <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp" />
     <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp" />
