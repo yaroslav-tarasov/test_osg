@@ -2085,5 +2085,49 @@ void Scene::setupDecals()
         std::transform(pnts.begin(), pnts.end(), pnts_array[i].begin(), [=]( const cg::point_2f & val)->cg::point_2f { return val  * trs[i];});
         _decal_map->AddPolyline(pnts_array[i], cg::colorf(0.80f, 0.80f, 0.80f), 0.5f );
     }
+	
+		std::vector<cg::point_2f> pnts_red;
+		pnts_red.emplace_back(cg::point_2f(0.f,-2.f));
+		pnts_red.emplace_back(cg::point_2f(-1.f, -2.f));
+		pnts_red.emplace_back(cg::point_2f(-2.f, -1.f));
+		pnts_red.emplace_back(cg::point_2f(-2.f, 1.f));
+		pnts_red.emplace_back(cg::point_2f(-1.f, 2.f));
+		pnts_red.emplace_back(cg::point_2f(0.f, 2.f));
+		pnts_red.emplace_back(cg::point_2f(1.f, 2.f));
+		pnts_red.emplace_back(cg::point_2f(2.f, 1.f));
+		pnts_red.emplace_back(cg::point_2f(2.f, -1.f)); 
+		pnts_red.emplace_back(cg::point_2f(1.f, -2.f));
+		pnts_red.emplace_back(cg::point_2f(0.f, -2.f)); 
+    {
+		std::vector<cg::point_2f> pnts_array;
+		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		//tr = cg::as_translation(cg::point_2f(201,392));
+		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f) * cg::rotation_2f(-173) * tr;});
+		_decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.0f, 0.0f), 0.3f );
+	}
+
+	{
+		std::vector<cg::point_2f> pnts_array;
+		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		//tr = cg::as_translation(cg::point_2f(201,392));
+		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f) * 1.f / (1.7436 * 1.2823) * cg::rotation_2f(-173) * tr;});
+		_decal_map->AddPolyline(pnts_array, cg::colorf(0.00f, 0.80f, 0.0f), 0.3f );
+	}
+
+	{
+		std::vector<cg::point_2f> pnts_array;
+		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		//tr = cg::as_translation(cg::point_2f(201,392));
+		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f)  * 1.f / (1.2823) * cg::rotation_2f(-173) * tr;});
+		_decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.80f, 0.0f), 0.3f );
+	}
+
+	/// 1,7436 mid to low
+    /// 1,2823 big to mid
+
+
 
 }

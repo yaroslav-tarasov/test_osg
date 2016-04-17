@@ -1983,6 +1983,8 @@ $if 0
 \n                float rainy_value = specular.a;
 \n
 \n                vec3 dif_tex_col = texture2D(colorTex, f_in.texcoord).rgb;
+\n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
+\n                dif_tex_col.rgb = fma(dif_tex_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);     
 \n                float tex_mix_val = rainy_value * 0.7;
 \n                dif_tex_col *= fma(dif_tex_col, vec3(tex_mix_val,tex_mix_val,tex_mix_val)/*tex_mix_val.xxx*/, vec3(1.0 - tex_mix_val));
 \n                float detail_factor = tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.015);
@@ -2003,8 +2005,7 @@ $if 0
 \n
 \n                // FIXME
 \n                // APPLY_DECAL(f_in, dif_tex_col);
-\n                vec4 decal_data = textureProj(ViewDecalMap, f_in.decal_coord).rgba; 
-\n                dif_tex_col.rgb = fma(dif_tex_col.rgb, vec3(1.0 - decal_data.a), decal_data.rgb);     
+
 \n
 \n                // get dist to point and normalized to-eye vector
 \n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);

@@ -309,6 +309,7 @@ void  Terrain::Create( const std::string& cFileName )
     nl.push_back("panorama");
     nl.push_back("plane");
     nl.push_back("default");
+    nl.push_back("color");
 
     MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,cFileName,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + cFileName + "/"+mat_file_name));
     scene->accept(mv);

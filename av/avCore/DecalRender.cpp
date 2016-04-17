@@ -118,7 +118,7 @@ protected:
         setRenderOrder(osg::CameraNode::PRE_RENDER);
 
         // attach the texture and use it as the color buffer.
-        attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, /*true*/false, 8, 8);
+        attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, true, 8, 8);
 
         osg::StateSet * pSS = getOrCreateStateSet();
         pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);

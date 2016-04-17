@@ -622,9 +622,11 @@ struct client
             ));
 #endif
 
+#if 1
         ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
         ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
         ADD_EVENT(239.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
+#endif
 
 
         runs_.insert(make_pair(traj_trp_->base_length() + 30,
