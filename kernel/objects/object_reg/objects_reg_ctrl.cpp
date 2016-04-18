@@ -150,6 +150,10 @@ void ctrl::inject_msg(net_layer::msg::traj_assign_msg const& msg)
         {
             pa->set_trajectory(msg.traj);
         }
+        else if (aircraft::control_ptr pa = a)
+        {
+            set(net_layer::msg::traj_assign_msg( msg.ext_id, msg.traj));
+        }
     }
 
 }

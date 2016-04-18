@@ -10,6 +10,9 @@ namespace aircraft_physless
 {
 namespace sync_fsm
 {
+
+    const double packet_delay = 1.0;
+
     void fms_state::update(double time, double /*dt*/) 
     {
         //             if (phys_transition_start_ && time > *phys_transition_start_ + phys_transition_time_)
@@ -80,6 +83,25 @@ namespace sync_fsm
 
                 FIXME(И гиде взять координаты)
                 self_.switch_sync_state(create_sync_phys_state(self_, phys_aircraft, /*base*/::get_base()));
+            }
+            {
+                FIXME(extern state)
+                if(auto traj_ = self_.get_trajectory())
+                {
+
+                    traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0);
+                    const double  tar_len = traj_->cur_len();
+                    
+                    decart_position target_pos;
+
+                    target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
+                    target_pos.orien = traj_->curs_value(tar_len);
+                    geo_position gtp(target_pos, get_base());
+
+
+                    self_.set_desired_nm_pos(gtp.pos);
+                    self_.set_desired_nm_orien(gtp.orien);
+                }
             }
         }
 

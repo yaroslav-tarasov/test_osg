@@ -261,9 +261,11 @@ namespace sync_fsm
             self_.set_desired_nm_pos(gtp.pos);
             self_.set_desired_nm_orien(gtp.orien);
 
+#if 0
             force_log fl;       
             LOG_ODS_MSG( "phys_state2::update " << step  << "\n" 
-                );   
+                );  
+#endif 
 
             phys_aircraft_->go_to_pos(gtp.pos, gtp.orien);
 			phys_aircraft_->update();

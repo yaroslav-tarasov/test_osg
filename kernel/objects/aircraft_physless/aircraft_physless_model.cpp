@@ -429,8 +429,11 @@ void model::update_contact_effects(double time)
 void model::sync_fms(bool force)
 {
 #if 1	
+    FIXME(Не понятно на сколько это корректно)
+#if 0
     if (!phys_aircraft_)
         return ;
+#endif
 
 	geo_position fmspos = fms_pos();
 	nodes_management::node_position root_node_pos = root_->position();
@@ -555,7 +558,7 @@ void model::make_aircraft_info()
 {
 	if (ada_)
 	{
-		aircraft_data_ = *ada_->get_data(/*"A319"*/settings_.kind);
+		aircraft_data_ = *ada_->get_data(settings_.kind);
 	}
 }
 

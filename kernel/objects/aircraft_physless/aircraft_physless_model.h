@@ -23,7 +23,6 @@ namespace aircraft_physless
         , aircraft::model_info                // интерфейс информации о модели
         , aircraft::model_control             // интерфейс управления моделью
 		, aircraft::model_ext_control
-        //, int_control
         , sync_fsm::self_t
         , phys_object_model_base 
     {

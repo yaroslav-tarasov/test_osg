@@ -387,7 +387,7 @@ struct client
 #endif
 
 
-#if 1
+#if 0
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
 #endif                                                                                                                              0
 
@@ -430,6 +430,13 @@ struct client
 
         ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
         ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
+
+        for (int i=0;i<4;i++)
+        {
+            ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
+                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+        }
 #endif
 
 #if 0
@@ -441,23 +448,19 @@ struct client
         ADD_EVENT(19.0  , create(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
         
-        for (int i=0;i<4;i++)
-        {
-            ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
-            ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
-            ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
-        }
 
-#if 1
+
+#if 0
         ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
         //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
-        //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") )   ]
-        ADD_EVENT(13.0  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
+        //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
         ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
-        
 #endif
 
-#if 1
+        ADD_EVENT(2.0  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
+        ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
+
+#if 0
 		ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
 		ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
 		ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
