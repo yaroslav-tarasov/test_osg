@@ -300,8 +300,8 @@ namespace sync_fsm
             auto wnode = shassis.wheel_node;
             auto chassis_node = shassis.node;
 
-            //if (shassis.phys_wheels.empty())
-            //    return;
+            if (shassis.phys_wheels.empty())
+                return;
 			
 			geo_base_3 global_pos   = wnode->get_global_pos();
 			quaternion global_orien = wnode->get_global_orien();
