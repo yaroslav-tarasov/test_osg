@@ -2150,7 +2150,7 @@ struct RenderLeafBounds
         }
         else
         {
-            FIXME(√де-то это получаем, и это не good);
+            FIXME("√де-то это получаем, и это не good");
 #if 0
             OSG_INFO<<"bb invalid"<<std::endl;
 #endif

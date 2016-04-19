@@ -138,12 +138,12 @@ cpr view::orien() const
     return get_state().orien();
 }
 
-void view::set_state(state_t const& state)
+void view::set_state(afms::state_t const& state)
 {
     set_state(state, true);
 }
 
-void view::set_state(state_t const& st, bool sure)
+void view::set_state(afms::state_t const& st, bool sure)
 {                   
     set(msg::state_msg(st), sure);
 }

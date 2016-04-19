@@ -30,6 +30,7 @@ bool generateBulletFile(std::string name, osg::Node* body, cg::point_3& offset);
 
 #include "av/avCore/Database.h"
 
+#include "cpp_utils/polymorph_ptr.h"
 #include "common/ref_counter.h"
 #include "av/avScene.h"
 

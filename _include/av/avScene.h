@@ -3,6 +3,14 @@
 #include "avVisualFwd.h"
 #include "avEnvironmentParams.h"
 
+namespace fms
+{
+    struct trajectory;
+    typedef polymorph_ptr<trajectory> trajectory_ptr;
+};
+
+
+
 namespace av
 {
 #if 0

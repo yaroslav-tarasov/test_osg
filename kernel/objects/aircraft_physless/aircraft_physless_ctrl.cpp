@@ -47,7 +47,7 @@ namespace aircraft_physless
         root->set_position(geo_position(p, quaternion(cpr(c, 0, 0))));
 
 #if 1
-        /*aircraft_fms::*/state_t st = /*get_fms_info()->*/get_state();
+        /*aircraft_fms::*/afms::state_t st = /*get_fms_info()->*/get_state();
         st.dyn_state.pos = p;
         st.dyn_state.course = c;
 

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "common/aircraft.h"
-//#include "common/aircraft_physless.h"
 
 #include "network/msg_base.h"
 #include "objects/aircraft_atc.h"
 #include "objects/aircraft.h"
-//#include "objects/aircraft_physless.h"
 #include "fms/trajectory.h"
 
-#include "aircraft_physless_state.h"
+
+namespace afms = aircraft::aircraft_fms;
+
 
 namespace aircraft_physless
 {
@@ -155,8 +155,8 @@ struct state_msg
     : network::msg_id<afm_state>
 {               
     state_msg();
-    explicit state_msg(state_t const& state);
-    operator state_t() const;
+    explicit state_msg(afms::state_t const& state);
+    operator afms::state_t() const;
 
     geo_point_2   pos;
     float         height;
@@ -178,9 +178,9 @@ REFL_STRUCT(state_msg)
     REFL_ENTRY(orien)
     REFL_ENTRY(TAS)
     REFL_ENTRY(fuel_mass)
-    //REFL_ENTRY(cfg)
-    //REFL_ENTRY(alt_state)
-    //REFL_ENTRY(version)
+    REFL_ENTRY(cfg)
+    REFL_ENTRY(alt_state)
+    REFL_ENTRY(version)
 REFL_END   ()
 
 
@@ -188,23 +188,23 @@ REFL_END   ()
 {
 }
 
-inline state_msg::state_msg(state_t const& state)
+inline state_msg::state_msg(afms::state_t const& state)
     : pos(state.dyn_state.pos)
     , height((float)state.dyn_state.pos.height)
     , orien(state.orien())
     , TAS((float)state.dyn_state.TAS)
-    //, cfg((unsigned char)state.dyn_state.cfg)
+    , cfg((unsigned char)state.dyn_state.cfg)
     , fuel_mass((float)state.dyn_state.fuel_mass)
-    //, alt_state(state.alt_state)
-    //, version(state.version)
+    , alt_state(state.alt_state)
+    , version(state.version)
 {
 }
 
-inline state_msg::operator state_t() const
+inline state_msg::operator afms::state_t() const
 {
-    ums::pilot_state_t pilot(ums::state_t(geo_point_3(pos, height), orien.course, fuel_mass, TAS/*, (fms::air_config_t)cfg*/)/*, (fms::alt_state_t)alt_state*/);
+    fms::pilot_state_t pilot(fms::state_t(geo_point_3(pos, height), orien.course, fuel_mass, TAS , (fms::air_config_t)cfg), (fms::alt_state_t)alt_state);
 
-    return state_t(pilot, orien.pitch, orien.roll, version);
+    return afms::state_t(pilot, orien.pitch, orien.roll, version);
 }
 
 struct local_meteo_msg 

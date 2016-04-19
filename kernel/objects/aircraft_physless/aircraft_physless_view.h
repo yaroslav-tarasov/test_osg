@@ -4,15 +4,13 @@
 #include "common/aircraft.h"
 #include "common/aircraft_fms.h"
 
-//#include "objects/aircraft_physless.h"
-
 #include "objects/nodes_management.h"
 #include "aircraft_physless/aircraft_physless_common.h"
 #include "common/chassis_common.h"
 #include "common/rotors_common.h"
 
 #include "common/meteo_local.h"
-#include "aircraft_physless_state.h"
+
 
 namespace aircraft_physless
 {
@@ -112,8 +110,8 @@ protected:
     void set_engine_state   (aircraft::engine_state_t state)    override;
 
 protected:
-	void set_state          (state_t const& st) /*override*/;
-    void set_state          (state_t const& st, bool sure);
+	void set_state          (afms::state_t const& st) /*override*/;
+    void set_state          (afms::state_t const& st, bool sure);
 
 	// aircraft_ipo_control
 protected:
@@ -207,8 +205,8 @@ protected:
     /////////////////////////////////////
 	DECLARE_EVENT(state_changed, ()) ;                       // fms
 
-    state_t                                _state;
-    inline        state_t  const&          get_state() const {return _state;}
+    afms::state_t                          _state;
+    inline        afms::state_t  const&          get_state() const {return _state;}
 
 private:
 #if 0 
