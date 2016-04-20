@@ -48,7 +48,7 @@ namespace Utils
            int i=0;
            BOOST_FOREACH(const auto &p, traj->extract_values())
            {
-               vert_->push_back( osg::Vec3( p.x, p.y, 0.8) );
+               vert_->push_back( osg::Vec3( p.x, p.y, (p.z<0.8)?0.8: p.z));
                traj_lines_->push_back(i++);
            } 
        

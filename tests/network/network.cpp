@@ -209,7 +209,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("3vis.ncfg", cfg_);
+           cfgr_->load_config("1vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
