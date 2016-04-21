@@ -10,7 +10,6 @@ namespace aircraft_physless
 {
 namespace sync_fsm
 {
-
     const double packet_delay = 1.0;
 
     void fms_state::update(double time, double /*dt*/) 
@@ -88,7 +87,6 @@ namespace sync_fsm
                 FIXME(extern state)
                 if(auto traj_ = self_.get_trajectory())
                 {
-
                     traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0);
                     const double  tar_len = traj_->cur_len();
                     
