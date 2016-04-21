@@ -88,10 +88,10 @@ namespace camera_moving
         fms::trajectory::speed_t       vls;
 
         crs.insert (std::make_pair(26.0,cpr(/*20*/cg::rad2grad() *-2.14)));
-        kpts.insert(std::make_pair(26.0,point_3f(48.89,411.65,28.50)));
+        kpts.insert(std::make_pair(26.0,point_3f(48.89f,411.65f,28.50f)));
 
         crs.insert (std::make_pair(59.0,cpr(cg::rad2grad() * -5.10)));
-        kpts.insert(std::make_pair(59.0,point_3f(-2383.51,-524.20, 21)));
+        kpts.insert(std::make_pair(59.0,point_3f(-2383.51f,-524.20f, 21.f)));
 
         return fms::trajectory::create(kpts,crs,vls);
     }
@@ -104,10 +104,10 @@ namespace camera_moving
         fms::trajectory::speed_t       vls;
 
         crs.insert (std::make_pair(163.0,cpr(/*20*/cg::rad2grad() *-2.14)));
-        kpts.insert(std::make_pair(163.0,point_3f(48.89,411.65,28.50)));
+        kpts.insert(std::make_pair(163.0,point_3f(48.89f,411.65f,28.50f)));
 
         crs.insert (std::make_pair(130.0,cpr(cg::rad2grad() * -5.10)));
-        kpts.insert(std::make_pair(130.0,point_3f(-2383.51,-524.20, 21)));
+        kpts.insert(std::make_pair(130.0,point_3f(-2383.51f,-524.20f, 21.0f)));
 
         return fms::trajectory::create(kpts,crs,vls);
     }
@@ -120,10 +120,10 @@ namespace camera_moving
         fms::trajectory::speed_t       vls;
 
         crs.insert (std::make_pair(240.0,cpr(cg::rad2grad() *-2.14)));
-        kpts.insert(std::make_pair(240.0,point_3f(48.89,411.65,28.50)));
+        kpts.insert(std::make_pair(240.0,point_3f(48.89f,411.65f,28.50f)));
 
         crs.insert (std::make_pair(360.0,cpr(cg::rad2grad() * -4.14)));
-        kpts.insert(std::make_pair(360.0,point_3f(48.89,411.65,28.50)));
+        kpts.insert(std::make_pair(360.0,point_3f(48.89f,411.65f,28.50f)));
 
         return fms::trajectory::create(kpts,crs,vls);
     }
@@ -209,7 +209,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("3vis.ncfg", cfg_);
+           cfgr_->load_config("1vis.ncfg", cfg_);
            refill_peers(peers);
        }
        
@@ -311,8 +311,8 @@ struct client
         //Camera: ÊÄÏ_óòê -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
 
 #if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51,-524.20, 21 ), quaternion(cprf(cg::rad2grad() * -5.10/*,cg::rad2grad() *- =0.07,cg::rad2grad() * 0.57*/)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(48.89,411.65,28.50), quaternion(cprf(cg::rad2grad() *-2.14/*, cg::rad2grad() * -0.13, cg::rad2grad() * 0.66*/)) , ok_camera, "camera 1", "") )
+        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f/*,cg::rad2grad() *- =0.07,cg::rad2grad() * 0.57*/)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(48.89f,411.65f,28.50f), quaternion(cprf(cg::rad2grad() *-2.14f/*, cg::rad2grad() * -0.13, cg::rad2grad() * 0.66*/)) , ok_camera, "camera 1", "") )
 #endif
 
         ADD_EVENT(time , state(0.0,time,factor))
@@ -394,7 +394,7 @@ struct client
 #if 1
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
-        ADD_EVENT(70.0, fire_fight_msg_t(2))
+        ADD_EVENT(70.0,  fire_fight_msg_t(2))
 #if 1
         ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
@@ -434,8 +434,8 @@ struct client
         for (int i=0;i<4;i++)
         {
             ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
-                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
-                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+            ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+            ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
         }
 #endif
 
@@ -457,7 +457,7 @@ struct client
         ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
 #endif
 
-        ADD_EVENT(2.0  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
+        ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
         ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
 
 #if 0
@@ -641,7 +641,7 @@ struct client
             ));
 
         runs_.insert(make_pair(traj_pos_->base_length(),
-            boost::bind( run_f_pos_, 173,_1,traj_offset)
+            boost::bind( run_f_pos_, 173,_1,/*traj_offset*/0)
             ));
 
 

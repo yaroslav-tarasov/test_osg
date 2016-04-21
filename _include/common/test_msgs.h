@@ -86,7 +86,7 @@ namespace net_layer
                 , orien    (cg::quaternion()) 
                 , time     (0)
                 , speed    (0)
-			    , reverse  (false)
+                , reverse  (false)
 				, mlp      (meteo::local_params())
             {
             }
@@ -112,13 +112,13 @@ namespace net_layer
         };
 
         REFL_STRUCT(run)
-            REFL_ENTRY( ext_id   )
-            REFL_ENTRY( time     )
-            REFL_ENTRY( speed    )
-            REFL_ENTRY( keypoint )
-            REFL_ENTRY( orien    )
-			REFL_ENTRY( reverse  )
-            REFL_ENTRY( mlp      )
+            REFL_ENTRY( ext_id    )
+            REFL_ENTRY( time      )
+            REFL_ENTRY( speed     )
+            REFL_ENTRY( keypoint  )
+            REFL_ENTRY( orien     )
+			REFL_ENTRY( reverse   )
+            REFL_ENTRY( mlp       )
         REFL_END()
         
         enum object_kind_t : int16_t
