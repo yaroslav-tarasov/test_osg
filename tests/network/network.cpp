@@ -65,11 +65,17 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
         auto p = cg::point_2(it->x,it->y);
         auto dist = cg::distance(prev,p);
         tlength += dist;
-        crs.insert (std::make_pair(it->time,cpr(it->fiw,it->tg, it->kr )));
-        kpts.insert(std::make_pair(it->time,cg::point_3(p,it->h)));
 
+        double tang = it->tg;
         if(it != kdg.kd_.begin())
+        {
             vls.insert(std::make_pair(it->time,dist/(it->time - std::prev(it)->time)));
+            if (it->h - std::prev(it)->h < 0) tang = abs(tang);
+        }
+
+
+        crs.insert (std::make_pair(it->time,cpr(it->fiw, tang, it->kr )));
+        kpts.insert(std::make_pair(it->time,cg::point_3(p,it->h)));
 
         prev = p;
     }
@@ -289,17 +295,17 @@ struct client
     };
 
     client(endpoints peers)
-        : net_cfgr_ (boost::make_shared<net_configurer>(peers))  
-        , connect_helper_ (peers, this)
-        , period_   (.5)
-        , timer_    (boost::bind(&client::update, this))
-        , traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
+        : traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
         , traj_trp2_(fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
         , traj_cam_         (camera_moving::fill_trajectory())
         , traj_cam_reverse_ (camera_moving::fill_reverse_trajectory ())
+        , net_cfgr_ (boost::make_shared<net_configurer>(peers))  
+        , connect_helper_ (peers, this)
+        , period_   (.5)
+        , timer_    (boost::bind(&client::update, this))
     {
         disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -457,7 +463,7 @@ struct client
         ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
 #endif
 
-        ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "L39", "173") )
+        ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
         ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
 
 #if 0
@@ -480,7 +486,7 @@ struct client
 #endif
 
 
-#if 1
+#if 0
 		ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
 		ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )

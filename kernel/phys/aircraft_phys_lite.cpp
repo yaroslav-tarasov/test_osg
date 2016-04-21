@@ -122,7 +122,7 @@ FIXME("Off point for bullet")
         // btWheelInfo& info = raycast_veh_->addWheel(to_bullet_vector3(connection_point),btVector3(0,0,-1),btVector3(1,0,0), 1.0f,btScalar(radius),tuning_,is_front);
         //tuning_.m_suspensionStiffness = 5.f; // 20.f
         //tuning_.m_suspensionDamping = 2.3f;
-        FIXME(Не сделать ли массо-завимимым параметром) 
+        FIXME(Не сделать ли массо-завиcимым параметром) 
 //#if !defined(SIMEX_MOD)
         tuning_.m_maxSuspensionForce = 60000000;
 //#endif

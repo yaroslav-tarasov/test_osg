@@ -92,6 +92,16 @@ namespace aircraft_physless
 			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
 			if(label_object_->root())
 				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+
+            landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg");
+            if (landing_dust_object_)
+            {
+                landing_dust_weak_ptr_ = nullptr;
+                if (auto landing_dust_node = findFirstNode(landing_dust_object_->node().get(),"LandingDustFx"))
+                {
+                    landing_dust_weak_ptr_ = dynamic_cast<LandingDustSfxNode *>(landing_dust_node);
+                }
+            }
 		}
 #endif
 
@@ -113,6 +123,11 @@ namespace aircraft_physless
             }
             else
                 smoke_object_->set_visible(false);
+        }
+        
+        if (landing_dust_object_)
+        {
+            landing_dust_object_->set_visible(nodes_management::vis_node_info_ptr(root())->is_visible());
         }
 
 		if (smoke_sfx_.smoke_object_ && engine_node_)
@@ -160,6 +175,18 @@ namespace aircraft_physless
         }
     }
 
+    void visual::on_new_wheel_contact_effect(double time, point_3f vel, point_3f offset)
+    {
+        geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
+
+        geo_base_3 root_pos   = root()->get_global_pos();
+        quaternion root_orien = root()->get_global_orien();
+
+        point_3f pos = base(root_pos) + root_orien.rotate_vector(offset);
+
+        if (landing_dust_object_)
+            landing_dust_weak_ptr_->makeContactDust(time, pos, vel);
+    }
 
 	void visual::smoke_sfx_t::on_malfunction_changed( aircraft::malfunction_kind_t kind )
 	{

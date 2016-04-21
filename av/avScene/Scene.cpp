@@ -1459,6 +1459,25 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 		return mt_.back();
 	}
 
+    if( path == "sfx//landing_dust.scg" )
+    {
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+        osg::Matrix mat; 
+        mat.setTrans(-offset/2);
+
+        auto mt_offset = new osg::MatrixTransform(mat);
+        parent?parent->asGroup()->addChild(mt_offset):nullptr;
+
+        avFx::LandingDustFx* fs = new avFx::LandingDustFx;
+
+        mt_.back()->addChild(fs);
+        _terrainRoot->asGroup()->addChild(mt_.back());
+
+        return mt_.back();
+    }
+
 	if( path == "sfx//foam_stream.scg" )
 	{
 		osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
