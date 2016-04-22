@@ -8,6 +8,7 @@
 #include "phys/character.h"
 #include "phys/aerostat.h"
 #include "phys/aircraft.h"
+#include "common/debug_render.h"
 
 namespace phys
 {
@@ -48,7 +49,7 @@ namespace phys
         virtual ~system() {}
 
         virtual void update( double dt ) = 0;
-        //virtual void set_debug_renderer(victory::debug_render_ptr debug_render = victory::debug_render_ptr()) = 0;
+        virtual void set_debug_renderer(debug_render_ptr debug_render = debug_render_ptr()) = 0;
 
         virtual static_mesh_ptr            create_static_mesh       ( sensor_ptr s ) = 0;
         virtual static_convex_ptr          create_static_convex     ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) = 0;

@@ -97,11 +97,13 @@ void model::update( double time )
     init_shassi_anim();
 
     double dt = time - (last_update_ ? *last_update_ : 0);
+    
     if (cg::eq_zero(dt))
         return;
 
     desired_nm_pos_.reset();
     desired_nm_orien_.reset();
+    desired_nm_speed_.reset();
 
     sync_fsm::state_ptr prev_state = sync_state_;
     sync_state_->update(time, dt);
@@ -143,25 +145,25 @@ void model::sync_nm_root(double dt)
 	
     nodes_management::node_position root_node_pos = root_->position();
 
-    // 
-    FIXME(Если раскоментарить отлично синхронизируемся)
-
-    //root_node_pos.global().pos = desired_pos;
-
     root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
     root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
-    
 
+    if(desired_nm_speed_)
+        root_node_pos.global().dpos =  *desired_nm_speed_ * cg::normalized_safe(root_node_pos.global().dpos);
 
-    //force_log fl;
-    LOG_ODS_MSG( "model::sync_nm_root: " << settings_.kind <<  " root_node_pos..global().pos :   x:  "  <<   root_node_pos.global().pos.lat << "    y: " <<  root_node_pos.global().pos.lon 
-        << " dpos.x " << root_node_pos.global().dpos.x
-        << " dpos.y " << root_node_pos.global().dpos.y
-        << " dpos.z " << root_node_pos.global().dpos.z
-        << " speed " << cg::norm(root_node_pos.global().dpos)
+    double cur_speed = cg::norm(root_node_pos.global().dpos);
+    force_log fl;
+    LOG_ODS_MSG( "model::sync_nm_root: " << settings_.kind <<  " root_node_pos.global().pos :   x:  "  <<   root_node_pos.global().pos.lat << "    y: " <<  root_node_pos.global().pos.lon 
+        << " desired_pos.x " << desired_pos.lat
+        << " desired_pos.y " << desired_pos.lon
+        << " speed " << cur_speed
+        << " acceleration " << (cur_speed - prev_speed_) / dt
+        << " dt " << dt
         << "\n" );
-
-    root_->set_position(root_node_pos);
+     
+    prev_speed_ = cur_speed;
+    
+   root_->set_position(root_node_pos);
 }
 
 void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
@@ -237,6 +239,11 @@ void model::set_desired_nm_pos  (geo_point_3 const& pos)
 void model::set_desired_nm_orien(quaternion const& orien)
 {
     desired_nm_orien_ = orien;
+}
+
+void model::set_desired_nm_speed    (double speed)
+{
+    desired_nm_speed_ = speed;
 }
 
 void model::on_malfunction_changed( aircraft::malfunction_kind_t kind ) 

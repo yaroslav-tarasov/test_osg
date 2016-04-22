@@ -10,6 +10,11 @@ inline cg::point_3 from_osg_vector3( osg::Vec3 const& v )
     return cg::point_3(v.x(), v.y(), v.z());
 }
 
+inline osg::Vec4 to_osg_vector4( cg::point_3 const& v , double a )
+{
+    return osg::Vec4(v.x, v.y, v.z, a);
+}
+
 inline osg::Quat to_osg_quat( cg::quaternion const& q )
 {
     return osg::Quat(q.get_v().x, q.get_v().y, q.get_v().z, q.get_w());

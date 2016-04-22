@@ -125,7 +125,7 @@ bool DebugRenderer::getEnabled() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::drawLine(const osg::Vec3& from,const osg::Vec3& to,const osg::Vec3& color)
+void DebugRenderer::drawLine(const cg::point_3& from,const cg::point_3& to,const cg::point_3& color)
 {
     if( !getEnabled() )
         return;
@@ -142,8 +142,8 @@ void DebugRenderer::drawLine(const osg::Vec3& from,const osg::Vec3& to,const osg
     // distant, and consequently the near plane is pulled back to maintain
     // the default near/far ratio. As a result, the entire scene is clipped.
     // In this case, don't draw this line.
-    osg::Vec3 osgFrom = from; //osgbCollision::asOsgVec3( from );
-    osg::Vec3 osgTo = to;     //osgbCollision::asOsgVec3( to );
+    osg::Vec3 osgFrom = to_osg_vector3(from); //osgbCollision::asOsgVec3( from );
+    osg::Vec3 osgTo = to_osg_vector3(to);     //osgbCollision::asOsgVec3( to );
     const double bigValue( 10000. );
     if( ( osg::absolute< double >( osgFrom[ 0 ] ) > bigValue ) ||
         ( osg::absolute< double >( osgFrom[ 1 ] ) > bigValue ) ||
@@ -155,12 +155,12 @@ void DebugRenderer::drawLine(const osg::Vec3& from,const osg::Vec3& to,const osg
     _lnVerts->push_back( osgFrom );
     _lnVerts->push_back( osgTo );  
 
-    osg::Vec4 c = osg::Vec4(color,1); //osgbCollision::asOsgVec4( color, 1. );
+    osg::Vec4 c = to_osg_vector4 (color, 1.0); //osg::Vec4(to_osg_vector3(color),1); //osgbCollision::asOsgVec4( color, 1. );
     _lnColors->push_back( c );
     _lnColors->push_back( c );
 }
 
-void DebugRenderer::drawSphere( const osg::Vec3& p, float radius, const osg::Vec3& color )
+void DebugRenderer::drawSphere( const cg::point_3& p, float radius, const cg::point_3& color )
 {
     if( !getEnabled() )
         return;
@@ -176,7 +176,7 @@ void DebugRenderer::drawSphere( const osg::Vec3& p, float radius, const osg::Vec
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::drawTriangle(const osg::Vec3& a,const osg::Vec3& b,const osg::Vec3& c,const osg::Vec3& color,float alpha)
+void DebugRenderer::drawTriangle(const cg::point_3& a,const cg::point_3& b,const cg::point_3& c,const cg::point_3& color,float alpha)
 {
     if( !getEnabled() )
         return;
@@ -187,17 +187,17 @@ void DebugRenderer::drawTriangle(const osg::Vec3& a,const osg::Vec3& b,const osg
         return;
     }
 
-    _triVerts->push_back( a /*osgbCollision::asOsgVec3( a )*/ );
-    _triVerts->push_back( b /*osgbCollision::asOsgVec3( b )*/ );
-    _triVerts->push_back( c /*osgbCollision::asOsgVec3( c )*/ );
+    _triVerts->push_back( to_osg_vector3 (a) /*osgbCollision::asOsgVec3( a )*/ );
+    _triVerts->push_back( to_osg_vector3 (b) /*osgbCollision::asOsgVec3( b )*/ );
+    _triVerts->push_back( to_osg_vector3 (c) /*osgbCollision::asOsgVec3( c )*/ );
 
-    osg::Vec4 c4 = osg::Vec4( color, alpha); // osgbCollision::asOsgVec4( color, alpha );
+    osg::Vec4 c4 = to_osg_vector4 (color, alpha); // osg::Vec4( color, alpha); // osgbCollision::asOsgVec4( color, alpha );
     _triColors->push_back( c4 );
     _triColors->push_back( c4 );
     _triColors->push_back( c4 );
 }
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::draw3dText(const osg::Vec3& location,const char* textString)
+void DebugRenderer::draw3dText(const cg::point_3& location,const char* textString)
 {
     if( !getEnabled() )
         return;
@@ -224,7 +224,7 @@ void DebugRenderer::draw3dText(const osg::Vec3& location,const char* textString)
     osgText::Text* text = _textVec[ _textStrings ].get();
     _textStrings++;
 
-    text->setPosition( location /*osgbCollision::asOsgVec3( location )*/ );
+    text->setPosition( to_osg_vector3(location) /*osgbCollision::asOsgVec3( location )*/ );
     text->setText( std::string( textString ) );
 
     _geode->addDrawable( text );
@@ -244,9 +244,9 @@ void DebugRenderer::reportErrorWarning(const char* warningString)
     osg::notify( osg::WARN ) << warningString << std::endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::drawContactPoint( const osg::Vec3& pointOnB,
-    const osg::Vec3& normalOnB, float distance, 
-    int lifeTime, const osg::Vec3& color)
+void DebugRenderer::drawContactPoint( const cg::point_3& pointOnB,
+    const cg::point_3& normalOnB, float distance, 
+    int lifeTime, const cg::point_3& color)
 {
     if( !getEnabled() )
         return;
@@ -259,11 +259,16 @@ void DebugRenderer::drawContactPoint( const osg::Vec3& pointOnB,
 
     _contacts++;
 
-    _ptVerts->push_back( pointOnB /*osgbCollision::asOsgVec3( pointOnB )*/ );
-    _ptColors->push_back( osg::Vec4( color, 1.) /*osgbCollision::asOsgVec4( color, 1. )*/ );
+    _ptVerts->push_back( to_osg_vector3(pointOnB) /*osgbCollision::asOsgVec3( pointOnB )*/ );
+    _ptColors->push_back( to_osg_vector4(color, 1.) /*osgbCollision::asOsgVec4( color, 1. )*/ );
 
+#if 0
     /*btVector3*/osg::Vec3 to=pointOnB+normalOnB*distance;
     const /*btVector3*/osg::Vec3 &from = pointOnB;
+#else
+    cg::point_3 to = pointOnB+normalOnB*distance; 
+    const cg::point_3  &from = pointOnB;
+#endif
 
     drawLine( from, to, color );
 

@@ -47,10 +47,6 @@ private:
 	// Some data
 private:
 
-	bool									_soar; // state ?
-	bool								   _dived;
-	bool                                 _landing;
-
     double                                 _speed;
 	float								 _damping;
     float			    			 _lerpCounter;

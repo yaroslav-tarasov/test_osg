@@ -14,7 +14,7 @@ to ensure that Bullet collision shapes and OSG geometry are synchronized.
 class /*OSGBCOLLISION_EXPORT*/ GLDebugDrawer : public btIDebugDraw
 {
 public:
-    GLDebugDrawer(debug_render* dr);
+    GLDebugDrawer(debug_render_ptr dr);
     virtual ~GLDebugDrawer(){};
 
     // osg::Node* getSceneGraph();
@@ -41,7 +41,7 @@ public:
 
 private:
 
-    osg::ref_ptr<debug_render> dr_;
+    debug_render_ptr        dr_;
 };
 
 

@@ -340,7 +340,7 @@ struct client
 
 #if 1
 
-#if 1
+#if 0
         weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
         weather.wind_dir    = cg::point_2f(1.0,0.0);
@@ -460,11 +460,13 @@ struct client
         ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
         //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
         //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-        ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
 #endif
+        ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
 
+#if 0
         ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
         ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
+#endif
 
 #if 0
 		ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
@@ -587,6 +589,7 @@ struct client
         }
         ));
 
+#if 0
         runs_once_.insert(make_pair( 25,
             [this]( double time )->void {
 
@@ -610,6 +613,8 @@ struct client
             }	
         }
         ));
+#endif
+
         
 #if 0
         runs_.insert(make_pair(traj_cam_->base_length(),
@@ -819,6 +824,7 @@ private:
             messages_size_ += binary::size(msg);
             messages_.push_back(move(msg));
 #endif
+
         }
 #endif
         

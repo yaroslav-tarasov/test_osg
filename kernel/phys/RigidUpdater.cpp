@@ -41,18 +41,6 @@
 ////  ifndef MULTITHREADED
 //#define DEPRECATED_DEBUG_MODE
 
-// FIXME
-FIXME("Производящие функции либо в интерфейс,либо совсем отдельно")
-namespace vehicle
-{
-	kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,const std::string& model_name);
-};
-
-namespace aircraft
-{
-    kernel::object_info_ptr create(kernel::system_ptr sys,nodes_management::manager_ptr nodes_manager,phys::control_ptr        phys);
-};
-
 
 namespace bi
 {

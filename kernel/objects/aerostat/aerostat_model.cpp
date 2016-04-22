@@ -21,8 +21,6 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
     , _speed                (10.0 )
-	, _soar                 (true )
-    , _landing              (false)
 {
     create_phys();
 
@@ -108,9 +106,7 @@ void model::update_model( double time, double dt )
         geo_position glb_phys_pos(phys_pos, base);
 
         double dist = cg::distance(glb_phys_pos.pos, desired_position_/*cur_pos*/);
-
     }
-
 
 }
 

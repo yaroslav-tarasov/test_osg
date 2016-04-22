@@ -23,19 +23,19 @@ enum	debug_draw_mode
 };
 
 // debug renderer
-struct debug_render : public osg::Referenced
+struct debug_render 
 {
 
     virtual void    setEnabled( bool enable ) = 0;
     virtual bool    getEnabled() const = 0;
 
-    virtual void	drawLine( const osg::Vec3& from,const osg::Vec3& to,const osg::Vec3& color ) = 0;
-    virtual void	drawSphere( const osg::Vec3& p, float radius, const osg::Vec3& color ) = 0;
+    virtual void	drawLine( const cg::point_3& from,const cg::point_3& to,const cg::point_3& color ) = 0;
+    virtual void	drawSphere( const cg::point_3& p, float radius, const cg::point_3& color ) = 0;
 
-    virtual void	drawTriangle(const osg::Vec3& a,const osg::Vec3& b,const osg::Vec3& c,const osg::Vec3& color,float alpha) = 0;
-    virtual void	drawContactPoint(const osg::Vec3& PointOnB,const osg::Vec3& normalOnB,float distance,int lifeTime,const osg::Vec3& color) = 0;
+    virtual void	drawTriangle(const cg::point_3& a,const cg::point_3& b,const cg::point_3& c,const cg::point_3& color,float alpha) = 0;
+    virtual void	drawContactPoint(const cg::point_3& PointOnB,const cg::point_3& normalOnB,float distance,int lifeTime,const cg::point_3& color) = 0;
     virtual void	reportErrorWarning(const char* warningString) = 0;
-    virtual void	draw3dText(const osg::Vec3& location,const char* textString) = 0;
+    virtual void	draw3dText(const cg::point_3& location,const char* textString) = 0;
 
     virtual void	setDebugMode(int debugMode) = 0;
     virtual int		getDebugMode() const = 0;
@@ -47,3 +47,5 @@ struct debug_render : public osg::Referenced
     virtual float   getTextSize() const = 0;
 
 };
+
+typedef debug_render* debug_render_ptr;

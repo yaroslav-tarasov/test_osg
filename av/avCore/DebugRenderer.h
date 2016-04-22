@@ -5,7 +5,8 @@
 namespace avCollision
 {
 
-class  DebugRenderer : public debug_render
+class  DebugRenderer : public osg::Referenced 
+                     , public debug_render
 {
 public:
     DebugRenderer();
@@ -16,13 +17,13 @@ public:
     virtual         void setEnabled    ( bool enable );
     virtual         bool getEnabled    () const;
 
-    virtual void	drawLine           ( const osg::Vec3& from,const osg::Vec3& to,const osg::Vec3& color );
-    virtual void	drawSphere         ( const osg::Vec3& p, float radius, const osg::Vec3& color );
+    virtual void	drawLine           ( const cg::point_3& from,const cg::point_3& to,const cg::point_3& color );
+    virtual void	drawSphere         ( const cg::point_3& p, float radius, const cg::point_3& color );
 
-    virtual void	drawTriangle       ( const osg::Vec3& a,const osg::Vec3& b,const osg::Vec3& c,const osg::Vec3& color,float alpha );
-    virtual void	drawContactPoint   ( const osg::Vec3& PointOnB,const osg::Vec3& normalOnB,float distance,int lifeTime,const osg::Vec3& color );
+    virtual void	drawTriangle       ( const cg::point_3& a,const cg::point_3& b,const cg::point_3& c,const cg::point_3& color,float alpha );
+    virtual void	drawContactPoint   ( const cg::point_3& PointOnB,const cg::point_3& normalOnB,float distance,int lifeTime,const cg::point_3& color );
     virtual void	reportErrorWarning ( const char* warningString );
-    virtual void	draw3dText         ( const osg::Vec3& location,const char* textString );
+    virtual void	draw3dText         ( const cg::point_3& location,const char* textString );
 
     virtual void	setDebugMode       (int debugMode);
     virtual int		getDebugMode       () const;

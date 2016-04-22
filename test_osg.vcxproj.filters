@@ -180,6 +180,9 @@
     <Filter Include="Source Files\av\terrain">
       <UniqueIdentifier>{dc97bf27-9180-43f9-bc0e-8bdd540d0da8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\mdd">
+      <UniqueIdentifier>{0f9870a5-1ea6-4065-9479-be8bab5fe6fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -496,6 +499,15 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\camera\camera_model.h">
       <Filter>Source Files\objects\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_model.h">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_view.h">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h">
+      <Filter>Source Files\objects\mdd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1230,6 +1242,15 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\object_reg\objects_reg_visual.cpp">
       <Filter>Source Files\objects\registrator</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_model.cpp">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp">
+      <Filter>Source Files\objects\mdd</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

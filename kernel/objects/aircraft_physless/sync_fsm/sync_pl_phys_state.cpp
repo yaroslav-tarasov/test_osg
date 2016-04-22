@@ -247,6 +247,15 @@ namespace sync_fsm
                 );           
             }
 #endif
+            if(traj_->speed_value(tar_len))
+            {
+                const double speed = *traj_->speed_value(tar_len);
+                force_log fl;       
+                LOG_ODS_MSG( "phys_state2::update " << tar_len << "  speed= " << speed << "\n"
+                    );
+
+                self_.set_desired_nm_speed(speed);
+            }
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = traj_->curs_value(tar_len);

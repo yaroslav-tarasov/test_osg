@@ -4,6 +4,16 @@
 // #include "atc/position.h"
 #include "../cpp_utils/polymorph_ptr.h"
 
+class btRigidBody;
+class btCollisionShape;
+class btDynamicsWorld;
+class btTypedConstraint;
+class btPoint2PointConstraint;
+class btGeneric6DofConstraint;
+class btCompoundShape;
+class btDefaultVehicleRaycaster;
+class btRaycastVehicle;
+
 namespace phys
 {
     typedef polymorph_ptr<btRigidBody>               bt_rigid_body_ptr;
@@ -76,6 +86,7 @@ namespace phys
         return btTransform(to_bullet_quaternion(orien), to_bullet_vector3(pos));
     }
 
+#ifndef BULLET_FROM_TO_ONLY
 
     inline decart_position from_bullet_position(btRigidBody const* body)
     {
@@ -288,6 +299,6 @@ namespace phys
               int i = 0;
         }
     };
-
+#endif
 
 }

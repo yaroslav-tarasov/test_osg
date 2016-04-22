@@ -506,9 +506,14 @@ BulletInterface::~BulletInterface()
     delete d_;
 }
 
-void     BulletInterface::setDebugDrawer(/*btIDebugDraw*/debug_render* dd)
+void   BulletInterface::set_debug_renderer(debug_render_ptr debug_render)
 {
-    d_->_dd= new avCollision::GLDebugDrawer(dd);    
+        setDebugDrawer(debug_render);
+}
+
+void     BulletInterface::setDebugDrawer(debug_render_ptr dd)
+{
+    d_->_dd =  new avCollision::GLDebugDrawer(dd);    
     if(d_->_dd)
         d_->_dw->setDebugDrawer(d_->_dd);
 }

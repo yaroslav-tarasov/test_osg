@@ -25,33 +25,14 @@ public:
 	BulletInterface();
 	virtual ~BulletInterface();
   
-#ifdef DEPRECATED	    
-    void                        createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
-#endif
-
     void                        createBox    ( int id, const osg::Vec3& dim, double mass );
     void                        createSphere ( int id, double radius, double mass );
-
-
     void                        createShape  ( osg::Node* node, int id, double mass);
-#ifdef DEPRECATED
-	void                        createUFO    ( osg::Node* node, int id, double mass);
-	aircraft::info_ptr          createUFO2    ( osg::Node* node, int id, double mass);
-#endif
 
-    aircraft::info_ptr          create_aircraft        (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
-	aircraft::info_ptr          create_aircraft_pl     (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
-    aircraft::info_ptr          create_helicopter_pl   (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
-    ray_cast_vehicle::info_ptr  create_ray_cast_vehicle(double,phys::compound_sensor_ptr,const decart_position & pos) override;
-    static_mesh_ptr             create_static_mesh     ( sensor_ptr s ) override;
-    static_convex_ptr           create_static_convex   ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) override;
-    flock::info_ptr             create_flock_child     (const phys::flock::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
-    aerostat::info_ptr          create_aerostat        (const phys::aerostat::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
-	character::info_ptr         create_character       (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
-	
-	
-
-#ifdef DEPRECATED    
+#ifdef DEPRECATED	    
+    void                        createWorld  ( const osg::Plane& plane, const osg::Vec3& gravity , on_collision_f on_collision = nullptr);
+    void                        createUFO    ( osg::Node* node, int id, double mass);
+    aircraft::info_ptr          createUFO2    ( osg::Node* node, int id, double mass);
     ray_cast_vehicle::info_ptr  createVehicle(osg::Node* node,int id,double mass);
 #endif
 
@@ -62,10 +43,27 @@ public:
     void                        setMatrix    ( int id, const osg::Matrix& matrix );
     osg::Matrix                 getMatrix( int id );
     
-    void                        update( double step );     // former simulate
 
-    void                        setDebugDrawer(/*btIDebugDraw*/debug_render* dd);
+
+    void                        setDebugDrawer(debug_render_ptr dd);
     void                        debugDrawWorld();
+
+    //
+    //  phys::system
+    //
+    aircraft::info_ptr          create_aircraft        (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
+    aircraft::info_ptr          create_aircraft_pl     (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
+    aircraft::info_ptr          create_helicopter_pl   (const phys::aircraft::params_t &,compound_sensor_ptr s,const decart_position &) override;
+    ray_cast_vehicle::info_ptr  create_ray_cast_vehicle(double,phys::compound_sensor_ptr,const decart_position & pos) override;
+    static_mesh_ptr             create_static_mesh     ( sensor_ptr s ) override;
+    static_convex_ptr           create_static_convex   ( sensor_ptr s, point_3 const& pos, quaternion const& orien ) override;
+    flock::info_ptr             create_flock_child     (const phys::flock::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
+    aerostat::info_ptr          create_aerostat        (const phys::aerostat::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
+    character::info_ptr         create_character       (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
+
+    void                        update                 ( double step )  override ;     // former simulate
+    virtual void                set_debug_renderer     (debug_render_ptr debug_render) override ;
+
 	//
     //  phys::system_impl
 	//
@@ -90,7 +88,7 @@ private:
 	boost::optional<double>   intersect_first(cg::point_3 const& p, cg::point_3 const& q) const;
 
 protected:  
-    void checkForCollisionEvents();
+    void                      checkForCollisionEvents();
 
 private:
     #define BIT(x) (1<<(x))

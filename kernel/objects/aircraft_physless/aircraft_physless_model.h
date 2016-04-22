@@ -74,8 +74,9 @@ namespace aircraft_physless
 
         geo_position                     get_root_pos() const;
         bool                             is_fast_session() const;
-        void                             set_desired_nm_pos  (geo_point_3 const& pos);
-        void                             set_desired_nm_orien(quaternion const& orien);
+        void                             set_desired_nm_pos   (geo_point_3 const& pos);
+        void                             set_desired_nm_orien (quaternion const& orien);
+        void                             set_desired_nm_speed (double speed);
         optional<ada::data_t> const&     fsettings() const;
 
         void switch_sync_state(sync_fsm::state_ptr state);
@@ -136,6 +137,9 @@ namespace aircraft_physless
 
         optional<geo_point_3>                  desired_nm_pos_;
         optional<quaternion>                   desired_nm_orien_;
+        
+        optional<double>                       desired_nm_speed_;
+        double                                 prev_speed_;
 
         double                                 nm_ang_smooth_;
         

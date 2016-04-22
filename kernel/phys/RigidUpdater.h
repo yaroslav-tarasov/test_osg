@@ -3,6 +3,12 @@
 #include "trajectory_drawer.h"
 #include "common/debug_render.h"
 
+namespace avCollision
+{
+    class DebugRenderer;
+}
+
+
 namespace bi
 {
     class RigidUpdater : public osgGA::GUIEventHandler 
@@ -64,7 +70,7 @@ namespace bi
         osg::observer_ptr<osg::Group>            _root;
         high_res_timer                           _hr_timer;
         on_collision_f                           _on_collision;
-        osg::ref_ptr<debug_render>               _dbgDraw; 
+        osg::ref_ptr<avCollision::DebugRenderer> _dbgDraw; 
         bool                                     _debug;
 		bool                                     _needDebugDrawer;
         
