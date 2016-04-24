@@ -206,6 +206,7 @@
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_model.h" />
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_view.h" />
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h" />
+    <ClInclude Include="kernel\objects\model_debug_drawer\remote_render.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tests\systems\factory_systems.h" />
     <ClInclude Include="tests\systems\systems_impl.h" />
@@ -368,6 +369,7 @@
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_model.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp" />
+    <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp" />
     <ClCompile Include="kernel\objects\nm\nodes_management.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

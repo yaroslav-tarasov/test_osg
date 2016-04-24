@@ -100,13 +100,15 @@ REFL_END()
     {
         if (is_local())
         {
-            local().dpos  = cg::point_3();
-            local().omega = cg::point_3();
+			//local().dpos = point_3();
+			//local().omega = point_3();
+			local().freeze();
         }
         else
         {
-            global().dpos  = cg::point_3();
-            global().omega = cg::point_3();
+			//global().dpos = point_3();
+			//global().omega = point_3();
+			global().freeze();
         }
     }
 

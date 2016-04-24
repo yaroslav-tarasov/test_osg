@@ -150,6 +150,8 @@ void model::sync_nm_root(double dt)
 
     if(desired_nm_speed_)
         root_node_pos.global().dpos =  *desired_nm_speed_ * cg::normalized_safe(root_node_pos.global().dpos);
+	    
+	root_node_pos.global().ddpos = (root_node_pos.global().dpos - prev_dpos_) / (sys_->calc_step());
 
     double cur_speed = cg::norm(root_node_pos.global().dpos);
     force_log fl;
@@ -162,8 +164,8 @@ void model::sync_nm_root(double dt)
         << "\n" );
      
     prev_speed_ = cur_speed;
-    
-   root_->set_position(root_node_pos);
+    prev_dpos_ = root_node_pos.global().dpos;
+    root_->set_position(root_node_pos);
 }
 
 void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )

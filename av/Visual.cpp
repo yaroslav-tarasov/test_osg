@@ -151,7 +151,7 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    avScene::Logo::Create(_viewerPtr.get());
+    // avScene::Logo::Create(_viewerPtr.get());
 	CreateScene();
 
     m_bInitialized = true;
@@ -253,7 +253,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     right  = zNear * tan(0.5*(fFOVHor[1] - fFOVHor[0])/zoom /*+ cVisualConfig.fTwist[0]*/);
     bottom = zNear * tan(fFOVVer[0]/zoom);
     top    = zNear * tan(fFOVVer[1]/zoom);
-    // _viewerPtr->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    //_viewerPtr->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(left, right, bottom, top, zNear, zFar);
 #endif
 

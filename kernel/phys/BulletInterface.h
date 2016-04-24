@@ -102,7 +102,7 @@ private:
 
    
     struct _private;
-    _private*  d_;
+    _private*  p_;
     
     on_collision_f                        on_collision_;
     cg::geo_base_3                        base_;

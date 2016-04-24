@@ -17,7 +17,7 @@ namespace mdd
 
 
         // 
-                                                                                #if 0
+#if 0
 virtual void    setEnabled( bool enable ) = 0;
 virtual bool    getEnabled() const = 0;
 
@@ -31,7 +31,7 @@ virtual void    BeginDraw() = 0;
 
 virtual void    setTextSize( const float size ) = 0;
 virtual float   getTextSize() const = 0;
-        #endif
+#endif
 
 
         struct state_msg_t
@@ -59,6 +59,11 @@ virtual float   getTextSize() const = 0;
             {
             }
 
+			draw_line_msg_t(const cg::point_3&  from, const cg::point_3&  to, const cg::point_3&  color )
+				: from (from) , to (to) , color (color) 
+			{
+			}
+
             cg::point_3  from;
             cg::point_3    to;
             cg::point_3 color;
@@ -78,6 +83,11 @@ virtual float   getTextSize() const = 0;
             {
             }
 
+			draw_sphere_msg_t( const cg::point_3&     p, float      radius, const cg::point_3&  color)
+				: p(p), radius(radius), color(color)
+			{
+			}
+
             cg::point_3     p;
             float      radius;
             cg::point_3 color;
@@ -96,6 +106,16 @@ virtual float   getTextSize() const = 0;
             draw_triangle_msg_t()
             {
             }
+
+			draw_triangle_msg_t( const cg::point_3&     a,
+								 const cg::point_3&     b,
+								 const cg::point_3&     c,
+								 const cg::point_3& color,
+								 float              alpha
+				)
+				: a(a), b(b), c(c), color(color), alpha(alpha)
+			{
+			}
 
             cg::point_3     a;
             cg::point_3     b;
@@ -120,12 +140,22 @@ virtual float   getTextSize() const = 0;
             draw_contact_point_msg_t()
             {
             }
+			
+			draw_contact_point_msg_t( const cg::point_3&  point_on_b,
+									  const cg::point_3&  normal_on_b,
+									  float               distance,
+								      int                 life_time,
+									  const cg::point_3&  color
+				)
+				: point_on_b(point_on_b), normal_on_b(normal_on_b), distance(distance), life_time(life_time), color(color)
+			{
+			}
 
-            cg::point_3  point_on_b;
-            cg::point_3  normal_on_b;
-            float        distance;
-            int          life_time;
-            cg::point_3  color;
+			cg::point_3  point_on_b;
+			cg::point_3  normal_on_b;
+			float        distance;
+			int          life_time;
+			cg::point_3  color;
         };
 
         REFL_STRUCT(draw_contact_point_msg_t)

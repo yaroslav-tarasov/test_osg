@@ -17,7 +17,9 @@ namespace mdd
 
         // base_presentation
     private:
-        void update( double /*time*/ );
+        void update      ( double /*time*/ ) override;
+	    void pre_update  ( double /*time*/ ) override;
+        void post_update ( double /*time*/ ) override;
 
         // info
     private:

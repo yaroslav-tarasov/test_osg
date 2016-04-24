@@ -213,7 +213,7 @@ Object* createObject(std::string name, bool fclone)
 	Object*    object      = nullptr;
     boost::optional<xml_model_t> data;
     
-    helper_t h(name);
+    //helper_t h(name);
 
     osg::PositionAttitudeTransform* pat;
 

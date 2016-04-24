@@ -14,6 +14,8 @@ namespace mdd
         , info
         , phys_object_model_base    
     {
+		friend struct remote_render;
+
         static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
     private:
@@ -29,9 +31,10 @@ namespace mdd
 
     private:
         void render();
-
+    
     private:
         debug_render_ptr renderer_;
+		bool				 init_;
     };
 
 }

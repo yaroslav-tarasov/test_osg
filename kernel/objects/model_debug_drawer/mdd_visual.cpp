@@ -21,10 +21,18 @@ namespace mdd
             .add<msg::draw_contact_point_msg_t  >(boost::bind(&visual::on_draw_contact_point  , this, _1))
             ;
     }
+	
+	void visual::pre_update( double /*time*/ )
+	{
+	}
 
     void visual::update( double /*time*/ )
     {
     }
+
+	void visual::post_update( double /*time*/ )
+	{
+	}
 
     debug_render_ptr visual::get_renderer()
     {
@@ -33,27 +41,23 @@ namespace mdd
 
     void visual::on_state              (msg::state_msg_t const& msg)
     {
-
+		
     }
 
     void visual::on_draw_line          (msg::draw_line_msg_t const& msg)
     {
-
     }
 
     void visual::on_draw_sphere        (msg::draw_sphere_msg_t const& msg)
     {
-
     }
 
     void visual::on_draw_triangle      (msg::draw_triangle_msg_t const& msg)
     {
-
     }
 
     void visual::on_draw_contact_point (msg::draw_contact_point_msg_t const& msg)
     {
-
     }
 
 

@@ -475,7 +475,7 @@ namespace bi
         frame_timer ftm (view,_last_frame_time);
         if ( !view || !_root ) return false;
 
-#if 0
+#if 1
         switch ( ea.getEventType() )
         {
 #ifdef DEPRECATED_DEBUG_MODE
@@ -618,6 +618,12 @@ namespace bi
                     LOG_ODS_MSG( "Simulation time differ from real time more the 0.1 sec  " << dt  << "  " <<  dt1 << "\n");
                }
 			   
+			   
+			   if(_dbgDraw && !_d->_sys && _needDebugDrawer)
+			   {
+				   _d->_sys = phys::create_phys_system();
+			   }
+
 			   if(_dbgDraw && _d->_sys && _needDebugDrawer)
 			   {
 				   _d->_sys->setDebugDrawer(_dbgDraw);

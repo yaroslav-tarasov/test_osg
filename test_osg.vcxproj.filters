@@ -509,6 +509,9 @@
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h">
       <Filter>Source Files\objects\mdd</Filter>
     </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\remote_render.h">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1250,6 +1253,9 @@
       <Filter>Source Files\objects\mdd</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp">
+      <Filter>Source Files\objects\mdd</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp">
       <Filter>Source Files\objects\mdd</Filter>
     </ClCompile>
   </ItemGroup>

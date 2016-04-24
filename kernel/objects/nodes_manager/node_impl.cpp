@@ -70,13 +70,13 @@ void node_impl::pre_update(double time)
     {
         if (position_.is_local())
         {                                                                                                                                       
-            extrapolated_position_.local().pos   = position_.local().pos + position_.local().dpos * dt;
+            extrapolated_position_.local().pos   = position_.local().pos + position_.local().dpos_t(dt); 
             extrapolated_position_.local().orien = cg::quaternion(cg::rot_axis(position_.local().omega * dt)) * position_.local().orien;
             extrapolated_position_reseted();
         }
         else
         {
-            extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos * dt);
+            extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos_t(dt));
             extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
             //force_log fl;
             LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << "  extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "  dt=" << dt 

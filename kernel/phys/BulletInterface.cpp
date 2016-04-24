@@ -451,76 +451,77 @@ namespace phys
 BulletInterface::BulletInterface()
     : on_collision_(nullptr)
     , base_(::get_base())
-    , d_(new _private())
+    , p_(new _private())
 {
 
-    d_->_configuration = new btDefaultCollisionConfiguration;
-    d_->_dispatcher = new btCollisionDispatcher( d_->_configuration );
-    d_->_overlappingPairCache = new btDbvtBroadphase;
-    d_->_solver = new btSequentialImpulseConstraintSolver;
+    p_->_configuration = new btDefaultCollisionConfiguration;
+    p_->_dispatcher = new btCollisionDispatcher( p_->_configuration );
+    p_->_overlappingPairCache = new btDbvtBroadphase;
+    p_->_solver = new btSequentialImpulseConstraintSolver;
 
 #if 0
     d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
 #endif
     
     
-	d_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+	p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
 	
-	d_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
+	p_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
 
-    d_->_dw->getSolverInfo().m_numIterations = 20;
-    d_->_dw->getSolverInfo().m_damping = 1.;
-    d_->_dw->getSolverInfo().m_splitImpulse = false;
-    d_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
+    p_->_dw->getSolverInfo().m_numIterations = 20;
+    p_->_dw->getSolverInfo().m_damping = 1.;
+    p_->_dw->getSolverInfo().m_splitImpulse = false;
+    p_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
 
  #if 0
    d_->_dw->setInternalTickCallback(internal_tick_callback); 
 #endif   
 
 
-    d_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*d_->_dw));
+    p_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*p_->_dw));
 }
 
 BulletInterface::~BulletInterface()
 {
-    if ( d_->_dw )
+    if ( p_->_dw )
     {
-        for ( int i=d_->_dw->getNumCollisionObjects()-1; i>=0; --i )
+        for ( int i=p_->_dw->getNumCollisionObjects()-1; i>=0; --i )
         {
-            btCollisionObject* obj = d_->_dw->getCollisionObjectArray()[i];
+            btCollisionObject* obj = p_->_dw->getCollisionObjectArray()[i];
             btRigidBody* body = btRigidBody::upcast(obj);
             if ( body && body->getMotionState() )
                 delete body->getMotionState();
             
-            d_->_dw->removeCollisionObject( obj );
+            p_->_dw->removeCollisionObject( obj );
             delete obj;
         }
 
-		d_->_dw.reset();
+		p_->_dw.reset();
     }
     
-    delete d_->_solver;
-    delete d_->_overlappingPairCache;
-    delete d_->_dispatcher;
-    delete d_->_configuration;
-    delete d_;
+    delete p_->_solver;
+    delete p_->_overlappingPairCache;
+    delete p_->_dispatcher;
+    delete p_->_configuration;
+    delete p_;
 }
 
 void   BulletInterface::set_debug_renderer(debug_render_ptr debug_render)
 {
-        setDebugDrawer(debug_render);
+        setDebugDrawer(debug_render); 
+		p_->_dd->setDebugMode( btIDebugDraw::DBG_FastWireframe/* ~btIDebugDraw::DBG_DrawText*/ );
 }
 
 void     BulletInterface::setDebugDrawer(debug_render_ptr dd)
 {
-    d_->_dd =  new avCollision::GLDebugDrawer(dd);    
-    if(d_->_dd)
-        d_->_dw->setDebugDrawer(d_->_dd);
+    p_->_dd =  new avCollision::GLDebugDrawer(dd);    
+    if(p_->_dd)
+        p_->_dw->setDebugDrawer(p_->_dd);
 }
 
 void  BulletInterface::debugDrawWorld()
 {
-     d_->_dw->debugDrawWorld();
+     p_->_dw->debugDrawWorld();
 }
 
 #ifdef DEPRECATED
@@ -547,7 +548,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     btDefaultMotionState* motionState = new btDefaultMotionState(groundTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( 0.0, motionState, groundShape, btVector3(0.0, 0.0, 0.0) );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    d_->_dw->addRigidBody( body );
+    p_->_dw->addRigidBody( body );
     body->setFriction(1.3f); 
     body->setActivationState(DISABLE_SIMULATION);
     body->setRestitution(0.5f);
@@ -555,7 +556,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
 
     on_collision_ = on_collision;
 
-	d_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*d_->_dw));
+	p_->vehicle_raycaster_.reset(new btDefaultVehicleRaycaster(&*p_->_dw));
 
 }
 #endif
@@ -573,9 +574,9 @@ void BulletInterface::createBox( int id, const osg::Vec3& dim, double mass )
     btDefaultMotionState* motionState = new btDefaultMotionState(boxTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, boxShape, localInertia );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    d_->_dw->addRigidBody( body); 
-    d_->_actors[id]._body = body;
-    d_->_actors[id]._type  = BOX;
+    p_->_dw->addRigidBody( body); 
+    p_->_actors[id]._body = body;
+    p_->_actors[id]._type  = BOX;
 }
 
 void BulletInterface::createSphere( int id, double radius, double mass )
@@ -591,11 +592,11 @@ void BulletInterface::createSphere( int id, double radius, double mass )
     btDefaultMotionState* motionState = new btDefaultMotionState(sphereTransform);
     btRigidBody::btRigidBodyConstructionInfo rigidInfo( mass, motionState, sphereShape, localInertia );
     btRigidBody* body = new btRigidBody(rigidInfo);
-    d_->_dw->addRigidBody( body );
+    p_->_dw->addRigidBody( body );
     body->setFriction(10.3f);
     body->setRestitution(0.1f);
-    d_->_actors[id]._body  = body;
-    d_->_actors[id]._type  = SPHERE;
+    p_->_actors[id]._body  = body;
+    p_->_actors[id]._type  = SPHERE;
 }
 
 
@@ -648,7 +649,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	btRaycastVehicle::btVehicleTuning    tuning_;
 	tuning_.m_maxSuspensionTravelCm = 500;
     //chassis->applyTorque(btVector3(100,100,100));
-	btRaycastVehicle* v = new btRaycastVehicle(tuning_,chassis,new btDefaultVehicleRaycaster(d_->_dw.get()));
+	btRaycastVehicle* v = new btRaycastVehicle(tuning_,chassis,new btDefaultVehicleRaycaster(p_->_dw.get()));
 	v->setCoordinateSystem(0,2,1);
 
 
@@ -664,14 +665,14 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 	//v->applyEngineForce(500,1);
 	//v->applyEngineForce(500,2);
 
-	d_->_dw->addRigidBody( chassis );
-	d_->_dw->addVehicle(v);
+	p_->_dw->addRigidBody( chassis );
+	p_->_dw->addVehicle(v);
 
 	chassis->applyCentralForce(btVector3(0,50000,0));
 
 	//chassis->setFriction(10.3f);
 	//chassis->setRestitution(0.1f);
-	d_->_actors[id]._body  = chassis;
+	p_->_actors[id]._body  = chassis;
 }
 #endif
 
@@ -716,7 +717,7 @@ aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double ma
     p = fill_params( ada::fill_data("BADA","A319"));
 
 	aircraft::control_ptr ctrl = boost::make_shared<aircraft::impl>(shared_from_this(),boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_),p,decart_position());
-	d_->_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
+	p_->_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 	
 	for (auto it=wi.begin();it!=wi.end();++it)
 	{
@@ -737,7 +738,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
     ::ray_cast_vehicle::fill_cs("",node,wi,cs);
 
     ray_cast_vehicle::info_ptr info = boost::make_shared<ray_cast_vehicle::impl>(shared_from_this(),mass,boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_),decart_position());
-    d_->_actors[id]._body  = rigid_body_impl_ptr(info)->get_body().get();
+    p_->_actors[id]._body  = rigid_body_impl_ptr(info)->get_body().get();
 
     for (auto it=wi.begin();it!=wi.end();++it)
     {
@@ -755,7 +756,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
 
 void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
 {
-    d_->_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
+    p_->_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 }
 
 void BulletInterface::registerBody(int id)
@@ -791,21 +792,21 @@ void BulletInterface::createShape(osg::Node* node,int id, double mass)
     btRigidBody* body = new btRigidBody(rigidInfo);
     
     // body->setAngularVelocity( btVector3( 0., .9, 0. ) );
-    d_->_dw->addRigidBody( body );
-    d_->_actors[id]._body  = body;
-    d_->_actors[id]._type  = SHAPE;
+    p_->_dw->addRigidBody( body );
+    p_->_actors[id]._body  = body;
+    p_->_actors[id]._type  = SHAPE;
 }
 
 void BulletInterface::setVelocity( int id, const osg::Vec3& vec )
 {
-    btRigidBody* actor = d_->_actors[id]._body;
+    btRigidBody* actor = p_->_actors[id]._body;
     if ( actor )
         actor->setLinearVelocity( btVector3(vec.x(), vec.y(), vec.z()) );
 }
 
 void BulletInterface::setMatrix( int id, const osg::Matrix& matrix )
 {
-    btRigidBody* actor = d_->_actors[id]._body;
+    btRigidBody* actor = p_->_actors[id]._body;
     if ( actor )
     {
         btTransform trans;
@@ -816,7 +817,7 @@ void BulletInterface::setMatrix( int id, const osg::Matrix& matrix )
 
 osg::Matrix BulletInterface::getMatrix( int id )
 {
-    btRigidBody* actor = d_->_actors[id]._body;
+    btRigidBody* actor = p_->_actors[id]._body;
     if ( actor )
     {
         btTransform trans = actor->getWorldTransform();
@@ -829,17 +830,22 @@ osg::Matrix BulletInterface::getMatrix( int id )
 
 void BulletInterface::update( double step )
 {
-	for (auto it = d_->rigid_bodies_.begin(); it != d_->rigid_bodies_.end(); ++it)
+	for (auto it = p_->rigid_bodies_.begin(); it != p_->rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
     
     if (!cg::eq_zero(step))
     {
-        d_->_dw->stepSimulation( btScalar(step), /*10*/cfg().model_params.msys_step/cfg().model_params.bullet_step, btScalar(cfg().model_params.bullet_step) ); 
-    }
+        p_->_dw->stepSimulation( btScalar(step), cfg().model_params.msys_step/cfg().model_params.bullet_step, btScalar(cfg().model_params.bullet_step) ); 
+    
 
+#if 0
+		if(p_->_dd)
+			p_->_dw->debugDrawWorld();
+#endif
 
-    checkForCollisionEvents();
+		checkForCollisionEvents();	
 
+	}
 }
 
 
@@ -849,10 +855,10 @@ void BulletInterface::checkForCollisionEvents() {
 	CollisionPairs pairsThisUpdate;
 	
 	// iterate through all of the manifolds in the dispatcher
-	for (int i = 0; i < d_->_dispatcher->getNumManifolds(); ++i) {
+	for (int i = 0; i < p_->_dispatcher->getNumManifolds(); ++i) {
 			
 		// get the manifold
-		btPersistentManifold* pManifold = d_->_dispatcher->getManifoldByIndexInternal(i);
+		btPersistentManifold* pManifold = p_->_dispatcher->getManifoldByIndexInternal(i);
 			
 		// ignore manifolds that have 
 		// no contact points.
@@ -875,8 +881,8 @@ void BulletInterface::checkForCollisionEvents() {
 			// if this pair doesn't exist in the list
 			// from the previous update, it is a new
 			// pair and we must send a collision event
-			if (d_->_pairsLastUpdate.find(thisPair) == d_->_pairsLastUpdate.end()) {
-				d_->CollisionEvent((btRigidBody*)pBody0, (btRigidBody*)pBody1, on_collision_);
+			if (p_->_pairsLastUpdate.find(thisPair) == p_->_pairsLastUpdate.end()) {
+				p_->CollisionEvent((btRigidBody*)pBody0, (btRigidBody*)pBody1, on_collision_);
 			}
 		}
 	}
@@ -902,7 +908,7 @@ void BulletInterface::checkForCollisionEvents() {
 	//// in the next iteration we'll want to
 	//// compare against the pairs we found
 	//// in this iteration
-	d_->_pairsLastUpdate = pairsThisUpdate;
+	p_->_pairsLastUpdate = pairsThisUpdate;
 }
 
 
@@ -910,23 +916,23 @@ void BulletInterface::checkForCollisionEvents() {
 
 phys::bt_dynamics_world_ptr BulletInterface::dynamics_world() const
 {
-	return d_->_dw;
+	return p_->_dw;
 }
 
 phys::bt_vehicle_raycaster_ptr BulletInterface::vehicle_raycaster() const
 {
-	return d_->vehicle_raycaster_;
+	return p_->vehicle_raycaster_;
 }
 
 void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 {
-	d_->rigid_bodies_.insert(rb);
+	p_->rigid_bodies_.insert(rb);
     // d_->rigid_bodies_.push_back(rb);
 }
 
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 {
-	d_->rigid_bodies_.erase(rb);
+	p_->rigid_bodies_.erase(rb);
     // FIXME  пока не удаляем
     FIXME("Нету удаления, а надо бы особенно для сомолей")
 }
@@ -979,11 +985,11 @@ aerostat::info_ptr BulletInterface::create_aerostat(const phys::aerostat::params
 
 boost::optional<double> BulletInterface::intersect_first(cg::point_3 const& p, cg::point_3 const& q) const
 {
-	d_->_dw->updateAabbs();
-	d_->_dw->computeOverlappingPairs();
+	p_->_dw->updateAabbs();
+	p_->_dw->computeOverlappingPairs();
 
 	btCollisionWorld::ClosestRayResultCallback callback(to_bullet_vector3(p), to_bullet_vector3(q));
-	d_->_dw->rayTest(to_bullet_vector3(p), to_bullet_vector3(q), callback);
+	p_->_dw->rayTest(to_bullet_vector3(p), to_bullet_vector3(q), callback);
 
 	if (!callback.hasHit())
 		return boost::none;

@@ -27,14 +27,16 @@ namespace aircraft
         {
             {
                 auto pos = wheel_node->position();
-                pos.local().dpos = point_3();
-                pos.local().omega = point_3();
+                //pos.local().dpos = point_3();
+                //pos.local().omega = point_3();
+				pos.local().freeze();
                 wheel_node->set_position(pos);
             }
             {
                 auto pos = node->position();
-                pos.local().dpos = point_3();
-                pos.local().omega = point_3();
+				//pos.local().dpos = point_3();
+				//pos.local().omega = point_3();
+				pos.local().freeze();
                 node->set_position(pos);
             }
         }
@@ -183,20 +185,23 @@ namespace aircraft
         {
             {
                 auto pos = rotor_node->position();
-                pos.local().dpos = point_3();
-                pos.local().omega = point_3();
+				//pos.local().dpos = point_3();
+				//pos.local().omega = point_3();
+				pos.local().freeze();
                 rotor_node->set_position(pos);
             }
             {
                 auto pos = dyn_rotor_node->position();
-                pos.local().dpos = point_3();
-                pos.local().omega = point_3();
+				//pos.local().dpos = point_3();
+				//pos.local().omega = point_3();
+				pos.local().freeze();
                 dyn_rotor_node->set_position(pos);
             }
             {
                 auto pos = sag_rotor_node->position();
-                pos.local().dpos = point_3();
-                pos.local().omega = point_3();
+				//pos.local().dpos = point_3();
+				//pos.local().omega = point_3();
+				pos.local().freeze();
                 sag_rotor_node->set_position(pos);
             }
         }

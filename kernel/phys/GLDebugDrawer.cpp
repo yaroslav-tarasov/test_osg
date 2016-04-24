@@ -84,6 +84,7 @@ void GLDebugDrawer::setDebugMode(int debugMode)
 {
     dr_->setDebugMode(debugMode);
 }
+
 int GLDebugDrawer::getDebugMode() const
 {
     return( dr_->getDebugMode() );
