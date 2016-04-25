@@ -316,12 +316,12 @@ void create_objects(const std::string & airport)
     }
 #endif
 
-#if 0
+#if 1
 	{
 		aerostat::settings_t vs;
 	    vs.model = "aerostat";
 		cg::geo_point_3 vpos(0.00055,0.0009,300.0);
-		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
+		geo_position vgp(vpos,quaternion(cpr(30)));
 
 		auto obj_aerostat = aerostat::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
 	}

@@ -183,17 +183,17 @@ void model::sync_nodes_manager( double /*dt*/ )
 
         // FIXME Глобальные локальные преобразования 
         nodes_management::node_position root_node_pos = root_->position();
-        root_node_pos.global().pos = root_next_pos_;
-        root_node_pos.global().dpos = cg::geo_base_3(root_next_pos_)(pos.pos) / (sys_->calc_step());
+        //root_node_pos.global().pos = root_next_pos_;
+        root_node_pos.global().dpos = cg::geo_base_3(root_node_pos.global().pos)(pos.pos) / (sys_->calc_step());
 
-        root_node_pos.global().orien = root_next_orien_;
+        //root_node_pos.global().orien = root_next_orien_;
         root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, pos.orien).rot_axis().omega() / (sys_->calc_step());
 
         // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
         root_->set_position(root_node_pos);
 
-        root_next_pos_ = pos.pos;
-        root_next_orien_ = pos.orien;
+        //root_next_pos_ = pos.pos;
+        //root_next_orien_ = pos.orien;
 
     }
 }

@@ -120,6 +120,8 @@ namespace avScene {
         bool									    Initialize( osgViewer::Viewer* vw );
         osg::Group*                                 createTerrainRoot();
         void                                        createObjects();
+        void                                        setupDecals(const std::string& scene);
+
     private:
         void                                        onZoneChanged   ( int zone );
 		void										onSetLights     ( bool on  );
@@ -129,10 +131,10 @@ namespace avScene {
         void                                        onSetCloudParams( const app::cloud_params_t& s );
         bool                                        onEvent         ( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter & aa, osg::Object * obj, osg::NodeVisitor * nv );
         void                                        onExit();
-    
+
     private:
         void                                        update( osg::NodeVisitor * nv );
-        void                                        setupDecals();
+
 	private:
         static osg::ref_ptr<Scene>                  _scenePtr;
 

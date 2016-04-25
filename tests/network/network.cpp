@@ -323,7 +323,7 @@ struct client
 
         ADD_EVENT(time , state(0.0,time,factor))
 
-#if 1
+#if 0
         ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds, "crow", "", 50)) 
 #if 0
         ADD_EVENT(25.0 , destroy_msg(333)) 
@@ -411,10 +411,14 @@ struct client
 
 #endif
 
+
+
 #if 0
         ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
         ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
+#else
+        ADD_EVENT(3.0  , create(10,point_3(0,0,0),cg::cpr(0), ok_aircraft, "A319","10") )
 #endif
 
 #if 0

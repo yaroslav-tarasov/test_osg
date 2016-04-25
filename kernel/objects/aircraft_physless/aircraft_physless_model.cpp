@@ -154,7 +154,7 @@ void model::sync_nm_root(double dt)
 	root_node_pos.global().ddpos = (root_node_pos.global().dpos - prev_dpos_) / (sys_->calc_step());
 
     double cur_speed = cg::norm(root_node_pos.global().dpos);
-    force_log fl;
+    //force_log fl;
     LOG_ODS_MSG( "model::sync_nm_root: " << settings_.kind <<  " root_node_pos.global().pos :   x:  "  <<   root_node_pos.global().pos.lat << "    y: " <<  root_node_pos.global().pos.lon 
         << " desired_pos.x " << desired_pos.lat
         << " desired_pos.y " << desired_pos.lon

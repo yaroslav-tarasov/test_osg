@@ -933,9 +933,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #if 1
     _decal_map = avCore::createDecalRenderer(this);
     addChild( _decal_map );
-
-    setupDecals();
-
 #endif
 
     FIXME(140 shaders version needed);
@@ -1595,6 +1592,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
+#if 0
+        setupDecals(path);
+#endif
+
 #if 0 
         load("su_27",_terrainRoot, 15000, false);
         load("mi_24",_terrainRoot, 15000, false);
@@ -2074,8 +2075,21 @@ bool Scene::PreUpdate()
     return ret;
 }
 
-void Scene::setupDecals() 
+inline void fill_parking (avCore::IDecalRendererPtr decal_map, const std::vector<cg::point_2f>& ptemplate , cg::point_2f pos ,float course, float coeff_size)
 {
+    std::vector<cg::point_2f> pnts_array;
+    pnts_array.resize(ptemplate.size()); 
+    cg::transform_3f tr(cg::as_translation(pos),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+    std::transform(ptemplate.begin(), ptemplate.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f)  * 1.f / (coeff_size) * cg::rotation_2f(-course) * tr;});
+    decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.80f, 0.0f), 0.3f );
+};
+
+void Scene::setupDecals(const std::string& scene) 
+{
+    if(scene!="eisk")
+        return;
+
+#if 0   // White T
     std::vector<cg::point_2f> pnts;
     pnts.emplace_back(cg::point_2f(0.f,0.f));
     pnts.emplace_back(cg::point_2f(0.f, 10.f));
@@ -2097,6 +2111,7 @@ void Scene::setupDecals()
     trs[8] = cg::as_translation(cg::point_2f(0,40));
     trs[9] = cg::as_translation(cg::point_2f(0,80));
 
+
     std::array< std::vector<cg::point_2f>,10> pnts_array;
     for (int i = 0;i < pnts_array.size(); ++i )
     {
@@ -2104,6 +2119,7 @@ void Scene::setupDecals()
         std::transform(pnts.begin(), pnts.end(), pnts_array[i].begin(), [=]( const cg::point_2f & val)->cg::point_2f { return val  * trs[i];});
         _decal_map->AddPolyline(pnts_array[i], cg::colorf(0.80f, 0.80f, 0.80f), 0.5f );
     }
+#endif
 	
 		std::vector<cg::point_2f> pnts_red;
 		pnts_red.emplace_back(cg::point_2f(0.f,-2.f));
@@ -2143,6 +2159,39 @@ void Scene::setupDecals()
 		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f)  * 1.f / (1.2823) * cg::rotation_2f(-173) * tr;});
 		_decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.80f, 0.0f), 0.3f );
 	}
+
+    const std::string parking [] = {
+    "13 ЦЗТ 0.043 0.370 173 1",
+    "14 ЦЗТ 0.079 0.374 173 1",
+    "15 ЦЗТ 0.115 0.378 173 1",
+    "16 ЦЗТ 0.156 0.387 173 2",
+    "17 ЦЗТ 0.201 0.392 173 2",
+    "18 ЦЗТ 0.245 0.398 173 2",
+    "19 ЦЗТ 0.286 0.400 173 1",
+    "20 ЦЗТ 0.322 0.404 173 1",
+    "21 ЦЗТ 0.357 0.408 173 1",
+    "22 ЦЗТ 0.394 0.413 173 1",
+    "23 ЦЗТ 0.443 0.418 173 1",
+    "24 ЦЗТ 0.479 0.423 173 1",
+    "25 ЦЗТ 0.514 0.428 173 1",
+    "26 ЦЗТ 0.551 0.432 173 1",
+    "27 ЦЗТ 0.587 0.437 173 1",
+    "28 ЦЗТ 0.622 0.437 173 0",
+    "29 ЦЗТ 0.647 0.440 173 0",
+    "30 ЦЗТ 0.672 0.443 173 0",
+    "31 ЦЗТ 0.696 0.446 173 0",
+    "32 ЦЗТ 0.721 0.449 173 0",
+    "33 ЦЗТ 0.746 0.451 173 0",
+    };
+
+    const size_t psize = sizeof(parking) / sizeof(parking[0]);
+    for( int i =0; i < psize; ++i )
+    {
+        std::vector<std::string> values_;
+        boost::split(values_, parking[i], boost::is_any_of(" \t="), boost::token_compress_on);
+        auto ptype = boost::lexical_cast<int>(values_[5]);
+        fill_parking(_decal_map, pnts_red,1000.f * point_2f(boost::lexical_cast<float>(values_[2]),boost::lexical_cast<float>(values_[3])),boost::lexical_cast<int>(values_[4]), (ptype==0) ? 1.7436 * 1.2823: ((ptype==1)? 1.2823:1));
+    }
 
 	/// 1,7436 mid to low
     /// 1,2823 big to mid
