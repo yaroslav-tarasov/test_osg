@@ -20,7 +20,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view                  (oc, dict)
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
-    , _speed                (10.0 )
+    , _speed                (50.0 )
 {
     create_phys();
 

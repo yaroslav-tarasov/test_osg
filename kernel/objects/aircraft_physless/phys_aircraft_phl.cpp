@@ -54,7 +54,7 @@ namespace aircraft_physless
 
     void phys_aircraft_impl::update()
     {     
-        sync_phys(/*0.1*/0.05);
+        sync_phys(/*0.1*/cfg().model_params.msys_step);
     }
 
     void phys_aircraft_impl::attach_tow(bool attached)
