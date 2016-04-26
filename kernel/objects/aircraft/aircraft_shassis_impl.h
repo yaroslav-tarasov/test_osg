@@ -3,7 +3,6 @@
 #include "phys/phys_sys.h"
 #include "aircraft_common.h"
 #include "common/chassis_common.h"
-#include "common/rotors_common.h"
 
 namespace aircraft
 {

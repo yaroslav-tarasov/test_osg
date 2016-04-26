@@ -332,67 +332,10 @@ struct client
 #endif
         
 
-        environment::weather_t  weather; 
-        weather.fog_density  = 0.2f; 
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
-        weather.wind_dir     = cg::point_2f(2.0, 4.0);
+		set_weather();
 
-        ADD_EVENT(2.0, environment_msg(weather))
 
 #if 1
-
-#if 1
-        weather.fog_density  = 0.4f; 
-        weather.wind_speed  = 20.0f;
-        weather.wind_dir    = cg::point_2f(1.0,0.0);
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
-        ADD_EVENT(18.0, environment_msg(weather))
-
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
-        ADD_EVENT(20.0, environment_msg(weather))
-
-        weather.wind_speed  = 20.0f;
-        weather.wind_dir    = cg::point_2f(-1.0,0.0);
-        weather.rain_density  = 0.2f;
-        ADD_EVENT(25.0, environment_msg(weather))
-        weather.rain_density  = 0.5f;
-        weather.lightning_intensity  = 0.75f;
-        ADD_EVENT(30.0, environment_msg(weather))
-        weather.rain_density  = 0.75f;
-        ADD_EVENT(35.0, environment_msg(weather))
-        weather.rain_density  = 1.0f;
-        ADD_EVENT(45.0, environment_msg(weather))
-
-        weather.wind_speed  = 10.0f;
-        weather.wind_dir    = cg::point_2f(1.0,1.0);
-        weather.rain_density  = 0.75f;
-        ADD_EVENT(50.0, environment_msg(weather))
-        weather.rain_density  = 0.45f;
-        ADD_EVENT(55.0, environment_msg(weather))
-        weather.lightning_intensity  = 0.0f;
-        weather.rain_density  = 0.2f;
-        ADD_EVENT(57.0, environment_msg(weather))
-        
-        weather.fog_density  = 0.45f; 
-        weather.rain_density  = 0.1f;
-        ADD_EVENT(60.0, environment_msg(weather))
-        
-        weather.fog_density  = 0.40f;
-        ADD_EVENT(70.0, environment_msg(weather)) 
-        weather.rain_density  = 0.0f;
-        weather.fog_density  = 0.2f;
-        weather.wind_speed  = 0.0f;
-        weather.wind_dir    = cg::point_2f(1.0,1.0);
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
-        ADD_EVENT(80.0, environment_msg(weather))
-
-        weather.fog_density  = 0.2f;
-        weather.wind_speed  = 0.0f;
-        weather.wind_dir    = cg::point_2f(1.0,1.0);
-        weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
-        ADD_EVENT(90.0, environment_msg(weather))
-#endif
-
 
 #if 0
         ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
@@ -573,6 +516,97 @@ struct client
 
 
     }
+
+	inline void set_weather()
+	{
+		environment::weather_t  weather; 
+		weather.fog_density  = 0.2f; 
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
+		weather.wind_dir     = cg::point_2f(2.0, 4.0);
+
+		ADD_EVENT(2.0, environment_msg(weather))
+#if 1
+			weather.fog_density  = 0.4f; 
+		weather.wind_speed  = 20.0f;
+		weather.wind_dir    = cg::point_2f(1.0,0.0);
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
+		weather.clouds_density = 0.1;
+		ADD_EVENT(15.0, environment_msg(weather))
+
+			weather.clouds_density = 0.5;
+		ADD_EVENT(16.0, environment_msg(weather))
+
+			weather.clouds_density = 0.7;
+		ADD_EVENT(17.5, environment_msg(weather))
+
+			weather.clouds_density = 0.9;
+		ADD_EVENT(19.0, environment_msg(weather))
+
+			weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
+		ADD_EVENT(20.0, environment_msg(weather))
+
+			weather.wind_speed  = 20.0f;
+		weather.wind_dir    = cg::point_2f(-1.0,0.0);
+		weather.rain_density  = 0.2f;
+		ADD_EVENT(25.0, environment_msg(weather))
+			weather.rain_density  = 0.5f;
+		weather.lightning_intensity  = 0.75f;
+		ADD_EVENT(30.0, environment_msg(weather))
+			weather.rain_density  = 0.75f;
+		ADD_EVENT(35.0, environment_msg(weather))
+			weather.rain_density  = 1.0f;
+		ADD_EVENT(45.0, environment_msg(weather))
+
+			weather.wind_speed  = 10.0f;
+		weather.wind_dir    = cg::point_2f(1.0,1.0);
+		weather.rain_density  = 0.75f;
+		ADD_EVENT(50.0, environment_msg(weather))
+			weather.rain_density  = 0.45f;
+		ADD_EVENT(55.0, environment_msg(weather))
+			weather.lightning_intensity  = 0.0f;
+		weather.rain_density  = 0.2f;
+		ADD_EVENT(57.0, environment_msg(weather))
+
+			weather.fog_density  = 0.45f; 
+		weather.rain_density  = 0.1f;
+		ADD_EVENT(60.0, environment_msg(weather))
+
+			weather.fog_density  = 0.40f;
+		ADD_EVENT(70.0, environment_msg(weather)) 
+			weather.rain_density  = 0.0f;
+		weather.fog_density  = 0.2f;
+		weather.wind_speed  = 0.0f;
+		weather.wind_dir    = cg::point_2f(1.0,1.0);
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
+		ADD_EVENT(80.0, environment_msg(weather))
+
+			weather.fog_density  = 0.2f;
+		weather.wind_speed  = 0.0f;
+		weather.wind_dir    = cg::point_2f(1.0,1.0);
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
+		ADD_EVENT(90.0, environment_msg(weather))
+
+
+	    weather.clouds_density = 0.9;
+		ADD_EVENT(95.0, environment_msg(weather))
+
+		weather.clouds_density = 0.7;
+		ADD_EVENT(105.0, environment_msg(weather))
+
+	    weather.clouds_density = 0.5;
+		ADD_EVENT(120.5, environment_msg(weather))
+
+	    weather.clouds_density = 0.0;
+		ADD_EVENT(140.0, environment_msg(weather))
+
+		weather.fog_density  = 0.1f; 
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
+		weather.wind_dir     = cg::point_2f(0.0, 0.0);
+
+		ADD_EVENT(160.0, environment_msg(weather))
+
+#endif;
+	}
 
     inline void init_URKE()
     {
