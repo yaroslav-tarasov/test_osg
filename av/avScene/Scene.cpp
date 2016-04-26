@@ -1061,7 +1061,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 	ld_sfx_weak_ptr_ = nullptr;
-#if 1 
+#if 0 
 	avFx::LandingDustFx* ld = new avFx::LandingDustFx;
 	ld_sfx_weak_ptr_ = dynamic_cast<LandingDustSfxNode*>(ld);
 
@@ -1583,7 +1583,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         return root;
     }
 
-    if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" )
+    if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" || path == "vnukovo")
     {
         //assert(_terrainRoot->removeChild(_terrainNode));
         //_terrainNode.release();

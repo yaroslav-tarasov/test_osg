@@ -165,8 +165,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
-
-    if ( manager_.valid() )
+    
+    FIXME("WO anim") 
+    
+    if ( manager_.valid() && false)
     {   
             const osgAnimation::AnimationList& animations =
                 manager_->getAnimationList();

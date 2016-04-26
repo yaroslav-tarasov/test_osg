@@ -339,13 +339,13 @@ inline string get_model(string icao_code)
         return "lipetsk";
     else if (icao_code == "URKE"  )
         return "eisk";
-    
+    else if (icao_code == "UUWW"  )
+        return "vnukovo";
 
     return "";
 }
 
 // FIXME Здесь хардкод и там хардкод
-// причем классный такой другой аэропорт фиг заведешь, как Владивосток сдавали?
 inline bool valid_icao(string icao_code)
 {
     return icao_code == "UUEE" || 

@@ -62,6 +62,8 @@ namespace
             return "minsk.scn";
         else if (name == "eisk")
             return "eisk.scn";
+        else if (name == "vnukovo")
+            return "vnukovo.scn";
         return "";
     }
 
@@ -270,6 +272,11 @@ void  Terrain::Create( const std::string& cFileName )
         scene_name = "eisk.dae";  
         mat_file_name = "eisk.dae.mat.xml"; 
     } 
+    else if(cFileName == "vnukovo")
+    {
+        scene_name = "vnukovo.dae";  
+        mat_file_name = "vnukovo.dae.mat.xml"; 
+    }
 
     osg::Node* scene = osgDB::readNodeFile(cFileName + "/"+ scene_name);  
     

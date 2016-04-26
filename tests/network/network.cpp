@@ -313,13 +313,14 @@ struct client
 
         const double time = 0.0;
 
-        //Camera: КДП        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
-        //Camera: КДП_утк -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
 
-#if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f/*,cg::rad2grad() *- =0.07,cg::rad2grad() * 0.57*/)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(48.89f,411.65f,28.50f), quaternion(cprf(cg::rad2grad() *-2.14f/*, cg::rad2grad() * -0.13, cg::rad2grad() * 0.66*/)) , ok_camera, "camera 1", "") )
-#endif
+
+        if ( g_icao_code == "URKE")
+            init_URKE();
+        else if ( g_icao_code == "URSS" )
+            init_URSS();
+
+
 
         ADD_EVENT(time , state(0.0,time,factor))
 
@@ -340,7 +341,7 @@ struct client
 
 #if 1
 
-#if 0
+#if 1
         weather.fog_density  = 0.4f; 
         weather.wind_speed  = 20.0f;
         weather.wind_dir    = cg::point_2f(1.0,0.0);
@@ -418,7 +419,7 @@ struct client
         ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #else
-        ADD_EVENT(3.0  , create(10,point_3(0,0,0),cg::cpr(0), ok_aircraft, "A319","10") )
+        // ADD_EVENT(3.0  , create(10,point_3(0,0,0),cg::cpr(0), ok_aircraft, "A319","10") )
 #endif
 
 #if 0
@@ -432,77 +433,6 @@ struct client
 
 #endif
 
-#if 1
-
-#if 0
-        ADD_EVENT(10.0  , create(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
-        ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
-
-        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
-        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
-
-        for (int i=0;i<4;i++)
-        {
-            ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
-            ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
-            ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
-        }
-#endif
-
-#if 0
-        ADD_EVENT(14.0  , create(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
-        ADD_EVENT(15.0  , create(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
-        ADD_EVENT(16.0  , create(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
-        ADD_EVENT(17.0  , create(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
-        ADD_EVENT(18.0  , create(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
-        ADD_EVENT(19.0  , create(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
-#endif
-        
-
-
-#if 0
-        ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
-        //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
-        //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-        ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
-#endif
-
-#if 1
-        ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
-        ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
-#endif
-
-#if 0
-		ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
-		ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
-		ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
-
-		for (int i=0;i<2;i++)
-		{
-			ADD_EVENT(20.0 + i  , engine_state_msg(176 + i , ES_LOW_THROTTLE)  )
-			ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
-			ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
-		}
-
-        ADD_EVENT(20.0  , engine_state_msg(178, ES_LOW_THROTTLE)  )
-        ADD_EVENT(40.0  , engine_state_msg(178, ES_FULL_THROTTLE) )
-#endif
-
-
-#endif
-
-
-#if 0
-		ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
-
-		ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-		ADD_EVENT(traj2_->base_length() + 40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-		ADD_EVENT(traj2_->length()              , engine_state_msg(150 , ES_STOPPED) )
-
-		//ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
-		//ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
-		//ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
-#endif
 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
@@ -532,50 +462,6 @@ struct client
             this->send(&msg[0], msg.size());
         };
 
-        run_f_trp_ = [this](uint32_t id, double time, double traj_offset)->void {
-            binary::bytes_t msg =  std::move(network::wrap_msg(run(
-                id 
-                , traj_trp_->kp_value    (time)
-                , traj_trp_->curs_value  (time)
-                , *traj_trp_->speed_value(time)
-                , time + traj_offset
-                , false
-                , meteo::local_params()
-                )));
-
-            this->send(&msg[0], msg.size());
-        };
-
-        run_wrap_f run_f_trp2 = [this](uint32_t id, double time, double traj_offset)->void {
-            binary::bytes_t msg =  std::move(network::wrap_msg(run(
-                id 
-                , traj_trp2_->kp_value    (time)
-                , traj_trp2_->curs_value  (time)
-                , *traj_trp2_->speed_value(time)
-                , time + traj_offset
-                , false
-                , meteo::local_params()
-                )));
-
-            this->send(&msg[0], msg.size());
-        };
-        
-        
-        
-        run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
-            binary::bytes_t msg =  std::move(network::wrap_msg(run(
-                id 
-                , traj_pos_->kp_value    (time)
-                , traj_pos_->curs_value  (time)
-                , *traj_pos_->speed_value(time)
-                , time + traj_offset
-                , false
-                , meteo::local_params()
-                )));
-
-            this->send(&msg[0], msg.size());
-        };
-        
         runs_once_.insert(make_pair( 1,
             [this]( double time )->void {
 
@@ -593,7 +479,7 @@ struct client
         }
         ));
 
-#if 0
+#if 1
         runs_once_.insert(make_pair( 25,
             [this]( double time )->void {
 
@@ -640,28 +526,12 @@ struct client
             ));
 #endif
 
-#if 1
-        ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
-        ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
-        ADD_EVENT(239.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
-#endif
 
 
-        runs_.insert(make_pair(traj_trp_->base_length() + 30,
-            boost::bind( run_f_trp_ , 178, _1, /*traj_offset*/30)
-            ));
-
-        runs_.insert(make_pair(traj_trp2_->base_length(),
-            boost::bind( run_f_trp2 , 172, _1, /*traj_offset*/0)
-            ));
-
-        runs_.insert(make_pair(traj_pos_->base_length(),
-            boost::bind( run_f_pos_, 173,_1,/*traj_offset*/0)
-            ));
 
 
         runs_.insert(make_pair(traj_->base_length(),
-            boost::bind( run_f_ , 1,_1,traj_offset)
+            boost::bind( run_f_ , 1 ,_1,traj_offset)
             ));
 
         runs_.insert(make_pair(traj2_->base_length(),
@@ -702,6 +572,193 @@ struct client
 #endif
 
 
+    }
+
+    inline void init_URKE()
+    {
+        // URKE
+        //Camera: КДП        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
+        //Camera: КДП_утк -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
+#if 1
+        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(48.89f,411.65f,28.50f), quaternion(cprf(cg::rad2grad() *-2.14f)) , ok_camera, "camera 1", "") )
+#endif
+
+#if 1
+        ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
+        ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
+        ADD_EVENT(239.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
+#endif
+
+#if 1
+
+#if 0
+        ADD_EVENT(10.0  , create(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
+        ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
+
+        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
+        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
+
+        for (int i=0;i<4;i++)
+        {
+            ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
+                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+        }
+#endif
+
+#if 0
+            ADD_EVENT(14.0  , create(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+            ADD_EVENT(15.0  , create(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+            ADD_EVENT(16.0  , create(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+            ADD_EVENT(17.0  , create(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+            ADD_EVENT(18.0  , create(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+            ADD_EVENT(19.0  , create(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
+#endif
+
+
+
+#if 0
+            ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
+            //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
+            //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
+            ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
+#endif
+
+#if 1
+            ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
+            ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
+#endif
+
+#if 0
+            ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
+            ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
+            ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
+
+            for (int i=0;i<2;i++)
+            {
+                ADD_EVENT(20.0 + i  , engine_state_msg(176 + i , ES_LOW_THROTTLE)  )
+                    ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
+                    ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
+            }
+
+            ADD_EVENT(20.0  , engine_state_msg(178, ES_LOW_THROTTLE)  )
+            ADD_EVENT(40.0  , engine_state_msg(178, ES_FULL_THROTTLE) )
+#endif
+
+
+#endif
+#if 0
+            ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
+
+            ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+            ADD_EVENT(traj2_->base_length() + 40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+            ADD_EVENT(traj2_->length()              , engine_state_msg(150 , ES_STOPPED) )
+
+            //ADD_EVENT(60.0 + 10.0  , engine_state_msg(150 , ES_LOW_THROTTLE)  )
+            //ADD_EVENT(60.0 + 30.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
+            //ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
+#endif
+            
+            run_f_trp_ = [this](uint32_t id, double time, double traj_offset)->void {
+                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                    id 
+                    , traj_trp_->kp_value    (time)
+                    , traj_trp_->curs_value  (time)
+                    , *traj_trp_->speed_value(time)
+                    , time + traj_offset
+                    , false
+                    , meteo::local_params()
+                    )));
+
+                this->send(&msg[0], msg.size());
+            };
+
+            runs_.insert(make_pair(traj_trp_->base_length() + 30,
+                boost::bind( run_f_trp_ , 178, _1, /*traj_offset*/30)
+                ));
+
+
+
+            run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
+                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                    id 
+                    , traj_pos_->kp_value    (time)
+                    , traj_pos_->curs_value  (time)
+                    , *traj_pos_->speed_value(time)
+                    , time + traj_offset
+                    , false
+                    , meteo::local_params()
+                    )));
+
+                this->send(&msg[0], msg.size());
+            };
+
+            runs_.insert(make_pair(traj_pos_->base_length(),
+                boost::bind( run_f_pos_, 173,_1,/*traj_offset*/0)
+                ));
+
+            run_wrap_f run_f_trp2 = [this](uint32_t id, double time, double traj_offset)->void {
+                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                    id 
+                    , traj_trp2_->kp_value    (time)
+                    , traj_trp2_->curs_value  (time)
+                    , *traj_trp2_->speed_value(time)
+                    , time + traj_offset
+                    , false
+                    , meteo::local_params()
+                    )));
+
+                this->send(&msg[0], msg.size());
+            };
+
+            runs_.insert(make_pair(traj_trp2_->base_length(),
+                boost::bind( run_f_trp2 , 172, _1, /*traj_offset*/0)
+                ));
+
+    }
+
+    inline void init_URSS()
+    {
+        const std::string parking [] = {
+         "12  -1.136  -0.081 8 A319",
+         "14  -1.029  -0.027 8 B737",
+         "19  -0.790   0.083 8 A321",
+         "21  -0.695   0.130 8 A319",
+         "23  -0.579   0.259 19 A321",
+         "28  -0.313   0.385 335 A321",
+         "29  -0.265   0.407 335 B737",
+         "31  -0.166   0.454 335 A333",
+         "35   0.024   0.543 335 A319",
+         "43  -0.293  -0.223 335 A321",
+         "45  -0.380  -0.263 335 SB20",
+         "52  -0.730  -0.425 335 A319",
+         "58  -1.078  -0.564 155 AN26",
+        };
+
+//Camera: Вышка        57.872086   48.000000  642.839783 7.790917 -0.026420 0.680001 45.000000 30000.000000 0
+//Camera: Старая_Вышка  -754.0       32.000000  160.839783 7.790917 -0.026420 0.680001 45.000000 30000.000000 0    
+//Camera: Вышка_взлет  640.872086  24.000000  885.839783 7.790917 -0.026420 0.80001 45.000000 30000.000000 0
+
+#if 1
+        ADD_EVENT(0.0  , create(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
+#endif
+
+#if 1
+        //ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
+        //ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
+        ADD_EVENT(129.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
+#endif
+
+        const size_t psize = sizeof(parking) / sizeof(parking[0]);
+        for( int i =0; i < psize; ++i )
+        {
+            std::vector<std::string> values_;
+            boost::split(values_, parking[i], boost::is_any_of(" \t="), boost::token_compress_on);
+            const cg::quaternion    orien (cg::cprf(boost::lexical_cast<int>(values_[3])) );
+            ADD_EVENT(0.0   , create( 2 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
+        }
     }
 
     // from struct tcp_connection

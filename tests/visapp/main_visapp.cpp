@@ -85,10 +85,6 @@ namespace
 namespace
 {
 
-
-
-
-
 struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size, endpoint peer)>   on_receive_f;
@@ -330,6 +326,8 @@ struct global_timer : boost::noncopyable
     inline void set_time(double time)
     {
          internal_time(time);
+         force_log fl;       
+         LOG_ODS_MSG( " void set_time(double time)  = " << time << "\n");
     }
 
     inline double get_time()
@@ -340,6 +338,8 @@ struct global_timer : boost::noncopyable
     inline void set_factor(double factor)
     {
         internal_factor(factor);
+        force_log fl;       
+        LOG_ODS_MSG( " void set_factor(double factor)  = " << factor << "\n");
     }
 
 private:
@@ -516,10 +516,12 @@ struct visapp
     void on_setup(setup const& msg)
     {
         w_->set_factor(0.0);
+        gt_.set_factor(0.0);
     }
 
     void on_state(state const& msg)
     {
+        gt_.set_factor(msg.factor);
         w_->set_factor(msg.factor);
         w_->reset_time(msg.srv_time / 1000.0f);
         gt_.set_time(/*time*/msg.srv_time / 1000.0f);
@@ -539,6 +541,8 @@ struct visapp
           update_messages();
 		  update_properties(va);
           va.on_render(gt_.get_time());
+          force_log fl;       
+          LOG_ODS_MSG( " void run() time  = " << gt_.get_time() << "\n");
         }
     }
     
