@@ -49,13 +49,20 @@ class heilVisitor : public osg::NodeVisitor
         {
             size_t num = 0;
 
-            for (unsigned i = 0; i < node.getNumChildren(); i++) //lod level
+            for (unsigned i = 0; i < node.getNumChildren(); i++) 
             {
                 if (node.getChild(i)->asTransform() || node.getChild(i)->asGroup())
+                    if( !(node.getChild(i)->asGroup()->getNumChildren()==1 && node.getChild(i)->asGroup()->getChild(0)->asGeode())  )
                     ++num;
             }
             return num;
         }
+
+        inline bool  geode_child(osg::Group& node)
+        {
+            return node.getNumChildren()==1 && node.getChild(0)->asGeode();
+        }
+
 
         void apply( osg::Node& node )
         {   
@@ -113,75 +120,80 @@ class heilVisitor : public osg::NodeVisitor
             {
 
                 model_structure::node_data new_node;
-            
-                binary::size_type  children_count = got_lod_?1:(node.asGroup()?num_children(*node.asGroup()):0);
+               
+                binary::size_type  children_count = got_lod_?1:(num_children(*node.asGroup()));
                 
                 if(node_name == "root")
                     children_count++;  // For damned_offset
 				
                 if(got_lod_)
                 {
-                    got_lod_=false;
+                    got_lod_ = false;
                 }
+                        
                 
-                bool mt = node.asTransform()!=nullptr;
-				
-                new_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
-                new_node.orien = from_osg_quat(mt?node.asTransform()->asMatrixTransform()->getMatrix().getRotate():osg::Quat());
-                //const osg::BoundingSphere& bs = node.getBound();
-                //new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
-                
-                osg::ComputeBoundsVisitor cbvs;
-                node.accept( cbvs );
-                const osg::BoundingBox bb = cbvs.getBoundingBox();
-                new_node.bound = cg::rectangle_3(cg::rectangle_3::point_t(bb.xMin(),bb.yMin(),bb.zMin()),cg::rectangle_3::point_t(bb.xMax(),bb.yMax(),bb.zMax()));
-
-                if (lod_visited_ && node_name.find("_lod")!= std::string::npos)
-                    std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut,&str_user_id_cut,&need_add_id](const std::string name){
-                        new_node.victory_nodes.push_back(name_cut + "_" + name);
-                        if(need_add_id) 
-                            new_node.node_ids.push_back(str_user_id_cut + "_" + name + "_" + name_cut + "_" + name);
-                });
-                else
+                if ( !geode_child(*node.asGroup()) )
                 {
-                    new_node.victory_nodes.push_back(name_cut);
-                    if(need_add_id) new_node.node_ids.push_back(str_user_id_cut + "_"  + name_cut);
-                }
-                new_node.name = name_cut; // логическое имя. Общее для все лодов
-
-                {
-                    auto d = wrap(new_node);
-                    ostream_nodes_.write(raw_ptr(d), size(d));
-                }
-
-                {
-                    const binary::size_type  cc = children_count;
-                    auto d = wrap(cc);// print root
-                    ostream_nodes_.write(raw_ptr(d), size(d));
-                }
-
-                print_node(new_node, children_count);
-
-                
-                if(!damned_offset_added_)
-                {
-                    model_structure::node_data do_node;
-                    do_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
-                    do_node.name =  "damned_offset";
-
-                    damned_offset_added_ = true;
-
-                    {
-                        auto d = wrap(do_node);
-                        ostream_nodes_.write(raw_ptr(d), size(d));
-                    }
-
-                    {
-                        auto d = wrap(0);// print root
-                        ostream_nodes_.write(raw_ptr(d), size(d));
-                    }
-
-                    print_node(do_node,0);
+	                bool mt = node.asTransform()!=nullptr;
+					
+	                new_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
+	                new_node.orien = from_osg_quat(mt?node.asTransform()->asMatrixTransform()->getMatrix().getRotate():osg::Quat());
+	                //const osg::BoundingSphere& bs = node.getBound();
+	                //new_node.bound = cg::sphere_3(cg::sphere_3::point_t(bs.center().x(),bs.center().y(),bs.center().z()),bs.radius());
+	                
+	                osg::ComputeBoundsVisitor cbvs;
+	                node.accept( cbvs );
+	                const osg::BoundingBox bb = cbvs.getBoundingBox();
+	                new_node.bound = cg::rectangle_3(cg::rectangle_3::point_t(bb.xMin(),bb.yMin(),bb.zMin()),cg::rectangle_3::point_t(bb.xMax(),bb.yMax(),bb.zMax()));
+	
+	                if (lod_visited_ && node_name.find("_lod")!= std::string::npos)
+	                    std::for_each(lods_.begin(),lods_.end(),[&new_node,&name_cut,&str_user_id_cut,&need_add_id](const std::string name){
+	                        new_node.victory_nodes.push_back(name_cut + "_" + name);
+	                        if(need_add_id) 
+	                            new_node.node_ids.push_back(str_user_id_cut + "_" + name + "_" + name_cut + "_" + name);
+	                });
+	                else
+	                {
+	                    new_node.victory_nodes.push_back(name_cut);
+	                    if(need_add_id) new_node.node_ids.push_back(str_user_id_cut + "_"  + name_cut);
+	                }
+	
+	                new_node.name = name_cut; // логическое имя. Общее для все лодов
+	
+	                {
+	                    auto d = wrap(new_node);
+	                    ostream_nodes_.write(raw_ptr(d), size(d));
+	                }
+	
+	                {
+	                    const binary::size_type  cc = children_count;
+	                    auto d = wrap(cc);// print root
+	                    ostream_nodes_.write(raw_ptr(d), size(d));
+	                }
+	
+	                print_node(new_node, children_count);
+	
+	                
+	                if(!damned_offset_added_)
+	                {
+	                    model_structure::node_data do_node;
+	                    do_node.pos   = from_osg_vector3(mt?node.asTransform()->asMatrixTransform()->getMatrix().getTrans():osg::Vec3(0,0,0)) + offset;
+	                    do_node.name =  "damned_offset";
+	
+	                    damned_offset_added_ = true;
+	
+	                    {
+	                        auto d = wrap(do_node);
+	                        ostream_nodes_.write(raw_ptr(d), size(d));
+	                    }
+	
+	                    {
+	                        auto d = wrap(0);// print root
+	                        ostream_nodes_.write(raw_ptr(d), size(d));
+	                    }
+	
+	                    print_node(do_node,0);
+	                }
                 }
 
             }

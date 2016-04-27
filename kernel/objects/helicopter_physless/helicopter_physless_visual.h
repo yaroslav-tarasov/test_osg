@@ -25,6 +25,9 @@ namespace helicopter_physless
     private:
         void on_malfunction_changed  ( aircraft::malfunction_kind_t kind ) override;
         void on_rotor_state           (double target, double speed, rotor_state_t visible) override;
+    
+    private:
+        void fill_nodes();
 
     private:
         nm::node_info_ptr engine_node_;
@@ -54,8 +57,8 @@ namespace helicopter_physless
 		};
 
 		smoke_sfx_t        smoke_sfx_;
+    
 
-        void fill_nodes();
     private:
         boost::shared_ptr<visual_objects::label_support>   ls_;
         boost::shared_ptr<visual_objects::morphs_support>  ms_;

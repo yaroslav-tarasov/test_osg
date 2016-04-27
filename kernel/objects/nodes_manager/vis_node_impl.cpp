@@ -159,17 +159,21 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
     osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
     pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
+        
+    
+    FIXME("WO anim") 
 
+#if 0
     if (victory_nodes_.size()>0)
     {
 
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
     
-    FIXME("WO anim") 
+
     
-    if ( manager_.valid() && false)
-    {   
+        if ( manager_.valid() )
+        {   
             const osgAnimation::AnimationList& animations =
                 manager_->getAnimationList();
 
@@ -202,7 +206,6 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 		    if(new_anim_name)
 			    current_anim =  *new_anim_name;
 
-
         }
 
     }
@@ -213,6 +216,8 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 
         FIXME(На этом этапе нет узлов это ошибка)
 	}
+#endif
+
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)

@@ -361,7 +361,16 @@ namespace sync_fsm
 
             
             wnode->set_position(wheel_node_pos);
-            chassis_node->set_position(chassis_node_pos);
+#if 1
+            {
+                const float angular_speed = 50; 
+                desired_orien_in_rel = chassis_node_pos.local().orien * cg::quaternion(cg::cpr(0,-cg::rad2grad() * angular_speed * dt,0));
+
+                cg::point_3 omega_rel       = cg::get_rotate_quaternion(chassis_node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / dt;
+                chassis_node_pos.local().omega = omega_rel ; 
+                chassis_node->set_position(chassis_node_pos);
+            }
+#endif
 
         });
 

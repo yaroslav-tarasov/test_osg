@@ -28,32 +28,39 @@ namespace aircraft_physless
 	{
         visual_system* vsys = smoke_sfx_.vsys;
 
-        nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
-        {
-			if (boost::starts_with(n->name(), "engine_l"))
-			{
-				this->engine_node_ = n;
-				return true;
-			}
-			else
-            if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorsag"))
-            {
-                nm::vis_node_control_ptr(n)->set_visibility(false);
-				return true;
-            }
-            else if (boost::starts_with(n->name(), "rotor"))
-            {
-                nm::vis_node_control_ptr(n)->set_visibility(true);
-				return true;
-            }
-            return true;
-        });
+#ifndef ASYNC_OBJECT_LOADING  
+        
+        fill_nodes();
 
-#ifndef ASYNC_OBJECT_LOADING           
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 #endif
 		start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
+    }
+
+
+    void visual::fill_nodes()
+    {
+        nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
+        {
+            if (boost::starts_with(n->name(), "engine_l"))
+            {
+                this->engine_node_ = n;
+                return true;
+            }
+            else
+                if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorsag"))
+                {
+                    nm::vis_node_control_ptr(n)->set_visibility(false);
+                    return true;
+                }
+                else if (boost::starts_with(n->name(), "rotor"))
+                {
+                    nm::vis_node_control_ptr(n)->set_visibility(true);
+                    return true;
+                }
+                return true;
+        });
     }
 
     void visual::update(double time)
@@ -102,6 +109,8 @@ namespace aircraft_physless
                     landing_dust_weak_ptr_ = dynamic_cast<LandingDustSfxNode *>(landing_dust_node);
                 }
             }
+
+            fill_nodes();
 		}
 #endif
 

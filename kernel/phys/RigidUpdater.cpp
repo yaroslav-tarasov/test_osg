@@ -2,8 +2,6 @@
 
 #include "utils/high_res_timer.h"
 
-#include "visitors/heil_visitor.h"
-
 #include "RigidUpdater.h"
 #include "BulletInterface.h"
 

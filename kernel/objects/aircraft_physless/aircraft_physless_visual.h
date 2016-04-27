@@ -24,6 +24,9 @@ namespace aircraft_physless
     private:
         void on_malfunction_changed    ( aircraft::malfunction_kind_t kind ) override;
         void on_new_wheel_contact_effect(double time, point_3f vel, point_3f offset) override;
+
+    private:
+        void fill_nodes();
     
     private:
         nm::node_info_ptr engine_node_;
