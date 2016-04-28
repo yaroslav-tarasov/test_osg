@@ -36,7 +36,7 @@ namespace kernel
             p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
             loaded_ = true;
 
-#if 1
+#ifndef ANIM_TURN_OFF
             using namespace avAnimation;
 
             AnimationManagerFinder finder;
@@ -80,7 +80,7 @@ namespace kernel
 
 		using namespace avAnimation;
 
-#if 1
+#ifndef ANIM_TURN_OFF
 		AnimationManagerFinder finder;
 		p_->node_->accept(finder);
 		p_->anim_manager_  = finder._am;  
@@ -112,6 +112,7 @@ namespace kernel
 
 		   using namespace avAnimation;
 
+#ifndef ANIM_TURN_OFF
 		   AnimationManagerFinder finder;
 		   p_->node_->accept(finder);
 
@@ -120,6 +121,7 @@ namespace kernel
                p_->anim_manager_  = finder._am;  
 			   p_->node_->setUpdateCallback(finder._am.get());
            }
+#endif
 
            CacheNodesVisitor cnv(p_->cache_);
            node()->accept(cnv);

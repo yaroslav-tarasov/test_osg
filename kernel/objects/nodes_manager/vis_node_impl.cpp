@@ -82,10 +82,10 @@ void vis_node_impl::fill_victory_nodes()
                 continue;
             }
 
-
             //if (auto visnode = findFirstNode(vo->node().get(), *jt,
             //    findNodeVisitor::exact, osg::NodeVisitor::TRAVERSE_ALL_CHILDREN, findNodeVisitor::user_id
             //    ))
+
             if (auto visnode = vo->get_node(*jt))
             {
                 victory_nodes_.push_back(visnode);
@@ -169,8 +169,6 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 
     auto root = victory_nodes_[0];
     node_     = victory_nodes_[0];
-    
-
     
         if ( manager_.valid() )
         {   
@@ -298,18 +296,18 @@ void vis_node_impl::sync_position()
     {
         if (position_.is_local())
         {
-            cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f(extrapolated_position_.local().orien.rotation()));
+            cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f((extrapolated_position_.local().orien ).rotation()));
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-                if ((*(it))->asTransform()/*as_transform()*/)
+                if ((*(it))->asTransform())
                 if((*(it))->asTransform()->asMatrixTransform())
-                    (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr))/*as_transform()->set_transform(tr)*/;
+                    (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
         }
         else
         {
             geo_base_3 base = dynamic_cast<visual_system_props*>(dynamic_cast<visual*>(manager_)->vis_system())->vis_props().base_point;
             point_3f offset = base(extrapolated_position_.global().pos);
 
-            cg::transform_4f tr(cg::as_translation(offset), rotation_3f(extrapolated_position_.global().orien.rotation()));
+            cg::transform_4f tr(cg::as_translation(offset), rotation_3f((extrapolated_position_.global().orien ).rotation()));
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
                 if ((*(it))->asTransform())
                 if((*(it))->asTransform()->asMatrixTransform())
