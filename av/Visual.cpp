@@ -141,7 +141,7 @@ void Visual::Initialize()
     ::Database::initDataPaths();
 	avCore::Database::Create();
 
-	osg::setNotifyLevel( osg::FATAL );   /*INFO*//*NOTICE*//*WARN*/
+	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";

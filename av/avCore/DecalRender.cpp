@@ -85,6 +85,7 @@ class DecalMapCamera : public osg::CameraNode
 public:
 
     DecalMapCamera()
+
     {
         init();
     };
@@ -201,7 +202,6 @@ protected:
     ITexturePtr                          color_buf_;
     unsigned                             _tex_dim;
     
-    // std::vector<SpotRenderVertex>        vertices_;
     std::vector<LineVertex>              vertices_;
     std::vector<unsigned>                lines_indices_;
 
@@ -214,6 +214,8 @@ protected:
     osg::Vec3Array  *                    geom_array_   ;
     osg::ref_ptr<osg::Vec3Array>         lcolor_       ;
     osg::ref_ptr<osg::UIntArray>         indices_;
+
+    bool                                 dirty_;
 
 private:
     bool                                     _NeedToUpdateFBO;
@@ -284,6 +286,7 @@ void _private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::col
     lines_updated_ = true;
 #endif
 
+    dirty_ = true;
 }
 
 void _private::traverse(osg::NodeVisitor& nv)
@@ -369,6 +372,7 @@ _private::_private(osg::Group * sceneRoot)
     : tex_dim_(0)
     , we_see_smth_(false)
     , _NeedToUpdateFBO(false)
+    , dirty_ (false)
 {
 
     _decalmapMatrix = new osg::Uniform("decal_matrix",osg::Matrixf());
@@ -530,8 +534,8 @@ void _private::cull( osg::NodeVisitor * nv )
     if (scene == NULL)
         return;
 
-
-    _commitData();
+    if(dirty_)
+        _commitData();
 
 }
 

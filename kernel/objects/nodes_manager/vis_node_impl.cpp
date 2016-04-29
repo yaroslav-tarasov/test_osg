@@ -298,7 +298,7 @@ void vis_node_impl::sync_position()
         {
             cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f((extrapolated_position_.local().orien ).rotation()));
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-                if ((*(it))->asTransform())
+                if ((*(it))->asTransform() && !boost::starts_with((*(it))->getName(),"shassi_") )
                 if((*(it))->asTransform()->asMatrixTransform())
                     (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
         }
@@ -309,7 +309,7 @@ void vis_node_impl::sync_position()
 
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f((extrapolated_position_.global().orien ).rotation()));
             for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
-                if ((*(it))->asTransform())
+                if ((*(it))->asTransform() && !boost::starts_with((*(it))->getName(),"shassi_") )
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
 

@@ -313,14 +313,10 @@ struct client
 
         const double time = 0.0;
 
-
-
         if ( g_icao_code == "URKE")
             init_URKE();
         else if ( g_icao_code == "URSS" )
             init_URSS();
-
-
 
         ADD_EVENT(time , state(0.0,time,factor))
 
@@ -334,12 +330,7 @@ struct client
 
 		set_weather();
 
-
 #if 1
-
-#if 0
-        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
-#endif                                                                                                                              0
 
 #if 0
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
@@ -354,8 +345,6 @@ struct client
 #endif
 
 #endif
-
-
 
 #if 0
         ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
@@ -372,11 +361,12 @@ struct client
 #if 0
         ADD_EVENT(89.0 , state(0.0,89.,0.0))
 #endif
-
-
+ 
 #endif
 
-
+#if 0
+        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
+ 
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
@@ -391,6 +381,30 @@ struct client
             this->send(&msg[0], msg.size());
         };
 
+        runs_.insert(make_pair(traj_->base_length(),
+            boost::bind( run_f_ , 1 ,_1,traj_offset)
+            ));
+
+        runs_.insert(make_pair( traj_->base_length() - vehicle_prediction,
+            [this] (double time)
+        {
+            double vtime = time + vehicle_prediction;
+
+            //run_f_(2,vtime,0);
+            //run_f_(3,vtime,0);
+
+            run_f_(31,vtime,0);
+
+            //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
+            //                                     << "  y: " << _traj->kp_value(vtime).y 
+            //                                     << "  h: " << _traj->kp_value(vtime).z
+            //                                     <<  "\n");
+        } 
+        ));
+
+#endif 
+
+#if 0
         run_f2_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
@@ -404,6 +418,11 @@ struct client
 
             this->send(&msg[0], msg.size());
         };
+
+        runs_.insert(make_pair(traj2_->base_length(),
+            boost::bind( run_f2_, 150,_1,traj_offset)
+            ));
+#endif
 
         runs_once_.insert(make_pair( 1,
             [this]( double time )->void {
@@ -471,32 +490,6 @@ struct client
 
 
 
-
-
-        runs_.insert(make_pair(traj_->base_length(),
-            boost::bind( run_f_ , 1 ,_1,traj_offset)
-            ));
-
-        runs_.insert(make_pair(traj2_->base_length(),
-            boost::bind( run_f2_, 150,_1,traj_offset)
-            ));
-
-        runs_.insert(make_pair( traj_->base_length() - vehicle_prediction,
-            [this] (double time)
-            {
-                double vtime = time + vehicle_prediction;
-
-                //run_f_(2,vtime,0);
-                //run_f_(3,vtime,0);
-
-                run_f_(31,vtime,0);
-
-               //LogInfo("update() send run " << _traj->base_length() << "  " <<time << "  x: " << _traj->kp_value(vtime).x 
-                //                                     << "  y: " << _traj->kp_value(vtime).y 
-                //                                     << "  h: " << _traj->kp_value(vtime).z
-                //                                     <<  "\n");
-           } 
-         ));
 
 #if 0         
          cg::point_3 poss[] = {cg::point_3(0.907 * 1000 , -0.060 * 1000, 0.0), 
@@ -779,7 +772,7 @@ struct client
         ADD_EVENT(0.0  , create(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
 #endif
 
-#if 1
+#if 0
         //ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
         //ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
         ADD_EVENT(129.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 
@@ -792,6 +785,8 @@ struct client
             boost::split(values_, parking[i], boost::is_any_of(" \t="), boost::token_compress_on);
             const cg::quaternion    orien (cg::cprf(boost::lexical_cast<int>(values_[3])) );
             ADD_EVENT(0.0   , create( 2 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
+
+
         }
     }
 
@@ -898,30 +893,6 @@ private:
         for(auto it = to_delete.begin(); it != to_delete.end(); ++it ) {
              runs_once_.erase(*it);
         }
-
-#if 0
-        if(time>=_traj->base_length())
-        {
-            run_f_(1,time,traj_offset);
-           
-#if 0
-            if (messages_size_ + binary::size(msg) > /*msg_threshold_*/100)
-            {
-                binary::bytes_t bts =  network::wrap_msg(net_layer::msg::container_msg(move(messages_)));
-
-                send(&bts[0], bts.size()); 
-
-                messages_.clear();
-                messages_size_ = 0;
-            }
-
-            
-            messages_size_ += binary::size(msg);
-            messages_.push_back(move(msg));
-#endif
-
-        }
-#endif
         
         time += period_ * factor;
 
@@ -998,20 +969,6 @@ int _tmain(int argc, _TCHAR* argv[])
     try
     {
         client::endpoints ep;
-#if 0
-		ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45001")), true));            // ModApp
-#if 0
-//        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));         // VisApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.141:45003")), false));       // VisApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.142:45003")), false));       // VisApp
-        ep.emplace_back(make_pair(endpoint(std::string("192.9.206.143:45003")), false));       // VisApp
-
-#else
-        ep.emplace_back(make_pair(endpoint(std::string("127.0.0.1:45003")), false));           // VisApp
-        //ep.emplace_back(make_pair(endpoint(std::string("192.9.206.245:45003")), false));     // VisApp
-#endif
-#endif
-
         client c(ep);              
         __main_srvc__->run();
     }

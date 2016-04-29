@@ -22,6 +22,7 @@ namespace kernel
         osg::ref_ptr<osg::Node>                                   node_;
         osg::ref_ptr<osg::Node>                                   root_;
         osg::ref_ptr<osgAnimation::BasicAnimationManager> anim_manager_;
+        std::string                                                res_;
     };
 
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async )
@@ -29,6 +30,9 @@ namespace kernel
         , p_  (make_shared<private_t>())
     {
         seed_ =  seed;
+        
+        p_->res_ = res;
+
 
 		if(!async)
 		{
@@ -122,13 +126,15 @@ namespace kernel
 			   p_->node_->setUpdateCallback(finder._am.get());
            }
 #endif
+           
+           osgDB::writeNodeFile(*p_->node_.get(), p_->res_ + boost::lexical_cast<std::string>(seed) + ".osgt");
 
            CacheNodesVisitor cnv(p_->cache_);
            node()->accept(cnv);
 #if 0
 		   SetupRigGeometry switcher(true, *p_->node_.get());
 #endif
-           
+
 		   object_loaded_signal_(seed);
          }
     }
