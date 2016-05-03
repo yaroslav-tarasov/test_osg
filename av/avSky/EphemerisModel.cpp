@@ -8,6 +8,8 @@
 
 #include "av/avSky/CloudLayer.h"
 
+#include "av/avLights/CulturalLights/PointLightsManager.h"
+
 //
 // Global namespaces
 //
@@ -209,9 +211,8 @@ void EphemerisModel::update( osg::NodeVisitor * nv )
         // get vis distance
         const float fVisDist = _skyFogLayer->getVisDistance();
 
-        FIXME("Cult lights");
-        // inform cultural lights manager about new values
-        // avScene::Scene::GetInstance()->getPointLightsManager()->SetWeatherConditions(_fogDensity, fVisDist, _illumination);
+		// inform cultural lights manager about new values
+        avScene::Scene::GetInstance()->getPointLightsManager()->SetWeatherConditions(_fogDensity, fVisDist, _illumination);
 
         // all done
         _needsToUpdate = false;

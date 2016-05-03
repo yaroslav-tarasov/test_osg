@@ -19,7 +19,8 @@ void initDataPaths()
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\sky");
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\lib");  
 	osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\materials\\misc");
-    
+	osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\images");   
+
     osgDB::getDataFilePathList().push_back(osgDB::getCurrentWorkingDirectory() + "\\data\\models\\human");
 }
 

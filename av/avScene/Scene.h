@@ -46,25 +46,19 @@ namespace avTerrain
     class Terrain;
 }
 
-namespace avShadow
-{
-    class ShadowTechnique;
-}
-
 namespace avScene
 {
     class Lights;
 }
 
-namespace bi
+namespace avLights
 {
-    class RigidUpdater;
+	class PointLightsManager;
 }
 
 namespace Utils
 {
     struct  LoadNodeThread;
-    class TrajectoryDrawer;
 }
 
 
@@ -102,12 +96,11 @@ namespace avScene {
 		inline avWeather::Weather*                  getWeather();
         inline ScreenTextureManager*                getScreenTextureManager() const;
         inline osg::Group*                          getTerrainRoot() const { return _terrainRoot.get(); } 
-        
+        inline avLights::PointLightsManager*        getPointLightsManager() const;
+
         void                                        setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center);
 
         osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0, bool async=true);
-
-        static std::string                          zoneToReload(){return zone_to_reload_;}
     
     private: // IScene interface declaration
         av::environment_weather*                    getEnvWeather() const override;
@@ -138,61 +131,44 @@ namespace avScene {
 	private:
         static osg::ref_ptr<Scene>                  _scenePtr;
 
-        osg::ref_ptr<Utils::TrajectoryDrawer>       _trajectory_drawer;
-
         osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
         osg::ref_ptr<osg::Group>                    _commonNode;
         osg::ref_ptr<osg::Group>                    _environmentNode;
-        osg::ref_ptr<avSky::Sky>                    _Sky;
-        osg::ref_ptr<avWeather::Weather>			_Weather;
-        osg::ref_ptr<avSky::Ephemeris>              _ephemerisNode;
+        osg::ref_ptr<avSky::Sky>                    _skyPtr;
+        osg::ref_ptr<avWeather::Weather>			_weatherPtr;
+        osg::ref_ptr<avSky::Ephemeris>              _ephemerisPtr;
         osg::ref_ptr<osg::Group>                    _weatherNode;
         osg::ref_ptr<avTerrain::Terrain>            _terrainNode; 
         osg::ref_ptr<osg::LightSource>              _ls;
         osg::ref_ptr<osg::Group>                    _terrainRoot;
-        osg::ref_ptr<avShadow::ShadowTechnique>     _st;  
         osg::ref_ptr<ScreenTextureManager>          _screenTextureManager;
+        osg::ref_ptr<avLights::PointLightsManager>  _pointLightsManager;
 
-         osg::ref_ptr<osg::Node>                    _loadManager;
+        osg::ref_ptr<osg::Node>                     _loadManager;
 
         osg::ref_ptr<osg::Group>                    _groupMainReflection;
-#if !defined(VISUAL_EXPORTS)
-        osg::ref_ptr<bi::RigidUpdater>              _rigidUpdater;
-#endif
-        osg::ref_ptr<PickHandler>                   _pickHandler; 
+
         std::vector<osg::ref_ptr<osg::Node>>        _lamps;
         osg::ref_ptr<Lights>                        _lights;                                            
         ILightMapRendererPtr                        _light_map;
 
         avCore::IDecalRendererPtr                   _decal_map;
 
-        app::vis_settings_panel_ptr                 _vis_settings_panel;
-        app::time_panel_ptr                         _time_panel;
-		app::main_window_ptr						_mw;
-        connection_holder                           conn_holder_;
 
-        static std::string                          zone_to_reload_;
-        
-		// uniforms	
-	private:
-		osg::ref_ptr<osg::Uniform>                  _windTime;
+#if 0
+		SmokeSfxNode *                              smoke_sfx_weak_ptr_;
+		SparksSfxNode *                             sparks_sfx_weak_ptr;
+		FrictionDustSfxNode*                        fd_sfx_weak_ptr_;
 
-
-    private:
-        osg::ref_ptr<osg::Node>                     _logo;
-
-		SmokeSfxNode *                 smoke_sfx_weak_ptr_;
-		SparksSfxNode *                sparks_sfx_weak_ptr;
-		FrictionDustSfxNode*           fd_sfx_weak_ptr_;
-
-		LandingDustSfxNode *           ld_sfx_weak_ptr_;
-		FoamStreamSfxNode *            fs_sfx_weak_ptr_;
-    private:
-        Utils::LoadNodeThread*                          _lnt;
-        std::vector<osg::ref_ptr<osg::MatrixTransform>> mt_;
+		LandingDustSfxNode *                        ld_sfx_weak_ptr_;
+		FoamStreamSfxNode *                         fs_sfx_weak_ptr_; 
+#endif
+       
 
     private:
-       app::settings_t*                               settings_;
+		struct _private;
+		std::shared_ptr<_private>  _p; 
+
 
     public:
         DECLARE_EVENT(object_loaded, (uint32_t)) ;

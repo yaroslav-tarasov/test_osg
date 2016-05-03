@@ -355,7 +355,8 @@ void model::update_shassi_anim (double time)
     {
         geo_point_3 const& pos = /*get_fms_info()->*/get_state().dyn_state.pos;
 
-        bool to_be_opened = true;/*pos.height < shassi_height_*/;
+		FIXME(shassi_opening)
+        bool to_be_opened = false;/*pos.height < shassi_height_*/;
 
         shassis_->visit_groups([this, to_be_opened, time](aircraft::shassis_group_t & shassis_group)
         {

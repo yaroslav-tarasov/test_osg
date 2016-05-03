@@ -155,6 +155,9 @@
     <ClInclude Include="av\avCore\Object.h" />
     <ClInclude Include="av\avCore\PreRender.h" />
     <ClInclude Include="av\avCore\Utils.h" />
+    <ClInclude Include="av\avLights\CulturalLights\NavigationalLight.h" />
+    <ClInclude Include="av\avLights\CulturalLights\PointLightGroup.h" />
+    <ClInclude Include="av\avLights\CulturalLights\PointLightsManager.h" />
     <ClInclude Include="av\avLights\LightManager.h" />
     <ClInclude Include="av\avLights\LightMaps.h" />
     <ClInclude Include="av\avLights\Lights.h" />
@@ -240,6 +243,9 @@
     <ClCompile Include="av\avFx\LandingDustFx.cpp" />
     <ClCompile Include="av\avFx\SmokeFx.cpp" />
     <ClCompile Include="av\avFx\SparksFx.cpp" />
+    <ClCompile Include="av\avLights\CulturalLights\NavigationalLight.cpp" />
+    <ClCompile Include="av\avLights\CulturalLights\PointLightGroup.cpp" />
+    <ClCompile Include="av\avLights\CulturalLights\PointLightsManager.cpp" />
     <ClCompile Include="av\avLights\LightManager.cpp" />
     <ClCompile Include="av\avLights\LightMaps.cpp" />
     <ClCompile Include="av\avLights\Lights.cpp" />
@@ -432,6 +438,7 @@
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\flame_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
+    <ClCompile Include="tests\light_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp" />
     <ClCompile Include="tests\main_shadows.cpp" />
     <ClCompile Include="tests\main_shadows_2.cpp" />

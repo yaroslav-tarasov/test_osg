@@ -12,10 +12,6 @@ namespace avCore
         virtual void SetVisible( bool vis ) = 0;
         virtual void Clear() =0;
         virtual void AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w )=0;
-
-    private:
-        class _private;
-        std::shared_ptr<_private>  _impl; 
     };
 
     typedef osg::ref_ptr<DecalRenderer> IDecalRendererPtr;

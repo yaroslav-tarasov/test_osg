@@ -18,26 +18,32 @@ namespace avAnimation
 
 struct AnimationManagerFinder : public osg::NodeVisitor
 {
-    osg::ref_ptr<osgAnimation::BasicAnimationManager> _am;
-    osg::ref_ptr<osgAnimation::AnimationManagerBase>  _bm;
-
     AnimationManagerFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
     void apply(osg::Node& node) {
         if (_am.valid())
             return;
 
         if (node.getUpdateCallback()) {
-            osgAnimation::AnimationManagerBase* b = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
-            if (b) {
-                _am = new osgAnimation::BasicAnimationManager(*b);
-				_bm = b; 
+            osgAnimation::AnimationManagerBase* a = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
+            if (a) {
+                _am = a;
+				_bm = dynamic_cast<osgAnimation::BasicAnimationManager*>(a); 
 				return;
 
             }
         }
         traverse(node);
     }
+
+	inline osgAnimation::AnimationManagerBase*  getAM() {return _am.get();}
+	inline osgAnimation::BasicAnimationManager* getBM() {return _bm.get();}
+    inline osgAnimation::BasicAnimationManager* getCopyBM() {return new osgAnimation::BasicAnimationManager(*_bm.get());}
+
+private:
+	osg::ref_ptr<osgAnimation::AnimationManagerBase > _am;
+	osg::ref_ptr<osgAnimation::BasicAnimationManager> _bm;
 };
+
 
 inline void deleteUseless( osgAnimation::Animation &anim ) 
 {

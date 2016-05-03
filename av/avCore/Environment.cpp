@@ -5,6 +5,7 @@
 #include "av/avCore/Utils.h"
 #include "av/avScene/Scene.h"
 #include "av/avWeather/Weather.h"
+#include "av/avLights/CulturalLights/PointLightsManager.h"
 
 using namespace avCore;
 
@@ -135,3 +136,32 @@ void Environment::RemoveLocalBank( local_bank_id_t id )
     }
 }
 
+
+void Environment::OnWeatherConditionsChanges()
+{
+	// inform cultural lights manager about new values
+	if(auto mgr = avScene::Scene::GetInstance()->getPointLightsManager()) 
+		mgr->SetWeatherConditions(m_FogParameters.fogDensity, m_FogParameters.visDist, m_IlluminationParameters.Illumination);
+}
+
+void Environment::setIllumination (float Illumination)                               
+{
+	m_IlluminationParameters.Illumination = Illumination; 
+	
+	if(ic_)
+		ic_(Illumination); 
+	
+	OnWeatherConditionsChanges();
+
+}
+
+void Environment::setVisibleRange (float VisibleRange, float ExpDensity) 
+{ 
+	if(vrc_)  
+		vrc_(VisibleRange,ExpDensity);
+	
+	m_FogParameters.fogDensity = ExpDensity;
+	m_FogParameters.visDist    = VisibleRange;
+
+	OnWeatherConditionsChanges();
+}

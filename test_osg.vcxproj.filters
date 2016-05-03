@@ -183,6 +183,9 @@
     <Filter Include="Source Files\objects\mdd">
       <UniqueIdentifier>{0f9870a5-1ea6-4065-9479-be8bab5fe6fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\lights\cult_lights">
+      <UniqueIdentifier>{318341c2-b462-42e4-bb7b-1fe1f48b74de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -511,6 +514,15 @@
     </ClInclude>
     <ClInclude Include="kernel\objects\model_debug_drawer\remote_render.h">
       <Filter>Source Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\CulturalLights\NavigationalLight.h">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\CulturalLights\PointLightGroup.h">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLights\CulturalLights\PointLightsManager.h">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1257,6 +1269,18 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp">
       <Filter>Source Files\objects\mdd</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\light_test.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\CulturalLights\NavigationalLight.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\CulturalLights\PointLightGroup.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLights\CulturalLights\PointLightsManager.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

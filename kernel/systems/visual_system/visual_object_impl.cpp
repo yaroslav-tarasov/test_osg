@@ -40,17 +40,11 @@ namespace kernel
             p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
             loaded_ = true;
 
-#ifndef ANIM_TURN_OFF
             using namespace avAnimation;
 
             AnimationManagerFinder finder;
             p_->node_->accept(finder);
-            p_->anim_manager_  = finder._am;  
-
-            if(finder._am.valid())
-                p_->node_->setUpdateCallback(finder._am.get());
-#endif
-
+		    p_->anim_manager_  = finder.getBM();
 #if 0
             SetupRigGeometry switcher(true, *node_.get());
 #endif
@@ -84,14 +78,9 @@ namespace kernel
 
 		using namespace avAnimation;
 
-#ifndef ANIM_TURN_OFF
 		AnimationManagerFinder finder;
 		p_->node_->accept(finder);
-		p_->anim_manager_  = finder._am;  
-
-		if(finder._am.valid())
-			p_->node_->setUpdateCallback(finder._am.get());
-#endif
+		p_->anim_manager_  = finder.getBM();
 
 #if 0
 		SetupRigGeometry switcher(true, *node_.get());
@@ -116,18 +105,15 @@ namespace kernel
 
 		   using namespace avAnimation;
 
-#ifndef ANIM_TURN_OFF
+
 		   AnimationManagerFinder finder;
 		   p_->node_->accept(finder);
+           p_->anim_manager_  = finder.getBM();
 
-		   if(finder._am.valid())
-           {
-               p_->anim_manager_  = finder._am;  
-			   p_->node_->setUpdateCallback(finder._am.get());
-           }
-#endif
            
+#if 0
            osgDB::writeNodeFile(*p_->node_.get(), p_->res_ + boost::lexical_cast<std::string>(seed) + ".osgt");
+#endif
 
            CacheNodesVisitor cnv(p_->cache_);
            node()->accept(cnv);

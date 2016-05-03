@@ -48,15 +48,19 @@
 #include "av/avLights/LightManager.h"
 #include "av/avLights/NavAid.h"
 
+#include "av/avLights/CulturalLights/PointLightsManager.h"
+#include "av/avLights/CulturalLights/PointLightGroup.h"
+#include "av/avLights/CulturalLights/NavigationalLight.h"
+
 #include "av/avTerrain/Terrain.h"
 
 #include "av/avWeather/Weather.h" 
 
 #include "av/avCore/Object.h"
+#include "av/avCore/Random.h"
 
 #include "application/panels/vis_settings_panel.h"
 #include "application/panels/time_panel.h"
-
 
 #include "application/main_window.h"
 #include "application/menu.h"
@@ -493,10 +497,50 @@ protected:
 
 } // namespace avGUI
 
+struct Scene::_private 
+{
+	//
+	// GUI
+	//    
+
+	app::vis_settings_panel_ptr                     _vis_settings_panel;
+	app::time_panel_ptr                             _time_panel;
+	app::main_window_ptr						    _mw;
+	connection_holder                               _conn_holder;
+
+	// uniforms	
+//private:
+	osg::ref_ptr<osg::Uniform>                      _windTime;
+
+    osg::ref_ptr<avShadow::ShadowTechnique>         _st;  
+
+//private:
+	osg::ref_ptr<osg::Node>                         _logo;
+
+	avCore::RandomNumber						    _rndGen;
+
+//private:
+	Utils::LoadNodeThread*                          _lnt;
+	std::vector<osg::ref_ptr<osg::MatrixTransform>> _mt;
+
+#if !defined(VISUAL_EXPORTS)
+	osg::ref_ptr<bi::RigidUpdater>                  _ru;
+#endif
+	
+	osg::ref_ptr<PickHandler>                       _pickHandler; 
+
+//private:
+	app::settings_t*                               settings_;
+	
+	//
+	// Something for debug 
+	//
+    
+	osg::ref_ptr<Utils::TrajectoryDrawer>          _trajectory_drawer;
+};
 
 osg::ref_ptr<Scene>	 Scene::_scenePtr;
 
-std::string          Scene::zone_to_reload_;
 
 //////////////////////////////////////////////////////////////////////////
 bool Scene::Create( osgViewer::Viewer* vw )
@@ -523,7 +567,7 @@ void Scene::Release()
         gui::releaseCEGUI();
 
 #if !defined(VISUAL_EXPORTS)
-        _scenePtr->_rigidUpdater->stopSession();
+        _scenePtr->_p->_ru->stopSession();
 #endif
         // Release scene
         _scenePtr = NULL;
@@ -547,7 +591,7 @@ Scene* Scene::GetInstance()
 
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene()
-	: smoke_sfx_weak_ptr_(nullptr)
+	: _p (std::make_shared<_private>())
 {      
     _loadManager = new avCore::LoadManager();
     addChild(_loadManager);
@@ -586,15 +630,15 @@ av::environment_weather* Scene::getEnvWeather() const
 
 av::ITrajectoryDrawer*    Scene::GetTrajectoryDrawer() const 
 {
-    return _trajectory_drawer.get();
+    return _p->_trajectory_drawer.get();
 }
 
 avSky::ISky*  Scene::getSky()
 { 
 #ifdef ORIG_EPHEMERIS
-    return static_cast<avSky::ISky*>(_ephemerisNode.get()); 
+    return static_cast<avSky::ISky*>(_ephemerisPtr.get()); 
 #else    
-    return static_cast<avSky::ISky*>(_Sky.get());
+    return static_cast<avSky::ISky*>(_skyPtr.get());
 #endif
 }
 
@@ -678,55 +722,55 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     // Add event handlers to the viewer
     //
 
-    _pickHandler = new PickHandler();
-    settings_ = new  app::settings_t;
+    _p->_pickHandler = new PickHandler();
+    _p->settings_ = new  app::settings_t;
     
-    settings_->shadow           = true;
-    settings_->shadow_for_smoke = true;
+    _p->settings_->shadow           = true;
+    _p->settings_->shadow_for_smoke = true;
 
-    settings_->clouds[0].radius_x = 1000.0f;
-    settings_->clouds[0].radius_y = 1000.0f;
-    settings_->clouds[0].x = 1000.0f;
-    settings_->clouds[0].y = 1000.0f;
-    settings_->clouds[0].height = 100.0f;
-    settings_->clouds[0].p_type = avWeather::/*PrecipitationRain*/PrecipitationFog;
-    settings_->clouds[0].intensity = 0.51f;
-    settings_->intensity = 0.0f;
+    _p->settings_->clouds[0].radius_x = 1000.0f;
+    _p->settings_->clouds[0].radius_y = 1000.0f;
+    _p->settings_->clouds[0].x = 1000.0f;
+    _p->settings_->clouds[0].y = 1000.0f;
+    _p->settings_->clouds[0].height = 100.0f;
+    _p->settings_->clouds[0].p_type = avWeather::/*PrecipitationRain*/PrecipitationFog;
+    _p->settings_->clouds[0].intensity = 0.51f;
+    _p->settings_->intensity = 0.0f;
 
     if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
         {
-            if (!this->_vis_settings_panel )
+            if (!this->_p->_vis_settings_panel )
             {
-
+				auto  pthis = this->_p;
                 app::zones_t zones_;
                 zones_.push_back(std::make_pair(0,std::wstring(L"Пустая сцена")));
                 zones_.push_back(std::make_pair(1,std::wstring(L"Шереметьево")));
                 zones_.push_back(std::make_pair(2,std::wstring(L"Сочи")));
 
 
-				this->_mw = app::create_main_win();
-				app::menu_ptr fm = this->_mw->add_main_menu("File");
+				pthis->_mw = app::create_main_win();
+				app::menu_ptr fm = pthis->_mw->add_main_menu("File");
 				fm->add_string("Exit" , boost::bind(&Scene::onExit,this)); // [&]() { /*exit(0);*/});
 
-				app::menu_ptr vm = this->_mw->add_main_menu("View");
+				app::menu_ptr vm = pthis->_mw->add_main_menu("View");
 				vm->add_string("Lights" , [=]() {  });
 
-				this->_mw->set_visible(false);
+				pthis->_mw->set_visible(false);
 
-				this->_vis_settings_panel = app::create_vis_settings_panel( zones_, *this->settings_ );
+				pthis->_vis_settings_panel = app::create_vis_settings_panel( zones_, *this->_p->settings_ );
 
-                this->_vis_settings_panel->subscribe_zone_changed     (boost::bind(&Scene::onZoneChanged,this,_1));
-                this->_vis_settings_panel->subscribe_exit_app         (boost::bind(&Scene::onExit,this));
-				this->_vis_settings_panel->subscribe_set_lights       (boost::bind(&Scene::onSetLights,this,_1));
-                this->_vis_settings_panel->subscribe_set_shadows      (boost::bind(&Scene::onSetShadows,this,_1, boost::none));
-                this->_vis_settings_panel->subscribe_set_shadows_part (boost::bind(&Scene::onSetShadows,this,boost::none,_1));
-				this->_vis_settings_panel->subscribe_set_map          (boost::bind(&Scene::onSetMap,this,_1));
-                this->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
-                this->_vis_settings_panel->subscribe_set_global_intensity       (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
-                this->_vis_settings_panel->set_light(true);
+                pthis->_vis_settings_panel->subscribe_zone_changed     (boost::bind(&Scene::onZoneChanged,this,_1));
+                pthis->_vis_settings_panel->subscribe_exit_app         (boost::bind(&Scene::onExit,this));
+				pthis->_vis_settings_panel->subscribe_set_lights       (boost::bind(&Scene::onSetLights,this,_1));
+                pthis->_vis_settings_panel->subscribe_set_shadows      (boost::bind(&Scene::onSetShadows,this,_1, boost::none));
+                pthis->_vis_settings_panel->subscribe_set_shadows_part (boost::bind(&Scene::onSetShadows,this,boost::none,_1));
+				pthis->_vis_settings_panel->subscribe_set_map          (boost::bind(&Scene::onSetMap,this,_1));
+                pthis->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
+                pthis->_vis_settings_panel->subscribe_set_global_intensity       (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
+                pthis->_vis_settings_panel->set_light(true);
 
-                this->_time_panel = app::create_time_panel();
+                pthis->_time_panel = app::create_time_panel();
 
             }
         } )
@@ -736,11 +780,11 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _viewerPtr->addEventHandler( new osgViewer::WindowSizeHandler );
     _viewerPtr->addEventHandler( new osgGA::StateSetManipulator(getCamera()->getOrCreateStateSet()) );
     _viewerPtr->addEventHandler( new osgViewer::StatsHandler );
-    _viewerPtr->addEventHandler( _pickHandler );    
+    _viewerPtr->addEventHandler( _p->_pickHandler );    
     _viewerPtr->addEventHandler( avGUI::makeGUIEventHandlerImpl(this, &Scene::onEvent));
     //_viewerPtr->realize();
 	
-    addChild(_pickHandler->getOrCreateSelectionBox()); 
+    addChild(_p->_pickHandler->getOrCreateSelectionBox()); 
 #endif
 
 
@@ -781,7 +825,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         ppuout->setInputTextureIndexForViewportReference(-1); // need this here to get viewport from camera
         
 
-        ppuout->setViewport(new osg::Viewport(0,0,1980, 1200));
+        ppuout->setViewport(new osg::Viewport(0,0,1280, 1024));
         lastUnit->addChild(ppuout);
     }
 
@@ -790,8 +834,8 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     	
 	
 	
-	_windTime   = new osg::Uniform("windTime"  , osg::Vec4(0.0,0.0,0.0,0.0));
-	pGlobalStateSet->addUniform(_windTime);
+	_p->_windTime   = new osg::Uniform("windTime"  , osg::Vec4(0.0,0.0,0.0,0.0));
+	pGlobalStateSet->addUniform(_p->_windTime);
        
     osg::Node* ct =  nullptr;// findFirstNode(_terrainNode,"camera_tower");
     
@@ -821,15 +865,15 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
     // Create ephemeris
     //                                                                       
-    _ephemerisNode = new avSky::Ephemeris( this , _terrainNode.get() );  
+    _ephemerisPtr = new avSky::Ephemeris( this , _terrainNode.get() );  
 
     //
     //  Get or create sunlight
     //
     
-    if( _ephemerisNode->getSunLightSource())
+    if( _ephemerisPtr->getSunLightSource())
     {
-        _ls =_ephemerisNode->getSunLightSource();  
+        _ls =_ephemerisPtr->getSunLightSource();  
         if(_terrainRoot) _terrainRoot->addChild(_ls.get());
     }
     else
@@ -837,14 +881,14 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         _ls = new osg::LightSource;
         _ls->getLight()->setLightNum(0);
         if(_terrainRoot) _terrainRoot->addChild(_ls.get());
-        _ephemerisNode->setSunLightSource(_ls);
+        _ephemerisPtr->setSunLightSource(_ls);
     }
     
     
-    //if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
+    //if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_p->_st.get()))
     //        pssm->setUserLight(_ls->getLight());
     
-    addChild( _ephemerisNode.get() );
+    addChild( _ephemerisPtr.get() );
 //////////////////////////////////////////////////////    
     FIXME(Many light sources sm)
 #if 0
@@ -865,30 +909,30 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 /////////////////////////////////////////////////////////////////
 
-    _viewerPtr->addEventHandler(_ephemerisNode->getEventHandler());
+    _viewerPtr->addEventHandler(_ephemerisPtr->getEventHandler());
 
 #else  
   
     // Create sky
     //
-    _Sky = new avSky::Sky( this );
-    /*_environmentNode->*/addChild( _Sky.get() );
+    _skyPtr = new avSky::Sky( this );
+    /*_environmentNode->*/addChild( _skyPtr.get() );
   
-    if( _Sky->getSunLightSource())
+    if( _skyPtr->getSunLightSource())
     {
-        _ls =_Sky->getSunLightSource();  
+        _ls =_skyPtr->getSunLightSource();  
         if(_terrainRoot) _terrainRoot->addChild(_ls.get());
     }
 
-    _viewerPtr->addEventHandler(new DebugHMIHandler(_Sky));
+    _viewerPtr->addEventHandler(new DebugHMIHandler(_skyPtr));
 
 #endif
 
 	//
 	// Create weather
 	//
-	_Weather = new avWeather::Weather();
-	_environmentNode->addChild( _Weather.get() );
+	_weatherPtr = new avWeather::Weather();
+	_environmentNode->addChild( _weatherPtr.get() );
 
 
     LightManager::Create();
@@ -929,11 +973,52 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
     _light_map = createLightMapRenderer(this);
     addChild( _light_map );
+	
+	//
+	// Cultural and navigational lights manager
+	//
 
-#if 1
+	// create it once per scene
+	_pointLightsManager = new avLights::PointLightsManager();
+	// add point lights manager to common node in the very beginning
+	// must be sure weather is already created as we get stateset fol local banks notion
+	/*_commonNode*/_terrainRoot->insertChild(0, _pointLightsManager.get());
+
+	//
+	// Lights manager test
+	//
+
+#if 0
+	static const float g_fMaxEnableDeviation = 0.05f;
+
+	// new light group
+	avLights::PointLightGroup * pNewGroup = new avLights::PointLightGroup();
+	pNewGroup->SetEnableThreshold(g_fMaxEnableDeviation  * _p->_rndGen.random_unit_signed() );
+	addChild(pNewGroup);
+
+	std::vector<float> afCommentPulses;
+	
+	pNewGroup->AddNavigationalLight(
+		osg::Vec3(),
+		osg::Vec4ub(.99 * 0xFF, .99  * 0xFF, .99 * 0xFF, .99  * 0xFF),
+		20, 100000, 0, 60, &afCommentPulses,
+		(true) ? 0.f : ((pNewGroup->GetLightsNum() & 0x3F) * 0.1f));
+	
+	auto nl = new avLights::NavigationalLight;
+	addChild(nl);
+	nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
+
+
+#endif
+
+
+	//
+	// Decal Renderer
+	//
+
     _decal_map = avCore::createDecalRenderer(this);
     addChild( _decal_map );
-#endif
+
 
     FIXME(140 shaders version needed);
 
@@ -979,14 +1064,14 @@ FIXME(Чудеса с Ephemeris)
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
-	const double dLatitude   = settings_->clouds[0].x;
-	const double dLongitude  = settings_->clouds[0].y;
+	const double dLatitude   = _p->settings_->clouds[0].x;
+	const double dLongitude  = _p->settings_->clouds[0].y;
 	const float fHeading     = 45;
-	const float fEllipseRadX = settings_->clouds[0].radius_x;
-	const float fEllipseRadY = settings_->clouds[0].radius_y;
-	const float fHeight      = settings_->clouds[0].height;
-	const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
-	const float fIntensity   = settings_->clouds[0].intensity;
+	const float fEllipseRadX = _p->settings_->clouds[0].radius_x;
+	const float fEllipseRadY = _p->settings_->clouds[0].radius_y;
+	const float fHeight      = _p->settings_->clouds[0].height;
+	const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
+	const float fIntensity   = _p->settings_->clouds[0].intensity;
 	const float fCentralPortion = 0.75;
 
 	pWeatherNode->UpdateLocalWeatherBank(nID, 
@@ -996,7 +1081,6 @@ FIXME(Чудеса с Ephemeris)
 
 #endif
 
-#if 1
     //
     // Reflections
     //
@@ -1015,22 +1099,25 @@ FIXME(Чудеса с Ephemeris)
     getOrCreateStateSet()->addUniform(new osg::Uniform("reflectionTexture", int(BASE_REFL_TEXTURE_UNIT)));
     getOrCreateStateSet()->setTextureAttribute(BASE_REFL_TEXTURE_UNIT, pReflFBOGroup->getTexture());
 
-
     _groupMainReflection->addChild(_terrainRoot);
-#endif
+
+	//
+	// Setup Environment Callback
+	//
 
     avCore::GetEnvironment()->setCallBacks(
-        [=](float illum){ if(_st!=0) {_st->setNightMode(illum < 0.8); if(_groupMainReflection.valid()) dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
+        [=](float illum){ if(_p->_st!=0) {_p->_st->setNightMode(illum < 0.8); if(_groupMainReflection.valid()) dynamic_cast<avCore::Prerender*>(_groupMainReflection.get())->setOn(illum < 0.8);  }  }  //  FIXME magic night value
         ,[this](float fog_vr,float fog_exp) {
         BOOST_FOREACH( auto g, this->_lamps)
         {
-            dynamic_cast<osgSim::LightPointNode*>(g.get())->setMaxVisibleDistance2(fog_vr * fog_vr);
-			dynamic_cast<NavAidGroup*>(g.get())->setFogCoeff(fog_exp);
+			auto nag = dynamic_cast<NavAidGroup*>(g.get());
+            nag->setMaxVisibleDistance2(fog_vr * fog_vr);
+			nag->setFogCoeff(fog_exp);
         }
     }
     );
 
-#if 1
+#if 0
 	smoke_sfx_weak_ptr_ = nullptr;
 #if 0
 	avFx::SmokeFx* smoke = new avFx::SmokeFx;
@@ -1074,7 +1161,7 @@ FIXME(Чудеса с Ephemeris)
 
 #endif
      
-   _trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
+   _p->_trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
 
     return true;
 }
@@ -1089,12 +1176,12 @@ osg::Group*  Scene::createTerrainRoot()
     const int fbo_tex_size = 1024*4;
 
 #ifdef  SHADOW_PSSM
-    _st = new avShadow::ParallelSplitShadowMap(NULL,3);
+    _p->_st = new avShadow::ParallelSplitShadowMap(NULL,3);
 #else
-    _st = new avShadow::ViewDependentShadowMap; 
+    _p->_st = new avShadow::ViewDependentShadowMap; 
 #endif
 
-    tr = new avShadow::ShadowedScene(_st.get());  
+    tr = new avShadow::ShadowedScene(_p->_st.get());  
 
     avShadow::ShadowSettings* settings = dynamic_cast<avShadow::ShadowedScene*>(tr)->getShadowSettings();
     
@@ -1113,7 +1200,7 @@ osg::Group*  Scene::createTerrainRoot()
 	//settings->setCastsShadowTraversalMask(cCastsShadowTraversalMask);
 	//settings->setReceivesShadowTraversalMask(cReceivesShadowTraversalMask); 
     
-    if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_st.get()))
+    if(auto pssm = dynamic_cast<avShadow::ParallelSplitShadowMap*>(_p->_st.get()))
     {
         pssm->setMaxFarDistance(1024.0);
         double polyoffsetfactor = pssm->getPolygonOffset().x() + 1.1;
@@ -1132,7 +1219,7 @@ void Scene::createObjects()
 {
 
 #if !defined(VISUAL_EXPORTS)
-    _rigidUpdater = new bi::RigidUpdater( _terrainRoot->asGroup() 
+    _p->_ru = new bi::RigidUpdater( _terrainRoot->asGroup() 
         ,[&](osg::MatrixTransform* mt){ 
             if(!findFirstNode(mt,"fire"))
             {
@@ -1145,223 +1232,9 @@ void Scene::createObjects()
     );
 #endif
     
+    if(_p->_ru.valid())
+		_p->_ru->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
 
-#if 0
-    osg::ref_ptr<osg::Group> node =  avAnimation::Initialize ( "man.x" );
-    _terrainRoot->addChild(node);
-#endif
-
-    //auto heli = creators::applyBM(creators::loadHelicopter(),"mi_8",true);
-    //_terrainRoot->addChild(heli);
-
-
-	if(_rigidUpdater.valid())
-		_rigidUpdater->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
-
-    const std::string name = "a_319";
-
-#if 0
-	auto obj = creators::createObject(name,true);
-
-	if(_rigidUpdater.valid())
-		_rigidUpdater->addPhysicsAirplane( obj,
-		osg::Vec3(0,0,0), osg::Vec3(0,60,0), 800.0f );
-
-
-	if(_rigidUpdater.valid())
-		_rigidUpdater->addUFO( obj,
-		osg::Vec3(100,100,0), osg::Vec3(0,0,0), 165.0f );
-
-#endif
-
-#if 0 
-	if(_rigidUpdater.valid())
-		_rigidUpdater->addUFO2( obj,
-		osg::Vec3(-100,-100,0), osg::Vec3(0,100000,0), 1650.0f );   // force 
-#endif
-
-#if 0 
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addUFO2( obj,
-        osg::Vec3(150,-150,00), osg::Vec3(0,30000,0), 1650.0f );    // force
-#endif
-
-    //if(_rigidUpdater.valid())
-    //    _rigidUpdater->addUFO3( obj,
-    //    osg::Vec3(-100,-100,0), osg::Vec3(0,0,0), 1650.0f );   // force 
-
-#if 0 
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addUFO4( creators::createObject(name,true),
-        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
-
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addUFO4( creators::createObject(name,true),
-        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
-    
-    if(_rigidUpdater.valid())
-        _rigidUpdater->addUFO4( creators::createObject(name,true),
-        osg::Vec3(-50,-50,10), osg::Vec3(0,0,0), 1650.0f );   // force 
-
-
-    const bool add_planes = false;
-
-    if (add_planes)
-    {
-
-        osg::Node* p_copy = creators::applyBM(creators::loadAirplane(name),name,true);
-        // auto p_copy = creators::loadAirplane(name); // А если без BM еще кадров 15-20 ??? Чет не вижу
-        
-        float rot_angle = -90.f;
-        if(dynamic_cast<osg::LOD*>(p_copy))
-            rot_angle = 0;  
-
-        for ( unsigned int i=0; i<10; ++i )
-        {
-            for ( unsigned int j=0; j<10; ++j )
-            {
-                if(_rigidUpdater.valid())
-                    _rigidUpdater->addPhysicsBox( new osg::Box(osg::Vec3(), 0.99f),
-                    osg::Vec3((float)i, 0.0f, (float)j+0.5f), osg::Vec3(), 1.0f );
-            }
-        }
-
-        const unsigned inst_num = 24;
-        for (unsigned i = 0; i < inst_num; ++i)
-        {
-            float const angle = 2.0f * /*cg::pif*/osg::PI * i / inst_num, radius = 400.f;
-            osg::Vec3 pos(radius * sin (angle), radius * cos(angle), 0.f);
-
-            const osg::Quat quat(osg::inDegrees(rot_angle), osg::X_AXIS,                      
-                osg::inDegrees(0.f) , osg::Y_AXIS,
-                osg::inDegrees(180.f * (i & 1)) - angle  , osg::Z_AXIS ); 
-
-
-            osg::MatrixTransform* positioned = new osg::MatrixTransform(osg::Matrix::translate(pos));
-            //positioned->setDataVariance(osg::Object::STATIC);
-
-            osg::MatrixTransform* rotated = new osg::MatrixTransform(osg::Matrix::rotate(quat));
-            //rotated->setDataVariance(osg::Object::STATIC);
-
-            positioned->addChild(rotated);
-            //rotated->addChild(p_copy);
-#ifdef DEPRECATED
-            if(_rigidUpdater.valid())
-             _rigidUpdater->addPhysicsAirplane( p_copy,
-                pos, osg::Vec3(0,0,0), 800.0f );
-#endif
-            osg::Vec3 pos2( radius * sin (angle),   radius * cos(angle), 0.f);
-
-#ifdef DEPRECATED
-            if(_rigidUpdater.valid())
-                _rigidUpdater->addPhysicsAirplane( p_copy,
-                pos2, osg::Vec3(0,60,0), 1000.0f );
-#endif
-            // add it
-            // _terrainRoot->addChild(positioned);  
-
-            if (i==1) 
-            {    
-                auto manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( p_copy->getUpdateCallback() );
-                if ( manager_ )
-                {   
-
-                    const osgAnimation::AnimationList& animations =
-                        manager_->getAnimationList();
-
-                    for ( unsigned int i=0; i<animations.size(); ++i )
-                    {
-                        const std::string& name = animations[i]-> getName();
-                        if ( name==std::string("Default") )
-                        {
-                            auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
-                            // manager->unregisterAnimation(animations[i].get());
-                            // manager->registerAnimation  (anim/*.get()*/);
-
-                            animations[i]->setPlayMode(osgAnimation::Animation::ONCE);                   
-                            manager_->playAnimation( /*anim*/ animations[i].get(),2,2.0 );
-
-                        }
-
-                    }
-                }
-
-
-            }
-
-            // FIXME при копировании начинаем падать кадров на 10
-            p_copy = osg::clone(p_copy, osg::CopyOp::DEEP_COPY_ALL 
-                & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
-                & ~osg::CopyOp::DEEP_COPY_ARRAYS
-                & ~osg::CopyOp::DEEP_COPY_IMAGES
-                & ~osg::CopyOp::DEEP_COPY_TEXTURES
-                & ~osg::CopyOp::DEEP_COPY_STATESETS  
-                & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
-                & ~osg::CopyOp::DEEP_COPY_UNIFORMS
-                & ~osg::CopyOp::DEEP_COPY_DRAWABLES
-                );
-
-            // p_copy = osg::clone(p_copy,(const osg::CopyOp) (osg::CopyOp::DEEP_COPY_CALLBACKS & osg::CopyOp::DEEP_COPY_DRAWABLES) );
-            
-        }
-    }
-#endif
-
-#if 0
-    auto towbar = creators::createObject("towbar");
-    osg::MatrixTransform* positioned = new osg::MatrixTransform;
-    positioned->setMatrix(osg::Matrix::translate(osg::Vec3d(200,100,0)));
-    positioned->addChild(towbar);
-    addChild(towbar);
-#endif
-
-#if 0
-    auto trap = creators::createObject("trap");
-    _rigidUpdater->addVehicle(trap,
-        osg::Vec3(250,750,00), osg::Vec3(0,30000,0), 1500.0f);
-
-    auto buksir = creators::createObject("buksir");
-    _rigidUpdater->addVehicle(buksir,
-        osg::Vec3(270,750,00), osg::Vec3(0,30000,0), 6000.0f);
-
-
-    auto cleaner = creators::createObject("cleaner");
-    _rigidUpdater->addVehicle(cleaner,
-        osg::Vec3(290,750,00), osg::Vec3(0,30000,0), 10000.0f);
-
-
-    auto niva_cevrolet = creators::createObject("niva_chevrolet");
-    _rigidUpdater->addVehicle(niva_cevrolet,
-        osg::Vec3(310,750,00), osg::Vec3(0,30000,0), 1860.0f);
-
-
-    auto pojarka = creators::createObject("pojarka");
-    _rigidUpdater->addVehicle(pojarka,
-        osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
-
-  
-    
-    //pojarka->setNodeMask(0);
-    //cleaner->setNodeMask(0);
-    //niva_cevrolet->setNodeMask(0);
-    //buksir->setNodeMask(0);
-#endif
-
-    const std::string v_name = "niva_chevrolet";
-
-#if 0
-    auto pojarka2 = creators::createObject(v_name);
-    if(pojarka2)
-	_rigidUpdater->addVehicle(pojarka2,
-        osg::Vec3(330,750,00), osg::Vec3(0,30000,0), 11200.0f);
-
-    auto pojarka_ctrl = creators::createObject(v_name);
-    if(pojarka_ctrl)
-	_rigidUpdater->addVehicle2(v_name,pojarka_ctrl,
-        osg::Vec3(370,750,00), osg::Vec3(0,30000,0), 200.0f);  
-#endif
-
-    // _terrainRoot->addChild(_rigidUpdater->addGUIObject(poj));
 
     const bool add_vehicles = true;
 
@@ -1370,28 +1243,26 @@ void Scene::createObjects()
         
     }
 #if !defined(VISUAL_EXPORTS)
-    if(_rigidUpdater.valid())
+    if(_p->_ru.valid())
     {
-        _viewerPtr->addEventHandler( _rigidUpdater);
+        _viewerPtr->addEventHandler( _p->_ru);
 
-        conn_holder_ << _pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _rigidUpdater.get(), _1));
-        conn_holder_ << _pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _rigidUpdater.get(), _1));
+        _p->_conn_holder << _p->_pickHandler->subscribe_choosed_point(boost::bind(&bi::RigidUpdater::handlePointEvent, _p->_ru.get(), _1));
+        _p->_conn_holder << _p->_pickHandler->subscribe_selected_node(boost::bind(&bi::RigidUpdater::handleSelectObjectEvent, _p->_ru.get(), _1));
 
-        conn_holder_ << _rigidUpdater->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _pickHandler.get(), _1));
-        _rigidUpdater->setTrajectoryDrawer(new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES));
+        _p->_conn_holder << _p->_ru->subscribe_selected_object_type(boost::bind(&PickHandler::handleSelectObjectEvent, _p->_pickHandler.get(), _1));
+        _p->_ru->setTrajectoryDrawer(new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES));
     }
 #endif
 
 }
 
 
-
 osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool async)
 {
     using namespace creators;
 
-    // osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform; // nullptr ;
-    
+	auto & mt_ = _p->_mt;
     mt_.push_back(new osg::MatrixTransform); 
     
     LogInfo("Scene::load enter " << path);
@@ -1624,6 +1495,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt, bool async)->osg::Node* {
     
+		auto & mt_ = _p->_mt;
     bool clone = true;
 
     using namespace creators;
@@ -1665,7 +1537,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         if(mt!=nullptr)
         {
             
-            osg::Node* sl  =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
+            osg::Node* ld  =  findFirstNode(mt,"landing_lamp" ,findNodeVisitor::exact);
+			osg::Node* ld1 =  findFirstNode(mt,"landing_lamp1",findNodeVisitor::exact);
+			osg::Node* sl  =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
             osg::Node* pat =  findFirstNode(mt,"pat"          ,findNodeVisitor::not_exact);
             osg::Node* hd  =  findFirstNode(mt,"headlight"    ,findNodeVisitor::not_exact);
 
@@ -1674,9 +1548,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             if(sl)
             {
                 avScene::LightManager::Light data;
-                data.transform  = mt;  
-                data.spotFalloff = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
-                data.distanceFalloff = cg::range_2f(75.f, 140.f);
+				data.transform       = mt;  
+				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+				data.distanceFalloff = cg::range_2f(75.f, 140.f);
 				data.color.r = 0.92f;
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
@@ -1695,7 +1569,74 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 //#ifndef ASYNC_OBJECT_LOADING
                 avScene::LightManager::GetInstance()->addLight(data);
 //#endif
+				auto nl = new avLights::NavigationalLight;
+				sl->asGroup()->addChild(nl);
+				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
+				nl->SetColor(osg::Vec4ub(255,255,250,255));
+				nl->SetSectorRange(0,90);
             }
+
+			if(ld)
+			{
+				avScene::LightManager::Light data;
+				data.transform       = mt;  
+				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+				data.distanceFalloff = cg::range_2f(75.f, 140.f);
+				data.color.r = 0.92f;
+				data.color.g = 0.92f;
+				data.color.b = 0.85f;
+
+				data.position =  from_osg_vector3(ld->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+
+				osg::Quat      rot   = ld->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+				cg::quaternion orien = from_osg_quat(rot);
+				cg::cpr        cr    = orien.cpr(); 
+
+				const float heading = osg::DegreesToRadians(cr.course);
+				const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
+
+				data.direction = set_direction(pitch, heading);
+				data.active = true;
+				//#ifndef ASYNC_OBJECT_LOADING
+				avScene::LightManager::GetInstance()->addLight(data);
+				//#endif
+				auto nl = new avLights::NavigationalLight;
+				ld->asGroup()->addChild(nl);
+				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
+				nl->SetColor(osg::Vec4ub(245,250,255,255));
+				nl->SetSectorRange(0,90);
+			}
+
+			if(ld1)
+			{
+				avScene::LightManager::Light data;
+				data.transform       = mt;  
+				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+				data.distanceFalloff = cg::range_2f(75.f, 140.f);
+				data.color.r = 0.92f;
+				data.color.g = 0.92f;
+				data.color.b = 0.85f;
+
+				data.position =  from_osg_vector3(ld1->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+
+				osg::Quat      rot   = ld1->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+				cg::quaternion orien = from_osg_quat(rot);
+				cg::cpr        cr    = orien.cpr(); 
+
+				const float heading = osg::DegreesToRadians(cr.course);
+				const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
+
+				data.direction = set_direction(pitch, heading);
+				data.active = true;
+				//#ifndef ASYNC_OBJECT_LOADING
+				avScene::LightManager::GetInstance()->addLight(data);
+				//#endif
+				auto nl = new avLights::NavigationalLight;
+				ld1->asGroup()->addChild(nl);
+				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
+				nl->SetColor(osg::Vec4ub(245,250,255,255));
+				nl->SetSectorRange(0,90);
+			}
 
             if(hd)
             {
@@ -1892,7 +1833,10 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
     if(async)
 		dynamic_cast<avCore::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
 	else
-		wf(seed, path,mt_.back().get(),async);
+		wf(seed, 
+		path, 
+		mt_.back().get(),
+		async);
 #else
     wf(seed, path,mt_.back().get(),async);
 #endif
@@ -1940,12 +1884,12 @@ void   Scene::onSetShadows(const optional<bool>& on, const optional<bool>& on_pa
 {
     if (on != boost::none)
     {
-       _st->enableShadows(*on);
+       _p->_st->enableShadows(*on);
     }
 
     if (on_part != boost::none)
     {
-        _st->enableParticleShadows(*on_part);
+        _p->_st->enableParticleShadows(*on_part);
     }
 
 }
@@ -1954,7 +1898,7 @@ void   Scene::onZoneChanged(int zone)
 {
     const char* scene_name[] = {"empty","adler","sheremetyevo","minsk"};
     
-    zone_to_reload_ = scene_name[zone];
+    // zone_to_reload_ = scene_name[zone];
 
     //_terrainRoot->removeChild(_terrainNode);
     //_terrainNode.release();
@@ -1972,7 +1916,8 @@ bool Scene::onEvent( const osgGA::GUIEventAdapter & ea, osgGA::GUIActionAdapter 
 
     if (key == osgGA::GUIEventAdapter::KEY_Escape)
     {
-		if(_mw) _mw->set_visible(!_mw->visible());
+		if(_p->_mw) 
+			_p->_mw->set_visible(!_p->_mw->visible());
 
         return true;
     }
@@ -2001,13 +1946,13 @@ void Scene::update( osg::NodeVisitor * nv )
       const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 	  const double lt = nv->getFrameStamp()->getSimulationTime();
       
-      if(_time_panel)
+      if(_p->_time_panel)
       {
-          _time_panel->set_time(lt * 1000.f);
+          _p->_time_panel->set_time(lt * 1000.f);
       }
 
       const unsigned base_hour = 10;
-      const unsigned time_coeff   = 1; // 500; 
+      const unsigned time_coeff   = 500; 
       const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
@@ -2018,10 +1963,11 @@ void Scene::update( osg::NodeVisitor * nv )
       vTime.Second = unsigned(et) % 60;
 
       if(bsetup)
-        _ephemerisNode->setTime();
+        _ephemerisPtr->setTime();
 
 
 
+#if 0
 	  if (smoke_sfx_weak_ptr_)
 	  {
 		  auto const intensity = 4.0f;
@@ -2056,11 +2002,13 @@ void Scene::update( osg::NodeVisitor * nv )
 		  fs_sfx_weak_ptr_->setIntensity(intensity * 120);
 		  //fs_sfx_weak_ptr_->setEmitterWorldSpeed(cg::point_3f(20, 10, 20) * 2);
 	  }	  
+#endif
+
 
 	  FIXME( "Ну и нафиг оно в cg?" );
 	  FIXME( "А третья координата?" );
 	  cg::point_3f wind = cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection;
-	  _windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
+	  _p->_windTime->set(osg::Vec4(wind.x,wind.y,lt,0.0));
 	  
 }
 

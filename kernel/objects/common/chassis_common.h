@@ -78,9 +78,9 @@ namespace aircraft
         void open(bool immediate = false)
         {
             if (immediate)
-                node->play_animation("clip1", -5, 0.,  0., 0.);
+                node->play_animation("Default", -5, 0.,  0., 0.);
             else
-                node->play_animation("clip1", -5, 1., -1., 0.);
+                node->play_animation("Default", -5, 1., -1., 0.);
 
 
             opened = true;
@@ -89,9 +89,9 @@ namespace aircraft
         void close(bool immediate = false)
         {
             if (immediate)
-                node->play_animation("clip1", -5, 1., 0., 0.);
+                node->play_animation("Default", -5, 1., 0., 0.);
             else
-                node->play_animation("clip1", -5, 0., 1., 0.);
+                node->play_animation("Default", -5, 0., 1., 0.);
 
 
             opened = false;

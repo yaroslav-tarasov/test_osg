@@ -134,7 +134,8 @@ namespace avSky
 			const float
 				fPrecipitationFogImpact = 0.7f * powf(osg::maximum(cWeatherParameters.SnowDensity, osg::maximum(cWeatherParameters.RainDensity * 0.8f, cWeatherParameters.HailDensity * 0.5f)), 0.5f);
             _fogLayer->setFogParams( osg::Vec3(fog_color.x(),fog_color.y(),fog_color.z()), cg::lerp01( fPrecipitationFogImpact, 1.f, cWeatherParameters.FogDensity));        
-       }
+
+		}
 
         osgGA::GUIEventHandler* getHandler() {return _handler.get()/*.release()*/;};
 

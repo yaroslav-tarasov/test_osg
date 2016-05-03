@@ -80,7 +80,7 @@ Object::Object(osg::Node& node , const std::string  & name)
     using namespace avAnimation;
     AnimationManagerFinder finder;
     _node->accept(finder);
-    _manager  = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get());
+    _manager  = finder.getBM();
     ObjectManager::get().Register(name,this);
 }
 
@@ -103,7 +103,7 @@ void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
     AnimationManagerFinder finder;
     anim_container->accept(finder);
 
-    osgAnimation::BasicAnimationManager* model = dynamic_cast<osgAnimation::BasicAnimationManager*>(finder._bm.get());
+    osgAnimation::BasicAnimationManager* model = finder.getBM();
 	
 	_anim_containers.insert(make_pair(name,anim_container));
 	
@@ -242,6 +242,7 @@ Object* createObject(std::string name, bool fclone)
             & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
             & ~osg::CopyOp::DEEP_COPY_UNIFORMS
             & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+			//& ~osg::CopyOp::DEEP_COPY_CALLBACKS  // wo anim
             ;
     }
 

@@ -13,6 +13,7 @@ namespace fms
 
 namespace av
 {
+
 #if 0
     // debug renderer
     struct debug_render : ref_counter

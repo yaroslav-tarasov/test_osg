@@ -29,10 +29,10 @@ protected:
 private:
             void                _createStateSet();
 private:
-    std::map<uint32_t,uint32_t>    lm_;
-    bool                           usePointSprites_;
-    static osg::ref_ptr<osg::Texture2D>        tex_;
-	std::function<float(bool)>		     	   sff_;
+    std::map<uint32_t,uint32_t>				         lm_;
+    bool                                usePointSprites_;
+    static osg::ref_ptr<osg::Texture2D>             tex_;
+	std::function<float(bool)>		     	        sff_;
 };
 
 

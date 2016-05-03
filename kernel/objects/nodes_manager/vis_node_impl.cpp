@@ -159,11 +159,8 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
     osgAnimation::Animation::PlayMode pm = bopen?osgAnimation::Animation::ONCE_BACKWARDS:osgAnimation::Animation::ONCE;
     
     pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
-        
-    
-    FIXME("WO anim") 
 
-#if 0
+#if 1
     if (victory_nodes_.size()>0)
     {
 
@@ -175,7 +172,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
             const osgAnimation::AnimationList& animations =
                 manager_->getAnimationList();
 
-		    const bool f = anim.name == "clip1";
+		    const bool f = anim.name == "Default";
 		
 		    const bool need_to_stop_now = current_anim != anim.name && cg::eq_zero(anim.cross_fade);
 		

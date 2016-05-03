@@ -76,46 +76,46 @@ namespace bi
 		, _needDebugDrawer(false)
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
-		, _d(new _private)
+		, _p(new _private)
 		, _trajectory_drawer2(new Utils::TrajectoryDrawer(root,Utils::TrajectoryDrawer::LINES))
 	{
         using namespace kernel;
         
         // Только получение без создания  
 #if 0
-        _d->_csys = get_systems()->get_control_sys();
-        _d->_msys = get_systems()->get_model_sys();
+        _p->_csys = get_systems()->get_control_sys();
+        _p->_msys = get_systems()->get_model_sys();
 #endif
 
 #if 0
-        _trajectory_drawer2->set(_d->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
+        _trajectory_drawer2->set(_p->_krv_data_getter.kp_,cg::coloraf(1.0f,0.f,0.f,1.0f));
 #endif        
       
     }
 
     RigidUpdater::~RigidUpdater()
     {
-        delete _d;
+        delete _p;
     }
 
     void RigidUpdater::stopSession()
     {
-        if (_d->_csys)
+        if (_p->_csys)
         {
-            kernel::system_session_ptr(_d->_csys)->on_session_stopped();
-            _d->_csys.reset();
+            kernel::system_session_ptr(_p->_csys)->on_session_stopped();
+            _p->_csys.reset();
         }
 
-        if (_d->_msys)
+        if (_p->_msys)
         {
-            kernel::system_session_ptr(_d->_msys)->on_session_stopped();
-            _d->_msys.reset();
+            kernel::system_session_ptr(_p->_msys)->on_session_stopped();
+            _p->_msys.reset();
         }
 
-        if (_d->_vsys)
+        if (_p->_vsys)
         {
-            kernel::system_session_ptr(_d->_vsys)->on_session_stopped();
-            _d->_vsys.reset();
+            kernel::system_session_ptr(_p->_vsys)->on_session_stopped();
+            _p->_vsys.reset();
         }
     }
 
@@ -124,7 +124,7 @@ namespace bi
     {
         FIXME(Debug drawer)
 #ifdef DEPRECATED
-        _d->_sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
+        _p->_sys->createWorld( osg::Plane(0.0f, 0.0f, 1.0f, 0.0f), gravity,
             [&](int id){
                 if(_on_collision)
                     _on_collision(_physicsNodes[id].get());   
@@ -144,8 +144,8 @@ namespace bi
 			_needDebugDrawer = true;
         }
 
-        if(_dbgDraw && _d->_sys)
-            _d->_sys->setDebugDrawer(_dbgDraw);
+        if(_dbgDraw && _p->_sys)
+            _p->_sys->setDebugDrawer(_dbgDraw);
     }
 
 
@@ -327,14 +327,14 @@ namespace bi
 
         int id = _physicsNodes.size();
 
-        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),lod3);
+        nm::manager_ptr man = nm::create_manager(_p->_msys,dict_t(),lod3);
 
         FIXME("А вот и засада с лодами")
         //aircraft::shassis_support_ptr s = boost::make_shared<aircraft::shassis_support_impl>(nm::create_manager(node));
 
         size_t pa_size = _model_aircrafts.size();
 
-        _model_aircrafts.emplace_back(aircraft::create(_d->_msys,man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
+        _model_aircrafts.emplace_back(aircraft::create(_p->_msys,man,_sys) /*boost::make_shared<aircraft::model>(nm::create_manager(node),ac_,s)*/);
         _sys->registerBody(id);  // FIXME Перевести внутрь модели //_sys->registerBody(id,ac_->get_rigid_body());
 
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -368,7 +368,7 @@ namespace bi
 
         //_sys->registerBody(id,phys::rigid_body_impl_ptr(veh)->get_body());
         
-        _d->_vehicles.emplace_back(veh);
+        _p->_vehicles.emplace_back(veh);
 
         //addPhysicsData( id, positioned, pos, /*vel*/osg::Vec3(0.0,0.0,0.0), mass );
         osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
@@ -394,17 +394,17 @@ namespace bi
 
 #ifdef  OSG_NODE_IMPL
         lod3?lod3->setNodeMask(0):0;
-        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),node);
+        nm::manager_ptr man = nm::create_manager(_p->_msys,dict_t(),node);
         //lod3?lod3->setNodeMask(0xffffffff):0;
 #else
-        nm::manager_ptr man = nm::create_manager(_d->_msys,dict_t(),nullptr/*lod3?lod3:node*/);
+        nm::manager_ptr man = nm::create_manager(_p->_msys,dict_t(),nullptr/*lod3?lod3:node*/);
         object_id  = man->get_node(0)->object_id();
 #endif
 
         FIXME("Костыль")
         man->set_model(model_name);
 
-        _phys_vehicles.push_back(vehicle::create(_d->_msys,man,model_name));
+        _phys_vehicles.push_back(vehicle::create(_p->_msys,man,model_name));
         _sys->registerBody(id);  // FIXME Перевести внутрь модели 
         //man->set_model(model_name);
 
@@ -431,14 +431,14 @@ namespace bi
     void RigidUpdater::addPhysicsBox( osg::Box* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        _d->_sys->createBox( id, shape->getHalfLengths(), mass );
+        _p->_sys->createBox( id, shape->getHalfLengths(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
 
     void RigidUpdater::addPhysicsSphere( osg::Sphere* shape, const osg::Vec3& pos, const osg::Vec3& vel, double mass )
     {
         int id = _physicsNodes.size();
-        _d->_sys->createSphere( id, shape->getRadius(), mass );
+        _p->_sys->createSphere( id, shape->getRadius(), mass );
         addPhysicsData( id, shape, pos, vel, mass );
     }
 
@@ -504,7 +504,7 @@ namespace bi
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_O )
             {
 
-                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"aircraft 0");
+                auto vvv = kernel::find_object<aircraft::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"aircraft 0");
                 if(vvv)
                 {
                       aircraft::aircraft_ipo_control_ptr(vvv)->set_malfunction(aircraft::MF_FIRE_ON_BOARD,true); 
@@ -525,7 +525,7 @@ namespace bi
                         shassis_group.close(false);
                 });
 #endif
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"vehicle 0");
                 if(vvv)
                 {
                     vvv->attach_tow();      
@@ -533,7 +533,7 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_N /*&& (ea.getModKeyMask() & osgGA::GUIEventAdapter::MODKEY_SHIFT)*/)
             {
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"vehicle 0");
                 if(vvv)
                 {
                     vvv->detach_tow();
@@ -541,8 +541,8 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_K )
             {
-                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
-                 auto sr_obj = kernel::find_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"simple_route 0");
+                 auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"vehicle 0");
+                 auto sr_obj = kernel::find_object<simple_route::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"simple_route 0");
                  if(sr_obj)
                  {
                     sr_obj->set_speed(5);
@@ -552,7 +552,7 @@ namespace bi
             } 
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_T )
             {
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"vehicle 0");
                 if(vvv)
                 {
                     vvv->follow_trajectory("simple_route 0");
@@ -561,12 +561,12 @@ namespace bi
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_B )
             {
-                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_d->_csys).get(),"vehicle 0");
+                auto vvv = kernel::find_object<vehicle::control_ptr>(kernel::object_collection_ptr(_p->_csys).get(),"vehicle 0");
                 vvv->set_brake(0.35);
             }
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Up )
             {
-                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
+                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_p->_msys.get());
                 
                 kernel::visit_objects<aircraft::model_control_ptr>(col,[this](aircraft::model_control_ptr a)->bool
                 {
@@ -585,7 +585,7 @@ namespace bi
             }  
             else if ( ea.getKey()==osgGA::GUIEventAdapter::KEY_Down )
             {
-                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_msys.get());
+                const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_p->_msys.get());
 
                 kernel::visit_objects<aircraft::model_control_ptr>(col,[this](aircraft::model_control_ptr a)->bool
                 {
@@ -617,18 +617,18 @@ namespace bi
                }
 			   
 			   
-			   if(_dbgDraw && !_d->_sys && _needDebugDrawer)
+			   if(_dbgDraw && !_p->_sys && _needDebugDrawer)
 			   {
-				   _d->_sys = phys::create_phys_system();
+				   _p->_sys = phys::create_phys_system();
 			   }
 
-			   if(_dbgDraw && _d->_sys && _needDebugDrawer)
+			   if(_dbgDraw && _p->_sys && _needDebugDrawer)
 			   {
-				   _d->_sys->setDebugDrawer(_dbgDraw);
+				   _p->_sys->setDebugDrawer(_dbgDraw);
 				   _needDebugDrawer = false;
 			   }
 
-			   if( _dbgDraw && _d->_sys)
+			   if( _dbgDraw && _p->_sys)
 			   {
                     _dbgDraw->BeginDraw();
 
@@ -647,12 +647,12 @@ namespace bi
                 for ( NodeMap::iterator itr=_physicsNodes.begin();
                     itr!=_physicsNodes.end(); ++itr )
                 {
-                    osg::Matrix matrix = _d->_sys->getMatrix(itr->first);
+                    osg::Matrix matrix = _p->_sys->getMatrix(itr->first);
                     itr->second->setMatrix( matrix );
                 }
 
 
-                    _d->_sys->debugDrawWorld();
+                    _p->_sys->debugDrawWorld();
                     _dbgDraw->EndDraw();
                 }
             } 
@@ -678,8 +678,8 @@ namespace bi
         mt->addChild( geode.get() );
         _root->addChild( mt.get() );
 
-        _d->_sys->setMatrix( id, osg::Matrix::translate(pos) );
-        _d->_sys->setVelocity( id, vel );
+        _p->_sys->setMatrix( id, osg::Matrix::translate(pos) );
+        _p->_sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
 
@@ -690,8 +690,8 @@ namespace bi
         mt->addChild( node );
         _root->addChild( mt.get() );
 
-        _d->_sys->setMatrix( id, osg::Matrix::translate(pos) );
-        _d->_sys->setVelocity( id, vel );
+        _p->_sys->setMatrix( id, osg::Matrix::translate(pos) );
+        _p->_sys->setVelocity( id, vel );
         _physicsNodes[id] = mt;
     }
 
@@ -717,7 +717,7 @@ namespace bi
 #endif
          bool a_or_v = false;
 
-         const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+         const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_p->_csys.get());
 
          kernel::visit_objects<vehicle::control_ptr>(col,[this,&a_or_v](vehicle::control_ptr a)->bool
          {
@@ -821,7 +821,7 @@ namespace bi
                     (*it_vh)->go_to_pos(gp.pos,90);
             }
 #endif            
-            const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_d->_csys.get());
+            const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_p->_csys.get());
 #if 0  // Рабочий код ездим           
             kernel::visit_objects<vehicle::control_ptr>(col,[this,&gp](vehicle::control_ptr a)->bool
             {
@@ -846,7 +846,7 @@ namespace bi
                 {
 
 #ifdef USING_SIMPLE_ROUTE
-                    auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_d->_csys).get());
+                    auto sr_obj = kernel::find_first_object<simple_route::control_ptr>(kernel::object_collection_ptr(_p->_csys).get());
                     sr_obj->add_point(gp.pos);
 #else
                     decart_position cur_pos = vc->get_local_position();

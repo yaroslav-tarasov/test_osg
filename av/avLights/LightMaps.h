@@ -22,10 +22,6 @@ struct LightMapRenderer : osg::Group
     };
 
     virtual void AddSpotLight( SpotData const & spot ) = 0;
-
-private:
-    class _private;
-    std::shared_ptr<_private>  _impl; 
 };
 
 typedef osg::ref_ptr<LightMapRenderer> ILightMapRendererPtr;

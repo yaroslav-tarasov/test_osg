@@ -337,9 +337,9 @@ int main_anim_test3( int argc, char** argv )
    AnimtkViewerModelController& mc   = AnimtkViewerModelController::instance();
 
    anim_file->accept(finder);
-   if (finder._am.valid()) {
-       pat->addUpdateCallback(finder._am.get());
-       AnimtkViewerModelController::setModel(finder._am.get());
+   if (finder.getBM()) {
+       pat->addUpdateCallback(finder.getBM());
+       AnimtkViewerModelController::setModel(finder.getBM());
        AnimtkViewerModelController::addAnimation(anim_idle); 
        AnimtkViewerModelController::addAnimation(anim_running); 
 

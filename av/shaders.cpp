@@ -1653,6 +1653,22 @@ $endif
         AUTO_REG_NAME(flame, shaders::flame_mat::get_shader)
     }
 
+	namespace sp_lit_mat
+	{
+
+		const char* vs =  STRINGIFY(
+			\n#include "data/materials/sp_lit/sp_lit.vert"
+			);
+
+		const char* fs =  STRINGIFY(
+			\n#include "data/materials/sp_lit/sp_lit.frag"
+			);
+
+		SHADERS_GETTER(get_shader, vs, fs)
+
+	    AUTO_REG_NAME(splight, shaders::sp_lit_mat::get_shader)
+	}
+
     namespace skinning_mat
     {
 

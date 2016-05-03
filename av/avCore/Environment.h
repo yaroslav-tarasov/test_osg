@@ -6,6 +6,18 @@ namespace avCore
 
     class Environment : public av::environment_weather
     {
+
+		struct FogParameters
+		{
+			FogParameters()
+				: fogDensity(0.f)
+			    , visDist   (0.f)
+			{}
+			
+			float fogDensity;
+		    float visDist;
+		};
+
     public:
     
         typedef std::function<void(float)>  OnIlluminationChangeF;
@@ -115,8 +127,8 @@ namespace avCore
         inline const TimeParameters &         GetTimeParameters()         const { return m_TimeParameters;         }
         inline TimeParameters &               GetTimeParameters()               { return m_TimeParameters;         }
 
-        void setIllumination (float Illumination)              { m_IlluminationParameters.Illumination = Illumination; if(ic_) ic_(Illumination); }
-        void setVisibleRange (float VisibleRange,float ExpDensity)              { if(vrc_)  vrc_(VisibleRange,ExpDensity); }
+        void setIllumination (float Illumination);                               
+        void setVisibleRange (float VisibleRange,float ExpDensity);            
         void setCallBacks    (const OnIlluminationChangeF& ic, const OnVisibleRangeChangeF& vrc) {ic_ = ic; vrc_=vrc; }
 
     public:
@@ -135,7 +147,11 @@ namespace avCore
         EnvironmentParameters  m_EnvironmentParameters;
         TimeParameters         m_TimeParameters;
 
+	private:
+		void OnWeatherConditionsChanges();
+
     private:
+		FogParameters          m_FogParameters; 
         IlluminationParameters m_IlluminationParameters;
         OnIlluminationChangeF  ic_;
         OnVisibleRangeChangeF  vrc_;
