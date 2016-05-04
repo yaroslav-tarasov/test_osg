@@ -22,7 +22,8 @@ namespace avScene
 {
 
     // maximum number of visible dynamic lights per object
-    static const unsigned nMaxLights = 1000;
+    static const unsigned nMaxLights = 124;
+    static const unsigned nMaxLMLights = 1000;
 
     // light affect type
     enum LightInfluence
@@ -60,6 +61,7 @@ namespace avScene
         cg::range_2f rDistAtt, rConeAtt;
         cg::colorf   cDiffuse;
         float        fAmbRatio, fSpecRatio; 
+        bool         bHighPriority;
 
         bool operator< ( const LightExternalInfo & second ) const
         {
@@ -87,7 +89,7 @@ namespace avScene
 
         // new style - add active light info
         // each update must be called to place active light here
-        void AddLight( LightInfluence dlInfluence, LightType dlType,
+        void AddLight( LightInfluence dlInfluence, LightType dlType, bool HighPriority,
                        const cg::point_3f & vWorldPos, const cg::vector_3 & vWorldDir,
                        const cg::range_2f & rDistAtt, const  cg::range_2f & rConeAtt,
                        const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio );

@@ -25,8 +25,9 @@ public:
         cg::vector_3f    direction;
 
         bool             active;
+        bool             high_priority;
 
-        inline Light() : transform(nullptr), active(false) { }
+        inline Light() : transform(nullptr), active(false), high_priority(false) { }
     };
 
 public:

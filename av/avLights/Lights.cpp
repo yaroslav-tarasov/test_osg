@@ -10,6 +10,8 @@
 
 #include "Lights.h"
 
+#define LIGHTS_TURN_ON
+
 //
 // Module namespaces
 //
@@ -65,7 +67,7 @@ Lights::Lights()
 }
 
 /////////////////////////////////////////////////////////////////////
-void Lights::AddLight( LightInfluence dlInfluence, LightType dlType,
+void Lights::AddLight( LightInfluence dlInfluence, LightType dlType, bool bHighPriority,
                        const cg::point_3f & vWorldPos, const cg::vector_3 & vWorldDir,
                        const cg::range_2f & rDistAtt,const cg::range_2f & rConeAtt,
                        const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio )
@@ -79,6 +81,7 @@ void Lights::AddLight( LightInfluence dlInfluence, LightType dlType,
     newLightInfo.cDiffuse = cDiffuse;
     newLightInfo.fAmbRatio = fAmbRatio;
     newLightInfo.fSpecRatio = fSpecRatio;
+    newLightInfo.bHighPriority =  bHighPriority;
 
     m_aFrameActiveLights.push_back(newLightInfo);
 }
@@ -123,7 +126,6 @@ void Lights::cull(osg::NodeVisitor * nv)
     // illumination factor
     FIXME(Sun Intensity студию)
     const float fDarkness = 1.f - (GetScene()->getSky() ? GetScene()->getSky()->GetSunIntensity() : 0.f);
-    //const float fDarkness = 1.f -  0.0f;
     const float fIllumFactor = cg::lerp01(0.25f, 1.0f,fDarkness * (2.0f - fDarkness));
 
     // sort lights
@@ -152,16 +154,19 @@ void Lights::cull(osg::NodeVisitor * nv)
         aCullVisibleLights.push_back(m_aFrameActiveLights[i]);
         aCullProcessedLights.push_back(LightProcessedInfo());
 
+        const auto & aCullVisibleLight = aCullVisibleLights.back();
+        auto & aCullProcessedLight = aCullProcessedLights.back();
+        
         // convert it to uniform-style
-        const cg::point_3f & vWorldPos = aCullVisibleLights.back().vPosWorld;
+        const cg::point_3f & vWorldPos = aCullVisibleLight.vPosWorld;
         const osg::Vec3f vLightVSPos = osg::Vec3(vWorldPos.x, vWorldPos.y, vWorldPos.z) * mWorldToView;
-        aCullProcessedLights.back().lightVSPosAmbRatio = osg::Vec4f(vLightVSPos, aCullVisibleLights.back().fAmbRatio);
+        aCullProcessedLight.lightVSPosAmbRatio = osg::Vec4f(vLightVSPos, aCullVisibleLight.fAmbRatio);
         // convert light direction to view-space
-        const cg::vector_3 & vWorldDir = aCullVisibleLights.back().vDirWorld;
+        const cg::vector_3 & vWorldDir = aCullVisibleLight.vDirWorld;
         const osg::Vec3f vLightVSDir = osg::Matrixd::transform3x3(osg::Vec3(vWorldDir.x, vWorldDir.y, vWorldDir.z), mWorldToView);
-        aCullProcessedLights.back().lightVSDirSpecRatio = osg::Vec4f(vLightVSDir, aCullVisibleLights.back().fSpecRatio);
+        aCullProcessedLight.lightVSDirSpecRatio = osg::Vec4f(vLightVSDir, aCullVisibleLight.fSpecRatio);
         // attenuation for distance and for conical angle
-        const cg::range_2f & rDistAtt = aCullVisibleLights.back().rDistAtt;
+        const cg::range_2f & rDistAtt = aCullVisibleLight.rDistAtt;
         const float fDistAttK = rDistAtt.lo() * rDistAtt.hi() / rDistAtt.size();
         const float fDistAttB = - rDistAtt.lo() / rDistAtt.size();
         cg::range_2f rConeAtt = m_aFrameActiveLights[i].rConeAtt;
@@ -169,10 +174,10 @@ void Lights::cull(osg::NodeVisitor * nv)
             rConeAtt = cg::range_2f(-cosf(rConeAtt.lo()), -cosf(rConeAtt.hi()));
         const float fConeAttK = rConeAtt.empty() ? 0.f : (-1.0f / rConeAtt.size());
         const float fConeAttB = rConeAtt.empty() ? 1.f : (rConeAtt.hi() / rConeAtt.size());
-        aCullProcessedLights.back().lightAttenuation = osg::Vec4f(fDistAttK, fDistAttB, fConeAttK, fConeAttB);
+        aCullProcessedLight.lightAttenuation = osg::Vec4f(fDistAttK, fDistAttB, fConeAttK, fConeAttB);
         // diffuse color
-        const cg::colorf cDiffuse = fIllumFactor * aCullVisibleLights.back().cDiffuse;
-        aCullProcessedLights.back().lightDiffuse = osg::Vec3f(cDiffuse.r, cDiffuse.g, cDiffuse.b);
+        const cg::colorf cDiffuse = fIllumFactor * aCullVisibleLight.cDiffuse;
+        aCullProcessedLight.lightDiffuse = osg::Vec3f(cDiffuse.r, cDiffuse.g, cDiffuse.b);
     }
 
     // done!
@@ -237,9 +242,12 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
     // was state pushed last time?
     bool & bWasActive = (bReflPass) ? m_bReflWasActive : m_bMainWasActive;
 
+    unsigned uHighPriorities = std::count_if(aCullVisibleLights.begin(),aCullVisibleLights.end(),[=](const LightExternalInfo& lei){return lei.bHighPriority;});
+
     // calculate lights for specific geometry
-    unsigned uLightsAdded = 0;
-    for (unsigned i = 0; i < aCullVisibleLights.size() && uLightsAdded < nMaxLights; ++i)
+    unsigned uLightsAdded = uHighPriorities;
+    unsigned uHighPrioritiesAdded = 0;
+    for (unsigned i = 0; i < aCullVisibleLights.size() && uLightsAdded < nMaxLMLights; ++i)
     {
         const LightExternalInfo & lightData = aCullVisibleLights[i];
 
@@ -274,12 +282,17 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
             }
         }
 
-#if LIGHTS_TURN_ON
-        // okey, so we can add
-        curStatePack.LightVSPosAmbRatio->setElement(uLightsAdded, uniformData.lightVSPosAmbRatio);
-        curStatePack.LightVSDirSpecRatio->setElement(uLightsAdded, uniformData.lightVSDirSpecRatio);
-        curStatePack.LightAttenuation->setElement(uLightsAdded, uniformData.lightAttenuation);
-        curStatePack.LightDiffuse->setElement(uLightsAdded, uniformData.lightDiffuse);
+#ifdef LIGHTS_TURN_ON
+        const unsigned uAdded = lightData.bHighPriority? ++uHighPrioritiesAdded:uLightsAdded; 
+        
+        if(uAdded < nMaxLights)
+        {
+            // okey, so we can add
+            curStatePack.LightVSPosAmbRatio->setElement(uAdded, uniformData.lightVSPosAmbRatio);
+            curStatePack.LightVSDirSpecRatio->setElement(uAdded, uniformData.lightVSDirSpecRatio);
+            curStatePack.LightAttenuation->setElement(uAdded, uniformData.lightAttenuation);
+            curStatePack.LightDiffuse->setElement(uAdded, uniformData.lightDiffuse);
+        }
 #endif
         uLightsAdded++;
     }
@@ -288,7 +301,7 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
     m_bStatePushed = false;
     if (uLightsAdded > 0 || bWasActive)
     {
-        curStatePack.LightsActiveNum->set(int(uLightsAdded));
+        curStatePack.LightsActiveNum->set(int(cg::min(uLightsAdded, nMaxLights)));
         pCV->pushStateSet(curStatePack.pStateSet.get());
         bWasActive = (uLightsAdded > 0);
         m_bStatePushed = true;

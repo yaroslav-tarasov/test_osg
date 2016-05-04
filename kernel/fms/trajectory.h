@@ -69,6 +69,7 @@ struct trajectory : traj_data
 
 
 
+#if 0
 inline std::vector<cg::geo_point_2> to_geo_points(const trajectory& traj)
 {
     const auto vals =  traj.extract_values();
@@ -80,6 +81,7 @@ inline std::vector<cg::geo_point_2> to_geo_points(const trajectory& traj)
     
     return vgp2;
 }
+#endif
 
 
 

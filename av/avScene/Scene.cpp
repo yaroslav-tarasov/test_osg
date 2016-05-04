@@ -1538,7 +1538,12 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         {
             
             osg::Node* ld  =  findFirstNode(mt,"landing_lamp" ,findNodeVisitor::exact);
+            if(ld==nullptr)
+                ld =  findFirstNode(mt,"landing_lamp_r" ,findNodeVisitor::exact);
 			osg::Node* ld1 =  findFirstNode(mt,"landing_lamp1",findNodeVisitor::exact);
+            if(ld1==nullptr)
+                ld1 =  findFirstNode(mt,"landing_lamp_l" ,findNodeVisitor::exact);
+
 			osg::Node* sl  =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
             osg::Node* pat =  findFirstNode(mt,"pat"          ,findNodeVisitor::not_exact);
             osg::Node* hd  =  findFirstNode(mt,"headlight"    ,findNodeVisitor::not_exact);
@@ -1571,20 +1576,21 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 //#endif
 				auto nl = new avLights::NavigationalLight;
 				sl->asGroup()->addChild(nl);
-				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
-				nl->SetColor(osg::Vec4ub(255,255,250,255));
-				nl->SetSectorRange(0,90);
+                nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
+                nl->SetColor(osg::Vec4ub(245,250,255,255));
+                nl->SetSectorRange(-90,90);
+                nl->SetSize(0.75);
             }
 
 			if(ld)
 			{
 				avScene::LightManager::Light data;
 				data.transform       = mt;  
-				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
-				data.distanceFalloff = cg::range_2f(75.f, 140.f);
-				data.color.r = 0.92f;
-				data.color.g = 0.92f;
-				data.color.b = 0.85f;
+				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
+				data.distanceFalloff = cg::range_2f(55.f, 100.f);
+                data.color.r = 0.82f;
+                data.color.g = 0.82f;
+                data.color.b = 0.75f;
 
 				data.position =  from_osg_vector3(ld->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
@@ -1602,20 +1608,21 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 				//#endif
 				auto nl = new avLights::NavigationalLight;
 				ld->asGroup()->addChild(nl);
-				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
+				nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
 				nl->SetColor(osg::Vec4ub(245,250,255,255));
-				nl->SetSectorRange(0,90);
+				nl->SetSectorRange(-90,90);
+                nl->SetSize(0.75);
 			}
 
 			if(ld1)
 			{
 				avScene::LightManager::Light data;
 				data.transform       = mt;  
-				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
-				data.distanceFalloff = cg::range_2f(75.f, 140.f);
-				data.color.r = 0.92f;
-				data.color.g = 0.92f;
-				data.color.b = 0.85f;
+				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
+				data.distanceFalloff = cg::range_2f(55.f, 100.f);
+				data.color.r = 0.82f;
+				data.color.g = 0.82f;
+				data.color.b = 0.75f;
 
 				data.position =  from_osg_vector3(ld1->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
@@ -1631,11 +1638,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 				//#ifndef ASYNC_OBJECT_LOADING
 				avScene::LightManager::GetInstance()->addLight(data);
 				//#endif
-				auto nl = new avLights::NavigationalLight;
+				
+                auto nl = new avLights::NavigationalLight;
 				ld1->asGroup()->addChild(nl);
-				nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
-				nl->SetColor(osg::Vec4ub(245,250,255,255));
-				nl->SetSectorRange(0,90);
+                nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
+                nl->SetColor(osg::Vec4ub(245,250,255,255));
+                nl->SetSectorRange(-90,90);
+                nl->SetSize(0.75);
 			}
 
             if(hd)
@@ -1704,6 +1713,29 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                 { 
                     pnt._color      = creators::white_color * 0.01f;
                     need_to_add     = true;
+                }
+                
+                if((*it)->getName() == "back_tail")
+                { 
+                    avScene::LightManager::Light data;
+
+                    data.color.r = 0.92f;
+                    data.color.g = 0.92f;
+                    data.color.b = 0.85f;
+
+                    data.transform  = mt;  
+                    data.spotFalloff = cg::range_2f();
+                    data.distanceFalloff = cg::range_2f(4.f, 5.f);
+                    FIXME( Damned offset )
+                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+                    data.active = true;
+                    const float heading = osg::DegreesToRadians(0.f);
+                    const float pitch   = osg::DegreesToRadians(0.f);
+                    
+                    data.high_priority = true;
+                    data.direction = set_direction(pitch, heading);
+
+                    avScene::LightManager::GetInstance()->addLight(data);
                 }
 
                 if((*it)->getName() == "port")

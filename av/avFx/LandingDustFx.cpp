@@ -228,8 +228,11 @@ void LandingDustFx::cull( osg::NodeVisitor * pNV )
 		factors_->at(i).set(float(cpu_p.factors.x), float(cpu_p.factors.y), float(cpu_p.factors.z), float(cpu_p.factors.w));
 	}
 
-	pos_time_unit_->dirty();
-	factors_->dirty();
+    if(i>0)
+    {
+	    pos_time_unit_->dirty();
+	    factors_->dirty();
 
-	_drawArrays->setCount(cpu_queue.size());
+       _drawArrays->setCount(cpu_queue.size());
+    }
 }

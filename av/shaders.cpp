@@ -332,7 +332,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n    uniform vec4 LightAttenuation[nMaxLights];                                                           \
 \n    uniform vec3 LightDiffuse[nMaxLights];                                                               \
 \n    \
-\n    void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
+\n   void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
 \n   {                                                                                                     \
 \n   int curLight = 0;                                                                                     \
 \n   cAmbDiff = vec3(0.0f,0.0f,0.0f);                                                                      \
@@ -357,7 +357,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n           {                                                                                             \
 \n           \
 \n           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
-\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * step(0,fDiffuseDot) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
+\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w /* * step(0,fDiffuseDot)*/ + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
 \n           \
 \n           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
 \n           fSpecPower *= fSpecPower;                                                                     \
@@ -430,8 +430,8 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n   }                                                                                                     \
    )  
 
-#undef INCLUDE_DL
-#define INCLUDE_DL
+//#undef INCLUDE_DL
+//#define INCLUDE_DL
 #undef INCLUDE_DL2
 #define INCLUDE_DL2
 
@@ -513,7 +513,9 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         INCLUDE_FOG_FUNCS
         INCLUDE_VS
 //		INCLUDE_PCF_EXT
+"\n"
         INCLUDE_DL
+"\n"
         INCLUDE_DL2
         INCLUDE_SCENE_PARAM
 "\n"       
@@ -609,10 +611,10 @@ $endif
 \n            vec3 vLightsSpecAddOn;
 \n            vec3 light_res;  
 \n                  
-\n            // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
-\n            // vec3 lightmap_color = light_res ; 
+\n            ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n            vec3 lightmap_color = light_res ; 
 \n
-\n            GET_LIGHTMAP(f_in.viewpos, f_in);
+\n            // GET_LIGHTMAP(f_in.viewpos, f_in);
 \n
 \n            float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
 \n            non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
@@ -800,7 +802,7 @@ $endif
 \n               shadow_vs_main(viewpos);
 \n
 \n               SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
-\n           }       
+\n           }
        )
        };
 
