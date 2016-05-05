@@ -22,8 +22,9 @@ namespace avScene
 {
 
     // maximum number of visible dynamic lights per object
-    static const unsigned nMaxLights = 124;
+    static const unsigned nMaxLights = 200;//124;
     static const unsigned nMaxLMLights = 1000;
+    static const size_t   nTextureRowDataSize =   4096u;
 
     // light affect type
     enum LightInfluence
@@ -158,14 +159,25 @@ namespace avScene
         // lights pack stateset already prepared
         struct LightsPackStateSet
         {
+#if 0
+#if 1
             osg::ref_ptr<osg::Uniform> LightVSPosAmbRatio;
             osg::ref_ptr<osg::Uniform> LightVSDirSpecRatio;
             osg::ref_ptr<osg::Uniform> LightAttenuation;
             osg::ref_ptr<osg::Uniform> LightDiffuse;
-            osg::ref_ptr<osg::Uniform> LightsActiveNum;
-            osg::ref_ptr<osg::StateSet> pStateSet;
+#else
+            osg::ref_ptr<osg::Uniform> LightsParams;
+#endif
+#endif
+            osg::ref_ptr<osg::TextureRectangle> bufferTexture_;
+            osg::ref_ptr<osg::Uniform>          LightsActiveNum;
+            osg::ref_ptr<osg::StateSet>         pStateSet;
 
             LightsPackStateSet();
+
+            void _createTextureBuffer();
+            void _setData( size_t idx, const osg::Matrixf& matrix);
+
         } m_lightsMain, m_lightsRefl;
 
         // father reference

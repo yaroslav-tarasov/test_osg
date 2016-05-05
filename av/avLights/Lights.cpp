@@ -199,16 +199,74 @@ LightNodeHandler::LightsPackStateSet::LightsPackStateSet()
     pStateSet->setNestRenderBins(false);
     // create uniforms array
     LightsActiveNum     = new osg::Uniform(osg::Uniform::INT,        "LightsActiveNum");
+#if 0
+#if 1
     LightVSPosAmbRatio  = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightVSPosAmbRatio", nMaxLights);
     LightVSDirSpecRatio = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightVSDirSpecRatio", nMaxLights);
     LightAttenuation    = new osg::Uniform(osg::Uniform::FLOAT_VEC4, "LightAttenuation", nMaxLights);
     LightDiffuse        = new osg::Uniform(osg::Uniform::FLOAT_VEC3, "LightDiffuse", nMaxLights);
+#else
+    LightsParams         = new osg::Uniform(osg::Uniform::FLOAT_MAT4, "LightParams", nMaxLights);
+#endif
+#endif
+
     // add uniforms
     pStateSet->addUniform(LightsActiveNum.get());
+
+    _createTextureBuffer();
+    pStateSet->setTextureAttributeAndModes(BASE_LIGHTS_TEXTURE_UNIT, bufferTexture_.get(), osg::StateAttribute::ON);
+    pStateSet->addUniform(new osg::Uniform("lightsBuffer", BASE_LIGHTS_TEXTURE_UNIT));
+
+#if 0
+#if 1
     pStateSet->addUniform(LightVSPosAmbRatio.get());
     pStateSet->addUniform(LightVSDirSpecRatio.get());
     pStateSet->addUniform(LightAttenuation.get());
     pStateSet->addUniform(LightDiffuse.get());
+#else
+    pStateSet->addUniform(LightsParams.get());
+#endif
+#endif
+
+
+}
+
+void LightNodeHandler::LightsPackStateSet::_createTextureBuffer() 
+{
+    // create texture to encode all matrices
+    const size_t nFixedDataSize =   4096u;
+
+    unsigned int height = ( nFixedDataSize / nTextureRowDataSize) + 1u;
+
+    osg::ref_ptr<osg::Image>       image = new osg::Image; 
+    image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
+    image->setInternalTextureFormat(GL_RGBA32F_ARB);
+
+    const osg::Matrixf matrix;
+
+    for (unsigned int j = 0; j < /*end*/nMaxLMLights; ++j)
+    {
+        float * data = (float*)image->data((j % nTextureRowDataSize) *4u, j / nTextureRowDataSize);
+        memcpy(data, matrix.ptr(), 16 * sizeof(float));
+    }
+
+    bufferTexture_ = new osg::TextureRectangle(image);
+    bufferTexture_->setInternalFormat(GL_RGBA32F_ARB);
+    bufferTexture_->setSourceFormat(GL_RGBA);
+    bufferTexture_->setSourceType(GL_FLOAT);
+    bufferTexture_->setTextureSize(4, nMaxLMLights);
+    bufferTexture_->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+    bufferTexture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+    bufferTexture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+    bufferTexture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+
+}
+
+void LightNodeHandler::LightsPackStateSet::_setData( size_t idx, const osg::Matrixf& matrix)
+{
+    float * data = (float*)bufferTexture_->getImage(0)->data((idx % nTextureRowDataSize) *4u, idx / nTextureRowDataSize);
+    memcpy(data, matrix.ptr(), 16 * sizeof(float));
+    bufferTexture_->dirtyTextureObject();
 }
 
 bool LightNodeHandler::_init = false;
@@ -288,10 +346,29 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
         if(uAdded < nMaxLights)
         {
             // okey, so we can add
+#if 0
+#if 1
             curStatePack.LightVSPosAmbRatio->setElement(uAdded, uniformData.lightVSPosAmbRatio);
             curStatePack.LightVSDirSpecRatio->setElement(uAdded, uniformData.lightVSDirSpecRatio);
             curStatePack.LightAttenuation->setElement(uAdded, uniformData.lightAttenuation);
             curStatePack.LightDiffuse->setElement(uAdded, uniformData.lightDiffuse);
+#else
+            curStatePack.LightsParams->setElement(uAdded, 
+            osg::Matrix(uniformData.lightVSPosAmbRatio.x(), uniformData.lightVSPosAmbRatio.y(),uniformData.lightVSPosAmbRatio.z(), uniformData.lightVSPosAmbRatio.w(),
+                uniformData.lightVSDirSpecRatio.x(), uniformData.lightVSDirSpecRatio.y(),uniformData.lightVSDirSpecRatio.z(), uniformData.lightVSDirSpecRatio.w(),
+                uniformData.lightAttenuation.x(), uniformData.lightAttenuation.y(),uniformData.lightAttenuation.z(), uniformData.lightAttenuation.w(),
+                uniformData.lightDiffuse.x(), uniformData.lightDiffuse.y(),uniformData.lightDiffuse.z(), 0
+                )
+            );
+#endif
+#endif
+            const osg::Matrixf mat(uniformData.lightVSPosAmbRatio.x(), uniformData.lightVSPosAmbRatio.y(),uniformData.lightVSPosAmbRatio.z(), uniformData.lightVSPosAmbRatio.w(),
+                uniformData.lightVSDirSpecRatio.x(), uniformData.lightVSDirSpecRatio.y(),uniformData.lightVSDirSpecRatio.z(), uniformData.lightVSDirSpecRatio.w(),
+                uniformData.lightAttenuation.x(), uniformData.lightAttenuation.y(),uniformData.lightAttenuation.z(), uniformData.lightAttenuation.w(),
+                uniformData.lightDiffuse.x(), uniformData.lightDiffuse.y(),uniformData.lightDiffuse.z(), 0
+                );
+
+            curStatePack._setData( uAdded, mat);  
         }
 #endif
         uLightsAdded++;
@@ -318,6 +395,7 @@ void LightNodeHandler::onCullEnd( osgUtil::CullVisitor * pCV )
         pCV->popStateSet();
     m_bStatePushed = false;
 }
+
 
 
 //

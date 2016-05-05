@@ -138,6 +138,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         const cg::point_3f position = transform.treat_point(light.position );
         const cg::vector_3 direction = transform.treat_vector(light.direction);
         
+        FIXME( "Ambient, Spec")
         lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight, light.high_priority,
             position, direction, light.distanceFalloff, light.spotFalloff, 
             light.color, 0.60f, 0.35f);

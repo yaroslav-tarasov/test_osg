@@ -330,7 +330,7 @@ void model::init_shassi_anim ()
         
         FIXME(init_shassi_anim)
 
-        bool to_be_opened = true ;//pos.height < shassi_height_;
+        bool to_be_opened = false ;//pos.height < shassi_height_;
 
         shassis_->visit_groups([to_be_opened](aircraft::shassis_group_t & shassis_group)
         {

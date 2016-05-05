@@ -316,7 +316,7 @@ void create_objects(const std::string & airport)
     }
 #endif
 
-#if 1
+#if 0
 	{
 		aerostat::settings_t vs;
 	    vs.model = "aerostat";

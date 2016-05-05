@@ -593,11 +593,14 @@ Scene* Scene::GetInstance()
 Scene::Scene()
 	: _p (std::make_shared<_private>())
 {      
+    setName("Scene");
+
     _loadManager = new avCore::LoadManager();
     addChild(_loadManager);
 
     _environmentNode = new Group();
     addChild(_environmentNode.get());
+    _environmentNode->setName("EnvironmentNode");
 
     // Common nodes for scene etc.
     _commonNode = new Group();
@@ -1016,8 +1019,10 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 	// Decal Renderer
 	//
 
+#if 1
     _decal_map = avCore::createDecalRenderer(this);
     addChild( _decal_map );
+#endif
 
 
     FIXME(140 shaders version needed);
@@ -1093,13 +1098,16 @@ FIXME(Чудеса с Ephemeris)
     osg::ref_ptr<osg::Group> reflectionSubGroup = new osg::Group();
     reflectionSubGroup->addChild(pReflFBOGroup.get());
     reflectionSubGroup->setCullCallback(new ReflectionCullCallback());
+    reflectionSubGroup->setName("ReflectionSubGroup");
     _environmentNode->addChild(reflectionSubGroup.get());
+
 
     // reflection unit
     getOrCreateStateSet()->addUniform(new osg::Uniform("reflectionTexture", int(BASE_REFL_TEXTURE_UNIT)));
     getOrCreateStateSet()->setTextureAttribute(BASE_REFL_TEXTURE_UNIT, pReflFBOGroup->getTexture());
 
     _groupMainReflection->addChild(_terrainRoot);
+    _groupMainReflection->setName("groupMainReflection");
 
 	//
 	// Setup Environment Callback
@@ -1210,7 +1218,8 @@ osg::Group*  Scene::createTerrainRoot()
 
 #else
     tr = new osg::Group;
-#endif     
+#endif 
+    tr->setName("TerrainRoot");
     return tr;
 
 }
@@ -2067,6 +2076,9 @@ inline void fill_parking (avCore::IDecalRendererPtr decal_map, const std::vector
 void Scene::setupDecals(const std::string& scene) 
 {
     if(scene!="eisk")
+        return;
+    
+    if(!_decal_map)
         return;
 
 #if 0   // White T

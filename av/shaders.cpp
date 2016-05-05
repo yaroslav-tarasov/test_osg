@@ -319,19 +319,22 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 #undef INCLUDE_COMPABILITY
 #define INCLUDE_COMPABILITY
 
-#define INCLUDE_DL                                                                                       \
-    STRINGIFY (                                                                                          \
+#define INCLUDE_DL                                                                                         \
+      "\n #extension GL_ARB_texture_rectangle : enable"                                                    \
+    STRINGIFY (                                                                                            \
 \n    \
-\n    const int nMaxLights = 124;                                                                           \
+\n    /*const int nMaxLights = 300; */                                                                         \
 \n    \
 \n    \
 \n    uniform int LightsActiveNum;                                                                         \
 \n    \
-\n    uniform vec4 LightVSPosAmbRatio[nMaxLights];                                                         \
-\n    uniform vec4 LightVSDirSpecRatio[nMaxLights];                                                        \
-\n    uniform vec4 LightAttenuation[nMaxLights];                                                           \
-\n    uniform vec3 LightDiffuse[nMaxLights];                                                               \
-\n    \
+\n    /*uniform vec4 LightVSPosAmbRatio[nMaxLights];*/                                                     \
+\n    /*uniform vec4 LightVSDirSpecRatio[nMaxLights];*/                                                    \
+\n    /*uniform vec4 LightAttenuation[nMaxLights];*/                                                       \
+\n    /*uniform vec3 LightDiffuse[nMaxLights]; */                                                          \
+\n    /*uniform mat4   LightsParams[nMaxLights]; */                                                        \
+\n    uniform sampler2DRect lightsBuffer;                                                                  \
+\n   \
 \n   void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
 \n   {                                                                                                     \
 \n   int curLight = 0;                                                                                     \
@@ -339,11 +342,19 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n   cSpecular = vec3(0.0f,0.0f,0.0f);                                                                     \
 \n   while (curLight < LightsActiveNum)                                                                    \
 \n       {                                                                                                 \
-\n       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
-\n       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
-\n       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
-\n       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
-\n       \
+\n                                                                                                         \
+\n       vec2 coord = vec2((curLight % 4096) * 4.0, curLight / 4096);                                      \
+\n                                                                                                         \
+\n       vec4 curVSPosAmbRatio  = textureOffset(lightsBuffer, coord, ivec2 (0, 0));                        \
+\n       vec4 curVSDirSpecRatio = textureOffset(lightsBuffer, coord, ivec2 (1, 0));                        \
+\n       vec4 curAttenuation    = textureOffset(lightsBuffer, coord, ivec2 (2, 0));                        \
+\n       vec3 curDiffuse        = textureOffset(lightsBuffer, coord, ivec2 (3, 0)).xyz;                    \
+\n                                                                                                         \
+\n       /*vec4 curVSPosAmbRatio  = LightsParams[curLight][0];LightVSPosAmbRatio[curLight];*/          \
+\n       /*vec4 curVSDirSpecRatio = LightsParams[curLight][1];LightVSDirSpecRatio[curLight];*/         \
+\n       /*vec4 curAttenuation    = LightsParams[curLight][2];LightAttenuation[curLight];*/            \
+\n       /*vec3 curDiffuse        = LightsParams[curLight][3].xyz;LightDiffuse[curLight];*/            \
+\n                                                                                                         \
 \n       vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                        \
 \n       float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                               \
 \n       vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                 \
