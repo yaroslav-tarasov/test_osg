@@ -368,7 +368,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n           {                                                                                             \
 \n           \
 \n           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
-\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w /* * step(0,fDiffuseDot)*/ + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
+\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * step(0,fDiffuseDot) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
 \n           \
 \n           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
 \n           fSpecPower *= fSpecPower;                                                                     \

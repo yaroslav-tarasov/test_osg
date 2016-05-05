@@ -139,7 +139,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         const cg::vector_3 direction = transform.treat_vector(light.direction);
         
         FIXME( "Ambient, Spec")
-        lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight, light.high_priority,
+        lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight, light.high_priority, light.lm_only,
             position, direction, light.distanceFalloff, light.spotFalloff, 
             light.color, 0.60f, 0.35f);
     }

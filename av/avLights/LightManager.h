@@ -26,8 +26,9 @@ public:
 
         bool             active;
         bool             high_priority;
+        bool             lm_only;
 
-        inline Light() : transform(nullptr), active(false), high_priority(false) { }
+        inline Light() : transform(nullptr), active(false), high_priority(false), lm_only(false) { }
     };
 
 public:

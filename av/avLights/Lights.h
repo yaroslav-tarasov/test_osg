@@ -63,6 +63,7 @@ namespace avScene
         cg::colorf   cDiffuse;
         float        fAmbRatio, fSpecRatio; 
         bool         bHighPriority;
+        bool         bLMOnly;
 
         bool operator< ( const LightExternalInfo & second ) const
         {
@@ -90,7 +91,7 @@ namespace avScene
 
         // new style - add active light info
         // each update must be called to place active light here
-        void AddLight( LightInfluence dlInfluence, LightType dlType, bool HighPriority,
+        void AddLight( LightInfluence dlInfluence, LightType dlType, bool HighPriority, bool bLMOnly,
                        const cg::point_3f & vWorldPos, const cg::vector_3 & vWorldDir,
                        const cg::range_2f & rDistAtt, const  cg::range_2f & rConeAtt,
                        const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio );

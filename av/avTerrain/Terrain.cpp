@@ -178,6 +178,7 @@ namespace
 				    data.direction = cg::as_vector(cg::point_3f(cos(pitch) * sin(heading), cos(pitch) * cos(heading), sin(pitch) ));
 
 					data.active = true;
+					data.lm_only = true;
 
 					navid_node->addLight(pnt,data);
                     //navid_node->addLightPoint(pnt);

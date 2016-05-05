@@ -67,7 +67,7 @@ Lights::Lights()
 }
 
 /////////////////////////////////////////////////////////////////////
-void Lights::AddLight( LightInfluence dlInfluence, LightType dlType, bool bHighPriority,
+void Lights::AddLight( LightInfluence dlInfluence, LightType dlType, bool bHighPriority, bool bLMOnly,
                        const cg::point_3f & vWorldPos, const cg::vector_3 & vWorldDir,
                        const cg::range_2f & rDistAtt,const cg::range_2f & rConeAtt,
                        const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio )
@@ -82,6 +82,7 @@ void Lights::AddLight( LightInfluence dlInfluence, LightType dlType, bool bHighP
     newLightInfo.fAmbRatio = fAmbRatio;
     newLightInfo.fSpecRatio = fSpecRatio;
     newLightInfo.bHighPriority =  bHighPriority;
+    newLightInfo.bLMOnly =  bLMOnly; 
 
     m_aFrameActiveLights.push_back(newLightInfo);
 }
@@ -259,7 +260,7 @@ void LightNodeHandler::LightsPackStateSet::_createTextureBuffer()
     bufferTexture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
     bufferTexture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
     bufferTexture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-
+	bufferTexture_->setUseHardwareMipMapGeneration(false);
 }
 
 void LightNodeHandler::LightsPackStateSet::_setData( size_t idx, const osg::Matrixf& matrix)
@@ -303,9 +304,10 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
     unsigned uHighPriorities = std::count_if(aCullVisibleLights.begin(),aCullVisibleLights.end(),[=](const LightExternalInfo& lei){return lei.bHighPriority;});
 
     // calculate lights for specific geometry
-    unsigned uLightsAdded = uHighPriorities;
+    unsigned uLMLightsAdded = uHighPriorities;
+	unsigned uLightsAdded = uHighPriorities;
     unsigned uHighPrioritiesAdded = 0;
-    for (unsigned i = 0; i < aCullVisibleLights.size() && uLightsAdded < nMaxLMLights; ++i)
+    for (unsigned i = 0; i < aCullVisibleLights.size() && uLMLightsAdded < nMaxLMLights; ++i)
     {
         const LightExternalInfo & lightData = aCullVisibleLights[i];
 
@@ -341,9 +343,9 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
         }
 
 #ifdef LIGHTS_TURN_ON
-        const unsigned uAdded = lightData.bHighPriority? ++uHighPrioritiesAdded:uLightsAdded; 
+        const unsigned uAdded = lightData.bHighPriority? uHighPrioritiesAdded++:uLightsAdded; 
         
-        if(uAdded < nMaxLights)
+        if(uAdded < nMaxLights && !lightData.bLMOnly)
         {
             // okey, so we can add
 #if 0
@@ -365,22 +367,25 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
             const osg::Matrixf mat(uniformData.lightVSPosAmbRatio.x(), uniformData.lightVSPosAmbRatio.y(),uniformData.lightVSPosAmbRatio.z(), uniformData.lightVSPosAmbRatio.w(),
                 uniformData.lightVSDirSpecRatio.x(), uniformData.lightVSDirSpecRatio.y(),uniformData.lightVSDirSpecRatio.z(), uniformData.lightVSDirSpecRatio.w(),
                 uniformData.lightAttenuation.x(), uniformData.lightAttenuation.y(),uniformData.lightAttenuation.z(), uniformData.lightAttenuation.w(),
-                uniformData.lightDiffuse.x(), uniformData.lightDiffuse.y(),uniformData.lightDiffuse.z(), 0
+                255/*uniformData.lightDiffuse.x()*/, 0/*uniformData.lightDiffuse.y()*/,0/*uniformData.lightDiffuse.z()*/, 0
                 );
 
             curStatePack._setData( uAdded, mat);  
+			lightData.bHighPriority?0:uLightsAdded++;
         }
+		
+
 #endif
-        uLightsAdded++;
+        uLMLightsAdded++;
     }
 
     // so push stateset if needed
     m_bStatePushed = false;
-    if (uLightsAdded > 0 || bWasActive)
+    if (uLMLightsAdded > 0 || bWasActive)
     {
-        curStatePack.LightsActiveNum->set(int(cg::min(uLightsAdded, nMaxLights)));
+        curStatePack.LightsActiveNum->set(int(cg::min(uLMLightsAdded, nMaxLights)));
         pCV->pushStateSet(curStatePack.pStateSet.get());
-        bWasActive = (uLightsAdded > 0);
+        bWasActive = (uLMLightsAdded > 0);
         m_bStatePushed = true;
     }
 

@@ -1758,7 +1758,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     data.distanceFalloff = cg::range_2f(1.5f, 10.f);
                     FIXME( Damned offset )
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
-
+					data.lm_only = true;
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f);
 
@@ -1777,6 +1777,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     data.distanceFalloff = cg::range_2f(1.5f, 10.f);
                     FIXME( Damned offset )
                     data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset); 
+					data.lm_only = true;
 
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f);
