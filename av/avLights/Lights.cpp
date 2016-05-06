@@ -125,7 +125,7 @@ void Lights::cull(osg::NodeVisitor * nv)
     std::vector<LightProcessedInfo> & aCullProcessedLights = (bReflPass) ? m_aReflProcessedLights : m_aMainProcessedLights;
 
     // illumination factor
-    FIXME(Sun Intensity ñòóäèþ)
+    FIXME(Sun Intensity Ã±Ã²Ã³Ã¤Ã¨Ã¾)
     const float fDarkness = 1.f - (GetScene()->getSky() ? GetScene()->getSky()->GetSunIntensity() : 0.f);
     const float fIllumFactor = cg::lerp01(0.25f, 1.0f,fDarkness * (2.0f - fDarkness));
 
@@ -371,7 +371,7 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
                 );
 
             curStatePack._setData( uAdded, mat);  
-			lightData.bHighPriority?0:uLightsAdded++;
+	    lightData.bHighPriority?0:uLightsAdded++;
         }
 		
 
@@ -383,7 +383,7 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
     m_bStatePushed = false;
     if (uLMLightsAdded > 0 || bWasActive)
     {
-        curStatePack.LightsActiveNum->set(int(cg::min(uLMLightsAdded, nMaxLights)));
+        curStatePack.LightsActiveNum->set(int(cg::min(uLightsAdded, nMaxLights)));
         pCV->pushStateSet(curStatePack.pStateSet.get());
         bWasActive = (uLMLightsAdded > 0);
         m_bStatePushed = true;
