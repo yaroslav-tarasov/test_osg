@@ -45,7 +45,9 @@ void visual::on_traj_assign(net_layer::msg::traj_assign_msg const& msg)
     if(msg.ext_id>0 )                          
     {
         traj_ = fms::trajectory::create(msg.traj);
-        _vsys->scene()->GetTrajectoryDrawer()->set(traj_, cg::coloraf(1.0f,0.0f,0.0f,1.0f));
+        if(_vsys->scene()->GetTrajectoryDrawer())
+            _vsys->scene()->GetTrajectoryDrawer()->set(traj_, cg::coloraf(1.0f,0.0f,0.0f,1.0f));
+
     }
 
 }

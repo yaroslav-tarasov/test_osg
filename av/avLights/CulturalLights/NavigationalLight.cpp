@@ -358,13 +358,16 @@ void NavigationalLight::cull(osg::NodeVisitor * nv)
     {
         // obtain manager pointer
         PointLightsManager * pCLM = Scene::GetInstance()->getPointLightsManager();
-        // result fading
-        const float fResultFading = fSectorFading * m_fBlinkAlpha;
-        // fade color
-        osg::Vec4ub cFadedColor = m_cColor;
-        cFadedColor.a() *= fResultFading;
-        // add light point fro latter drawing
-        pCLM->AddVisibleLight(vViewPos, cFadedColor, m_fSize * fResultFading, m_fVisDist);
+        if(pCLM)
+        {
+            // result fading
+            const float fResultFading = fSectorFading * m_fBlinkAlpha;
+            // fade color
+            osg::Vec4ub cFadedColor = m_cColor;
+            cFadedColor.a() *= fResultFading;
+            // add light point fro latter drawing
+            pCLM->AddVisibleLight(vViewPos, cFadedColor, m_fSize * fResultFading, m_fVisDist);
+        }
     }
 
     // exit

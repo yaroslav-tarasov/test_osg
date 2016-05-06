@@ -90,6 +90,12 @@
 #undef TEST_SHADOWS_FROM_OSG
 #endif
 
+
+#define POINT_LIGHT_MANAGER
+#define DECAL_RENDERER     
+//#define TRAJECTORY_DRAWER
+
+
 namespace gui 
 { 
     osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler);
@@ -844,7 +850,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     
     
 
-#if 1
+
 #ifdef MANIPS
     if(ct) 
     {
@@ -858,11 +864,28 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         manip->home(0);
 	}
 #endif
+
+    
+    avCore::Environment::Create();
+
+    //
+    // Create weather
+    //
+    _weatherPtr = new avWeather::Weather();
+    _environmentNode->addChild( _weatherPtr.get() );
+    //
+    // Cultural and navigational lights manager
+    //
+
+#ifdef POINT_LIGHT_MANAGER
+    // create it once per scene
+    _pointLightsManager = new avLights::PointLightsManager();
+    // add point lights manager to common node in the very beginning
+    // must be sure weather is already created as we get stateset for local banks notion
+    /*_commonNode*/_terrainRoot->insertChild(0, _pointLightsManager.get());
 #endif
 
 #if 1 
-
-    avCore::Environment::Create();
 
 #ifdef ORIG_EPHEMERIS
     //
@@ -931,11 +954,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 #endif
 
-	//
-	// Create weather
-	//
-	_weatherPtr = new avWeather::Weather();
-	_environmentNode->addChild( _weatherPtr.get() );
 
 
     LightManager::Create();
@@ -952,8 +970,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
     _lights = new Lights();
     _environmentNode->addChild(_lights.get());
-
-
    
 #if 0   
     //
@@ -977,15 +993,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _light_map = createLightMapRenderer(this);
     addChild( _light_map );
 	
-	//
-	// Cultural and navigational lights manager
-	//
 
-	// create it once per scene
-	_pointLightsManager = new avLights::PointLightsManager();
-	// add point lights manager to common node in the very beginning
-	// must be sure weather is already created as we get stateset fol local banks notion
-	/*_commonNode*/_terrainRoot->insertChild(0, _pointLightsManager.get());
 
 	//
 	// Lights manager test
@@ -1010,8 +1018,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 	auto nl = new avLights::NavigationalLight;
 	addChild(nl);
 	nl->SetExhibitionCondition(avLights::NavigationalLight::Always);
-
-
 #endif
 
 
@@ -1019,7 +1025,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 	// Decal Renderer
 	//
 
-#if 1
+#ifdef DECAL_RENDERER
     _decal_map = avCore::createDecalRenderer(this);
     addChild( _decal_map );
 #endif
@@ -1168,8 +1174,10 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 #endif
-     
+   
+#ifdef TRAJECTORY_DRAWER
    _p->_trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
+#endif
 
     return true;
 }
@@ -1472,7 +1480,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
-#if 0
+#ifdef DECAL_RENDERER
         setupDecals(path);
 #endif
 
@@ -1742,6 +1750,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     const float pitch   = osg::DegreesToRadians(0.f);
                     
                     data.high_priority = true;
+                    data.normal_coeff  = 1.0;   // XXX
                     data.direction = set_direction(pitch, heading);
 
                     avScene::LightManager::GetInstance()->addLight(data);
@@ -1994,7 +2003,7 @@ void Scene::update( osg::NodeVisitor * nv )
       }
 
       const unsigned base_hour = 10;
-      const unsigned time_coeff   = 500; 
+      const unsigned time_coeff   = 1/*500*/; 
       const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();
@@ -2006,7 +2015,6 @@ void Scene::update( osg::NodeVisitor * nv )
 
       if(bsetup)
         _ephemerisPtr->setTime();
-
 
 
 #if 0

@@ -719,37 +719,43 @@ namespace bi
 
          const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_p->_csys.get());
 
-         kernel::visit_objects<vehicle::control_ptr>(col,[this,&a_or_v](vehicle::control_ptr a)->bool
+         FIXME( Выбор не работает)
+         if(col)
          {
-             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
-             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
-             if( nm_id == this->selected_obj_id_)
+             kernel::visit_objects<vehicle::control_ptr>(col,[this,&a_or_v](vehicle::control_ptr a)->bool
              {
-                 selected_object_type_signal_(VEHICLE_TYPE);
-                 auto traj = a->get_trajectory();
-                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(0.0f,1.f,0.f,1.0f));
-                 a_or_v = true;
-                 return false;
-             }
-             return true;
-         });
+                 auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                 uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
 
-         kernel::visit_objects<aircraft::control_ptr>(col,[this,&a_or_v](aircraft::control_ptr a)->bool
-         {
-             auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
-             uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+                 if( nm_id == this->selected_obj_id_)
+                 {
+                     selected_object_type_signal_(VEHICLE_TYPE);
+                     auto traj = a->get_trajectory();
+                     if (traj) _trajectory_drawer->set(traj,cg::coloraf(0.0f,1.f,0.f,1.0f));
+                     a_or_v = true;
+                     return false;
+                 }
+                 return true;
+             });
 
-             if( nm_id == this->selected_obj_id_)
+             kernel::visit_objects<aircraft::control_ptr>(col,[this,&a_or_v](aircraft::control_ptr a)->bool
              {
-                 selected_object_type_signal_(AIRCRAFT_TYPE);
-                 auto traj = aircraft::int_control_ptr(a)->get_trajectory();
-                 if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
-                 a_or_v = true;
-                 return false;
-             }
-             return true;
-         });
+                 auto nm = kernel::find_first_child<nodes_management::manager_ptr>(a);
+                 uint32_t nm_id = kernel::object_info_ptr(nm)->object_id();
+
+                 if( nm_id == this->selected_obj_id_)
+                 {
+                     selected_object_type_signal_(AIRCRAFT_TYPE);
+                     auto traj = aircraft::int_control_ptr(a)->get_trajectory();
+                     if (traj) _trajectory_drawer->set(traj,cg::coloraf(1.0f,0.0f,0.f,1.0f));
+                     a_or_v = true;
+                     return false;
+                 }
+                 return true;
+             });
+
+         }
 
          if(!a_or_v)
             selected_object_type_signal_(NONE_TYPE);

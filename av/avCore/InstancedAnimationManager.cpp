@@ -187,7 +187,7 @@ namespace avCore
 		instancesData_[idx] = matrix;
 		float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
 		memcpy(data, matrix.ptr(), 16 * sizeof(float));
-		instTexture_->dirtyTextureObject();
+        instTexture_->getImage(0)->dirty();
 	}
 
 

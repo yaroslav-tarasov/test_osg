@@ -37,7 +37,7 @@ public:
             geode->addDrawable( shape );
 
             _selectionBox = new osg::MatrixTransform;
-            _selectionBox->setNodeMask( PICK_NODE_MASK );
+            _selectionBox->setNodeMask( 0 );
             _selectionBox->addChild( geode.get() );
 
             osg::StateSet* ss = _selectionBox->getOrCreateStateSet();
@@ -157,6 +157,8 @@ public:
                         const double fy =  (bb.yMax()-bb.yMin())/2.0;
                         const double fz =  (bb.zMax()-bb.zMin())/2.0;
 
+                        _selectionBox->setNodeMask( PICK_NODE_MASK );
+                        
                         _selectionBox->setMatrix(
                             osg::Matrix::scale(fx, fy, fz) *
                             osg::Matrix::translate( worldCenter )

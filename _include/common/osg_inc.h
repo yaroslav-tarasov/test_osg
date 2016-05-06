@@ -22,6 +22,7 @@
 #include <osg/Texture2D>
 #include <osg/Texture3D>
 #include <osg/TextureRectangle>
+#include <osg/TextureBuffer>
 #include <osg/TriangleFunctor>
 #include <osg/ImageSequence>
 #include <osg/AnimationPath>

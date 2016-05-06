@@ -27,8 +27,9 @@ public:
         bool             active;
         bool             high_priority;
         bool             lm_only;
+        float            normal_coeff;
 
-        inline Light() : transform(nullptr), active(false), high_priority(false), lm_only(false) { }
+        inline Light() : transform(nullptr), active(false), high_priority(false), lm_only(false), normal_coeff(0.f) { }
     };
 
 public:

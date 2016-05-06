@@ -4,9 +4,11 @@
 // Local includes
 //
 
-#include <osg/Node>
-#include <osg/Geometry>
-
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
+#include <osg/BufferTemplate>
+#else
+#include "osg/BufferTemplate_3_4"
+#endif
 
 
 namespace osgUtil {
@@ -50,7 +52,7 @@ namespace avScene
         osg::Vec4f lightVSPosAmbRatio;
         osg::Vec4f lightVSDirSpecRatio;
         osg::Vec4f lightAttenuation;
-        osg::Vec3f lightDiffuse;
+        osg::Vec4f lightDiffuseNormalCoeff;
     };
     
     // light external info struct
@@ -61,7 +63,7 @@ namespace avScene
         cg::vector_3 vDirWorld;
         cg::range_2f rDistAtt, rConeAtt;
         cg::colorf   cDiffuse;
-        float        fAmbRatio, fSpecRatio; 
+        float        fAmbRatio, fSpecRatio, fNormalCoeff;
         bool         bHighPriority;
         bool         bLMOnly;
 
@@ -94,7 +96,7 @@ namespace avScene
         void AddLight( LightInfluence dlInfluence, LightType dlType, bool HighPriority, bool bLMOnly,
                        const cg::point_3f & vWorldPos, const cg::vector_3 & vWorldDir,
                        const cg::range_2f & rDistAtt, const  cg::range_2f & rConeAtt,
-                       const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio );
+                       const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio, const float & fNormalCoeff);
 
         //
         // OSG node interfaces
@@ -161,23 +163,31 @@ namespace avScene
         struct LightsPackStateSet
         {
 #if 0
-#if 1
             osg::ref_ptr<osg::Uniform> LightVSPosAmbRatio;
             osg::ref_ptr<osg::Uniform> LightVSDirSpecRatio;
             osg::ref_ptr<osg::Uniform> LightAttenuation;
-            osg::ref_ptr<osg::Uniform> LightDiffuse;
-#else
-            osg::ref_ptr<osg::Uniform> LightsParams;
+            osg::ref_ptr<osg::Uniform> LightDiffuseNormalCoeff;
 #endif
-#endif
+            typedef osg::BufferTemplate< std::vector<osg::Matrixf> >  BufferMatricesT;
+            typedef osg::Matrixf::value_type                          ElementValueT;
+            typedef const osg::Matrixf::value_type &                  ConstRefElementT;
+
+            osg::ref_ptr<BufferMatricesT>       bufferMatrices_;
             osg::ref_ptr<osg::TextureRectangle> bufferTexture_;
+            osg::ref_ptr<osg::Image>            bufferImage_;
+
             osg::ref_ptr<osg::Uniform>          LightsActiveNum;
             osg::ref_ptr<osg::StateSet>         pStateSet;
 
             LightsPackStateSet();
 
-            void _createTextureBuffer();
-            void _setData( size_t idx, const osg::Matrixf& matrix);
+            __forceinline void _createTextureBuffer();
+            __forceinline void _setData( size_t idx, const osg::Matrixf& matrix);
+            __forceinline void _setData( size_t idx,
+                ConstRefElementT a00, ConstRefElementT a01, ConstRefElementT a02, ConstRefElementT a03,
+                ConstRefElementT a10, ConstRefElementT a11, ConstRefElementT a12, ConstRefElementT a13,
+                ConstRefElementT a20, ConstRefElementT a21, ConstRefElementT a22, ConstRefElementT a23,
+                ConstRefElementT a30, ConstRefElementT a31, ConstRefElementT a32, ConstRefElementT a33 );
 
         } m_lightsMain, m_lightsRefl;
 

@@ -336,15 +336,16 @@ struct client
         ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
         ADD_EVENT(70.0,  fire_fight_msg_t(2))
-#if 0
+#endif
+
+#if 1
         ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
-		ADD_EVENT(52.0 , destroy_msg(3)) 
+        ADD_EVENT(52.0 , destroy_msg(3)) 
         ADD_EVENT(80.0 , destroy_msg(4)) 
 #endif
 
-#endif
 
 #if 0
         ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
@@ -797,7 +798,7 @@ struct client
             std::vector<std::string> values_;
             boost::split(values_, parking[i], boost::is_any_of(" \t="), boost::token_compress_on);
             const cg::quaternion    orien (cg::cprf(boost::lexical_cast<int>(values_[3])) );
-            ADD_EVENT(0.0   , create( 2 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
+            ADD_EVENT(0.0   , create( 200 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
 
 
         }

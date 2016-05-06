@@ -331,8 +331,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n    /*uniform vec4 LightVSPosAmbRatio[nMaxLights];*/                                                     \
 \n    /*uniform vec4 LightVSDirSpecRatio[nMaxLights];*/                                                    \
 \n    /*uniform vec4 LightAttenuation[nMaxLights];*/                                                       \
-\n    /*uniform vec3 LightDiffuse[nMaxLights]; */                                                          \
-\n    /*uniform mat4   LightsParams[nMaxLights]; */                                                        \
+\n    /*uniform vec4 LightDiffuseNormalCoeff[nMaxLights]; */                                                          \
 \n    uniform sampler2DRect lightsBuffer;                                                                  \
 \n   \
 \n   void ComputeDynamicLights( in vec3 vViewSpacePoint, in vec3 vViewSpaceNormal, in vec3 vReflVec, inout vec3 cAmbDiff, inout vec3 cSpecular ) \
@@ -348,16 +347,16 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n       vec4 curVSPosAmbRatio  = textureOffset(lightsBuffer, coord, ivec2 (0, 0));                        \
 \n       vec4 curVSDirSpecRatio = textureOffset(lightsBuffer, coord, ivec2 (1, 0));                        \
 \n       vec4 curAttenuation    = textureOffset(lightsBuffer, coord, ivec2 (2, 0));                        \
-\n       vec3 curDiffuse        = textureOffset(lightsBuffer, coord, ivec2 (3, 0)).xyz;                    \
+\n       vec4 curDiffuseNC      = textureOffset(lightsBuffer, coord, ivec2 (3, 0));                        \
 \n                                                                                                         \
-\n       /*vec4 curVSPosAmbRatio  = LightsParams[curLight][0];LightVSPosAmbRatio[curLight];*/          \
-\n       /*vec4 curVSDirSpecRatio = LightsParams[curLight][1];LightVSDirSpecRatio[curLight];*/         \
-\n       /*vec4 curAttenuation    = LightsParams[curLight][2];LightAttenuation[curLight];*/            \
-\n       /*vec3 curDiffuse        = LightsParams[curLight][3].xyz;LightDiffuse[curLight];*/            \
+\n       /*vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];*/                                        \
+\n       /*vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];*/                                       \
+\n       /*vec4 curAttenuation    = LightAttenuation[curLight];*/                                          \
+\n       /*vec3 curDiffuseNC      = LightDiffuseNormalCoeff[curLight];*/                                   \
 \n                                                                                                         \
-\n       vec3 vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                        \
+\n       vec3  vVecToLight = curVSPosAmbRatio.xyz - vViewSpacePoint;                                       \
 \n       float vDistToLightInv = inversesqrt(dot(vVecToLight, vVecToLight));                               \
-\n       vec3 vDirToLight = vDistToLightInv * vVecToLight;                                                 \
+\n       vec3  vDirToLight = vDistToLightInv * vVecToLight;                                                \
 \n       \
 \n       float fAngleDot = dot(vDirToLight, curVSDirSpecRatio.xyz);                                        \
 \n       float fTotalAtt = clamp(curAttenuation.z * fAngleDot + curAttenuation.w, 0.0, 1.0);               \
@@ -368,12 +367,12 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n           {                                                                                             \
 \n           \
 \n           float fDiffuseDot = dot(vDirToLight, vViewSpaceNormal);                                       \
-\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * step(0,fDiffuseDot) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuse;   \
+\n           cAmbDiff += (fTotalAtt * (curVSPosAmbRatio.w * smoothstep(-0.2, 0.2 , clamp(fDiffuseDot + curDiffuseNC.w * 2, 0.0, 1.0)) + clamp(fDiffuseDot, 0.0, 1.0))) * curDiffuseNC.xyz;   \
 \n           \
 \n           float fSpecPower = clamp(dot(vReflVec, vDirToLight), 0.0, 1.0);                               \
 \n           fSpecPower *= fSpecPower;                                                                     \
 \n           fSpecPower *= fSpecPower;                                                                     \
-\n           cSpecular += (fTotalAtt * curVSDirSpecRatio.w * fSpecPower) * curDiffuse;                     \
+\n           cSpecular += (fTotalAtt * curVSDirSpecRatio.w * fSpecPower) * curDiffuseNC.xyz;               \
 \n           }                                                                                             \
 \n                                                                                                         \
 \n                                                                                                         \
@@ -400,7 +399,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n       vec4 curVSPosAmbRatio  = LightVSPosAmbRatio[curLight];                                            \
 \n       vec4 curVSDirSpecRatio = LightVSDirSpecRatio[curLight];                                           \
 \n       vec4 curAttenuation    = LightAttenuation[curLight];                                              \
-\n       vec3 curDiffuse        = LightDiffuse[curLight];                                                  \
+\n       vec4 curDiffuseNC      = LightDiffuseNormalCoeff[curLight];                                       \
 \n                                                                                                         \
 \n                                                                                                         \
 \n        vec4 specular_ =  vec4(curDiffuse * curVSDirSpecRatio.w,1.0);                                    \
@@ -431,7 +430,7 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 \n                            }                                                                            \
 \n                }                                                                                        \
 \n                                                                                                         \
-\n           cAmbDiff += fTotalAtt *(intensity * curDiffuse + spec.rgb);                                   \
+\n           cAmbDiff += fTotalAtt *(intensity * curDiffuseNC.xyz + spec.rgb);                             \
 \n                                                                                                         \
 \n                                                                                                         \
 \n           ++curLight;                                                                                   \

@@ -487,9 +487,10 @@ void _private::_commitData()
     
     _clearArrays();
 
-    if(vertices_.empty())
+    if(vertices_.size()==0)
     {
         _geom->setPrimitiveSet(0, new osg::DrawArrays() );
+        _geom->removePrimitiveSet(0);
         return;
     }
 
@@ -512,7 +513,6 @@ void _private::_commitData()
 
 
     _geom->setPrimitiveSet(0, new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES, indices_->size(), &indices_->front()) );
-    _geom->setUseDisplayList( false );
     indices_->dirty();
     lcolor_->dirty();
     geom_array_->dirty();

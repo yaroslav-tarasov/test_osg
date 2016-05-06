@@ -141,7 +141,7 @@ void LightManager::update( osg::NodeVisitor * nv )
         FIXME( "Ambient, Spec")
         lights->AddLight(avScene::/*GlobalInfluence*/LocalInfluence, avScene::ConicalLight, light.high_priority, light.lm_only,
             position, direction, light.distanceFalloff, light.spotFalloff, 
-            light.color, 0.60f, 0.35f);
+            light.color, 0.60f, 0.35f, light.normal_coeff);
     }
 
 
