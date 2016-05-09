@@ -44,7 +44,7 @@ char fragmentShaderSource[] =  {
 \n    void main()
 \n    {
 \n        FragColor = f_in.color;
-\n        //FragColor = vec4(1.0f, 0.0, 0.0, 1.0f);
+\n        // FragColor = vec4(1.0f, 0.0, 0.0, 1.0f);
 \n    }
 \n
     )                                                                                                             
@@ -130,7 +130,7 @@ protected:
         FIXME( invalid operation after BlendEquation)
         osg::BlendEquation * pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD,osg::BlendEquation::FUNC_ADD);
         pSS->setAttributeAndModes(pBlendEquation, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-        pSS->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE,osg::BlendFunc::ZERO, osg::BlendFunc::ONE, osg::BlendFunc::ZERO), osg::StateAttribute::ON);
+        pSS->setAttributeAndModes(new osg::BlendFunc(osg::BlendFunc::ONE,osg::BlendFunc::ZERO, osg::BlendFunc::ONE, osg::BlendFunc::ZERO), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
         pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
@@ -172,11 +172,15 @@ public: // IDecalRenderer
 
     void                                setMVP(const osg::Matrixf& mvp);
     osg::Matrix                         getProjectionMatrix() {return to_osg_matrix(proj_matr_);};
-
+	
+	//
+    // DecalRenderer interface
+	//
 private:
     void SetVisible( bool vis ) override;
     void Clear()                override;
     void AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w ) override;
+	void AddGeometry( osg::Geometry * g );
 
 protected:
 
@@ -209,7 +213,10 @@ protected:
     
     osg::ref_ptr<osg::Uniform>           _decalmapMatrix;
 
-    osg::ref_ptr<osg::Geometry>          _geom         ;
+    osg::ref_ptr<osg::Geometry>          _geom ;
+    osg::ref_ptr<osg::Geode>             _geode ;
+	osg::ref_ptr<osg::Geode>             _geodeExt;
+    osg::ref_ptr<osg::StateSet>          _stateset;
 
     osg::Vec3Array  *                    geom_array_   ;
     osg::ref_ptr<osg::Vec3Array>         lcolor_       ;
@@ -218,7 +225,7 @@ protected:
     bool                                 dirty_;
 
 private:
-    bool                                     _NeedToUpdateFBO;
+    bool                                 _NeedToUpdateFBO;
 	boost::optional<std::pair<matrix_4f,matrix_4f>> clpt_mat_;
 };
 
@@ -236,6 +243,38 @@ void _private::SetVisible( bool vis )
 void _private::Clear()
 {
 
+}
+    
+void _private::AddGeometry( osg::Geometry * g )
+{
+	std::string ls = boost::to_lower_copy(g->getStateSet()->getName());
+	g->setStateSet(_stateset);
+	
+	auto color = osg::Vec3(0.0f,0.0f,0.0f);
+
+	if(ls.find("red") != std::string::npos)
+	{
+		color = osg::Vec3(1.0f,0.0f,0.0f);
+	}
+	else if (ls.find("yellow") != std::string::npos)
+	{
+		color = osg::Vec3(1.0f,1.0f,0.0f);
+	}
+	else if (ls.find("white") != std::string::npos)
+	{
+		color = osg::Vec3(1.0f,1.0f,1.0f);
+	}
+
+
+	osg::Vec3Array*  acolor = new osg::Vec3Array();
+	acolor->push_back(color);
+	acolor->setPreserveDataType(true);
+	g->setVertexAttribArray(1, acolor,osg::Array::BIND_OVERALL);
+
+	_geodeExt->addDrawable(g);
+	g->setUseDisplayList(false);
+	g->setUseVertexBufferObjects(true);
+	g->setDataVariance(osg::Object::DYNAMIC);
 }
 
 void _private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w )
@@ -298,17 +337,11 @@ void _private::traverse(osg::NodeVisitor& nv)
     }
 
     osgUtil::CullVisitor * cv = static_cast<osgUtil::CullVisitor*>(&nv);
-
     const  osg::Camera* cam = avScene::GetScene()->getCamera();
 
-    double  m_fLeft(-1.0f)
-        , m_fRight(+1.0f)
-        , m_fBottom(-1.0f)
-        , m_fTop(+1.0f)
-        , m_fNear(1.0f)
-        , m_fFar(1000.0f);
+    double  fLeft(-1.0f), fRight(+1.0f), fBottom(-1.0f), fTop(+1.0f), fNear(1.0f), fFar(1000.0f);
 
-    cam->getProjectionMatrixAsFrustum(m_fLeft, m_fRight, m_fBottom, m_fTop, m_fNear, m_fFar);
+    cam->getProjectionMatrixAsFrustum(fLeft, fRight, fBottom, fTop, fNear, fFar);
 
     osg::Vec3f eye, center, up;
     cam->getViewMatrixAsLookAt(eye, center, up);
@@ -317,12 +350,12 @@ void _private::traverse(osg::NodeVisitor& nv)
     auto dir = cg::polar_point_3f(from_osg_vector3(center - eye));
     const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
-    cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+    cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(fNear, fFar), 2.0f * cg::rad2grad(atan(fRight / fNear)), 2.0f * cg::rad2grad(atan(fTop / fNear)));
     frustum_.camera() = cg::camera_f(vPosition, rOrientation);
     
     const avCore::Environment::IlluminationParameters & cIlluminationParameters = avCore::GetEnvironment()->GetIlluminationParameters();
     FIXME(Дистанция хардкод)
-    SetupProjection(frustum_, cg::range_2f(500.f, 2250.f));  // cg::range_2f(500.f, 2250.f)
+    SetupProjection(frustum_, cg::range_2f(500.f, 2250.f)); 
 
     cull( cv );
     
@@ -378,37 +411,53 @@ _private::_private(osg::Group * sceneRoot)
     _decalmapMatrix = new osg::Uniform("decal_matrix",osg::Matrixf());
     sceneRoot->getOrCreateStateSet()->addUniform(_decalmapMatrix.get());
 
-    osg::Geode* geode = new osg::Geode;
+	_geodeExt = new osg::Geode;
+    _geode = new osg::Geode;
 
     _geom = _createGeometry();
 
+    _geode->addDrawable(_geom.get());
 
-    geode->addDrawable(_geom.get());
 
-    osg::StateSet* stateset = _geom->getOrCreateStateSet();
+	osg::Group* gr = new osg::Group;
+    _stateset = gr->getOrCreateStateSet();
 
     osg::Program* program = new osg::Program;
 
     osg::Shader* vertex_shader = new osg::Shader(osg::Shader::VERTEX, vertexShaderSource);
     program->addShader(vertex_shader);
-
     
     osg::Shader* fragment_shader = new osg::Shader(osg::Shader::FRAGMENT, fragmentShaderSource);
     program->addShader(fragment_shader);
 
 
     program->setName("DecalMap");
-    stateset->setAttribute(program);
+    _stateset->setAttribute(program);
 
     _createArrays();
-
     
     _camera = new DecalMapCamera();
     _camera->setCullCallback ( new CameraCullCallback ( _NeedToUpdateFBO ) );
+	
+	const osg::Quat quat0(osg::inDegrees(0.0f), osg::X_AXIS,                      
+		osg::inDegrees(0.f)  , osg::Y_AXIS,
+		osg::inDegrees(0.f)  , osg::Z_AXIS ); 
+	 
+	
+	osg::PositionAttitudeTransform* patExt = new osg::PositionAttitudeTransform;
+	patExt->addChild(_geodeExt);
+	patExt->setAttitude(quat0);
 
-
-    _camera->addChild(geode);
-    color_buf_ = _camera->getTexture();
+	osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform;
+	pat->addChild(_geode);
+	pat->setAttitude(osg::Quat (osg::inDegrees(180.f)  , osg::Z_AXIS ));
+    
+	gr->addChild(pat);
+	gr->addChild(patExt);
+	
+	_camera->addChild(gr);
+    
+	color_buf_ = _camera->getTexture();
 
 }
  
@@ -452,6 +501,8 @@ void _private::UpdateTextureMatrix( bool enabled )
         _decalmapMatrix->set(to_osg_matrix(tex_matr_.transpose()));
     }
 }
+
+
 
 
 void _private::_createArrays()

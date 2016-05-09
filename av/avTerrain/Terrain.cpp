@@ -211,8 +211,8 @@ namespace avTerrain
         osg::inDegrees(0.f)  , osg::Z_AXIS ); 
 
 Terrain::Terrain (osg::Group* sceneRoot)
-    : _lightsHandler(avScene::/*GlobalInfluence*/LocalInfluence)
-    , _sceneRoot (sceneRoot)
+    : _sceneRoot (sceneRoot)
+    , _lightsHandler(avScene::/*GlobalInfluence*/LocalInfluence)
 {
     setNodeMask( PICK_NODE_MASK | REFLECTION_MASK/*| cReceivesShadowTraversalMask*/ );
 
@@ -445,6 +445,7 @@ void Terrain::cull( osg::NodeVisitor * pNV )
     _lightsHandler.onCullBegin(pCV);
     pNV->traverse(*this);
     _lightsHandler.onCullEnd(pCV);
+
 }
 
 void Terrain::setGrassMapFactor(float val)

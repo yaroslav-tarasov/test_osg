@@ -13,9 +13,8 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
+
 #include <boost/any.hpp>
 #include <boost/variant.hpp>
 #include <boost/foreach.hpp>

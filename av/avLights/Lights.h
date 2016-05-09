@@ -25,7 +25,7 @@ namespace avScene
 
     // maximum number of visible dynamic lights per object
     static const unsigned nMaxLights = 200;//124;
-    static const unsigned nMaxLMLights = 1000;
+    static const unsigned nMaxLMLights = 1024;
     static const size_t   nTextureRowDataSize =   4096u;
 
     // light affect type
@@ -172,14 +172,17 @@ namespace avScene
             typedef osg::Matrixf::value_type                          ElementValueT;
             typedef const osg::Matrixf::value_type &                  ConstRefElementT;
 
+#if 0
             osg::ref_ptr<BufferMatricesT>       bufferMatrices_;
+#endif
             osg::ref_ptr<osg::TextureRectangle> bufferTexture_;
             osg::ref_ptr<osg::Image>            bufferImage_;
 
             osg::ref_ptr<osg::Uniform>          LightsActiveNum;
             osg::ref_ptr<osg::StateSet>         pStateSet;
+			
 
-            LightsPackStateSet();
+			LightsPackStateSet();
 
             __forceinline void _createTextureBuffer();
             __forceinline void _setData( size_t idx, const osg::Matrixf& matrix);

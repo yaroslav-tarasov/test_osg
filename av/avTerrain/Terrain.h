@@ -22,8 +22,10 @@ namespace utils
      private:
          osg::Group*                    _sceneRoot;
          utils::LoadNodeThread*         _lnt;
+
          // Dynamic lights handler
          avScene::LightNodeHandler      _lightsHandler;
+
          osg::ref_ptr<osg::Group>       _grass;
          
      };

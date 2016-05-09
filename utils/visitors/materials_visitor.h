@@ -55,19 +55,25 @@ public:
             _cr(&geode,geode.getStateSet(),_found_mat_name,_mats);
         for ( unsigned int i=0; i<geode.getNumDrawables(); ++i )
         {
-            ret |= findTexture( &geode, geode.getDrawable(i)->getStateSet() );
+			osg::Drawable* drb = geode.getDrawable(i);
+            ret |= findTexture( &geode, drb->getStateSet() );
 			
             if (ret)
 			{
 				if(!geode.getDrawable(i)->getStateSet()) 
                 {
-					OSG_WARN << "Stateset = 0 at " <<" geode: " << geode.getName() << " drawable: " << geode.getDrawable(i)->getName();
+					OSG_WARN << "Stateset = 0 at " <<" geode: " << geode.getName() << " drawable: " << drb->getName();
                 }
 				else
                 {
-					_cr(&geode, geode.getDrawable(i)->getStateSet(),_found_mat_name,_mats);
+					_cr(&geode, drb->getStateSet(),_found_mat_name,_mats);
                 }
 			}
+
+#if 0
+			drb->setUseDisplayList(false);
+			drb->setUseVertexBufferObjects(true);
+#endif
         }
 
         if(ret && _cm)

@@ -10,44 +10,13 @@
 
 #include "Lights.h"
 
-//#define LIGHTS_TURN_ON
+#define LIGHTS_TURN_ON
 
 //
 // Module namespaces
 //
 
 using namespace avScene;
-
-//
-// Helpful lights classes
-//
-
-//// light processed info struct
-//struct avScene::LightProcessedInfo
-//{
-//    osg::Vec4f lightVSPosAmbRatio;
-//    osg::Vec4f lightVSDirSpecRatio;
-//    osg::Vec4f lightAttenuation;
-//    osg::Vec3f lightDiffuse;
-//};
-
-//// light external info struct
-//struct avScene::LightExternalInfo
-//{
-//    unsigned     uPriority;
-//    cg::point_3f vPosWorld;
-//    cg::vector_3 vDirWorld;
-//    cg::range_2f rDistAtt, rConeAtt;
-//    cg::colorf   cDiffuse;
-//    float        fAmbRatio, fSpecRatio; 
-//
-//    bool operator< ( const LightExternalInfo & second ) const
-//    {
-//        return uPriority < second.uPriority;
-//    }
-//};
-
-
 
 
 //
@@ -148,7 +117,11 @@ void Lights::cull(osg::NodeVisitor * nv)
             // test sphere for visibility
             const cg::point_3f & vWorldPos = m_aFrameActiveLights[i].vPosWorld;
             const cg::range_2f & rDistAtt = m_aFrameActiveLights[i].rDistAtt;
-            if (pCV->isCulled(osg::BoundingSphere(osg::Vec3(vWorldPos.x, vWorldPos.y, vWorldPos.z), double(rDistAtt.hi()))))
+			FIXME(cg::range_2f .empty() );
+			if(rDistAtt.empty())
+                continue;
+
+			if (pCV->isCulled(osg::BoundingSphere(osg::Vec3(vWorldPos.x, vWorldPos.y, vWorldPos.z), double(rDistAtt.hi()))))
                 continue;
         }
 
@@ -211,10 +184,11 @@ LightNodeHandler::LightsPackStateSet::LightsPackStateSet()
     // add uniforms
     pStateSet->addUniform(LightsActiveNum.get());
 
+
     _createTextureBuffer();
+
     pStateSet->setTextureAttributeAndModes(BASE_LIGHTS_TEXTURE_UNIT, bufferTexture_.get(), osg::StateAttribute::ON);
     pStateSet->addUniform(new osg::Uniform("lightsBuffer", BASE_LIGHTS_TEXTURE_UNIT));
-    
 
 
 #if 0
@@ -234,15 +208,20 @@ void LightNodeHandler::LightsPackStateSet::_createTextureBuffer()
 
     unsigned int height = ( nFixedDataSize / nTextureRowDataSize) + 1u;
     
+#if 0
     bufferMatrices_ = new BufferMatricesT;
-    bufferMatrices_->getData().resize( nFixedDataSize / 4);
+    bufferMatrices_->getData().resize( height * nFixedDataSize / 4);
+	size_t f = bufferMatrices_->getTotalDataSize();
+#endif
+
 
     bufferImage_ = new osg::Image; 
-    // bufferImage_->allocateImage(/*16384*/ nFixedDataSize * 4 , height, 1, GL_RGBA, GL_FLOAT);
-    bufferImage_->setImage(/*16384*/ nFixedDataSize * 4 , height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT, (unsigned char*)bufferMatrices_->getDataPointer(), osg::Image::NO_DELETE);
+    bufferImage_->allocateImage(/*16384*/ nFixedDataSize * 4 , height, 1, GL_RGBA, GL_FLOAT);
+    //bufferImage_->setImage(/*16384*/ nFixedDataSize * 4 , height, 1, GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT, (unsigned char*)bufferMatrices_->getDataPointer(), osg::Image::NO_DELETE);
     bufferImage_->setInternalTextureFormat(GL_RGBA32F_ARB);
+	bufferImage_->setFileName("createTextureBuffer");
 
-#if 0
+#if 1
     const osg::Matrixf matrix;
 
     for (unsigned int j = 0; j < /*end*/nMaxLMLights; ++j)
@@ -275,10 +254,9 @@ void LightNodeHandler::LightsPackStateSet::_createTextureBuffer()
 
 void LightNodeHandler::LightsPackStateSet::_setData( size_t idx, const osg::Matrixf& matrix)
 {
-    auto image = bufferTexture_->getImage(0);
-    float * data = (float*)/*bufferImage_*/image->data((idx % nTextureRowDataSize) *4u, idx / nTextureRowDataSize);
+    float * data = (float*)bufferImage_->data((idx % nTextureRowDataSize) *4u, idx / nTextureRowDataSize);
     memcpy(data, matrix.ptr(), 16 * sizeof(float));
-    image->dirty();
+    bufferImage_->dirty();
 }
 
 void LightNodeHandler::LightsPackStateSet::_setData( size_t idx,
@@ -287,16 +265,34 @@ void LightNodeHandler::LightsPackStateSet::_setData( size_t idx,
                                                     ConstRefElementT a20, ConstRefElementT a21, ConstRefElementT a22, ConstRefElementT a23,
                                                     ConstRefElementT a30, ConstRefElementT a31, ConstRefElementT a32, ConstRefElementT a33 )
 {
-     auto image = bufferTexture_->getImage(0);
+	 float * data = (float*)bufferImage_->data((idx % nTextureRowDataSize) *4u, idx / nTextureRowDataSize);
+	 *data++ = a00;
+	 *data++ = a01;
+	 *data++ = a02;
+	 *data++ = a03;
+	 *data++ = a10;
+	 *data++ = a11;
+	 *data++ = a12;
+	 *data++ = a13;
+	 *data++ = a20;
+	 *data++ = a21;
+	 *data++ = a22;
+	 *data++ = a23;
+	 *data++ = a30;
+	 *data++ = a31;
+	 *data++ = a32;
+	 *data++ = a33;
+#if 0
      auto & el  = bufferMatrices_->getData()[idx];
-     el.set(a00, a01, a02, a03,
-            a10, a11, a12, a13,
-            a20, a21, a22, a23,
-            a30, a31, a32, a33
-         );
+	 el.set(a00, a01, a02, a03,
+		 a10, a11, a12, a13,
+		 a20, a21, a22, a23,
+		 a30, a31, a32, a33
+		 );
+#endif
      
 
-     image->dirty();
+     bufferImage_->dirty();
 }
 
 
@@ -323,8 +319,8 @@ void LightNodeHandler::onCullBegin( osgUtil::CullVisitor * pCV, const osg::Bound
 
     if(!m_pFatherRef)
         m_pFatherRef = GetScene()->getLights();
-
-    // current stateset to work with
+    
+	// current stateset to work with
     const bool bReflPass = (pCV->getCullMask() == REFLECTION_MASK/*0x00010000UL*/);
     LightsPackStateSet & curStatePack = (bReflPass) ? m_lightsRefl : m_lightsMain;
     const std::vector<LightExternalInfo> & aCullVisibleLights = (bReflPass) ? m_pFatherRef->m_aReflVisibleLights : m_pFatherRef->m_aMainVisibleLights;

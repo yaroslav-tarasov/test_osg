@@ -182,6 +182,7 @@ namespace aircraft
 
 #include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
+#include "visitors/visitors.h"
 #include "av/avScene.h"
 
 

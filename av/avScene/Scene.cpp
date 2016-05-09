@@ -93,7 +93,7 @@
 
 #define POINT_LIGHT_MANAGER
 #define DECAL_RENDERER     
-//#define TRAJECTORY_DRAWER
+#define TRAJECTORY_DRAWER
 
 
 namespace gui 
@@ -2077,9 +2077,9 @@ inline void fill_parking (avCore::IDecalRendererPtr decal_map, const std::vector
 {
     std::vector<cg::point_2f> pnts_array;
     pnts_array.resize(ptemplate.size()); 
-    cg::transform_3f tr(cg::as_translation(pos),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+    cg::transform_3f tr(cg::as_translation(pos),cg::rotation_2f(/*180*/),cg::scale_2f(/*3.0*/));
     std::transform(ptemplate.begin(), ptemplate.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f)  * 1.f / (coeff_size) * cg::rotation_2f(-course) * tr;});
-    decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.80f, 0.0f), 0.3f );
+    decal_map->AddPolyline(pnts_array, cg::colorf(0.0f, 0.0f, 0.8f), 0.3f );
 };
 
 void Scene::setupDecals(const std::string& scene) 
@@ -2137,7 +2137,7 @@ void Scene::setupDecals(const std::string& scene)
     {
 		std::vector<cg::point_2f> pnts_array;
 		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
-		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(/*180*/),cg::scale_2f(/*3.0*/));
 		//tr = cg::as_translation(cg::point_2f(201,392));
 		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f) * cg::rotation_2f(-173) * tr;});
 		_decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.0f, 0.0f), 0.3f );
@@ -2146,7 +2146,7 @@ void Scene::setupDecals(const std::string& scene)
 	{
 		std::vector<cg::point_2f> pnts_array;
 		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
-		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(/*180*/),cg::scale_2f(/*3.0*/));
 		//tr = cg::as_translation(cg::point_2f(201,392));
 		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f) * 1.f / (1.7436 * 1.2823) * cg::rotation_2f(-173) * tr;});
 		_decal_map->AddPolyline(pnts_array, cg::colorf(0.00f, 0.80f, 0.0f), 0.3f );
@@ -2155,7 +2155,7 @@ void Scene::setupDecals(const std::string& scene)
 	{
 		std::vector<cg::point_2f> pnts_array;
 		pnts_array.resize(pnts_red.size()); // point_3(201,392,0),cg::cpr(173)
-		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(180),cg::scale_2f(/*3.0*/));
+		cg::transform_3f tr(cg::as_translation(cg::point_2f(201,392)),cg::rotation_2f(/*180*/),cg::scale_2f(/*3.0*/));
 		//tr = cg::as_translation(cg::point_2f(201,392));
 		std::transform(pnts_red.begin(), pnts_red.end(), pnts_array.begin(), [=]( const cg::point_2f & val)->cg::point_2f { return cg::point_2f(val.x * 10.f, val.y * 11.f)  * 1.f / (1.2823) * cg::rotation_2f(-173) * tr;});
 		_decal_map->AddPolyline(pnts_array, cg::colorf(0.80f, 0.80f, 0.0f), 0.3f );
@@ -2197,6 +2197,42 @@ void Scene::setupDecals(const std::string& scene)
 	/// 1,7436 mid to low
     /// 1,2823 big to mid
 
+	const std::string geoms_names [] = {
+		"KraiWhite",
+		"MarkingVPP",
+		"Marking02",
+		"NiytkaRazmetka2",
+		"NiytkaRazmetka",
+		"NitkaState",
+		"marking01",
+		"Tr01White",
+		"Tr02White01",
+		"Tr03Bel01",
+		"State01Red1",
+		"State03Red",
+		"State02Red",
+		"StopRazmetka",
+
+	};
+
+	const size_t gnsize = sizeof(geoms_names) / sizeof(geoms_names[0]);
+	for( int i =0; i < gnsize; ++i )
+	{
+		auto marking = findFirstNode(this, geoms_names[i]  ,findNodeVisitor::not_exact);
+		if(marking)
+		{
+			Utils::FindGeometry findVis; 
+			marking->accept(findVis);
+
+			osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*findVis._geom->asGeometry(), osg::CopyOp::DEEP_COPY_ALL
+				& ~osg::CopyOp::DEEP_COPY_CALLBACKS
+				);
+
+			_decal_map->AddGeometry(geometry);
+
+			marking->setNodeMask(0);
+		}
+	}
 
 
 }

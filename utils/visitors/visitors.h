@@ -24,5 +24,27 @@ private:
 
 };
 
+struct FindGeometry : public osg::NodeVisitor
+{
+	osg::Drawable*  _geom;
+
+	FindGeometry() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+
+	FindGeometry( osg::Node& node ) : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)
+	{
+		node.accept(*this);
+	}
+
+	void apply(osg::Geode& geode)
+	{
+		for (unsigned int i = 0; i < geode.getNumDrawables(); i++)
+			apply(*geode.getDrawable(i));
+	}
+
+	void apply(osg::Drawable& geom)
+	{
+		_geom = &geom;
+	}
+};
 
 }
