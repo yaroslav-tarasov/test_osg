@@ -78,6 +78,13 @@ namespace aircraft_physless
         desired_position_ = pos;
         desired_orien_ = orien;
     }
+    
+    void  phys_aircraft_impl::go_to_pos(geo_position const& pos)  
+    {
+        desired_position_ = pos.pos;
+        desired_orien_ = pos.orien;
+        desired_geo_position_ = pos;
+    }
 
     geo_position phys_aircraft_impl::get_position() const
     {
@@ -324,7 +331,7 @@ namespace aircraft_physless
         phys_aircraft_->set_rudder(rudder);
         // phys_aircraft_->set_wind(wind);
 
-		phys_aircraft_->set_position(decart_position(base_(desired_position_),desired_orien_));
+		phys_aircraft_->set_position(decart_position(base_(desired_position_),desired_geo_position_.dpos,desired_orien_,point_3f()));
     }
 
 }

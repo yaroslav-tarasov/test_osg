@@ -101,7 +101,7 @@ namespace aircraft_physless
 				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 
 
-#if 0
+#if 1
             landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,false);
 #endif
             if (landing_dust_object_)

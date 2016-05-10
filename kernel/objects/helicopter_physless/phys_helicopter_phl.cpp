@@ -78,6 +78,12 @@ namespace helicopter_physless
         desired_position_ = pos;
         desired_orien_ = orien;
     }
+    
+    void  phys_aircraft_impl::go_to_pos(geo_position const& pos)  
+    {
+        desired_position_ = pos.pos;
+        desired_orien_ = pos.orien;
+    }
 
     geo_position phys_aircraft_impl::get_position() const
     {

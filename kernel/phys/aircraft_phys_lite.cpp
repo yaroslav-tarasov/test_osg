@@ -268,7 +268,7 @@ FIXME("Off point for bullet")
         {
             raycast_veh_->resetSuspension();
             raycast_veh_->updateWheelTransform(i,false);
-//            raycast_veh_->applyEngineForce(0,i);
+//          raycast_veh_->applyEngineForce(0,i);
         }
         
     }
@@ -276,6 +276,7 @@ FIXME("Off point for bullet")
 	void impl::set_position(const decart_position& pos)
 	{
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+        chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 	}
 
     decart_position impl::get_position() const

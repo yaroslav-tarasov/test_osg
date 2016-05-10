@@ -45,6 +45,7 @@ namespace helicopter_physless
         void                 update                () override;
         void                 attach_tow            (bool attached) override;
         void                 go_to_pos             (cg::geo_point_3 const& pos, quaternion const& orien) override;
+        void                 go_to_pos             (geo_position const& pos) override;
         geo_position         get_position          () const override;
         decart_position      get_local_position    () const override;
         void                 set_air_cfg           (fms::air_config_t cfg);

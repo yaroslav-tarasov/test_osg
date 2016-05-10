@@ -539,6 +539,7 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	//osg::Geode* sgeode = new osg::Geode;
 	//sgeode->addDrawable( sd );
 
+#if 0
     osg::Node*  para_node = /*sgeode;*/osgDB::readNodeFile( "cube2.dae" );
 	btSoftBody* para = btSoftBodyFromOSG( para_node );
 	// Configure the soft body for interaction with the wind.
@@ -601,10 +602,12 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	pat->setAttitude(osg::Quat(osg::inDegrees(-90.0),osg::X_AXIS));
 	pat->addChild(para_node);
 
-	group->addChild(geode);
     group->addChild(pat);
-    
-	return( group.release() );
+#endif
+
+	group->addChild(geode);
+	
+    return( group.release() );
 }
 
 btSoftRigidDynamicsWorld* initPhysics()
@@ -663,12 +666,33 @@ int main_patched_lowlevel( int argc, char** argv )
 
     // Add ground
     const osg::Vec4 plane( 0., 0., 1., -100. );
-    root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
+    root->addChild( osgbDynamics::generateGroundPlane( plane, bw	) );
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+    //create  object
+    btTransform tr;
+    tr.setIdentity();
+    tr.setOrigin(btVector3(0,0,-100));
+     
+    btCollisionShape* cylinderShape = new btCylinderShape (btVector3(50,50,100));
+
+    btCollisionObject* newOb = new btCollisionObject();
+    newOb->setWorldTransform(tr);
+    newOb->setInterpolationWorldTransform( tr);
+
+    newOb->setCollisionShape(cylinderShape);
+
+    bw->addCollisionObject(newOb);
+
+    worldInfo.m_sparsesdf.Reset();
+///////////////////////////////////////////////////////////////////////
 
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( /*debugDisplay*/ false)
+    if( /*debugDisplay*/ true)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );
