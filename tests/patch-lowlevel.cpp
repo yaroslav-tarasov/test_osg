@@ -539,8 +539,8 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	//osg::Geode* sgeode = new osg::Geode;
 	//sgeode->addDrawable( sd );
 
-#if 0
-    osg::Node*  para_node = /*sgeode;*/osgDB::readNodeFile( "cube2.dae" );
+#if 1
+    osg::Node*  para_node = /*sgeode;*/osgDB::readNodeFile( "cube2.dae" );//"shut.dae"
 	btSoftBody* para = btSoftBodyFromOSG( para_node );
 	// Configure the soft body for interaction with the wind.
 	btSoftBody::Material*	pm=para->appendMaterial();
@@ -575,7 +575,7 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	trs.setRotation(rot);
 	para->transform(trs);
 	para->setTotalMass(0.01);
-	// para->addForce(btVector3(0,2,0),0);
+	//para->addForce(btVector3(0,2,0),0);
 
 #if 0
 #if( BT_BULLET_VERSION >= 279 )
@@ -666,7 +666,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
     // Add ground
     const osg::Vec4 plane( 0., 0., 1., -100. );
-    root->addChild( osgbDynamics::generateGroundPlane( plane, bw	) );
+    root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
 
 
 
@@ -692,7 +692,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( /*debugDisplay*/ true)
+    if( /*debugDisplay*/ false)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );

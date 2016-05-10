@@ -148,7 +148,6 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
     //}
 
     // FIXME  Заглушка для анимации
-    FIXME(Анимация на коленке)
     FIXME(Место для удара головой)
     
     visual* vis_manager = dynamic_cast<visual*>(manager_);
