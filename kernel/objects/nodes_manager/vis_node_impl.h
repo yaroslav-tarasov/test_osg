@@ -42,6 +42,10 @@ namespace nodes_management
 
     private:
         void init_disp();
+	
+	protected:
+		node_impl* as_visual_node() override {return this;};
+		node_impl* as_model_node()  override {return nullptr;};
 
     private:
         FIXME(Надо кэшировать при загрузке)

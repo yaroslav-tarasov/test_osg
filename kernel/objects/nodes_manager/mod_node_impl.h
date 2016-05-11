@@ -25,6 +25,10 @@ private:
 private:
     uint32_t cur_freeze() const;
 
+protected:
+	node_impl* as_visual_node() override {return nullptr;};
+	node_impl* as_model_node()  override {return this;};
+
 private:
     struct node_pos_stamp
     {

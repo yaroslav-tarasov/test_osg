@@ -69,6 +69,7 @@ void node_impl::pre_update(double time)
         LOG_ODS_MSG( "node_impl::pre_update(double time) node name : " << name() << "  dt=" << dt 
             << " time "   << time
             << " time_ "   << *time_
+			<< " node_type: " << (this->as_visual_node()?std::string("visual"):(this->as_model_node()?std::string("model"):std::string("control")))
             << "\n" );
          return;
     }

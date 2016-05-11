@@ -35,9 +35,6 @@ public:
 
     virtual ~node_impl()
     {
-//#ifndef DEPRECATED
-//        childs_callbacks_.clear();
-//#endif
     }
 
 public:
@@ -90,13 +87,9 @@ protected:
 private:
     void init_disp();
 
-#if 0
-#ifndef DEPRECATED
-public:
-//  node_impl
-    osg::Node*                  as_osg_node() {return node_.get();}
-#endif
-#endif
+protected:
+	virtual node_impl* as_visual_node() {return nullptr;};
+	virtual node_impl* as_model_node()  {return nullptr;};
 
 protected:
     view *      manager_;
