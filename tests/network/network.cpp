@@ -338,7 +338,7 @@ struct client
         ADD_EVENT(70.0,  fire_fight_msg_t(2))
 #endif
 
-#if 1
+#if 0
         ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
@@ -612,7 +612,7 @@ struct client
         ADD_EVENT(0.0  , create(1501, point_3f(48.89f,411.65f,28.50f), quaternion(cprf(cg::rad2grad() *-2.14f)) , ok_camera, "camera 1", "") )
 #endif
 
-#if 1
+#if 0
         ADD_EVENT(8.0   , traj_assign_msg( 1501, *traj_cam_) )  
         ADD_EVENT(129.0 , traj_assign_msg( 1501, *traj_cam_reverse_) ) 
         ADD_EVENT(239.0 , traj_assign_msg( 1501, *camera_moving::fill_orient_trajectory () )) 

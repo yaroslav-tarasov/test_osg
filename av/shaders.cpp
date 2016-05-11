@@ -571,11 +571,11 @@ $if 0
 \n            float shadow = 1 - v * 0.5;;
 $endif
 \n
-            // GET_SHADOW(f_in.viewpos, f_in);
-            //#define GET_SHADOW(viewpos, in_frag)   
-          //  float shadow = 1.0; 
-            //if(ambient.a > 0.35)
-          //     shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
+              // GET_SHADOW(f_in.viewpos, f_in);
+              // #define GET_SHADOW(viewpos, in_frag)   
+              // float shadow = 1.0; 
+              // if(ambient.a > 0.35)
+              //     shadow = PCF_Ext(shadowTexture0, f_in.shadow_view,ambient.a);
 \n
 \n            float shadow =  shadow_fs_main(ambient.a);
 \n
@@ -624,7 +624,7 @@ $endif
 \n            ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
 \n            vec3 lightmap_color = light_res ; 
 \n
-\n            // GET_LIGHTMAP(f_in.viewpos, f_in);
+\n            //GET_LIGHTMAP(f_in.viewpos, f_in);
 \n
 \n            float up_dot_clamped = saturate(fma(normal_world_space_z, 0.55, 0.45));
 \n            non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);

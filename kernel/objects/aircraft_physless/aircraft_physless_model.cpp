@@ -148,8 +148,10 @@ void model::sync_nm_root(double dt)
     root_node_pos.global().dpos = geo_base_3(root_node_pos.global().pos)(desired_pos) / (sys_->calc_step());
     root_node_pos.global().omega = cg::get_rotate_quaternion(root_node_pos.global().orien, desired_orien).rot_axis().omega() / (nm_ang_smooth_ * sys_->calc_step());
 
+#if 0
     if(desired_nm_speed_)
         root_node_pos.global().dpos =  *desired_nm_speed_ * cg::normalized_safe(root_node_pos.global().dpos);
+#endif
 	    
 	root_node_pos.global().ddpos = (root_node_pos.global().dpos - prev_dpos_) / (sys_->calc_step());
 

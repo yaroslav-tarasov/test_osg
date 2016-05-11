@@ -64,7 +64,15 @@ void node_impl::pre_update(double time)
 
     double dt = time - *time_;
     if (dt <= 0)
-        return;
+    {
+        force_log fl;
+        LOG_ODS_MSG( "node_impl::pre_update(double time) node name : " << name() << "  dt=" << dt 
+            << " time "   << time
+            << " time_ "   << *time_
+            << "\n" );
+         return;
+    }
+
 
     if (!position_.is_static())
     {
@@ -78,12 +86,18 @@ void node_impl::pre_update(double time)
         {
             extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos_t(dt));
             extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
-            //force_log fl;
-            LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << "  extrapolated_position_.global().pos :   x:  "  <<  extrapolated_position_.global().pos.lat << "    y: " << extrapolated_position_.global().pos.lon << "  dt=" << dt 
-                << " dpos.x " << position_.global().dpos.x
-                << " dpos.y " << position_.global().dpos.y
-                << " dpos.z " << position_.global().dpos.z
-                << "\n" );
+            {
+	            force_log fl;
+	            LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << " time "   << time  << "  extrapolated_position_.global().pos : lat: "  <<  extrapolated_position_.global().pos.lat << "  lon: " << extrapolated_position_.global().pos.lon << "  z: " << extrapolated_position_.global().pos.height << "  dt=" << dt 
+	                << " dpos.x "   << position_.global().dpos.x
+	                << " dpos.y "   << position_.global().dpos.y
+	                << " dpos.z "   << position_.global().dpos.z
+	                << " cg::norm " << cg::norm ( position_.global().dpos )
+	                << " ddpos.x "  << position_.global().ddpos.x
+	                << " ddpos.y "  << position_.global().ddpos.y
+	                << " ddpos.z "  << position_.global().ddpos.z
+	                << "\n" );
+            }
             extrapolated_position_reseted();
         }
     }
@@ -224,8 +238,22 @@ void node_impl::on_position(msg::node_pos_descr const& m)
         }
     }
     else
+    {
         rel_node_.reset();
 
+        {
+            force_log fl;
+            LOG_ODS_MSG( "node_impl::on_position node name :" << name() << " time_ "   << time_  << "  extrapolated_position_.global().pos : lat: "  <<  extrapolated_position_.global().pos.lat << "  lon: " << extrapolated_position_.global().pos.lon << "  z: " << extrapolated_position_.global().pos.height 
+                << " dpos.x "   << position_.global().dpos.x
+                << " dpos.y "   << position_.global().dpos.y
+                << " dpos.z "   << position_.global().dpos.z
+                << " cg::norm " << cg::norm ( position_.global().dpos )
+                << " ddpos.x "  << position_.global().ddpos.x
+                << " ddpos.y "  << position_.global().ddpos.y
+                << " ddpos.z "  << position_.global().ddpos.z
+                << "\n" );
+        }
+    }
     extrapolated_position_reseted();
 }
 

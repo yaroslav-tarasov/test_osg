@@ -541,7 +541,7 @@ struct visapp
           update_messages();
 		  update_properties(va);
           va.on_render(gt_.get_time());
-          force_log fl;       
+          //force_log fl;       
           LOG_ODS_MSG( " void run() time  = " << gt_.get_time() << "\n");
         }
     }

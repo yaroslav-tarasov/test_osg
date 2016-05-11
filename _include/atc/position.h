@@ -30,6 +30,11 @@ struct decart_position
     
     inline point_3 dpos_t( double dt )
     {
+        return dpos * dt ;
+    }
+
+    inline point_3 ddpos_t( double dt )
+    {
         return (dpos + ddpos * dt * .5) * dt ;
     }
 
@@ -45,7 +50,7 @@ inline decart_position operator *(transform_4 const& tr, decart_position const& 
     decart_position res = pos;
     res.pos   = tr * pos.pos;
     res.dpos  = tr * pos.dpos;
-    res.ddpos  = tr * pos.ddpos;
+    res.ddpos = tr * pos.ddpos;
     res.orien = quaternion(tr.rotation().cpr()) * pos.orien;
     res.omega = tr * pos.omega; // TODO
 

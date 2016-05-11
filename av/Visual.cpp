@@ -141,7 +141,7 @@ void Visual::Initialize()
     ::Database::initDataPaths();
 	avCore::Database::Create();
 
-	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*//*DEBUG_INFO*/
+	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*//*DEBUG_INFO*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -226,7 +226,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(m_fLeft,m_fRight,m_fBottom,m_fTop,4.0,7000.0);
 #endif
     
-#if 0
+#if 1
     
     float fZoom = 1.0f; 
 
