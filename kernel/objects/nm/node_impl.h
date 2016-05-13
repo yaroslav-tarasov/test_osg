@@ -96,6 +96,10 @@ protected:
     uint32_t    node_id_;
 
     optional<double>                              time_; 
+    
+    optional<double>                              last_pre_update_time_;
+    optional<double>                              last_dt_;
+
 
     model_structure::node_data                    data_;
     node_position                                 position_;

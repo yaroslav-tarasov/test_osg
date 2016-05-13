@@ -269,7 +269,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // disable ESC key
     _viewerPtr->setKeyEventSetsDone(0);
 
-    _viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
+    //_viewerPtr->setRunFrameScheme( osgViewer::ViewerBase::ON_DEMAND );
 }
 
 void Visual::CreateScene()

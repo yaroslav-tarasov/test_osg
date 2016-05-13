@@ -62,6 +62,8 @@ void node_impl::pre_update(double time)
     if (!time_)
         return;
 
+    last_pre_update_time_ = time;
+
     double dt = time - *time_;
     if (dt <= 0)
     {
@@ -74,22 +76,25 @@ void node_impl::pre_update(double time)
          return;
     }
 
+    last_dt_ = dt;
 
     if (!position_.is_static())
     {
         if (position_.is_local())
         {                                                                                                                                       
-            extrapolated_position_.local().pos   = position_.local().pos + position_.local().dpos_t(dt); 
+            extrapolated_position_.local().pos   = position_.local().pos + position_.local().ddpos_t(dt); 
             extrapolated_position_.local().orien = cg::quaternion(cg::rot_axis(position_.local().omega * dt)) * position_.local().orien;
             extrapolated_position_reseted();
         }
         else
         {
-            extrapolated_position_.global().pos   = position_.global().pos(position_.global().dpos_t(dt));
+            extrapolated_position_.global().pos   = position_.global().pos(position_.global().ddpos_t(dt));
             extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(position_.global().omega * dt)) * position_.global().orien;
+
             {
-	            force_log fl;
-	            LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << " time "   << time  << "  extrapolated_position_.global().pos : lat: "  <<  extrapolated_position_.global().pos.lat << "  lon: " << extrapolated_position_.global().pos.lon << "  z: " << extrapolated_position_.global().pos.height << "  dt=" << dt 
+	            point_3 e_pos = cg::geo_base_3(get_base())(extrapolated_position_.global().pos);
+                force_log fl;
+	            LOG_ODS_MSG( "node_impl::pre_update(double time) node name :" << name() << " time "   << time  << "  extrapolated_position_.global().pos : lat: "  <<  e_pos.x << "  lon: " << e_pos.y << "  z: " << e_pos.z << "  dt=" << dt 
 	                << " dpos.x "   << position_.global().dpos.x
 	                << " dpos.y "   << position_.global().dpos.y
 	                << " dpos.z "   << position_.global().dpos.z
@@ -226,9 +231,34 @@ void node_impl::on_msg(binary::bytes_cref data)
 
 void node_impl::on_position(msg::node_pos_descr const& m)
 {
-    time_                   = m.time;
-    position_               = m.pos.get_pos(position_, m.components);
-    extrapolated_position_  = position_;
+    const node_position& np = m.pos.get_pos();
+    if(as_visual_node() && last_pre_update_time_ && *m.time <= *last_pre_update_time_ && cg::norm(np.is_local()?np.local().dpos:np.global().dpos) !=0)
+    {
+        const double dt = last_dt_?*last_dt_ * 0.05:0.0025;
+        time_                   = last_pre_update_time_;  *time_ += dt; 
+        /*position_               = m.pos.get_pos(extrapolated_position_, ct_dpos | ct_ddpos | ct_omega | ct_loc_glob);
+        extrapolated_position_  = position_;*/
+        position_               = extrapolated_position_;
+
+        if (extrapolated_position_.is_local())
+        {                                                                                                                                       
+            position_.local().dpos = np.local().dpos;
+            extrapolated_position_.local().pos   = extrapolated_position_.local().pos + extrapolated_position_.local().ddpos_t(dt); 
+            extrapolated_position_.local().orien = cg::quaternion(cg::rot_axis(extrapolated_position_.local().omega * dt)) * extrapolated_position_.local().orien;
+        }
+        else
+        {
+            position_.global().dpos = np.global().dpos;
+            extrapolated_position_.global().pos   = extrapolated_position_.global().pos(extrapolated_position_.global().ddpos_t(dt));
+            extrapolated_position_.global().orien = cg::quaternion(cg::rot_axis(extrapolated_position_.global().omega * dt)) * extrapolated_position_.global().orien;
+        }
+    }
+    else
+    {
+        time_                   = m.time;
+        position_               = m.pos.get_pos(position_, m.components);
+        extrapolated_position_  = position_;
+    }
 
     if (position_.is_local())
     {
@@ -243,15 +273,20 @@ void node_impl::on_position(msg::node_pos_descr const& m)
         rel_node_.reset();
 
         {
+            point_3 e_pos = cg::geo_base_3(get_base())(extrapolated_position_.global().pos);
+           
             force_log fl;
-            LOG_ODS_MSG( "node_impl::on_position node name :" << name() << " time_ "   << time_  << "  extrapolated_position_.global().pos : lat: "  <<  extrapolated_position_.global().pos.lat << "  lon: " << extrapolated_position_.global().pos.lon << "  z: " << extrapolated_position_.global().pos.height 
+            LOG_ODS_MSG( "node_impl::on_position node name :" << name() << " time_ "   << time_  << "  extrapolated_position_.global().pos : lat: "  <<  e_pos.x << "  lon: " << e_pos.y << "  z: " << e_pos.z 
                 << " dpos.x "   << position_.global().dpos.x
                 << " dpos.y "   << position_.global().dpos.y
-                << " dpos.z "   << position_.global().dpos.z
+                << " dpos.z "   << position_.global().dpos.z       
                 << " cg::norm " << cg::norm ( position_.global().dpos )
-                << " ddpos.x "  << position_.global().ddpos.x
-                << " ddpos.y "  << position_.global().ddpos.y
-                << " ddpos.z "  << position_.global().ddpos.z
+                << " msg.dpos.x "   << np.global().dpos.x
+                << " msg.dpos.y "   << np.global().dpos.y
+                << " msg.dpos.z "   << np.global().dpos.z 
+                //<< " ddpos.x "  << position_.global().ddpos.x
+                //<< " ddpos.y "  << position_.global().ddpos.y
+                //<< " ddpos.z "  << position_.global().ddpos.z
                 << "\n" );
         }
     }

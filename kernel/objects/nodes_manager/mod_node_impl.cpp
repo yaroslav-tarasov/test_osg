@@ -8,11 +8,11 @@ namespace
 {
 using namespace nodes_management;
 
-uint16_t eq_components(node_pos const& curr, node_pos& next, bool revert_new_changes = false)
+component_t eq_components(node_pos const& curr, node_pos& next, bool revert_new_changes = false)
 {
     const double max_eps = 1e-2;
 
-    uint16_t components = 0;
+    component_t components = 0;
 
     if (curr.loc.is_initialized() != next.loc.is_initialized())
         return ct_none;

@@ -140,7 +140,7 @@ namespace aircraft_physless
         
         optional<double>                       desired_nm_speed_;
         double                                 prev_speed_;
-		cg::point_3							   prev_dpos_;
+		optional<cg::point_3>   			   prev_dpos_;
 
         double                                 nm_ang_smooth_;
         

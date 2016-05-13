@@ -95,6 +95,17 @@
 #define DECAL_RENDERER     
 #define TRAJECTORY_DRAWER
 
+#define TEST_WEATHER
+
+
+#define TEST_ANIMATION
+
+#ifdef TEST_ANIMATION
+    namespace tests {
+    osg::Group* createAnimatedObject();
+    }
+#endif
+
 
 namespace gui 
 { 
@@ -955,7 +966,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #endif
 
 
-
     LightManager::Create();
 
     //
@@ -1071,7 +1081,7 @@ FIXME(Чудеса с Ephemeris)
 #endif
 
 
-#if 1
+#ifdef TEST_WEATHER
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
 	const avWeather::Weather::WeatherBankIdentifier nID = 666;
@@ -1114,6 +1124,7 @@ FIXME(Чудеса с Ephemeris)
 
     _groupMainReflection->addChild(_terrainRoot);
     _groupMainReflection->setName("groupMainReflection");
+
 
 	//
 	// Setup Environment Callback
@@ -1177,6 +1188,10 @@ FIXME(Чудеса с Ephemeris)
    
 #ifdef TRAJECTORY_DRAWER
    _p->_trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
+#endif
+
+#ifdef TEST_ANIMATION
+   addChild(tests::createAnimatedObject());
 #endif
 
     return true;
@@ -2013,7 +2028,7 @@ void Scene::update( osg::NodeVisitor * nv )
       vTime.Minute = unsigned(et / 60.0)  % 60;
       vTime.Second = unsigned(et) % 60;
 
-      if(bsetup)
+      if(bsetup && _ephemerisPtr)
         _ephemerisPtr->setTime();
 
 

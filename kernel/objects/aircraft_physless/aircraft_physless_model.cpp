@@ -151,9 +151,11 @@ void model::sync_nm_root(double dt)
 #if 0
     if(desired_nm_speed_)
         root_node_pos.global().dpos =  *desired_nm_speed_ * cg::normalized_safe(root_node_pos.global().dpos);
+ 
+
+    if(prev_dpos_)
+	    root_node_pos.global().ddpos = (root_node_pos.global().dpos - *prev_dpos_) / (sys_->calc_step());
 #endif
-	    
-	root_node_pos.global().ddpos = (root_node_pos.global().dpos - prev_dpos_) / (sys_->calc_step());
 
     double cur_speed = cg::norm(root_node_pos.global().dpos);
     //force_log fl;

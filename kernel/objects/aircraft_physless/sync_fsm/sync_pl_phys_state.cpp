@@ -259,6 +259,7 @@ namespace sync_fsm
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = traj_->curs_value(tar_len);
+            // Очень необходимо для движения физ модели.
             target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
             geo_position gtp(target_pos, get_base());
        
@@ -267,7 +268,7 @@ namespace sync_fsm
             self_.set_desired_nm_orien(gtp.orien);
             
 
-            phys_aircraft_->go_to_pos(/*gtp.pos, gtp.orien*/gtp);
+            phys_aircraft_->go_to_pos(gtp);
 			phys_aircraft_->update();
         }
 #endif

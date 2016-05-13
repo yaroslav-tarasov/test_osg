@@ -102,6 +102,11 @@ struct geo_position
     {
         return (dpos + ddpos * dt * .5 ) * dt ;
     }
+    
+    inline point_3 ddpos_t( double dt )
+    {
+        return (dpos + ddpos * dt * .5) * dt ;
+    }
 
     geo_base_3 pos;
     point_3    dpos;

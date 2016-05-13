@@ -1282,5 +1282,8 @@
     <ClCompile Include="av\avLights\CulturalLights\PointLightsManager.cpp">
       <Filter>Source Files\av\lights\cult_lights</Filter>
     </ClCompile>
+    <ClCompile Include="tests\animation_test5.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

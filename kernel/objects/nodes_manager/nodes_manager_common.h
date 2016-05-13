@@ -20,26 +20,33 @@ enum component_type
     ct_dpos_y   = 1 << 4,
     ct_dpos_z   = 1 << 5,
 
-    ct_orien_x  = 1 << 6,
-    ct_orien_y  = 1 << 7,
-    ct_orien_z  = 1 << 8,
+    ct_ddpos_x   = 1 << 6,
+    ct_ddpos_y   = 1 << 7,
+    ct_ddpos_z   = 1 << 8,
 
-    ct_omega_x  = 1 << 9,
-    ct_omega_y  = 1 << 10,
-    ct_omega_z  = 1 << 11,
+    ct_orien_x  = 1 << 9,
+    ct_orien_y  = 1 << 10,
+    ct_orien_z  = 1 << 11,
 
-    ct_loc_glob = 1 << 12,
+    ct_omega_x  = 1 << 12,
+    ct_omega_y  = 1 << 13,
+    ct_omega_z  = 1 << 14,
+
+    ct_loc_glob = 1 << 15,
 
     ct_pos      = ct_pos_x   | ct_pos_y   | ct_pos_z  ,
     ct_dpos     = ct_dpos_x  | ct_dpos_y  | ct_dpos_z ,
+    ct_ddpos    = ct_ddpos_x | ct_ddpos_y | ct_ddpos_z,
     ct_orien    = ct_orien_x | ct_orien_y | ct_orien_z,
     ct_omega    = ct_omega_x | ct_omega_y | ct_omega_z,
 
     ct_none     = 0,
-    ct_all      = ct_pos | ct_dpos | ct_orien | ct_omega | ct_loc_glob,
+    ct_all      = ct_pos | ct_dpos | ct_ddpos | ct_orien | ct_omega | ct_loc_glob,
 };
 
 #pragma pack(push, 1)
+
+typedef uint32_t component_t; 
 
 struct node_pos
 {
@@ -50,6 +57,7 @@ struct node_pos
             auto const& lp = p.local();
             pos     = lp.pos;
             dpos    = lp.dpos;
+            ddpos   = lp.ddpos;
             orien   = lp.orien.rot_axis().omega();
             omega   = lp.omega;
 
@@ -60,6 +68,7 @@ struct node_pos
             auto const& gp = p.global();
             pos     = point_3(gp.pos.lat, gp.pos.lon, gp.pos.height);
             dpos    = gp.dpos;
+            ddpos   = gp.ddpos;
             orien   = gp.orien.rot_axis().omega();
             omega   = gp.omega;
         }
@@ -71,7 +80,7 @@ struct node_pos
 
     double const*   as_doubles() const  { return reinterpret_cast<double const*>(this); }
     double*         as_doubles()        { return reinterpret_cast<double*      >(this); }
-    static size_t   doubles_count()     { return 12; }
+    static size_t   doubles_count()     { return 15; }
 
     node_position get_pos() const 
     {
@@ -80,6 +89,7 @@ struct node_pos
             local_position lp;
             lp.pos  = pos;
             lp.dpos = dpos;
+            lp.ddpos = ddpos;
             lp.orien= quaternion(rot_axis(orien));
             lp.omega= omega;
 
@@ -94,6 +104,7 @@ struct node_pos
 
             gp.pos  = geo_point_3(pos.x, pos.y, pos.z);
             gp.dpos = dpos;
+            gp.ddpos = ddpos;
             gp.orien= quaternion(rot_axis(orien));
             gp.omega= omega;
 
@@ -101,7 +112,7 @@ struct node_pos
         }
     }
 
-    node_position get_pos(node_position const& base, uint16_t components) const 
+    node_position get_pos(node_position const& base, component_t components) const 
     {
         node_pos res(base);
 
@@ -113,7 +124,7 @@ struct node_pos
 
         for (size_t i = 0, count = node_pos::doubles_count(); i != count; ++i)
         {
-            uint16_t component = 1 << i;
+            component_t component = 1 << i;
             if ((component & components) == component)
                 resd[i] = myd[i];
         }
@@ -123,6 +134,7 @@ struct node_pos
 
     point_3 pos;
     point_3 dpos;
+    point_3 ddpos;
     point_3 orien;
     point_3 omega;
     
@@ -210,7 +222,7 @@ struct node_data
 
 struct node_pos_descr
 {
-    node_pos_descr(optional<double> const& time, uint16_t components, node_pos const& pos)
+    node_pos_descr(optional<double> const& time, component_t components, node_pos const& pos)
         : time          (time   )
         , components    (components)
         , pos           (pos    )
@@ -223,7 +235,7 @@ struct node_pos_descr
     }
 
     optional<double> time;
-    uint16_t         components;
+    component_t      components;
     node_pos         pos;
 };
 
@@ -315,7 +327,7 @@ inline void write(binary::output_stream& os, node_pos_descr const& msg)
     auto doubles = msg.pos.as_doubles();
     for (size_t i = 0, count = node_pos::doubles_count(); i != count; ++i)
     {
-        uint16_t component = 1 << i;
+        component_t component = 1 << i;
         if ((component & msg.components) == component)
         {
             if (msg.pos.loc || component > ct_pos_y)
@@ -339,7 +351,7 @@ inline void read(binary::input_stream& is, node_pos_descr& msg)
     auto doubles = msg.pos.as_doubles();
     for (size_t i = 0, count = node_pos::doubles_count(); i != count; ++i)
     {
-        uint16_t component = 1 << i;
+        component_t component = 1 << i;
         if ((component & msg.components) == component)
         {
             if (msg.pos.loc || component > ct_pos_y)

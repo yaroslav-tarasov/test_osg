@@ -865,8 +865,8 @@ osg::Node* loadVehicle(std::string name)
 
     // «асада при копированиии надо думать avLod::LOD
     lod_->addChild(lod);
-    lod->addChild(lod0,0,1200);
-    lod->addChild(lod3,1200,50000);
+    lod->addChild(lod0,0,/*1200*/10000);
+    lod->addChild(lod3,/*1200*/10000,50000);
 
     return model_file;
 }
