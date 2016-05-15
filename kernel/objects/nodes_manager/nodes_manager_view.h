@@ -39,6 +39,7 @@ public:
     object_collection const*    collection () const;
     kernel::system const*       system     () const;
     optional<double>            update_time() const;
+    optional<double>            last_update_time() const;
     collision_structure const*  get_collision_structure() const;
     /*inline */cg::transform_4  get_relative_transform(/*manager_ptr manager,*/ node_info_ptr node, node_info_ptr rel );
 

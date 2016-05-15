@@ -32,6 +32,11 @@ optional<double> view::update_time() const
     return sys_->update_time();
 }
 
+optional<double> view::last_update_time() const
+{
+	return sys_->last_update_time();
+}
+
 model_structure::collision_structure const* view::get_collision_structure() const
 {
     return collision_structure_ 

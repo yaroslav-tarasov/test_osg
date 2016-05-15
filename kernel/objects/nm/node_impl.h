@@ -99,7 +99,7 @@ protected:
     
     optional<double>                              last_pre_update_time_;
     optional<double>                              last_dt_;
-
+	optional<double>                              correction_update_time_;
 
     model_structure::node_data                    data_;
     node_position                                 position_;

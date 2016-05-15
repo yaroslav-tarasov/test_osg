@@ -354,7 +354,7 @@ private:
 
         if(time > 0.0 )
         {
-			time_ = cg::eq(time,prev_time_,20e-3)? prev_time_: time;
+			time_ = cg::eq(time,prev_time_,5e-3)? prev_time_: time;
             hr_timer = high_res_timer();
             prev_time_ = time_;
             return time_;
