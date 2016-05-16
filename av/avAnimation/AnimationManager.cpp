@@ -41,7 +41,7 @@ void AnimationManager::Release()
 }
 
 // static method of ship creating
-avDynamicObject::VisualDynamicObject * AnimationManager::CreateAnimation( unsigned char ucObjectClassEnum, avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement, const std::string& FolderFileName )
+avDynamicObject::VisualDynamicObject * AnimationManager::CreateAnimation( unsigned char ucObjectClassEnum, uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement, const std::string& FolderFileName )
 {
     return CreateMan ( nID, pInfoXMLRootElement );
 }
@@ -49,7 +49,7 @@ avDynamicObject::VisualDynamicObject * AnimationManager::CreateAnimation( unsign
 void AnimationManager::EventHandler_ManState( avCore::MessageManager::MessageStream& mStream )
 {
     // Get data from the event
-    avCore::uint32 objectID = mStream.get<avCore::uint32>();
+    uint32_t objectID = mStream.get<uint32_t>();
     unsigned count;
     const avCore::uint8* animation = mStream.get_vector<avCore::uint8> ( count );
 
@@ -65,7 +65,7 @@ void AnimationManager::EventHandler_ManState( avCore::MessageManager::MessageStr
 void AnimationManager::EventHandler_ManOutfitState ( avCore::MessageManager::MessageStream& mStream )
 {
     // Get data from the event
-    avCore::uint32 objectID = mStream.get<avCore::uint32>();
+    uint32_t objectID = mStream.get<uint32_t>();
     const char*	SubobjectName = mStream.get<const char*>();
     bool CullingIsOn = mStream.get<bool>();
 
@@ -81,9 +81,9 @@ void AnimationManager::EventHandler_ManOutfitState ( avCore::MessageManager::Mes
 void AnimationManager::EventHandler_ManTools ( avCore::MessageManager::MessageStream& mStream )
 {
     // Get data from the event
-    avCore::uint32 objectID = mStream.get<avCore::uint32>();
+    uint32_t objectID = mStream.get<uint32_t>();
     unsigned count;
-    const avCore::uint * pTools = mStream.get_vector<avCore::uint>(count);
+    const uint32_t * pTools = mStream.get_vector<uint32_t>(count);
 
     // Process event
     avAnimation::Man * pMan = avCore::ObjectManager::GetInstance()->GetObjectByID<avAnimation::Man>(avCore::ObjectBase::OBJECT_DYNAMIC, objectID);

@@ -18,13 +18,13 @@ struct Man
     : public avDynamicObject::VisualDynamicObject
     , public IMan
 {
-    Man ( avCore::uint32 nID )
+    Man ( uint32_t nID )
         : avDynamicObject::VisualDynamicObject ( nID )
     {
     }
 };
 
-Man * CreateMan ( avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement );
+Man * CreateMan ( uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement );
 
 } // end namespace
 

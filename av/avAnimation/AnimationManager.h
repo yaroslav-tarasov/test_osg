@@ -14,7 +14,7 @@ namespace avAnimation
         static void                 Create();
         static void                 Release();
 
-        static avDynamicObject::VisualDynamicObject* CreateAnimation( unsigned char ucObjectClassEnum, avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement, const std::string& FolderFileName );
+        static avDynamicObject::VisualDynamicObject* CreateAnimation( unsigned char ucObjectClassEnum, uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement, const std::string& FolderFileName );
 
     private:
         AnimationManager();

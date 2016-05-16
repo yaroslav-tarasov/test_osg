@@ -162,6 +162,7 @@
     <ClInclude Include="av\avLights\LightMaps.h" />
     <ClInclude Include="av\avLights\Lights.h" />
     <ClInclude Include="av\avLights\NavAid.h" />
+    <ClInclude Include="av\avLine\Line.h" />
     <ClInclude Include="av\avScene\Scene.h" />
     <ClInclude Include="av\avScene\ScreenTexture.h" />
     <ClInclude Include="av\avScene\ScreenTextureManager.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="av\avLights\LightMaps.cpp" />
     <ClCompile Include="av\avLights\Lights.cpp" />
     <ClCompile Include="av\avLights\NavAid.cpp" />
+    <ClCompile Include="av\avLine\Line.cpp" />
     <ClCompile Include="av\avScene\av_scene.cpp" />
     <ClCompile Include="av\avScene\Scene.cpp" />
     <ClCompile Include="av\avScene\ScreenTexture.cpp" />

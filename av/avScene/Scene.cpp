@@ -375,7 +375,7 @@ class ReflectionCullCallback : public osg::NodeCallback
         const osg::Matrixd & mProjection = *pCV->getProjectionMatrix();
 
         // check underwater status
-        osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * svCore::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
+        osg::Vec3d vEyeLTPPos = pCV->getEyeLocal()/* * avCore::GetCoordinateSystem()->GetLCS2LTPMatrix()*/;
         const bool bUnderWater = vEyeLTPPos.z() < fTide;
 
         // reverted model view matrix for planar reflections

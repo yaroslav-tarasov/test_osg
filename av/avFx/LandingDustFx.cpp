@@ -57,7 +57,7 @@ LandingDustFx::LandingDustFx()
 	// enable depth clamping to avoid cutting
 	pCurStateSet->setMode(GL_DEPTH_CLAMP_NV, osg::StateAttribute::ON);
 
-	pCurStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+	pCurStateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
 
 	// setup shader
 	osg::Program * pCurProgram = new osg::Program;

@@ -186,6 +186,9 @@
     <Filter Include="Source Files\av\lights\cult_lights">
       <UniqueIdentifier>{318341c2-b462-42e4-bb7b-1fe1f48b74de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\line">
+      <UniqueIdentifier>{f3b8a504-8d08-4dee-948b-eb4e5b657dd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -523,6 +526,9 @@
     </ClInclude>
     <ClInclude Include="av\avLights\CulturalLights\PointLightsManager.h">
       <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avLine\Line.h">
+      <Filter>Source Files\av\line</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1284,6 +1290,9 @@
     </ClCompile>
     <ClCompile Include="tests\animation_test5.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLine\Line.cpp">
+      <Filter>Source Files\av\line</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

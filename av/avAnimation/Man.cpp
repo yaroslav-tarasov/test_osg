@@ -43,7 +43,7 @@ typedef Man base ;
 
 public:
 
-    ManImpl ( avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement );
+    ManImpl ( uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement );
     ~ManImpl ();
 
     // object each-frame callback (called before OSG traversal, so you can freely modify scene graph)
@@ -112,7 +112,7 @@ private:
 // ManImpl
 //
 
-ManImpl::ManImpl( avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement )
+ManImpl::ManImpl( uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement )
     : base ( nID )
 {
     // Find all tools
@@ -257,7 +257,7 @@ void ManImpl::clearAllTools( )
     m_currentlyPlacedTools.clear();
 }
 
-Man * CreateMan ( avCore::uint32 nID, avCore::XML::XmlNode pInfoXMLRootElement )
+Man * CreateMan ( uint32_t nID, avCore::XML::XmlNode pInfoXMLRootElement )
 {
     return new ManImpl( nID, pInfoXMLRootElement );
 }
