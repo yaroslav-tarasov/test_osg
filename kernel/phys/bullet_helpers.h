@@ -5,6 +5,7 @@
 #include "../cpp_utils/polymorph_ptr.h"
 
 class btRigidBody;
+class btSoftBody;
 class btCollisionShape;
 class btDynamicsWorld;
 class btTypedConstraint;
@@ -25,7 +26,7 @@ namespace phys
     typedef polymorph_ptr<btCompoundShape>           bt_compound_shape_ptr;
     typedef polymorph_ptr<btDefaultVehicleRaycaster> bt_vehicle_raycaster_ptr;
     typedef polymorph_ptr<btRaycastVehicle>          bt_raycast_vehicle_ptr;
-
+    typedef polymorph_ptr<btSoftBody>                bt_soft_body_ptr;
 
     inline btVector3 to_bullet_vector3( cg::point_3 const& v )
     {
@@ -117,14 +118,7 @@ namespace phys
 
 		}
 
-#if 0
-        void add(bt_collision_shape_ptr shape, osg::Matrix const& tr)
-        {
-            shape_->addChildShape(osg_helpers::to_bullet_transform(tr), &*shape);
-            childs_.push_back(shape);
-        }
-#endif
-        
+
         void add(bt_collision_shape_ptr shape, cg::transform_4 const& tr)
         {
             shape_->addChildShape(to_bullet_transform(tr), &*shape);

@@ -630,8 +630,8 @@ struct client
         for (int i=0;i<4;i++)
         {
             ADD_EVENT(20.0 + i  , engine_state_msg(151 + i , ES_LOW_THROTTLE)  )
-                ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
-                ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
+            ADD_EVENT(40.0 + i  , engine_state_msg(151 + i , ES_FULL_THROTTLE) )
+            ADD_EVENT(60.0 + i  , engine_state_msg(151 + i , ES_STOPPED) )
         }
 #endif
 
@@ -666,8 +666,8 @@ struct client
             for (int i=0;i<2;i++)
             {
                 ADD_EVENT(20.0 + i  , engine_state_msg(176 + i , ES_LOW_THROTTLE)  )
-                    ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
-                    ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
+                ADD_EVENT(40.0 + i  , engine_state_msg(176 + i , ES_FULL_THROTTLE) )
+                ADD_EVENT(60.0 + i  , engine_state_msg(176 + i , ES_STOPPED) )
             }
 
             ADD_EVENT(20.0  , engine_state_msg(178, ES_LOW_THROTTLE)  )
@@ -676,7 +676,7 @@ struct client
 
 
 #endif
-#if 0
+#if 1
             ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
             ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )

@@ -1585,21 +1585,23 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
             if(sl)
             {
                 avScene::LightManager::Light data;
+                const osg::Vec3 tr = sl->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+
 				data.transform       = mt;  
 				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
-				data.distanceFalloff = cg::range_2f(75.f, 140.f);
+				data.distanceFalloff = cg::range_2f(75.f, 140.f) * tr.z() * .5;
 				data.color.r = 0.92f;
                 data.color.g = 0.92f;
                 data.color.b = 0.85f;
                 FIXME(  Damned offset  );
-                data.position =  from_osg_vector3(sl->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+                data.position =  from_osg_vector3(tr + offset);
 
                 osg::Quat      rot   = sl->asTransform()->asMatrixTransform()->getMatrix().getRotate();
                 cg::quaternion orien = from_osg_quat(rot);
                 cg::cpr        cr    = orien.cpr(); 
 
                 const float heading = osg::DegreesToRadians(cr.course);
-                const float pitch   = osg::DegreesToRadians(/*cr.pitch*/15.f);
+                const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
 
                 data.direction = set_direction(pitch, heading);
                 data.active = true;
@@ -1754,12 +1756,14 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     data.color.r = 0.92f;
                     data.color.g = 0.92f;
                     data.color.b = 0.85f;
+                    
+                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(4.f, 5.f);
+                    data.distanceFalloff = cg::range_2f(tr.z() - 1.0,tr.z()/*4.f, 5.f*/);
                     FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+                    data.position =  from_osg_vector3( tr + offset);
                     data.active = true;
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f);
@@ -1776,12 +1780,14 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     pnt._color      = green_color * 0.01f;
                     need_to_add     = true;
                     pnt._sector = sector;
+                    
+                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(1.5f, 10.f);
+                    data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f) , tr.z() * 2/*10.f*/);
                     FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+                    data.position =  from_osg_vector3(tr + offset);
 					data.lm_only = true;
                     const float heading = osg::DegreesToRadians(0.f);
                     const float pitch   = osg::DegreesToRadians(0.f);
@@ -1795,12 +1801,14 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
                     pnt._color = red_color * 0.01f ;
                     need_to_add     = true;
                     pnt._sector = sector;
+                    
+                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(1.5f, 10.f);
+                    data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f), tr.z() * 2/*10.f*/);
                     FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset); 
+                    data.position =  from_osg_vector3( tr + offset); 
 					data.lm_only = true;
 
                     const float heading = osg::DegreesToRadians(0.f);

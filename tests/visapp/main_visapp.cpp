@@ -20,6 +20,10 @@
 
 #include "reflection/proc/prop_tree.h"
 
+#ifdef _WIN32
+    #include  <mmsystem.h>  // timerBeginPeriod
+#endif
+
 
 using network::endpoint;
 using network::async_acceptor;
@@ -590,11 +594,38 @@ private:
 
 }
 
+
+
+inline void timer_res()
+{
+
+#ifdef _WIN32
+    TIMECAPS  timecaps;  // требуется для функции timeGetDevCaps
+
+    // получить max & min of системного таймера
+    if ( timeGetDevCaps( &timecaps, sizeof( TIMECAPS ) ) == TIMERR_NOERROR )
+    {
+	    // получить оптимальное разрешение
+	    UINT wTimerRes = std::max( timecaps.wPeriodMin, UINT(1) );
+
+        // установить минимальное разрешение для нашего таймера
+	    if( timeBeginPeriod( wTimerRes ) != TIMERR_NOERROR )
+	    {
+	        // здесь происходит ошибка
+	    }
+    }
+#endif
+
+}
+
+
 int main_visapp( int argc, char** argv )
 {
     
     logger::need_to_log(/*true*/);
     logging::add_console_writer();
+    
+    timer_res();
 
     boost::asio::io_service  service_;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;

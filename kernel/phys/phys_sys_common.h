@@ -9,16 +9,25 @@ namespace phys
     {
         virtual bt_rigid_body_ptr get_body() const = 0;
         virtual void pre_update(double dt) = 0;
-        virtual void has_contact(rigid_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel) = 0;
+        virtual void has_contact(bt_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel) = 0;
+    };
+    
+    struct soft_body_impl : soft_body
+    {
+        virtual bt_soft_body_ptr get_body() const = 0;
+        virtual void pre_update(double dt) = 0;
+        virtual void has_contact(bt_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel) = 0;
     };
 
     struct system_impl
     {
         virtual ~system_impl() {}
-        virtual bt_dynamics_world_ptr    dynamics_world() const = 0;
+        virtual bt_dynamics_world_ptr    dynamics_world() const    = 0;
         virtual bt_vehicle_raycaster_ptr vehicle_raycaster() const = 0;
-        virtual void register_rigid_body( rigid_body_impl * rb ) = 0;
+        virtual void register_rigid_body  ( rigid_body_impl * rb ) = 0;
         virtual void unregister_rigid_body( rigid_body_impl * rb ) = 0;
+        virtual void register_soft_body   ( soft_body_impl * rb  ) = 0;
+        virtual void unregister_soft_body ( soft_body_impl * rb  ) = 0;
     };
 
 

@@ -12,7 +12,7 @@ namespace phys
 	{
 
     impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
-        : rigid_body_user_info_t(rb_aircraft)
+        : bt_body_user_info_t(rb_aircraft)
 		, sys_ (sys)
 		, chassis_    (sys->dynamics_world())
 		, raycast_veh_(sys->dynamics_world())
@@ -224,7 +224,7 @@ FIXME("Off point for bullet")
 		raycast_veh_.activate(chassis_->isActive());
 	}
 
-    void impl::has_contact(rigid_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
+    void impl::has_contact(bt_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
     {
         has_chassis_contact_ = true;
         size_t id = body_contact_points_.insert(local_point).first;

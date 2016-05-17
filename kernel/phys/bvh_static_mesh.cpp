@@ -48,7 +48,7 @@ namespace phys
         body_->setCenterOfMassTransform(btTransform(m, to_bullet_vector3(cg::point_3())));
         body_->setFriction(0.99f);
         body_->setActivationState(DISABLE_SIMULATION);
-        body_->setUserPointer(new rigid_body_user_info_t(rb_terrain));
+        body_->setUserPointer(new bt_body_user_info_t(rb_terrain));
         body_->setCollisionFlags(body_->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 
         sys_->dynamics_world()->addRigidBody(&*body_);

@@ -24,7 +24,7 @@ namespace ray_cast_vehicle
     private:
         bt_rigid_body_ptr get_body() const;
         void pre_update(double dt);
-        void has_contact(rigid_body_user_info_t const* /*other*/, cg::point_3 const& /*local_point*/, cg::point_3 const& /*vel*/) {}
+        void has_contact(bt_body_user_info_t const* /*other*/, cg::point_3 const& /*local_point*/, cg::point_3 const& /*vel*/) {}
 
         // btActionInterface
     private:

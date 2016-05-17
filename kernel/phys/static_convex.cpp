@@ -41,7 +41,7 @@ namespace phys
         body_.get()->setCenterOfMassTransform(to_bullet_transform(pos, orien));
         body_.get()->setFriction(0.99f);
         body_.get()->setActivationState(DISABLE_SIMULATION);
-        body_.get()->setUserPointer(new rigid_body_user_info_t(rb_static_convex));
+        body_.get()->setUserPointer(new bt_body_user_info_t(rb_static_convex));
         body_.get()->setCollisionFlags(body_.get()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
     }
 

@@ -5,7 +5,7 @@
 
 namespace phys
 {
-    enum rigid_body_kind_t
+    enum bt_body_kind_t
     {
         rb_simple,
         rb_fracture,
@@ -17,19 +17,20 @@ namespace phys
         rb_character, 
         rb_aircraft,
         rb_static_convex,
-        rb_flock_child
+        rb_flock_child,
+        bt_soft_body
     };
 
-    struct rigid_body_user_info_t // Must be first in derives, because static cast used in user_info
+    struct bt_body_user_info_t // Must be first in derives, because static cast used in user_info
     {
-        rigid_body_user_info_t(rigid_body_kind_t kind, bool has_collision = true)
+        bt_body_user_info_t(bt_body_kind_t kind, bool has_collision = true)
             : kind_(kind)
             , has_collision_(has_collision)
         {}
 
-        virtual ~rigid_body_user_info_t() {}
+        virtual ~bt_body_user_info_t() {}
 
-        rigid_body_kind_t rigid_body_kind() const
+        bt_body_kind_t rigid_body_kind() const
         {
             return kind_;
         }
@@ -41,12 +42,12 @@ namespace phys
 
         bool has_collision() const { return has_collision_; }
 
-        virtual float get_friction( const btCollisionObject* /*other*/ ) const { return 0.f; }
+        virtual float get_friction      ( const btCollisionObject* /*other*/ ) const { return 0.f; }
         virtual bool  has_collision_with( const btCollisionObject* /*other*/ ) const { return true; }
 
     private:
         bool has_collision_;
-        rigid_body_kind_t kind_;
+        bt_body_kind_t kind_;
     };
 
     struct overlap_filter_callback : public btOverlapFilterCallback
@@ -61,8 +62,8 @@ namespace phys
             btCollisionObject * col1 = static_cast<btCollisionObject *>(proxy1->m_clientObject);
             if (col0->getUserPointer() && col1->getUserPointer())
             {
-                rigid_body_user_info_t * info0 = static_cast<rigid_body_user_info_t *>(col0->getUserPointer());
-                rigid_body_user_info_t * info1 = static_cast<rigid_body_user_info_t *>(col1->getUserPointer());
+                bt_body_user_info_t * info0 = static_cast<bt_body_user_info_t *>(col0->getUserPointer());
+                bt_body_user_info_t * info1 = static_cast<bt_body_user_info_t *>(col1->getUserPointer());
 
                 if (!info0->has_collision() || !info1->has_collision())
                     collides = false;
@@ -108,7 +109,7 @@ namespace phys
                 btRigidBody const* body0 = static_cast<btRigidBody const*>(colObj0);
                 if (body0->getUserPointer())
                 {
-                    rigid_body_user_info_t * info0 = static_cast<rigid_body_user_info_t *>(body0->getUserPointer());
+                    bt_body_user_info_t * info0 = static_cast<bt_body_user_info_t *>(body0->getUserPointer());
                     friction0 = info0->get_friction(colObj1);
                 }
             }
@@ -120,7 +121,7 @@ namespace phys
                 btRigidBody const* body1 = static_cast<btRigidBody const*>(colObj1);
                 if (body1->getUserPointer())
                 {
-                    rigid_body_user_info_t * info1 = static_cast<rigid_body_user_info_t *>(body1->getUserPointer());
+                    bt_body_user_info_t * info1 = static_cast<bt_body_user_info_t *>(body1->getUserPointer());
                     friction1 = info1->get_friction(colObj0);
                 }
             }

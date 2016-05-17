@@ -70,8 +70,10 @@ public:
 public:
 	phys::bt_dynamics_world_ptr    dynamics_world()    const override;
 	phys::bt_vehicle_raycaster_ptr vehicle_raycaster() const override;
-	void register_rigid_body( phys::rigid_body_impl * rb )   override;
+	void register_rigid_body  ( phys::rigid_body_impl * rb ) override;
 	void unregister_rigid_body( phys::rigid_body_impl * rb ) override;
+    void register_soft_body   ( phys::soft_body_impl * rb )  override;
+    void unregister_soft_body ( phys::soft_body_impl * rb )  override;
 
     // control
 public:

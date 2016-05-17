@@ -471,6 +471,22 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
     bw->addSoftBody( softBody );
     geom->setUpdateCallback( new MeshUpdater( softBody, resX*resY ) );
 
+
+    const int n=15;
+    for(int i=0;i<n;++i)
+    {
+        btSoftBody*	psb=btSoftBodyHelpers::CreateRope(worldInfo,	btVector3(-10,i*0.25,0),
+            btVector3(10,i*0.25,0),
+            16,
+            1+2);
+        psb->m_cfg.piterations		=	4;
+        psb->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
+        psb->setTotalMass(20);
+        bw->addSoftBody(psb);
+
+    }
+
+
 #if 0
 	struct	Functors
 	{
@@ -637,6 +653,162 @@ btSoftRigidDynamicsWorld* initPhysics()
     return( dynamicsWorld );
 }
 
+namespace
+{
+    //////////////////// static data and functions shared between all ropes
+    static const uint32_t rope_sides	= 6;
+
+    static std::vector<osg::Vec3d>			_vertex_ring;
+    static osg::ref_ptr<osg::Vec3Array>		vertices1;
+    static osg::ref_ptr<osg::Vec3Array>		normals1;
+    static osg::ref_ptr<osg::Vec4Array>		tcoords1;
+    static std::vector<unsigned int>        v_indices1;
+    static bool vertex_pool_created = false;
+
+    static void createVertexRing()
+    {
+        _vertex_ring.resize(rope_sides);
+
+        double deltaAngle = (2.0*osg::PI) / rope_sides;
+        double angle = 0.0;
+        for (unsigned int i = 0; i < rope_sides; i++)
+        {
+            float x = sin(angle);
+            float z = cos(angle);
+            _vertex_ring[i].set(x, 0, z);
+            angle += deltaAngle;
+        }
+    }
+
+    static inline void createVertexData()
+    {
+        createVertexRing();
+
+        vertices1 = new osg::Vec3Array();
+        normals1 = new osg::Vec3Array();
+        tcoords1 = new osg::Vec4Array();
+
+        unsigned int k = 0;
+
+        //cap 0
+        //body
+        for (unsigned int i = 0; i < rope_sides; i++)
+        {
+            const static double dbTexCoordDelta = 1.0 / double( rope_sides );
+            osg::Vec3d v1 = osg::Vec3d(_vertex_ring[i].x(), 0.0, _vertex_ring[i].z()); 
+            osg::Vec3d v2 = osg::Vec3d(_vertex_ring[i].x(), 0.0, _vertex_ring[i].z()); 
+            osg::Vec3d v3 = osg::Vec3d(_vertex_ring[(i+1)%rope_sides].x(), 0.0, _vertex_ring[(i+1)%rope_sides].z()); 
+
+            vertices1->push_back(v1);
+            normals1->push_back(_vertex_ring[i]);
+            tcoords1->push_back(osg::Vec4(double(i)*dbTexCoordDelta, 1.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            vertices1->push_back(v2);
+            normals1->push_back(_vertex_ring[i]);
+            tcoords1->push_back(osg::Vec4(double(i)*dbTexCoordDelta, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            vertices1->push_back(v3);
+            normals1->push_back(_vertex_ring[(i+1)%rope_sides]);
+            tcoords1->push_back(osg::Vec4(double(i+1)*dbTexCoordDelta, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            v1 = osg::Vec3d(_vertex_ring[i].x(), 0.0, _vertex_ring[i].z()); 
+            v2 = osg::Vec3d(_vertex_ring[(i+1)%rope_sides].x(), 0.0, _vertex_ring[(i+1)%rope_sides].z()); 
+            v3 = osg::Vec3d(_vertex_ring[(i+1)%rope_sides].x(), 0.0, _vertex_ring[(i+1)%rope_sides].z()); 
+
+            vertices1->push_back(v1);
+            normals1->push_back(_vertex_ring[i]);
+            tcoords1->push_back(osg::Vec4(double(i)*dbTexCoordDelta, 1.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            vertices1->push_back(v2);
+            normals1->push_back(_vertex_ring[(i+1)%rope_sides]);
+            tcoords1->push_back(osg::Vec4(double(i+1)*dbTexCoordDelta, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            vertices1->push_back(v3);
+            normals1->push_back(_vertex_ring[(i+1)%rope_sides]);
+            tcoords1->push_back(osg::Vec4(double(i+1)*dbTexCoordDelta, 1.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+        }
+
+        osg::Vec3d norm = osg::Vec3d(0.0, 1.0, 0.0);
+        for (unsigned int i = 0; i < rope_sides; i++)
+        {
+            osg::Vec3d v = osg::Vec3d(0.0, 0.0, 0.0);
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, -1.0, 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            v = osg::Vec3d(_vertex_ring[i].x(), 0.0, _vertex_ring[i].z());
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, -1.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            v = osg::Vec3d(_vertex_ring[(i+1)%rope_sides].x(), 0.0, _vertex_ring[(i+1)%rope_sides].z());
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, -1.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+        }
+
+        //cap 1
+        norm = osg::Vec3d(0.0, -1.0, 0.0);
+        for (unsigned int i = 0; i < rope_sides; i++)
+        {
+            osg::Vec3d v = osg::Vec3d(0.0, 0.0, 0.0);
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            v = osg::Vec3d(_vertex_ring[(i+1)%rope_sides].x(), 0.0, _vertex_ring[(i+1)%rope_sides].z());
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+
+            v = osg::Vec3d(_vertex_ring[i].x(), 0.0, _vertex_ring[i].z());
+            vertices1->push_back(v);
+            normals1->push_back(norm);
+            tcoords1->push_back(osg::Vec4(0.0, 0.0 , 0.0, 0.0));
+            v_indices1.push_back(k++);
+        }
+    }
+
+    osg::Geode* createSomething()
+    {
+        createVertexData();
+        
+        osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+        osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
+        // geometry->setComputeBoundingBoxCallback( GetBoundingBoxCallback() );
+
+        geometry->setUseDisplayList(false);
+        geometry->setUseVertexBufferObjects(true);
+
+        geometry->setVertexArray(vertices1.get());
+        geometry->setNormalArray(normals1.get());
+        geometry->setTexCoordArray( 0, tcoords1.get() );
+        geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+
+        const uint32_t SizeOfBodyGeometry	= 6 * rope_sides;
+        // Body
+        geometry->addPrimitiveSet(new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES, SizeOfBodyGeometry, &v_indices1.front(), 1));
+        //            geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES, 0, v_indices1.size()));
+        // Caps
+        geometry->addPrimitiveSet(new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES, v_indices1.size() - SizeOfBodyGeometry, &v_indices1[SizeOfBodyGeometry]));
+
+        geode->addDrawable(geometry.get());
+        return geode.release();
+    }
+
+
+}
 
 
 int main_patched_lowlevel( int argc, char** argv )
@@ -668,7 +840,7 @@ int main_patched_lowlevel( int argc, char** argv )
     const osg::Vec4 plane( 0., 0., 1., -100. );
     root->addChild( osgbDynamics::generateGroundPlane( plane, bw ) );
 
-
+    root->addChild(createSomething());
 
 /////////////////////////////////////////////////////////////////////////////
     //create  object
@@ -692,7 +864,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( /*debugDisplay*/ false)
+    if( /*debugDisplay*/ true)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );

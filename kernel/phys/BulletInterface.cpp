@@ -47,6 +47,8 @@ namespace phys {
 FIXME("deprecated")
 #include "osgbullet_helpers.h"
 
+#define SOFTBODY_WORLD
+
 using namespace phys;
 
 struct FilterCallback : public btOverlapFilterCallback
@@ -406,6 +408,8 @@ namespace phys
         btCollisionDispatcher*                _dispatcher;
         btBroadphaseInterface*                _overlappingPairCache;
         btSequentialImpulseConstraintSolver*  _solver;
+        btSoftBodyWorldInfo	                  _worldInfo;
+
 
         boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
         boost::scoped_ptr<btCollisionDispatcher>           dispatcher_;
@@ -418,7 +422,9 @@ namespace phys
 
         bt_vehicle_raycaster_ptr              vehicle_raycaster_;
         std::set<rigid_body_impl *>           rigid_bodies_;
-        
+        std::set<soft_body_impl  *>           soft_bodies_;
+
+
         void CollisionEvent(btRigidBody * pBody0, btRigidBody * pBody1 , on_collision_f  on_collision_) 
         {
             // find the two colliding objects
@@ -453,25 +459,38 @@ BulletInterface::BulletInterface()
     , base_(::get_base())
     , p_(new _private())
 {
-
+#ifdef SOFTBODY_WORLD
+    p_->_configuration = new btSoftBodyRigidBodyCollisionConfiguration();
+#else
     p_->_configuration = new btDefaultCollisionConfiguration;
-    p_->_dispatcher = new btCollisionDispatcher( p_->_configuration );
-    p_->_overlappingPairCache = new btDbvtBroadphase;
-    p_->_solver = new btSequentialImpulseConstraintSolver;
-
-#if 0
-    d_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
 #endif
     
-    
-	p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
-	
+    p_->_dispatcher = new btCollisionDispatcher( p_->_configuration );
+    p_->_solver = new btSequentialImpulseConstraintSolver;
+
+#ifdef SOFTBODY_WORLD
+    //btVector3 worldAabbMin( -10000, -10000, -10000 );
+    //btVector3 worldAabbMax( 10000, 10000, 10000 );
+    //p_->_overlappingPairCache = new btAxisSweep3( worldAabbMin, worldAabbMax, 1000 );
+
+    p_->_overlappingPairCache = new btDbvtBroadphase;
+
+    p_->_worldInfo.m_broadphase = p_->_overlappingPairCache;
+    p_->_worldInfo.m_dispatcher = p_->_dispatcher;
+    p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
+#else
+    p_->_overlappingPairCache = new btDbvtBroadphase;
+    p_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+#endif
+
 	p_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
 
     p_->_dw->getSolverInfo().m_numIterations = 20;
     p_->_dw->getSolverInfo().m_damping = 1.;
     p_->_dw->getSolverInfo().m_splitImpulse = false;
     p_->_dw->getSolverInfo().m_solverMode |= SOLVER_SIMD;
+
+
 
  #if 0
    d_->_dw->setInternalTickCallback(internal_tick_callback); 
@@ -552,7 +571,7 @@ void BulletInterface::createWorld( const osg::Plane& plane, const osg::Vec3& gra
     body->setFriction(1.3f); 
     body->setActivationState(DISABLE_SIMULATION);
     body->setRestitution(0.5f);
-    body->setUserPointer(new rigid_body_user_info_t(rb_terrain));
+    body->setUserPointer(new bt_body_user_info_t(rb_terrain));
 
     on_collision_ = on_collision;
 
@@ -754,7 +773,7 @@ ray_cast_vehicle::info_ptr BulletInterface::createVehicle(osg::Node* node,int id
 }
 #endif
 
-void BulletInterface::registerBody(int id,phys::rigid_body_ptr ctrl)
+void BulletInterface::registerBody(int id, phys::rigid_body_ptr ctrl)
 {
     p_->_actors[id]._body  = rigid_body_impl_ptr(ctrl)->get_body().get();
 }
@@ -833,6 +852,10 @@ void BulletInterface::update( double step )
 	for (auto it = p_->rigid_bodies_.begin(); it != p_->rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
     
+    for (auto it = p_->soft_bodies_.begin(); it != p_->soft_bodies_.end(); ++it)
+        (*it)->pre_update(step);
+    
+
     if (!cg::eq_zero(step))
     {
         p_->_dw->stepSimulation( btScalar(step), cfg().model_params.msys_step/cfg().model_params.bullet_step, btScalar(cfg().model_params.bullet_step) ); 
@@ -927,7 +950,6 @@ phys::bt_vehicle_raycaster_ptr BulletInterface::vehicle_raycaster() const
 void BulletInterface::register_rigid_body( rigid_body_impl * rb )
 {
 	p_->rigid_bodies_.insert(rb);
-    // d_->rigid_bodies_.push_back(rb);
 }
 
 void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
@@ -935,6 +957,15 @@ void BulletInterface::unregister_rigid_body( rigid_body_impl * rb )
 	p_->rigid_bodies_.erase(rb);
     // FIXME  пока не удаляем
     FIXME("Нету удаления, а надо бы особенно для сомолей")
+}
+void BulletInterface::register_soft_body ( phys::soft_body_impl * rb )
+{
+    p_->soft_bodies_.insert(rb);
+}
+
+void BulletInterface::unregister_soft_body( phys::soft_body_impl  * rb )
+{
+    p_->soft_bodies_.erase(rb);
 }
 
 static_mesh_ptr BulletInterface::create_static_mesh( sensor_ptr s )
@@ -1035,8 +1066,8 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 
 		if (obA->getUserPointer() && obB->getUserPointer())
 		{
-			rigid_body_user_info_t * rbA = (rigid_body_user_info_t *)(obA->getUserPointer());
-			rigid_body_user_info_t * rbB = (rigid_body_user_info_t *)(obB->getUserPointer());
+			bt_body_user_info_t * rbA = (bt_body_user_info_t *)(obA->getUserPointer());
+			bt_body_user_info_t * rbB = (bt_body_user_info_t *)(obB->getUserPointer());
 
 			size_t numContacts = (size_t)contactManifold->getNumContacts();
 			if (numContacts)

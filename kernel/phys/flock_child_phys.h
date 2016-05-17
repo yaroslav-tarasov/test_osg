@@ -14,7 +14,7 @@ namespace phys
 	{
    // ATTRIBUTE_ALIGNED16 (class impl)
    class impl
-       : public rigid_body_user_info_t
+       : public bt_body_user_info_t
 	   , public rigid_body_impl
        , public btActionInterface
        , public info
@@ -51,7 +51,7 @@ namespace phys
    private:
 	   bt_rigid_body_ptr get_body   () const;
 	   void              pre_update (double dt);
-	   void              has_contact(rigid_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel);
+	   void              has_contact(bt_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel);
 
    private:
 #if 0
@@ -61,7 +61,7 @@ namespace phys
 #endif
 
        rigid_body_proxy                       chassis_;
-       polymorph_ptr<rigid_body_user_info_t>  self_;
+       polymorph_ptr<bt_body_user_info_t>  self_;
 	   system_impl_ptr						  sys_;
        params_t     params_;
        cg::point_3  wind_;

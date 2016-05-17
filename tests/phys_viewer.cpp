@@ -74,7 +74,7 @@ btDiscreteDynamicsWorld* initPhysics()
     body->setFriction(/*1.3f*/0.99f); 
     body->setActivationState(DISABLE_SIMULATION);
     body->setRestitution(/*0.5f*/0.1f);
-    // body->setUserPointer(new rigid_body_user_info_t(rb_terrain));
+    // body->setUserPointer(new bt_body_user_info_t(rb_terrain));
 
     return( dynamicsWorld );
 }
