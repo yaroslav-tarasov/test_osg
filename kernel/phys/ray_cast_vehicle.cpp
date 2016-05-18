@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "phys/bullet_helpers.h"
 
 #include "ray_cast_vehicle.h"

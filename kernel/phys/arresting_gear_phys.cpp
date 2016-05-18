@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
 #include "arresting_gear.h"
@@ -18,13 +19,15 @@ namespace phys
 	namespace arresting_gear
 	{
 
-    impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
-        : bt_body_user_info_t(rb_flock_child)
+    impl::impl(system_impl_ptr sys,compound_sensor_ptr s,params_t const& params, decart_position const& pos)
+        : bt_body_user_info_t(bt_soft_body)
 		, sys_                  (sys)
+#if 0
 		, chassis_              (sys->dynamics_world())
         , chassis_shape_        (compound_sensor_impl_ptr(s)->cs_)
+#endif
+		, rope_					(sys->dynamics_world())
 		, params_               (params)
-        , prev_attack_angle_    (0)
         , has_chassis_contact_  (false)
         , body_contact_points_  (1.5)
     {
@@ -32,11 +35,10 @@ namespace phys
 		btTransform  tr;
 		tr.setIdentity();
 		btVector3 aabbMin,aabbMax;
+
 #if 0
-        chassis_shape_.get()->getAabb(tr,aabbMin,aabbMax);
-#else
         chassis_shape_->getAabb(tr,aabbMin,aabbMax);
-#endif
+
         const float  fake_mass = 20;
 
 		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);// btScalar(params_.wingspan / 2);
@@ -58,12 +60,15 @@ namespace phys
 		chassis_->setRestitution(0.1f);
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
 		chassis_->setFriction(0.3f);
+#endif
 
 		// sys_->dynamics_world()->addAction(this);
 
 		sys_->register_rigid_body(this);
 
+#if 0
 		chassis_->setUserPointer(this);
+#endif
     }
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
@@ -91,17 +96,23 @@ namespace phys
     
     void  impl::set_linear_velocity (point_3 const& v)
     {
+#if 0
         chassis_->setLinearVelocity(to_bullet_vector3(v));
+#endif
     }
     
     void  impl::set_angular_velocity (point_3 const& a)
     {
+#if 0
         chassis_->setAngularVelocity(to_bullet_vector3(a));
+#endif
     }
 
     void impl::apply_force (point_3 const& f)
     {
+#if 0
         chassis_->applyCentralForce(to_bullet_vector3(f));
+#endif
     }
 
     void impl::set_wind    (point_3 const& wind)
@@ -111,7 +122,7 @@ namespace phys
 
 	bt_rigid_body_ptr impl::get_body() const
 	{
-		return chassis_.get();
+		return bt_rigid_body_ptr(); //chassis_.get();
 	}
 
 	void impl::pre_update(double /*dt*/)
@@ -149,28 +160,15 @@ namespace phys
 
     decart_position impl::get_position() const
     {
-        return from_bullet_position(&*chassis_.get());
+        return decart_position(); //from_bullet_position(&*chassis_.get());
     }
 	
 	void impl::set_position(const decart_position& pos)
 	{
+#if 0
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
+#endif
 	}
-
-    double impl::Ixx() const
-    {
-        return 1. / chassis_->getInvInertiaDiagLocal().x();
-    }
-
-    double impl::Iyy() const
-    {
-        return 1. / chassis_->getInvInertiaDiagLocal().y();
-    }
-
-    double impl::Izz() const
-    {
-        return 1. / chassis_->getInvInertiaDiagLocal().z();
-    }
 
     params_t const& impl::params() const
     {

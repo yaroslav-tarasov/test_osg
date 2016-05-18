@@ -17,7 +17,7 @@ namespace phys
 	   , public control
    {
    public:
-      impl(system_impl_ptr,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos);
+      impl(system_impl_ptr,compound_sensor_ptr s, params_t const& params, decart_position const& pos);
    
    
    private:
@@ -27,9 +27,6 @@ namespace phys
    //info
    private:
        decart_position get_position() const;
-       double Ixx() const ;
-       double Iyy() const ;
-       double Izz() const ;
        params_t const& params() const ;
        bool has_contact() const;
        std::vector<contact_info_t> get_body_contacts() const;
@@ -54,12 +51,15 @@ namespace phys
 #else 
        btCompoundShape*                       chassis_shape_;
 #endif
+#if 0
        rigid_body_proxy                       chassis_;
-       polymorph_ptr<bt_body_user_info_t>  self_;
+#endif
+
+	   soft_body_proxy						  rope_;
+       polymorph_ptr<bt_body_user_info_t>     self_;
 	   system_impl_ptr						  sys_;
        params_t     params_;
        cg::point_3  wind_;
-       double       prev_attack_angle_;
        bool         has_chassis_contact_;
 
        typedef cg::duplicate_points_fixed_id<cg::point_3> dup_points_t;

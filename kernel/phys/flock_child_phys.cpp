@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
 #include "flock_child_phys.h"

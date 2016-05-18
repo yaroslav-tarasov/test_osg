@@ -8,6 +8,7 @@ class btRigidBody;
 class btSoftBody;
 class btCollisionShape;
 class btDynamicsWorld;
+class btSoftRigidDynamicsWorld;
 class btTypedConstraint;
 class btPoint2PointConstraint;
 class btGeneric6DofConstraint;
@@ -27,6 +28,7 @@ namespace phys
     typedef polymorph_ptr<btDefaultVehicleRaycaster> bt_vehicle_raycaster_ptr;
     typedef polymorph_ptr<btRaycastVehicle>          bt_raycast_vehicle_ptr;
     typedef polymorph_ptr<btSoftBody>                bt_soft_body_ptr;
+    typedef polymorph_ptr<btSoftRigidDynamicsWorld>  bt_softrigid_dynamics_world_ptr;
 
     inline btVector3 to_bullet_vector3( cg::point_3 const& v )
     {
@@ -87,7 +89,7 @@ namespace phys
         return btTransform(to_bullet_quaternion(orien), to_bullet_vector3(pos));
     }
 
-#ifndef BULLET_FROM_TO_ONLY
+#ifndef BULLET_CONV_ONLY
 
     inline decart_position from_bullet_position(btRigidBody const* body)
     {
@@ -293,6 +295,52 @@ namespace phys
               int i = 0;
         }
     };
+
+	struct soft_body_proxy
+	{
+		soft_body_proxy(bt_softrigid_dynamics_world_ptr dynamics_world, bt_soft_body_ptr body = bt_soft_body_ptr())
+			: dynamics_world_(dynamics_world)
+			, body_          (body)
+		{
+			if (body_)
+				dynamics_world_->addSoftBody(&*body_);
+		}
+
+		~soft_body_proxy()
+		{
+			if (body_)
+				dynamics_world_->removeSoftBody(&*body_);
+		}
+
+		void reset(bt_rigid_body_ptr body = bt_rigid_body_ptr())
+		{
+			if (body_)
+				dynamics_world_->removeSoftBody(&*body_);
+
+			body_ = body;
+			if (body_)
+				dynamics_world_->addSoftBody(&*body_);
+		}
+
+		operator bool() const
+		{
+			return body_;
+		}
+
+		bt_rigid_body_ptr get() const
+		{
+			return body_;
+		}
+
+		btSoftBody * operator->() { return body_.get();}
+		btSoftBody const* operator->() const { return body_.get();}
+
+
+	private:
+		bt_softrigid_dynamics_world_ptr dynamics_world_;
+		bt_soft_body_ptr body_;
+	};
+
 #endif
 
 }

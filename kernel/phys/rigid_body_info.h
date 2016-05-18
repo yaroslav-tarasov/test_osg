@@ -1,6 +1,7 @@
 #pragma once
 
-#include <btBulletDynamicsCommon.h> 
+#include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
 namespace phys

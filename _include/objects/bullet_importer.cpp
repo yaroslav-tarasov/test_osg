@@ -1,6 +1,7 @@
 #include "stdafx.h"
 //at the top of the file add
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "btBulletWorldImporter.h"
 #include <btBulletFile.h>
 

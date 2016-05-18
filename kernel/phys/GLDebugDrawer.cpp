@@ -2,7 +2,7 @@
 
 #include "GLDebugDrawer.h"
 #include <osgbCollision/Utils.h>
-#define BULLET_FROM_TO_ONLY
+#define BULLET_CONV_ONLY
 #include "bullet_helpers.h"
 
 namespace avCollision

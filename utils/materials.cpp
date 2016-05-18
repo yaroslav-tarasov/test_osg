@@ -217,8 +217,6 @@ FIXME(Все теже кривые плоскости)
 
         if(GetTextures().find(mat_name)==GetTextures().end())
         {
-            FIXME(test it);
-
             textures_t  t /*= th*/; 
             t.colorTex = new osg::Texture2D;
             t.nightTex = new osg::Texture2D;
