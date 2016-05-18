@@ -188,6 +188,10 @@
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h" />
     <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h" />
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_common.h" />
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_ctrl.h" />
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_model.h" />
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_view.h" />
     <ClInclude Include="kernel\objects\camera\camera_model.h" />
     <ClInclude Include="kernel\objects\environment\environment_ctrl.h" />
     <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h" />
@@ -341,6 +345,9 @@
     <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
     <ClCompile Include="kernel\objects\airport\airport_vis.cpp" />
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_ctrl.cpp" />
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_model.cpp" />
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_view.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_model.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
@@ -412,6 +419,7 @@
     <ClCompile Include="kernel\phys\aerostat_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
+    <ClCompile Include="kernel\phys\arresting_gear_phys.cpp" />
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />

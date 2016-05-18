@@ -12,7 +12,7 @@ namespace phys
 	{
 
     impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
-        : bt_body_user_info_t(rb_flock_child)
+        : bt_body_user_info_t(rb_aircraft)
 		, sys_                  (sys)
 		, chassis_              (sys->dynamics_world())
         , chassis_shape_        (compound_sensor_impl_ptr(s)->cs_)

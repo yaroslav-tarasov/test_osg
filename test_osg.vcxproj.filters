@@ -189,6 +189,9 @@
     <Filter Include="Source Files\av\line">
       <UniqueIdentifier>{f3b8a504-8d08-4dee-948b-eb4e5b657dd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\arresting_gear">
+      <UniqueIdentifier>{b2e4bf2e-791a-40c6-8a44-253da4d44f9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -529,6 +532,18 @@
     </ClInclude>
     <ClInclude Include="av\avLine\Line.h">
       <Filter>Source Files\av\line</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_ctrl.h">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_model.h">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_view.h">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_common.h">
+      <Filter>Source Files\objects\arresting_gear</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1293,6 +1308,18 @@
     </ClCompile>
     <ClCompile Include="av\avLine\Line.cpp">
       <Filter>Source Files\av\line</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_model.cpp">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_view.cpp">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_ctrl.cpp">
+      <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\arresting_gear_phys.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

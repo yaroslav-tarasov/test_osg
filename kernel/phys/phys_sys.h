@@ -8,6 +8,7 @@
 #include "phys/character.h"
 #include "phys/aerostat.h"
 #include "phys/aircraft.h"
+#include "phys/arresting_gear.h"
 #include "common/debug_render.h"
 
 namespace phys

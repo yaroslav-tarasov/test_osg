@@ -43,6 +43,9 @@
 
 #include "utils/visitors/ComputeTriMeshVisitor.h"
 
+#include <osg/LineWidth>
+
+
 btSoftBodyWorldInfo	worldInfo;
 
 
@@ -60,15 +63,36 @@ struct MeshUpdater : public osg::Drawable::UpdateCallback
     {
         osg::Geometry* geom( draw->asGeometry() );
         osg::Vec3Array* verts( dynamic_cast< osg::Vec3Array* >( geom->getVertexArray() ) );
-
+        
+        const osg::PrimitiveSet* primitiveset= geom->getPrimitiveSet(0);
+        
         // Update the vertex array from the soft body node array.
         const btSoftBody::tNodeArray& nodes = _softBody->m_nodes;
-        osg::Vec3Array::iterator it( verts->begin() );
-        unsigned int idx;
-        for( idx=0; idx<_size && idx<nodes.size(); idx++)
+        
+#if 0
+        if (primitiveset->getType()== osg::PrimitiveSet::DrawElementsUBytePrimitiveType )
         {
-            *it++ = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
+            const osg::DrawElementsUByte* drawElements = static_cast<const osg::DrawElementsUByte*>(primitiveset);
+
+            osg::DrawElementsUByte::const_iterator it( drawElements->begin() );
+            unsigned int idx;
+            for( idx=0; idx<_size && idx<nodes.size(); idx++)
+            {
+                osg::Vec3Array::value_type & el = (*verts)[*it++];
+                el = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
+            }
         }
+        else
+#endif
+        {
+            osg::Vec3Array::iterator it( verts->begin() );
+            unsigned int idx;
+            for( idx=0; idx<_size && idx<nodes.size(); idx++)
+            {
+                *it++ = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
+            }
+        }
+
         verts->dirty();
         draw->dirtyBound();
 
@@ -396,6 +420,59 @@ btSoftBody* btSoftBodyFromOSG( osg::Node* node )
 	return  btSoftBodyHelpers::CreateFromTriMesh(worldInfo,&vtx[0],&idx[0], vertices->size()/3 );
 }
 
+osg::Node* makeRope(const btSoftBody* softBody)
+{
+    // osg::ref_ptr< osg::Group > group = new osg::Group;
+
+    osg::ref_ptr< osg::Geode > geode( new osg::Geode );
+
+    osg::Geometry* geom = new osg::Geometry;
+    
+    osg::Vec3 corner(0.0,0.0,0.0);
+
+    const size_t rope_nodes_num = 16 + 2;
+
+    osg::Vec3Array* coords = new osg::Vec3Array(rope_nodes_num);
+
+
+    geom->setVertexArray(coords);
+
+    osg::Vec4Array* color = new osg::Vec4Array(1);
+    (*color)[0].set(0.25f,0.25f,0.15f,1.0f) ;
+
+
+    geom->setColorArray(color, osg::Array::BIND_OVERALL);
+
+    //geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES,0,rope_nodes_num));
+    std::vector<int>   Indices;
+    
+    for ( unsigned int i = 0; i < rope_nodes_num - 1; i++ )
+    {
+         Indices.push_back(i);
+         Indices.push_back(i + 1);
+    }
+
+    geom->addPrimitiveSet(new osg::DrawElementsUInt ( osg::PrimitiveSet::LINES, Indices.size(), (GLuint*)&Indices [ 0 ] ));
+
+    osg::StateSet* stateset = geom->getOrCreateStateSet();
+    osg::LineWidth* linewidth = new osg::LineWidth();
+    linewidth->setWidth(4.0f);
+    stateset->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+    stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+    geom->setStateSet(stateset);
+
+    // Set up for dynamic data buffer objects
+    geom->setDataVariance( osg::Object::DYNAMIC );
+    geom->setUseDisplayList( false );
+    geom->setUseVertexBufferObjects( true );
+    geom->getOrCreateVertexBufferObject()->setUsage( GL_DYNAMIC_DRAW );
+
+    geode->addDrawable( geom );
+    
+    geom->setUpdateCallback( new MeshUpdater( softBody, rope_nodes_num ) );
+
+    return geode.release();
+}
 
 osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 {
@@ -483,7 +560,20 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
         psb->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
         psb->setTotalMass(20);
         bw->addSoftBody(psb);
+        
+        if(i == 0)
+        {
+            btTransform startTransform;
+            startTransform.setIdentity();
+            startTransform.setOrigin(btVector3(/*12*/2,6,2));
+            btRigidBody*		body=SoftBodyHelpers::createRigidBody(bw,50,startTransform,new btBoxShape(btVector3(2,6,2)));
+            psb->appendAnchor(psb->m_nodes.size()/2,body);
+            body->setLinearVelocity( btVector3(100.0,100.0,100.0) );
+        }
 
+
+
+        group->addChild(makeRope(psb)); 
     }
 
 
@@ -584,13 +674,13 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	btTransform		trs;
 	btQuaternion	rot;
 	btVector3		ra=Vector3Rand()*0.1;
-	btVector3		rp=Vector3Rand()*15+btVector3(0,20,80);
+	btVector3		rp=Vector3Rand()*15+btVector3(0,0,80);
 	rot.setEuler(SIMD_PI/2,-SIMD_PI/2,ra.z());
 	trs.setIdentity();
-	//trs.setOrigin(rp);
+	trs.setOrigin(rp);
 	trs.setRotation(rot);
 	para->transform(trs);
-	para->setTotalMass(0.01);
+	para->setTotalMass(0.1);
 	//para->addForce(btVector3(0,2,0),0);
 
 #if 0
