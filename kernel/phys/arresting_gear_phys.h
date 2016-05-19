@@ -26,19 +26,24 @@ namespace phys
    
    //info
    private:
-       decart_position get_position() const;
+       decart_position get_position() const override;
        params_t const& params() const ;
        bool has_contact() const;
        std::vector<contact_info_t> get_body_contacts() const;
+       std::vector<rope_info_t>    get_ropes_info() const override;                               
 
+   // control
    private:
        void   set_wind    (cg::point_3 const& wind)    override;
        void   apply_force (point_3 const& f)           override;
 
-       void   set_position(const decart_position& pos) override;
-       void   set_linear_velocity  (point_3 const& v)  override;
-       void   set_angular_velocity (point_3 const& a)  override;
+       void   set_position         (const decart_position& pos) override;
+       void   set_linear_velocity  (point_3 const& v)           override;
+       void   set_angular_velocity (point_3 const& a)           override;
        
+       void   append_anchor        (rigid_body_ptr body, cg::point_3 const& pos) override;
+       void   release_anchor       (rigid_body_ptr body) override;
+
    // rigid_body_impl
    private:
 	   bt_rigid_body_ptr get_body   () const;
@@ -55,7 +60,7 @@ namespace phys
        rigid_body_proxy                       chassis_;
 #endif
 
-	   soft_body_proxy						  rope_;
+	   std::vector<soft_body_proxy>			  ropes_;
        polymorph_ptr<bt_body_user_info_t>     self_;
 	   system_impl_ptr						  sys_;
        params_t     params_;

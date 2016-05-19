@@ -18,6 +18,8 @@ FIXME(Это что за нафиг нужно  для object_creators )
 #include "objects/human/human_common.h"
 #include "common/human.h"
 
+#include "arresting_gear/arresting_gear_common.h"
+
 #include "object_creators.h"
 
 #include "common/test_msgs.h"
@@ -410,7 +412,17 @@ inline object_info_ptr create_character(kernel::system* csys, create const& msg)
     return human::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
  
+ 
+inline object_info_ptr create_arresting_gear(kernel::system* csys, create const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
 
+    arresting_gear::settings_t ms;
+    // ms.model = "arresting_gear";
+
+    return arresting_gear::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+}
 
 inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
 {

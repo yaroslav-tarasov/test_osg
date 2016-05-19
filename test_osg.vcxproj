@@ -192,6 +192,7 @@
     <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_ctrl.h" />
     <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_model.h" />
     <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_view.h" />
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_vis.h" />
     <ClInclude Include="kernel\objects\camera\camera_model.h" />
     <ClInclude Include="kernel\objects\environment\environment_ctrl.h" />
     <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h" />
@@ -348,6 +349,7 @@
     <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_ctrl.cpp" />
     <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_model.cpp" />
     <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_view.cpp" />
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_vis.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_model.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_view.cpp" />

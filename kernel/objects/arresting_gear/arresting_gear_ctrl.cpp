@@ -14,7 +14,6 @@ AUTO_REG_NAME(arresting_gear_ext_ctrl, ctrl::create);
 
 ctrl::ctrl(kernel::object_create_t const& oc, dict_copt dict)
     : view(oc,dict)
-    , anim_started(false)
 {
     
     if (nodes_manager_)

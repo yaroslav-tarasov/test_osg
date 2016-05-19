@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
@@ -16,6 +17,77 @@
 
 namespace phys
 {
+
+
+namespace {
+
+    inline bt_soft_body_ptr	create_rope(	btSoftBodyWorldInfo& worldInfo, const btVector3& from,
+        const btVector3& to,
+        int res,
+        int fixeds)
+    {
+        /* Create nodes	*/ 
+        const int		r=res+2;
+        btVector3*		x=new btVector3[r];
+        btScalar*		m=new btScalar[r];
+        int i;
+
+        for(i=0;i<r;++i)
+        {
+            const btScalar	t=i/(btScalar)(r-1);
+            x[i]=lerp(from,to,t);
+            m[i]=1;
+        }
+
+        bt_soft_body_ptr		psb= boost::make_shared<btSoftBody>(&worldInfo,r,x,m);
+        if(fixeds&1) psb->setMass(0,0);
+        if(fixeds&2) psb->setMass(r-1,0);
+        delete[] x;
+        delete[] m;
+        /* Create links	*/ 
+        for(i=1;i<r;++i)
+        {
+            psb->appendLink(i-1,i);
+        }
+        /* Finished		*/ 
+        return(psb);
+    }
+
+    btRigidBody*	create_rigid_body(btDiscreteDynamicsWorld* dW,float mass, const btTransform& startTransform, btCollisionShape* shape,  const btVector4& color = btVector4(1, 0, 0, 1))
+    {
+        btAssert((!shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
+
+        //rigidbody is dynamic if and only if mass is non zero, otherwise static
+        bool isDynamic = (mass != 0.f);
+
+        btVector3 localInertia(0, 0, 0);
+        if (isDynamic)
+            shape->calculateLocalInertia(mass, localInertia);
+
+        //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+
+#define USE_MOTIONSTATE 1
+#ifdef USE_MOTIONSTATE
+        btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+
+        btRigidBody::btRigidBodyConstructionInfo cInfo(mass, myMotionState, shape, localInertia);
+
+        btRigidBody* body = new btRigidBody(cInfo);
+        //body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
+
+#else
+        btRigidBody* body = new btRigidBody(mass, 0, shape, localInertia);
+        body->setWorldTransform(startTransform);
+#endif//
+
+        body->setUserIndex(-1);
+        dW->addRigidBody(body);
+        return body;
+    }
+}
+
+
+
 	namespace arresting_gear
 	{
 
@@ -26,7 +98,6 @@ namespace phys
 		, chassis_              (sys->dynamics_world())
         , chassis_shape_        (compound_sensor_impl_ptr(s)->cs_)
 #endif
-		, rope_					(sys->dynamics_world())
 		, params_               (params)
         , has_chassis_contact_  (false)
         , body_contact_points_  (1.5)
@@ -61,8 +132,43 @@ namespace phys
 		//chassis_->setActivationState(DISABLE_DEACTIVATION);
 		chassis_->setFriction(0.3f);
 #endif
+        bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys->dynamics_world());
 
-		// sys_->dynamics_world()->addAction(this);
+        const unsigned n=15;
+        const float step = 1.0;
+
+        ropes_.reserve(n);
+        for( unsigned i=0; i<n; ++i)
+        {
+            ropes_.push_back(soft_body_proxy(bw));
+
+            ropes_.back().reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,1),
+                btVector3(60 + i*step,60,0.5),
+                16,
+                1+2));
+
+            auto& psb = ropes_.back();
+            ropes_.back()->m_cfg.piterations		=	4;
+            ropes_.back()->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
+            ropes_.back()->setTotalMass(20);
+
+
+#if 0
+            if(i==0)
+            {
+                btTransform startTransform;
+                startTransform.setIdentity();
+                startTransform.setOrigin(btVector3(60 + i*step,30,100));
+                btRigidBody*		body= create_rigid_body(bw.get(),50,startTransform,new btBoxShape(btVector3(2,6,2)));
+                psb->appendAnchor(psb->m_nodes.size()-1,body);
+                body->setLinearVelocity( btVector3(30.0,0.0,0.0) );
+            }
+#endif
+
+        }
+
+
+        // sys_->dynamics_world()->addAction(this);
 
 		sys_->register_rigid_body(this);
 
@@ -78,12 +184,6 @@ namespace phys
 
     void impl::debugDraw(btIDebugDraw* debugDrawer)
     {
-#if 0
-        if (raycast_veh_->getNumWheels() == 0)
-            return;
-
-        raycast_veh_->debugDraw(debugDrawer);
-#endif
     }
 
     bool impl::has_contact() const
@@ -151,8 +251,30 @@ namespace phys
         std::vector<contact_info_t> res;
         for (auto it = body_contact_points_.begin(); it != body_contact_points_.end(); ++it)
         {
-                point_3 vel = body_contacts_[it.id()].sum_vel / body_contacts_[it.id()].count;
+            point_3 vel = body_contacts_[it.id()].sum_vel / body_contacts_[it.id()].count;
             res.push_back(contact_info_t(*it, vel));
+        }
+
+        return res;
+    }
+
+    std::vector<rope_info_t>   impl::get_ropes_info() const
+    {
+        std::vector<rope_info_t> res;
+        res.reserve(ropes_.size());
+        unsigned i = 0;
+        for (auto it = ropes_.begin(); it != ropes_.end(); ++it, ++i)
+        {
+            const btSoftBody::tNodeArray& nodes = it->get()->m_nodes;
+            unsigned idx;
+            rope_info_t ri;
+            ri.resize(nodes.size());
+            for( idx=0; idx<nodes.size(); idx++)
+            {
+                ri[idx].coord  = from_bullet_vector3(nodes[ idx ].m_x);
+                ri[idx].vel = from_bullet_vector3(nodes[ idx ].m_v);
+            }
+            res.push_back(std::move(ri));
         }
 
         return res;
@@ -169,6 +291,18 @@ namespace phys
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
 #endif
 	}
+    
+    void   impl::append_anchor        (rigid_body_ptr body, cg::point_3 const& pos)
+    {
+
+    }
+
+    void   impl::release_anchor       (rigid_body_ptr body)
+    {
+
+    }
+
+
 
     params_t const& impl::params() const
     {

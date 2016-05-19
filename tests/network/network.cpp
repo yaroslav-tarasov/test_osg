@@ -658,7 +658,7 @@ struct client
             ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
 #endif
 
-#if 1
+#if 0
             ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
             ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
             ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )

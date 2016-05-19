@@ -5,6 +5,7 @@
 #include "common/phys_sys.h"
 #include "objects/nodes_management.h"
 #include "common/phys_object_model_base.h"
+#include "arresting_gear_msg.h"
 
 namespace arresting_gear
 {
@@ -35,6 +36,7 @@ private:
     void sync_phys          ( double dt );
     void sync_nodes_manager ( double dt );
     void update_model       ( double time, double dt );
+    void update_ropes       ( double time );
 
 private:
     phys::static_mesh_ptr                  mesh_;

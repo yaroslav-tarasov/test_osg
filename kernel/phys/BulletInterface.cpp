@@ -24,6 +24,7 @@
 #include "flock_child_phys.h"
 #include "character_phys.h"
 #include "aerostat_phys.h"
+#include "arresting_gear_phys.h"
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
@@ -408,7 +409,7 @@ namespace phys
         btCollisionDispatcher*                _dispatcher;
         btBroadphaseInterface*                _overlappingPairCache;
         btSequentialImpulseConstraintSolver*  _solver;
-        btSoftBodyWorldInfo	                  _worldInfo;
+        //btSoftBodyWorldInfo	*                 _worldInfo;
 
 
         boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
@@ -469,21 +470,31 @@ BulletInterface::BulletInterface()
     p_->_solver = new btSequentialImpulseConstraintSolver;
 
 #ifdef SOFTBODY_WORLD
-    //btVector3 worldAabbMin( -10000, -10000, -10000 );
-    //btVector3 worldAabbMax( 10000, 10000, 10000 );
-    //p_->_overlappingPairCache = new btAxisSweep3( worldAabbMin, worldAabbMax, 1000 );
+    btVector3 worldAabbMin( -10000, -10000, -10000 );
+    btVector3 worldAabbMax( 10000, 10000, 10000 );
+    p_->_overlappingPairCache = new btAxisSweep3( worldAabbMin, worldAabbMax, 1000 );
 
-    p_->_overlappingPairCache = new btDbvtBroadphase;
+    //p_->_overlappingPairCache = new btDbvtBroadphase;
 
-    p_->_worldInfo.m_broadphase = p_->_overlappingPairCache;
-    p_->_worldInfo.m_dispatcher = p_->_dispatcher;
     p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
+    auto & worldInfo = bt_softrigid_dynamics_world_ptr(p_->_dw)->getWorldInfo();   
+    
+    worldInfo.m_broadphase = p_->_overlappingPairCache;
+    worldInfo.m_dispatcher = p_->_dispatcher;
+
+    worldInfo.air_density = btScalar( 1.2 );
+    worldInfo.water_density = 0;
+    worldInfo.water_offset = 0;
+    worldInfo.water_normal = btVector3( 0, 0, 0 );
+    worldInfo.m_gravity = btVector3(0,0,-9.8);
+    worldInfo.m_sparsesdf.Initialize();   
+
 #else
     p_->_overlappingPairCache = new btDbvtBroadphase;
     p_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
 #endif
 
-	p_->_dw->setGravity( btVector3(/*gravity[0], gravity[1], gravity[2]*/0,0,-9.8) );
+	p_->_dw->setGravity( btVector3(0,0,-9.8) );
 
     p_->_dw->getSolverInfo().m_numIterations = 20;
     p_->_dw->getSolverInfo().m_damping = 1.;
@@ -869,6 +880,12 @@ void BulletInterface::update( double step )
 		checkForCollisionEvents();	
 
 	}
+
+#ifdef SOFTBODY_WORLD
+    auto & worldInfo = bt_softrigid_dynamics_world_ptr(p_->_dw)->getWorldInfo();  
+    worldInfo.m_sparsesdf.GarbageCollect();
+#endif
+
 }
 
 
@@ -1013,6 +1030,10 @@ aerostat::info_ptr BulletInterface::create_aerostat(const phys::aerostat::params
 	return  boost::make_shared<aerostat::impl>(shared_from_this(),s,p,pos);
 }
 
+arresting_gear::info_ptr   BulletInterface::create_arresting_gear    ( arresting_gear::params_t  const& p,compound_sensor_ptr s,const decart_position & pos)
+{
+    return  boost::make_shared<arresting_gear::impl>(shared_from_this(),s,p,pos);
+}
 
 boost::optional<double> BulletInterface::intersect_first(cg::point_3 const& p, cg::point_3 const& q) const
 {

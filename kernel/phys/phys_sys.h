@@ -61,6 +61,8 @@ namespace phys
         virtual flock::info_ptr            create_flock_child       ( flock::params_t const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
 		virtual character::info_ptr        create_character         (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos)  = 0;
 		virtual aerostat::info_ptr         create_aerostat          ( aerostat::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
+        virtual arresting_gear::info_ptr   create_arresting_gear    ( arresting_gear::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
+        
 	};
 
     //! интерфейс коллизии, 

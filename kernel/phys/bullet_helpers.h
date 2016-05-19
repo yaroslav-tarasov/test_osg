@@ -312,7 +312,7 @@ namespace phys
 				dynamics_world_->removeSoftBody(&*body_);
 		}
 
-		void reset(bt_rigid_body_ptr body = bt_rigid_body_ptr())
+		void reset(bt_soft_body_ptr body = bt_soft_body_ptr())
 		{
 			if (body_)
 				dynamics_world_->removeSoftBody(&*body_);
@@ -327,7 +327,7 @@ namespace phys
 			return body_;
 		}
 
-		bt_rigid_body_ptr get() const
+		bt_soft_body_ptr get() const
 		{
 			return body_;
 		}

@@ -69,29 +69,13 @@ struct MeshUpdater : public osg::Drawable::UpdateCallback
         // Update the vertex array from the soft body node array.
         const btSoftBody::tNodeArray& nodes = _softBody->m_nodes;
         
-#if 0
-        if (primitiveset->getType()== osg::PrimitiveSet::DrawElementsUBytePrimitiveType )
+        osg::Vec3Array::iterator it( verts->begin() );
+        unsigned int idx;
+        for( idx=0; idx<_size && idx<nodes.size(); idx++)
         {
-            const osg::DrawElementsUByte* drawElements = static_cast<const osg::DrawElementsUByte*>(primitiveset);
+            *it++ = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
+        }
 
-            osg::DrawElementsUByte::const_iterator it( drawElements->begin() );
-            unsigned int idx;
-            for( idx=0; idx<_size && idx<nodes.size(); idx++)
-            {
-                osg::Vec3Array::value_type & el = (*verts)[*it++];
-                el = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
-            }
-        }
-        else
-#endif
-        {
-            osg::Vec3Array::iterator it( verts->begin() );
-            unsigned int idx;
-            for( idx=0; idx<_size && idx<nodes.size(); idx++)
-            {
-                *it++ = osgbCollision::asOsgVec3( nodes[ idx ].m_x );
-            }
-        }
 
         verts->dirty();
         draw->dirtyBound();
@@ -422,8 +406,6 @@ btSoftBody* btSoftBodyFromOSG( osg::Node* node )
 
 osg::Node* makeRope(const btSoftBody* softBody)
 {
-    // osg::ref_ptr< osg::Group > group = new osg::Group;
-
     osg::ref_ptr< osg::Geode > geode( new osg::Geode );
 
     osg::Geometry* geom = new osg::Geometry;

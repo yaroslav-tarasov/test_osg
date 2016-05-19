@@ -30,10 +30,25 @@ namespace phys
             cg::point_3 offset;
         };
         
+        struct rope_node_info_t
+        {
+            rope_node_info_t() {}
+            rope_node_info_t( cg::point_3 const& vel, cg::point_3 const& coord )
+                : vel(vel), coord(coord)
+            {}
+
+            cg::point_3 vel;
+            cg::point_3 coord;
+        };
+        
+        
+        typedef std::vector<rope_node_info_t> rope_info_t;
+
         struct info
         {
             virtual ~info() {}
             virtual decart_position get_position() const = 0;
+            virtual std::vector<rope_info_t>    get_ropes_info() const = 0; 
         };
 
         struct control

@@ -1,5 +1,4 @@
 #pragma once
-#include "network/msg_base.h"
 
 
 namespace arresting_gear
@@ -14,37 +13,6 @@ struct settings_t
 
     string   model;
 };
-
-
-
-namespace msg
-{
-
-enum msg_type
-{
-    mt_settings
-};
-
-struct settings_msg
-    : network::msg_id<mt_settings>
-{
-    settings_t settings;
-
-    settings_msg(settings_t const& settings)
-        : settings(settings)
-    {
-    }
-    
-    settings_msg()
-    {
-    }
-};
-
-REFL_STRUCT(settings_msg)
-    REFL_ENTRY(settings)
-REFL_END()
-} // messages 
-
 
 
 REFL_STRUCT(settings_t)
@@ -74,4 +42,4 @@ REFL_END()
 } // namespace arresting_gear
 
 
-
+#include "arresting_gear/arresting_gear_msg.h"

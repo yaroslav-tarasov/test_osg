@@ -21,13 +21,15 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
 {
-    create_phys();
+    
 }
 
 void model::update(double time)
 {
     view::update(time);
 	
+    create_phys();
+
 	double dt = time - (last_update_ ? *last_update_ : 0);
     if (!cg::eq_zero(dt))
     {
@@ -55,7 +57,7 @@ void model::on_child_removing(object_info_ptr child)
 
 void model::create_phys()
 {
-    if (!phys_ || !root_)
+    if ( !phys_ || phys_model_ /*|| !root_*/)
         return;
 
     phys_zone_ = phys_->get_zone(cg::geo_point_3(pos(), 0));
@@ -66,11 +68,12 @@ void model::create_phys()
 
 #if 0
     phys::compound_sensor_ptr s = phys::arresting_gear::fill_cs(nodes_manager_); 
-    decart_position p(base(state_.pos), state_.orien);
 #endif
+    decart_position p(base(state_.pos), state_.orien);
+
     
     phys::arresting_gear::params_t  params;
-    //phys_model_ = phys_->get_system(*phys_zone_)->create_arresting_gear(params, s, p);
+    phys_model_ = phys_->get_system(*phys_zone_)->create_arresting_gear(params, phys::compound_sensor_ptr(), p);
 
 }
 
@@ -87,8 +90,32 @@ void model::update_model( double time, double dt )
 
         double dist = cg::distance(glb_phys_pos.pos, desired_position_/*cur_pos*/);
 #endif
+
+        update_ropes(time);
     }
 
+}
+
+void model::update_ropes(double time)
+{
+    if (!phys_model_)
+        return;
+
+    auto ropes_info = std::move(phys_model_->get_ropes_info());
+    if (!ropes_info.empty())
+    {
+        vector<msg::ropes_state::rope_state_t> ropes_state;
+
+#if 0
+        for (auto it = contacts.begin(); it != contacts.end(); ++it)
+            contacts_to_send.push_back(msg::contact_effect::contact_t(it->offset, it->vel));
+
+        set(msg::contact_effect(move(contacts_to_send), time), false);
+#endif
+
+    }
+
+ 
 }
 
 void model::sync_phys(double dt)

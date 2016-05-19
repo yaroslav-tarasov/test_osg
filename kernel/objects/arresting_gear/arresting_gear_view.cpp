@@ -52,7 +52,7 @@ void view::on_settings(msg::settings_msg const& msg)
 		nodes_manager_->set_model(settings.model);
 #endif
 	
-	settings_ = msg.settings;
+	settings_ = msg/*.settings*/;
     on_new_settings();
 }
 

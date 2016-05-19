@@ -14,6 +14,7 @@
 #include "airport/airport_view.h"
 #include "environment/environment_view.h"
 #include "flock_manager/flock_manager_view.h"
+#include "arresting_gear/arresting_gear_view.h"
 #include "aerostat/aerostat_view.h"
 #include "human/human_view.h"
 #include "camera/camera_view.h"
@@ -188,6 +189,7 @@ namespace airport
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
 			.add_child(obj_create_data("environment", "environment", dict::wrap(environment::settings_t          ())))
+            .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t          ())))
             ;
 
         return sys->create_object(ocd);	
