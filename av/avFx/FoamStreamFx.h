@@ -75,22 +75,22 @@ namespace avFx
 
 	private: // particles_effect_info
 
-		virtual float getMaxParticleLifetime() const override { return foam_lifetime_max; }
-		virtual bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
+		float getMaxParticleLifetime() const override { return foam_lifetime_max; }
+		bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
 
 	private: // smoke_sfx_node
 
-		virtual void                 setIntensity( float inten ) override;
-		virtual float                getIntensity() const override { return data_.intensity; }
+		void                 setIntensity( float inten ) override;
+		float                getIntensity() const override { return data_.intensity; }
 
-		virtual void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }
-		virtual cg::point_3f const & getEmitWorldDir() const override { return data_.emit_dir; }
+		void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }
+		cg::point_3f const & getEmitWorldDir() const override { return data_.emit_dir; }
 
-		virtual void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override { data_.emitter_speed = speed; }
-		virtual cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
+		void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override { data_.emitter_speed = speed; }
+		cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
 
-		virtual void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
-		virtual float                getFactor() const override { return data_.factor; }
+		void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
+		float                getFactor() const override { return data_.factor; }
 
 	private:
 

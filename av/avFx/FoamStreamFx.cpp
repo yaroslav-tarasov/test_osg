@@ -21,7 +21,7 @@ using namespace Utils;
 
 
 //
-// Local cloud constructor
+// Foam stream special effect constructor
 //
 
 // constructor

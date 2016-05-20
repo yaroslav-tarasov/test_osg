@@ -548,6 +548,9 @@
     <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_vis.h">
       <Filter>Source Files\objects\arresting_gear</Filter>
     </ClInclude>
+    <ClInclude Include="av\avLine\Ropes.h">
+      <Filter>Source Files\av\line</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1326,6 +1329,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_vis.cpp">
       <Filter>Source Files\objects\arresting_gear</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avLine\Ropes.cpp">
+      <Filter>Source Files\av\line</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "phys/phys_sys_fwd.h"
-
+#include "objects/arresting_gear.h"
 
 namespace phys
 {
@@ -9,14 +9,12 @@ namespace phys
     {
         struct params_t
         {
-            typedef std::pair<cg::point_3f,cg::point_3f> cord_t;
+            typedef std::pair<cg::point_3f,cg::point_3f> rope_t;
 
             params_t()
-                : length(0.0)
             {}
 
-            double         length;
-            vector<cord_t> cords;
+            vector<rope_t> ropes;
         };  
 
         struct contact_info_t
@@ -30,25 +28,12 @@ namespace phys
             cg::point_3 offset;
         };
         
-        struct rope_node_info_t
-        {
-            rope_node_info_t() {}
-            rope_node_info_t( cg::point_3 const& vel, cg::point_3 const& coord )
-                : vel(vel), coord(coord)
-            {}
-
-            cg::point_3 vel;
-            cg::point_3 coord;
-        };
         
-        
-        typedef std::vector<rope_node_info_t> rope_info_t;
-
         struct info
         {
             virtual ~info() {}
             virtual decart_position get_position() const = 0;
-            virtual std::vector<rope_info_t>    get_ropes_info() const = 0; 
+            virtual std::vector<::arresting_gear::rope_state_t>    get_ropes_info() const = 0; 
         };
 
         struct control

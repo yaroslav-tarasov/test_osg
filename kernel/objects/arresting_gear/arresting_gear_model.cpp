@@ -104,15 +104,14 @@ void model::update_ropes(double time)
     auto ropes_info = std::move(phys_model_->get_ropes_info());
     if (!ropes_info.empty())
     {
-        vector<msg::ropes_state::rope_state_t> ropes_state;
+        vector<rope_state_t> ropes_state_to_send;
+        ropes_state_to_send.reserve(ropes_info.size());
+        for (auto it = ropes_info.begin(); it != ropes_info.end(); ++it)
+        {
+             ropes_state_to_send.push_back(std::move(*it));
+        }
 
-#if 0
-        for (auto it = contacts.begin(); it != contacts.end(); ++it)
-            contacts_to_send.push_back(msg::contact_effect::contact_t(it->offset, it->vel));
-
-        set(msg::contact_effect(move(contacts_to_send), time), false);
-#endif
-
+        set(msg::ropes_state(move(ropes_state_to_send), time), false);
     }
 
  

@@ -7,16 +7,20 @@ namespace arresting_gear
 
 struct settings_t
 {
+    typedef std::pair<cg::point_3f,cg::point_3f> rope_t;
+
     settings_t()
         : model("arresting_gear")
     {}
 
+    vector<rope_t> ropes;
     string   model;
 };
 
 
 REFL_STRUCT(settings_t)
     REFL_ENTRY(model)
+    REFL_ENTRY(ropes)          
 REFL_END()
 
 struct state_t

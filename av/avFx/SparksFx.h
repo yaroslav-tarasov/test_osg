@@ -67,26 +67,26 @@ namespace avFx
 
 	private: // particles_effect_info
 
-		virtual float getMaxParticleLifetime() const override { return spark_lifetime_max; }
-		virtual bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
+		float getMaxParticleLifetime() const override { return spark_lifetime_max; }
+		bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
 
 	private: // SparksFx
 		
-		virtual void                 setContactFlag( bool flag ) override;
-		virtual bool                 getContactFlag() const override { return data_.active; }
+		void                 setContactFlag( bool flag ) override;
+		bool                 getContactFlag() const override { return data_.active; }
 
-		virtual void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override;
-		virtual cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
+		void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override;
+		cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
 
-		virtual void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
-		virtual float                getFactor() const override { return data_.factor; }
+		void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
+		float                getFactor() const override { return data_.factor; }
 
 	private:
 
 		// data
 		sparks_sfx_data data_;
-		cg::point_3f speed_left;
-		float speed_val_;
+		cg::point_3f    speed_left;
+		float           speed_val_;
 
 		// cpu part queue
 		struct cpu_particle : base_cpu_particle

@@ -27,7 +27,11 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     }
 
     msg_disp()
-        .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1));
+        .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1))
+        .add<msg::ropes_state> (boost::bind(&view::on_ropes_state, this, _1))
+        
+        
+        ; 
 }
 
 geo_point_3 view::pos() const
@@ -45,15 +49,23 @@ settings_t const& view::settings() const
     return settings_;
 }
 
+ropes_state_t const& view::ropes_state() const
+{
+    return ropes_state_;
+}
+
 void view::on_settings(msg::settings_msg const& msg)
 {
-#if 0  // Нужно или нет пока не понятно 
-	if (nodes_manager_ && nodes_manager_->get_model() != settings.model)
-		nodes_manager_->set_model(settings.model);
-#endif
-	
-	settings_ = msg/*.settings*/;
+
+	settings_ = msg;
     on_new_settings();
+}
+
+void view::on_ropes_state(msg::ropes_state const& msg)
+{
+    ropes_state_ =  std::move(msg.state);
+
+    on_new_ropes_state();
 }
 
 void view::on_model_changed_internal()

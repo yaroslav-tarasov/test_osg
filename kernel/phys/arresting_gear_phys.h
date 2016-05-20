@@ -30,7 +30,7 @@ namespace phys
        params_t const& params() const ;
        bool has_contact() const;
        std::vector<contact_info_t> get_body_contacts() const;
-       std::vector<rope_info_t>    get_ropes_info() const override;                               
+       std::vector<::arresting_gear::rope_state_t>    get_ropes_info() const override;                               
 
    // control
    private:
@@ -60,7 +60,7 @@ namespace phys
        rigid_body_proxy                       chassis_;
 #endif
 
-	   std::vector<soft_body_proxy>			  ropes_;
+	   std::vector<std::unique_ptr<soft_body_proxy>>			  ropes_;
        polymorph_ptr<bt_body_user_info_t>     self_;
 	   system_impl_ptr						  sys_;
        params_t     params_;

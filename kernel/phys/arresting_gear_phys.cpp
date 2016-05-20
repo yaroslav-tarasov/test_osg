@@ -135,32 +135,32 @@ namespace {
         bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys->dynamics_world());
 
         const unsigned n=15;
-        const float step = 1.0;
+        const float step = 3.0;
 
         ropes_.reserve(n);
         for( unsigned i=0; i<n; ++i)
         {
-            ropes_.push_back(soft_body_proxy(bw));
+            ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
 
-            ropes_.back().reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,1),
-                btVector3(60 + i*step,60,0.5),
+            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,10),
+                btVector3(60 + i*step,60,10.5),
                 16,
                 1+2));
 
-            auto& psb = ropes_.back();
-            ropes_.back()->m_cfg.piterations		=	4;
-            ropes_.back()->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
-            ropes_.back()->setTotalMass(20);
+            auto& psb = *ropes_.back().get();
+            psb->m_cfg.piterations		=	4;
+            psb->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
+            psb->setTotalMass(20);
 
 
-#if 0
+#if 1
             if(i==0)
             {
                 btTransform startTransform;
                 startTransform.setIdentity();
-                startTransform.setOrigin(btVector3(60 + i*step,30,100));
+                startTransform.setOrigin(btVector3(60 + i*step,30,0));
                 btRigidBody*		body= create_rigid_body(bw.get(),50,startTransform,new btBoxShape(btVector3(2,6,2)));
-                psb->appendAnchor(psb->m_nodes.size()-1,body);
+                psb->appendAnchor(psb->m_nodes.size()/2,body);
                 body->setLinearVelocity( btVector3(30.0,0.0,0.0) );
             }
 #endif
@@ -258,16 +258,16 @@ namespace {
         return res;
     }
 
-    std::vector<rope_info_t>   impl::get_ropes_info() const
+    std::vector<::arresting_gear::rope_state_t>   impl::get_ropes_info() const
     {
-        std::vector<rope_info_t> res;
+        std::vector<::arresting_gear::rope_state_t> res;
         res.reserve(ropes_.size());
         unsigned i = 0;
         for (auto it = ropes_.begin(); it != ropes_.end(); ++it, ++i)
         {
-            const btSoftBody::tNodeArray& nodes = it->get()->m_nodes;
+            const btSoftBody::tNodeArray& nodes = it->get()->get()->m_nodes;
             unsigned idx;
-            rope_info_t ri;
+            ::arresting_gear::rope_state_t ri;
             ri.resize(nodes.size());
             for( idx=0; idx<nodes.size(); idx++)
             {

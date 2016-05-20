@@ -19,7 +19,7 @@ using namespace avFx;
 
 
 //
-// Local cloud constructor
+// Dust special effect constructor
 //
 
 // constructor

@@ -433,8 +433,14 @@ osg::Node* makeRope(const btSoftBody* softBody)
          Indices.push_back(i);
          Indices.push_back(i + 1);
     }
+    
+    std::vector<int>   Indices2;
+
+    Indices2.push_back(0);
+    Indices2.push_back(rope_nodes_num-1);
 
     geom->addPrimitiveSet(new osg::DrawElementsUInt ( osg::PrimitiveSet::LINES, Indices.size(), (GLuint*)&Indices [ 0 ] ));
+    geom->addPrimitiveSet(new osg::DrawElementsUInt ( osg::PrimitiveSet::LINES, Indices2.size(), (GLuint*)&Indices2 [ 0 ] ));
 
     osg::StateSet* stateset = geom->getOrCreateStateSet();
     osg::LineWidth* linewidth = new osg::LineWidth();
@@ -683,8 +689,6 @@ osg::Node* makeFlag( btSoftRigidDynamicsWorld* bw )
 	osg::Vec3Array* vertices( dynamic_cast< osg::Vec3Array* >( pgeom->getVertexArray() ) );
 
 	pgeom->setUpdateCallback( new MeshUpdater( para, vertices->size() ) );
-	
-
 	
 	osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform;
 	pat->setAttitude(osg::Quat(osg::inDegrees(-90.0),osg::X_AXIS));
@@ -936,7 +940,7 @@ int main_patched_lowlevel( int argc, char** argv )
 
 
     osgbCollision::GLDebugDrawer* dbgDraw( NULL );
-    if( /*debugDisplay*/ true)
+    if( /*debugDisplay*/ false)
     {
         dbgDraw = new osgbCollision::GLDebugDrawer();
         dbgDraw->setDebugMode( ~btIDebugDraw::DBG_DrawText );

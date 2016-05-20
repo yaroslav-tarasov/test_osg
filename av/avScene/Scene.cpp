@@ -77,6 +77,8 @@
 #include "av/avFx/FoamStreamFx.h"
 #include "av/avFx/FrictionDustFx.h"
 
+#include "av/avLine/Ropes.h"
+
 //
 //  ext
 //
@@ -1334,6 +1336,16 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         _viewerPtr->addEventHandler(sp_fire.second);
         
         //_viewerPtr->addEventHandler(sp_s.second);
+
+        return mt_.back();
+    }
+
+    if( path == "arrested_gear.scg" )
+    {
+        avRopes::RopesNode* fs = new avRopes::RopesNode;
+
+        mt_.back()->addChild(fs);
+        _terrainRoot->asGroup()->addChild(mt_.back());
 
         return mt_.back();
     }

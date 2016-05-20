@@ -78,7 +78,7 @@ namespace avFx
 
 	private: // LandingDustFx
 
-		virtual void makeContactDust( float timestamp, cg::point_3f const & contact_pos, cg::point_3f const & contact_speed )
+		void makeContactDust( float timestamp, cg::point_3f const & contact_pos, cg::point_3f const & contact_speed ) override
 		{
 			data_.events.insert(landing_dust_sfx_data::dust_event(timestamp, contact_pos, contact_speed));
 		}

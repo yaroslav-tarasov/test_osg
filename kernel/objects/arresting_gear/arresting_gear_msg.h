@@ -3,7 +3,7 @@
 #include "common/arresting_gear.h"
 
 #include "network/msg_base.h"
-//#include "objects/arresting_gear.h"
+#include "objects/arresting_gear.h"
 
 namespace arresting_gear
 {
@@ -71,24 +71,6 @@ struct contact_effect
 struct ropes_state
     : network::msg_id<ar_ropes_state>
 {
-    struct rope_node_info_t
-    {
-        rope_node_info_t() {}
-        rope_node_info_t( cg::point_3 const& vel, cg::point_3 const& coord )
-            : vel(vel), coord(coord)
-        {}
-
-        cg::point_3 vel;
-        cg::point_3 coord;
-
-        REFL_INNER(rope_node_info_t)
-            REFL_ENTRY(vel)
-            REFL_ENTRY(coord)
-        REFL_END()
-    };
-    
-    typedef  std::vector<rope_node_info_t> rope_state_t;
-
     ropes_state() {}
 
     ropes_state(std::vector<rope_state_t>&& state, double time)
