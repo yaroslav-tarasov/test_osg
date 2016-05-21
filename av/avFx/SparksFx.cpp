@@ -86,8 +86,6 @@ SparksFx::SparksFx()
 	
 	
 	setCullCallback(Utils::makeNodeCallback(this, &SparksFx::cull));
-    // exit
-    return;
 }
 
 

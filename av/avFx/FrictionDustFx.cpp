@@ -95,8 +95,6 @@ FrictionDustFx::FrictionDustFx()
 
 	
 	setCullCallback(Utils::makeNodeCallback(this, &FrictionDustFx::cull));
-    // exit
-    return;
 }
 
 

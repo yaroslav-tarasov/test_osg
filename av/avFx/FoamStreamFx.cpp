@@ -99,8 +99,6 @@ FoamStreamFx::FoamStreamFx()
 
 	
 	setCullCallback(Utils::makeNodeCallback(this, &FoamStreamFx::cull));
-    // exit
-    return;
 }
 
 

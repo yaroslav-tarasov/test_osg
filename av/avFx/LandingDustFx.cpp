@@ -96,8 +96,6 @@ LandingDustFx::LandingDustFx()
 
 
 	setCullCallback(Utils::makeNodeCallback(this, &LandingDustFx::cull));
-	// exit
-	return;
 }
 
 

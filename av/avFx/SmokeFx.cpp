@@ -97,8 +97,6 @@ SmokeFx::SmokeFx()
 
 	
 	setCullCallback(Utils::makeNodeCallback(this, &SmokeFx::cull));
-    // exit
-    return;
 }
 
 
