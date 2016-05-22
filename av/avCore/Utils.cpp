@@ -38,7 +38,7 @@ bool Utils::GetMouseCursorShowState()
 // helpful vector absolution
 static __forceinline void _vectorAbs( osg::Vec3f & vVec )
 {
-    DWORD * pPtr = reinterpret_cast<DWORD *>(&vVec);
+    uint32_t * pPtr = reinterpret_cast<uint32_t *>(&vVec);
     *(pPtr++) &= 0x7FFFFFFF;
     *(pPtr++) &= 0x7FFFFFFF;
     *(pPtr++) &= 0x7FFFFFFF;
@@ -48,14 +48,14 @@ static __forceinline void _vectorAbs( osg::Vec3f & vVec )
 // helpful vector clamping
 static __forceinline void _vectorZeroClamp( osg::Vec3f & vVec )
 {
-    DWORD * pPtr = reinterpret_cast<DWORD *>(&vVec);
-    DWORD & val0 = *(pPtr++);
+    uint32_t * pPtr = reinterpret_cast<uint32_t *>(&vVec);
+    uint32_t & val0 = *(pPtr++);
     if (val0 & 0x80000000)
         val0 ^= val0;
-    DWORD & val1 = *(pPtr++);
+    uint32_t & val1 = *(pPtr++);
     if (val1 & 0x80000000)
         val1 ^= val1;
-    DWORD & val2 = *(pPtr++);
+    uint32_t & val2 = *(pPtr++);
     if (val2 & 0x80000000)
         val2 ^= val2;
     return;

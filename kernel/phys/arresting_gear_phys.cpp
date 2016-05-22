@@ -142,8 +142,8 @@ namespace {
         {
             ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
 
-            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,10),
-                btVector3(60 + i*step,60,10.5),
+            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,0.5),
+                btVector3(60 + i*step,60,0.5),
                 16,
                 1+2));
 
@@ -153,7 +153,7 @@ namespace {
             psb->setTotalMass(20);
 
 
-#if 1
+#if 0
             if(i==0)
             {
                 btTransform startTransform;
@@ -294,7 +294,8 @@ namespace {
     
     void   impl::append_anchor        (rigid_body_ptr body, cg::point_3 const& pos)
     {
-
+		auto& psb = *ropes_.back().get();
+		psb->appendAnchor(psb->m_nodes.size()/2, rigid_body_impl_ptr(body)->get_body().get());
     }
 
     void   impl::release_anchor       (rigid_body_ptr body)

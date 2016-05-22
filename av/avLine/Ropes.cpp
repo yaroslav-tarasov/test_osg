@@ -260,4 +260,12 @@ void RopesNode::cull( osg::NodeVisitor * pNV )
 	float fScreenClarity = 1.f / 4.5/*P(1,1) *// 1024.f/*W.height()*/;//Utils::GetScreenClarity(pCV);
 
 	m_uniformSettings->set(osg::Vec2f(fScreenClarity , m_fRadius));
+
+	float fClampedPixelSize;
+	osg::CullStack* cullStack = dynamic_cast<osg::CullStack*>(pNV);
+	if (cullStack)
+	{
+		fClampedPixelSize = cullStack->clampedPixelSize(getBound()) ;
+	}
+
 }
