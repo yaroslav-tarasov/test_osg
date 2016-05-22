@@ -92,9 +92,9 @@ RopesNode::RopesNode()
     osg::StateSet * pCurStateSet = getOrCreateStateSet();
 
 
-    osg::LineWidth* linewidth = new osg::LineWidth();
-    linewidth->setWidth(4.0f);
-    pCurStateSet->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
+    //osg::LineWidth* linewidth = new osg::LineWidth();
+    //linewidth->setWidth(4.0f);
+    //pCurStateSet->setAttributeAndModes(linewidth,osg::StateAttribute::ON);
 
     pCurStateSet->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
