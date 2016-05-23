@@ -134,17 +134,17 @@ namespace {
 #endif
         bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys->dynamics_world());
 
-        const unsigned n=15;
-        const float step = 3.0;
-
+        const unsigned n = params.ropes.size();
+        auto const & propes_params = params.ropes;
         ropes_.reserve(n);
         for( unsigned i=0; i<n; ++i)
         {
             ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
 
-            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	btVector3(60 + i*step,0,0.5),
-                btVector3(60 + i*step,60,0.5),
-                16,
+            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	
+                to_bullet_vector3(propes_params[i].first),
+                to_bullet_vector3(propes_params[i].second),
+                params.seg_num,
                 1+2));
 
             auto& psb = *ropes_.back().get();
@@ -273,6 +273,7 @@ namespace {
             {
                 ri[idx].coord  = from_bullet_vector3(nodes[ idx ].m_x);
                 ri[idx].vel = from_bullet_vector3(nodes[ idx ].m_v);
+                FIXME(Some kind of on may be placed here)
             }
             res.push_back(std::move(ri));
         }

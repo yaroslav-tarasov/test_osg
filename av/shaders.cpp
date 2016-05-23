@@ -292,22 +292,22 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
 
 #define INCLUDE_SCENE_PARAM                                                                             \
      STRINGIFY (                                                                                        \
-\n        uniform vec4 ambient;                                                                           \
-\n        uniform vec4 diffuse;                                                                           \
-\n        uniform vec4 specular;                                                                          \
-\n        uniform vec4 light_vec_view;                                                                    \
+\n        uniform vec4 ambient;                                                                         \
+\n        uniform vec4 diffuse;                                                                         \
+\n        uniform vec4 specular;                                                                        \
+\n        uniform vec4 light_vec_view;                                                                  \
      )
 
 #define INCLUDE_UNIFORMS                                                                                \
     STRINGIFY (                                                                                         \
-\n        uniform sampler2D           ViewLightMap;                                                       \
-\n        uniform sampler2D           detailTex;                                                          \
-\n        uniform samplerCube         envTex;                                                             \
-\n        uniform sampler2DShadow     ShadowSplit0;                                                       \
-\n        uniform sampler2DShadow     ShadowSplit1;                                                       \
-\n        uniform sampler2DShadow     ShadowSplit2;                                                       \
-\n        uniform sampler2D           ViewDecalMap;                                                       \
-\n        uniform vec4                SceneFogParams;                                                     \
+\n        uniform sampler2D           ViewLightMap;                                                     \
+\n        uniform sampler2D           detailTex;                                                        \
+\n        uniform samplerCube         envTex;                                                           \
+\n        uniform sampler2DShadow     ShadowSplit0;                                                     \
+\n        uniform sampler2DShadow     ShadowSplit1;                                                     \
+\n        uniform sampler2DShadow     ShadowSplit2;                                                     \
+\n        uniform sampler2D           ViewDecalMap;                                                     \
+\n        uniform vec4                SceneFogParams;                                                   \
         )
 
 #define INCLUDE_COMPABILITY \

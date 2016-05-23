@@ -18,33 +18,43 @@ namespace {
 char vertexShaderSource[] = 
 	"#version 430 compatibility \n"
 	"#extension GL_ARB_gpu_shader5 : enable \n"
-	"uniform vec2 Settings; \n"
+    "vec3 light_dir = normalize(vec3(-0.79f, 0.39f, 0.47f)); \n"
+    "uniform vec2 Settings; \n"
+    "out block\n"
+    "{        \n"
 	"centroid out vec2 texcoord; \n"
-	"centroid out float fade; \n"
+    "centroid out float fade; \n"
+	"out float light; \n"
+    "} v_out;       \n"
 	"void main(void) \n"
 	"{ \n"
-	"    float w = dot(transpose(gl_ModelViewProjectionMatrix)[3], vec4(gl_Vertex.xyz, 1.0f));  \n"
+	"    float w            = dot(transpose(gl_ModelViewProjectionMatrix)[3], vec4(gl_Vertex.xyz, 1.0f));  \n"
 	"    float pixel_radius = w * Settings.x;  \n"
-	"    float radius =  max(Settings.y, pixel_radius);  \n"
-	"    fade = Settings.y / radius;  \n"
-	"    vec3 position = gl_Vertex.xyz + radius * gl_Normal.xyz;    \n"
-	"    texcoord    = vec2( gl_MultiTexCoord0.x * (0.02f / radius), gl_MultiTexCoord0.y)   ;  \n"
-	"    gl_Position = gl_ModelViewProjectionMatrix * vec4(position, 1.0f) ;\n"
+	"    float radius       = max(Settings.y, pixel_radius);  \n"
+	"    v_out.fade         = Settings.y / radius;  \n"
+	"    vec3 position      = gl_Vertex.xyz + radius * gl_Normal.xyz;    \n"
+    "    v_out.texcoord     = vec2( gl_MultiTexCoord0.x * (0.02f / radius), gl_MultiTexCoord0.y)   ;  \n"
+	"    v_out.light        = dot(light_dir,gl_Normal.xyz) * 0.5f + 0.5f;  \n"
+	"    gl_Position        = gl_ModelViewProjectionMatrix * vec4(position, 1.0f) ;\n"
 	"}\n";
 
 
 char fragmentShaderSource[] =  
 	"#version 430 compatibility \n"
 	"#extension GL_ARB_gpu_shader5 : enable \n"
-	"centroid in vec2 texcoord; \n"
-	"centroid in float fade; \n"
+    "in block\n"
+    "{        \n"
+    "centroid in vec2 texcoord; \n"
+    "centroid in float fade; \n"
+    "in float light; \n"
+    "} v_in;       \n"
 	"uniform sampler2D colorTex; \n"
 	"out vec4 FragColor;   \n"
 	"\n"
 	"void main(void) \n"
 	"{ \n"
 	"\n"
-	"    FragColor = vec4(texture2D(colorTex, texcoord.xy).xyz, fade);"
+	"    FragColor = vec4(texture2D(colorTex, v_in.texcoord.xy).xyz * v_in.light, v_in.fade);"
 	"}\n";
 
 osg::Program* createProgram( const std::string& name, const std::string& vertexSource, const std::string& fragmentSource  )
@@ -206,6 +216,8 @@ void  RopesNode::updateRopes( const arresting_gear::ropes_state_t& rss )
 			 osg::Vec3 dir0 = (dir ^ osg::Vec3(0, 0, 1)); dir0.normalize();
 			 osg::Vec3 dir1 = (dir0 ^ dir);  dir1.normalize();
 			 
+             cg::point_3 coord (it_r->coord.x,it_r->coord.y,rs.on?it_r->coord.z:0);
+
 			 auto it_uv0 = std::next(it_uv); 
 			 auto it_normals0 = std::next(it_normals);
 		     for (int a = 0; a < sides; a++)
@@ -216,7 +228,7 @@ void  RopesNode::updateRopes( const arresting_gear::ropes_state_t& rss )
 
 				 osg::Vec3f normal = dir0 * x  + dir1 * y;
 
-				 *it_vert++ = to_osg_vector3(it_r->coord);
+				 *it_vert++ = to_osg_vector3(coord);
              
 				 if( it_r != before_end)
 				 {
@@ -229,9 +241,9 @@ void  RopesNode::updateRopes( const arresting_gear::ropes_state_t& rss )
 				 (*it_normals++).set(normal);
 			 }
 
-			  *it_vert++ = to_osg_vector3(it_r->coord);
+			 (*it_vert++).set(to_osg_vector3(coord));
 			 (*it_uv++).set((*it_uv0).x(), 1.0);
-			 (*it_normals++).set((*it_normals0).x(), (*it_normals0).y(), (*it_normals0).z());
+			 (*it_normals++).set(*it_normals0);
 
 
          }
@@ -257,9 +269,14 @@ void RopesNode::cull( osg::NodeVisitor * pNV )
 	const osg::Matrix & P = *pCV->getProjectionMatrix();
 	const osg::Viewport & W = *pCV->getViewport();
 
-	float fScreenClarity = 1.f / 4.5/*P(1,1) *// 1024.f/*W.height()*/;//Utils::GetScreenClarity(pCV);
+#if 0
+	m_fPixelSize = 1.f / 4.5/ 1200.f/*1024.f*/;
+#else 
+    if(W.height()>2.0 && pNV->getNodePath().size()< 5) // dirty hack with node paths
+        m_fPixelSize= 1.f / P(1,1) / W.height();
+#endif
 
-	m_uniformSettings->set(osg::Vec2f(fScreenClarity , m_fRadius));
+	m_uniformSettings->set(osg::Vec2f(m_fPixelSize , m_fRadius));
 
 	float fClampedPixelSize;
 	osg::CullStack* cullStack = dynamic_cast<osg::CullStack*>(pNV);

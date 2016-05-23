@@ -55,7 +55,7 @@ namespace avRopes
 	    osg::ref_ptr<osg::Vec3Array>  _normals;
 		
 		float						  m_fRadius;
-
+        float                         m_fPixelSize;
     private:
 		osg::ref_ptr<osg::Uniform>   m_uniformSettings;
 		osg::Geometry *              _geom;

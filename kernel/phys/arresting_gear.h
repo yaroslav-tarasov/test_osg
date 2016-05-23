@@ -11,9 +11,11 @@ namespace phys
         {
             typedef std::pair<cg::point_3f,cg::point_3f> rope_t;
 
-            params_t()
+            params_t() 
+            : seg_num(16)
             {}
 
+            unsigned       seg_num;
             vector<rope_t> ropes;
         };  
 

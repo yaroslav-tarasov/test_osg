@@ -326,16 +326,22 @@ void  Terrain::Create( const std::string& cFileName )
     FIXME(Test code)
     if(cFileName == "eisk")
     {
-        findNodeByType< osg::Geode> geode_finder;  
-        geode_finder.apply(*scene);
+        auto terra = findFirstNode(scene,"Terrain",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
-        osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
-        osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
+        if(terra)
+        {
+            findNodeByType< osg::Geode> geode_finder;  
+            geode_finder.apply(*terra);
 
-        osgUtil::Tessellator tscx;
-        tscx.setBoundaryOnly(true);
-        tscx.setWindingType( osgUtil::Tessellator::TESS_WINDING_ODD); // tessellation - ODD, only show boundary.
-        tscx.retessellatePolygons(*mesh);
+            osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
+            osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
+
+            osgUtil::Tessellator tscx;
+            tscx.setBoundaryOnly(true);
+            tscx.setWindingType( osgUtil::Tessellator::TESS_WINDING_ODD); // tessellation - ODD, only show boundary.
+            tscx.retessellatePolygons(*mesh);
+        }
+
     } 
 
 

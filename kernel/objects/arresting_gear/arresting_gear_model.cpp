@@ -71,8 +71,16 @@ void model::create_phys()
 #endif
     decart_position p(base(state_.pos), state_.orien);
 
-    
     phys::arresting_gear::params_t  params;
+    
+    const float step = 3.0;
+
+    for (size_t i=0; i < 15; ++i)
+    {
+       params.ropes.push_back(std::make_pair(cg::point_3f(60 + i*step,0,0.1), cg::point_3f(60 + i*step,60,0.1) ));
+    }
+    
+
     phys_model_ = phys_->get_system(*phys_zone_)->create_arresting_gear(params, phys::compound_sensor_ptr(), p);
 
 }
@@ -108,6 +116,12 @@ void model::update_ropes(double time)
         ropes_state_to_send.reserve(ropes_info.size());
         for (auto it = ropes_info.begin(); it != ropes_info.end(); ++it)
         {
+             FIXME(Some kind of on may be placed here)
+             if (time  < 40.)
+                (*it).on = false;
+             else
+                (*it).on = true;
+
              ropes_state_to_send.push_back(std::move(*it));
         }
 
