@@ -656,7 +656,7 @@ struct client
 #if 1
             ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
             ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
-            ADD_EVENT(232.0  , set_target_msg( 173 ) ) 
+            ADD_EVENT(/*232*/180.0  , set_target_msg( 173 ) ) 
 #endif
 
 #if 0

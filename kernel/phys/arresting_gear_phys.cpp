@@ -137,6 +137,7 @@ namespace {
         const unsigned n = params.ropes.size();
         auto const & propes_params = params.ropes;
         ropes_.reserve(n);
+		ropes_bound = cg::rectangle_3f (propes_params[0].first, propes_params[0].second);
         for( unsigned i=0; i<n; ++i)
         {
             ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
@@ -146,6 +147,9 @@ namespace {
                 to_bullet_vector3(propes_params[i].second),
                 params.seg_num,
                 1+2));
+
+			ropes_bound |= propes_params[i].first;
+			ropes_bound |= propes_params[i].second;
 
             auto& psb = *ropes_.back().get();
             psb->m_cfg.piterations		=	4;
@@ -167,8 +171,9 @@ namespace {
 
         }
 
+		ropes_bound.inflate(20);
 
-        // sys_->dynamics_world()->addAction(this);
+        sys_->dynamics_world()->addAction(this);
 
 		sys_->register_rigid_body(this);
 
@@ -176,10 +181,25 @@ namespace {
 		chassis_->setUserPointer(this);
 #endif
     }
+	
+	void impl::update(double dt)
+	{
+
+		if(target_)
+		{
+			auto target = rigid_body_impl_ptr(target_)->get_body();
+			cg::transform_4f target_transform = from_bullet_transform(target->getWorldTransform());
+			if(ropes_bound.contains(target_transform.translation()))
+			{
+				append_anchor(target_,cg::point_3());
+			}
+		}
+
+	}
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
 	{
-        //update_aerodynamics(deltaTimeStep);
+        update(deltaTimeStep);
 	}
 
     void impl::debugDraw(btIDebugDraw* debugDrawer)
@@ -306,7 +326,8 @@ namespace {
     
     void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
     {
-         append_anchor        (rb, self_offset);
+         // append_anchor        (rb, self_offset);
+		target_ = rb;
     }
 
     void impl::reset_target()

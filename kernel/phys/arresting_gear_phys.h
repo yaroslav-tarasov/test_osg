@@ -52,7 +52,9 @@ namespace phys
 	   bt_rigid_body_ptr get_body   () const;
 	   void              pre_update (double dt);
 	   void              has_contact(bt_body_user_info_t const* other, cg::point_3 const& local_point, cg::point_3 const& vel);
-
+   
+   private:
+	   	void             update(double dt);
    private:
 #if 0
        compound_shape_proxy                   chassis_shape_;
@@ -86,7 +88,8 @@ namespace phys
        };
 
        fixed_id_vector<contact_t> body_contacts_;
-
+	   cg::rectangle_3f                  ropes_bound;
+	   rigid_body_ptr                     target_;
    };
 
 
