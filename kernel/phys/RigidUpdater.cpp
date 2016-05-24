@@ -25,7 +25,7 @@
 #include "objects/aerostat/aerostat_common.h"
 #include "objects/human/human_common.h"
 
-#include "object_creators.h"
+#include "objects_factory.h"
 
 // Моя фантазия
 #include "objects/vehicle_fwd.h"

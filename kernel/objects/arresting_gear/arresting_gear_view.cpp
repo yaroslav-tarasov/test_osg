@@ -29,8 +29,9 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     msg_disp()
         .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1))
         .add<msg::ropes_state> (boost::bind(&view::on_ropes_state, this, _1))
+        .add<msg::target_msg>  (boost::bind(&view::on_set_target, this, _1))
         
-        
+         
         ; 
 }
 
@@ -67,6 +68,15 @@ void view::on_ropes_state(msg::ropes_state const& msg)
 
     on_new_ropes_state();
 }
+
+void view::on_set_target( boost::optional<uint32_t> id)
+{
+    auto old_target = target_;
+    target_ = id ? collection_->get_object(*id) : nullptr;
+
+    on_target_changed(old_target, id) ;
+}
+
 
 void view::on_model_changed_internal()
 {

@@ -199,6 +199,25 @@ void model::sync_nodes_manager( double /*dt*/ )
     }
 }
 
+void model::on_target_changed (aircraft::info_ptr old_target, const boost::optional<uint32_t> & id )
+{
+    if (!phys_model_)
+        return;
 
+    if (target_ && aircraft::model_info_ptr(target_)->get_rigid_body())
+    {
+        cg::point_3 offset;
+
+        FIXME(tow_offset)
+        phys::arresting_gear::control_ptr(phys_model_)->set_target(aircraft::model_info_ptr(target_)->get_rigid_body(), offset, aircraft::model_info_ptr(target_)->tow_offset());
+    }
+    else
+    {
+        // phys::arresting_gear::control_ptr(phys_model_)->reset_target();
+
+
+    }
+
+}
 
 } // end of arresting_gear

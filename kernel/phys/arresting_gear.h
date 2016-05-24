@@ -48,6 +48,8 @@ namespace phys
             virtual void   set_position        (const decart_position& pos) = 0;
             virtual void   append_anchor       (rigid_body_ptr body, cg::point_3 const& pos)     = 0;
             virtual void   release_anchor      (rigid_body_ptr body)     = 0;
+            virtual void   set_target          (rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset) = 0;
+            virtual void   reset_target        () = 0;
         };
 
     }

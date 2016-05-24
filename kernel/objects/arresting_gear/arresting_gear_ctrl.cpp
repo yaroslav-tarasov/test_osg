@@ -28,16 +28,15 @@ ctrl::ctrl(kernel::object_create_t const& oc, dict_copt dict)
 
 }
 
-void ctrl::set_model(const std::string&  icao_code)
-{
-}
-
 void ctrl::update( double time )
 {   
     view::update(time);
 }
 
-
+void ctrl::set_target(const boost::optional<uint32_t>&   target_id)
+{
+      set(msg::target_msg(target_id));
+}
 
 } // arresting_gear 
 

@@ -10,7 +10,7 @@
 #include "kernel/systems/fake_system.h"
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 #include "common/locks.h"
 #include "common/time_counter.h"
 

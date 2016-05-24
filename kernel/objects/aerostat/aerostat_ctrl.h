@@ -15,9 +15,6 @@ struct ctrl
 protected:
     ctrl( kernel::object_create_t const& oc, dict_copt dict );
 
-private:
-    void set_model(const std::string&  name) override;
-
     // base_presentation
 private:
     void update( double /*time*/ ) override;

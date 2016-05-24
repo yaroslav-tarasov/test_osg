@@ -27,6 +27,8 @@ namespace net_layer
             vm_detach_tow_dc    ,
             vm_fire_fight       ,
 			
+            ar_set_target       ,
+
 			id_environment      ,   
 
             sm_container_msg    

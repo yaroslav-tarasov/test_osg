@@ -3,7 +3,7 @@
 #include "network/msg_base.h"
 using network::gen_msg;
 
-#include "test_msg_enum.h"
+#include "ext_msg_enum.h"
 
 // FIXME messages and namespaces
 

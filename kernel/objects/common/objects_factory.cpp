@@ -22,7 +22,20 @@
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
 
-#include "objects/object_creators.h"
+#include "objects/objects_factory.h"
+
+namespace 
+{
+    using namespace kernel;
+
+    std::list<obj_create_data> creating_objects_list_t;
+
+    inline object_info_ptr sys_object_create(fake_objects_factory* sys, obj_create_data const& descr)
+    {
+         return sys->create_object(descr);
+    }
+}
+
 
 namespace aircraft
 {
@@ -38,16 +51,17 @@ object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const ge
     ocd
         .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
         .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
-        ;//.add_child(obj_create_data("gui"          , "gui"          , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
+        //.add_child(obj_create_data("gui"          , "gui"       , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
+        ;
 
-    return sys->create_object(ocd);	
+    return sys_object_create(sys, ocd);	
 }
 
 }
 
 namespace flock
 {
-    namespace manager 
+    namespace manager
     {
         object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
         {
@@ -55,7 +69,7 @@ namespace flock
             const std::string unique_name = sys->generate_unique_name(class_name);
 
             obj_create_data ocd(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien))));
-            return sys->create_object(ocd);	
+            return sys_object_create(sys, ocd);	
         }
     }
 }
@@ -72,9 +86,9 @@ namespace human
         
         obj_create_data ocd(class_name, unique_name, dict::wrap(human_data(sett, state_t(init_pos.pos, init_pos.orien,cg::norm(init_pos.dpos)))));
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())));
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 
 }
@@ -89,9 +103,9 @@ namespace aerostat
 
 		obj_create_data ocd(class_name, unique_name, dict::wrap(aerostat_data(sett, state_t(init_pos.pos, init_pos.orien))));
 		ocd
-			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
+			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())));
 
-		return sys->create_object(ocd);	
+		return sys_object_create(sys, ocd);	
 	}
 
 }
@@ -107,9 +121,9 @@ namespace vehicle
 
         obj_create_data ocd(class_name, unique_name, dict::wrap(vehicle_data(sett, state_t(init_pos.pos, init_pos.orien.get_course(), 10))));
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())));
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data    ())));
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 }
 
@@ -126,7 +140,7 @@ namespace simple_route
         aps.push_back(anchor_point_t(ani::point_pos(0,init_pos)));
         obj_create_data ocd(class_name, unique_name, dict::wrap(route_data(sett,aps)));
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 }
 
@@ -144,10 +158,10 @@ namespace aircraft_physless
         obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft_physless::craft_data(sett,s)));
 
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())))
             ;
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 
 }
@@ -165,10 +179,10 @@ namespace helicopter_physless
         obj_create_data ocd(class_name, unique_name, dict::wrap(helicopter_physless::craft_data(sett,s)));
 
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
             ;
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 
 }
@@ -187,12 +201,12 @@ namespace airport
         obj_create_data ocd(class_name, unique_name, dict::wrap(airport::port_data(sett,data)));
 
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
 			.add_child(obj_create_data("environment", "environment", dict::wrap(environment::settings_t          ())))
-            .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t          ())))
+            .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t ())))
             ;
 
-        return sys->create_object(ocd);	
+        return sys_object_create(sys, ocd);	
     }
 
 }
@@ -212,10 +226,10 @@ namespace camera
 		obj_create_data ocd(class_name, unique_name, dict::wrap(data));
 
 		ocd
-			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
 			;
 
-		return sys->create_object(ocd);	
+		return sys_object_create(sys, ocd);	
 	}
 
 }

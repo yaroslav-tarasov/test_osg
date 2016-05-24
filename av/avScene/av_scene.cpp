@@ -10,7 +10,7 @@
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 #include "kernel/systems/vis_system.h"
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 #include "common/time_counter.h"
 #include "utils/high_res_timer.h"
 #include "tests/systems/factory_systems.h"

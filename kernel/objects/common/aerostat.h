@@ -23,7 +23,6 @@ namespace aerostat
     struct control
     {
         virtual ~control(){};
-        virtual void set_model(const std::string&  icao) =0;
     };
 
 

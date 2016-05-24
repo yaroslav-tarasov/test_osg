@@ -112,8 +112,8 @@ namespace {
 
         const float  fake_mass = 20;
 
-		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);// btScalar(params_.wingspan / 2);
-		btScalar dyy = btScalar((aabbMax.y() - aabbMin.y()) / 2);// btScalar(params_.length / 2);
+		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);
+		btScalar dyy = btScalar((aabbMax.y() - aabbMin.y()) / 2);
 		btScalar dzz = btScalar((aabbMax.z() - aabbMin.z()) / 2);
 		btScalar m12 = btScalar((fake_mass) /12);
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
@@ -303,8 +303,16 @@ namespace {
     {
 
     }
+    
+    void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
+    {
+         append_anchor        (rb, self_offset);
+    }
 
+    void impl::reset_target()
+    {
 
+    }
 
     params_t const& impl::params() const
     {

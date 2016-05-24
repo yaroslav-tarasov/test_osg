@@ -87,6 +87,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -356,7 +357,8 @@
     <ClCompile Include="kernel\objects\camera\camera_model.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
     <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />
-    <ClCompile Include="kernel\objects\common\object_creators.cpp" />
+    <ClCompile Include="kernel\objects\common\net_object_factory.cpp" />
+    <ClCompile Include="kernel\objects\common\objects_factory.cpp" />
     <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
     <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />

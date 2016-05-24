@@ -15,8 +15,9 @@ struct ctrl
 protected:
     ctrl( kernel::object_create_t const& oc, dict_copt dict );
 
+    // control
 private:
-    void set_model(const std::string&  name) override;
+    void set_target(const boost::optional<uint32_t>&   target_id) override;
 
     // base_presentation
 private:

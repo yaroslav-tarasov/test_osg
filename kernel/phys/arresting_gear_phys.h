@@ -43,6 +43,9 @@ namespace phys
        
        void   append_anchor        (rigid_body_ptr body, cg::point_3 const& pos) override;
        void   release_anchor       (rigid_body_ptr body) override;
+       
+       void   set_target           (rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset) override;
+       void   reset_target         () override;
 
    // rigid_body_impl
    private:

@@ -20,9 +20,9 @@ FIXME(Это что за нафиг нужно  для object_creators )
 
 #include "arresting_gear/arresting_gear_common.h"
 
-#include "object_creators.h"
+#include "objects_factory.h"
 
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 
 #include "factory_systems.h"
 
@@ -341,128 +341,7 @@ void create_objects(const std::string & airport)
 #endif
 }
 
-using namespace net_layer::msg;
-
-inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    aircraft::settings_t as;
-    as.kind = msg.model_name; // "A319"; //
-    return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as, gp);
-}
-
-inline object_info_ptr create_helicopter_phl(kernel::system* csys,create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    aircraft::settings_t as;
-    as.kind = msg.model_name;  
-    as.custom_label = msg.custom_label;
-
-    return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
-}
-
-inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    aircraft::settings_t as;
-    as.kind = msg.model_name; // "A319"; //
-    as.custom_label = msg.custom_label;
-
-    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
-}
-
-inline object_info_ptr create_vehicle(kernel::system* csys,create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    vehicle::settings_t vs;
-    vs.model        = msg.model_name;
-    vs.custom_label = msg.custom_label;
-
-    return  vehicle::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
-}
-
-inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-    
-    flock::manager::settings_t vs;
-    vs.model        = "crow";
-    vs._childAmount = msg.num_instances;
-
-    return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
-}
-
-inline object_info_ptr create_character(kernel::system* csys, create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    human::settings_t vs;
-    vs.model = msg.model_name;
-
-    return human::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
-}
- 
- 
-inline object_info_ptr create_arresting_gear(kernel::system* csys, create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-    arresting_gear::settings_t ms;
-    // ms.model = "arresting_gear";
-
-    return arresting_gear::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
-}
-
-inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
-{
-    decart_position dpos(msg.pos,msg.orien);
-	geo_position gp(dpos, get_base());
-
-	aerostat::settings_t ms;
-	ms.model = "aerostat";
-
-	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
-}
-
-inline object_info_ptr create_camera(kernel::system* csys, create const& msg)
-{       
-    decart_position dpos(msg.pos,msg.orien);
-    geo_position gp(dpos, get_base());
-
-	return camera::create(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
-}
-
-object_info_ptr create_object( kernel::system* csys, create const& msg)
-{
-    if(msg.object_kind & ok_vehicle)
-        return create_vehicle(csys, msg);
-    else if ( msg.object_kind == ok_flock_of_birds)
-        return create_flock_of_birds(csys, msg);
-    else if ( msg.object_kind ==ok_human)
-        return create_character(csys, msg);
-    else if ( msg.object_kind == ok_helicopter)
-        return create_helicopter_phl(csys, msg); 
-    else if( msg.object_kind == ok_camera)
-        return create_camera(csys, msg);
-    else
-        return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
-
-}
-
-
-
 }
 
 AUTO_REG(create_objects)
-AUTO_REG_NAME(create_object, create_object)
+

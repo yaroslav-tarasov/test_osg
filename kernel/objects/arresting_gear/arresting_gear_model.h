@@ -38,6 +38,10 @@ private:
     void update_model       ( double time, double dt );
     void update_ropes       ( double time );
 
+//  view 
+private:
+    void on_target_changed (aircraft::info_ptr old_target, const boost::optional<uint32_t> & id ) override;
+
 private:
     phys::static_mesh_ptr                  mesh_;
 

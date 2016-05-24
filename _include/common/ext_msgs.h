@@ -6,7 +6,7 @@ using network::gen_msg;
 
 #include "common/meteo_local.h"
 
-#include "test_msg_enum.h"
+#include "ext_msg_enum.h"
 
 #include "common/environment.h"
 
@@ -17,6 +17,10 @@ namespace net_layer
 
     namespace msg
     {
+
+//
+//    Session 
+//
 
         struct setup
             : network::msg_id<id_setup>
@@ -187,9 +191,34 @@ namespace net_layer
 
 		typedef gen_msg<id_destroy, uint32_t> destroy_msg;
         
-		typedef gen_msg<id_ready, uint16_t> ready_msg;
+		typedef gen_msg<id_ready, uint16_t>   ready_msg;
 
-    
+        struct traj_assign_msg
+            : network::msg_id<id_traj_assign>
+        {
+            traj_assign_msg() {}
+
+            traj_assign_msg(uint32_t ext_id,const fms::traj_data& traj)
+                : ext_id      (ext_id),traj(traj)
+            {}
+
+            traj_assign_msg(uint32_t ext_id,const fms::traj_data&& traj)
+                : ext_id      (ext_id),traj(move(traj))
+            {}
+
+            uint32_t           ext_id;
+            fms::traj_data     traj;
+        };
+
+        REFL_STRUCT(traj_assign_msg)
+            REFL_ENTRY(ext_id)
+            REFL_ENTRY(traj)
+        REFL_END()
+
+//
+//  Engines
+//
+
     enum engine_state_t : int16_t
     {
         ES_STOPPED = 0 ,  
@@ -202,27 +231,7 @@ namespace net_layer
         ES_SIZE
     };
 
-    struct traj_assign_msg
-        : network::msg_id<id_traj_assign>
-    {
-        traj_assign_msg() {}
 
-        traj_assign_msg(uint32_t ext_id,const fms::traj_data& traj)
-            : ext_id      (ext_id),traj(traj)
-        {}
-
-        traj_assign_msg(uint32_t ext_id,const fms::traj_data&& traj)
-            : ext_id      (ext_id),traj(move(traj))
-        {}
-
-        uint32_t           ext_id;
-        fms::traj_data     traj;
-    };
-
-    REFL_STRUCT(traj_assign_msg)
-        REFL_ENTRY(ext_id)
-        REFL_ENTRY(traj)
-    REFL_END()
 
     struct engine_state_msg
         : network::msg_id<am_engines_state>
@@ -241,6 +250,10 @@ namespace net_layer
         REFL_ENTRY(ext_id)
         REFL_ENTRY(state)
     REFL_END()
+
+//
+//   Mulfunction
+//
 
 // Типы и значения похожи/повторяют  внутренние для самолета
 //  , но они принципиально другие 
@@ -280,6 +293,10 @@ namespace net_layer
         REFL_ENTRY(enabled)
     REFL_END()
 
+//
+//  Towing
+//
+
     typedef gen_msg<vm_attach_tow, uint32_t>               attach_tow_msg_t;    
     typedef gen_msg<vm_detach_tow, uint32_t>               detach_tow_msg_t;
     
@@ -305,26 +322,13 @@ namespace net_layer
         REFL_ENTRY(course)
     REFL_END()
 	
-	typedef gen_msg<vm_fire_fight, uint32_t>         fire_fight_msg_t;  
+	typedef gen_msg<vm_fire_fight, uint32_t>         fire_fight_msg;  
 
-    struct container_msg
-        : network::msg_id<sm_container_msg>
-    {
-        typedef std::vector<bytes_t>  msgs_t;
+    typedef gen_msg<ar_set_target, uint32_t>         set_target_msg; 
 
-        container_msg(){}
-
-        container_msg(msgs_t&& msgs)
-            : msgs(move(msgs))
-        {
-        }
-
-        msgs_t msgs;
-    };
-
-    REFL_STRUCT(container_msg)
-        REFL_ENTRY(msgs)
-    REFL_END()
+//
+//  Environment
+//
 
 	struct environment_msg
 		: network::msg_id<id_environment>
@@ -343,6 +347,29 @@ namespace net_layer
 
 	REFL_STRUCT(environment_msg)
 		REFL_SER(weather)
+    REFL_END()
+    
+//
+//  System 
+//  
+
+    struct container_msg
+        : network::msg_id<sm_container_msg>
+    {
+        typedef std::vector<bytes_t>  msgs_t;
+
+        container_msg(){}
+
+        container_msg(msgs_t&& msgs)
+            : msgs(move(msgs))
+        {
+        }
+
+        msgs_t msgs;
+    };
+
+    REFL_STRUCT(container_msg)
+        REFL_ENTRY(msgs)
     REFL_END()
 
     }

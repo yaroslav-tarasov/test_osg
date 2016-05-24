@@ -2,7 +2,7 @@
 
 #include "cpp_utils/polymorph_ptr.h"
 
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 
 namespace objects_reg
 {

@@ -76,7 +76,7 @@ void view::on_settings(settings_t const& settings)
     settings_changed();
 }
 
-void view::on_tow(/*optional<uint32_t> id*/msg::tow_msg const& msg)
+void view::on_tow(msg::tow_msg const& msg) /*optional<uint32_t> id*/
 {
     auto old_aerotow = aerotow_;
     aerotow_ = msg.tow_id ? collection_->get_object(*msg.tow_id) : nullptr;

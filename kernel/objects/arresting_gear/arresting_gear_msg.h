@@ -19,10 +19,12 @@ enum id
     ar_settings      ,
     ar_phys_pos      ,
     ar_contact_effect,
-    ar_ropes_state   ,    
+    ar_ropes_state   ,
+    ar_set_target    ,
 };
 
-typedef gen_msg<ar_settings,     arresting_gear::settings_t>         settings_msg;
+typedef gen_msg<ar_settings,     arresting_gear::settings_t>    settings_msg;
+typedef gen_msg<ar_set_target, boost::optional<uint32_t>>       target_msg;
 
 //! сообщение "физическая позиция ВС"
 struct phys_pos_msg

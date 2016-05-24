@@ -7,8 +7,9 @@
 #include "objects/common/airport.h"
 #include "objects/environment.h"
 #include "objects/common/camera_common.h"
+#include "objects/common/arresting_gear.h"
 
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 
 
 namespace objects_reg
@@ -32,9 +33,10 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
     void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg_t const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_set_target)  (net_layer::msg::set_target_msg   const& msg)  = &ctrl::inject_msg;
 
     
 
@@ -45,9 +47,10 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
 	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
-		.add<net_layer::msg::fire_fight_msg_t      >(boost::bind(on_fire        , this, _1))
+		.add<net_layer::msg::fire_fight_msg        >(boost::bind(on_fire        , this, _1))
         .add<net_layer::msg::traj_assign_msg       >(boost::bind(on_traj_assign , this, _1)) 
         .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
+        .add<net_layer::msg::set_target_msg        >(boost::bind(on_set_target  , this, _1))
         	
         ;
 
@@ -223,7 +226,7 @@ void ctrl::inject_msg(net_layer::msg::detach_tow_msg_t  const& ext_id)
     }
 }
 
-void ctrl::inject_msg(net_layer::msg::fire_fight_msg_t  const& ext_id)  
+void ctrl::inject_msg(net_layer::msg::fire_fight_msg  const& ext_id)  
 {
 	if(ext_id>0 )                          
 	{
@@ -235,6 +238,31 @@ void ctrl::inject_msg(net_layer::msg::fire_fight_msg_t  const& ext_id)
 		}
 	}
 }
+   
+void ctrl::inject_msg(net_layer::msg::set_target_msg const& ext_id)  
+{
+    if(ext_id>0 )                          
+    {
+        auto ap = regs_objects_[ext_id];
+        
+        if( ap && airports_.size()>0 )                          
+        {
+            for ( auto a = airports_.begin(); a != airports_.end(); ++a)
+            {
+                arresting_gear::control_ptr par = find_first_child<arresting_gear::control_ptr    >((*a).second);
+
+                if (par)
+                {
+                    par->set_target(boost::optional<uint32_t>(ap->object_id()));
+                    break;
+                }
+            }
+
+        }
+
+    }
+}
+
 
 void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 {

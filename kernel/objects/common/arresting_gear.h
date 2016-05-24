@@ -23,7 +23,7 @@ namespace arresting_gear
     struct control
     {
         virtual ~control(){};
-        virtual void set_model(const std::string&  icao) =0;
+        virtual void set_target(const boost::optional<uint32_t>&   ext_id)=0;
     };
 
 

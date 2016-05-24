@@ -520,7 +520,7 @@ object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std
 {
     object_info_ptr obj;
     msgs_blocker    mb(*this);
-    FIXME(Доп функционал)
+
     {
         locks::bool_lock l(create_object_lock_);
         obj = create_object_hierarchy_impl(hier_class, obj_name, true);

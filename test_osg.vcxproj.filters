@@ -138,9 +138,6 @@
     <Filter Include="Source Files\objects\airport">
       <UniqueIdentifier>{9dd83263-84cf-4a2e-84a6-f5b685cfd3b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\av\fx">
-      <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\aerostat">
       <UniqueIdentifier>{85f57a9b-c35a-404f-840c-01d3ca96b6af}</UniqueIdentifier>
     </Filter>
@@ -191,6 +188,9 @@
     </Filter>
     <Filter Include="Source Files\objects\arresting_gear">
       <UniqueIdentifier>{b2e4bf2e-791a-40c6-8a44-253da4d44f9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\lights\fx">
+      <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -787,9 +787,6 @@
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\objects\common\object_creators.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
     <ClCompile Include="utils\animation_handler.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -1100,22 +1097,22 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\SmokeFx.cpp">
-      <Filter>Source Files\av\fx</Filter>
+      <Filter>Source Files\av\lights\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\FoamStreamFx.cpp">
-      <Filter>Source Files\av\fx</Filter>
+      <Filter>Source Files\av\lights\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\SparksFx.cpp">
-      <Filter>Source Files\av\fx</Filter>
+      <Filter>Source Files\av\lights\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\LandingDustFx.cpp">
-      <Filter>Source Files\av\fx</Filter>
+      <Filter>Source Files\av\lights\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\NodeTracker.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\FrictionDustFx.cpp">
-      <Filter>Source Files\av\fx</Filter>
+      <Filter>Source Files\av\lights\fx</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp">
       <Filter>Source Files\objects\aerostat</Filter>
@@ -1332,6 +1329,12 @@
     </ClCompile>
     <ClCompile Include="av\avLine\Ropes.cpp">
       <Filter>Source Files\av\line</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\common\net_object_factory.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\common\objects_factory.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,7 +5,7 @@
 
 #include "objects/common/camera_common.h"
 
-#include "common/test_msgs.h"
+#include "common/ext_msgs.h"
 
 
 namespace objects_reg

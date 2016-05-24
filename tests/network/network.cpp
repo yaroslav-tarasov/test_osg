@@ -11,8 +11,8 @@
 #include "network/msg_dispatcher.h"
 #include "logger/logger.hpp"
 
-#include "common/test_msgs.h"
-#include "common/test_msgs2.h"
+#include "common/ext_msgs.h"
+#include "common/ext_msgs2.h"
 
 #include "utils/krv_import.h"
 
@@ -524,13 +524,13 @@ struct client
 		weather.wind_speed  = 20.0f;
 		weather.wind_dir    = cg::point_2f(1.0,0.0);
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
-		weather.clouds_density = 0.1;
+		weather.clouds_density = 0.1f;
 		ADD_EVENT(15.0, environment_msg(weather))
 
-			weather.clouds_density = 0.5;
+			weather.clouds_density = 0.5f;
 		ADD_EVENT(16.0, environment_msg(weather))
 
-			weather.clouds_density = 0.7;
+			weather.clouds_density = 0.7f;
 		ADD_EVENT(17.5, environment_msg(weather))
 
 			weather.clouds_density = 0.9;
@@ -581,16 +581,16 @@ struct client
 		ADD_EVENT(90.0, environment_msg(weather))
 
 
-	    weather.clouds_density = 0.9;
+	    weather.clouds_density = 0.9f;
 		ADD_EVENT(95.0, environment_msg(weather))
 
-		weather.clouds_density = 0.7;
+		weather.clouds_density = 0.7f;
 		ADD_EVENT(105.0, environment_msg(weather))
 
-	    weather.clouds_density = 0.5;
+	    weather.clouds_density = 0.5f;
 		ADD_EVENT(120.5, environment_msg(weather))
 
-	    weather.clouds_density = 0.0;
+	    weather.clouds_density = 0.0f;
 		ADD_EVENT(140.0, environment_msg(weather))
 
 		weather.fog_density  = 0.1f; 
@@ -656,6 +656,7 @@ struct client
 #if 1
             ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
             ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
+            ADD_EVENT(232.0  , set_target_msg( 173 ) ) 
 #endif
 
 #if 0
