@@ -1448,7 +1448,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
 				root = new osg::MatrixTransform(mat);
 				root->setName("root");
-				phys_ctrl?phys_ctrl->asGroup()->addChild(root):nullptr;
+				phys_ctrl->asGroup()->addChild(root);
         
 				std::string timesFont("fonts/times.ttf");
 
@@ -1498,6 +1498,34 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         return root;
     }
 
+    if (path == "parashute.scg")
+    {
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+        osg::MatrixTransform* root = nullptr;
+
+        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+        osg::Node* body = findFirstNode(parent,"Body",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+
+        if(phys_ctrl && body)
+        {
+             avCore::Object* obj = avCore::createObject("parashute" , true);
+             osg::Node* obj_node = obj->getOrCreateNode();
+
+             mt_.back()->addChild( obj_node );
+         
+             body->asGroup()->addChild(obj_node);
+
+             osg::Node* root =  findFirstNode(obj_node,"root"); 
+             if(root!=nullptr) root->setUserValue("id",seed);
+
+             //_terrainRoot->asGroup()->addChild(mt_.back());
+        }
+
+        return mt_.back();
+    }
+
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" || path == "vnukovo")
     {
         //assert(_terrainRoot->removeChild(_terrainNode));
@@ -1539,7 +1567,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt, bool async)->osg::Node* {
     
-		auto & mt_ = _p->_mt;
+    auto & mt_ = _p->_mt;
     bool clone = true;
 
     using namespace creators;

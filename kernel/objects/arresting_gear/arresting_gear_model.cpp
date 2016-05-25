@@ -77,7 +77,7 @@ void model::create_phys()
 
     for (size_t i=0; i < 15; ++i)
     {
-       params.ropes.push_back(std::make_pair(cg::point_3f(60 + i*step,0,0.1), cg::point_3f(60 + i*step,60,0.1) ));
+       params.ropes.push_back(std::make_pair(cg::point_3f(60 + i*step,0,0.1), cg::point_3f(60 + i*step,100,0.1) ));
     }
     
 

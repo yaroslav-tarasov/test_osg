@@ -6,6 +6,7 @@
 namespace visual_objects
 {
     struct label_support;
+    struct parashute_support;
 }
 
 namespace aircraft_physless
@@ -57,11 +58,12 @@ namespace aircraft_physless
 
 		smoke_sfx_t        smoke_sfx_;
         
-        visual_object_ptr landing_dust_object_;
+        visual_object_ptr    landing_dust_object_;
         LandingDustSfxNode * landing_dust_weak_ptr_;
 
     private:
-        boost::shared_ptr<visual_objects::label_support>   ls_;
+        boost::shared_ptr<visual_objects::label_support>       ls_;
+        boost::shared_ptr<visual_objects::parashute_support>   ps_;
 
 	private: 
 		boost::function<void()>                       start_ ;

@@ -135,43 +135,48 @@ namespace {
         bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys->dynamics_world());
 
         const unsigned n = params.ropes.size();
-        auto const & propes_params = params.ropes;
-        ropes_.reserve(n);
-		ropes_bound = cg::rectangle_3f (propes_params[0].first, propes_params[0].second);
-        for( unsigned i=0; i<n; ++i)
+        if(n>0)
         {
-            ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
+            auto const & propes_params = params.ropes;
+            ropes_.reserve(n);
+            ropes_bound_ = cg::rectangle_3f (propes_params[0].first, propes_params[0].second);
+            for( unsigned i=0; i<n; ++i)
+            {
+                ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
 
-            ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	
-                to_bullet_vector3(propes_params[i].first),
-                to_bullet_vector3(propes_params[i].second),
-                params.seg_num,
-                1+2));
+                ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	
+                    to_bullet_vector3(propes_params[i].first),
+                    to_bullet_vector3(propes_params[i].second),
+                    params.seg_num,
+                    1+2));
 
-			ropes_bound |= propes_params[i].first;
-			ropes_bound |= propes_params[i].second;
-
-            auto& psb = *ropes_.back().get();
-            psb->m_cfg.piterations		=	4;
-            psb->m_materials[0]->m_kLST	=	0.1+(i/(btScalar)(n-1))*0.9;
-            psb->setTotalMass(20);
-
+                ropes_bound_ |= propes_params[i].first;
+                ropes_bound_ |= propes_params[i].second;
+                
+                auto& psb = *ropes_.back().get();
+                psb->m_cfg.piterations		=	4;
+                psb->m_materials[0]->m_kLST	=	0.1+((n - i)/(btScalar)(n-1))*0.9;
+                psb->setTotalMass(20);
 
 #if 0
-            if(i==0)
-            {
-                btTransform startTransform;
-                startTransform.setIdentity();
-                startTransform.setOrigin(btVector3(60 + i*step,30,0));
-                btRigidBody*		body= create_rigid_body(bw.get(),50,startTransform,new btBoxShape(btVector3(2,6,2)));
-                psb->appendAnchor(psb->m_nodes.size()/2,body);
-                body->setLinearVelocity( btVector3(30.0,0.0,0.0) );
-            }
+                if(i==0)
+                {
+                    btTransform startTransform;
+                    startTransform.setIdentity();
+                    startTransform.setOrigin(btVector3(60 + i*step,30,0));
+                    btRigidBody*		body= create_rigid_body(bw.get(),50,startTransform,new btBoxShape(btVector3(2,6,2)));
+                    psb->appendAnchor(psb->m_nodes.size()/2,body);
+                    body->setLinearVelocity( btVector3(30.0,0.0,0.0) );
+                }
 #endif
-
+            }
+            
+            trap_bound_ = cg::rectangle_3f (propes_params[n-1].first, propes_params[n-1].second);
+            trap_bound_.inflate(point_3f(5.f,0,20.f));
         }
 
-		ropes_bound.inflate(20);
+        
+		ropes_bound_.inflate(20);
 
         sys_->dynamics_world()->addAction(this);
 
@@ -189,9 +194,9 @@ namespace {
 		{
 			auto target = rigid_body_impl_ptr(target_)->get_body();
 			cg::transform_4f target_transform = from_bullet_transform(target->getWorldTransform());
-			if(ropes_bound.contains(target_transform.translation()))
+			if(trap_bound_.contains(target_transform.translation()))
 			{
-				append_anchor(target_,cg::point_3());
+				append_anchor(target_,target_transform.translation());
 			}
 		}
 
@@ -316,7 +321,24 @@ namespace {
     void   impl::append_anchor        (rigid_body_ptr body, cg::point_3 const& pos)
     {
 		auto& psb = *ropes_.back().get();
-		psb->appendAnchor(psb->m_nodes.size()/2, rigid_body_impl_ptr(body)->get_body().get());
+        const btSoftBody::tNodeArray& nodes = psb.get()->m_nodes;
+		
+        int idx = psb->m_nodes.size()/2;
+        double dist = cg::distance(from_bullet_vector3(nodes[idx].m_x), pos);
+        for(int  i = 0;i < nodes.size(); ++i)
+        {
+#if 1
+            double d = cg::distance(from_bullet_vector3(nodes[i].m_x), pos);
+            if( d < dist)
+            {
+               dist = d;
+               idx = i;
+            }
+#endif
+            
+        }
+
+        psb->appendAnchor(idx, rigid_body_impl_ptr(body)->get_body().get());
     }
 
     void   impl::release_anchor       (rigid_body_ptr body)
@@ -326,7 +348,6 @@ namespace {
     
     void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
     {
-         // append_anchor        (rb, self_offset);
 		target_ = rb;
     }
 

@@ -87,9 +87,10 @@ namespace phys
            size_t count;
        };
 
-       fixed_id_vector<contact_t> body_contacts_;
-	   cg::rectangle_3f                  ropes_bound;
-	   rigid_body_ptr                     target_;
+       fixed_id_vector<contact_t>        body_contacts_;
+	   cg::rectangle_3f                  ropes_bound_;
+       cg::rectangle_3f                  trap_bound_;
+	   rigid_body_ptr                    target_;
    };
 
 

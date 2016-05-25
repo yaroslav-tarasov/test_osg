@@ -130,3 +130,16 @@ positions = { 'port' : [bbx[0] , plane_centerY, plane_centerZ], 'starboard' : [b
 
 createLights(root_node, positions,orients)
 
+#####################################
+#  For body geomety setup 
+#
+
+import maya.cmds as cmds
+nodes = cmds.ls( tr=True )
+body_nodes = [ x for x in nodes if 'Body_' in x  or 'body_' in x]
+
+for bn in body_nodes :
+    bn_trans = cmds.getAttr(bn + '.translate')
+    body_children = cmds.listRelatives(bn) 
+    for bc in body_children :
+        cmds.setAttr( bn + '|' + bc + '.translate', -bn_trans[0][0],-bn_trans[0][1],-bn_trans[0][2], type="double3")

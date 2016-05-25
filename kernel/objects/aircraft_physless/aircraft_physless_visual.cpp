@@ -3,6 +3,7 @@
 #include "aircraft_physless_visual.h"
 
 #include "common/text_label.h"
+#include "common/parashute.h"
 #include "ext/spark/SmokeNode.h"
 
 
@@ -34,6 +35,10 @@ namespace aircraft_physless
 
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+
+        ps_ = boost::make_shared<visual_objects::parashute_support>(
+            vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,false));
+
 #endif
 		start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
     }
@@ -93,17 +98,22 @@ namespace aircraft_physless
 #endif
 
 #ifdef ASYNC_OBJECT_LOADING 
-		if(!label_object_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
+		if( !label_object_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
 		{ 
 			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
-			if(label_object_->root())
-				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+
+            label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
+            if(label_object_->root())
+                ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+
+            if(!ps_)
+                ps_ = boost::make_shared<visual_objects::parashute_support>(
+                        vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,false));
 
 
-#if 1
-            landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,false);
-#endif
+            if (!landing_dust_object_)
+                landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,false);
+
             if (landing_dust_object_)
             {
                 landing_dust_weak_ptr_ = nullptr;
