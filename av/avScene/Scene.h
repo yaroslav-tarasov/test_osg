@@ -100,7 +100,7 @@ namespace avScene {
 
         void                                        setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center);
 
-        osg::Node*                                  load(std::string path, osg::Node* parent=0, uint32_t seed=0, bool async=true);
+        osg::Node*                                  load(std::string path, osg::Node* parent, uint32_t seed, bool& async);
     
     private: // IScene interface declaration
         av::environment_weather*                    getEnvWeather() const override;

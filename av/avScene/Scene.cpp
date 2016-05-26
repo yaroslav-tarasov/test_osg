@@ -1292,7 +1292,7 @@ void Scene::createObjects()
 }
 
 
-osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool async)
+osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool& async)
 {
     using namespace creators;
 
@@ -1528,11 +1528,13 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" || path == "vnukovo")
     {
+        async = false;
+
         //assert(_terrainRoot->removeChild(_terrainNode));
         //_terrainNode.release();
         _terrainNode =  new avTerrain::Terrain (this);
         _terrainNode->Create(path);
-        
+
         _terrainRoot->asGroup()->addChild(_terrainNode);
 		
 #ifdef DECAL_RENDERER
@@ -1548,7 +1550,7 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         // load("trees",_terrainRoot, 15000);
         // load("ka_50",_terrainRoot, 15000, false);
 
-         /*_commonNode*//*this*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
+         /*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 
         return _terrainNode;
     }

@@ -8,14 +8,15 @@ namespace net_layer
         enum message_id
         {
             id_setup            ,
-            id_run              ,
-            id_create           ,
-			id_destroy          ,
             id_ready            ,
 
             id_state            ,
             id_props_updated    ,
             id_vis_peers        ,
+            
+            id_run              ,
+            id_create           ,
+            id_destroy          ,
 
             id_traj_assign      ,
 

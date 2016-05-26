@@ -348,7 +348,7 @@ private:
 
 struct mod_app
 {
-    typedef boost::function<void(run const& msg)>                   on_run_f;
+    typedef boost::function<void(run_msg const& msg)>                   on_run_f;
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
@@ -356,15 +356,16 @@ struct mod_app
         , ctrl_sys_ (systems_->get_control_sys())
         , mod_sys_  (systems_->get_model_sys  ())
         , end_of_load_(eol)
-        , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2)) 
+        , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2))
+        , init_ (false)
     {   
 
         disp_
-            .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
-            .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
+            .add<setup_msg             >(boost::bind(&mod_app::on_setup      , this, _1))
+            .add<create_msg            >(boost::bind(&mod_app::on_create     , this, _1))
 			.add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
-            .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
-            .add<vis_peers             >(boost::bind(&mod_app::on_vis_peers  , this, _1))
+            .add<state_msg             >(boost::bind(&mod_app::on_state      , this, _1))
+            .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             ;
 
         w_.reset (new net_worker( peer 
@@ -398,10 +399,11 @@ private:
         ctrl_sys_->update(time);
         systems_->update_messages();
         mod_sys_->update(time);
+        deffered_create();
     }
 
 
-    void on_setup(setup const& msg)
+    void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
         
@@ -417,22 +419,38 @@ private:
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_proxy(&bts[0], bts.size());
+
+        init_ = true;
     }
 
 
 
-    void on_state(state const& msg)
+    void on_state(state_msg const& msg)
     {
        w_->set_factor(msg.factor);
        w_->reset_time(msg.srv_time / 1000.0f);
     }
 
-    void on_create(create const& msg)
+    void on_create(create_msg const& msg)
     {
-		reg_obj_->create_object(msg);
+		if(init_)
+            reg_obj_->create_object(msg);
+        else
+            creation_deque_.push_back(msg);
 
         LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
 
+    }
+
+    void deffered_create()
+    {
+        if(init_)
+        {
+          for(auto it = creation_deque_.begin(); it != creation_deque_.end(); ++it )
+             reg_obj_->create_object(*it);
+         
+          creation_deque_.clear();
+        }
     }
 
 	void on_destroy(destroy_msg const& msg)
@@ -443,7 +461,7 @@ private:
 
 	}
 
-    void on_vis_peers(vis_peers const& msg)
+    void on_vis_peers(vis_peers_msg const& msg)
     {
         w_->vis_connect(msg.eps);
     }
@@ -461,20 +479,11 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        high_res_timer hr_timer;
-
         systems_->create_auto_objects();
-
-        force_log fl;       
-        LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.set_point() << "\n");
 
         auto fp = fn_reg::function<void(const std::string&)>("create_objects");
         if(fp)
             fp(airport);
-
-        force_log fl2;  
-        LOG_ODS_MSG( "create_objects(const std::string& airport): create_objects " << hr_timer.set_point() << "\n");
-
 
         reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
 
@@ -496,11 +505,12 @@ private:
 private:
     msg_dispatcher<uint32_t>                                       disp_;
     std::vector<endpoint>                                      vis_peers_;
-
+    std::deque<create_msg>                                creation_deque_;
+    bool                                                            init_;
 private:
     on_container_f                                              on_cont_;
     boost::function<void()>                                 end_of_load_;
-    setup                                                     setup_msg_;
+    setup_msg                                                     setup_msg_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 

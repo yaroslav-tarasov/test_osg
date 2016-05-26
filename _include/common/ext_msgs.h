@@ -22,10 +22,10 @@ namespace net_layer
 //    Session 
 //
 
-        struct setup
+        struct setup_msg
             : network::msg_id<id_setup>
         {
-            setup(const std::string& icao_code = "URSS")
+            setup_msg(const std::string& icao_code = "URSS")
                 : icao_code (icao_code)
             {
             }
@@ -33,21 +33,21 @@ namespace net_layer
             std::string icao_code;
         };
         
-        REFL_STRUCT(setup)
+        REFL_STRUCT(setup_msg)
             REFL_ENTRY(icao_code )
         REFL_END()
 
-        struct state
+        struct state_msg
             : network::msg_id<id_state>
         {
-            state(double task_time, double srv_time, double factor)
+            state_msg(double task_time, double srv_time, double factor)
                 : task_time (task_time)
                 , srv_time  (srv_time )
 				, factor    (factor   )
             {
             }
 
-            state()
+            state_msg()
                 : task_time (0)
                 , srv_time  (0)
 				, factor    (0)
@@ -59,7 +59,7 @@ namespace net_layer
 			double      factor;
         };
 
-        REFL_STRUCT(state)
+        REFL_STRUCT(state_msg)
             REFL_ENTRY(task_time)
             REFL_ENTRY(srv_time )
             REFL_ENTRY(factor )
@@ -80,11 +80,12 @@ namespace net_layer
             REFL_ENTRY(properties)
         REFL_END()
 
+        typedef gen_msg<id_ready, uint16_t>   ready_msg;
 
-        struct run
+        struct run_msg
             : network::msg_id<id_run>
         {
-            run()
+            run_msg()
                 : ext_id(0)
                 , keypoint (cg::point_3())
                 , orien    (cg::quaternion()) 
@@ -95,7 +96,7 @@ namespace net_layer
             {
             }
 
-            run( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time,  bool reverse, const meteo::local_params& mlp)
+            run_msg( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time,  bool reverse, const meteo::local_params& mlp)
                 : ext_id(id)
                 , keypoint (keypoint)
                 , orien (orien) 
@@ -115,7 +116,7 @@ namespace net_layer
 			meteo::local_params mlp;
         };
 
-        REFL_STRUCT(run)
+        REFL_STRUCT(run_msg)
             REFL_ENTRY( ext_id    )
             REFL_ENTRY( time      )
             REFL_ENTRY( speed     )
@@ -147,11 +148,11 @@ namespace net_layer
             // ok_size
         };
 
-        struct create
+        struct create_msg
             : network::msg_id<id_create>
         {
             
-            create()
+            create_msg()
                 : ext_id (0)
                 , pos (pos)
                 , orien (orien)
@@ -159,7 +160,7 @@ namespace net_layer
             {
             }
 
-            create(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name, const std::string& custom_label, uint16_t  num_instances = 1)
+            create_msg(uint32_t id, const cg::point_3&       pos, const cg::quaternion& orien , object_kind_t ok, const std::string& model_name, const std::string& custom_label, uint16_t  num_instances = 1)
                 : ext_id      (id)
                 , pos (pos)
                 , orien (orien)
@@ -179,7 +180,7 @@ namespace net_layer
             uint16_t            num_instances;
         };
 
-        REFL_STRUCT(create)
+        REFL_STRUCT(create_msg)
             REFL_ENTRY( ext_id   )
             REFL_ENTRY( pos      )
             REFL_ENTRY( orien    )
@@ -191,7 +192,7 @@ namespace net_layer
 
 		typedef gen_msg<id_destroy, uint32_t> destroy_msg;
         
-		typedef gen_msg<id_ready, uint16_t>   ready_msg;
+
 
         struct traj_assign_msg
             : network::msg_id<id_traj_assign>

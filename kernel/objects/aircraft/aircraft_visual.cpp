@@ -99,7 +99,7 @@ namespace aircraft
 
             if (!smoke_object_ && has_smoke && engine_node_)
             {
-                smoke_object_ = vsys->create_visual_object(nm::node_control_ptr(engine_node_),"smoke");
+                smoke_object_ = vsys->create_visual_object(nm::node_control_ptr(engine_node_),"smoke",0,0,false);
             }
 
 

@@ -153,7 +153,7 @@ void visual::update(double time)
 		if(!label_object_ && nm::vis_node_control_ptr(root_)->vis_nodes().size()>0)
 		{
 			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg", 0 ,false);
+			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg", 0,0 ,false);
 		    if(label_object_->root())
 				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 		}
@@ -165,7 +165,7 @@ void visual::update(double time)
 			{
 
 				const std::string tow_type = "towbar"; // "towbar"  "tube"
-				tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type, 0 ,  false) ;
+				tow_visual_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(tow_type, 0 ,0,  false) ;
 				ts_ = boost::make_shared<tow_support>(*tow_visual_object_, tow_type);
 			}
 
@@ -215,7 +215,7 @@ void visual::update(double time)
 			{
 				if (true)
 				{
-				   foam_stream_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(turret_node_,"sfx//foam_stream.scg") ;
+				   foam_stream_object_ = dynamic_cast<visual_system*>(sys_)->create_visual_object(turret_node_,"sfx//foam_stream.scg",0,0,false) ;
 				   foam_stream_sfx_weak_ptr_ = nullptr;
 				   if (auto foam_stream_node = findFirstNode(foam_stream_object_->node().get(),"FoamStreamFx"))
 				   {

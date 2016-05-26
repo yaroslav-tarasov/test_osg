@@ -295,7 +295,7 @@ struct visapp
     {   
 
         disp_
-            .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
+            .add<setup_msg                 >(boost::bind(&visapp::on_setup      , this, _1))
             .add<container_msg         >(boost::bind(&visapp::on_container  , this, _1))
             .add<create                >(boost::bind(&visapp::on_create     , this, _1))
             ;
@@ -350,7 +350,7 @@ private:
     }
     
    
-    void on_setup(setup const& msg)
+    void on_setup(setup_msg const& msg)
     {
          create_objects(msg.icao_code);
          osg_vis_->EndSceneCreation();
@@ -405,7 +405,7 @@ private:
         
         if (reg_obj)
         {
-            void (objects_reg::control::*on_run)       (net_layer::msg::run const& msg)           = &objects_reg::control::inject_msg;
+            void (objects_reg::control::*on_run)       (net_layer::msg::run_msg const& msg)           = &objects_reg::control::inject_msg;
 
 			disp_
                 .add<run                   >(boost::bind(on_run , objects_reg::control_ptr(reg_obj).get(), _1));
@@ -614,7 +614,7 @@ private:
 
 struct mod_app
 {
-    typedef boost::function<void(run const& msg)>                   on_run_f;
+    typedef boost::function<void(run_msg const& msg)>                   on_run_f;
     typedef boost::function<void(container_msg const& msg)>   on_container_f;
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
@@ -626,9 +626,9 @@ struct mod_app
     {   
 
         disp_
-            .add<setup                 >(boost::bind(&mod_app::on_setup      , this, _1))
-            .add<create                >(boost::bind(&mod_app::on_create     , this, _1))
-            .add<state                 >(boost::bind(&mod_app::on_state      , this, _1))
+            .add<setup_msg                 >(boost::bind(&mod_app::on_setup      , this, _1))
+            .add<create_msg                >(boost::bind(&mod_app::on_create     , this, _1))
+            .add<state_msg                 >(boost::bind(&mod_app::on_state      , this, _1))
             ;
 
 
@@ -668,7 +668,7 @@ private:
     }
 
 
-    void on_setup(setup const& msg)
+    void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
         gt_.set_factor(0.0);
@@ -682,14 +682,14 @@ private:
         w_->send(&bts[0], bts.size());
     }
 
-    void on_state(state const& msg)
+    void on_state(state_msg const& msg)
     {
        w_->set_factor(msg.factor);
        w_->reset_time(msg.srv_time / 1000.0f);
        gt_.set_factor(msg.factor);
     }
 
-    void on_create(create const& msg)
+    void on_create(create_msg const& msg)
     {
 		reg_obj_->create_object(msg);
 

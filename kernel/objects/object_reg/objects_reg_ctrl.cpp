@@ -27,7 +27,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 	, _sys(oc.sys)
 {
 
-    void (ctrl::*on_run)         (net_layer::msg::run const& msg)               = &ctrl::inject_msg;
+    void (ctrl::*on_run)         (net_layer::msg::run_msg const& msg)           = &ctrl::inject_msg;
     void (ctrl::*on_container)   (net_layer::msg::container_msg    const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_atow)        (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
@@ -41,7 +41,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     
 
     disp_
-        .add<net_layer::msg::run                   >(boost::bind(on_run         , this, _1))
+        .add<net_layer::msg::run_msg               >(boost::bind(on_run         , this, _1))
         .add<net_layer::msg::container_msg         >(boost::bind(on_container   , this, _1))
         .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow        , this, _1))
         .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
@@ -54,7 +54,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         	
         ;
 
-	f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create const&)>( "create_object");
+	f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
 
 }
 
@@ -107,12 +107,12 @@ void ctrl::inject_msg(const void* data, size_t size)
     messages_.push_back(std::move(msg));
 }
 
-void ctrl::inject_msg(net_layer::msg::run const& msg)
+void ctrl::inject_msg(net_layer::msg::run_msg const& msg)
 {
 #if 0
     buffer_.push_back(msg);
 #else
-    net_layer::msg::run  smsg = msg;
+    net_layer::msg::run_msg  smsg = msg;
     smsg.ext_id = e2o_[msg.ext_id];
     set(smsg);
 #endif
@@ -277,7 +277,7 @@ void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 
 
 
-void ctrl::create_object(net_layer::msg::create const& msg)
+void ctrl::create_object(net_layer::msg::create_msg const& msg)
 {
 	kernel::object_info_ptr  a = nullptr;
 

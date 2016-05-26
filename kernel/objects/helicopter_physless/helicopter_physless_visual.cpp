@@ -97,7 +97,7 @@ namespace helicopter_physless
             if(!label_object_ )
 	        { 
 		        visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-		        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
+		        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
 				if(label_object_->root())
 					ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
@@ -195,7 +195,7 @@ namespace helicopter_physless
 		{
 			if (!smoke_object_ && vthis_->engine_node_)
 			{
-				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,false);
+				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,0,false);
 				smoke_sfx_weak_ptr_ = nullptr;
 				if (auto smoke_node = findFirstNode(smoke_object_->node().get(),"SmokeFx"))
 				{

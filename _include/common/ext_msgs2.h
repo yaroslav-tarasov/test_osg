@@ -15,10 +15,10 @@ namespace net_layer
 
         typedef std::vector< network::endpoint > endpoints;
 
-        struct vis_peers
+        struct vis_peers_msg
             : network::msg_id<id_vis_peers>
         {
-            vis_peers(const endpoints& eps = endpoints())
+            vis_peers_msg(const endpoints& eps = endpoints())
                 : eps(eps)
             {
             }
@@ -26,7 +26,7 @@ namespace net_layer
             endpoints eps;
         };
 
-        REFL_STRUCT(vis_peers)
+        REFL_STRUCT(vis_peers_msg)
             REFL_ENTRY(eps )
         REFL_END()
 

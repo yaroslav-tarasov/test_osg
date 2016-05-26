@@ -257,7 +257,7 @@ void Line::CalcBonesTransforms()
     _cBones.resize(_cSegmentPoints.size());
     if ( m_nStartSegmentPointsChangeFrom > 0 )
     {
-        avAssert( _eLineMode == LINE_MODE_DRUM );
+        // avAssert( _eLineMode == LINE_MODE_DRUM );
         const CBone& cLastBone = _cBones [ m_nStartSegmentPointsChangeFrom - 1 ];
         vUp = cLastBone.vUp;
     } 

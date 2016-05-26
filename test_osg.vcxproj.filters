@@ -655,9 +655,6 @@
     <ClCompile Include="kernel\phys\RigidUpdater.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\phys\static_convex.cpp">
-      <Filter>Source Files\phys</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp">
       <Filter>Source Files\objects\aircraft\sync_fms</Filter>
     </ClCompile>
@@ -1335,6 +1332,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\common\objects_factory.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\static_convex.cpp">
+      <Filter>Source Files\shaders</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -24,7 +24,7 @@ private:
 
     // control
 private:
-    void inject_msg   (net_layer::msg::run               const& msg);  
+    void inject_msg   (net_layer::msg::run_msg           const& msg);  
     void inject_msg   (net_layer::msg::container_msg     const& msg);
     void inject_msg   (net_layer::msg::attach_tow_msg_t  const& msg);  
     void inject_msg   (net_layer::msg::detach_tow_msg_t  const& msg); 
@@ -36,7 +36,7 @@ private:
     void inject_msg   (net_layer::msg::set_target_msg    const& msg);
 
     virtual void inject_msg     ( const void* data, size_t size      ) override;
-	virtual void create_object  ( net_layer::msg::create const& msg  ) override;
+	virtual void create_object  ( net_layer::msg::create_msg const& msg  ) override;
     virtual void destroy_object ( net_layer::msg::destroy_msg const& msg ) override;
     
 	virtual void set_sender     (remote_send_f s)                    override;
@@ -57,14 +57,14 @@ protected:
 
 
     e2o_t                                                               e2o_;
-    std::deque<net_layer::msg::run>                                  buffer_;
+    std::deque<net_layer::msg::run_msg>                              buffer_;
     std::deque<bytes_t>                                            messages_;
     
     remote_send_f                                                      send_;
 private:
     network::msg_dispatcher<uint32_t>                                  disp_;
 	boost::function<kernel::object_info_ptr 
-		(kernel::system*, net_layer::msg::create const&)>                 f_;
+		(kernel::system*, net_layer::msg::create_msg const&)>             f_;
 	kernel::system*                                                     _sys;
 private:
     connection_holder                                           conn_holder_;

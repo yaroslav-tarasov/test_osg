@@ -30,7 +30,7 @@ void visual::update( double time )
     {
         visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
-        ropes_object_ = vsys->create_visual_object("arrested_gear.scg",0,false);
+        ropes_object_ = vsys->create_visual_object("arrested_gear.scg",0,0,false);
         ropes_weak_ptr_ = nullptr;
         if (auto ropes_node = findFirstNode(ropes_object_->node().get(),"RopesNode"))
         {

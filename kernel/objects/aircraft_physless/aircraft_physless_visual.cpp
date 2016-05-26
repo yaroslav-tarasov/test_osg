@@ -37,7 +37,7 @@ namespace aircraft_physless
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 
         ps_ = boost::make_shared<visual_objects::parashute_support>(
-            vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,false));
+            vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,0,false));
 
 #endif
 		start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
@@ -102,17 +102,17 @@ namespace aircraft_physless
 		{ 
 			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
-            label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,false);
+            label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
             if(label_object_->root())
                 ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 
             if(!ps_)
                 ps_ = boost::make_shared<visual_objects::parashute_support>(
-                        vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,false));
+                        vsys->create_visual_object(nm::node_control_ptr(root()),"parashute.scg",0,0,false));
 
 
             if (!landing_dust_object_)
-                landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,false);
+                landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,0,false);
 
             if (landing_dust_object_)
             {
@@ -218,7 +218,7 @@ namespace aircraft_physless
 		{
 			if (!smoke_object_ && vthis_->engine_node_)
 			{
-				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,false);
+				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,0,false);
 				smoke_sfx_weak_ptr_ = nullptr;
 				if (auto smoke_node = findFirstNode(smoke_object_->node().get(),"SmokeFx"))
 				{

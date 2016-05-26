@@ -458,8 +458,8 @@ struct visapp
         props_.channel.camera_name = "camera 0";
 
         disp_
-            .add<setup                 >(boost::bind(&visapp::on_setup      , this, _1))
-            .add<state                 >(boost::bind(&visapp::on_state      , this, _1))
+            .add<setup_msg             >(boost::bind(&visapp::on_setup      , this, _1))
+            .add<state_msg             >(boost::bind(&visapp::on_state      , this, _1))
             .add<props_updated         >(boost::bind(&visapp::on_props_updated   , this, _1))
             ;
 
@@ -517,13 +517,13 @@ struct visapp
         LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
     }
  
-    void on_setup(setup const& msg)
+    void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
         gt_.set_factor(0.0);
     }
 
-    void on_state(state const& msg)
+    void on_state(state_msg const& msg)
     {
         gt_.set_factor(msg.factor);
         w_->set_factor(msg.factor);

@@ -12,8 +12,8 @@ namespace kernel
 struct visual_object_impl
     : visual_object
 {
-    visual_object_impl( std::string const & res, uint32_t seed, bool async );
-    visual_object_impl( nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async );
+    visual_object_impl( std::string const & res, uint32_t seed, bool async, on_object_loaded_f f);
+    visual_object_impl( nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async, on_object_loaded_f f);
    
    ~visual_object_impl();
 
@@ -30,6 +30,7 @@ private:
 #endif
     uint32_t                            seed_;
     bool                              loaded_;
+    on_object_loaded_f                    ol_;
 
 private:
 

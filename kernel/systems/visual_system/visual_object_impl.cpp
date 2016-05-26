@@ -12,9 +12,10 @@ namespace kernel
 {
     struct visual_object_impl::private_t
     {
-        private_t()
-            : scene_( avScene::GetScene() )
+        explicit private_t(std::string const & res)
+            : scene_        ( avScene::GetScene() )
             , anim_manager_ (nullptr) 
+            , res_          (res)
         {}
 
         CacheNodesVisitor::CacheMapType                          cache_;
@@ -25,14 +26,12 @@ namespace kernel
         std::string                                                res_;
     };
 
-    visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async )
+    visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async, on_object_loaded_f f )
         : loaded_(false)
-        , p_  (make_shared<private_t>())
+        , p_     (boost::make_shared<private_t>(res))
+        , seed_  (seed)
+        , ol_    (f)
     {
-        seed_ =  seed;
-        
-        p_->res_ = res;
-
 
 		if(!async)
 		{
@@ -55,17 +54,21 @@ namespace kernel
             p_->scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
 #endif
             p_->node_ = p_->scene_->load(res, nullptr, seed, async);
+            
+            if(!async) 
+                object_loaded( seed );
         }
 
     }
 
-    visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async )
+    visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async, on_object_loaded_f f )
         : loaded_(false)
-        , p_  (make_shared<private_t>())
+        , p_     (boost::make_shared<private_t>(res))
+        , seed_  (seed)
+        , ol_    (f)
     {
 #ifdef ASYNC_OBJECT_LOADING           
         p_->scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
-        seed_ =  seed;
 #endif
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
@@ -110,16 +113,15 @@ namespace kernel
 		   p_->node_->accept(finder);
            p_->anim_manager_  = finder.getBM();
 
-           
 #if 0
            osgDB::writeNodeFile(*p_->node_.get(), p_->res_ + boost::lexical_cast<std::string>(seed) + ".osgt");
 #endif
 
            CacheNodesVisitor cnv(p_->cache_);
            node()->accept(cnv);
-#if 0
-		   SetupRigGeometry switcher(true, *p_->node_.get());
-#endif
+
+           if(ol_)
+               ol_(seed);
 
 		   object_loaded_signal_(seed);
          }

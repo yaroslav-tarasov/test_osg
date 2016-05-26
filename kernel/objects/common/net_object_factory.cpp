@@ -28,7 +28,7 @@ namespace {
 using namespace kernel;
 using namespace net_layer::msg;
 
-inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
+inline object_info_ptr create_aircraft(kernel::system* csys,create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -38,7 +38,7 @@ inline object_info_ptr create_aircraft(kernel::system* csys,create const& msg)
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as, gp);
 }
 
-inline object_info_ptr create_helicopter_phl(kernel::system* csys,create const& msg)
+inline object_info_ptr create_helicopter_phl(kernel::system* csys,create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -50,7 +50,7 @@ inline object_info_ptr create_helicopter_phl(kernel::system* csys,create const& 
     return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
 }
 
-inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& msg)
+inline object_info_ptr create_aircraft_phl(kernel::system* csys,create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -62,7 +62,7 @@ inline object_info_ptr create_aircraft_phl(kernel::system* csys,create const& ms
     return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
 }
 
-inline object_info_ptr create_vehicle(kernel::system* csys,create const& msg)
+inline object_info_ptr create_vehicle(kernel::system* csys,create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -74,7 +74,7 @@ inline object_info_ptr create_vehicle(kernel::system* csys,create const& msg)
     return  vehicle::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
 
-inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const& msg)
+inline object_info_ptr create_flock_of_birds(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -86,7 +86,7 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create const&
     return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
 
-inline object_info_ptr create_character(kernel::system* csys, create const& msg)
+inline object_info_ptr create_character(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -98,7 +98,7 @@ inline object_info_ptr create_character(kernel::system* csys, create const& msg)
 }
  
  
-inline object_info_ptr create_arresting_gear(kernel::system* csys, create const& msg)
+inline object_info_ptr create_arresting_gear(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -109,7 +109,7 @@ inline object_info_ptr create_arresting_gear(kernel::system* csys, create const&
     return arresting_gear::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
 }
 
-inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
+inline object_info_ptr create_aerostat(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
 	geo_position gp(dpos, get_base());
@@ -120,7 +120,7 @@ inline object_info_ptr create_aerostat(kernel::system* csys, create const& msg)
 	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
 }
 
-inline object_info_ptr create_camera(kernel::system* csys, create const& msg)
+inline object_info_ptr create_camera(kernel::system* csys, create_msg const& msg)
 {       
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
@@ -128,7 +128,7 @@ inline object_info_ptr create_camera(kernel::system* csys, create const& msg)
 	return camera::create(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
 }
 
-object_info_ptr create_object( kernel::system* csys, create const& msg)
+object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
 {
     if(msg.object_kind & ok_vehicle)
         return create_vehicle(csys, msg);

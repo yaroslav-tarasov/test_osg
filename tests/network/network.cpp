@@ -234,7 +234,7 @@ struct client
             return cfgr_->applications();
        }
 
-       hosts_props_t& get_visas()
+       hosts_props_t& get_apps(const std::string& app_name )
        {
            net_layer::configuration_t const& cfg =  configuration();
 
@@ -243,7 +243,7 @@ struct client
                host_props hp; 
                auto app  = applications ()[(*it).app_id];
 
-               if(app.name == "visapp")
+               if(app.name == app_name)
                {
                     auto phosts = hosts();
                     hp.host = phosts[(*it).host_id];
@@ -318,7 +318,7 @@ struct client
         else if ( g_icao_code == "URSS" )
             init_URSS();
 
-        ADD_EVENT(time , state(0.0,time,factor))
+        ADD_EVENT(time , state_msg(0.0,time,factor))
 
 #if 0
         ADD_EVENT(10.0 , create(333, cg::point_3(0.0,0.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds, "crow", "", 50)) 
@@ -428,7 +428,7 @@ struct client
         runs_once_.insert(make_pair( 1,
             [this]( double time )->void {
 
-                client::net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+                client::net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
 
                 for (auto it = hp.begin(); it!=hp.end(); ++it )
                 {
@@ -446,7 +446,7 @@ struct client
         runs_once_.insert(make_pair( 25,
             [this]( double time )->void {
 
-            client::net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+            client::net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
 
             for (auto it = hp.begin(); it!=hp.end(); ++it )
             {
@@ -511,6 +511,11 @@ struct client
 
     }
 
+    inline void setup_scene()
+    {
+
+    }
+
 	inline void set_weather()
 	{
 		environment::weather_t  weather; 
@@ -520,61 +525,61 @@ struct client
 
 		ADD_EVENT(2.0, environment_msg(weather))
 #if 1
-			weather.fog_density  = 0.4f; 
+		weather.fog_density  = 0.4f; 
 		weather.wind_speed  = 20.0f;
 		weather.wind_dir    = cg::point_2f(1.0,0.0);
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
 		weather.clouds_density = 0.1f;
 		ADD_EVENT(15.0, environment_msg(weather))
 
-			weather.clouds_density = 0.5f;
+		weather.clouds_density = 0.5f;
 		ADD_EVENT(16.0, environment_msg(weather))
 
-			weather.clouds_density = 0.7f;
+		weather.clouds_density = 0.7f;
 		ADD_EVENT(17.5, environment_msg(weather))
 
-			weather.clouds_density = 0.9;
+		weather.clouds_density = 0.9f;
 		ADD_EVENT(19.0, environment_msg(weather))
 
-			weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
+		weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
 		ADD_EVENT(20.0, environment_msg(weather))
 
-			weather.wind_speed  = 20.0f;
+		weather.wind_speed  = 20.0f;
 		weather.wind_dir    = cg::point_2f(-1.0,0.0);
 		weather.rain_density  = 0.2f;
 		ADD_EVENT(25.0, environment_msg(weather))
-			weather.rain_density  = 0.5f;
+		weather.rain_density  = 0.5f;
 		weather.lightning_intensity  = 0.75f;
 		ADD_EVENT(30.0, environment_msg(weather))
-			weather.rain_density  = 0.75f;
+		weather.rain_density  = 0.75f;
 		ADD_EVENT(35.0, environment_msg(weather))
-			weather.rain_density  = 1.0f;
+		weather.rain_density  = 1.0f;
 		ADD_EVENT(45.0, environment_msg(weather))
 
-			weather.wind_speed  = 10.0f;
+		weather.wind_speed  = 10.0f;
 		weather.wind_dir    = cg::point_2f(1.0,1.0);
 		weather.rain_density  = 0.75f;
 		ADD_EVENT(50.0, environment_msg(weather))
-			weather.rain_density  = 0.45f;
+		weather.rain_density  = 0.45f;
 		ADD_EVENT(55.0, environment_msg(weather))
-			weather.lightning_intensity  = 0.0f;
+		weather.lightning_intensity  = 0.0f;
 		weather.rain_density  = 0.2f;
 		ADD_EVENT(57.0, environment_msg(weather))
 
-			weather.fog_density  = 0.45f; 
+		weather.fog_density  = 0.45f; 
 		weather.rain_density  = 0.1f;
 		ADD_EVENT(60.0, environment_msg(weather))
 
-			weather.fog_density  = 0.40f;
+		weather.fog_density  = 0.40f;
 		ADD_EVENT(70.0, environment_msg(weather)) 
-			weather.rain_density  = 0.0f;
+		weather.rain_density  = 0.0f;
 		weather.fog_density  = 0.2f;
 		weather.wind_speed  = 0.0f;
 		weather.wind_dir    = cg::point_2f(1.0,1.0);
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::none);
 		ADD_EVENT(80.0, environment_msg(weather))
 
-			weather.fog_density  = 0.2f;
+	    weather.fog_density  = 0.2f;
 		weather.wind_speed  = 0.0f;
 		weather.wind_dir    = cg::point_2f(1.0,1.0);
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::overcast);
@@ -608,8 +613,8 @@ struct client
         //Camera: КДП        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
         //Camera: КДП_утк -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
 #if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(48.89f,411.65f,28.50f), quaternion(cprf(cg::rad2grad() *-2.14f)) , ok_camera, "camera 1", "") )
+        ADD_EVENT(0.0  , create_msg(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create_msg(1501, point_3f(48.89f,411.65f,28.50f),      quaternion(cprf(cg::rad2grad() *-2.14f)) , ok_camera, "camera 1", "") )
 #endif
 
 #if 0
@@ -621,11 +626,11 @@ struct client
 #if 1
 
 #if 0
-        ADD_EVENT(10.0  , create(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
-        ADD_EVENT(11.0  , create(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
+        ADD_EVENT(10.0  , create_msg(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
+        ADD_EVENT(11.0  , create_msg(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
 
-        ADD_EVENT(12.0  , create(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
-        ADD_EVENT(13.0  , create(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
+        ADD_EVENT(12.0  , create_msg(153,point_3(-466,158,0),cg::cpr(353), ok_helicopter, "KA52", "153") )
+        ADD_EVENT(13.0  , create_msg(154,point_3(-478,254,0),cg::cpr(173), ok_helicopter, "KA52", "154") )
 
         for (int i=0;i<4;i++)
         {
@@ -636,33 +641,33 @@ struct client
 #endif
 
 #if 0
-            ADD_EVENT(14.0  , create(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
-            ADD_EVENT(15.0  , create(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
-            ADD_EVENT(16.0  , create(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
-            ADD_EVENT(17.0  , create(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
-            ADD_EVENT(18.0  , create(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
-            ADD_EVENT(19.0  , create(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
+            ADD_EVENT(14.0  , create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+            ADD_EVENT(15.0  , create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+            ADD_EVENT(16.0  , create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+            ADD_EVENT(17.0  , create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+            ADD_EVENT(18.0  , create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+            ADD_EVENT(19.0  , create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
 
 
 #if 1
-            ADD_EVENT(12.0  , create(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
-            //ADD_EVENT(13.0  , create(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
-            //ADD_EVENT(14.0  , create(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-            ADD_EVENT(14.0  , create(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
+            ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
+            //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
+            //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
+            ADD_EVENT(14.0  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
 #endif
 
 #if 1
-            ADD_EVENT(traj_pos_->base_length()  , create(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
+            ADD_EVENT(traj_pos_->base_length()  , create_msg(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
             ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
             ADD_EVENT(/*232*/180.0  , set_target_msg( 173 ) ) 
 #endif
 
 #if 0
-            ADD_EVENT(12.0  , create(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
-            ADD_EVENT(13.0  , create(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
-            ADD_EVENT(14.0  , create(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
+            ADD_EVENT(12.0  , create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )
+            ADD_EVENT(13.0  , create_msg(177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "AN140", "177") )
+            ADD_EVENT(14.0  , create_msg(178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "AN140", "178") )
 
             for (int i=0;i<2;i++)
             {
@@ -678,7 +683,7 @@ struct client
 
 #endif
 #if 1
-            ADD_EVENT(1.0  , create(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
+            ADD_EVENT(1.0  , create_msg(150,point_3(-447,258,0),cg::cpr(173), ok_helicopter, "KA27", "150") )
 
             ADD_EVENT(traj2_->base_length()         , engine_state_msg(150 , ES_LOW_THROTTLE)  )
             ADD_EVENT(traj2_->base_length() + 40.0  , engine_state_msg(150 , ES_FULL_THROTTLE) )
@@ -690,7 +695,7 @@ struct client
 #endif
             
             run_f_trp_ = [this](uint32_t id, double time, double traj_offset)->void {
-                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
                     , traj_trp_->kp_value    (time)
                     , traj_trp_->curs_value  (time)
@@ -710,7 +715,7 @@ struct client
 
 
             run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
-                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
                     , traj_pos_->kp_value    (time)
                     , traj_pos_->curs_value  (time)
@@ -728,7 +733,7 @@ struct client
                 ));
 
             run_wrap_f run_f_trp2 = [this](uint32_t id, double time, double traj_offset)->void {
-                binary::bytes_t msg =  std::move(network::wrap_msg(run(
+                binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
                     , traj_trp2_->kp_value    (time)
                     , traj_trp2_->curs_value  (time)
@@ -783,8 +788,8 @@ struct client
 //Camera: Вышка_взлет  640.872086  24.000000  885.839783 7.790917 -0.026420 0.80001 45.000000 30000.000000 0
 
 #if 1
-        ADD_EVENT(0.0  , create(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
-        ADD_EVENT(0.0  , create(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
+        ADD_EVENT(0.0  , create_msg(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
+        ADD_EVENT(0.0  , create_msg(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
 #endif
 
 #if 0
@@ -798,8 +803,8 @@ struct client
         {
             std::vector<std::string> values_;
             boost::split(values_, parking[i], boost::is_any_of(" \t="), boost::token_compress_on);
-            const cg::quaternion    orien (cg::cprf(boost::lexical_cast<int>(values_[3])) );
-            ADD_EVENT(0.0   , create( 200 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
+            const cg::quaternion    orien (cg::cprf(float(boost::lexical_cast<int>(values_[3]))) );
+            ADD_EVENT(0.0   , create_msg( 200 + i, 1000.f * point_3f(boost::lexical_cast<float>(values_[1]),boost::lexical_cast<float>(values_[2]), 0),orien, ok_aircraft, values_[4], "") )
 
 
         }
@@ -831,35 +836,67 @@ private:
         
         if (peer.port == 45001)
         {
-            binary::bytes_t bts =  std::move(wrap_msg(vis_peers(eps_)));
+            binary::bytes_t bts =  std::move(wrap_msg(vis_peers_msg(eps_)));
             peers_[peer]->send(&bts[0], bts.size());
             LogInfo("Send peers list to " << peer);
         }
-        
 
+#if 1
+        binary::bytes_t bts =  std::move(wrap_msg(setup_msg(g_icao_code)));
+        peers_[peer]->send(&bts[0], bts.size());
+#endif
+
+
+        if (peers_.size()==cons_.size())
         {
-            net_configurer::hosts_props_t& hp = net_cfgr_->get_visas();
+             LogInfo("on_connected peers_.size()" << peers_.size());
 
-            for (auto it = hp.begin(); it!=hp.end(); ++it )
+#if 0
+            net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("modapp");
+
+            for (auto it = peers_.begin();it!= peers_.end(); ++it )
             {
-                if((*it).host.ip==peer.addr.to_string())
+                // auto & peer = (*it).first;
+                binary::bytes_t bts =  std::move(wrap_msg(setup_msg(g_icao_code)));
+                it->second->send(&bts[0], bts.size());
+
+                #if 0
+                for (auto it_h = hp.begin(); it_h!=hp.end(); ++it_h )
                 {
-                    kernel::vis_sys_props props;
-                    // props.base_point = *kta_position( "URSS" );
-                    // props.channel.course = 60 ;
-                    // std::stringstream os;
-                    // prop_tree::write_to(os, props); 
-
-                    binary::bytes_t bts =  std::move(wrap_msg(props_updated(/*os.str()*/(*it).task.properties)));
-                    peers_[peer]->send(&bts[0], bts.size());
+                    if((*it_h).host.ip==peer.addr.to_string())
+                    {
+                        binary::bytes_t bts =  std::move(wrap_msg(create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176")));
+                        (*it).second->send(&bts[0], bts.size());
+                    }
                 }
-            }		   
+                #endif
+            }
+#endif
 
-        }
 
-        {
-            binary::bytes_t bts =  std::move(wrap_msg(setup(g_icao_code)));
-            peers_[peer]->send(&bts[0], bts.size());
+#if 0
+            {
+                net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
+
+                for (auto it = hp.begin(); it!=hp.end(); ++it )
+                {
+                    if((*it).host.ip==peer.addr.to_string())
+                    {
+                        kernel::vis_sys_props props;
+                        // props.base_point = *kta_position( "URSS" );
+                        // props.channel.course = 60 ;
+                        // std::stringstream os;
+                        // prop_tree::write_to(os, props); 
+
+                        binary::bytes_t bts =  std::move(wrap_msg(props_updated(/*os.str()*/(*it).task.properties)));
+                        peers_[peer]->send(&bts[0], bts.size());
+                    }
+                }		   
+
+            }
+#endif
+
+
         }
 
     }

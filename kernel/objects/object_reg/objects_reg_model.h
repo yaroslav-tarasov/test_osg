@@ -20,12 +20,12 @@ private:
 	void on_object_destroying(object_info_ptr object) override;
 
 protected:
-    void on_inject_msg(net_layer::msg::run const& msg);
+    void on_inject_msg(net_layer::msg::run_msg const& msg);
     void on_inject_msg(net_layer::msg::malfunction_msg const& msg);
     void on_inject_msg(net_layer::msg::container_msg const& msg);
 
 private:
-    std::unordered_map<object_id_t, net_layer::msg::run>  last_msg_;
+    std::unordered_map<object_id_t, net_layer::msg::run_msg>  last_msg_;
 };
 
 } // end of objects_reg

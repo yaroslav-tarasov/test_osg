@@ -23,16 +23,16 @@ AUTO_REG_NAME(aircraft_reg_model, model::create);
 model::model( kernel::object_create_t const& oc, dict_copt dict)
     : view                 (oc, dict)
 {
-    void (model::*on_run)  (net_layer::msg::run const& msg)             = &model::on_inject_msg;
+    void (model::*on_run)  (net_layer::msg::run_msg const& msg)             = &model::on_inject_msg;
     void (model::*on_malf) (net_layer::msg::malfunction_msg const& msg) = &model::on_inject_msg;
 
     msg_disp()
-        .add<net_layer::msg::run >(boost::bind(on_run      , this, _1))
+        .add<net_layer::msg::run_msg >(boost::bind(on_run      , this, _1))
         .add<net_layer::msg::malfunction_msg >(boost::bind(on_malf      , this, _1))
         ;
 }
 
-void model::on_inject_msg(net_layer::msg::run const& msg)
+void model::on_inject_msg(net_layer::msg::run_msg const& msg)
 {
      if(msg.ext_id>0 )                          
      {

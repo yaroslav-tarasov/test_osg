@@ -41,16 +41,22 @@ void visual::apply_vis_model()
     if (!settings_.model.empty())
     {
 
-        visual_object_ = sys_->create_visual_object(settings_.model /*+ "//" + settings_.model + ".scg"*/, object_id()) ;
+        visual_object_ = sys_->create_visual_object(settings_.model, boost::bind(&visual::object_loaded,this,_1), object_id()) ;
+
+#if 0
 #ifdef ASYNC_OBJECT_LOADING
         visual_object_->subscribe_object_loaded(boost::bind(&visual::object_loaded,this,_1));
-#endif  
+#endif 
+#endif 
+
     }
     else 
         visual_object_.reset();
 
+#if 0
 #ifndef ASYNC_OBJECT_LOADING
-    object_loaded( 0 );
+    object_loaded( object_id() );
+#endif
 #endif
 
 }
@@ -63,6 +69,8 @@ void visual::object_loaded( uint32_t seed )
 
     for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
           vis_node_impl_ptr(*it)->on_visual_object_created();
+    
+    sys_->visual_object_created(seed);
 
 #if 0
     force_log fl;

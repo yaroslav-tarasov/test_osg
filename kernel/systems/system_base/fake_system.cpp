@@ -1248,7 +1248,6 @@ struct visual_system_impl
     , fake_system_base
     //, victory::widget_control
 {
-
     visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props);
 
 private:
@@ -1258,12 +1257,14 @@ private:
     // visual_system
 private:
 #ifdef ASYNC_OBJECT_LOADING
-    visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 , bool async=true);
-    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0, bool async=true );
+    visual_object_ptr       create_visual_object( std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0 , bool async=true) override;
+    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=true ) override;
 #else
-	visual_object_ptr       create_visual_object( std::string const & res, uint32_t seed = 0 , bool async=false);
-	visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, uint32_t seed = 0, bool async=false );
+	visual_object_ptr       create_visual_object( std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0 , bool async=false) override;
+	visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=false ) override;
 #endif
+    void                    visual_object_created( uint32_t seed ) override;
+    const std::set<uint32_t>&  visual_objects_to_create () const      override { return objects_to_create_;}
 
     // visual_system_props
 private:
@@ -1287,11 +1288,11 @@ private:
 private:
     vis_sys_props           props_;
 
-    av::IVisualPtr                     vis_;
-    av::IScenePtr                    scene_;
-    //victory::IViewportPtr   viewport_;
+    av::IVisualPtr          vis_;
+    av::IScenePtr           scene_;
+    //victory::IViewportPtr viewport_;
 
-    scoped_connection object_destroying_connection_;
+    scoped_connection       object_destroying_connection_;
 
 //private:
 //    void init_frustum_projection();
@@ -1299,6 +1300,7 @@ private:
 private:
     visual_control_ptr      eye_;
 
+    std::set<uint32_t>      objects_to_create_;
 
 };
 
@@ -1350,14 +1352,31 @@ void visual_system_impl::load_exercise(dict_cref dict)
     init_eye();
 }
 
-visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, uint32_t seed/* = 0*/, bool async )
+visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-    return boost::make_shared<visual_object_impl>( res, seed, async);
+    if (seed>0) objects_to_create_.insert(seed);
+    LogInfo("Objects to create: " << res << " seed = " << seed);
+    return boost::make_shared<visual_object_impl>( res, seed, async, f);
 }
 
-visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, uint32_t seed/* = 0*/, bool async )
+visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-    return boost::make_shared<visual_object_impl>( parent, res, seed, async);
+    if (seed>0) objects_to_create_.insert(seed);
+    LogInfo("Objects to create: " << res << " seed = " << seed);
+    return boost::make_shared<visual_object_impl>( parent, res, seed, async, f);
+}
+
+void    visual_system_impl::visual_object_created( uint32_t seed )
+{
+      auto it = objects_to_create_.find(seed);
+      if(it!=objects_to_create_.end())
+          objects_to_create_.erase(it);
+
+      for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
+                  LogInfo("Objects left to create: " << " seed = " << *it);
+
+
+      LogInfo("Objects left to create: " << objects_to_create_.size() << " seed = " << seed);
 }
 
 void visual_system_impl::init_eye()
