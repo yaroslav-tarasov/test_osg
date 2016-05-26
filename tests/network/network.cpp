@@ -211,6 +211,7 @@ struct client
        };
 
        typedef  std::vector< host_props >  hosts_props_t;
+	   typedef  std::map<std::string,hosts_props_t> hosts_props_by_app_t;
 
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
@@ -238,6 +239,7 @@ struct client
        {
            net_layer::configuration_t const& cfg =  configuration();
 
+		   if(hp_.find(app_name)==hp_.end())
            for (auto it = cfg.tasks.begin();it!= cfg.tasks.end();++it)
            {
                host_props hp; 
@@ -249,12 +251,12 @@ struct client
                     hp.host = phosts[(*it).host_id];
                     hp.app  = app;
                     hp.task = *it;
-                    hp_.emplace_back(std::move(hp));
+                    hp_[app_name].emplace_back(std::move(hp));
                }
 
            }
 
-           return hp_;
+           return hp_[app_name];
        }
 
     private:
@@ -291,7 +293,7 @@ struct client
     private:
         net_layer::configurator_ptr                                            cfgr_;
         net_layer::configuration_t                                              cfg_;
-        hosts_props_t                                                            hp_;
+        hosts_props_by_app_t                                                     hp_;
     };
 
     client(endpoints peers)
@@ -425,6 +427,7 @@ struct client
             ));
 #endif
 
+#if 1
         runs_once_.insert(make_pair( 1,
             [this]( double time )->void {
 
@@ -441,6 +444,7 @@ struct client
                 }	
         }
         ));
+#endif
 
 #if 1
         runs_once_.insert(make_pair( 25,
@@ -841,7 +845,7 @@ private:
             LogInfo("Send peers list to " << peer);
         }
 
-#if 1
+#if 0
         binary::bytes_t bts =  std::move(wrap_msg(setup_msg(g_icao_code)));
         peers_[peer]->send(&bts[0], bts.size());
 #endif
@@ -851,21 +855,21 @@ private:
         {
              LogInfo("on_connected peers_.size()" << peers_.size());
 
-#if 0
+#if 1
             net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("modapp");
+            binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(g_icao_code)));
 
             for (auto it = peers_.begin();it!= peers_.end(); ++it )
             {
-                // auto & peer = (*it).first;
-                binary::bytes_t bts =  std::move(wrap_msg(setup_msg(g_icao_code)));
+                auto & peer = (*it).first;
                 it->second->send(&bts[0], bts.size());
 
-                #if 0
+                #if 1
                 for (auto it_h = hp.begin(); it_h!=hp.end(); ++it_h )
                 {
                     if((*it_h).host.ip==peer.addr.to_string())
                     {
-                        binary::bytes_t bts =  std::move(wrap_msg(create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176")));
+                        binary::bytes_t bts =  std::move(network::wrap_msg(create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176")));
                         (*it).second->send(&bts[0], bts.size());
                     }
                 }
