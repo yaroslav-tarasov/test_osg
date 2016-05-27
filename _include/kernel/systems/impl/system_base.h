@@ -116,7 +116,6 @@ protected:
     optional<double> last_update_atc_;
 
 protected:
-    //! корень дерева "классов объектов"
     object_class_ptr root_;
 
 private:

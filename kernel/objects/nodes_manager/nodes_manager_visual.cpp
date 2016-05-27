@@ -70,8 +70,6 @@ void visual::object_loaded( uint32_t seed )
     for (auto it = nodes_.begin(); it != nodes_.end(); ++it)
           vis_node_impl_ptr(*it)->on_visual_object_created();
     
-    sys_->visual_object_created(seed);
-
 #if 0
     force_log fl;
     LOG_ODS_MSG( "visual::object_loaded( uint32_t seed )  " << settings_.model << " time: " << hr_timer.get_delta() << "\n");

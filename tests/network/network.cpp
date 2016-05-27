@@ -828,6 +828,8 @@ struct client
 			}
 		}
     }
+    
+    #define ADD_INIT(msg) msgs.push_back(std::move(network::wrap_msg(msg)));
 
 private:
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
@@ -853,24 +855,39 @@ private:
 
         if (peers_.size()==cons_.size())
         {
-             LogInfo("on_connected peers_.size()" << peers_.size());
-
 #if 1
             net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("modapp");
-            binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(g_icao_code)));
+
 
             for (auto it = peers_.begin();it!= peers_.end(); ++it )
             {
                 auto & peer = (*it).first;
-                it->second->send(&bts[0], bts.size());
 
                 #if 1
+                setup_msg::msgs_t msgs;
                 for (auto it_h = hp.begin(); it_h!=hp.end(); ++it_h )
                 {
                     if((*it_h).host.ip==peer.addr.to_string())
                     {
-                        binary::bytes_t bts =  std::move(network::wrap_msg(create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176")));
-                        (*it).second->send(&bts[0], bts.size());
+                        ADD_INIT( create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
+                        ADD_INIT( create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+                        ADD_INIT( create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+                        ADD_INIT( create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+                        ADD_INIT( create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+                        ADD_INIT( create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+                        ADD_INIT( create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
+
+#if 0
+                        for(auto msg = msgs.begin(); msg!= msgs.end(); ++msg)
+                            (*it).second->send(&(*msg)[0], (*msg).size());
+#endif
+                        binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(std::move(std::string(g_icao_code)), std::move(msgs))));
+                        it->second->send(&bts[0], bts.size());
+                    }
+                    else
+                    {
+                       binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(g_icao_code)));
+                       it->second->send(&bts[0], bts.size());
                     }
                 }
                 #endif
@@ -878,7 +895,7 @@ private:
 #endif
 
 
-#if 0
+#if 1
             {
                 net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
 

@@ -187,6 +187,9 @@ void  RopesNode::updateRopes( const arresting_gear::ropes_state_t& rss )
 {
     using namespace arresting_gear;
     
+    if (rss.size()==0)
+        return;
+
     _coords->clear();
     _coords->resize(rss.size() * rss[0].size()  * (sides + 1));
     _uv->resize(rss.size() * rss[0].size() * (sides + 1));

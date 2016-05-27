@@ -1263,9 +1263,9 @@ private:
 	visual_object_ptr       create_visual_object( std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0 , bool async=false) override;
 	visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=false ) override;
 #endif
-    void                    visual_object_created( uint32_t seed ) override;
-    const std::set<uint32_t>&  visual_objects_to_create () const      override { return objects_to_create_;}
 
+private:
+    void                    visual_object_created( uint32_t seed );
     // visual_system_props
 private:
 
@@ -1301,7 +1301,8 @@ private:
     visual_control_ptr      eye_;
 
     std::set<uint32_t>      objects_to_create_;
-
+    bool                    ready_;
+    uint32_t                obj_counter_;
 };
 
 
@@ -1309,6 +1310,8 @@ visual_system_impl::visual_system_impl(msg_service& service, av::IVisualPtr vis,
     : fake_system_base(sys_visual, service, "objects.xml")
     , vis_   (vis)
     , scene_ (vis->GetScene())
+    , ready_ (false)
+    , obj_counter_(0)
     //, viewport_ (vis->create_viewport())
 
     , props_(props)
@@ -1354,16 +1357,34 @@ void visual_system_impl::load_exercise(dict_cref dict)
 
 visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-    if (seed>0) objects_to_create_.insert(seed);
+#if 1
     LogInfo("Objects to create: " << res << " seed = " << seed);
-    return boost::make_shared<visual_object_impl>( res, seed, async, f);
+#endif
+    if (seed>0 && !ready_)
+    {
+        objects_to_create_.insert(seed);
+        obj_counter_++;
+    }
+
+    auto  vo = boost::make_shared<visual_object_impl>( res, seed, async, [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
+
+    return vo;
 }
 
 visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-    if (seed>0) objects_to_create_.insert(seed);
+#if 1
     LogInfo("Objects to create: " << res << " seed = " << seed);
-    return boost::make_shared<visual_object_impl>( parent, res, seed, async, f);
+#endif
+    if (seed>0 && !ready_)
+    {
+        objects_to_create_.insert(seed);
+        obj_counter_++;
+    }
+
+    auto  vo = boost::make_shared<visual_object_impl>( parent, res, seed, async,  [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
+
+    return vo;
 }
 
 void    visual_system_impl::visual_object_created( uint32_t seed )
@@ -1372,11 +1393,20 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
       if(it!=objects_to_create_.end())
           objects_to_create_.erase(it);
 
+#if 1
       for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
                   LogInfo("Objects left to create: " << " seed = " << *it);
+#endif
 
+      if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1/*== obj_to_load_num_*/ )  
+      {
+          exercise_loaded_signal_();
+          ready_ = true;
+      }
 
+#if 1
       LogInfo("Objects left to create: " << objects_to_create_.size() << " seed = " << seed);
+#endif
 }
 
 void visual_system_impl::init_eye()

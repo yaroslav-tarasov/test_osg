@@ -49,23 +49,28 @@ namespace
         __main_srvc__->stop();
     }
 
-    struct updater
+    struct sys_updater
     {
-       updater(kernel::system_ptr  sys,double period = 0.001)
+       typedef boost::function<void ()> on_ready_f;
+
+       sys_updater(kernel::system_ptr  sys, on_ready_f ready_f, double period = 0.001)
           : period_(period)
           , old_val(0)
           , sys_(sys)
+          , vis_sys_(sys)
+          , vis_sys_props_(vis_sys_)
        {
-
+           sys_->subscribe_exercise_loaded(ready_f);
        }
 
        __forceinline void update(double time)
        {
-           if(time - old_val >=period_)
-           {
-               sys_->update(time);
-               old_val = time;
-           }
+           sys_->update(time);
+       }
+
+       __forceinline void  update_props(kernel::vis_sys_props const& props)
+       {
+           vis_sys_props_->update_props(props);
        }
 
        __forceinline void reset()
@@ -77,11 +82,19 @@ namespace
        {
            return sys_;
        }
+       
+       __forceinline kernel::visual_system_ptr get_vis_sys()
+       {
+           return vis_sys_;
+       }
 
     private:
        double                                                   period_; 
        double                                                   old_val;
        kernel::system_ptr                                          sys_;
+       kernel::visual_system_ptr                               vis_sys_;
+       kernel::visual_system_props_ptr                   vis_sys_props_;
+       scoped_connection                    exercise_loaded_connection_;
     };
 
 }
@@ -200,7 +213,7 @@ private:
          ses_acc_.reset();
          mod_acc_.reset();
          calc_timer_.reset();
-         sockets_.clear();
+         socket_.reset();
 
          __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
      }
@@ -217,7 +230,7 @@ private:
          size_t size = binary::size(*data);
          error_code_t ec;
 
-         sockets_[id]->send(binary::raw_ptr(*data), size);
+         socket_->send(binary::raw_ptr(*data), size);
          if (ec)
          {
              LogError("TCP send error: " << ec.message());
@@ -243,9 +256,9 @@ private:
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
          const uint32_t id = peer.port;
-         if(sockets_.size()==0)
+         if(!socket_)
          {
-             sockets_[id] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
+             socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
                  , boost::bind(&net_worker::on_recieve, this, _1,_2, peer)
                  , boost::bind(&net_worker::on_disconnected, this, _1, id)
                  , boost::bind(&net_worker::on_error, this, _1, id)
@@ -280,7 +293,8 @@ private:
      void on_disconnected(boost::system::error_code const& ec, uint32_t sock_id)
      {  
          LogInfo("Client " << sock_id << " disconnected with error: " << ec.message() );
-         sockets_.erase(sock_id);
+         // sockets_.erase(sock_id);
+         socket_.reset();
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
      }
@@ -288,14 +302,15 @@ private:
      void on_error(boost::system::error_code const& ec, uint32_t sock_id)
      {
          LogError("TCP error: " << ec.message());
-         sockets_.erase(sock_id);
+         // sockets_.erase(sock_id);
+         socket_.reset();
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
      }
 
 private:
     boost::scoped_ptr<async_acceptor>                           ses_acc_       ;
     boost::scoped_ptr<async_acceptor>                           mod_acc_   ;
-    std::map<uint32_t, std::shared_ptr<tcp_fragment_wrapper> >  sockets_;
+    std::shared_ptr<tcp_fragment_wrapper>                       socket_;
     
     ses_helper                                                  ses_helper_;
 private:
@@ -321,9 +336,6 @@ private:
     net::timer_connection                                       calc_timer_ ;
     net::ses_srv*                                               ses_;
 };
-
-
-
 
 struct global_timer : boost::noncopyable
 {
@@ -389,15 +401,14 @@ private:
 struct visapp_impl
 {
     friend struct visapp;
+    
+    typedef boost::function<void ()> on_ready_f;
 
-    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv)
+    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv, const on_ready_f& ready_f)
         : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
-        , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/))
-
-    {   
-
-    }
+        , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/), ready_f)
+    {}
 
     ~visapp_impl()
     {
@@ -416,7 +427,7 @@ struct visapp_impl
     
     void update_property(kernel::vis_sys_props const& props)
     {
-        kernel::visual_system_props_ptr(vis_sys_.get_sys())->update_props(props);
+        vis_sys_.update_props(props);
     }
 
 private:
@@ -440,18 +451,17 @@ private:
 private:
 	av::IVisualPtr                                              osg_vis_;
     kernel::msg_service&                                        msg_srv_;
-    updater                                                     vis_sys_;
-
-
+    sys_updater                                                 vis_sys_;
+    on_ready_f                                                  ready_f_;
 };
 
 struct visapp
 {
     visapp( const  endpoint &  peer, const endpoint& mod_peer)
         : done_          (false)
+        , need_to_update_(false)
         , thread_        (new boost::thread(boost::bind(&visapp::run, this)))
-        , msg_service_   (boost::bind(&visapp::push_back, this, _1))
-		, need_to_update_(false)
+        , msg_service_   (boost::bind(&visapp::send, this, _1))
     {
         
         props_.base_point = ::get_base();
@@ -505,7 +515,7 @@ struct visapp
 		}
 	}
 
-    void push_back (binary::bytes_cref bytes)
+    void send (binary::bytes_cref bytes)
     {
         w_->send(bytes);
     }
@@ -517,10 +527,17 @@ struct visapp
         LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
     }
  
+    void on_ready()
+    {
+        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
+        send(bts);
+    }
+
     void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
         gt_.set_factor(0.0);
+        obj_to_load_num_ =  msg.obj_num;
     }
 
     void on_state(state_msg const& msg)
@@ -537,7 +554,7 @@ struct visapp
 
     void run()
     {   
-        visapp_impl  va( props_, msg_service_);
+        visapp_impl  va( props_, msg_service_, boost::bind(&visapp::on_ready, this));
         end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
         end_of_load_();
         while (!va.done() && !done_)
@@ -575,7 +592,7 @@ private:
     bool                                 done_;
     std::unique_ptr<boost::thread>     thread_;
     boost::function<void()>       end_of_load_;
-
+    boost::optional<uint32_t> obj_to_load_num_;
 private:
     msg_dispatcher<uint32_t>             disp_;
     kernel::msg_service           msg_service_;

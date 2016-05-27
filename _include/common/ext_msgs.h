@@ -17,6 +17,28 @@ namespace net_layer
 
     namespace msg
     {
+        //
+        //  System 
+        //  
+
+        struct container_msg
+            : network::msg_id<sm_container_msg>
+        {
+            typedef std::vector<bytes_t>  msgs_t;
+
+            container_msg(){}
+
+            container_msg(msgs_t&& msgs)
+                : msgs(move(msgs))
+            {
+            }
+
+            msgs_t msgs;
+        };
+
+        REFL_STRUCT(container_msg)
+            REFL_ENTRY(msgs)
+        REFL_END()
 
 //
 //    Session 
@@ -25,16 +47,30 @@ namespace net_layer
         struct setup_msg
             : network::msg_id<id_setup>
         {
-            setup_msg(const std::string& icao_code = "URSS")
+            typedef std::vector<bytes_t>  msgs_t;
+
+            setup_msg(const std::string& icao_code = "URSS", uint32_t obj_num = 0)
                 : icao_code (icao_code)
+                , obj_num   (obj_num)
             {
             }
 
-            std::string icao_code;
+            setup_msg(std::string&& icao_code, msgs_t&&     msgs )
+                : icao_code (icao_code)
+                , msgs      (msgs)
+                , obj_num   (msgs.size() + 1)
+            {
+            }
+
+            std::string      icao_code;
+            msgs_t           msgs;
+            uint32_t         obj_num;   
         };
         
         REFL_STRUCT(setup_msg)
             REFL_ENTRY(icao_code )
+            REFL_ENTRY(msgs)
+            REFL_ENTRY(obj_num)
         REFL_END()
 
         struct state_msg
@@ -350,28 +386,7 @@ namespace net_layer
 		REFL_SER(weather)
     REFL_END()
     
-//
-//  System 
-//  
 
-    struct container_msg
-        : network::msg_id<sm_container_msg>
-    {
-        typedef std::vector<bytes_t>  msgs_t;
-
-        container_msg(){}
-
-        container_msg(msgs_t&& msgs)
-            : msgs(move(msgs))
-        {
-        }
-
-        msgs_t msgs;
-    };
-
-    REFL_STRUCT(container_msg)
-        REFL_ENTRY(msgs)
-    REFL_END()
 
     }
 

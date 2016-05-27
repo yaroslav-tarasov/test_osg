@@ -37,9 +37,6 @@ struct visual_system
 	virtual visual_object_ptr       create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=false ) = 0;
 #endif
 
-    virtual void                    visual_object_created( uint32_t seed ) = 0;
-    virtual const std::set<uint32_t>&     visual_objects_to_create () const = 0;
-
 	virtual av::IVisualPtr          visual  () = 0;
     virtual av::IScenePtr           scene   () = 0;
     //virtual av::IViewportPtr      viewport() = 0;

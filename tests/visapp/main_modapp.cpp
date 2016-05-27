@@ -88,6 +88,7 @@ struct net_worker
      typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
      typedef boost::function<void()>                                on_all_connected_f; 
+     typedef boost::function<void(const ready_msg&)>                on_client_ready_f; 
 
      net_worker(const  endpoint &  peer,  on_receive_f on_recv , on_update_f on_update, on_all_connected_f on_all_connected)
          : period_     (cfg().model_params.msys_step)
@@ -172,7 +173,6 @@ private:
          worker_service_ = &(asi.get_service());
          
          boost::asio::io_service::work skwark(asi.get_service());
-
 
          calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
 
@@ -318,7 +318,8 @@ private:
 private:
     std::map< endpoint,unique_ptr<async_connector>>                                      cons_;
     std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >               sockets_;
-    std::vector<endpoint>                                                           modapp_peers_;  
+    std::vector<endpoint>                                                        modapp_peers_;  
+   
 
 private:
     boost::thread                                                               worker_thread_;
@@ -349,15 +350,18 @@ private:
 struct mod_app
 {
     typedef boost::function<void(run_msg const& msg)>                   on_run_f;
-    typedef boost::function<void(container_msg const& msg)>   on_container_f;
+    typedef boost::function<void(container_msg const& msg)>       on_container_f;
 
     mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
-        : systems_  (get_systems(systems::SECOND_IMPL, boost::bind(&mod_app::push_back, this, _1)))
-        , ctrl_sys_ (systems_->get_control_sys())
-        , mod_sys_  (systems_->get_model_sys  ())
+        : systems_    (get_systems(systems::SECOND_IMPL, boost::bind(&mod_app::send, this, _1)))
+        , ctrl_sys_   (systems_->get_control_sys())
+        , mod_sys_    (systems_->get_model_sys  ())
         , end_of_load_(eol)
-        , disp_     (boost::bind(&mod_app::inject_msg      , this, _1, _2))
-        , init_ (false)
+        , disp_       (boost::bind(&mod_app::inject_msg      , this, _1, _2))
+        , init_       (false)
+        , dc_         (false)
+        , peers_ready_(0)
+
     {   
 
         disp_
@@ -366,6 +370,7 @@ struct mod_app
 			.add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
             .add<state_msg             >(boost::bind(&mod_app::on_state      , this, _1))
             .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
+            .add<ready_msg             >(boost::bind(&mod_app::on_ready      , this, _1))
             ;
 
         w_.reset (new net_worker( peer 
@@ -388,7 +393,7 @@ private:
     {   
     }
     
-    void push_back (binary::bytes_cref bytes)
+    void send (binary::bytes_cref bytes)
     {
         w_->send_clients(bytes);
     }
@@ -407,29 +412,34 @@ private:
     {
         w_->set_factor(0.0);
         
-        setup_msg_ = msg;
+        setup_msg_ = std::move(msg);
     }
 
     void on_setup_deffered()
     {
+        // Airport & auto objects
         create_objects(setup_msg_.icao_code);
-
-        if(end_of_load_)
-            end_of_load_();  
-
-        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
-        w_->send_proxy(&bts[0], bts.size());
-
+        
         init_ = true;
+
+        for(auto it=setup_msg_.msgs.begin(); it != setup_msg_.msgs.end(); ++it )
+            disp_.dispatch_bytes(*it);
+
     }
-
-
 
     void on_state(state_msg const& msg)
     {
        w_->set_factor(msg.factor);
        w_->reset_time(msg.srv_time / 1000.0f);
     }
+
+    void on_ready(ready_msg const& msg)
+    {
+        peers_ready_++; 
+        if (peers_ready_ == vis_peers_.size() )
+           all_ready() ;
+    }
+
 
     void on_create(create_msg const& msg)
     {
@@ -444,14 +454,26 @@ private:
 
     void deffered_create()
     {
-        if(init_)
+        if(init_ /*&& !dc_*/)
         {
           for(auto it = creation_deque_.begin(); it != creation_deque_.end(); ++it )
              reg_obj_->create_object(*it);
          
           creation_deque_.clear();
+          
+          dc_ = true; 
         }
     }
+
+    void all_ready() 
+    {
+        if(end_of_load_)
+            end_of_load_();  
+
+        binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
+        w_->send_proxy(&bts[0], bts.size());
+    }
+
 
 	void on_destroy(destroy_msg const& msg)
 	{
@@ -463,6 +485,7 @@ private:
 
     void on_vis_peers(vis_peers_msg const& msg)
     {
+        vis_peers_ = msg.eps;
         w_->vis_connect(msg.eps);
     }
 
@@ -505,8 +528,10 @@ private:
 private:
     msg_dispatcher<uint32_t>                                       disp_;
     std::vector<endpoint>                                      vis_peers_;
+    uint16_t                                                 peers_ready_; 
     std::deque<create_msg>                                creation_deque_;
     bool                                                            init_;
+    bool                                                            dc_;
 private:
     on_container_f                                              on_cont_;
     boost::function<void()>                                 end_of_load_;
