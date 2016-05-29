@@ -545,7 +545,7 @@ struct visapp
         gt_.set_factor(msg.factor);
         w_->set_factor(msg.factor);
         w_->reset_time(msg.srv_time / 1000.0f);
-        gt_.set_time(/*time*/msg.srv_time / 1000.0f);
+        gt_.set_time(msg.srv_time / 1000.0f);
         force_log fl;       
         LOG_ODS_MSG( " void visapp::on_state(double time) " << msg.srv_time / 1000.0f << "\n");
     }

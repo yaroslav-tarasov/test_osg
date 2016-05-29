@@ -12,9 +12,8 @@ system_ptr create_ctrl_system  ( msg_service& service );
 
 struct fake_objects_factory
 {
-    virtual ~fake_objects_factory(){}
+	virtual ~fake_objects_factory(){}
 
-    //virtual object_info_ptr create_object        (std::string const &object_name) = 0;
     virtual object_info_ptr create_object        (object_class_ptr hierarchy_class, std::string const &name)  = 0;
 	virtual object_info_ptr create_object        (obj_create_data const& descr)                               = 0;
     virtual object_info_ptr load_object_hierarchy(dict_t const& dict)                                         = 0;

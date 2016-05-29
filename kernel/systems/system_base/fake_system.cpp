@@ -114,7 +114,6 @@ system_ptr create_ctrl_system( msg_service& service )
 struct  fake_system_base
     : system            
     , system_session    
-    //, objects_factory  
     , fake_objects_factory
     , object_collection 
     , boost::enable_shared_from_this<fake_system_base>
@@ -145,10 +144,14 @@ protected:
     object_info_ptr create_object            (obj_create_data const& descr)                                  override;
     object_info_ptr load_object_hierarchy    (dict_cref dict)                                                override;
     void            save_object_hierarchy    (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
-    object_class_vector const& object_classes() const                                                   override;
-    object_class_ptr get_object_class(std::string const& name) const                                    override;
+    object_class_vector const& object_classes() const                                                        override;
+    object_class_ptr get_object_class        (std::string const& name) const                                 override;
 
-    std::string generate_unique_name(std::string const &init_name) const override;
+    std::string     generate_unique_name     (std::string const &init_name) const override;
+
+private:
+	object_info_ptr local_create_object      (obj_create_data const& data);
+	void            pack_exercise            (const creating_objects_list_t& co , dict_ref dict, bool safe_key) /*const*/;
 
 private:
     void check_destroy(std::vector<object_info_wptr> const& objs_to_destroy);
@@ -530,6 +533,41 @@ object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std
         fire_object_created(obj);
 
     return obj;
+}
+
+object_info_ptr fake_system_base::local_create_object(obj_create_data const& data)
+{
+	object_info_ptr obj;
+	msgs_blocker    mb(*this);
+
+	{
+		locks::bool_lock l(create_object_lock_,false);
+		obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
+	}
+
+	// fire only on my system
+	if (obj)
+		object_created_signal_(obj);
+
+	return obj;
+}
+
+void fake_system_base::pack_exercise(const creating_objects_list_t& co , dict_ref dict, bool safe_key) /*const*/
+{
+	time_counter tc;
+
+	dict_t& objs = dict.add_child("objects");
+
+	for (auto it = co.begin(); it != co.end(); ++it)
+	{
+		object_info_ptr info = local_create_object(*it);
+
+		string branch_name = info->name() + "_" + lexical_cast<string>(info->object_id());
+
+		save_object_hierarchy(info, objs.add_child(branch_name.c_str()), safe_key);
+	}
+
+	LogInfo("Exercise saved in " << tc.to_double(tc.time()));
 }
 
 object_info_ptr fake_system_base::create_object(obj_create_data const& data)
