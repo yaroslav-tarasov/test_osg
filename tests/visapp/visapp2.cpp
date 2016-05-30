@@ -545,8 +545,7 @@ namespace
 
         void on_create(create const& msg)
         {
-            auto fp = fn_reg::function<void(create const&)>("create_aircraft");
-            if(fp)
+            if(auto fp = fn_reg::function<void(create const&)>("create_aircraft"))
                 fp(msg);
 
             LogInfo("Got create message: " << msg.course << " : " << msg.lat << " : " << msg.lon  );
@@ -566,8 +565,7 @@ namespace
 
             sys_creator()->create_auto_objects();
 
-            auto fp = fn_reg::function<void(const std::string&)>("create_objects");
-            if(fp)
+            if(auto fp = fn_reg::function<void(const std::string&)>("create_objects"))
                 fp(airport);
         }
 

@@ -370,10 +370,9 @@ private:
 
     void on_create(create const& msg)
     {
-        auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>(kernel::system* csys, "create_object");
         kernel::object_info_ptr  a;
         
-        if(fp)
+        if(auto fp = fn_reg::function<kernel::object_info_ptr (create const&)>(kernel::system* csys, "create_object"))
             a = fp(ctrl_sys_.get(), msg);
 
         //LogInfo("Got create message: " << msg.model_name << "   " << msg.object_kind << "   " << msg.course << " : " << msg.lat << " : " << msg.lon  );
@@ -393,8 +392,7 @@ private:
         force_log fl;       
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.get_delta() << "\n");
         
-        auto fp = fn_reg::function<void(const std::string&)>("create_objects");
-        if(fp)
+        if(auto fp = fn_reg::function<void(const std::string&)>("create_objects"))
             fp(airport);
 
         force_log fl2;  
@@ -718,8 +716,7 @@ private:
         force_log fl;       
         LOG_ODS_MSG( "create_objects(const std::string& airport): create_auto_objects() " << hr_timer.set_point() << "\n");
 
-        auto fp = fn_reg::function<void(const std::string&)>("create_objects");
-        if(fp)
+        if(auto fp = fn_reg::function<void(const std::string&)>("create_objects"))
             fp(airport);
 
         force_log fl2;  

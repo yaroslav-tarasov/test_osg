@@ -110,3 +110,13 @@ namespace arresting_gear
     obj_create_data pack(fake_objects_factory* sys, const settings_t& sett,  const geo_position& init_pos);
     object_info_ptr create(fake_objects_factory* sys, const settings_t& sett,  const geo_position& init_pos);
 }
+
+
+namespace auto_object
+{
+
+    using namespace kernel;
+
+    obj_create_data pack(fake_objects_factory* sys, const std::string& class_name);
+    object_info_ptr create(fake_objects_factory* sys, const std::string& class_name);
+}

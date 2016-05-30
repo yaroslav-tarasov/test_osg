@@ -454,10 +454,8 @@ private:
     static inline const char* GetShader_internal(const shaders::shader_t& t, const std::string& mat_name)
     {
         std::string mat_name_cut = GetMaterialName(mat_name);
-
-        auto fp = fn_reg::function<const char*(shaders::shader_t)>(mat_name_cut);
         
-        if (fp)
+        if (auto fp = fn_reg::function<const char*(shaders::shader_t)>(mat_name_cut))
             return fp(t);
 
         if (mat_name.find("default") !=std::string::npos)

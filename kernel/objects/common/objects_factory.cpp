@@ -278,3 +278,21 @@ namespace camera
         return sys_object_create(sys, pack( sys,  init_pos, name));
     }
 }
+
+
+namespace auto_object
+{
+
+    obj_create_data pack(fake_objects_factory* sys, const std::string& class_name)
+    {
+        const std::string unique_name = sys->generate_unique_name(class_name);
+
+        return obj_create_data(class_name, unique_name);	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys, const std::string& class_name)
+    {
+        return sys_object_create(sys, pack( sys, class_name));	
+    }
+
+}

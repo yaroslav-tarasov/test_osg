@@ -45,28 +45,40 @@ namespace
         return "";
     }
 
-void pack_objects(const std::string & airport)
+void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
 {
-    const std::string icao_code = airport; 
-
-    krv::data_getter              _krv_data_getter(data_file(icao_code));
-    
-    high_res_timer hr_timer;
+    high_res_timer     hr_timer;
 
     // Только получение без контроля  
-    kernel::system_ptr _csys = get_systems()->get_control_sys();
-    
+    kernel::system_ptr csys = get_systems()->get_control_sys();
+    auto fact = dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(csys).get());
+
     kernel::creating_objects_list_t   obj_list;
 
+    obj_list.push_back(std::move(auto_object::pack( fact,"phys_sys")));
+    obj_list.push_back(std::move(auto_object::pack( fact,"airports_manager")));
+    obj_list.push_back(std::move(auto_object::pack( fact,"ada")));
+    obj_list.push_back(std::move(auto_object::pack( fact,"meteo_proxy")));
+    obj_list.push_back(std::move(auto_object::pack( fact,"aircraft_reg")));
+    
     {
         airport::settings_t as;
-        as.icao_code = icao_code;
-        obj_list.push_back(std::move(airport::pack(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as)));
+        as.icao_code = msg.icao_code;
+        obj_list.push_back(std::move(airport::pack(fact,as)));
     }
     
     force_log fl;       
     LOG_ODS_MSG( "pack_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
-
+    
+    if( auto f = fn_reg::function<kernel::obj_create_data (kernel::system*, net_layer::msg::create_msg const&)>( "pack_object"))
+        for (auto it = msg.msgs.begin(); it != msg.msgs.end(); ++it)
+        {
+                net_layer::msg::create_msg m;
+                network::safe_read_msg(*it,m);
+                obj_list.push_back(f(csys.get(), m));
+        }
+    
+    csys->pack_exercise(obj_list, dict, true);
 
 }
 

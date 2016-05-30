@@ -94,7 +94,7 @@ namespace first
     void impl::create_auto_objects()   
     {
         create_auto_object(_csys,"phys_sys","phys_sys");
-        create_auto_object(_csys,"airports_manager","aiports_manager");
+        create_auto_object(_csys,"airports_manager","airports_manager");
         create_auto_object(_csys,"ada","ada");
         create_auto_object(_csys,"meteo_proxy","meteo_proxy");
         create_auto_object(_csys,"aircraft_reg","aircraft_reg");

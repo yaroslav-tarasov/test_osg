@@ -114,15 +114,31 @@ struct net_worker
          ses_helper (net_worker* nw)
              : nw_ (nw)
          {}
+         
+         ~ses_helper()
+         {
+
+         }
+
+         void init()
+         {
+             ses_acc_.reset(new  async_acceptor (nw_->peer_, boost::bind(&ses_helper::on_accepted, this, _1, nw_->peer_ ), tcp_error));
+         }
+
+         void reset()
+         {
+              ses_acc_.reset();
+              sockets_.clear();
+         }
 
          void on_accepted(network::tcp::socket& sock, endpoint const& peer)
          {
              const uint32_t id = peer.port;
-             socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock 
+             sockets_.push_back(std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock 
                  , boost::bind(&ses_helper::on_recieve, this, _1,_2, peer)
                  , boost::bind(&net_worker::on_disconnected, nw_, _1, id)
                  , boost::bind(&net_worker::on_error, nw_, _1, id)
-                 ));        
+                 )));        
 
              LogInfo("Client " << peer << " accepted");
          }
@@ -138,8 +154,9 @@ struct net_worker
                  nw_->on_ses_recv_(binary::raw_ptr(*data), binary::size(*data));
          }
 
-         std::shared_ptr<tcp_fragment_wrapper>   socket_;
-         net_worker*                             nw_;
+         boost::scoped_ptr<async_acceptor>                    ses_acc_;
+         std::vector<std::shared_ptr<tcp_fragment_wrapper>>   sockets_;
+         net_worker*                                               nw_;
      };
 
      net_worker(const  endpoint &  peer, const endpoint& mod_peer, on_receive_f on_recv ,on_ses_receive_f on_ses_recv , on_update_f on_update)
@@ -197,7 +214,7 @@ private:
      {
          async_services_initializer asi(false);
 
-         ses_acc_.reset(new  async_acceptor (peer_, boost::bind(&ses_helper::on_accepted, ses_helper_, _1, endpoint(std::string("0.0.0.0:45003")) ), tcp_error));
+         ses_helper_.init();
          mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45002")) ), tcp_error));
 
          worker_service_ = &(asi.get_service());
@@ -210,7 +227,7 @@ private:
          size_t ret = worker_service_->run(ec);
 
 
-         ses_acc_.reset();
+         ses_helper_.reset();
          mod_acc_.reset();
          calc_timer_.reset();
          socket_.reset();
@@ -308,7 +325,6 @@ private:
      }
 
 private:
-    boost::scoped_ptr<async_acceptor>                           ses_acc_       ;
     boost::scoped_ptr<async_acceptor>                           mod_acc_   ;
     std::shared_ptr<tcp_fragment_wrapper>                       socket_;
     
@@ -404,10 +420,10 @@ struct visapp_impl
     
     typedef boost::function<void ()> on_ready_f;
 
-    visapp_impl(kernel::vis_sys_props const& props/*, binary::bytes_cref bytes*/, kernel::msg_service& msg_srv, const on_ready_f& ready_f)
+    visapp_impl(kernel::vis_sys_props const& props, binary::bytes_cref bytes, kernel::msg_service& msg_srv, const on_ready_f& ready_f)
         : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
-        , vis_sys_  (create_vis(props, osg_vis_/*, bytes*/), ready_f)
+        , vis_sys_  (create_vis(props, osg_vis_, bytes), ready_f)
     {}
 
     ~visapp_impl()
@@ -440,12 +456,18 @@ private:
 
 private:
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis/*, binary::bytes_cref bytes*/)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis, binary::bytes_cref bytes)
     {
-        using namespace binary;
         using namespace kernel;
+        
+        auto ptr = create_visual_system(msg_srv_, vis, props);
+        
+        dict_t dic;
+        binary::unwrap(bytes, dic);
 
-        return create_visual_system(msg_srv_, vis, props);
+        system_ptr(ptr)->load_exercise(dic);
+
+        return ptr;
     }
 
 private:
@@ -460,7 +482,7 @@ struct visapp
     visapp( const  endpoint &  peer, const endpoint& mod_peer)
         : done_          (false)
         , need_to_update_(false)
-        , thread_        (new boost::thread(boost::bind(&visapp::run, this)))
+        , thread_        (new boost::thread(boost::bind(&visapp::run_empty, this )))
         , msg_service_   (boost::bind(&visapp::send, this, _1))
     {
         
@@ -468,9 +490,10 @@ struct visapp
         props_.channel.camera_name = "camera 0";
 
         disp_
-            .add<setup_msg             >(boost::bind(&visapp::on_setup      , this, _1))
-            .add<state_msg             >(boost::bind(&visapp::on_state      , this, _1))
-            .add<props_updated         >(boost::bind(&visapp::on_props_updated   , this, _1))
+            .add<setup_msg             >(boost::bind(&visapp::on_setup          , this, _1))
+            .add<create_session        >(boost::bind(&visapp::do_create_session , this, _1))
+            .add<state_msg             >(boost::bind(&visapp::on_state          , this, _1))
+            .add<props_updated         >(boost::bind(&visapp::on_props_updated  , this, _1))
             ;
 
         w_.reset (new net_worker( peer, mod_peer 
@@ -539,6 +562,14 @@ struct visapp
         gt_.set_factor(0.0);
         obj_to_load_num_ =  msg.obj_num;
     }
+    
+    void do_create_session(create_session const& msg)
+    {
+        done_ = true;
+        thread_->join();
+        done_ = false;
+        thread_.reset(new boost::thread(boost::bind(&visapp::run, this, msg.data )));
+    }
 
     void on_state(state_msg const& msg)
     {
@@ -550,11 +581,18 @@ struct visapp
         LOG_ODS_MSG( " void visapp::on_state(double time) " << msg.srv_time / 1000.0f << "\n");
     }
 
-
-
-    void run()
+    void run_empty()
     {   
-        visapp_impl  va( props_, msg_service_, boost::bind(&visapp::on_ready, this));
+        while (!done_)
+        {
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(10));
+            update_messages();
+        }
+    }
+
+    void run( binary::bytes_t data )
+    {   
+        visapp_impl  va( props_, data, msg_service_,  boost::bind(&visapp::on_ready, this));
         end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
         end_of_load_();
         while (!va.done() && !done_)

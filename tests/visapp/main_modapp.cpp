@@ -86,18 +86,115 @@ namespace
 struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size)>   on_receive_f;
+     typedef boost::function<void(const void* data, size_t size)>   on_ses_receive_f;
      typedef boost::function<void(double time)>                     on_update_f;     
      typedef boost::function<void()>                                on_all_connected_f; 
      typedef boost::function<void(const ready_msg&)>                on_client_ready_f; 
 
-     net_worker(const  endpoint &  peer,  on_receive_f on_recv , on_update_f on_update, on_all_connected_f on_all_connected)
+
+     struct ses_helper
+     {
+         ses_helper (net_worker* nw)
+             : nw_ (nw)
+         {}
+
+         void init()
+         {
+              ses_acc_.reset(new  async_acceptor (nw_->peer_, boost::bind(&ses_helper::on_accepted, this, _1, nw_->peer_ ), tcp_error));
+         }
+
+         void reset()
+         {
+             ses_acc_.reset();
+             cons_.clear();
+             proxy_socket_.reset();
+             sockets_.clear();
+         }
+
+         void on_accepted(network::tcp::socket& sock, endpoint const& peer)
+         {
+             const uint32_t id = peer.port;
+             proxy_socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock 
+                 , boost::bind(&ses_helper::on_recieve     , this, _1, _2, peer)
+                 , boost::bind(&net_worker::on_disconnected, nw_ , _1, peer)
+                 , boost::bind(&net_worker::on_error       , nw_ , _1, peer)
+                 ));        
+
+             LogInfo("Client " << peer << " accepted");
+         }
+
+         void on_recieve(const void* data, size_t size, endpoint const& peer)
+         {
+             __main_srvc__->post(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
+         }
+
+         void do_recieve(binary::bytes_ptr data )
+         {
+             if (nw_->on_ses_recv_)
+                 nw_->on_ses_recv_(binary::raw_ptr(*data), binary::size(*data));
+         }
+         
+         
+         void vis_connect(const std::vector<endpoint>& vis_peers)
+         {  
+             vis_peers_  = vis_peers;
+             for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
+             {
+
+                 (*it).port = 45003;
+                 cons_[*it].reset(  new async_connector(*it, boost::bind(&ses_helper::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, nw_, _1) , tcp_error));
+
+             }
+
+         }
+
+         void send_clients(binary::bytes_cref data)
+         {
+             size_t size = binary::size(data);
+             error_code_t ec;
+
+             for( auto it = vis_peers_.begin();it!=vis_peers_.end(); ++it )
+                 if(sockets_.find(*it)!=sockets_.end()) sockets_[*it]->send(binary::raw_ptr(data), size);
+
+             if (ec)
+             {
+                 LogError("TCP send error: " << ec.message());
+                 return;
+             }
+         }
+
+         void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
+         {
+             LogInfo("Session helper connected to " << peer);
+
+             sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
+                 sock, boost::bind(&ses_helper::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, nw_, _1), &tcp_error));  
+
+#if 0
+             if(on_all_connected_ && vis_peers_.size() == sockets_.size())
+                 on_all_connected_();
+#endif
+         }
+
+         net_worker*                                                                nw_;
+         std::shared_ptr<tcp_fragment_wrapper>                            proxy_socket_;
+
+         boost::scoped_ptr<async_acceptor>                                     ses_acc_;
+         std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >   sockets_;
+
+         std::map< endpoint,unique_ptr<async_connector>>                          cons_;
+         std::vector<endpoint>                                               vis_peers_;
+     };
+
+     net_worker(const  endpoint &  peer,  on_ses_receive_f on_ses_recv , on_update_f on_update, on_all_connected_f on_all_connected)
          : period_     (cfg().model_params.msys_step)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
-         , mod_peer_   (peer)
-         , on_receive_ (on_recv)
+         , on_ses_recv_(on_ses_recv)
          , on_update_  (on_update)
          , on_all_connected_ (on_all_connected)
          , done_       (false)
+         , peer_       (peer)
+         , ses_helper_ (this)
      {
           worker_thread_ = boost::thread(&net_worker::run, this);
      }
@@ -125,17 +222,22 @@ struct net_worker
 
      void send_proxy(void const* data, uint32_t size)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)));
+         worker_service_->post(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(data, size)));
      }
      
      void send_proxy (binary::bytes_cref bytes)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+         worker_service_->post(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
       
      void send_clients (binary::bytes_cref bytes)
      {
          worker_service_->post(boost::bind(&net_worker::do_send_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+     }
+     
+     void send_session_clients (binary::bytes_cref bytes)
+     {
+         worker_service_->post(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
 
      void reset_time(double new_time)
@@ -151,6 +253,12 @@ struct net_worker
      void vis_connect(const std::vector<endpoint>& vis_peers)
      {  
          modapp_peers_  = vis_peers;
+        
+         worker_service_->post([this]()
+         {
+             ses_helper_.vis_connect(modapp_peers_);
+         } );
+         
          worker_service_->post([this]()
          {
              for (auto it = modapp_peers_.begin(); it!= modapp_peers_.end(); ++it )
@@ -160,15 +268,14 @@ struct net_worker
              }
          } );
 
-         
      }
 
 private:
      void run()
      {
          async_services_initializer asi(false);
-
-         acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, _2), tcp_error));
+         
+         ses_helper_.init();
          
          worker_service_ = &(asi.get_service());
          
@@ -180,7 +287,7 @@ private:
 		 boost::system::error_code ec;
          size_t ret = worker_service_->run(ec);
 
-         acc_.reset();
+         ses_helper_.reset();
          calc_timer_.reset();
          sockets_.clear();
 
@@ -194,7 +301,7 @@ private:
      }
 
      // from struct tcp_connection
-     void do_send(int id, binary::bytes_ptr data)
+     void do_send_proxy(int id, binary::bytes_ptr data)
      {   
          size_t size = binary::size(*data);
          error_code_t ec;
@@ -224,6 +331,10 @@ private:
 
      }
 
+     void do_send_session_clients(binary::bytes_ptr data)
+     {   
+          ses_helper_.send_clients(*data);
+     }
 
 
 private:
@@ -320,19 +431,20 @@ private:
     std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >               sockets_;
     std::vector<endpoint>                                                        modapp_peers_;  
    
-
+        ses_helper                                                                 ses_helper_;
 private:
     boost::thread                                                               worker_thread_;
     boost::asio::io_service*                                                   worker_service_;
     std::shared_ptr<boost::asio::io_service::work>                                       work_;
     const  endpoint                                                                  mod_peer_;
-
+    const  endpoint                                                                      peer_;
 private:
     std::shared_ptr<tcp_fragment_wrapper>                                    srv_;
-    boost::scoped_ptr<async_acceptor>                                        acc_;
+
                   
 private:
     on_receive_f                                                      on_receive_;
+    on_ses_receive_f                                                 on_ses_recv_;
     on_update_f                                                        on_update_;
     on_all_connected_f                                          on_all_connected_;
 private:
@@ -371,6 +483,7 @@ struct mod_app
             .add<state_msg             >(boost::bind(&mod_app::on_state      , this, _1))
             .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             .add<ready_msg             >(boost::bind(&mod_app::on_ready      , this, _1))
+
             ;
 
         w_.reset (new net_worker( peer 
@@ -418,13 +531,14 @@ private:
     void on_setup_deffered()
     {
         // Airport & auto objects
-        create_objects(setup_msg_.icao_code);
+        //create_objects(setup_msg_.icao_code);
         
         init_ = true;
 
-        for(auto it=setup_msg_.msgs.begin(); it != setup_msg_.msgs.end(); ++it )
-            disp_.dispatch_bytes(*it);
+        //for(auto it=setup_msg_.msgs.begin(); it != setup_msg_.msgs.end(); ++it )
+        //    disp_.dispatch_bytes(*it);
 
+        create_objects(setup_msg_);
     }
 
     void on_state(state_msg const& msg)
@@ -504,8 +618,7 @@ private:
 
         systems_->create_auto_objects();
 
-        auto fp = fn_reg::function<void(const std::string&)>("create_objects");
-        if(fp)
+        if(auto fp = fn_reg::function<void(const std::string&)>("create_objects"))
             fp(airport);
 
         reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
@@ -524,11 +637,9 @@ private:
         using namespace binary;
         using namespace kernel;
 
-        systems_->create_auto_objects();
-
-        auto fp = fn_reg::function<void(const std::string&)>("pack_objects");
-        if(fp)
-            fp(msg.icao_code);
+        dict_t dict;
+        if(auto fp = fn_reg::function<void(const setup_msg&, dict_t& dict)>("pack_objects"))
+            fp(msg, dict);
 
         reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
 
@@ -539,6 +650,11 @@ private:
             reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
         }
 
+        binary::bytes_t bts =  std::move(network::wrap_msg(create_session(std::string("session_name"), binary::wrap(dict),0.0)));
+        w_->send_session_clients(bts);
+        
+        mod_sys_->load_exercise(dict);
+
     }
 
 private:
@@ -548,20 +664,20 @@ private:
 
 private:
     msg_dispatcher<uint32_t>                                       disp_;
-    std::vector<endpoint>                                      vis_peers_;
-    uint16_t                                                 peers_ready_; 
-    std::deque<create_msg>                                creation_deque_;
-    bool                                                            init_;
-    bool                                                            dc_;
+    std::vector<endpoint>                                     vis_peers_;
+    uint16_t                                                peers_ready_; 
+    std::deque<create_msg>                               creation_deque_;
+    bool                                                           init_;
+    bool                                                             dc_;
 private:
     on_container_f                                              on_cont_;
     boost::function<void()>                                 end_of_load_;
-    setup_msg                                                     setup_msg_;
+    setup_msg                                                 setup_msg_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
 
 private:
-    objects_reg::control_ptr                                   reg_obj_;
+    objects_reg::control_ptr                                    reg_obj_;
 
 };
 

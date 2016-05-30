@@ -3,9 +3,7 @@
 int main( int argc, char** argv )
 {  
 
-    auto fp = fn_reg::function<BOOST_TYPEOF(main)>("visapp2");
-
-    if(fp)
+    if(auto fp = fn_reg::function<BOOST_TYPEOF(main)>("visapp2"))
         return fp(argc, argv);
 
     return 0;

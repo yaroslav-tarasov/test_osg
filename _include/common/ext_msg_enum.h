@@ -7,8 +7,11 @@ namespace net_layer
     {
         enum message_id
         {
-            id_setup            ,
-            id_ready            ,
+            id_setup            ,   // from  task_messages.h
+            id_ready            ,   // from  task_messages.h
+            
+            id_create_session   ,   // from  task_messages.h
+
 
             id_state            ,
             id_props_updated    ,

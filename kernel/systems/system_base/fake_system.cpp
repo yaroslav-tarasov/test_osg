@@ -641,11 +641,10 @@ inline object_info_ptr create_object(kernel::object_create_t oc, dict_copt dict 
     }
 
     //auto fp = fn_reg::function<object_info_ptr(kernel::object_create_t const&)>(function_name);
-    auto fp_d = fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt dict)>(function_name);
 
     /*    if(fp)
     return fp(oc);
-    else*/ if(fp_d)
+    else*/ if(auto fp_d = fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt dict)>(function_name))
         return fp_d(oc,dict);
     else
         return fn_reg::function<object_info_ptr(kernel::object_create_t const&, dict_copt)>(/*lib_name,*/ class_name+"_view")(boost::cref(oc), dict);

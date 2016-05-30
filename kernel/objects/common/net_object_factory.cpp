@@ -248,8 +248,25 @@ object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
 
 }
 
+kernel::obj_create_data pack_object( kernel::system* csys, create_msg const& msg)
+{
+    if(msg.object_kind & ok_vehicle)
+        return pack_vehicle(csys, msg);
+    else if ( msg.object_kind == ok_flock_of_birds)
+        return pack_flock_of_birds(csys, msg);
+    else if ( msg.object_kind ==ok_human)
+        return pack_character(csys, msg);
+    else if ( msg.object_kind == ok_helicopter)
+        return pack_helicopter_phl(csys, msg); 
+    else if( msg.object_kind == ok_camera)
+        return pack_camera(csys, msg);
+    else
+        return pack_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 
+}
 
 }
 
 AUTO_REG_NAME(create_object, create_object)
+AUTO_REG_NAME(pack_object, pack_object)
+

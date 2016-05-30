@@ -49,7 +49,7 @@ namespace net_layer
         {
             typedef std::vector<bytes_t>  msgs_t;
 
-            setup_msg(const std::string& icao_code = "URSS", uint32_t obj_num = 0)
+            explicit setup_msg(const std::string& icao_code = "URSS", uint32_t obj_num = 0)
                 : icao_code (icao_code)
                 , obj_num   (obj_num)
             {
@@ -71,6 +71,44 @@ namespace net_layer
             REFL_ENTRY(icao_code )
             REFL_ENTRY(msgs)
             REFL_ENTRY(obj_num)
+        REFL_END()
+
+
+        struct session_base 
+        {
+            session_base(string const& name = "")
+                : name(name)
+            {
+            }
+
+            string name;
+        };
+
+        struct create_session
+            : network::msg_id<id_create_session>
+            , session_base 
+        {
+            binary::bytes_t data;
+            double          initial_time;
+
+            create_session(string const& name, binary::bytes_t const& data, double initial_time)
+                : session_base(name)
+                , data        (data)
+                , initial_time(initial_time)
+            {
+            }
+
+            create_session(){}
+        };
+
+        REFL_STRUCT(session_base)
+            REFL_ENTRY(name)
+        REFL_END()
+
+        REFL_STRUCT(create_session)
+            REFL_CHAIN(session_base)
+            REFL_ENTRY(data)
+            REFL_ENTRY(initial_time)
         REFL_END()
 
         struct state_msg
@@ -117,6 +155,9 @@ namespace net_layer
         REFL_END()
 
         typedef gen_msg<id_ready, uint16_t>   ready_msg;
+        
+
+
 
         struct run_msg
             : network::msg_id<id_run>
