@@ -23,7 +23,7 @@ namespace aircraft_physless
 	ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict , optional<cg::geo_point_3> const &initial_pos , optional<double> const &initial_course )
 		: view(oc,dict)
 	{
-        ctrl_system* vsys = dynamic_cast<ctrl_system*>(sys_);
+        ctrl_system* csys = dynamic_cast<ctrl_system*>(sys_);
         
         if(initial_pos && initial_course)
             set_initial_position(*initial_pos,*initial_course);

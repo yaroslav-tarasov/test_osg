@@ -4,7 +4,7 @@
 namespace avCore
 {
 
-class Prerender : public osg::CameraNode
+class Prerender : public osg::Camera
 {
 public:
 

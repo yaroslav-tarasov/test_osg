@@ -109,14 +109,9 @@ void ctrl::inject_msg(const void* data, size_t size)
 
 void ctrl::inject_msg(net_layer::msg::run_msg const& msg)
 {
-#if 0
-    buffer_.push_back(msg);
-#else
     net_layer::msg::run_msg  smsg = msg;
     smsg.ext_id = e2o_[msg.ext_id];
     set(smsg);
-#endif
-
 }
 
 void ctrl::inject_msg( net_layer::msg::container_msg const& msg)
@@ -300,21 +295,11 @@ void ctrl::pre_update(double time)
 {
     base_view_presentation::pre_update(time);
 
-#if 0
-    while(buffer_.size()>0)
-    {
-        net_layer::msg::run & msg = buffer_.front();
-        msg.ext_id = e2o_[msg.ext_id];
-		set(msg);
-        buffer_.pop_front();
-    }
-#else 
     while(messages_.size()>0)    
     {
       disp_.dispatch_bytes(messages_.front());
       messages_.pop_front();
     }
-#endif
 }
 
 } // end of objects_reg

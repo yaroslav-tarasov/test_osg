@@ -490,6 +490,7 @@
     <ClCompile Include="tests\systems\systems_impl.cpp" />
     <ClCompile Include="tests\systems\systems_impl2.cpp" />
     <ClCompile Include="tests\systems\test_objects1.cpp" />
+    <ClCompile Include="tests\systems\test_objects2.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
     <ClCompile Include="tests\tess_test.cpp" />
     <ClCompile Include="tests\test_boost_timer.cpp" />

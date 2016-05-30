@@ -34,8 +34,20 @@ inline object_info_ptr create_aircraft(kernel::system* csys,create_msg const& ms
     geo_position gp(dpos, get_base());
 
     aircraft::settings_t as;
-    as.kind = msg.model_name; // "A319"; //
+    as.kind = msg.model_name; 
+    as.custom_label = msg.custom_label;
     return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as, gp);
+}
+
+inline kernel::obj_create_data pack_aircraft(kernel::system* csys,create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    aircraft::settings_t as;
+    as.kind = msg.model_name; 
+    as.custom_label = msg.custom_label;
+    return  aircraft::pack(dynamic_cast<fake_objects_factory*>(csys),as, gp);
 }
 
 inline object_info_ptr create_helicopter_phl(kernel::system* csys,create_msg const& msg)
@@ -50,6 +62,18 @@ inline object_info_ptr create_helicopter_phl(kernel::system* csys,create_msg con
     return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
 }
 
+inline kernel::obj_create_data pack_helicopter_phl(kernel::system* csys,create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    aircraft::settings_t as;
+    as.kind = msg.model_name;  
+    as.custom_label = msg.custom_label;
+
+    return  helicopter_physless::pack(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+}
+
 inline object_info_ptr create_aircraft_phl(kernel::system* csys,create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
@@ -60,6 +84,18 @@ inline object_info_ptr create_aircraft_phl(kernel::system* csys,create_msg const
     as.custom_label = msg.custom_label;
 
     return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+}
+
+inline kernel::obj_create_data pack_aircraft_phl(kernel::system* csys,create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    aircraft::settings_t as;
+    as.kind = msg.model_name; // "A319"; //
+    as.custom_label = msg.custom_label;
+
+    return  aircraft_physless::pack(dynamic_cast<fake_objects_factory*>(csys),as,gp);
 }
 
 inline object_info_ptr create_vehicle(kernel::system* csys,create_msg const& msg)
@@ -74,6 +110,20 @@ inline object_info_ptr create_vehicle(kernel::system* csys,create_msg const& msg
     return  vehicle::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
 
+inline kernel::obj_create_data pack_vehicle(kernel::system* csys,create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    vehicle::settings_t vs;
+    vs.model        = msg.model_name;
+    vs.custom_label = msg.custom_label;
+
+    return  vehicle::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+}
+
+
+
 inline object_info_ptr create_flock_of_birds(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
@@ -86,6 +136,19 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create_msg co
     return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
 
+inline kernel::obj_create_data pack_flock_of_birds(kernel::system* csys, create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    flock::manager::settings_t vs;
+    vs.model        = "crow";
+    vs._childAmount = msg.num_instances;
+
+    return flock::manager::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+}
+
+
 inline object_info_ptr create_character(kernel::system* csys, create_msg const& msg)
 {
     decart_position dpos(msg.pos,msg.orien);
@@ -96,7 +159,17 @@ inline object_info_ptr create_character(kernel::system* csys, create_msg const& 
 
     return human::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
 }
- 
+
+inline kernel::obj_create_data pack_character(kernel::system* csys, create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    human::settings_t vs;
+    vs.model = msg.model_name;
+
+    return human::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+}
  
 inline object_info_ptr create_arresting_gear(kernel::system* csys, create_msg const& msg)
 {
@@ -107,6 +180,17 @@ inline object_info_ptr create_arresting_gear(kernel::system* csys, create_msg co
     // ms.model = "arresting_gear";
 
     return arresting_gear::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+}
+
+inline kernel::obj_create_data pack_arresting_gear(kernel::system* csys, create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    arresting_gear::settings_t ms;
+    // ms.model = "arresting_gear";
+
+    return arresting_gear::pack(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
 }
 
 inline object_info_ptr create_aerostat(kernel::system* csys, create_msg const& msg)
@@ -120,12 +204,31 @@ inline object_info_ptr create_aerostat(kernel::system* csys, create_msg const& m
 	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
 }
 
+inline kernel::obj_create_data pack_aerostat(kernel::system* csys, create_msg const& msg)
+{
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    aerostat::settings_t ms;
+    ms.model = "aerostat";
+
+    return aerostat::pack(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+}
+
 inline object_info_ptr create_camera(kernel::system* csys, create_msg const& msg)
 {       
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
 
 	return camera::create(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
+}
+
+inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg const& msg)
+{       
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
+
+    return camera::pack(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
 }
 
 object_info_ptr create_object( kernel::system* csys, create_msg const& msg)

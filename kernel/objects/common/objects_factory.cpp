@@ -42,20 +42,25 @@ namespace aircraft
 
 using namespace kernel;
 
-object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
-{
-    const std::string class_name = "aircraft";
-    const std::string unique_name = sys->generate_unique_name(class_name);
-    obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft::craft_data(sett,state_t(init_pos.pos,init_pos.orien)/*, fpl_id*/)));
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    {
+        const std::string class_name = "aircraft";
+        const std::string unique_name = sys->generate_unique_name(class_name);
+        obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft::craft_data(sett,state_t(init_pos.pos,init_pos.orien)/*, fpl_id*/)));
 
-    ocd
-        .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
-        .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
-        //.add_child(obj_create_data("gui"          , "gui"       , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
-        ;
+        ocd
+            .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
+            //.add_child(obj_create_data("gui"          , "gui"       , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
+            ;
 
-    return sys_object_create(sys, ocd);	
-}
+        return ocd;	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    {
+        return sys_object_create(sys, pack( sys, sett, init_pos));	
+    }
 
 }
 
@@ -63,13 +68,17 @@ namespace flock
 {
     namespace manager
     {
-        object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+        obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
         {
             const std::string class_name = "flock_manager";
             const std::string unique_name = sys->generate_unique_name(class_name);
 
-            obj_create_data ocd(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien))));
-            return sys_object_create(sys, ocd);	
+            return obj_create_data(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien))));	
+        }
+
+        object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+        {
+            return sys_object_create(sys, pack( sys, sett, init_pos));	
         }
     }
 }
@@ -77,7 +86,7 @@ namespace flock
 namespace human
 {
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "human";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -88,15 +97,19 @@ namespace human
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())));
 
-        return sys_object_create(sys, ocd);	
+        return ocd;	
     }
 
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    {
+        return sys_object_create(sys, pack( sys, sett, init_pos));	
+    }
 }
 
 namespace aerostat
 {
 
-	object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+	obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
 	{
 		const std::string class_name = "aerostat";
 		const std::string unique_name = sys->generate_unique_name(class_name);
@@ -105,8 +118,13 @@ namespace aerostat
 		ocd
 			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())));
 
-		return sys_object_create(sys, ocd);	
+		return ocd;	
 	}
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    {
+         return sys_object_create(sys, pack( sys, sett, init_pos));	
+    }
 
 }
 
@@ -114,7 +132,7 @@ namespace vehicle
 {
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "vehicle";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -123,7 +141,12 @@ namespace vehicle
         ocd
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data    ())));
 
-        return sys_object_create(sys, ocd);	
+        return ocd;	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    {
+        return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
 }
 
@@ -132,7 +155,7 @@ namespace simple_route
 {
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
     {
         const std::string class_name = "simple_route";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -140,7 +163,12 @@ namespace simple_route
         aps.push_back(anchor_point_t(ani::point_pos(0,init_pos)));
         obj_create_data ocd(class_name, unique_name, dict::wrap(route_data(sett,aps)));
 
-        return sys_object_create(sys, ocd);	
+        return  ocd;	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+    {
+        return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
 }
 
@@ -149,8 +177,8 @@ namespace aircraft_physless
 {
 
     using namespace kernel;
-
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    
+    obj_create_data pack(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -161,7 +189,12 @@ namespace aircraft_physless
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())))
             ;
 
-        return sys_object_create(sys, ocd);	
+        return ocd;	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    {
+        return sys_object_create(sys, aircraft_physless::pack( sys, sett, init_pos));	
     }
 
 }
@@ -171,7 +204,7 @@ namespace helicopter_physless
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "helicopter_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -182,9 +215,13 @@ namespace helicopter_physless
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
             ;
 
-        return sys_object_create(sys, ocd);	
+        return  ocd;	
     }
 
+    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    {
+        return sys_object_create(sys, aircraft_physless::pack( sys, sett, init_pos));
+    }
 }
 
 
@@ -193,7 +230,7 @@ namespace airport
 
     using namespace kernel;
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett)
     {
         const std::string class_name = "airport";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -206,16 +243,20 @@ namespace airport
             .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t ())))
             ;
 
-        return sys_object_create(sys, ocd);	
+        return  ocd;	
     }
 
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    {
+        return sys_object_create(sys, pack( sys, sett));
+    }
 }
 
 namespace camera
 {
 	using namespace kernel;
 
-	object_info_ptr create(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
+	obj_create_data pack(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
 	{
 		const std::string class_name = "camera";
 		const std::string unique_name = name?*name:sys->generate_unique_name(class_name);
@@ -229,7 +270,11 @@ namespace camera
 			.add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
 			;
 
-		return sys_object_create(sys, ocd);	
+		return  ocd;	
 	}
 
+    object_info_ptr create(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
+    {
+        return sys_object_create(sys, pack( sys,  init_pos, name));
+    }
 }

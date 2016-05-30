@@ -1336,5 +1336,8 @@
     <ClCompile Include="kernel\phys\static_convex.cpp">
       <Filter>Source Files\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="tests\systems\test_objects2.cpp">
+      <Filter>Source Files\tests\systems</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -36,7 +36,7 @@
 #include <osg/StateSet>
 #include <osg/LightModel>
 #include <osg/ComputeBoundsVisitor>
-#include <osg/CameraNode>
+#include <osg/Camera>
 #include <osg/FrontFace>
 #include <osg/CullFace>
 #include <osg/ValueObject>

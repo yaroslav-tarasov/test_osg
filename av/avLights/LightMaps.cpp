@@ -120,7 +120,7 @@ public:
 
 };
 
-class LightMapCamera : public osg::CameraNode
+class LightMapCamera : public osg::Camera
 {
 public:
 
@@ -153,12 +153,12 @@ protected:
         setViewport(0,0,_texture->getTextureWidth(),_texture->getTextureHeight());
 
         // set the camera to render before the main camera.
-        setRenderTargetImplementation(osg::CameraNode::FRAME_BUFFER_OBJECT);
+        setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
         setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        setRenderOrder(osg::CameraNode::PRE_RENDER);
+        setRenderOrder(osg::Camera::PRE_RENDER);
 
         // attach the texture and use it as the color buffer.
-        attach(osg::CameraNode::COLOR_BUFFER, _texture.get(), 0, 0, true, 0, 0);
+        attach(osg::Camera::COLOR_BUFFER, _texture.get(), 0, 0, true, 0, 0);
 
         osg::StateSet * pSS = /*_camera->*/getOrCreateStateSet();
         pSS->setAttribute(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL), osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE | osg::StateAttribute::PROTECTED);

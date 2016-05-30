@@ -35,7 +35,7 @@ private:
     void inject_msg   (net_layer::msg::traj_assign_msg   const& msg);
     void inject_msg   (net_layer::msg::set_target_msg    const& msg);
 
-    virtual void inject_msg     ( const void* data, size_t size      ) override;
+    virtual void inject_msg     ( const void* data, size_t size          ) override;
 	virtual void create_object  ( net_layer::msg::create_msg const& msg  ) override;
     virtual void destroy_object ( net_layer::msg::destroy_msg const& msg ) override;
     
@@ -57,7 +57,6 @@ protected:
 
 
     e2o_t                                                               e2o_;
-    std::deque<net_layer::msg::run_msg>                              buffer_;
     std::deque<bytes_t>                                            messages_;
     
     remote_send_f                                                      send_;

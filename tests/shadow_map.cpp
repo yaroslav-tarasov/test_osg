@@ -22,7 +22,7 @@ ShadowMap::ShadowMap(int width, int height)
 /** Copy constructor using CopyOp to manage deep vs shallow copy.*/
 ShadowMap::ShadowMap(const ShadowMap& sm,const osg::CopyOp& copyop)
     : osg::Group(sm,copyop)
-    , _camera(sm._camera)/*osg::CameraNode(sm,copyop)*/
+    , _camera(sm._camera)/*osg::Camera(sm,copyop)*/
     , _texture(sm._texture)
 {
        setNumChildrenRequiringUpdateTraversal(1);

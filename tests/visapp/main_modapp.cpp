@@ -457,7 +457,7 @@ private:
         if(init_ /*&& !dc_*/)
         {
           for(auto it = creation_deque_.begin(); it != creation_deque_.end(); ++it )
-             reg_obj_->create_object(*it);
+             on_create(*it);
          
           creation_deque_.clear();
           
@@ -519,6 +519,27 @@ private:
 
     }
 
+    void create_objects(const setup_msg& msg)
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        systems_->create_auto_objects();
+
+        auto fp = fn_reg::function<void(const std::string&)>("pack_objects");
+        if(fp)
+            fp(msg.icao_code);
+
+        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
+
+        if (reg_obj_)
+        {
+            void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send_proxy;
+
+            reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
+        }
+
+    }
 
 private:
     systems_ptr                                                 systems_;
