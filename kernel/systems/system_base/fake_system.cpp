@@ -1435,7 +1435,7 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
                   LogInfo("Objects left to create: " << " seed = " << *it);
 #endif
 
-      if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1/*== obj_to_load_num_*/ )  
+      if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1 )  
       {
           exercise_loaded_signal_();
           ready_ = true;

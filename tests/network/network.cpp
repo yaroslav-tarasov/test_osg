@@ -616,7 +616,7 @@ struct client
         // URKE
         //Camera: йдо        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
         //Camera: йдо_СРЙ -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
-#if 1
+#if 0
         ADD_EVENT(0.0  , create_msg(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f)) , ok_camera, "camera 0", "") )
         ADD_EVENT(0.0  , create_msg(1501, point_3f(48.89f,411.65f,28.50f),      quaternion(cprf(cg::rad2grad() *-2.14f)) , ok_camera, "camera 1", "") )
 #endif

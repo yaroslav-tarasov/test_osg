@@ -287,7 +287,7 @@ namespace auto_object
     {
         const std::string unique_name = sys->generate_unique_name(class_name);
 
-        return obj_create_data(class_name, unique_name);	
+        return obj_create_data(class_name, /*unique_name*/class_name);	
     }
 
     object_info_ptr create(fake_objects_factory* sys, const std::string& class_name)

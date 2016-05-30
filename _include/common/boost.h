@@ -90,10 +90,12 @@ using boost::signals2::connection;
 #if (BOOST_VERSION == 105900)
 
 #ifdef _DEBUG
+#pragma comment(lib, "boost_chrono-vc100-mt-gd-1_59.lib")
 #pragma comment(lib, "boost_thread-vc100-mt-gd-1_59.lib")
 #pragma comment(lib, "boost_filesystem-vc100-mt-gd-1_59.lib")
 #pragma comment(lib, "boost_system-vc100-mt-gd-1_59.lib")
 #else
+#pragma comment(lib, "boost_chrono-vc100-mt-1_59.lib")
 #pragma comment(lib, "boost_thread-vc100-mt-1_59.lib")
 #pragma comment(lib, "boost_filesystem-vc100-mt-1_59.lib")
 #pragma comment(lib, "boost_system-vc100-mt-1_59.lib")

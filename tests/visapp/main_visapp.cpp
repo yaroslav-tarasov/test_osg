@@ -148,6 +148,21 @@ struct net_worker
              __main_srvc__->post(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
          }
 
+		 void send_clients(binary::bytes_cref data)
+		 {
+			 size_t size = binary::size(data);
+			 error_code_t ec;
+
+			 for( auto it = sockets_.begin();it!=sockets_.end(); ++it )
+				 (*it)->send(binary::raw_ptr(data), size);
+
+			 if (ec)
+			 {
+				 LogError("TCP send error: " << ec.message());
+				 return;
+			 }
+		 }
+
          void do_recieve(binary::bytes_ptr data )
          {
              if (nw_->on_ses_recv_)
@@ -198,6 +213,11 @@ struct net_worker
      {
          worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
+
+	 void send_session_clients (binary::bytes_cref bytes)
+	 {
+		 worker_service_->post(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+	 }
 
      void reset_time(double new_time)
      {
@@ -255,6 +275,11 @@ private:
          }
 
      }
+
+	 void do_send_session_clients(binary::bytes_ptr data)
+	 {   
+		 ses_helper_.send_clients(*data);
+	 }
 
 private:
 
@@ -553,7 +578,7 @@ struct visapp
     void on_ready()
     {
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
-        send(bts);
+        w_->send_session_clients(bts);
     }
 
     void on_setup(setup_msg const& msg)

@@ -163,6 +163,20 @@ struct net_worker
              }
          }
 
+		 void send_proxy(binary::bytes_ptr data)
+		 {   
+			 size_t size = binary::size(*data);
+			 error_code_t ec;
+
+			 proxy_socket_->send(binary::raw_ptr(*data), size);
+			 if (ec)
+			 {
+				 LogError("TCP send error: " << ec.message());
+				 return;
+			 }
+
+		 }
+
          void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
          {
              LogInfo("Session helper connected to " << peer);
@@ -303,16 +317,7 @@ private:
      // from struct tcp_connection
      void do_send_proxy(int id, binary::bytes_ptr data)
      {   
-         size_t size = binary::size(*data);
-         error_code_t ec;
-
-         srv_->send(binary::raw_ptr(*data), size);
-         if (ec)
-         {
-             LogError("TCP send error: " << ec.message());
-             return;
-         }
-
+			ses_helper_.send_proxy(data);
      }
 
      void do_send_clients(binary::bytes_ptr data)
@@ -351,6 +356,7 @@ private:
      }
      
 
+#if 0
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
          if (!srv_)
@@ -366,6 +372,7 @@ private:
          else
             LogError("Client " << peer << " rejected. Connection already esteblished");
      }
+#endif
 
      void on_recieve(const void* data, size_t size, endpoint const& peer)
      {
@@ -438,9 +445,6 @@ private:
     std::shared_ptr<boost::asio::io_service::work>                                       work_;
     const  endpoint                                                                  mod_peer_;
     const  endpoint                                                                      peer_;
-private:
-    std::shared_ptr<tcp_fragment_wrapper>                                    srv_;
-
                   
 private:
     on_receive_f                                                      on_receive_;
