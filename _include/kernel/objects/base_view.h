@@ -1,6 +1,7 @@
 #pragma once
 #include "network/msg_dispatcher.h"
 #include "kernel/object_info_fwd.h"
+#include "object_data_fwd.h"
 //#include "kernel/systems/history_system.h"
 //#include "python/utils.h"
 
@@ -104,7 +105,7 @@ protected:
 //! базовый класс для любого "представления" 
 struct /*SYSTEMS_API*/ base_view_presentation
     : kernel::base_presentation // базовый интерфейс представления
-    //, kernel::history_prs     // что-то связанное с историей // now history is generic for all objects
+    //, kernel::history_prs     // now history is generic for all objects
 {
     base_view_presentation(kernel::object_create_t const& oc);
 
@@ -117,6 +118,10 @@ public:
     kernel::object_info_vector const&   objects  () const;
     kernel::object_class_ptr            hierarchy_class() const;
     void                                save     (dict_ref dict, bool key_safe) const;
+
+// object_data
+public:
+    const object_data_t&                   get_data    () const;
 
 public:
     DECLARE_EVENT(state_modified, ());
@@ -242,6 +247,8 @@ private:
     string                      name_;
     kernel::object_info_wptr    parent_;
     kernel::object_info_vector  objects_;
+
+    object_data_t               object_data_;
 
     kernel::send_msg_f          send_msg_;
     kernel::block_obj_msgs_f    block_msgs_;

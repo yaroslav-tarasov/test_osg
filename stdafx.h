@@ -8,6 +8,7 @@
 
 // time to undef now
 #undef SYSTEMS_API
+#define SYSTEMS_API
 
 #include "targetver.h"
 

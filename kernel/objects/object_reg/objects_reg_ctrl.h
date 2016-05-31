@@ -63,7 +63,8 @@ protected:
 private:
     network::msg_dispatcher<uint32_t>                                  disp_;
 	boost::function<kernel::object_info_ptr 
-		(kernel::system*, net_layer::msg::create_msg const&)>             f_;
+		(kernel::system*, net_layer::msg::create_msg const&)>  create_object_f_;
+
 	kernel::system*                                                     _sys;
 private:
     connection_holder                                           conn_holder_;

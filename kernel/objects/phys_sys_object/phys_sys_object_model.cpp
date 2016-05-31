@@ -60,7 +60,8 @@ void model::on_object_created(object_info_ptr object)
         for (auto it = zones_.begin(); it != zones_.end(); ++it)
             it->sys->set_debug_renderer(mod_debug->get_renderer());
     }
-    else*/ if (airport::info_ptr airport = object)
+    else*/ 
+    if (airport::info_ptr airport = object)
     {
         auto it = std::find_if(zones_.begin(), zones_.end(), airport_zone_predicate(airport->name()));
         if (it == zones_.end())
@@ -104,18 +105,12 @@ void model::on_object_destroying(object_info_ptr object)
 
 system_ptr model::get_system(size_t zone)
 {
-    //FIXME(Тоже магия)
-    //zone = 0;
-    
     return zones_[zone].sys;
 }
 
 optional<size_t> model::get_zone(geo_point_3 const & pos) const
 {
     optional<size_t> zone;
-    
-    //FIXME(Магическое число)  
-    //    return 1;
 
     for (auto it = zones_.begin(); it != zones_.end(); ++it)
     {

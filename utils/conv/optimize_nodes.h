@@ -18,7 +18,8 @@ namespace do_not_optimize
         "tow_point",
         "rtow_point",
         "back_tail",
-        "rotor"
+        "rotor",
+        "parachute"
     };
 
     struct list_t

@@ -75,7 +75,7 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
         {
                 net_layer::msg::create_msg m;
                 network::safe_read_msg(*it,m);
-                obj_list.push_back(f(csys.get(), m));
+                obj_list.push_back(f(csys.get(), m).add_data(m.ext_id));
         }
     
     csys->pack_exercise(obj_list, dict, true);

@@ -220,7 +220,7 @@ namespace helicopter_physless
 
     object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
-        return sys_object_create(sys, aircraft_physless::pack( sys, sett, init_pos));
+        return sys_object_create(sys, helicopter_physless::pack( sys, sett, init_pos));
     }
 }
 

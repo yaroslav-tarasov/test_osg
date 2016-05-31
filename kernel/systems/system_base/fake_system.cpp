@@ -81,6 +81,12 @@ namespace kernel
         return *this;
     }
 
+    obj_create_data& obj_create_data::add_data(object_data_t const& data)
+    {
+        write(data_, data      , "ext_data");
+        return *this;
+    }
+
     dict_t const& obj_create_data::dict() const
     {
         return data_;
@@ -544,6 +550,8 @@ object_info_ptr fake_system_base::local_create_object(obj_create_data const& dat
 		locks::bool_lock l(create_object_lock_,false);
 		obj = load_object_hierarchy_impl(object_class_ptr(), data.dict(), true, false);
 	}
+        
+    auto d = object_data_ptr(obj)->get_data();
 
 	// fire only on my system
 	if (obj)
@@ -608,10 +616,13 @@ void fake_system_base::save_object_hierarchy(object_info_ptr objinfo, dict_t& di
     //     optional<time_counter> tc;
     //     if (objinfo->parent().expired())
     //         tc = in_place();
-
+    
+    dict_t d;
+    
     write(dict, objinfo->hierarchy_class()->name(), "hierarchy_class_name");
     write(dict, objinfo->name()     , "name");
     write(dict, objinfo->object_id(), "id"  );
+    write(dict, object_data_ptr(objinfo)->get_data(), "ext_data"  );
 
     dict_t& children = dict.add_child("children");
 
@@ -679,7 +690,7 @@ object_info_ptr fake_system_base::create_object_hierarchy_impl(
         auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
         auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
 
-        kernel::object_create_t oc(hierarchy_class, this, id, name, children, msg_service, block_msgs);
+        kernel::object_create_t oc(hierarchy_class, this, id, name, children, msg_service, block_msgs, 0);
 
         // создаем объект через динамическую загрузку библиотеки
         object_info_ptr object = kernel::create_object(oc);
@@ -722,6 +733,9 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
     string class_name = read_dict<string>(dict, "hierarchy_class_name");
     string name       = read_dict<string>(dict, "name"                );
     uint32_t id       = read_id ? read_dict<uint32_t>(dict, "id") : generate_object_id();
+    
+    auto ext_data = dict.find("ext_data");
+    uint32_t ext_id   = ext_data ? read_dict<uint32_t>(dict, "ext_data") : 0;
 
     object_class_ptr hierarchy_class =         
         parent_hierarchy_class 
@@ -757,7 +771,7 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
     auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
 
 
-    kernel::object_create_t oc(hierarchy_class, this, id, name, children, msg_service, block_msgs);
+    kernel::object_create_t oc(hierarchy_class, this, id, name, children, msg_service, block_msgs, ext_id);
 
     auto ownd_data = dict.find("own_data");
 

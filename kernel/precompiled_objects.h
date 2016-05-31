@@ -6,6 +6,7 @@
 
 #include "kernel/object_class.h"
 #include "kernel/object_info.h"
+#include "kernel/object_data.h"
 
 #include "network/msg_base.h"
 

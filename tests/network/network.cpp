@@ -656,7 +656,7 @@ struct client
 
 
 #if 1
-            ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
+            //ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
             ADD_EVENT(14.0  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
@@ -869,12 +869,12 @@ private:
                 {
                     if((*it_h).host.ip==peer.addr.to_string())
                     {
-                        ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
-                        ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
-                        ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
-                        ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
-                        ADD_INIT( msgs, create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
-                        ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+                        //ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
+                        //ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+                        //ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+                        //ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+                        //ADD_INIT( msgs, create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+                        //ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
                         ADD_INIT( msgs, create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
                         ADD_INIT( msgs, create_msg(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
                         ADD_INIT( msgs, create_msg(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )

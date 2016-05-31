@@ -54,7 +54,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         	
         ;
 
-	f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
+	create_object_f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
 
 }
 
@@ -62,6 +62,14 @@ void ctrl::on_object_created(object_info_ptr object)
 {
 	if(airport::info_ptr(object))
 		airports_[object->object_id()]=object;
+
+    auto data = object_data_ptr(object)->get_data();
+
+    if (data>0)
+    {
+        e2o_[data] = object->object_id();
+        regs_objects_[data] = object;
+    }
 }
 
 void ctrl::on_object_destroying(object_info_ptr object)
@@ -84,6 +92,22 @@ void ctrl::on_object_destroying(object_info_ptr object)
                 airports_.erase(a);
             }
         }
+    }
+}
+
+void ctrl::create_object(net_layer::msg::create_msg const& msg)
+{
+    kernel::object_info_ptr  a = nullptr;
+
+
+    if(create_object_f_)
+        a = create_object_f_(sys_, msg);
+
+
+    if (a)
+    {
+        e2o_[msg.ext_id] = a->object_id();
+        regs_objects_[msg.ext_id] = a;
     }
 }
 
@@ -272,19 +296,7 @@ void ctrl::on_detach_tow (uint32_t ext_id, decart_position const& pos)
 
 
 
-void ctrl::create_object(net_layer::msg::create_msg const& msg)
-{
-	kernel::object_info_ptr  a = nullptr;
 
-	if(f_)
-		a = f_(sys_, msg);
-
-	if (a)
-    {
-		e2o_[msg.ext_id] = a->object_id();
-        regs_objects_[msg.ext_id] = a;
-    }
-}
 
 void ctrl::set_sender(remote_send_f s)
 {

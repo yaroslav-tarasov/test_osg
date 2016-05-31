@@ -9,7 +9,8 @@ namespace kernel
 
 base_view_presentation::base_view_presentation(kernel::object_create_t const& oc)
     : /*py_reg_       (oc.sys->kind() == kernel::sys_model )
-    , */object_id_    (oc.object_id)
+    , */
+      object_id_    (oc.object_id)
     , name_         (oc.name)
     , objects_      (oc.objects )
     , sys_          (oc.sys)
@@ -17,6 +18,7 @@ base_view_presentation::base_view_presentation(kernel::object_create_t const& oc
     , send_msg_     (oc.send_msg)
     , block_msgs_   (oc.block_msgs)
     , hierarchy_class_(oc.hierarchy_class)
+    , object_data_  (oc.object_data)
 {
     typedef base_view_presentation this_t;
 
@@ -67,6 +69,11 @@ void base_view_presentation::save(dict_ref dict, bool key_safe) const
 {
     if (auto ptr = dynamic_cast<obj_data_saver const*>(this))
         ptr->save_obj_data(dict, key_safe);
+}
+
+const object_data_t&  base_view_presentation::get_data      () const 
+{
+    return object_data_;
 }
 
 connection_holder& base_view_presentation::conn_holder()

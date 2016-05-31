@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kernel/object_info.h"
+#include "kernel/object_data.h"
 #include "kernel/systems_fwd.h"
 #include "reflection/proc/binary.h"
 #include "reflection/proc/dict.h"
@@ -77,6 +78,8 @@ struct SYSTEMS_API obj_create_data
     obj_create_data(std::string const& hier_class, std::string const& name);
 
     obj_create_data&    add_child(obj_create_data const&);
+    obj_create_data&    add_data(object_data_t const& data);
+
     dict_t const&       dict     () const;
 
 private:
@@ -133,6 +136,7 @@ struct tree_object
 struct base_presentation
     : object_info   // интерфейс информации об объекте внутри дерева
     , tree_object   // интерфейс добавления и удаления дочерних объектов в дерево
+    , object_data
 {
     virtual ~base_presentation(){}
 

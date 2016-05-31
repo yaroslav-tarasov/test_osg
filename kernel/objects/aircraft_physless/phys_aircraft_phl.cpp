@@ -303,7 +303,7 @@ namespace aircraft_physless
             phys_aircraft_->set_elevator(0);
             phys_aircraft_->set_ailerons(0);
 
-			FIXME(Наверное зависит от направления буксировки, причем сильно)
+			FIXME("Наверное зависит от направления буксировки, причем сильно")
             //return;
         }
 
