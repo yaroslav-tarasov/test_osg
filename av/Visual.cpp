@@ -151,7 +151,7 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    // avScene::Logo::Create(_viewerPtr.get());
+    //avScene::Logo::Create(_viewerPtr.get());
 	CreateScene();
 
     m_bInitialized = true;
