@@ -186,17 +186,11 @@
     <Filter Include="Source Files\objects\arresting_gear">
       <UniqueIdentifier>{b2e4bf2e-791a-40c6-8a44-253da4d44f9b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\av\lights\fx">
-      <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\av\terrain">
       <UniqueIdentifier>{1a03c763-71a9-4877-940a-f9c0e4743b9c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\av\lights\cult_lights">
       <UniqueIdentifier>{5dd3eb8c-e1d8-4e92-89c5-690d45e9fd44}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\av\lights\fx">
-      <UniqueIdentifier>{29a53638-d161-4366-a3f3-e4e21a12d49b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\av\line">
       <UniqueIdentifier>{2fbadda2-a1f9-4ffe-b366-fc4b9350ea51}</UniqueIdentifier>
@@ -254,6 +248,12 @@
     </Filter>
     <Filter Include="Header Files\utils">
       <UniqueIdentifier>{f411affb-7e83-410f-a354-2c750fa51d23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\fx">
+      <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\fx">
+      <UniqueIdentifier>{29a53638-d161-4366-a3f3-e4e21a12d49b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1148,22 +1148,22 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\SmokeFx.cpp">
-      <Filter>Source Files\av\lights\fx</Filter>
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\FoamStreamFx.cpp">
-      <Filter>Source Files\av\lights\fx</Filter>
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\SparksFx.cpp">
-      <Filter>Source Files\av\lights\fx</Filter>
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\LandingDustFx.cpp">
-      <Filter>Source Files\av\lights\fx</Filter>
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\NodeTracker.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
     <ClCompile Include="av\avFx\FrictionDustFx.cpp">
-      <Filter>Source Files\av\lights\fx</Filter>
+      <Filter>Source Files\av\fx</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp">
       <Filter>Source Files\objects\aerostat</Filter>
