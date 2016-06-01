@@ -392,18 +392,6 @@
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp" />
-    <ClCompile Include="kernel\objects\nm\nodes_management.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\nodes_manager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp" />
     <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp" />

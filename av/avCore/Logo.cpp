@@ -503,8 +503,6 @@ osg::Camera* createHUD()
 		osg::StateSet* pCurStateSet = geode->getOrCreateStateSet();
 		pCurStateSet->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
-		pCurStateSet->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-
 		osg::ref_ptr<osg::Program> program;
 		program = createProgram("Logo",vertexShaderSource,fragmentShaderSource);
 		pCurStateSet->setAttributeAndModes(program);	
@@ -650,7 +648,7 @@ bool Create( osgViewer::Viewer* vw )
 
 	// create a HUD as slave camera attached to the master view.
 
-	vw->setUpViewAcrossAllScreens();
+	// vw->setUpViewAcrossAllScreens();
 
 	osgViewer::Viewer::Windows windows;
 	vw->getWindows(windows);
@@ -674,6 +672,16 @@ bool Create( osgViewer::Viewer* vw )
 	}
 
 	return true;
+}
+
+bool Release( osgViewer::Viewer* vw )
+{
+    if(vw->getNumSlaves()>0)
+    {
+        return vw->removeSlave(0);
+    }
+
+    return false;
 }
 
 #if 0

@@ -126,9 +126,6 @@
     <Filter Include="Source Files\objects\human">
       <UniqueIdentifier>{8a01353b-b642-40c6-8b88-6ebbf18608e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\objects\nodes_manager\nm">
-      <UniqueIdentifier>{6f7efcd7-d029-4c7d-bceb-11340a46af22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\flock_child">
       <UniqueIdentifier>{75826f99-1a99-43c6-9e90-9c866cd446bf}</UniqueIdentifier>
     </Filter>
@@ -191,6 +188,72 @@
     </Filter>
     <Filter Include="Source Files\av\lights\fx">
       <UniqueIdentifier>{66447063-faac-4bef-bc17-6dd4a6fdf919}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\terrain">
+      <UniqueIdentifier>{1a03c763-71a9-4877-940a-f9c0e4743b9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\lights\cult_lights">
+      <UniqueIdentifier>{5dd3eb8c-e1d8-4e92-89c5-690d45e9fd44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\lights\fx">
+      <UniqueIdentifier>{29a53638-d161-4366-a3f3-e4e21a12d49b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\line">
+      <UniqueIdentifier>{2fbadda2-a1f9-4ffe-b366-fc4b9350ea51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sky">
+      <UniqueIdentifier>{35ef8d7c-644e-452d-98ba-4122f0a84190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sky\orig_ephemeris">
+      <UniqueIdentifier>{91bfc4d6-b3f3-4725-a0ec-6b1ee01ede23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sm">
+      <UniqueIdentifier>{c4225ee4-9d4a-405a-8d69-e934ff587f41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\weather">
+      <UniqueIdentifier>{694170fa-6eb6-4aac-8e7e-176034e8828b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\fms">
+      <UniqueIdentifier>{15398751-2626-46d1-9ddf-fe0d29669f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects">
+      <UniqueIdentifier>{1fde5d05-ae8a-4e9b-b052-aa3bdffa1978}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\aerostat">
+      <UniqueIdentifier>{6b65781e-7d3a-431c-ac7b-4a091bc770ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\aircraft_physless">
+      <UniqueIdentifier>{50d71a2e-c41a-4180-a3df-891febf25f0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\aircraft_physless\sync_fms">
+      <UniqueIdentifier>{0dec964a-067b-461f-9852-dcf1422b4c65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\airport">
+      <UniqueIdentifier>{786c8346-be0c-4536-952b-9e0716f19a56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\arresting_gear">
+      <UniqueIdentifier>{f63da944-126c-42a4-8c73-dfc28a896158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\camera">
+      <UniqueIdentifier>{0a1bc5fd-6f1c-43fe-a4b4-5ac62753f5cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\environment">
+      <UniqueIdentifier>{4b6b4762-fd8e-4204-90da-64a4be503f1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\flock_child">
+      <UniqueIdentifier>{4ac1179e-cd44-4d8b-9255-8a4280786279}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\helicopter_physless">
+      <UniqueIdentifier>{15714dfc-f4fd-486e-b7e5-5c3c55af93dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\helicopter_physless\sync_fms">
+      <UniqueIdentifier>{f6d38f06-83aa-4692-a2c6-652a0381dd35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\mdd">
+      <UniqueIdentifier>{4dd1044c-5741-44c7-8064-a5e67e67c044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{f411affb-7e83-410f-a354-2c750fa51d23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -302,29 +365,8 @@
     <ClInclude Include="_include\objects\object_creators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\fms\trajectory.h">
-      <Filter>Source Files\fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
     <ClInclude Include="av\Visual.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\krv_import.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\empty_scene.h">
-      <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="ext\spark\SmokeNode.h">
       <Filter>Source Files\spark</Filter>
@@ -392,75 +434,6 @@
     <ClInclude Include="av\avAnimation\AnimationObject.h">
       <Filter>Header Files\av\animation</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h">
-      <Filter>Source Files\objects\aircraft_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h">
-      <Filter>Source Files\objects\flock_child</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\flock_child\flock_child_model.h">
-      <Filter>Source Files\objects\flock_child</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\flock_child\flock_child_view.h">
-      <Filter>Source Files\objects\flock_child</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aerostat\aerostat_common.h">
-      <Filter>Source Files\objects\aerostat</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aerostat\aerostat_ctrl.h">
-      <Filter>Source Files\objects\aerostat</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aerostat\aerostat_model.h">
-      <Filter>Source Files\objects\aerostat</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\aerostat\aerostat_view.h">
-      <Filter>Source Files\objects\aerostat</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_common.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_model.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_msg.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_state.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_view.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_visual.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\phys_helicopter_phl.h">
-      <Filter>Source Files\objects\helicopter_physless</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h">
-      <Filter>Source Files\objects\helicopter_physless\sync_fms</Filter>
-    </ClInclude>
     <ClInclude Include="tests\systems\factory_systems.h">
       <Filter>Source Files\tests\systems</Filter>
     </ClInclude>
@@ -470,86 +443,176 @@
     <ClInclude Include="tests\systems\systems_impl2.h">
       <Filter>Source Files\tests\systems</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\objects\environment\environment_ctrl.h">
-      <Filter>Source Files\objects\environment</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avCore\Object.h">
-      <Filter>Source Files\av\core</Filter>
-    </ClInclude>
     <ClInclude Include="av\avTerrain\Grass.h">
-      <Filter>Source Files\av\terrain</Filter>
+      <Filter>Header Files\av\terrain</Filter>
     </ClInclude>
     <ClInclude Include="av\avTerrain\Grass2.h">
-      <Filter>Source Files\av\terrain</Filter>
+      <Filter>Header Files\av\terrain</Filter>
     </ClInclude>
     <ClInclude Include="av\avTerrain\Terrain.h">
-      <Filter>Source Files\av\terrain</Filter>
+      <Filter>Header Files\av\terrain</Filter>
     </ClInclude>
     <ClInclude Include="av\avTerrain\Trees.h">
-      <Filter>Source Files\av\terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avCore\PreRender.h">
-      <Filter>Source Files\av\core</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avSky\CloudLayer.h">
-      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avSky\Ephemeris.h">
-      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avSky\FogLayer.h">
-      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
-    </ClInclude>
-    <ClInclude Include="av\avSky\LightningLayer.h">
-      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\LoadManager.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\camera\camera_model.h">
-      <Filter>Source Files\objects\camera</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_model.h">
-      <Filter>Source Files\objects\mdd</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_view.h">
-      <Filter>Source Files\objects\mdd</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h">
-      <Filter>Source Files\objects\mdd</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\model_debug_drawer\remote_render.h">
-      <Filter>Source Files\objects\mdd</Filter>
+      <Filter>Header Files\av\terrain</Filter>
     </ClInclude>
     <ClInclude Include="av\avLights\CulturalLights\NavigationalLight.h">
-      <Filter>Source Files\av\lights\cult_lights</Filter>
+      <Filter>Header Files\av\lights\cult_lights</Filter>
     </ClInclude>
     <ClInclude Include="av\avLights\CulturalLights\PointLightGroup.h">
-      <Filter>Source Files\av\lights\cult_lights</Filter>
+      <Filter>Header Files\av\lights\cult_lights</Filter>
     </ClInclude>
     <ClInclude Include="av\avLights\CulturalLights\PointLightsManager.h">
-      <Filter>Source Files\av\lights\cult_lights</Filter>
+      <Filter>Header Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\PreRender.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\Object.h">
+      <Filter>Header Files\av\core</Filter>
     </ClInclude>
     <ClInclude Include="av\avLine\Line.h">
-      <Filter>Source Files\av\line</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_ctrl.h">
-      <Filter>Source Files\objects\arresting_gear</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_model.h">
-      <Filter>Source Files\objects\arresting_gear</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_view.h">
-      <Filter>Source Files\objects\arresting_gear</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_common.h">
-      <Filter>Source Files\objects\arresting_gear</Filter>
-    </ClInclude>
-    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_vis.h">
-      <Filter>Source Files\objects\arresting_gear</Filter>
+      <Filter>Header Files\av\line</Filter>
     </ClInclude>
     <ClInclude Include="av\avLine\Ropes.h">
-      <Filter>Source Files\av\line</Filter>
+      <Filter>Header Files\av\line</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\FogLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\Ephemeris.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\CloudLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avSky\LightningLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\fms\trajectory.h">
+      <Filter>Header Files\fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_common.h">
+      <Filter>Header Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_model.h">
+      <Filter>Header Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_view.h">
+      <Filter>Header Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aerostat\aerostat_ctrl.h">
+      <Filter>Header Files\objects\aerostat</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h">
+      <Filter>Header Files\objects\aircraft_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_common.h">
+      <Filter>Header Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_ctrl.h">
+      <Filter>Header Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_model.h">
+      <Filter>Header Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_view.h">
+      <Filter>Header Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\arresting_gear\arresting_gear_vis.h">
+      <Filter>Header Files\objects\arresting_gear</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\camera\camera_model.h">
+      <Filter>Header Files\objects\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\environment\environment_ctrl.h">
+      <Filter>Header Files\objects\environment</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_ctrl.h">
+      <Filter>Header Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_model.h">
+      <Filter>Header Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\flock_child\flock_child_view.h">
+      <Filter>Header Files\objects\flock_child</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_common.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_model.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_msg.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_state.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_view.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\helicopter_physless_visual.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\phys_helicopter_phl.h">
+      <Filter>Header Files\objects\helicopter_physless</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h">
+      <Filter>Header Files\objects\helicopter_physless\sync_fms</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_model.h">
+      <Filter>Header Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_view.h">
+      <Filter>Header Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h">
+      <Filter>Header Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\model_debug_drawer\remote_render.h">
+      <Filter>Header Files\objects\mdd</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\empty_scene.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\krv_import.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\LoadManager.h">
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -717,15 +780,6 @@
     </ClCompile>
     <ClCompile Include="core\nfi\lib_loader.cpp">
       <Filter>Source Files\nfi</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\node_osg_impl.cpp">
-      <Filter>Source Files\objects\nodes_manager\nm</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\nodes_management.cpp">
-      <Filter>Source Files\objects\nodes_manager\nm</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\objects\nm\nodes_manager.cpp">
-      <Filter>Source Files\objects\nodes_manager\nm</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp">
       <Filter>Source Files\objects\nodes_manager</Filter>

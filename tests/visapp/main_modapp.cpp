@@ -20,6 +20,10 @@
 #include "net_layer/net_worker.h"
 #include <boost/container/map.hpp>
 
+#ifdef _WIN32
+#include  <mmsystem.h>  // timerBeginPeriod
+#endif
+
 using network::endpoint;
 using network::async_acceptor;
 using network::async_connector;
@@ -688,11 +692,50 @@ private:
 
 }
 
+namespace {
+    inline void timer_res()
+    {
+
+#ifdef _WIN32
+        TIMECAPS  timecaps;  // требуется для функции timeGetDevCaps
+
+        // получить max & min of системного таймера
+        if ( timeGetDevCaps( &timecaps, sizeof( TIMECAPS ) ) == TIMERR_NOERROR )
+        {
+            // получить оптимальное разрешение
+            UINT wTimerRes = std::max( timecaps.wPeriodMin, UINT(1) );
+
+            // установить минимальное разрешение для нашего таймера
+            if( timeBeginPeriod( wTimerRes ) != TIMERR_NOERROR )
+            {
+                // здесь происходит ошибка
+            }
+        }
+#endif
+
+    }
+
+    inline void hide_console()
+    {
+#ifdef _WIN32
+        ShowWindow( GetConsoleWindow(), SW_HIDE );
+#endif
+
+    }
+
+
+
+}
+
+
 int main_modapp( int argc, char** argv )
 {
     
     logger::need_to_log(/*true*/);
     logging::add_console_writer();
+
+    timer_res();
+    hide_console();
 
     boost::asio::io_service  service_;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;

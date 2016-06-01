@@ -151,8 +151,9 @@ void Visual::Initialize()
     
     InitializeViewer( pTraits);
     
-    //avScene::Logo::Create(_viewerPtr.get());
-	CreateScene();
+    avScene::Logo::Create(_viewerPtr.get());
+	
+    CreateScene();
 
     m_bInitialized = true;
 }
@@ -289,8 +290,8 @@ void   Visual::SetPosition (const cg::point_3f& pos, const cg::quaternion&  orie
 
 void Visual::EndSceneCreation()
 {
-   _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
-
+    _viewerPtr->setSceneData( avScene::Scene::GetInstance() );
+    avScene::Logo::Release(_viewerPtr.get());
 }
 
 bool   Visual::Done()

@@ -448,7 +448,8 @@ struct visapp_impl
     visapp_impl(kernel::vis_sys_props const& props, binary::bytes_cref bytes, kernel::msg_service& msg_srv, const on_ready_f& ready_f)
         : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
-        , vis_sys_  (create_vis(props, osg_vis_, bytes), ready_f)
+        , ready_f_  (ready_f)
+        , vis_sys_  (create_vis(props, osg_vis_, bytes), [this](){ end_this(); ready_f_(); })
     {}
 
     ~visapp_impl()
@@ -618,8 +619,6 @@ struct visapp
     void run( binary::bytes_t data )
     {   
         visapp_impl  va( props_, data, msg_service_,  boost::bind(&visapp::on_ready, this));
-        end_of_load_  = boost::bind(&visapp_impl::end_this,&va);
-        end_of_load_();
         while (!va.done() && !done_)
         {
           update_messages();
@@ -675,7 +674,7 @@ private:
 }
 
 
-
+namespace {
 inline void timer_res()
 {
 
@@ -698,6 +697,18 @@ inline void timer_res()
 
 }
 
+inline void hide_console()
+{
+#ifdef _WIN32
+        ShowWindow( GetConsoleWindow(), SW_HIDE );
+#endif
+
+}
+
+
+
+}
+
 
 int main_visapp( int argc, char** argv )
 {
@@ -706,6 +717,7 @@ int main_visapp( int argc, char** argv )
     logging::add_console_writer();
     
     timer_res();
+    hide_console();
 
     boost::asio::io_service  service_;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;

@@ -183,8 +183,10 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 		    for ( unsigned int i=0; i<animations.size(); ++i )
             {
                 const std::string& name = animations[i]->getName();
-           
-		        if(!manager_->isPlaying(name) && (f? true : name == anim.name))
+                
+                const bool is_playing = manager_->isPlaying(name);
+		        
+                if( (!is_playing ||  is_playing &&  animations[i]->getPlayMode() != pm ) &&(f? true : name == anim.name))
                 {
                     if(anim.len >0) animations[i]->setDuration(anim.len);
                     animations[i]->setPlayMode(pm);

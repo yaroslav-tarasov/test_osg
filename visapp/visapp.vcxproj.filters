@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Generated Files">
@@ -35,9 +35,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\..\av">
-      <UniqueIdentifier>{e3adca4a-4130-4f58-be2a-adc45a76e577}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\.." />
@@ -52,9 +49,6 @@
     <ClCompile Include="..\_include\bada\bada_import.cpp">
       <Filter>Source Files\..\_include\bada</Filter>
     </ClCompile>
-    <ClCompile Include="..\av\avCore\DebugRenderer.cpp">
-      <Filter>Source Files\..\av</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\_include\objects" />
@@ -65,7 +59,394 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Source Files\..\av" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avAnimation" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avAnimation\AnimTest.cpp">
+      <Filter>Source Files\..\av\avAnimation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avAnimation\AnimationObject.cpp">
+      <Filter>Source Files\..\av\avAnimation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avAnimation\AnimationPrototype.cpp">
+      <Filter>Source Files\..\av\avAnimation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avAnimation\Bone.cpp">
+      <Filter>Source Files\..\av\avAnimation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avAnimation\XFileParser.cpp">
+      <Filter>Source Files\..\av\avAnimation</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Database.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\DebugRenderer.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\DecalRender.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Environment.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\InstancedAnimationManager.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\LOD.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Logo.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\NodeTracker.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Object.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\PreRender.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Timer.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\Utils.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avCore\XmlModel.cpp">
+      <Filter>Source Files\..\av\avCore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avFx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avFx\FoamStreamFx.cpp">
+      <Filter>Source Files\..\av\avFx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avFx\FrictionDustFx.cpp">
+      <Filter>Source Files\..\av\avFx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avFx\LandingDustFx.cpp">
+      <Filter>Source Files\..\av\avFx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avFx\SmokeFx.cpp">
+      <Filter>Source Files\..\av\avFx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avFx\SparksFx.cpp">
+      <Filter>Source Files\..\av\avFx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avLights" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avLights\CulturalLights" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\CulturalLights\NavigationalLight.cpp">
+      <Filter>Source Files\..\av\avLights\CulturalLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\CulturalLights\PointLightGroup.cpp">
+      <Filter>Source Files\..\av\avLights\CulturalLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\CulturalLights\PointLightsManager.cpp">
+      <Filter>Source Files\..\av\avLights\CulturalLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\LightManager.cpp">
+      <Filter>Source Files\..\av\avLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\LightMaps.cpp">
+      <Filter>Source Files\..\av\avLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\Lights.cpp">
+      <Filter>Source Files\..\av\avLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLights\NavAid.cpp">
+      <Filter>Source Files\..\av\avLights</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avLine" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLine\Line.cpp">
+      <Filter>Source Files\..\av\avLine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avLine\Ropes.cpp">
+      <Filter>Source Files\..\av\avLine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avScene" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avScene\Scene.cpp">
+      <Filter>Source Files\..\av\avScene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avScene\ScreenTexture.cpp">
+      <Filter>Source Files\..\av\avScene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avScene\ScreenTextureManager.cpp">
+      <Filter>Source Files\..\av\avScene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avScene\av_scene.cpp">
+      <Filter>Source Files\..\av\avScene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avShadows" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ParallelSplitShadowMap.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ShadowMap.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ShadowSettings.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ShadowTechnique.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ShadowedScene.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avShadows\ViewDependentShadowMap.cpp">
+      <Filter>Source Files\..\av\avShadows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avSky" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\CelestialBodies.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\CloudLayer.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\DateTime.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\Ephemeris.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\EphemerisEngine.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\EphemerisModel.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\FogLayer.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\LightningLayer.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\Moon.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\Sky.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\SkyDome.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avSky\StarField.cpp">
+      <Filter>Source Files\..\av\avSky</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avTerrain" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avTerrain\Grass.cpp">
+      <Filter>Source Files\..\av\avTerrain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avTerrain\Grass2.cpp">
+      <Filter>Source Files\..\av\avTerrain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avTerrain\Terrain.cpp">
+      <Filter>Source Files\..\av\avTerrain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avTerrain\Trees.cpp">
+      <Filter>Source Files\..\av\avTerrain</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\av\avWeather" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avWeather\Cloud.cpp">
+      <Filter>Source Files\..\av\avWeather</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avWeather\FogBank.cpp">
+      <Filter>Source Files\..\av\avWeather</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avWeather\LocalWeather.cpp">
+      <Filter>Source Files\..\av\avWeather</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avWeather\PrecipitationBase.cpp">
+      <Filter>Source Files\..\av\avWeather</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\avWeather\Weather.cpp">
+      <Filter>Source Files\..\av\avWeather</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\EnvRenderer.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\Visual.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\scn_parser.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\av\shaders.cpp">
+      <Filter>Source Files\..\av</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\core\cluster" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\core\cluster\net_layer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\core\cluster\net_layer\net_worker.cpp">
+      <Filter>Source Files\..\core\cluster\net_layer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\core\cluster\net_layer\session_impl.cpp">
+      <Filter>Source Files\..\core\cluster\net_layer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\core\config" />
@@ -87,6 +468,54 @@
     <Filter Include="Source Files\..\ext" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Source Files\..\ext\spark" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\SmokeNode.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\SparkDrawable.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\SparkUpdatingHandler.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\explosion_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\fire_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\osgspark.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\rain_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\simple_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ext\spark\test_effect.cpp">
+      <Filter>Source Files\..\ext\spark</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\hmi" />
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +523,11 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\hmi\gui_vis\panels" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\hmi\gui_vis\panels\time_panel_impl.cpp">
+      <Filter>Source Files\..\hmi\gui_vis\panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
@@ -135,6 +569,24 @@
   <ItemGroup>
     <ClCompile Include="..\kernel\objects\ada\ada_view.cpp">
       <Filter>Source Files\..\kernel\objects\ada</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\aerostat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aerostat\aerostat_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\aerostat</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aerostat\aerostat_model.cpp">
+      <Filter>Source Files\..\kernel\objects\aerostat</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aerostat\aerostat_view.cpp">
+      <Filter>Source Files\..\kernel\objects\aerostat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +700,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp">
       <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
     </ClCompile>
@@ -259,6 +721,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_view.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\aircraft_physless\phys_aircraft_phl.cpp">
       <Filter>Source Files\..\kernel\objects\aircraft_physless</Filter>
     </ClCompile>
   </ItemGroup>
@@ -281,6 +753,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\kernel\objects\airport\airport_vis.cpp">
+      <Filter>Source Files\..\kernel\objects\airport</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\kernel\objects\airports_manager" />
   </ItemGroup>
   <ItemGroup>
@@ -289,10 +766,61 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\arresting_gear" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\arresting_gear\arresting_gear_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\arresting_gear</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\arresting_gear\arresting_gear_model.cpp">
+      <Filter>Source Files\..\kernel\objects\arresting_gear</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\arresting_gear\arresting_gear_view.cpp">
+      <Filter>Source Files\..\kernel\objects\arresting_gear</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\arresting_gear\arresting_gear_vis.cpp">
+      <Filter>Source Files\..\kernel\objects\arresting_gear</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\camera" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\camera\camera_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\camera\camera_model.cpp">
+      <Filter>Source Files\..\kernel\objects\camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\camera\camera_view.cpp">
+      <Filter>Source Files\..\kernel\objects\camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\camera\camera_vis.cpp">
+      <Filter>Source Files\..\kernel\objects\camera</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\kernel\objects\common" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\objects\common\object_creators.cpp">
+    <ClCompile Include="..\kernel\objects\common\net_object_factory.cpp">
+      <Filter>Source Files\..\kernel\objects\common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\common\objects_factory.cpp">
       <Filter>Source Files\..\kernel\objects\common</Filter>
     </ClCompile>
   </ItemGroup>
@@ -318,21 +846,169 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source Files\..\kernel\objects\nm" />
+    <Filter Include="Source Files\..\kernel\objects\environment" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\objects\nm\node_osg_impl.cpp">
-      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    <ClCompile Include="..\kernel\objects\environment\environment_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\objects\nm\nodes_management.cpp">
-      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    <ClCompile Include="..\kernel\objects\environment\environment_view.cpp">
+      <Filter>Source Files\..\kernel\objects\environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\kernel\objects\nm\nodes_manager.cpp">
-      <Filter>Source Files\..\kernel\objects\nm</Filter>
+    <ClCompile Include="..\kernel\objects\environment\environment_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\environment</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\flock_child" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_child\flock_child_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_child</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_child\flock_child_model.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_child</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_child\flock_child_view.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_child</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\flock_manager" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_manager\flock_manager_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_manager\flock_manager_model.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\flock_manager\flock_manager_view.cpp">
+      <Filter>Source Files\..\kernel\objects\flock_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\helicopter_physless" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\helicopter_physless\sync_fsm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\helicopter_physless_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\helicopter_physless_model.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\helicopter_physless_view.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\helicopter_physless_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\helicopter_physless\phys_helicopter_phl.cpp">
+      <Filter>Source Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\human" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\human\human_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\human</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\human\human_model.cpp">
+      <Filter>Source Files\..\kernel\objects\human</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\human\human_model_states.cpp">
+      <Filter>Source Files\..\kernel\objects\human</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\human\human_view.cpp">
+      <Filter>Source Files\..\kernel\objects\human</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\human\human_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\human</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\model_debug_drawer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\model_debug_drawer\mdd_model.cpp">
+      <Filter>Source Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\model_debug_drawer\mdd_view.cpp">
+      <Filter>Source Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\model_debug_drawer\mdd_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\model_debug_drawer\remote_render.cpp">
+      <Filter>Source Files\..\kernel\objects\model_debug_drawer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -366,6 +1042,29 @@
   <ItemGroup>
     <ClCompile Include="..\kernel\objects\nodes_manager\vis_node_impl.cpp">
       <Filter>Source Files\..\kernel\objects\nodes_manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files\..\kernel\objects\object_reg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\object_reg\objects_reg_ctrl.cpp">
+      <Filter>Source Files\..\kernel\objects\object_reg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\object_reg\objects_reg_model.cpp">
+      <Filter>Source Files\..\kernel\objects\object_reg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\object_reg\objects_reg_view.cpp">
+      <Filter>Source Files\..\kernel\objects\object_reg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\objects\object_reg\objects_reg_visual.cpp">
+      <Filter>Source Files\..\kernel\objects\object_reg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -446,12 +1145,42 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\kernel\phys\aerostat_phys.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\kernel\phys\aircraft_phys.cpp">
       <Filter>Source Files\..\kernel\phys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\kernel\phys\aircraft_phys_lite.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\arresting_gear_phys.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\kernel\phys\bvh_static_mesh.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\character_phys.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\flock_child_phys.cpp">
+      <Filter>Source Files\..\kernel\phys</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\kernel\phys\helicopter_phys_lite.cpp">
       <Filter>Source Files\..\kernel\phys</Filter>
     </ClCompile>
   </ItemGroup>
@@ -525,7 +1254,30 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Source Files\..\tests\ssao" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\ssao\ffssao.cpp">
+      <Filter>Source Files\..\tests\ssao</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\tests\systems" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\systems\factory_systems.cpp">
+      <Filter>Source Files\..\tests\systems</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\systems\systems_impl.cpp">
+      <Filter>Source Files\..\tests\systems</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\systems\systems_impl2.cpp">
+      <Filter>Source Files\..\tests\systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\systems\test_objects1.cpp">
@@ -533,12 +1285,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\tests\systems\test_systems.cpp">
+    <ClCompile Include="..\tests\systems\test_objects2.cpp">
       <Filter>Source Files\..\tests\systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\tests\visapp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\visapp\main_modapp.cpp">
+      <Filter>Source Files\..\tests\visapp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\visapp\main_visapp.cpp">
+      <Filter>Source Files\..\tests\visapp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\visapp\visapp1.cpp">
@@ -556,10 +1318,175 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\tests\DynamicCharacterController.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\SimpleHUD.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\SkyBox.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\animation_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\animation_test2.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\animation_test3.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\animation_test4.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\animation_test5.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\bump_mapping.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\creators.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\dubins_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\exp_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\flame_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\grass_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\light_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\main_scene.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\main_shadows.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\main_shadows_2.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\morph_geometry.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\mrt_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\noise_texture_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\patch-lowlevel.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\phys_viewer.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\render_points.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\select_geometry.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\shadow_map.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\sparse_texture.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\teapot.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\tess_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\test_boost_timer.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\test_curves.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tests\tex_test.cpp">
+      <Filter>Source Files\..\tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Source Files\..\utils" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files\..\utils\visitors" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\visitors\ComputeTriMeshVisitor.cpp">
+      <Filter>Source Files\..\utils\visitors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\utils\visitors\find_node_visitor.cpp">
@@ -567,7 +1494,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\utils\LoadManager.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\utils\animation_handler.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\async_load.cpp">
       <Filter>Source Files\..\utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -577,7 +1514,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\utils\materials.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\utils\workqueue.cpp">
+      <Filter>Source Files\..\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\stdafx.cpp">
+      <Filter>Source Files\..</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\test_osg.cpp">
       <Filter>Source Files\..</Filter>
     </ClCompile>
   </ItemGroup>
@@ -676,12 +1628,40 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\av\avCore\Object.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avCore\PreRender.h">
+      <Filter>Header Files\..\av\avCore</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="..\av\avCore\Utils.h">
       <Filter>Header Files\..\av\avCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files\..\av\avLights" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av\avLights\CulturalLights" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\CulturalLights\NavigationalLight.h">
+      <Filter>Header Files\..\av\avLights\CulturalLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\CulturalLights\PointLightGroup.h">
+      <Filter>Header Files\..\av\avLights\CulturalLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLights\CulturalLights\PointLightsManager.h">
+      <Filter>Header Files\..\av\avLights\CulturalLights</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\av\avLights\LightManager.h">
@@ -704,6 +1684,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Header Files\..\av\avLine" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLine\Line.h">
+      <Filter>Header Files\..\av\avLine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avLine\Ropes.h">
+      <Filter>Header Files\..\av\avLine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <Filter Include="Header Files\..\av\avScene" />
   </ItemGroup>
   <ItemGroup>
@@ -722,8 +1715,49 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\av\Grass.h">
-      <Filter>Header Files\..\av</Filter>
+    <Filter Include="Header Files\..\av\avSky" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avSky\CloudLayer.h">
+      <Filter>Header Files\..\av\avSky</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avSky\Ephemeris.h">
+      <Filter>Header Files\..\av\avSky</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avSky\FogLayer.h">
+      <Filter>Header Files\..\av\avSky</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avSky\LightningLayer.h">
+      <Filter>Header Files\..\av\avSky</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\av\avTerrain" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avTerrain\Grass.h">
+      <Filter>Header Files\..\av\avTerrain</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avTerrain\Grass2.h">
+      <Filter>Header Files\..\av\avTerrain</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avTerrain\Terrain.h">
+      <Filter>Header Files\..\av\avTerrain</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\av\avTerrain\Trees.h">
+      <Filter>Header Files\..\av\avTerrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -734,6 +1768,258 @@
   <ItemGroup>
     <ClInclude Include="..\av\Visual.h">
       <Filter>Header Files\..\av</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\fms" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\fms\trajectory.h">
+      <Filter>Header Files\..\kernel\fms</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\aerostat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aerostat\aerostat_common.h">
+      <Filter>Header Files\..\kernel\objects\aerostat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aerostat\aerostat_ctrl.h">
+      <Filter>Header Files\..\kernel\objects\aerostat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aerostat\aerostat_model.h">
+      <Filter>Header Files\..\kernel\objects\aerostat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aerostat\aerostat_view.h">
+      <Filter>Header Files\..\kernel\objects\aerostat</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\aircraft_physless" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\aircraft_physless\sync_fsm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.h">
+      <Filter>Header Files\..\kernel\objects\aircraft_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\arresting_gear" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\arresting_gear\arresting_gear_common.h">
+      <Filter>Header Files\..\kernel\objects\arresting_gear</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\arresting_gear\arresting_gear_ctrl.h">
+      <Filter>Header Files\..\kernel\objects\arresting_gear</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\arresting_gear\arresting_gear_model.h">
+      <Filter>Header Files\..\kernel\objects\arresting_gear</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\arresting_gear\arresting_gear_view.h">
+      <Filter>Header Files\..\kernel\objects\arresting_gear</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\arresting_gear\arresting_gear_vis.h">
+      <Filter>Header Files\..\kernel\objects\arresting_gear</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\camera" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\camera\camera_model.h">
+      <Filter>Header Files\..\kernel\objects\camera</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\environment" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\environment\environment_ctrl.h">
+      <Filter>Header Files\..\kernel\objects\environment</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\flock_child" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\flock_child\flock_child_ctrl.h">
+      <Filter>Header Files\..\kernel\objects\flock_child</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\flock_child\flock_child_model.h">
+      <Filter>Header Files\..\kernel\objects\flock_child</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\flock_child\flock_child_view.h">
+      <Filter>Header Files\..\kernel\objects\flock_child</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\helicopter_physless" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\helicopter_physless\sync_fsm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless\sync_fsm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_common.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_ctrl.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_model.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_msg.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_state.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_view.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\helicopter_physless_visual.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\helicopter_physless\phys_helicopter_phl.h">
+      <Filter>Header Files\..\kernel\objects\helicopter_physless</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\kernel\objects\model_debug_drawer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\model_debug_drawer\mdd_model.h">
+      <Filter>Header Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\model_debug_drawer\mdd_view.h">
+      <Filter>Header Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\model_debug_drawer\mdd_visual.h">
+      <Filter>Header Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\kernel\objects\model_debug_drawer\remote_render.h">
+      <Filter>Header Files\..\kernel\objects\model_debug_drawer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files\..\utils" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\utils\LoadManager.h">
+      <Filter>Header Files\..\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\utils\empty_scene.h">
+      <Filter>Header Files\..\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\utils\krv_import.h">
+      <Filter>Header Files\..\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
