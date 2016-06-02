@@ -175,7 +175,7 @@ struct client
 	struct connect_helper
 	{
 		connect_helper(const endpoints& peers, client* cl)
-		{
+		{                                                                      
 			std::set<network::address_v4> peer_addrs;
             
             for (auto it = peers.begin();it!= peers.end(); ++it )
@@ -871,10 +871,10 @@ private:
                     {
                         //ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
                         //ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
-                        //ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
-                        //ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
-                        //ADD_INIT( msgs, create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
-                        //ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
+                        ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
+                        ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
+                        ADD_INIT( msgs, create_msg(158,point_3(-357,431,0),cg::cpr(0)  , ok_helicopter, "KA50", "158") )
+                        ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
                         ADD_INIT( msgs, create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
                         ADD_INIT( msgs, create_msg(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
                         ADD_INIT( msgs, create_msg(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )

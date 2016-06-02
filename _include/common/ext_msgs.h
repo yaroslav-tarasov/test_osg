@@ -55,7 +55,7 @@ namespace net_layer
             {
             }
 
-            setup_msg(std::string&& icao_code, msgs_t&&     msgs )
+            setup_msg(const std::string& icao_code, msgs_t&&     msgs )
                 : icao_code (icao_code)
                 , msgs      (msgs)
                 , obj_num   (msgs.size() + 1)

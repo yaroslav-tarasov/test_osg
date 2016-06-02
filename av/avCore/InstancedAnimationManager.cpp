@@ -381,17 +381,16 @@ namespace avCore
             //instTexture_->dirtyTextureObject();
             instTexture_->getImage(0)->dirty();
 
-            auto & dl = instGeode_->getDrawableList(); 
             instGeode_->setNodeMask(inst_counter>0?REFLECTION_MASK:0);
 
-            for(auto it = dl.begin(); it!= dl.end() ; ++it)
+            for(int i=0;i<instGeode_->getNumDrawables(); ++i)
             { 
-                (*it)->dirtyBound();
+                instGeode_->getDrawable(i)->dirtyBound();
                         
                 //if(inst_counter != inst_nodes_.size())
                 if (inst_num_!=inst_counter)
                 {
-                    auto geometry = (*it)->asGeometry();
+                    auto geometry = instGeode_->getDrawable(i)->asGeometry();
                     // first turn on hardware instancing for every primitive set
                     for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
                     {

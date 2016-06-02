@@ -20,13 +20,11 @@ namespace visual_objects
 
         inline void set_text(const std::string&  text)
         {
-            const auto& l = label_->asGeode()->getDrawableList();
+            const auto& geode = label_->asGeode();
 
-            for(auto itr=l.begin();
-                itr!= l.end();
-                ++itr)
+            for(int i=0;i<geode->getNumDrawables(); ++i)
             {
-                if(auto dtext =  dynamic_cast<osgText::Text*>(itr->get()))
+                if(auto dtext =  dynamic_cast<osgText::Text*>(geode->getDrawable(i)))
                 {
                     dtext->setText(unicode::a2w(text).c_str());
                 }
