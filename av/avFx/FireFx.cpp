@@ -65,9 +65,9 @@ FireFx::FireFx()
     // setup shader
     osg::Program * pCurProgram = new osg::Program;
     pCurProgram->setName("FireFx");
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.vs", NULL, osg::Shader::VERTEX  ));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.gs", NULL, osg::Shader::GEOMETRY));
-    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("SmokeFx.fs", NULL, osg::Shader::FRAGMENT));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FireFx.vs", NULL, osg::Shader::VERTEX  ));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FireFx.gs", NULL, osg::Shader::GEOMETRY));
+    pCurProgram->addShader(avCore::GetDatabase()->LoadShader("FireFx.fs", NULL, osg::Shader::FRAGMENT));
     pCurProgram->setParameter(GL_GEOMETRY_VERTICES_OUT_EXT, 4);
     pCurProgram->setParameter(GL_GEOMETRY_INPUT_TYPE_EXT, GL_POINTS);
     pCurProgram->setParameter(GL_GEOMETRY_OUTPUT_TYPE_EXT, GL_TRIANGLE_STRIP);

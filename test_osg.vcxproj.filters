@@ -357,6 +357,15 @@
     <None Include="misc\shaders\sea.frag">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.fs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.gs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.vs">
+      <Filter>Source Files\shaders\fx</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

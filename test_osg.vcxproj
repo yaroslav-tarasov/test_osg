@@ -106,6 +106,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.fs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.gs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.vs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.fs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.gs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FoamStreamFx.vs" />
