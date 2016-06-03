@@ -1513,8 +1513,9 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
              avCore::Object* obj = avCore::createObject("parachute" , true);
              osg::Node* obj_node = obj->getOrCreateNode();
              
-             osg::Matrix mat; 
-             mat.setTrans(body->getMatrix().getTrans());
+             osg::Matrix mat;
+             mat.scale(osg::Vec3f(0.001, 0.001, 0.001));
+             mat.setTrans(body->getMatrix().getTrans() - offset/2.0 );
              
              mt_.back()->setMatrix(mat);
              mt_.back()->addChild( obj_node );

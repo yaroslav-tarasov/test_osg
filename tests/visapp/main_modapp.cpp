@@ -735,7 +735,7 @@ int main_modapp( int argc, char** argv )
     logging::add_console_writer();
 
     timer_res();
-    hide_console();
+    //hide_console();
 
     boost::asio::io_service  service_;
     typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
