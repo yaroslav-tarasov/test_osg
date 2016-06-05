@@ -13,7 +13,7 @@
 // Smoke special effect
 //
 
-struct smoke_sfx_data /*: node_data*/
+struct fire_sfx_data /*: node_data*/
 {
 	float            intensity,
 		                factor;
@@ -21,12 +21,12 @@ struct smoke_sfx_data /*: node_data*/
 	cg::point_3f      emit_dir;
 	cg::point_3f emitter_speed;
 
-	smoke_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
+	fire_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
 };
 
 
-static const float smoke_lifetime_min = 4.0f;
-static const float smoke_lifetime_max = 8.5f;
+static const float fire_lifetime_min = 1.0f;
+static const float fire_lifetime_max = 1.5f;
 
 //
 // Local namespaces
@@ -69,7 +69,7 @@ namespace avFx
 
 	private: // particles_effect_info
 
-		virtual float getMaxParticleLifetime() const override { return smoke_lifetime_max; }
+		virtual float getMaxParticleLifetime() const override { return fire_lifetime_max; }
 		virtual bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
 
 	private: // SmokeSfxNode
@@ -92,7 +92,7 @@ namespace avFx
 	private:
 
 		// data
-		smoke_sfx_data data_;
+		fire_sfx_data data_;
 
 		// cpu part queue
 		struct cpu_particle : base_cpu_particle
@@ -117,7 +117,9 @@ namespace avFx
 			cg::colorab randoms;
 		};
 #pragma pack(pop)
+#if 0
 		gpu_part_drawer<gpu_particle> gpu_queue_;
+#endif
 
 		// clip data
 		bound_info                    bvol_;

@@ -120,7 +120,9 @@ namespace avFx
 			cg::colorab randoms;
 		};
 #pragma pack(pop)
+#if 0
 		gpu_part_drawer<gpu_particle> gpu_queue_;
+#endif
 
 		// clip data
 		bound_info                    bvol_;

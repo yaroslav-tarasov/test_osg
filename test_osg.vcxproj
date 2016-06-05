@@ -250,6 +250,7 @@
     <ClCompile Include="av\avCore\Timer.cpp" />
     <ClCompile Include="av\avCore\Utils.cpp" />
     <ClCompile Include="av\avCore\XmlModel.cpp" />
+    <ClCompile Include="av\avFx\FireFx.cpp" />
     <ClCompile Include="av\avFx\FoamStreamFx.cpp" />
     <ClCompile Include="av\avFx\FrictionDustFx.cpp" />
     <ClCompile Include="av\avFx\LandingDustFx.cpp" />

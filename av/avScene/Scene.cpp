@@ -76,6 +76,7 @@
 #include "av/avFx/LandingDustFx.h"
 #include "av/avFx/FoamStreamFx.h"
 #include "av/avFx/FrictionDustFx.h"
+#include "av/avFx/FireFx.h"
 
 #include "av/avLine/Ropes.h"
 
@@ -1144,6 +1145,20 @@ FIXME(Чудеса с Ephemeris)
     }
     );
 
+	smoke_sfx_weak_ptr_ = nullptr;
+#if 1
+	avFx::FireFx* smoke = new avFx::FireFx;
+	smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode*>(smoke);
+	osg::PositionAttitudeTransform* pat;
+	pat = new osg::PositionAttitudeTransform;
+	pat->setPosition(osg::Vec3(0,0,8));
+	pat->setScale(osg::Vec3(1,1,1));
+	pat->addChild(smoke);
+	addChild(pat);
+#endif
+    bool async = false;
+	Scene::load("smoke", nullptr , 0, async);
+
 #if 0
 	smoke_sfx_weak_ptr_ = nullptr;
 #if 0
@@ -1292,7 +1307,7 @@ void Scene::createObjects()
 }
 
 
-osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool& async)
+osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed, bool& async)
 {
     using namespace creators;
 
@@ -1315,27 +1330,11 @@ osg::Node*   Scene::load(std::string path,osg::Node* parent, uint32_t seed, bool
         spark::spark_pair_t sp_fire =  spark::create(spark::FIRE,parent?mt_offset->asTransform():nullptr);
         sp_fire.first->setName("fire");
         mt_.back()->addChild(sp_fire.first);
-        
-        //spark::spark_pair_t sp_s =  spark::create(spark::SOMETHING/*,parent?mt_offset->asTransform():nullptr*/);
-        //sp_s.first->setName("something");
-        //mt_.back()->addChild(sp_s.first);
-
-        //spark::spark_pair_t sp_smoke =  spark::create(spark::SMOKE,parent?mt_offset->asTransform():nullptr);
-        //sp_smoke.first->setName("smoke");
-        //mt_.back()->addChild(sp_smoke.first);
-        
 		
 		_terrainRoot->asGroup()->addChild(mt_.back());
-
-		//sp_smoke.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
         sp_fire.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
- //       sp_s.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
 
-
-        //_viewerPtr->addEventHandler(sp_smoke.second);
         _viewerPtr->addEventHandler(sp_fire.second);
-        
-        //_viewerPtr->addEventHandler(sp_s.second);
 
         return mt_.back();
     }
@@ -2086,16 +2085,17 @@ void Scene::update( osg::NodeVisitor * nv )
         _ephemerisPtr->setTime();
 
 
-#if 0
+
 	  if (smoke_sfx_weak_ptr_)
 	  {
 		  auto const intensity = 4.0f;
 
 		  smoke_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
-		  smoke_sfx_weak_ptr_->setIntensity(intensity * 2);
+		  smoke_sfx_weak_ptr_->setIntensity(intensity * 40);
 	      
 	  }
 
+#if 0
 	  if(sparks_sfx_weak_ptr)
 	  {
 		  sparks_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));

@@ -40,8 +40,9 @@ FireFx::FireFx()
     pCurStateSet->setRenderBinDetails(RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin");
 
     // setup blending
-    osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+    osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE);
     pCurStateSet->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
+
 	
 	osg::BlendEquation* pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
 	pCurStateSet->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
@@ -93,7 +94,7 @@ FireFx::FireFx()
 	// textures
 
     // setup texture for point quads
-    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/fire2.bmp", osg::Texture::REPEAT));
+    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/fire2.dds", osg::Texture::REPEAT));
 
 	
 	setCullCallback(Utils::makeNodeCallback(this, &FireFx::cull));
@@ -185,20 +186,20 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 		const float & t_unit = part.t();
 		const float & t = part.get_age();
 		const float mega_age_func = t_unit * (t_unit * (0.333333f * t_unit - 1.0f) + 1.0f);
-		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y, part.start_vel.z + 35.0f) * (mega_age_func * t);
+		const cg::point_3f velocity_impact = cg::point_3f(part.start_vel.x, part.start_vel.y, part.start_vel.z + 0.0f) * (mega_age_func * t);
 		part.start_pos() += wind_vec * dt;
-		part.cur_pos() = part.start_pos() + velocity_impact;
+		part.cur_pos() = part.start_pos(); // + velocity_impact;
 	};
 
 	// update current
-	static const float break_sfx_dist = 80.f;
+	static const float break_sfx_dist = 1.5f;
 	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), data_.emit_pos, break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;
 	auto const & cpu_emit_new = [&factor_val]( cg::point_3f const & wp, float emit_timestamp, float tfe, simplerandgen & rnd )->cpu_particle
 	{
-		const float lt_particle = rnd.random_range(smoke_lifetime_min, smoke_lifetime_max);
+		const float lt_particle = rnd.random_range(fire_lifetime_min, fire_lifetime_max);
 
 		cg::colorab randoms;
 		randoms.r = rnd.random_8bit();
@@ -214,7 +215,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 		return FireFx::cpu_particle(wp, emit_timestamp, lt_particle, tfe, start_vel, factor_val, randoms);
 	};
 	// particles emission
-	static const float break_time_dist = 2.f;
+	static const float break_time_dist = 10.5f;
 	emitter_.emit_new_particles(data_.intensity, 1.25f / cg::max(data_.factor, 1.0f), break_time_dist, cpu_emit_new, cpu_updater);
 	
 	_clearArrays();

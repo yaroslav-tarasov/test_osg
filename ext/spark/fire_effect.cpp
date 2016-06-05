@@ -128,16 +128,22 @@ SPK::SPK_ID createFire( const SparkDrawable::TextureIDMap& textureIDMap, int scr
 
     // Groups
     SPK::Group* fireGroup = SPK::Group::create(fireModel,135);
+
     fireGroup->addEmitter(fireEmitter1);
+#if 0
     fireGroup->addEmitter(fireEmitter2);
     fireGroup->addEmitter(fireEmitter3);
     fireGroup->addEmitter(fireEmitter4);
     fireGroup->addEmitter(fireEmitter5);
+#endif
+
     fireGroup->setRenderer(fireRenderer);
     fireGroup->setGravity(SPK::Vector3D(0.0f,0.0f,3.0f));
     FIXME(Tests)
     SPK::Group* smokeGroup = SPK::Group::create(smokeModel,135/*500000*/);
+#if 0
     smokeGroup->addEmitter(smokeEmitter);
+#endif
     smokeGroup->setRenderer(smokeRenderer);
     smokeGroup->setGravity(SPK::Vector3D(0.0f,0.0f,0.4f));
     smokeGroup->enableSorting(true);
@@ -250,11 +256,13 @@ SPK::SPK_ID createFireSmoke( const SparkDrawable::TextureIDMap& textureIDMap, in
 
     // Groups
     SPK::Group* fireGroup = SPK::Group::create(fireModel,135);
+#if 0
     fireGroup->addEmitter(fireEmitter1);
     fireGroup->addEmitter(fireEmitter2);
     fireGroup->addEmitter(fireEmitter3);
     fireGroup->addEmitter(fireEmitter4);
     fireGroup->addEmitter(fireEmitter5);
+#endif
     fireGroup->setRenderer(fireRenderer);
     fireGroup->setGravity(SPK::Vector3D(0.0f,0.0f,3.0f));
 

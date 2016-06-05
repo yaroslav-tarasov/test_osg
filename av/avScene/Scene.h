@@ -100,7 +100,7 @@ namespace avScene {
 
         void                                        setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center);
 
-        osg::Node*                                  load(std::string path, osg::Node* parent, uint32_t seed, bool& async);
+        osg::Node*                                  load(const std::string path, osg::Node* parent, uint32_t seed, bool& async);
     
     private: // IScene interface declaration
         av::environment_weather*                    getEnvWeather() const override;
@@ -155,8 +155,9 @@ namespace avScene {
         avCore::IDecalRendererPtr                   _decal_map;
 
 
-#if 0
+
 		SmokeSfxNode *                              smoke_sfx_weak_ptr_;
+#if 0
 		SparksSfxNode *                             sparks_sfx_weak_ptr;
 		FrictionDustSfxNode*                        fd_sfx_weak_ptr_;
 
