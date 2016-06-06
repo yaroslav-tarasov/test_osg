@@ -4,6 +4,7 @@
 
 #include "common/text_label.h"
 #include "common/parachute.h"
+#include "common/forsage.h"
 #include "ext/spark/SmokeNode.h"
 
 
@@ -33,8 +34,8 @@ namespace aircraft_physless
         
         fill_nodes();
 
-        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
-        ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+        ls_ = boost::make_shared<visual_objects::label_support>(
+            vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg"), settings_.custom_label);
 
         ps_ = boost::make_shared<visual_objects::parashute_support>(
             vsys->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
@@ -54,6 +55,12 @@ namespace aircraft_physless
                 return true;
             }
             else
+                if (boost::starts_with(n->name(), "forsage"))
+                {
+                    this->forsage_node_ = n;
+                    return true;
+                }
+                else
                 if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorsag"))
                 {
                     nm::vis_node_control_ptr(n)->set_visibility(false);
@@ -98,18 +105,16 @@ namespace aircraft_physless
 #endif
 
 #ifdef ASYNC_OBJECT_LOADING 
-		if( !label_object_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
+		if( !ls_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
 		{ 
 			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
-            label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
-            if(label_object_->root())
-                ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+            ls_ = boost::make_shared<visual_objects::label_support>(
+                    vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
 
             if(!ps_)
                 ps_ = boost::make_shared<visual_objects::parashute_support>(
                         vsys->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
-
 
             if (!landing_dust_object_)
                 landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,0,false);
@@ -124,6 +129,10 @@ namespace aircraft_physless
             }
 
             fill_nodes();
+
+            if(forsage_node_ && !fs_)
+                fs_ = boost::make_shared<visual_objects::forsage_support>(
+                vsys->create_visual_object(nm::node_control_ptr(root()),"sfx//forsage.scg",0,0,false), forsage_node_, root());
 		}
 #endif
 
@@ -174,6 +183,12 @@ namespace aircraft_physless
 			else
 				ss.smoke_object_->set_visible(false);
 		}
+        
+        if(fs_)
+            fs_->set_update_time(time);
+
+        if(fs_)
+            fs_->update(time, polar_point_3f() , point_3f(), base);
 
         last_update_ = time;
     }

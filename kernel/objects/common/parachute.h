@@ -39,6 +39,7 @@ namespace visual_objects
         }
 
         visual_object_ptr     visual_object_;
+        nm::node_info_ptr     parent_;
     };
 
 }

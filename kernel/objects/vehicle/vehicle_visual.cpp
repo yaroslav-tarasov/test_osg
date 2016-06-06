@@ -275,7 +275,7 @@ void visual::update(double time)
 						
 						foam_stream_sfx_weak_ptr_->setFactor(fs_factor_ * cg::clamp(0., fs_end_duration_, 1., 0.)(time-last_fs_time_));
 						foam_stream_sfx_weak_ptr_->setIntensity(fs_factor_ * 120);
-						foam_stream_sfx_weak_ptr_->setEmitterWorldSpeed(cg::point_3(0.0,speed,0.0));
+						foam_stream_sfx_weak_ptr_->setEmitterWorldVelocity(cg::point_3(0.0,speed,0.0));
 					}
 				}
 				else

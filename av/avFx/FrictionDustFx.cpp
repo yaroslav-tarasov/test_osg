@@ -167,11 +167,11 @@ void FrictionDustFx::setContactFlag( bool flag )
 	data_.active = flag;
 }
 
-void FrictionDustFx::setEmitterWorldSpeed( cg::point_3f const & speed )
+void FrictionDustFx::setEmitterWorldVelocity( cg::point_3f const & velocity )
 {
-	data_.emitter_speed = speed;
-	speed_left = normalized_safe(cg::point_3f(0, 0, 1) ^ speed);
-	speed_val_ = cg::norm(data_.emitter_speed);
+	data_.emitter_velocity = velocity;
+	velocity_left = normalized_safe(cg::point_3f(0, 0, 1) ^ velocity);
+	speed_val_ = cg::norm(data_.emitter_velocity);
 }
 
 // update
@@ -211,7 +211,7 @@ void FrictionDustFx::cull( osg::NodeVisitor * pNV )
 			randoms.b = rnd.random_8bit();
 			randoms.a = rnd.random_8bit();
 
-			cg::point_3f start_vel = this->data_.emitter_speed;
+			cg::point_3f start_vel = this->data_.emitter_velocity;
 
 			cg::point_3f cvel;
 			cvel.x += rnd.random_unit_signed() * (intensity_cur * 3.5f);

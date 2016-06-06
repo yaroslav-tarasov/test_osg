@@ -1,13 +1,11 @@
 #pragma once
 
 #include "aircraft_physless_view.h"
+#include "common/aircraft_support_fwd.h"
+
 #include "av/avFx/Fx.h"
 
-namespace visual_objects
-{
-    struct label_support;
-    struct parashute_support;
-}
+
 
 namespace aircraft_physless
 {
@@ -31,8 +29,8 @@ namespace aircraft_physless
     
     private:
         nm::node_info_ptr engine_node_;
+        nm::node_info_ptr forsage_node_;
         visual_object_ptr smoke_object_;
-        visual_object_ptr label_object_;
         optional<double>  last_update_;
 
 		struct smoke_sfx_t
@@ -64,6 +62,7 @@ namespace aircraft_physless
     private:
         boost::shared_ptr<visual_objects::label_support>       ls_;
         boost::shared_ptr<visual_objects::parashute_support>   ps_;
+        boost::shared_ptr<visual_objects::forsage_support>     fs_;
 
 	private: 
 		boost::function<void()>                       start_ ;

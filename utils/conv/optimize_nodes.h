@@ -19,7 +19,8 @@ namespace do_not_optimize
         "rtow_point",
         "back_tail",
         "rotor",
-        "parachute"
+        "parachute",
+        "forsage"
     };
 
     struct list_t

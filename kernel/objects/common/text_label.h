@@ -6,6 +6,8 @@ namespace visual_objects
 {
     struct label_support
     {
+        SAFE_BOOL_OPERATOR(visual_object_)
+
         label_support(visual_object_ptr obj,const std::string& text )
             : visual_object_(obj)
             , label_            (nullptr) 
@@ -16,6 +18,11 @@ namespace visual_objects
         inline void update( cg::polar_point_3f const  &dir, point_3f offset )
         {
             update_(dir,offset); 
+        }
+
+        visual_object_ptr get() const
+        {
+            return visual_object_;
         }
 
         inline void set_text(const std::string&  text)

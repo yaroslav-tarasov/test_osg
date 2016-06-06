@@ -158,11 +158,11 @@ void SparksFx::setContactFlag( bool flag )
 	data_.active = flag;
 }
 
-void SparksFx::setEmitterWorldSpeed( cg::point_3f const & speed )
+void SparksFx::setEmitterWorldVelocity( cg::point_3f const & velocity )
 {
-	data_.emitter_speed = speed;
-	speed_left = normalized_safe(cg::point_3f(0, 0, 1) ^ speed);
-	speed_val_ = cg::norm(data_.emitter_speed);
+	data_.emitter_velocity = velocity;
+	velocity_left = normalized_safe(cg::point_3f(0, 0, 1) ^ velocity);
+	speed_val_ = cg::norm(data_.emitter_velocity);
 }
 
 // update
@@ -212,16 +212,16 @@ void SparksFx::cull( osg::NodeVisitor * pNV )
 		{
 			const unsigned spark_dir = rnd.random_32bit() & 3;
 			const float lt = rnd.random_range(spark_lifetime_min, spark_lifetime_max);
-			cg::point_3f vel = data_.emitter_speed;
+			cg::point_3f vel = data_.emitter_velocity;
 			if (spark_dir < 2)
 			{
 				const float speed_sign = -1.f + 2.f * spark_dir;
-				vel = vel * rnd.random_dev(1.1f, 0.15f) + speed_left * (speed_sign * rnd.random_dev(3.f + 4.f * intensity_cur, 2.f));
+				vel = vel * rnd.random_dev(1.1f, 0.15f) + velocity_left * (speed_sign * rnd.random_dev(3.f + 4.f * intensity_cur, 2.f));
 				vel.z = rnd.random_dev(3.f + 3.f * intensity_cur, 2.f);
 			}
 			else
 			{
-				vel = vel * rnd.random_dev(0.9f, 0.075f) + speed_left * rnd.random_dev(0.f, 1.f + 2.f * intensity_cur);
+				vel = vel * rnd.random_dev(0.9f, 0.075f) + velocity_left * rnd.random_dev(0.f, 1.f + 2.f * intensity_cur);
 				vel.z = rnd.random_dev(2.f + 2.f * intensity_cur, 1.f);
 			}
 			return SparksFx::cpu_particle(wp, lt, tfe, vel);

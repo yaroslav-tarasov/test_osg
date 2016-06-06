@@ -17,7 +17,7 @@
 struct friction_dust_sfx_data /*: node_data*/
 {
 	bool active;
-	cg::point_3f emitter_speed;
+	cg::point_3f emitter_velocity;
 
 	friction_dust_sfx_data() : active(false) {}
 };
@@ -76,15 +76,15 @@ namespace avFx
 		void                 setContactFlag( bool flag ) override;
 		bool                 getContactFlag() const override { return data_.active; }
 
-		void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override;
-		cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
+		void                 setEmitterWorldVelocity( cg::point_3f const & velocity ) override;
+		cg::point_3f const & getEmitterWorldVelocity() const override { return data_.emitter_velocity; }
 
 	private:
 
 		// data
 		friction_dust_sfx_data data_;
-		cg::point_3f speed_left;
-		float speed_val_;
+		cg::point_3f           velocity_left;
+		float                  speed_val_;
 
 		// cpu part queue
 		struct cpu_particle : base_cpu_particle

@@ -1348,6 +1348,25 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         return mt_.back();
     }
+    
+    if( path == "sfx//forsage.scg" )
+    {
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+        osg::Matrix mat; 
+        mat.setTrans(-offset/2);
+
+        auto mt_offset = new osg::MatrixTransform(mat);
+        parent?parent->asGroup()->addChild(mt_offset):nullptr;
+
+        avFx::FireFx* fs = new avFx::FireFx;
+
+        mt_.back()->addChild(fs);
+        _terrainRoot->asGroup()->addChild(mt_.back());
+
+        return mt_.back();
+    }
 
 	if( path == "sfx//smoke.scg" )
 	{
@@ -1513,10 +1532,9 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
              osg::Node* obj_node = obj->getOrCreateNode();
              
              osg::Matrix mat;
-             mat.scale(osg::Vec3f(0.001, 0.001, 0.001));
              mat.setTrans(body->getMatrix().getTrans() - offset/2.0 );
              
-             mt_.back()->setMatrix(mat);
+             mt_.back()->setMatrix(osg::Matrix::scale(osg::Vec3f(0.25, 0.25, 0.25)) * mat );
              mt_.back()->addChild( obj_node );
          
              phys_ctrl->asGroup()->addChild(mt_.back());
@@ -2098,13 +2116,13 @@ void Scene::update( osg::NodeVisitor * nv )
 #if 0
 	  if(sparks_sfx_weak_ptr)
 	  {
-		  sparks_sfx_weak_ptr->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
+		  sparks_sfx_weak_ptr->setEmitterWorldVelocity(point_3f(20.f,20.f,20.f));
 		  sparks_sfx_weak_ptr->setContactFlag(true);
 	  }
 
 	  if(fd_sfx_weak_ptr_)
 	  {
-		  fd_sfx_weak_ptr_->setEmitterWorldSpeed(point_3f(20.f,20.f,20.f));
+		  fd_sfx_weak_ptr_->setEmitterWorldVelocity(point_3f(20.f,20.f,20.f));
 		  fd_sfx_weak_ptr_->setContactFlag(true);
 	  }
 
@@ -2119,7 +2137,7 @@ void Scene::update( osg::NodeVisitor * nv )
 
 		  fs_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),2.5)));
 		  fs_sfx_weak_ptr_->setIntensity(intensity * 120);
-		  //fs_sfx_weak_ptr_->setEmitterWorldSpeed(cg::point_3f(20, 10, 20) * 2);
+		  //fs_sfx_weak_ptr_->setEmitterWorldVelocity(cg::point_3f(20, 10, 20) * 2);
 	  }	  
 #endif
 

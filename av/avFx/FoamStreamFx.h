@@ -23,9 +23,9 @@ struct foam_sfx_data /*: node_data*/
 {
 	float intensity, factor;
 	cg::point_3f emit_dir;
-	cg::point_3f emitter_speed;
+	cg::point_3f emitter_velocity;
 
-	foam_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emitter_speed(0.f,50.f, 0.f) {}
+	foam_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emitter_velocity(0.f,50.f, 0.f) {}
 };
 
 
@@ -83,11 +83,13 @@ namespace avFx
 		void                 setIntensity( float inten ) override;
 		float                getIntensity() const override { return data_.intensity; }
 
+#if 0
 		void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }
 		cg::point_3f const & getEmitWorldDir() const override { return data_.emit_dir; }
+#endif
 
-		void                 setEmitterWorldSpeed( cg::point_3f const & speed ) override { data_.emitter_speed = speed; }
-		cg::point_3f const & getEmitterWorldSpeed() const override { return data_.emitter_speed; }
+		void                 setEmitterWorldVelocity( cg::point_3f const & velocity ) override { data_.emitter_velocity = velocity; }
+		cg::point_3f const & getEmitterWorldVelocity() const override { return data_.emitter_velocity; }
 
 		void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
 		float                getFactor() const override { return data_.factor; }
