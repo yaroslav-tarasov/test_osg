@@ -188,7 +188,7 @@ namespace aircraft_physless
             fs_->set_update_time(time);
 
         if(fs_)
-            fs_->update(time, polar_point_3f() , point_3f(), base);
+            fs_->update(time, point_3f(), base);
 
         last_update_ = time;
     }

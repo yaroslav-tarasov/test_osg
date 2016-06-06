@@ -19,9 +19,9 @@ namespace visual_objects
             init_();
         }
         
-        __forceinline void update( double time,cg::polar_point_3f const  &dir, point_3f offset, geo_base_3 const & base)
+        __forceinline void update( double time, const point_3f& velocity, geo_base_3 const & base)
         {
-            update_(time, dir, offset, base); 
+            update_(time, velocity, base); 
         }
 
  		visual_object_ptr get() const
@@ -48,7 +48,7 @@ namespace visual_objects
         }
 
 
-        inline void update_(double time, cg::polar_point_3f const  &dir, point_3f offset , geo_base_3 const & base)
+        inline void update_(double time, const point_3f& velocity, geo_base_3 const & base)
         {
             if (visual_object_ && parent_)
             {
@@ -60,7 +60,7 @@ namespace visual_objects
                     
                     quaternion root_orien = nm::node_info_ptr(root_)->get_global_orien();
                     
-                    root_orien.rotate_vector(offset);
+                    // root_orien.rotate_vector(velocity);
 
                     visual_object_->set_visible(true);
 
@@ -69,7 +69,7 @@ namespace visual_objects
                         effect_weak_ptr_->setFactor      (factor_ * cg::clamp(0., effect_end_duration_, 1., 0.)(time-last_update_time_));
                         effect_weak_ptr_->setIntensity   (factor_ * 40);
                         effect_weak_ptr_->setEmitWorldPos(pos);
-                        effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(100.,0.,100.) ));  
+                        effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(40., 0., 0.) ));  
                     }
                 }
                 else
