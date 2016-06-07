@@ -156,8 +156,6 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechn
 
         ViewDependentData* getViewDependentData(osgUtil::CullVisitor* cv);
 
-
-
         virtual void createShaders();
 
         virtual bool selectActiveLights(osgUtil::CullVisitor* cv, ViewDependentData* vdd) const;
@@ -173,6 +171,8 @@ class /*OSGSHADOW_EXPORT*/ ViewDependentShadowMap : public avShadow::ShadowTechn
         virtual void cullShadowReceivingScene(osgUtil::CullVisitor* cv) const;
 
         virtual void cullShadowCastingScene(osgUtil::CullVisitor* cv, osg::Camera* camera) const;
+		
+		virtual void cullShadowCastingScene(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int castTraversalMask) const;
 
         virtual osg::StateSet* selectStateSetForRenderingShadow(ViewDependentData& vdd) const;
 

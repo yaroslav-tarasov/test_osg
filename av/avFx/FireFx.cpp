@@ -217,7 +217,12 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 		start_vel.x = rnd.random_unit_signed() * (factor_val * 5.0f);
 		start_vel.y = rnd.random_unit_signed() * (factor_val * 5.0f);
 		start_vel.z = rnd.random_unit() * (factor_val * 2.5f);
-
+		
+#if 0
+		const float r = 1.f;
+		cg::point_3f  wp_rnd(float(randoms.r)/255.f - .5f,float(randoms.g)/255.f - .5f,float(randoms.b)/255.f - .5f); 
+		wp_rnd *= r;
+#endif
 		return FireFx::cpu_particle(wp, emit_timestamp, lt_particle, tfe, start_vel, factor_val, randoms);
 	};
 	// particles emission
@@ -240,7 +245,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 		auto cpu_p = *part;
 		pos_start_time_->at(i).set(cpu_p.cur_pos().x,cpu_p.cur_pos().y,cpu_p.cur_pos().z,cpu_p.start_time);
 		lifetimercp_factor_->at(i).set(cpu_p.lifetime_inv(), cpu_p.factor, data_.alpha);
-		randoms_->at(i).set(float(cpu_p.randoms.r)/255.0f,float(cpu_p.randoms.g)/255.0f,float(cpu_p.randoms.b)/255.0f,float(cpu_p.randoms.a)/255.0f); 
+		randoms_->at(i).set(float(cpu_p.randoms.r)/255.f,float(cpu_p.randoms.g)/255.f,float(cpu_p.randoms.b)/255.f,float(cpu_p.randoms.a)/255.f); 
 	}
 
     if(i>0)

@@ -2629,6 +2629,24 @@ void ViewDependentShadowMap::cullShadowCastingScene(osgUtil::CullVisitor* cv, os
     return;
 }
 
+void ViewDependentShadowMap::cullShadowCastingScene(osgUtil::CullVisitor* cv, osg::Camera* camera, unsigned int castTraversalMask) const
+{
+#if 0
+	OSG_INFO<<"cullShadowCastingScene()"<<std::endl;
+#endif
+
+	// record the traversal mask on entry so we can reapply it later.
+	unsigned int traversalMask = cv->getTraversalMask();
+
+	cv->setTraversalMask( traversalMask & castTraversalMask);
+
+	if (camera) camera->accept(*cv);
+
+	cv->setTraversalMask( traversalMask );
+
+	return;
+}
+
 osg::StateSet* ViewDependentShadowMap::selectStateSetForRenderingShadow(ViewDependentData& vdd) const
 {
 #if 0

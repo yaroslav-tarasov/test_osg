@@ -2113,7 +2113,7 @@ void Scene::update( osg::NodeVisitor * nv )
 		  auto const intensity = 4.0f;
 
 		  fire_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
-		  fire_sfx_weak_ptr_->setIntensity(intensity * 40);
+		  fire_sfx_weak_ptr_->setIntensity(intensity * 20);
 
           const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 
