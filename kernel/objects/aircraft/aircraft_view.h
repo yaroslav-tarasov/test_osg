@@ -130,6 +130,8 @@ protected:
 
     nodes_management::node_info_ptr root() const override; 
     nodes_management::node_info_ptr tow_point() const override;
+    
+
 
     bool        malfunction(malfunction_kind_t kind) const override;
 #if 0
@@ -142,6 +144,9 @@ protected:
 
     optional<double>    get_prediction_length() const override;
     optional<double>    get_proc_length() const override;
+    
+    // without interface
+    nodes_management::node_info_ptr damned_offset() const;
 
     // ani_info
 #if 0

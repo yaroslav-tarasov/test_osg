@@ -21,8 +21,9 @@ namespace aircraft_physless
         void update(double time);
 
     private:
-        void on_malfunction_changed    ( aircraft::malfunction_kind_t kind ) override;
+        void on_malfunction_changed     ( aircraft::malfunction_kind_t kind ) override;
         void on_new_wheel_contact_effect(double time, point_3f vel, point_3f offset) override;
+        void on_engine_state_changed    ( aircraft::engine_state_t state ) override; 
 
     private:
         void fill_nodes();
@@ -63,6 +64,8 @@ namespace aircraft_physless
         boost::shared_ptr<visual_objects::label_support>       ls_;
         boost::shared_ptr<visual_objects::parashute_support>   ps_;
         boost::shared_ptr<visual_objects::forsage_support>     fs_;
+        
+        visual_system*                                         vsys_;
 
 	private: 
 		boost::function<void()>                       start_ ;

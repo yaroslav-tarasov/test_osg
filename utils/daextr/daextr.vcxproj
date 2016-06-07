@@ -56,7 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;DOM_DYNAMIC;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SolutionDir)\ext\pugixml-1.4\src;$(BOOST_INCLUDE);$(BOOST_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SolutionDir)\ext\pugixml-1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;DOM_DYNAMIC;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SIMEX_DIR)\ext\include;$(SolutionDir)\ext\pugixml-1.4\src;$(BOOST_INCLUDE);$(BOOST_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SIMEX_DIR)\ext\include;$(SolutionDir)\ext\pugixml-1.4\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

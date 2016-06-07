@@ -659,7 +659,13 @@ struct client
             //ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-            ADD_EVENT(14.0  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
+            ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "L39", "172") )
+            
+            ADD_EVENT(traj_trp2_->base_length() + 1.0   , engine_state_msg(172 , ES_LOW_THROTTLE)  )
+            ADD_EVENT(traj_trp2_->base_length() + 82.0  , engine_state_msg(172 , ES_FULL_THROTTLE) )
+            ADD_EVENT(traj_trp2_->base_length() + 75.0  , engine_state_msg(172 , ES_FORSAGE) )
+            ADD_EVENT(traj_trp2_->length()              , engine_state_msg(172 , ES_FULL_THROTTLE) )
+
 #endif
 
 #if 1
@@ -877,7 +883,7 @@ private:
                         ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
                         ADD_INIT( msgs, create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
                         ADD_INIT( msgs, create_msg(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
-                        ADD_INIT( msgs, create_msg(1501, point_3f(57.872086f + 200, 642.839783f, 30.50f), quaternion(cprf(86.38665036 + 150.f/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
+                        ADD_INIT( msgs, create_msg(1501, point_3f(-2383.51, -524.20, 30.50f), quaternion(cprf(86.38665036 /*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
                         
                         binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(std::move(std::string(g_icao_code)), std::move(msgs))));
                         it->second->send(&bts[0], bts.size());

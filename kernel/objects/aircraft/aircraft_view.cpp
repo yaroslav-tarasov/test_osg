@@ -240,6 +240,11 @@ nodes_management::node_info_ptr view::tow_point() const
     return nodes_manager_->find_node("tow_point");
 }
 
+nodes_management::node_info_ptr view::damned_offset() const
+{
+    return nodes_manager_->find_node("damned_offset");
+}
+
 bool view::malfunction(malfunction_kind_t kind) const
 {
     return malfunctions_[kind];
@@ -868,7 +873,11 @@ void view::on_settings(settings_t const& s)
             nodes_manager_->set_model(get_model(s.kind));
 
             if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
-                tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node);
+            {
+                auto damned_offset_node  = nodes_manager_->find_node("damned_offset");
+                cg::transform_4 tr = nodes_manager_->get_relative_transform(damned_offset_node);
+                tow_point_transform_ = nodes_manager_->get_relative_transform(tow_point_node) * tr;
+            }
 
             model_changed = true;
         }

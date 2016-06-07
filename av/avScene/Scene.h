@@ -155,9 +155,9 @@ namespace avScene {
         avCore::IDecalRendererPtr                   _decal_map;
 
 
-
-		SmokeSfxNode *                              smoke_sfx_weak_ptr_;
+        FireSfxNode *                               fire_sfx_weak_ptr_;
 #if 0
+		SmokeSfxNode *                              smoke_sfx_weak_ptr_;
 		SparksSfxNode *                             sparks_sfx_weak_ptr;
 		FrictionDustSfxNode*                        fd_sfx_weak_ptr_;
 

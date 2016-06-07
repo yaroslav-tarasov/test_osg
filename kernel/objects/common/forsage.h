@@ -3,18 +3,22 @@
 
 namespace visual_objects
 {
+
+    static const double factor_for_factor = 0.25;
     struct forsage_support
     {
 
         SAFE_BOOL_OPERATOR(visual_object_)
         
-        forsage_support(visual_object_ptr obj , nm::node_info_ptr parent, nm::node_info_ptr root)
+        forsage_support(visual_object_ptr obj , nm::node_info_ptr parent, nm::node_info_ptr root , const cg::transform_4& damned_offset)
             : visual_object_(obj)
+            , effect_weak_ptr_ (nullptr)
             , parent_ (parent)
             , factor_ (4.0)
             , effect_end_duration_(10.0)
             , last_update_time_ (0.0)
             , root_(root) 
+            , damned_offset_(damned_offset)
         {
             init_();
         }
@@ -39,10 +43,13 @@ namespace visual_objects
 
         inline void init_()
         {
-            effect_weak_ptr_ = nullptr;
+
             if (auto fire_node = findFirstNode(visual_object_->node().get(),"FireFx"))
             {
-                effect_weak_ptr_ = dynamic_cast<SmokeSfxNode *>(fire_node);
+                effect_weak_ptr_ = dynamic_cast<FireSfxNode *>(fire_node);
+                if(effect_weak_ptr_)
+                    effect_weak_ptr_->setStartAlpha(0.2f);
+
             }
 
         }
@@ -60,16 +67,14 @@ namespace visual_objects
                     
                     quaternion root_orien = nm::node_info_ptr(root_)->get_global_orien();
                     
-                    // root_orien.rotate_vector(velocity);
-
                     visual_object_->set_visible(true);
 
                     if (effect_weak_ptr_)
                     {
-                        effect_weak_ptr_->setFactor      (factor_ * cg::clamp(0., effect_end_duration_, 1., 0.)(time-last_update_time_));
-                        effect_weak_ptr_->setIntensity   (factor_ * 40);
-                        effect_weak_ptr_->setEmitWorldPos(pos);
-                        effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(40., 0., 0.) ));  
+                        effect_weak_ptr_->setFactor      (factor_ * factor_for_factor * cg::clamp(0., effect_end_duration_, 1., 0.)(time-last_update_time_));
+                        effect_weak_ptr_->setIntensity   (factor_ * 35);
+                        effect_weak_ptr_->setEmitWorldPos( pos );
+                        effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(0., -15., 0.) ));  
                     }
                 }
                 else
@@ -77,14 +82,15 @@ namespace visual_objects
             }
 
         }
-        
-        SmokeSfxNode *        effect_weak_ptr_;
+
+        FireSfxNode *         effect_weak_ptr_;
         visual_object_ptr     visual_object_;
         nm::node_info_ptr     parent_;
-        nm::vis_node_info_ptr   root_;
+        nm::vis_node_info_ptr root_;
         double                factor_;
 
-        
+        cg::transform_4       damned_offset_;
+
         double                last_update_time_;
         double                effect_end_duration_;
 

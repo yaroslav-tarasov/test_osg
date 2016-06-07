@@ -26,9 +26,9 @@ namespace aircraft_physless
 
 	visual::visual( kernel::object_create_t const& oc, dict_copt dict )
 		: view      (oc,dict)
-		, smoke_sfx_(dynamic_cast<visual_system*>(sys_), this)
+        , vsys_     (dynamic_cast<visual_system*>(sys_))  
+		, smoke_sfx_(vsys_, this)
 	{
-        visual_system* vsys = smoke_sfx_.vsys;
 
 #ifndef ASYNC_OBJECT_LOADING  
         
@@ -82,7 +82,9 @@ namespace aircraft_physless
 
         double dt = time - (last_update_ ? *last_update_ : 0);
         //if (cg::eq_zero(dt))
-        //    return;
+        //    return;        
+
+        bool root_visible = nodes_management::vis_node_info_ptr(root())->is_visible();
 
         bool has_smoke = malfunction(aircraft::MF_FIRE_ON_BOARD) || malfunction(aircraft::MF_SMOKE_ON_BOARD);
         
@@ -96,6 +98,9 @@ namespace aircraft_physless
 
 			smoke_sfx_.last_fire_time_ = time;
 		}
+
+        if(fs_)
+            fs_->set_update_time(time);
 
 
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
@@ -129,16 +134,27 @@ namespace aircraft_physless
             }
 
             fill_nodes();
+                     
 
-            if(forsage_node_ && !fs_)
-                fs_ = boost::make_shared<visual_objects::forsage_support>(
-                vsys->create_visual_object(nm::node_control_ptr(root()),"sfx//forsage.scg",0,0,false), forsage_node_, root());
 		}
 #endif
+        
+        if(forsage_node_ && fs_)
+        {
+            if (root_visible)
+            {
+                fs_->get()->set_visible(true);
+                fs_->update(time, point_3f(), base);
+            }
+            else
+            {
+                fs_->get()->set_visible(true);
+            }
+        }
 
         if (smoke_object_ && engine_node_)
         {
-            if (nodes_management::vis_node_info_ptr(root())->is_visible())
+            if (root_visible)
             {
            
                 auto p = dynamic_cast<SmokeNode*>(smoke_object_->node().get());
@@ -164,7 +180,7 @@ namespace aircraft_physless
 		if (smoke_sfx_.smoke_object_ && engine_node_)
 		{
 			auto & ss = smoke_sfx_;
-			if (nodes_management::vis_node_info_ptr(root())->is_visible())
+			if (root_visible)
 			{
 				geo_base_3 node_pos   = engine_node_->get_global_pos();
 				quaternion node_orien = engine_node_->get_global_orien();
@@ -183,12 +199,7 @@ namespace aircraft_physless
 			else
 				ss.smoke_object_->set_visible(false);
 		}
-        
-        if(fs_)
-            fs_->set_update_time(time);
 
-        if(fs_)
-            fs_->update(time, point_3f(), base);
 
         last_update_ = time;
     }
@@ -223,6 +234,25 @@ namespace aircraft_physless
 
         if (landing_dust_object_)
             landing_dust_weak_ptr_->makeContactDust(time, pos, vel);
+    }
+    
+    void visual::on_engine_state_changed( aircraft::engine_state_t state )
+    {
+        if (state < aircraft::ES_FORSAGE)
+        {
+            if(fs_)
+                fs_.reset();
+        }
+        else if (state == aircraft::ES_FORSAGE)
+        {
+            if(forsage_node_ && !fs_)
+            {
+                cg::transform_4 tr = get_nodes_manager()->get_relative_transform(damned_offset());
+                fs_ = boost::make_shared<visual_objects::forsage_support>(
+                    vsys_->create_visual_object("sfx//forsage.scg",0,0,false),
+                    forsage_node_, root(), tr );
+            }
+        }
     }
 
 	void visual::smoke_sfx_t::on_malfunction_changed( aircraft::malfunction_kind_t kind )

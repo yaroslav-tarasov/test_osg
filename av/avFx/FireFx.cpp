@@ -168,6 +168,11 @@ void FireFx::setIntensity( float inten )
 	data_.intensity = inten;
 }
 
+void FireFx::setStartAlpha( float alpha )
+{
+    data_.alpha = alpha;
+}
+
 // update
 void FireFx::cull( osg::NodeVisitor * pNV )
 {
@@ -234,7 +239,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 		// result_aabb |= part->cur_pos();
 		auto cpu_p = *part;
 		pos_start_time_->at(i).set(cpu_p.cur_pos().x,cpu_p.cur_pos().y,cpu_p.cur_pos().z,cpu_p.start_time);
-		lifetimercp_factor_->at(i).set(cpu_p.lifetime_inv(), cpu_p.factor, 0.f);
+		lifetimercp_factor_->at(i).set(cpu_p.lifetime_inv(), cpu_p.factor, data_.alpha);
 		randoms_->at(i).set(float(cpu_p.randoms.r)/255.0f,float(cpu_p.randoms.g)/255.0f,float(cpu_p.randoms.b)/255.0f,float(cpu_p.randoms.a)/255.0f); 
 	}
 

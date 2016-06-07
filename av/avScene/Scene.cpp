@@ -1145,10 +1145,10 @@ FIXME(Чудеса с Ephemeris)
     }
     );
 
-	smoke_sfx_weak_ptr_ = nullptr;
+	fire_sfx_weak_ptr_ = nullptr;
 #if 1
 	avFx::FireFx* smoke = new avFx::FireFx;
-	smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode*>(smoke);
+	fire_sfx_weak_ptr_ = dynamic_cast<FireSfxNode*>(smoke);
 	osg::PositionAttitudeTransform* pat;
 	pat = new osg::PositionAttitudeTransform;
 	pat->setPosition(osg::Vec3(0,0,8));
@@ -1351,15 +1351,19 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     if( path == "sfx//forsage.scg" )
     {
-        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
-        const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+#if 0
+        if(parent)
+        {
+            osg::Node* pat =  findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+            const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
-        osg::Matrix mat; 
-        mat.setTrans(-offset/2);
+            osg::Matrix mat; 
+            mat.setTrans(-offset/2);
 
-        auto mt_offset = new osg::MatrixTransform(mat);
-        parent?parent->asGroup()->addChild(mt_offset):nullptr;
-
+            auto mt_offset = new osg::MatrixTransform(mat);
+            parent->asGroup()->addChild(mt_offset);
+        }
+#endif
         avFx::FireFx* fs = new avFx::FireFx;
 
         mt_.back()->addChild(fs);
@@ -2104,16 +2108,31 @@ void Scene::update( osg::NodeVisitor * nv )
 
 
 
-	  if (smoke_sfx_weak_ptr_)
+	  if (fire_sfx_weak_ptr_)
 	  {
 		  auto const intensity = 4.0f;
 
-		  smoke_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
-		  smoke_sfx_weak_ptr_->setIntensity(intensity * 40);
+		  fire_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
+		  fire_sfx_weak_ptr_->setIntensity(intensity * 40);
+
+          const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+
+          cg::point_3f const wind_vec(cEnvironmentParameters.WindSpeed * cEnvironmentParameters.WindDirection);
+          fire_sfx_weak_ptr_->setEmitterWorldVelocity(wind_vec );  
 	      
 	  }
 
 #if 0
+      if (smoke_sfx_weak_ptr_)
+      {
+          auto const intensity = 4.0f;
+
+          smoke_sfx_weak_ptr_->setFactor(intensity * cg::clamp(0., /*smoke_end_duration_*/10., 1., 0.)(cg::mod(_viewerPtr->getFrameStamp()->getSimulationTime(),5)));
+          smoke_sfx_weak_ptr_->setIntensity(intensity * 40);
+
+      }
+
+
 	  if(sparks_sfx_weak_ptr)
 	  {
 		  sparks_sfx_weak_ptr->setEmitterWorldVelocity(point_3f(20.f,20.f,20.f));

@@ -54,6 +54,29 @@ struct SmokeSfxNode : particles_effect_info
 	virtual float getFactor() const = 0;
 };
 
+// Fire
+struct FireSfxNode : particles_effect_info
+{
+    virtual void  setIntensity( float inten ) = 0;
+    virtual float getIntensity() const = 0;
+    
+    virtual void  setStartAlpha( float alpha )= 0;
+    virtual float getStartAlpha() const = 0;
+
+#if 0
+    virtual void setEmitWorldDir( cg::point_3f const & dir ) = 0;
+    virtual cg::point_3f const & getEmitWorldDir() const = 0;
+#endif
+
+    virtual void setEmitWorldPos( cg::point_3f const & dir ) = 0;
+    virtual cg::point_3f const & getEmitWorldPos() const = 0;
+
+    virtual void setEmitterWorldVelocity( cg::point_3f const & velocity ) = 0;
+    virtual cg::point_3f const & getEmitterWorldVelocity() const = 0;
+
+    virtual void setFactor( float factor ) = 0;
+    virtual float getFactor() const = 0;
+};
 
 // Sparks
 struct SparksSfxNode : particles_effect_info

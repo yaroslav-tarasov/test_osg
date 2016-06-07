@@ -17,6 +17,7 @@ namespace aircraft
 
     private:
         void on_malfunction_changed     ( malfunction_kind_t kind ) override;
+        void on_engine_state_changed    ( engine_state_t state ) override;
 
     private:
         nm::node_info_ptr engine_node_;

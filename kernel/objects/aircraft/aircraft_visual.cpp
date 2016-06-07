@@ -106,6 +106,33 @@ namespace aircraft
         }
     }
 
+    void visual::on_engine_state_changed( aircraft::engine_state_t state )
+    {
+        if (state == aircraft::ES_STOPPED)
+        {
+
+        }
+        else if (state == aircraft::ES_LOW_THROTTLE)
+        {
+
+        }
+        else if (state == aircraft::ES_FULL_THROTTLE)
+        {
+
+        }
+        else if (state == aircraft::ES_FORSAGE)
+        {
+#if 0
+            if(forsage_node_ && !fs_)
+            {
+                cg::transform_4 tr = get_nodes_manager()->get_relative_transform(damned_offset());
+                fs_ = boost::make_shared<visual_objects::forsage_support>(
+                    vsys_->create_visual_object("sfx//forsage.scg",0,0,false),
+                    forsage_node_, root(), tr );
+            }
+#endif
+        }
+    }
 }
 
 

@@ -101,6 +101,8 @@ protected:
     optional<double>    get_prediction_length() const override;
     optional<double>    get_proc_length() const override;
 
+    // without interface
+    nodes_management::node_info_ptr damned_offset() const;
 
     // control
 protected:

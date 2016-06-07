@@ -16,12 +16,13 @@
 struct fire_sfx_data /*: node_data*/
 {
 	float            intensity,
-		                factor;
+		                factor,
+                         alpha; 
 	cg::point_3f      emit_pos;
 	cg::point_3f      emit_dir;
 	cg::point_3f      emit_vel;
 
-	fire_sfx_data() : intensity(0), factor(1.f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
+	fire_sfx_data() : intensity(0), factor(1.f), alpha(0.4f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
 };
 
 
@@ -43,7 +44,7 @@ namespace avFx
     //
 
     class FireFx : public osg::Geode
-				  ,	public SmokeSfxNode
+				  ,	public FireSfxNode
     {
 
     public:
@@ -72,10 +73,13 @@ namespace avFx
 		virtual float getMaxParticleLifetime() const override { return fire_lifetime_max; }
 		virtual bool  isQueueEmpty() const override { return !emitter_.get_queue().size(); }	
 
-	private: // SmokeSfxNode
+	private: // FireSfxNode
 
 		void                 setIntensity( float inten ) override;
 		float                getIntensity() const override { return data_.intensity; }
+
+        void                 setStartAlpha( float alpha );
+		float                getStartAlpha() const override { return data_.alpha; }
 
 #if 0
 		void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }
@@ -94,7 +98,7 @@ namespace avFx
 	private:
 
 		// data
-		fire_sfx_data data_;
+		fire_sfx_data        data_;
 
 		// cpu part queue
 		struct cpu_particle : base_cpu_particle
@@ -129,6 +133,8 @@ namespace avFx
 		osg::ref_ptr<osg::Vec4Array>  pos_start_time_;
 		osg::ref_ptr<osg::Vec3Array>  lifetimercp_factor_;
 		osg::ref_ptr<osg::Vec4Array>  randoms_;
+
+
 		// drawing data
 		osg::ref_ptr<osg::DrawArrays> _drawArrays;
 
