@@ -37,8 +37,7 @@ namespace visual_objects
 
                         point_3f pos = base(root_pos) + root_orien.rotate_vector(offset);
 
-                        if (visual_object_)
-                            effect_weak_ptr_->makeContactDust(time, pos, vel);
+                        effect_weak_ptr_->makeContactDust(time, pos, vel);
 
                     }
                 }
