@@ -5,12 +5,13 @@
 #include "common/text_label.h"
 #include "common/parachute.h"
 #include "common/forsage.h"
+#include "common/smoke_support.h"
+#include "common/landing_dust_support.h"
 #include "ext/spark/SmokeNode.h"
 
 
 namespace aircraft_physless
 {
-	const double visual::smoke_end_duration_  = 10;
 	const double visual::sparks_end_duration_ = 0.2;
 }
 
@@ -27,7 +28,6 @@ namespace aircraft_physless
 	visual::visual( kernel::object_create_t const& oc, dict_copt dict )
 		: view      (oc,dict)
         , vsys_     (dynamic_cast<visual_system*>(sys_))  
-		, smoke_sfx_(vsys_, this)
 	{
 
 #ifndef ASYNC_OBJECT_LOADING  
@@ -41,7 +41,8 @@ namespace aircraft_physless
             vsys->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
 
 #endif
-		start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
+        start_  = boost::bind(&visual::on_malfunction_changed, this, aircraft::MF_FIRE_ON_BOARD );
+
     }
 
 
@@ -96,7 +97,8 @@ namespace aircraft_physless
 				start_.clear();
 			}
 
-			smoke_sfx_.last_fire_time_ = time;
+            if(smoke_sup_)
+                smoke_sup_->set_update_time(time);
 		}
 
         if(fs_)
@@ -112,17 +114,13 @@ namespace aircraft_physless
 #ifdef ASYNC_OBJECT_LOADING 
 		if( !ls_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
 		{ 
-			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-
             ls_ = boost::make_shared<visual_objects::label_support>(
-                    vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
+                    vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
 
-            if(!ps_)
-                ps_ = boost::make_shared<visual_objects::parashute_support>(
-                        vsys->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
 
+#if 0
             if (!landing_dust_object_)
-                landing_dust_object_ = vsys->create_visual_object("sfx//landing_dust.scg",0,0,false);
+                landing_dust_object_ = vsys_->create_visual_object("sfx//landing_dust.scg",0,0,false);
 
             if (landing_dust_object_)
             {
@@ -131,6 +129,13 @@ namespace aircraft_physless
                 {
                     landing_dust_weak_ptr_ = dynamic_cast<LandingDustSfxNode *>(landing_dust_node);
                 }
+            }
+#endif
+
+            if(!lds_)
+            {
+                lds_ = boost::make_shared<visual_objects::landing_dust_support>(
+                    vsys_->create_visual_object("sfx//landing_dust.scg",0,0,false), root(), root(), damned_offset());
             }
 
             fill_nodes();
@@ -143,12 +148,12 @@ namespace aircraft_physless
         {
             if (root_visible)
             {
-                fs_->get()->set_visible(true);
+                (*fs_)->set_visible(true);
                 fs_->update(time, point_3f(), base);
             }
             else
             {
-                fs_->get()->set_visible(true);
+                (*fs_)->set_visible(false);
             }
         }
 
@@ -172,34 +177,17 @@ namespace aircraft_physless
                 smoke_object_->set_visible(false);
         }
         
+#if 0
         if (landing_dust_object_)
         {
             landing_dust_object_->set_visible(nodes_management::vis_node_info_ptr(root())->is_visible());
         }
+#endif
 
-		if (smoke_sfx_.smoke_object_ && engine_node_)
-		{
-			auto & ss = smoke_sfx_;
-			if (root_visible)
-			{
-				geo_base_3 node_pos   = engine_node_->get_global_pos();
-				quaternion node_orien = engine_node_->get_global_orien();
-				point_3f pos = base(node_pos);
-
-				// ss.smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
-				ss.smoke_object_->set_visible(true);
-
-				if (ss.smoke_sfx_weak_ptr_)
-				{
-					ss.smoke_sfx_weak_ptr_->setFactor      (ss.smoke_factor_ * cg::clamp(0., smoke_end_duration_, 1., 0.)(time-ss.last_fire_time_));
-					ss.smoke_sfx_weak_ptr_->setIntensity   (ss.smoke_factor_ * 2);
-					ss.smoke_sfx_weak_ptr_->setEmitWorldPos(pos);
-				}
-			}
-			else
-				ss.smoke_object_->set_visible(false);
-		}
-
+        if (smoke_sup_)
+        {
+            smoke_sup_->update(time, point_3f(), base);
+        }
 
         last_update_ = time;
     }
@@ -218,6 +206,21 @@ namespace aircraft_physless
                 smoke_object_ = vsys->create_visual_object(nm::node_control_ptr(engine_node_),"smoke");
             }
 #endif
+            
+            if (!smoke_sup_ && has_smoke && engine_node_ )
+            {
+                 smoke_sup_ = boost::make_shared<visual_objects::smoke_support>(
+                    vsys_->create_visual_object("sfx//smoke.scg",0,0,false), engine_node_, root(), damned_offset());
+            }
+
+            if (smoke_sup_)
+            {
+                if (malfunction(aircraft::MF_SMOKE_ON_BOARD))
+                    smoke_sup_->set_factor(1.);
+                else if (malfunction(aircraft::MF_FIRE_ON_BOARD))
+                    smoke_sup_->set_factor(3.);
+            }
+
 
 
         }
@@ -227,6 +230,7 @@ namespace aircraft_physless
     {
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
 
+#if 0
         geo_base_3 root_pos   = root()->get_global_pos();
         quaternion root_orien = root()->get_global_orien();
 
@@ -234,49 +238,47 @@ namespace aircraft_physless
 
         if (landing_dust_object_)
             landing_dust_weak_ptr_->makeContactDust(time, pos, vel);
+#endif
+        if(lds_)
+        {
+            lds_->make_contact_dust(time, vel, offset, base);
+        }
     }
     
-    void visual::on_engine_state_changed( aircraft::engine_state_t state )
+    void visual::on_equipment_state_changed( aircraft::equipment_state_t state )
     {
-        if (state < aircraft::ES_FORSAGE)
+        if (state.eng_state < aircraft::ES_FORSAGE)
         {
             if(fs_)
                 fs_.reset();
         }
-        else if (state == aircraft::ES_FORSAGE)
+        else if (state.eng_state == aircraft::ES_FORSAGE)
         {
             if(forsage_node_ && !fs_)
             {
-                cg::transform_4 tr = get_nodes_manager()->get_relative_transform(damned_offset());
                 fs_ = boost::make_shared<visual_objects::forsage_support>(
                     vsys_->create_visual_object("sfx//forsage.scg",0,0,false),
-                    forsage_node_, root(), tr );
+                    forsage_node_, root(), damned_offset() );
             }
         }
+
+        if(state.para_state == aircraft::PS_SHOW)
+        {
+            if(!ps_)
+               ps_ = boost::make_shared<visual_objects::parashute_support>(
+                vsys_->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
+            
+        }
+        else
+        {
+            if(ps_)
+                ps_.reset();
+        }
+
+
     }
 
-	void visual::smoke_sfx_t::on_malfunction_changed( aircraft::malfunction_kind_t kind )
-	{
-		using namespace aircraft;
 
-		if (kind == MF_FIRE_ON_BOARD || kind == MF_SMOKE_ON_BOARD)
-		{
-			if (!smoke_object_ && vthis_->engine_node_)
-			{
-				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,0,false);
-				smoke_sfx_weak_ptr_ = nullptr;
-				if (auto smoke_node = findFirstNode(smoke_object_->node().get(),"SmokeFx"))
-				{
-					smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode *>(smoke_node);
-				}
-			}
-
-			if (vthis_->malfunction(MF_SMOKE_ON_BOARD))
-				smoke_factor_ = 1;
-			else if (vthis_->malfunction(MF_FIRE_ON_BOARD))
-				smoke_factor_ = 3;
-		}
-	}
 }
 
 

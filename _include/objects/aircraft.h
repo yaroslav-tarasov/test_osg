@@ -96,7 +96,7 @@ struct state_t
     state_t()
     {}
 
-    state_t(cg::geo_point_3 const& pos, cg::quaternion const orien)
+    state_t(cg::geo_point_3 const& pos, cg::quaternion const& orien)
         : pos(pos), orien(orien)
     {}
 
@@ -184,9 +184,9 @@ enum malfunction_kind_t
     MF_SIZE
 };
 
-enum engine_state_t
+enum engine_state_t : int16_t
 {
-    ES_STOPPED = 0,
+    ES_STOPPED = 0,                 
     ES_LOW_THROTTLE = 1,
     ES_HALF_THROTTLE,
     ES_FULL_THROTTLE,
@@ -194,6 +194,38 @@ enum engine_state_t
     ES_FULL_FORSAGE,
 
     ES_SIZE
+};
+
+enum parachute_state_t : int16_t
+{
+    PS_NONE = 0,
+    PS_HIDE = 1,
+    PS_SHOW = 2,
+
+    PS_SIZE
+};
+
+struct  equipment_state_t
+{
+   parachute_state_t para_state;
+   engine_state_t    eng_state;
+
+   equipment_state_t()
+       : para_state(PS_NONE), eng_state(ES_STOPPED)
+   {}
+
+   equipment_state_t(engine_state_t const& eng_state, parachute_state_t const& para_state)
+       : para_state(para_state), eng_state(eng_state)
+   {}
+
+   explicit equipment_state_t(engine_state_t const& eng_state)
+       : para_state(PS_NONE), eng_state(eng_state)
+   {}
+
+   REFL_INNER(equipment_state_t)
+       REFL_ENTRY(para_state)
+       REFL_ENTRY(eng_state)
+   REFL_END()
 };
 
 //! интерфейс, получение предсказания траектории
@@ -227,7 +259,7 @@ struct info
     virtual nodes_management::node_info_ptr root             () const = 0;
     virtual bool                            malfunction      (malfunction_kind_t kind) const = 0;
 
-// FIXME not relized yet 
+// FIXME not realized yet 
     //virtual tp_provider_ptr  get_tp_provider(double duration_sec) = 0;
 
     virtual aircraft_fms::info_ptr          get_fms          () const = 0;
@@ -260,7 +292,7 @@ struct control
 //    virtual void set_atc_controls(atc_controls_t const& controls) = 0 ;
 //    virtual void set_ipo_controls(ipo_controls_t const& controls) = 0 ;
 
-    virtual void set_engine_state(engine_state_t state) = 0;
+    virtual void set_equipment_state   (aircraft::equipment_state_t const&) = 0;
 };
 
 //! интерфейс, управление ВС (со стороны пилота-оператора ?)

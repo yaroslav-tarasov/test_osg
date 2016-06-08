@@ -60,8 +60,8 @@ struct FireSfxNode : particles_effect_info
     virtual void  setIntensity( float inten ) = 0;
     virtual float getIntensity() const = 0;
     
-    virtual void  setStartAlpha( float alpha )= 0;
-    virtual float getStartAlpha() const = 0;
+    virtual void  setBaseAlpha( float alpha )= 0;
+    virtual float getBaseAlpha() const = 0;
 
 #if 0
     virtual void setEmitWorldDir( cg::point_3f const & dir ) = 0;

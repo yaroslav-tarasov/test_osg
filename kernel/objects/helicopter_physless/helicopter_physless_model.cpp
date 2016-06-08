@@ -274,17 +274,17 @@ void model::on_malfunction_changed( aircraft::malfunction_kind_t kind )
     }
 }
 
-void model::on_engine_state_changed( aircraft::engine_state_t state )
+void model::on_equipment_state_changed( aircraft::equipment_state_t state )
 {
-    if (state == aircraft::ES_STOPPED)
+    if (state.eng_state == aircraft::ES_STOPPED)
     {
         set_rotors_angular_speed(0) ;
     }
-    else if (state == aircraft::ES_LOW_THROTTLE)
+    else if (state.eng_state == aircraft::ES_LOW_THROTTLE)
     {
         set_rotors_angular_speed(10) ;
     }
-    else if (state == aircraft::ES_FULL_THROTTLE)
+    else if (state.eng_state == aircraft::ES_FULL_THROTTLE)
     {
         set_rotors_angular_speed(160) ;
     }

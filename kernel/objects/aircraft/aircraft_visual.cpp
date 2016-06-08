@@ -106,21 +106,21 @@ namespace aircraft
         }
     }
 
-    void visual::on_engine_state_changed( aircraft::engine_state_t state )
+    void visual::on_equipment_state_changed( aircraft::equipment_state_t state )
     {
-        if (state == aircraft::ES_STOPPED)
+        if (state.eng_state == aircraft::ES_STOPPED)
         {
 
         }
-        else if (state == aircraft::ES_LOW_THROTTLE)
+        else if (state.eng_state == aircraft::ES_LOW_THROTTLE)
         {
 
         }
-        else if (state == aircraft::ES_FULL_THROTTLE)
+        else if (state.eng_state == aircraft::ES_FULL_THROTTLE)
         {
 
         }
-        else if (state == aircraft::ES_FORSAGE)
+        else if (state.eng_state == aircraft::ES_FORSAGE)
         {
 #if 0
             if(forsage_node_ && !fs_)

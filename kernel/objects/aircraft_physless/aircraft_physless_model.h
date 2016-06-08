@@ -35,7 +35,7 @@ namespace aircraft_physless
     public:
         void on_malfunction_changed ( aircraft::malfunction_kind_t kind ) override; 
         void on_new_contact_effect  ( double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
-        void on_engine_state_changed( aircraft::engine_state_t state    ) override; 
+        void on_equipment_state_changed( aircraft::equipment_state_t state    ) override; 
 
     // base_presentation
         FIXME(private)

@@ -99,8 +99,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
         {
             auto damned_offset_node  = nodes_manager_->find_node("damned_offset");
-            cg::transform_4 tr = nodes_manager_->get_relative_transform(damned_offset_node);
-            tow_point_transform_ = nodes_manager_->get_relative_transform(/*nodes_manager_,*/ tow_point_node) * tr;
+            damned_offset_ = nodes_manager_->get_relative_transform(damned_offset_node);
+            tow_point_transform_ = nodes_manager_->get_relative_transform(tow_point_node) * damned_offset_;
         }
     }
 
@@ -113,7 +113,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
         .add<msg::fpl_msg           >(boost::bind(&view::on_fpl         , this, _1))
         .add<msg::atc_state_msg     >(boost::bind(&view::on_atc_state   , this, _1))
         .add<msg::malfunction_msg   >(boost::bind(&view::on_malfunction , this, _1))
-        .add<msg::engine_state_msg  >(boost::bind(&view::on_engine_state, this, _1))
+        .add<msg::equipment_state_msg  >(boost::bind(&view::on_equipment_state, this, _1))
         .add<msg::atc_controls_msg  >(boost::bind(&view::on_atc_controls, this, _1))
         .add<msg::ipo_controls_msg  >(boost::bind(&view::on_ipo_controls, this, _1))
         .add<msg::traj_assign_msg   >(boost::bind(&view::on_traj_assign, this, _1))
@@ -240,9 +240,9 @@ nodes_management::node_info_ptr view::tow_point() const
     return nodes_manager_->find_node("tow_point");
 }
 
-nodes_management::node_info_ptr view::damned_offset() const
+transform_4 view::damned_offset() const
 {
-    return nodes_manager_->find_node("damned_offset");
+    return damned_offset_;
 }
 
 bool view::malfunction(malfunction_kind_t kind) const
@@ -694,9 +694,9 @@ void view::set_malfunction(malfunction_kind_t kind, bool enabled)
     set(msg::malfunction_msg(kind, enabled));
 }
 
-void view::set_engine_state(engine_state_t state)
+void view::set_equipment_state(aircraft::equipment_state_t const& state)
 {
-    set(msg::engine_state_msg(state));
+    set(msg::equipment_state_msg(state));
 }
 
 void view::set_cmd_go_around(uint32_t cmd_id)
@@ -875,8 +875,8 @@ void view::on_settings(settings_t const& s)
             if (auto tow_point_node = nodes_manager_->find_node("tow_point"))
             {
                 auto damned_offset_node  = nodes_manager_->find_node("damned_offset");
-                cg::transform_4 tr = nodes_manager_->get_relative_transform(damned_offset_node);
-                tow_point_transform_ = nodes_manager_->get_relative_transform(tow_point_node) * tr;
+                damned_offset_ = nodes_manager_->get_relative_transform(damned_offset_node);
+                tow_point_transform_ = nodes_manager_->get_relative_transform(tow_point_node) * damned_offset_;
             }
 
             model_changed = true;
@@ -967,10 +967,10 @@ void view::on_malfunction(msg::malfunction_msg const& m)
     on_malfunction_changed(m.kind);
 }
 
-void view::on_engine_state(msg::engine_state_msg const& m)
+void view::on_equipment_state(msg::equipment_state_msg const& m)
 {
-    engines_state_ = m.state;
-    on_engine_state_changed(m.state);
+    equipment_state_ = m.state;
+    on_equipment_state_changed(m.state);
 }
 
 void view::on_atc_controls(msg::atc_controls_msg const& controls)

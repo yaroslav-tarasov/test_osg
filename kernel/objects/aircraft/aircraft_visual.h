@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aircraft_view.h"
+#include "common/aircraft_support_fwd.h"
 
 namespace aircraft
 {
@@ -17,7 +18,7 @@ namespace aircraft
 
     private:
         void on_malfunction_changed     ( malfunction_kind_t kind ) override;
-        void on_engine_state_changed    ( engine_state_t state ) override;
+        void on_equipment_state_changed ( equipment_state_t state ) override;
 
     private:
         nm::node_info_ptr engine_node_;

@@ -30,9 +30,9 @@ namespace aircraft
         model( kernel::object_create_t const& oc, dict_copt dict);
 
     public:
-        void on_malfunction_changed  ( malfunction_kind_t kind ) override; 
-        void on_new_contact_effect   ( double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
-        void on_engine_state_changed ( engine_state_t state ) override; 
+        void on_malfunction_changed     ( malfunction_kind_t kind ) override; 
+        void on_new_contact_effect      ( double /*time*/, std::vector<contact_t> const& /*contacts*/) override;
+        void on_equipment_state_changed ( equipment_state_t state ) override; 
     // base_presentation
         FIXME(private)
         void update(double dt);

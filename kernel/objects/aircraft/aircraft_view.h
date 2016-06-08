@@ -48,11 +48,11 @@ struct tp_provider_impl
 
 struct craft_data
 {
-    explicit craft_data(settings_t const& settings = settings_t(), state_t const& state = state_t(),obj_id_opt fpl_id = /*boost::*/none, engine_state_t  engines_state=ES_STOPPED)
-        : settings_      (settings)
-        , state_         (state)
-        , fpl_id_        (fpl_id)
-        , engines_state_ (engines_state)
+    explicit craft_data(settings_t const& settings = settings_t(), state_t const& state = state_t(),obj_id_opt fpl_id = /*boost::*/none, equipment_state_t  equipment_state= equipment_state_t(ES_STOPPED))
+        : settings_        (settings)
+        , state_           (state)
+        , fpl_id_          (fpl_id)
+        , equipment_state_ (equipment_state)
     {
         std::for_each(malfunctions_.begin(), malfunctions_.end(), [](bool& item){item = false;});
     }
@@ -61,7 +61,7 @@ protected:
     obj_id_opt              fpl_id_;
     aircraft::settings_t    settings_;
     array<bool, MF_SIZE>    malfunctions_;
-    engine_state_t          engines_state_;
+    equipment_state_t       equipment_state_;
     atc_controls_t          atc_controls_;
     ipo_controls_t          ipo_controls_;
     state_t                 state_;       // Исключительно для задания начальных параметров 
@@ -69,7 +69,7 @@ protected:
         REFL_ENTRY(fpl_id_      )
         REFL_ENTRY(settings_    )
         REFL_ENTRY(malfunctions_)
-        REFL_ENTRY(engines_state_)
+        REFL_ENTRY(equipment_state_)
         REFL_ENTRY(atc_controls_)
         REFL_ENTRY(ipo_controls_)
         REFL_ENTRY(state_       )
@@ -146,7 +146,7 @@ protected:
     optional<double>    get_proc_length() const override;
     
     // without interface
-    nodes_management::node_info_ptr damned_offset() const;
+    transform_4         damned_offset() const;
 
     // ani_info
 #if 0
@@ -183,7 +183,7 @@ protected:
     void set_atc_controls (atc_controls_t const& controls) override;
     void set_ipo_controls (ipo_controls_t const& controls) override;
 #endif
-    void set_engine_state (engine_state_t state) override;
+    void set_equipment_state (aircraft::equipment_state_t const&) override;
 
     // aircraft_ipo_control
 protected:
@@ -230,7 +230,7 @@ protected:
     virtual void on_atc_controls_changed() {}
     virtual void on_ipo_controls_changed() {}
     virtual void on_malfunction_changed (malfunction_kind_t /*kind*/) {}
-    virtual void on_engine_state_changed( engine_state_t state ) {}
+    virtual void on_equipment_state_changed( equipment_state_t state ) {}
     virtual void on_assigned_fpl_changed();
     virtual void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/){}
     virtual void on_new_wheel_contact_effect(double /*time*/, point_3f /*vel*/, point_3f /*offset*/){}
@@ -250,7 +250,7 @@ private:
 
     void on_atc_state           (msg::atc_state_msg     const&  m);
     void on_malfunction         (msg::malfunction_msg   const&  m);
-    void on_engine_state        (msg::engine_state_msg const& m);
+    void on_equipment_state     (msg::equipment_state_msg const& m);
     void on_atc_controls        (msg::atc_controls_msg  const& controls);
     void on_ipo_controls        (msg::ipo_controls_msg  const& controls);
     void on_contact_effect      (msg::contact_effect    const& eff)     ;
@@ -292,6 +292,7 @@ private:
 
 protected:
     transform_4                    tow_point_transform_;
+    transform_4                    damned_offset_;
 
 protected:
     fpl::info_ptr                  fpl_ ;

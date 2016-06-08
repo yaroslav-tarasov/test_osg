@@ -23,7 +23,7 @@ enum id
 {          
     am_settings      ,
     am_malfunction   ,
-    am_engines_state ,
+    am_equipment_state ,
     am_contact_effect,
     am_wheel_contact_effect,
     am_traj_assign   , 
@@ -50,20 +50,24 @@ struct malfunction_msg
     bool enabled;
 };
 
-struct engine_state_msg
-    : network::msg_id<am_engines_state>
+struct equipment_state_msg
+    : network::msg_id<am_equipment_state>
 {
-    engine_state_msg() {}
+    equipment_state_msg()
+        : state( aircraft::ES_STOPPED, aircraft::PS_HIDE)
+    {}
 
-    engine_state_msg( aircraft::engine_state_t state)
+    equipment_state_msg( aircraft::equipment_state_t state)
         : state(state)
     {}
-    aircraft::engine_state_t      state;
+    aircraft::equipment_state_t      state;
 };
 
-REFL_STRUCT(engine_state_msg)
+REFL_STRUCT(equipment_state_msg)
     REFL_ENTRY(state)
 REFL_END()
+
+
 //! сообщение 
 struct traj_assign_msg
     : network::msg_id<am_traj_assign>

@@ -204,7 +204,7 @@ void ctrl::inject_msg(net_layer::msg::engine_state_msg const& msg)
 
         if (aircraft::control_ptr pa = a)
         {
-            pa->set_engine_state((aircraft::engine_state_t)msg.state);
+            pa->set_equipment_state(aircraft::equipment_state_t((aircraft::engine_state_t)msg.state));
         }
     }
 

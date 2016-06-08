@@ -334,15 +334,15 @@ struct client
 
 #if 1
 
-#if 0
-        ADD_EVENT(10.0 , create(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
+#if 1
+        ADD_EVENT(10.0 , create_msg(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
         ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
-        ADD_EVENT(70.0,  fire_fight_msg_t(2))
+        ADD_EVENT(70.0,  fire_fight_msg(2))
 #endif
 
 #if 0
-        ADD_EVENT(10.0 , create(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
-        ADD_EVENT(50.0 , create(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
+        ADD_EVENT(10.0 , create_msg(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
+        ADD_EVENT(50.0 , create_msg(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
         ADD_EVENT(52.0 , destroy_msg(3)) 
         ADD_EVENT(80.0 , destroy_msg(4)) 
@@ -350,15 +350,15 @@ struct client
 
 
 #if 0
-        ADD_EVENT(3.0  , create(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
-        ADD_EVENT(4.0  , create(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
+        ADD_EVENT(3.0  , create_msg(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
+        ADD_EVENT(4.0  , create_msg(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #else
         // ADD_EVENT(3.0  , create(10,point_3(0,0,0),cg::cpr(0), ok_aircraft, "A319","10") )
 #endif
 
 #if 0
-        ADD_EVENT(10.0  , create(31,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_human, "human") )
+        ADD_EVENT(10.0  , create_msg(31,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_human, "human") )
 #endif
 
 #if 0
@@ -367,11 +367,11 @@ struct client
  
 #endif
 
-#if 0
-        ADD_EVENT(1.0  , create(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
+#if 1
+        ADD_EVENT(1.0  , create_msg(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
  
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
-            binary::bytes_t msg =  std::move(network::wrap_msg(run(
+            binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                 id 
                 , traj_->kp_value    (time)
                 , traj_->curs_value  (time)

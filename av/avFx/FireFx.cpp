@@ -168,7 +168,7 @@ void FireFx::setIntensity( float inten )
 	data_.intensity = inten;
 }
 
-void FireFx::setStartAlpha( float alpha )
+void FireFx::setBaseAlpha( float alpha )
 {
     data_.alpha = alpha;
 }

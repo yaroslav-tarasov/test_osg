@@ -2,13 +2,15 @@
 #include "precompiled_objects.h"
 #include "helicopter_physless_visual.h"
 
-#include "common/text_label.h"
 #include "ext/spark/SmokeNode.h"
 #include "common/morphs_support.h"
+#include "common/text_label.h"
+#include "common/parachute.h"
+#include "common/forsage.h"
+#include "common/smoke_support.h"
 
 namespace helicopter_physless
 {
-	const double visual::smoke_end_duration_  = 10;
 	const double visual::sparks_end_duration_ = 0.2;
 }
 
@@ -25,17 +27,16 @@ namespace helicopter_physless
 
 	visual::visual( kernel::object_create_t const& oc, dict_copt dict )
 		: view      (oc,dict)
-		, smoke_sfx_(dynamic_cast<visual_system*>(sys_), this)
         , deffered_init_(true)
+        , vsys_     (dynamic_cast<visual_system*>(sys_))  
 	{
-        visual_system* vsys = smoke_sfx_.vsys;
 
 #ifndef ASYNC_OBJECT_LOADING         
         //fill_nodes();
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 #endif
-		start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
+		// start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
     }
     
     void visual::fill_nodes()
@@ -81,7 +82,8 @@ namespace helicopter_physless
 				start_.clear();
 			}
 
-			smoke_sfx_.last_fire_time_ = time;
+            if(smoke_sup_)
+                smoke_sup_->set_update_time(time);
 		}
 
 
@@ -96,8 +98,7 @@ namespace helicopter_physless
         {
             if(!label_object_ )
 	        { 
-		        visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-		        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
+		        label_object_ = vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
 				if(label_object_->root())
 					ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
@@ -141,28 +142,10 @@ namespace helicopter_physless
                 smoke_object_->set_visible(false);
         }
 
-		if (smoke_sfx_.smoke_object_ && engine_node_)
-		{
-			auto & ss = smoke_sfx_;
-			if (nodes_management::vis_node_info_ptr(root())->is_visible())
-			{
-				geo_base_3 node_pos   = engine_node_->get_global_pos();
-				quaternion node_orien = engine_node_->get_global_orien();
-				point_3f pos = base(node_pos);
-
-				// ss.smoke_object_->node()->as_transform()->set_transform(cg::transform_4f(cg::as_translation(pos), cg::rotation_3f(node_orien.rotation())));
-				ss.smoke_object_->set_visible(true);
-
-				if (ss.smoke_sfx_weak_ptr_)
-				{
-					ss.smoke_sfx_weak_ptr_->setFactor(ss.smoke_factor_ * cg::clamp(0., smoke_end_duration_, 1., 0.)(time-ss.last_fire_time_));
-					ss.smoke_sfx_weak_ptr_->setIntensity(ss.smoke_factor_ * 2);
-					ss.smoke_sfx_weak_ptr_->setEmitWorldPos(pos);
-				}
-			}
-			else
-				ss.smoke_object_->set_visible(false);
-		}
+        if (smoke_sup_)
+        {
+            smoke_sup_->update(time, point_3f(), base);
+        }
 
         last_update_ = time;
     }
@@ -171,44 +154,32 @@ namespace helicopter_physless
     {
         if (kind == aircraft::MF_FIRE_ON_BOARD || kind == aircraft::MF_SMOKE_ON_BOARD)
         {
-            visual_system* vsys = dynamic_cast<visual_system*>(sys_);
 
             bool has_smoke = malfunction(aircraft::MF_FIRE_ON_BOARD) || malfunction(aircraft::MF_SMOKE_ON_BOARD);
 
 #if 0
             if (!smoke_object_ && has_smoke && engine_node_)
             {
-                smoke_object_ = vsys->create_visual_object(nm::node_control_ptr(engine_node_),"smoke");
+                smoke_object_ = vsys_->create_visual_object(nm::node_control_ptr(engine_node_),"smoke");
             }
 #endif
+            if (!smoke_sup_ && has_smoke && engine_node_ )
+            {
+                cg::transform_4 tr = get_nodes_manager()->get_relative_transform(damned_offset());
+                smoke_sup_ = boost::make_shared<visual_objects::smoke_support>(
+                    vsys_->create_visual_object("sfx//smoke.scg",0,0,false), engine_node_, root(), tr);
+            }
 
+            if (smoke_sup_)
+            {
+                if (malfunction(aircraft::MF_SMOKE_ON_BOARD))
+                    smoke_sup_->set_factor(1.);
+                else if (malfunction(aircraft::MF_FIRE_ON_BOARD))
+                    smoke_sup_->set_factor(3.);
+            }
 
         }
     }
-
-
-	void visual::smoke_sfx_t::on_malfunction_changed( aircraft::malfunction_kind_t kind )
-	{
-		using namespace aircraft;
-
-		if (kind == MF_FIRE_ON_BOARD || kind == MF_SMOKE_ON_BOARD)
-		{
-			if (!smoke_object_ && vthis_->engine_node_)
-			{
-				smoke_object_ = vsys->create_visual_object("sfx//smoke.scg",0,0,false);
-				smoke_sfx_weak_ptr_ = nullptr;
-				if (auto smoke_node = findFirstNode(smoke_object_->node().get(),"SmokeFx"))
-				{
-					smoke_sfx_weak_ptr_ = dynamic_cast<SmokeSfxNode *>(smoke_node);
-				}
-			}
-
-			if (vthis_->malfunction(MF_SMOKE_ON_BOARD))
-				smoke_factor_ = 1;
-			else if (vthis_->malfunction(MF_FIRE_ON_BOARD))
-				smoke_factor_ = 3;
-		}
-	}
 
     void visual::on_rotor_state  (double target, double speed, rotor_state_t visible) 
     {

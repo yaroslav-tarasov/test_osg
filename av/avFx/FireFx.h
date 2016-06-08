@@ -78,8 +78,8 @@ namespace avFx
 		void                 setIntensity( float inten ) override;
 		float                getIntensity() const override { return data_.intensity; }
 
-        void                 setStartAlpha( float alpha );
-		float                getStartAlpha() const override { return data_.alpha; }
+        void                 setBaseAlpha( float alpha );
+		float                getBaseAlpha() const override { return data_.alpha; }
 
 #if 0
 		void                 setEmitWorldDir( cg::point_3f const & dir ) override { data_.emit_dir = dir; }

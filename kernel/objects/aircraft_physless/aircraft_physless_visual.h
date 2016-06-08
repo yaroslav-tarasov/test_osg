@@ -22,56 +22,38 @@ namespace aircraft_physless
 
     private:
         void on_malfunction_changed     ( aircraft::malfunction_kind_t kind ) override;
-        void on_new_wheel_contact_effect(double time, point_3f vel, point_3f offset) override;
-        void on_engine_state_changed    ( aircraft::engine_state_t state ) override; 
+        void on_new_wheel_contact_effect( double time, point_3f vel, point_3f offset ) override;
+        void on_equipment_state_changed ( aircraft::equipment_state_t state ) override; 
 
     private:
         void fill_nodes();
     
     private:
-        nm::node_info_ptr engine_node_;
-        nm::node_info_ptr forsage_node_;
-        visual_object_ptr smoke_object_;
         optional<double>  last_update_;
 
-		struct smoke_sfx_t
-		{
-			smoke_sfx_t(visual_system*    vsys, visual*    vthis)
-				: vsys (vsys)
-				, vthis_(vthis)
-			{}
-			
-			visual_object_ptr    smoke_object_;
-			SmokeSfxNode * smoke_sfx_weak_ptr_;
+        nm::node_info_ptr engine_node_;
+        nm::node_info_ptr forsage_node_;
 
-			double last_fire_time_;
-			double   smoke_factor_;
-			visual_system*    vsys;
-
-
-			void on_malfunction_changed( aircraft::malfunction_kind_t kind );
-		
-		private:
-			visual*          vthis_;
-		};
-
-		smoke_sfx_t        smoke_sfx_;
+        visual_object_ptr smoke_object_;
         
+#if 0
         visual_object_ptr    landing_dust_object_;
         LandingDustSfxNode * landing_dust_weak_ptr_;
+#endif
 
     private:
         boost::shared_ptr<visual_objects::label_support>       ls_;
         boost::shared_ptr<visual_objects::parashute_support>   ps_;
         boost::shared_ptr<visual_objects::forsage_support>     fs_;
-        
+        boost::shared_ptr<visual_objects::smoke_support>       smoke_sup_;
+        boost::shared_ptr<visual_objects::landing_dust_support>  lds_;
+
         visual_system*                                         vsys_;
 
 	private: 
-		boost::function<void()>                       start_ ;
+		boost::function<void()>                                start_ ;
 	
 	private:
-		static const double smoke_end_duration_;
 		static const double sparks_end_duration_;
 	};
 }
