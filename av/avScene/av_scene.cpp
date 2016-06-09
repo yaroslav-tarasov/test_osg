@@ -671,10 +671,10 @@ private:
         w_->set_factor(0.0);
         gt_.set_factor(0.0);
 
-        create_objects(msg.icao_code);
+        create_objects(/*msg.icao_code*/msg);
         
         if(end_of_load_)
-            end_of_load_();  //osg_vis_->EndSceneCreation();
+            end_of_load_(); 
 
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send(&bts[0], bts.size());
@@ -734,6 +734,32 @@ private:
 
     }
 
+    void create_objects(const setup_msg& msg)
+    {
+        using namespace binary;
+        using namespace kernel;
+
+        dict_t dict;
+        if(auto fp = fn_reg::function<void(const setup_msg&, dict_t& dict)>("pack_objects"))
+            fp(msg, dict);
+
+        reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
+
+        if (reg_obj_)
+        {
+            void (net_worker::*send_)       (binary::bytes_cref bytes)              = &net_worker::send; // &net_worker::send_proxy;
+
+            reg_obj_->set_sender(boost::bind(send_, w_.get(), _1 ));
+        }
+
+#if 0
+        binary::bytes_t bts =  std::move(network::wrap_msg(create_session(std::string("session_name"), binary::wrap(dict),0.0)));
+        w_->send_session_clients(bts);
+#endif
+
+        mod_sys_->load_exercise(dict);
+
+    }
 
 private:
     systems_ptr                                                 systems_;

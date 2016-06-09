@@ -1820,9 +1820,9 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
                 { 
                     avScene::LightManager::Light data;
 
-                    data.color.r = 0.92f;
-                    data.color.g = 0.92f;
-                    data.color.b = 0.85f;
+                    data.color.r = 0.82f;
+                    data.color.g = 0.82f;
+                    data.color.b = 0.75f;
                     
                     const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 
