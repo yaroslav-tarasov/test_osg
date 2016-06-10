@@ -63,7 +63,11 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
     
     {
         airport::settings_t as;
-        as.icao_code = msg.icao_code;
+        if(airport::valid_icao(msg.icao_code))
+            as.icao_code = msg.icao_code;
+        else
+            as.icao_code = airport::get_icao_code(msg.icao_code);
+
         obj_list.push_back(std::move(airport::pack(fact,as)));
     }
     

@@ -244,7 +244,7 @@ namespace sync_fsm
             if(tar_len > traj_->length())
             {
                 force_log fl;       
-                LOG_ODS_MSG( "phys_state2::update " << tar_len << "  traj_->length() - traj_->base_length()= " << traj_->length() - traj_->base_length() << "\n"
+                LOG_ODS_MSG( "phys_state2::update tar_len > traj_->length()" << tar_len << "  traj_->length() - traj_->base_length()= " << traj_->length() - traj_->base_length() << "\n"
                 << "  traj_->length() " << traj_->length() << " traj_->base_length()= " << traj_->base_length()    << "\n" 
                 );           
             }

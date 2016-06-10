@@ -353,9 +353,29 @@ inline bool valid_icao(string icao_code)
            icao_code == "UHWW" ||
            icao_code == "UMMS" ||
            icao_code == "UMMM" ||
-           icao_code == "UUOL" 
+           icao_code == "UUOL" ||
+           icao_code == "URKE" 
            ;     
 }
+
+inline string get_icao_code(string name)
+{
+    if (name == "Шереметьево")
+        return "UUEE";
+    else if (name == "Адлер")
+        return "URSS";
+    else if (name == "Минск")
+        return "UMMS";
+    else if (name == "Липецк"  )
+        return "UUOL";
+    else if (name == "Ейск"  )
+        return "URKE";
+    else if (name == "Внуково"  )
+        return "UUWW";
+
+    return "";
+}
+
 
 //! смещение огней по коду аэропорта (нет нормальной базы данных, объединяющей всю информацию об объектах и средства ее редактирования)
 inline point_3f lights_offset(string icao_code)
