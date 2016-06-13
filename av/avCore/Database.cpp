@@ -116,7 +116,7 @@ bool LoadShaderInternal(const std::string & fileName, std::stringstream& file, s
 bool LoadShaderFileInternal(const std::string & fileName, std::ostream & shaderText)
 {
     const std::string  file_name = osgDB::findDataFile(fileName);
-    std::ifstream file(fileName.c_str());
+    std::ifstream file(file_name.c_str());
     if (file.bad())
     {
         avError("Failed to load shader '%s'.", fileName.c_str());

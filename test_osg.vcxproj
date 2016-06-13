@@ -59,7 +59,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\kernel;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -448,6 +448,7 @@
     <ClCompile Include="tests\exp_test.cpp" />
     <ClCompile Include="tests\flame_test.cpp" />
     <ClCompile Include="tests\grass_test.cpp" />
+    <ClCompile Include="tests\grass_test2.cpp" />
     <ClCompile Include="tests\light_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp" />
     <ClCompile Include="tests\main_shadows.cpp" />

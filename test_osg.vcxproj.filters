@@ -1405,5 +1405,8 @@
     <ClCompile Include="av\avFx\FireFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
+    <ClCompile Include="tests\grass_test2.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
