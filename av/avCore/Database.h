@@ -13,7 +13,9 @@ namespace Database
             fpl_.push_back(cfg().path.data + "/areas/" + name + "/");
             fpl_.push_back(cfg().path.data + "/areas/misc/" + name + "/");
         };
-
+        
+        const osgDB::FilePathList& get_file_list() const {return fpl_;}
+    private:
         osgDB::FilePathList fpl_;
     };
 

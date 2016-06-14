@@ -20,6 +20,7 @@
 #include "reflection/proc/prop_tree.h"
 
 #include  "configurer.h"
+#include  "net_layer/app_ports.h"
 
 #include "av/avEnvironmentParams.h"
 
@@ -275,13 +276,13 @@ struct client
                 {
                     auto phosts = hosts();
                     auto host = phosts[(*it).host_id];
-                    endpoint ep (host.ip + ":45003");
+                    endpoint ep (host.ip + ":" + boost::lexical_cast<std::string>(net_layer::visapp_ses_port));
                     peers_out.emplace_back(make_pair(std::move(ep),false));    
                 } else if(app.name == "modapp")
                 {
                     auto phosts = hosts();
                     auto host = phosts[(*it).host_id];
-                    endpoint ep (host.ip + ":45001");
+                    endpoint ep (host.ip + ":" + boost::lexical_cast<std::string>(net_layer::modapp_ses_port));
                     peers_out.emplace_back(make_pair(std::move(ep),true));    
                 }                
             }
@@ -846,7 +847,7 @@ private:
         peers_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&msg_dispatcher<endpoint>::dispatch, &disp_, _1, _2, peer), &tcp_error, &tcp_error));  
         
-        if (peer.port == 45001)
+        if (peer.port == net_layer::modapp_ses_port)
         {
             binary::bytes_t bts =  std::move(wrap_msg(vis_peers_msg(eps_)));
             peers_[peer]->send(&bts[0], bts.size());

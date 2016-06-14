@@ -577,9 +577,6 @@ bool Database::FindFile( PathType ePathType, const std::string& cFileName, std::
 {
     avAssert( cFileName.empty() == false );
 
-	//fpl_wrap  fpl(cFileName);
-	//*pFullPath =  osgDB::findFileInPath(cFileName, fpl.fpl_, osgDB::CASE_INSENSITIVE);
-	
 	osgDB::FilePathList fpl = osgDB::getDataFilePathList();
 
 	*pFullPath = osgDB::findFileInPath(cFileName, fpl,osgDB::CASE_INSENSITIVE);

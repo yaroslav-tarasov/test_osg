@@ -54,24 +54,48 @@ namespace avCore
         std::string  target;
     };
 
-    typedef struct xml_model
+    struct xml_model_base
 	{
 		enum up_axis_t {X_UP,Y_UP,Z_UP,NEG_X_UP,NEG_Y_UP,NEG_Z_UP};
-		typedef std::map<std::string, std::string> animations_t; 
+
+        std::string    main_model;
+        float		   scale;
+        up_axis_t      axis_up;
+        osg::Vec3      pivot_point;
+	};
+
+    struct xml_model : xml_model_base 
+    {
+        typedef std::map<std::string, std::string> animations_t; 
         typedef std::map<std::string, morph_params>    morphs_t;
-		std::string    main_model;
-		animations_t   anims;
+
+        animations_t   anims;
         morphs_t       morphs;
-		float		   scale;
-		up_axis_t      axis_up;
-		osg::Vec3      pivot_point;
         bool           lod3;
-		bool		   hw_instanced;
-	} xml_model_t;
+        bool		   hw_instanced;
+
+    } ;
+
+    typedef xml_model xml_model_t;
+    
+    struct camera_params
+    {
+        osg::Vec3 pos;
+        float     course;
+    };
+
+    struct xml_scene  : xml_model_base 
+    {
+         std::vector<camera_params>   cams;
+         std::vector<xml_model_base>  objs;  // ????????????????
+    };
+    
+    typedef xml_scene xml_scene_t;
 
     struct ModelReader
     {
-        xml_model_t  Load (std::string full_path);
+        bool  Load (const std::string& full_path, xml_model_t& );
+        bool  Load (const std::string& full_path, xml_scene_t& );
     };
 
 }

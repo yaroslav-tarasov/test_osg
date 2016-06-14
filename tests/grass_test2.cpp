@@ -108,18 +108,30 @@ namespace
 		pTex2->setImage( pImage2 );
 		ss->setTextureAttributeAndModes( 1, pTex2, osg::StateAttribute::ON );
 		ss->addUniform( new osg::Uniform("Texture2"      , 1) );
+        
+        pTex2->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex2->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex2->setUseHardwareMipMapGeneration(true);
 
 		osg::Texture2D* pTex3 = new osg::Texture2D;
 		osg::Image* pImage3 = osgDB::readImageFile( osgDB::findDataFile("blender/grass/TallGrass.Png") );
 		pTex3->setImage( pImage3 );
 		ss->setTextureAttributeAndModes( 2, pTex3, osg::StateAttribute::ON );
 		ss->addUniform( new osg::Uniform("Texture3"      , 2) );
+        
+        pTex3->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex3->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex3->setUseHardwareMipMapGeneration(true);
 
 		osg::Texture2D* pTex4 = new osg::Texture2D;
 		osg::Image* pImage4 = osgDB::readImageFile( osgDB::findDataFile("blender/grass/GrassBush.Png") );
 		pTex4->setImage( pImage4 );
 		ss->setTextureAttributeAndModes( 3, pTex4, osg::StateAttribute::ON );
 		ss->addUniform( new osg::Uniform("Texture4"      , 3) );
+        
+        pTex4->setFilter(osg::Texture::MIN_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex4->setFilter(osg::Texture::MAG_FILTER, osg::Texture::LINEAR_MIPMAP_LINEAR);
+        pTex4->setUseHardwareMipMapGeneration(true);
 
 #if 0
 		shader.setUniform4f('Radius1', Radius1[0],Radius1[1],Radius1[2],Radius1[3])
@@ -237,7 +249,7 @@ int main_grass_test2( int argc, char** argv )
 	auto gg = findFirstNode(sub_model ,"GroundGrass",findNodeVisitor::not_exact);
 	_buildStateSet(gg);
 	
-	auto gr = findFirstNode(sub_model ,"groundrender",findNodeVisitor::not_exact);
+	auto gr = findFirstNode(sub_model ,"GroundRender",findNodeVisitor::not_exact);
 	createGRState(gr);
 
 

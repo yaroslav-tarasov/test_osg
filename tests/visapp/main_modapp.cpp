@@ -18,6 +18,8 @@
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
+#include  "net_layer/app_ports.h"
+
 #include <boost/container/map.hpp>
 
 #ifdef _WIN32
@@ -145,7 +147,7 @@ struct net_worker
              for (auto it = vis_peers_.begin(); it!= vis_peers_.end(); ++it )
              {
 
-                 (*it).port = 45003;
+                 (*it).port = net_layer::visapp_ses_port;
                  cons_[*it].reset(  new async_connector(*it, boost::bind(&ses_helper::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, nw_, _1) , tcp_error));
 
              }
@@ -270,18 +272,18 @@ struct net_worker
 
      void vis_connect(const std::vector<endpoint>& vis_peers)
      {  
-         modapp_peers_  = vis_peers;
+         visapp_peers_  = vis_peers;
         
          worker_service_->post([this]()
          {
-             ses_helper_.vis_connect(modapp_peers_);
+             ses_helper_.vis_connect(visapp_peers_);
          } );
          
          worker_service_->post([this]()
          {
-             for (auto it = modapp_peers_.begin(); it!= modapp_peers_.end(); ++it )
+             for (auto it = visapp_peers_.begin(); it!= visapp_peers_.end(); ++it )
              {
-                 (*it).port = 45002;
+                 (*it).port = net_layer::visapp_data_port;
                  cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
              }
          } );
@@ -329,7 +331,7 @@ private:
          size_t size = binary::size(*data);
          error_code_t ec;
 
-         for( auto it = modapp_peers_.begin();it!=modapp_peers_.end(); ++it )
+         for( auto it = visapp_peers_.begin();it!=visapp_peers_.end(); ++it )
             if(sockets_.find(*it)!=sockets_.end()) sockets_[*it]->send(binary::raw_ptr(*data), size);
 
          if (ec)
@@ -405,7 +407,7 @@ private:
          // delete  ses_;
          worker_service_->post([this]()
          {
-             for (auto it = modapp_peers_.begin(); it!= modapp_peers_.end(); ++it )
+             for (auto it = visapp_peers_.begin(); it!= visapp_peers_.end(); ++it )
              {
                  cons_[*it].reset();
              }
@@ -433,16 +435,16 @@ private:
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
 
-        if(on_all_connected_ && modapp_peers_.size() == sockets_.size())
+        if(on_all_connected_ && visapp_peers_.size() == sockets_.size())
             on_all_connected_();
     }
 
 private:
     std::map< endpoint,unique_ptr<async_connector>>                                      cons_;
     std::map<network::endpoint, std::shared_ptr<tcp_fragment_wrapper> >               sockets_;
-    std::vector<endpoint>                                                        modapp_peers_;  
+    std::vector<endpoint>                                                        visapp_peers_;  
    
-        ses_helper                                                                 ses_helper_;
+    ses_helper                                                                     ses_helper_;
 private:
     boost::thread                                                               worker_thread_;
     boost::asio::io_service*                                                   worker_service_;
@@ -472,11 +474,10 @@ struct mod_app
     typedef boost::function<void(run_msg const& msg)>                   on_run_f;
     typedef boost::function<void(container_msg const& msg)>       on_container_f;
 
-    mod_app(endpoint peer, boost::function<void()> eol/*,  binary::bytes_cref bytes*/)
+    mod_app(endpoint peer/*,  binary::bytes_cref bytes*/)
         : systems_    (get_systems(systems::SECOND_IMPL, boost::bind(&mod_app::send, this, _1)))
         , ctrl_sys_   (systems_->get_control_sys())
         , mod_sys_    (systems_->get_model_sys  ())
-        , end_of_load_(eol)
         , disp_       (boost::bind(&mod_app::inject_msg      , this, _1, _2))
         , init_       (false)
         , dc_         (false)
@@ -492,7 +493,7 @@ struct mod_app
             .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             .add<ready_msg             >(boost::bind(&mod_app::on_ready      , this, _1))
 
-            ;
+            ;                                   
 
         w_.reset (new net_worker( peer 
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
@@ -589,9 +590,6 @@ private:
 
     void all_ready() 
     {
-        if(end_of_load_)
-            end_of_load_();  
-
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_proxy(&bts[0], bts.size());
     }
@@ -679,7 +677,6 @@ private:
     bool                                                             dc_;
 private:
     on_container_f                                              on_cont_;
-    boost::function<void()>                                 end_of_load_;
     setup_msg                                                 setup_msg_;
 private:
     boost::scoped_ptr<net_worker>                                     w_;
@@ -748,7 +745,7 @@ int main_modapp( int argc, char** argv )
     {
 
         endpoint peer(cfg().network.local_address);
-        mod_app ma(peer,boost::function<void()>());
+        mod_app ma(peer);
 
         boost::system::error_code ec;
         __main_srvc__->run(ec);

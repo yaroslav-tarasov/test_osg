@@ -17,6 +17,7 @@
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
+#include "net_layer/app_ports.h"
 
 #include "reflection/proc/prop_tree.h"
 
@@ -235,7 +236,7 @@ private:
          async_services_initializer asi(false);
 
          ses_helper_.init();
-         mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, endpoint(std::string("0.0.0.0:45002")) ), tcp_error));
+         mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, mod_peer_ ), tcp_error));
 
          worker_service_ = &(asi.get_service());
          
@@ -653,7 +654,6 @@ private:
 private:
     bool                                 done_;
     std::unique_ptr<boost::thread>     thread_;
-    boost::function<void()>       end_of_load_;
     boost::optional<uint32_t> obj_to_load_num_;
 private:
     msg_dispatcher<uint32_t>             disp_;
@@ -728,9 +728,9 @@ int main_visapp( int argc, char** argv )
 
     try
     {
-
-        endpoint proxy_peer(std::string("0.0.0.0:45003"));
-        endpoint mod_peer  (std::string("0.0.0.0:45002"));
+        using boost::asio::ip::address_v4;
+        endpoint proxy_peer(endpoint(address_v4(0),net_layer::visapp_ses_port));
+        endpoint mod_peer  (endpoint(address_v4(0),net_layer::visapp_data_port));
 
         visapp  va(proxy_peer, mod_peer);
 

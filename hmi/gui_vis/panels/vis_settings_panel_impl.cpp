@@ -13,18 +13,21 @@ using namespace CEGUI;
 #include "cegui_utils.h"
 
 
+namespace {
 
 const  String combo_name     ( "selModeBox"		);
 const  String btn_exit_name  ( "btnExit"		);
 const  String main_menu_name ( "mainMenuBar"    );
 const  String tb_name		 ( "tbLight"        );
+const  String setting_dlg    ( "FrameWindow"    );
 
 
 std::string trim_copy (const char* name )
 {
-    return boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtRadX"));
+    return boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtRadX"));
 }
 
+}
 
 vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, const app::settings_t& s )
 {
@@ -33,12 +36,12 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     
 	WindowManager& winMgr = WindowManager::getSingleton();
 
-    FrameWindow* demoWindow = static_cast<FrameWindow*>(
-        CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "DemoWindow") );
-    demoWindow->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim(0.5f)));
+    FrameWindow* mainWindow = static_cast<FrameWindow*>(
+        CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/FrameWindow", "MainWindow") );
+    mainWindow->setPosition(UVector2(cegui_reldim(0.01f), cegui_reldim(0.5f)));
     //demoWindow->setSize(USize(cegui_reldim(0.3f), cegui_reldim(0.3f)));
-    demoWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
-    demoWindow->setText( "Choose Zone" );
+    mainWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
+    mainWindow->setText( "Choose Zone" );
 
     //PushButton* demoButtonOK = static_cast<PushButton*>(
     //    WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
@@ -50,12 +53,12 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
         {
 			CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
 			CEGUI::Window* root = context.getRootWindow();
-			root->getChild("DemoWindow")->setVisible(false);
+			root->getChild("MainWindow")->setVisible(false);
             return true;
 
         };
 
-    demoWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,Event::Subscriber(fn_exit));
+    mainWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,Event::Subscriber(fn_exit));
 	//demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,Event::Subscriber(fn_exit));
 
 
@@ -82,11 +85,11 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     Combobox* cbbo = static_cast<Combobox*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Combobox", combo_name));
     cbbo->setPosition(UVector2(cegui_reldim(0.15f), cegui_reldim( 0.1f)));
     //cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
-    demoWindow->addChild(cbbo);
+    mainWindow->addChild(cbbo);
 	//demoWindow->addChild( demoButtonOK );
-    root->addChild( demoWindow );
+    root->addChild( mainWindow );
 
-    demoWindow->setVisible(false);
+    mainWindow->setVisible(false);
 
     ListboxTextItem* itm;
     CEGUI::Win32StringTranscoder stc;
@@ -102,7 +105,7 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     cbbo->subscribeEvent(Combobox::EventListSelectionAccepted, 
         Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
             {
-                Combobox* combo = static_cast<Combobox*>(static_cast<const WindowEventArgs&>(args).window->getRootWindow()->getChild("DemoWindow/" + combo_name));
+                Combobox* combo = static_cast<Combobox*>(static_cast<const WindowEventArgs&>(args).window->getRootWindow()->getChild("MainWindow/" + combo_name));
                 
                 ListboxItem* item = combo->findItemWithText(combo->getText(), 0);
                 if (item)
@@ -123,66 +126,69 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
 	CEGUI::ToggleButton*    checkbox = static_cast<ToggleButton*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Checkbox", tb_name));
 	checkbox->setSelected(true);
 	checkbox->setText( "Lights" );
-	demoWindow->addChild(checkbox);
+	mainWindow->addChild(checkbox);
 	
-	root->addChild(winMgr.loadLayoutFromFile("vis_settings.layout"));
-	subscribeEvent("FrameWindow/Settings/chkLights", ToggleButton::EventSelectStateChanged,
+    auto settingsWindow = winMgr.loadLayoutFromFile("vis_settings.layout");
+	root->addChild(settingsWindow);
+	subscribeEvent(setting_dlg + "/Settings/chkLights", ToggleButton::EventSelectStateChanged,
 		Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
         {
             
-			bool wrap = isCheckboxSelected("FrameWindow/Settings/chkLights");
+			bool wrap = isCheckboxSelected(setting_dlg + "/Settings/chkLights");
 			set_lights_signal_(wrap); 
             return true;
 
         }));
+    
+    settingsWindow->setVisible(false);
 
-	subscribeEvent("FrameWindow/LWeather/edtGrassMap", CEGUI::Editbox::EventTextAccepted,
+	subscribeEvent(setting_dlg + "/LWeather/edtGrassMap", CEGUI::Editbox::EventTextAccepted,
 		Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
 	{
 
-		std::string param = getEditboxText("FrameWindow/LWeather/edtGrassMap");
+		std::string param = getEditboxText(setting_dlg + "/LWeather/edtGrassMap");
 		set_map_signal_(boost::lexical_cast<float>(param.empty()?"0":param)); 
 		return true;
 
 	}));
 
-	subscribeEvent("FrameWindow/LWeather/btnApply", PushButton::EventClicked,
+	subscribeEvent(setting_dlg + "/LWeather/btnApply", PushButton::EventClicked,
 		Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
 	{
 
-		std::string param = getEditboxText("FrameWindow/LWeather/edtGrassMap");
+		std::string param = getEditboxText(setting_dlg + "/LWeather/edtGrassMap");
 		set_map_signal_(boost::lexical_cast<float>(param.empty()?"0":param)); 
 		return true;
 
 	}));
 
-    subscribeEvent("FrameWindow/Settings/chkShadows", ToggleButton::EventSelectStateChanged,
+    subscribeEvent(setting_dlg + "/Settings/chkShadows", ToggleButton::EventSelectStateChanged,
         Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
     {
 
-        bool wrap = isCheckboxSelected("FrameWindow/Settings/chkShadows");
+        bool wrap = isCheckboxSelected(setting_dlg + "/Settings/chkShadows");
         set_shadows_signal_(wrap); 
         return true;
 
     }));
     
-    subscribeEvent("FrameWindow/Settings/chkShadowsParticles", ToggleButton::EventSelectStateChanged,
+    subscribeEvent(setting_dlg + "/Settings/chkShadowsParticles", ToggleButton::EventSelectStateChanged,
         Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
     {
 
-        bool wrap = isCheckboxSelected("FrameWindow/Settings/chkShadowsParticles");
+        bool wrap = isCheckboxSelected(setting_dlg + "/Settings/chkShadowsParticles");
         set_shadows_part_signal_(wrap); 
         return true;
 
     }));
 
-    setItemText("FrameWindow/LWeather/edtRadX"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_x));
-    setItemText("FrameWindow/LWeather/edtRadY"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_y));
-    setItemText("FrameWindow/LWeather/edtX"       , boost::str(boost::format("%.2f") % s.clouds[0].x));
-    setItemText("FrameWindow/LWeather/edtY"       , boost::str(boost::format("%.2f") % s.clouds[0].y));
-    setItemText("FrameWindow/LWeather/edtHeight"  , boost::str(boost::format("%.2f") % s.clouds[0].height));
-    setItemText("FrameWindow/LWeather/edtIntensity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
-    setItemText("FrameWindow/GWeather/edtIntensity", boost::str(boost::format("%.2f") % s.intensity));
+    setItemText(setting_dlg + "/LWeather/edtRadX"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_x));
+    setItemText(setting_dlg + "/LWeather/edtRadY"    , boost::str(boost::format("%.2f") % s.clouds[0].radius_y));
+    setItemText(setting_dlg + "/LWeather/edtX"       , boost::str(boost::format("%.2f") % s.clouds[0].x));
+    setItemText(setting_dlg + "/LWeather/edtY"       , boost::str(boost::format("%.2f") % s.clouds[0].y));
+    setItemText(setting_dlg + "/LWeather/edtHeight"  , boost::str(boost::format("%.2f") % s.clouds[0].height));
+    setItemText(setting_dlg + "/LWeather/edtIntensity", boost::str(boost::format("%.2f") % s.clouds[0].intensity));
+    setItemText(setting_dlg + "/GWeather/edtIntensity", boost::str(boost::format("%.2f") % s.intensity));
 
 
 
@@ -191,22 +197,22 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     {
         app::cloud_params_t s;
 
-        std::string edtRadX = trim_copy("FrameWindow/LWeather/edtRadX");
+        std::string edtRadX = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtRadX"));
         s.radius_x = boost::lexical_cast<float>(edtRadX.empty()?"0":edtRadX);
 
-        std::string edtRadY = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtRadY"));
+        std::string edtRadY = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtRadY"));
         s.radius_y = boost::lexical_cast<float>(edtRadY.empty()?"0":edtRadY);
 
-        std::string edtX = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtX"));
+        std::string edtX = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtX"));
         s.x = boost::lexical_cast<float>(edtX.empty()?"0":edtX);
 
-        std::string edtY = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtY"));
+        std::string edtY = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtY"));
         s.y = boost::lexical_cast<float>(edtY.empty()?"0":edtY);
 
-        std::string edtHeight = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtHeight"));
+        std::string edtHeight = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtHeight"));
         s.height = boost::lexical_cast<float>(edtHeight.empty()?"0":edtHeight);
 
-        std::string edtIntensity = boost::trim_copy(getEditboxText("FrameWindow/LWeather/edtIntensity"));
+        std::string edtIntensity = boost::trim_copy(getEditboxText(setting_dlg + "/LWeather/edtIntensity"));
         s.intensity = boost::lexical_cast<float>(edtIntensity.empty()?"0":edtIntensity);
 
         s.p_type   = 1;
@@ -216,35 +222,32 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
 
     };
 
-    subscribeEvent("FrameWindow/LWeather/edtRadX", Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtRadX", Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback));
 
-    subscribeEvent("FrameWindow/LWeather/edtRadY", Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtRadY", Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback)); 
 
-    subscribeEvent("FrameWindow/LWeather/edtX"   , Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtX"   , Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback)); 
 
-    subscribeEvent("FrameWindow/LWeather/edtY"   , Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtY"   , Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback)); 
     
-    subscribeEvent("FrameWindow/LWeather/edtHeight", Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtHeight", Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback)); 
 
-    subscribeEvent("FrameWindow/LWeather/edtIntensity", Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/LWeather/edtIntensity", Editbox::EventTextAccepted,
         Event::Subscriber(cloud_settings_callback)); 
 
-    subscribeEvent("FrameWindow/GWeather/edtIntensity", Editbox::EventTextAccepted,
+    subscribeEvent(setting_dlg + "/GWeather/edtIntensity", Editbox::EventTextAccepted,
         Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
     {
-        std::string param = boost::trim_copy(getEditboxText("FrameWindow/GWeather/edtIntensity"));
+        std::string param = boost::trim_copy(getEditboxText(setting_dlg + "/GWeather/edtIntensity"));
         set_global_intensity_signal_ (boost::lexical_cast<float>(param.empty()?"0":param)); 
         return true;
 
     }));
-
-
-
 
 	//CEGUI::Menubar* menuBar = dynamic_cast<CEGUI::Menubar*>(CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Menubar", main_menu_name));
 	//if(menuBar)
@@ -262,26 +265,26 @@ void vis_settings_panel_impl::set_visible(bool visible)
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
-    root->getChild(combo_name)->setVisible(visible);
+    // root->getChild(combo_name)->setVisible(visible);
     root->getChild(btn_exit_name)->setVisible(visible);
+    root->getChild(setting_dlg)->setVisible(visible);
     //root->getChild(main_menu_name)->setVisible(visible);
-
 }
 
 bool vis_settings_panel_impl::visible()
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
-    return root->getChild(btn_exit_name)->isVisible() || root->getChild(combo_name)->isVisible();
+    return root->getChild(btn_exit_name)->isVisible() ||     root->getChild(setting_dlg)->isVisible(); /*|| root->getChild(combo_name)->isVisible()*/;
 }
 
 void vis_settings_panel_impl::set_light(bool on)
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
-    if (root->isChild("FrameWindow/Settings/chkLights"))
+    if (root->isChild(setting_dlg + "/Settings/chkLights"))
     {
-        ToggleButton* button = static_cast<ToggleButton*>(root->getChild("FrameWindow/Settings/chkLights"));
+        ToggleButton* button = static_cast<ToggleButton*>(root->getChild(setting_dlg + "/Settings/chkLights"));
         return button->setSelected(on);
     }
 }

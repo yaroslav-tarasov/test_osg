@@ -777,7 +777,12 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 				fm->add_string("Exit" , boost::bind(&Scene::onExit,this)); // [&]() { /*exit(0);*/});
 
 				app::menu_ptr vm = pthis->_mw->add_main_menu("View");
-				vm->add_string("Lights" , [=]() {  });
+				vm->add_string("Settings" , [pthis]() { 
+                    pthis->_vis_settings_panel->set_visible(!pthis->_vis_settings_panel->visible());
+                });
+                
+                app::menu_ptr am = pthis->_mw->add_main_menu("About");
+                // vm->add_string("Lights" , [=]() {  });
 
 				pthis->_mw->set_visible(false);
 

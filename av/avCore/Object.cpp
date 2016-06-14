@@ -125,7 +125,7 @@ void  Object::setupInstanced()
     {
         ::Database::fpl_wrap fpl(_name);
         
-        std::string anim_file_name =  osgDB::findFileInPath("data.row", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+        std::string anim_file_name =  osgDB::findFileInPath("data.row", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
         _inst_manager = new InstancedAnimationManager(_node.get(), anim_file_name);
         
@@ -270,18 +270,18 @@ Object* createObject(std::string name, bool fclone)
 	}
 	else
 	{
-		std::string object_file_name =  osgDB::findFileInPath(name + ".xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
-        std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+		std::string object_file_name =  osgDB::findFileInPath(name + ".xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+        std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 		
 		if(object_file_name.empty())
 		{
-			object_file_name = osgDB::findFileInPath(name+".osgb", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+			object_file_name = osgDB::findFileInPath(name+".osgb", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
 			if(object_file_name.empty())
-				object_file_name = osgDB::findFileInPath(name+".fbx", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+				object_file_name = osgDB::findFileInPath(name+".fbx", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
 			if(object_file_name.empty())
-				object_file_name = osgDB::findFileInPath(name+".dae", fpl.fpl_,osgDB::CASE_INSENSITIVE);
+				object_file_name = osgDB::findFileInPath(name+".dae", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
 			if(object_file_name.empty())
 				return nullptr;
@@ -293,9 +293,10 @@ Object* createObject(std::string name, bool fclone)
 		else
 		{
 			ModelReader mr;
-			data = mr.Load(object_file_name);
+            data =  xml_model_t();
+			mr.Load(object_file_name, *data);
 			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
-			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.fpl_,osgDB::CASE_INSENSITIVE));
+			object_file = osgDB::readNodeFile(osgDB::findFileInPath((*data).main_model, fpl.get_file_list(),osgDB::CASE_INSENSITIVE));
 #if 1
             if(data->morphs.size()>0)
             {
@@ -505,7 +506,7 @@ Object* createObject(std::string name, bool fclone)
 			const xml_model_t::animations_t&  anims = data->anims;
 			for(auto it = anims.begin();it!= anims.end();++it)
 			{
-				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.fpl_,osgDB::CASE_INSENSITIVE);
+				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 				if(!anim_file_name.empty())
 					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
 			}

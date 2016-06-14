@@ -22,7 +22,7 @@
 #include "Grass.h"
 #include "Grass2.h"
 
-
+#include "av/avCore/XmlModel.h"
 
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"
@@ -228,10 +228,12 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 void  Terrain::Create( const std::string& cFileName )
 {
-    Database::fpl_wrap  fpl(cFileName);
+    
 
     auto wf =  [this](std::string cFileName)->osg::Node* {
- 
+    
+    Database::fpl_wrap  fpl(cFileName);
+
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
     high_res_timer                _hr_timer;
@@ -247,36 +249,50 @@ void  Terrain::Create( const std::string& cFileName )
 
     std::string scene_name;
     std::string mat_file_name;
+ 	
+    std::string scene_file_name =  osgDB::findFileInPath(cFileName + ".xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
-    if(cFileName == "sheremetyevo")
+    if(scene_file_name.empty())
     {
-        scene_name =    "sheremetyevo.osgb";//"sheremetyevo.open.osgb";//"sheremetyevo.osgb"; 
-        mat_file_name = "sheremetyevo.dae.mat.xml"; //"sheremetyevo.open.dae.mat.xml"; 
+        if(cFileName == "sheremetyevo")
+        {
+            scene_name =    "sheremetyevo.osgb";//"sheremetyevo.open.osgb";//"sheremetyevo.osgb"; 
+            mat_file_name = "sheremetyevo.dae.mat.xml"; //"sheremetyevo.open.dae.mat.xml"; 
+        }
+        else if(cFileName == "adler")
+        {
+            scene_name    = "adler.osgb";  
+            mat_file_name = "adler.open.dae.mat.xml"; 
+        }
+	    else if(cFileName == "minsk")
+	    {
+            scene_name    = "minsk.dae";  
+            mat_file_name = "minsk.dae.mat.xml"; 
+	    }
+        else if(cFileName == "lipetsk")
+        {
+            scene_name    = "lipetsk.dae";  
+            mat_file_name = "lipetsk.dae.mat.xml"; 
+        }
+        else if(cFileName == "eisk")
+        {
+            scene_name    = "eisk.dae";  
+            mat_file_name = "eisk.dae.mat.xml"; 
+        } 
+        else if(cFileName == "vnukovo")
+        {
+            scene_name = "vnukovo.dae";  
+            mat_file_name = "vnukovo.dae.mat.xml"; 
+        }
     }
-    else if(cFileName == "adler")
+    else
     {
-        scene_name = "adler.osgb";  
-        mat_file_name = "adler.open.dae.mat.xml"; 
-    }
-	else if(cFileName == "minsk")
-	{
-        scene_name = "minsk.dae";  
-        mat_file_name = "minsk.dae.mat.xml"; 
-	}
-    else if(cFileName == "lipetsk")
-    {
-        scene_name = "lipetsk.dae";  
-        mat_file_name = "lipetsk.dae.mat.xml"; 
-    }
-    else if(cFileName == "eisk")
-    {
-        scene_name = "eisk.dae";  
-        mat_file_name = "eisk.dae.mat.xml"; 
-    } 
-    else if(cFileName == "vnukovo")
-    {
-        scene_name = "vnukovo.dae";  
-        mat_file_name = "vnukovo.dae.mat.xml"; 
+        avCore::ModelReader mr;
+        avCore::xml_scene_t data;
+        mr.Load(scene_file_name, data);
+
+        scene_name = data.main_model;  
+        mat_file_name = cFileName + ".mat.xml"; 
     }
 
     osg::Node* scene = osgDB::readNodeFile(cFileName + "/"+ scene_name);  
@@ -429,7 +445,9 @@ void  Terrain::Create( const std::string& cFileName )
     wf(cFileName);
 #endif
     
-    std::string scn_file_name =  osgDB::findFileInPath(lights_file(cFileName), fpl.fpl_,osgDB::CASE_INSENSITIVE);
+    Database::fpl_wrap  fpl(cFileName);
+
+    std::string scn_file_name =  osgDB::findFileInPath(lights_file(cFileName), fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
     
     if(!scn_file_name.empty())
         fill_navids(
