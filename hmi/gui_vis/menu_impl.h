@@ -16,8 +16,8 @@ public:
 
     // app::menu
 public:
-    size_t        add_string(std::string const &text, target const &click, target const &hover) override ;
-    app::menu_ptr add_pop_up(std::string const &text) override ;
+    size_t        add_string(std::wstring const &text, target const &click, target const &hover) override ;
+    app::menu_ptr add_pop_up(std::wstring const &text) override ;
     void          add_separator() override ;
     void          set_enabled(bool enabled) override ;
     void          set_checked(size_t string_id, bool checked) override ;

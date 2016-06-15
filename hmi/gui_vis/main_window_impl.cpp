@@ -207,19 +207,21 @@ bool  main_window_impl::visible ()
 //    return sb ;
 //}
 
-app::menu_ptr main_window_impl::add_main_menu(std::string const &name)
+app::menu_ptr main_window_impl::add_main_menu(std::wstring const &name)
 {
+    CEGUI::Win32StringTranscoder stc;
+    CEGUI::String sname = stc.stringFromStdWString(name);
     CEGUI::String skin = menuBar->getType();
 	skin = skin.substr(0, skin.find_first_of('/'));
 	CEGUI::String menuItemMapping = skin + "/MenuItem";
 	CEGUI::String popupMenuMapping = skin + "/PopupMenu";
 
 	CEGUI::WindowManager& windowManager = CEGUI::WindowManager::getSingleton(); 
-	CEGUI::MenuItem* mi = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, name + "_MenuItem"));
-	mi->setText(name);
+	CEGUI::MenuItem* mi = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, sname + "_MenuItem"));
+	mi->setText(sname);
 	menuBar->addChild(mi);
 
-	menu_impl_ptr m = boost::make_shared<menu_impl>(mi,popupMenuMapping,name) ;
+	menu_impl_ptr m = boost::make_shared<menu_impl>(mi,popupMenuMapping, sname) ;
 	mi->addChild(m.get()->get_menu());
 
     widgets_.insert(m) ;
@@ -230,7 +232,7 @@ app::menu_ptr main_window_impl::add_main_menu(std::string const &name)
     return m ;
 }
 
-void main_window_impl::track_context_menu(std::string const &/*name*/, boost::function<void (app::menu &m)> fill_menu)
+void main_window_impl::track_context_menu(std::wstring const &/*name*/, boost::function<void (app::menu &m)> fill_menu)
 {
     //menu_impl m(this) ;
 
@@ -312,7 +314,7 @@ std::string main_window_impl::default_layout_name() const
     return "";//!full_screen_ ? objectName().toStdString() : (objectName().toStdString() + "_FULLSCREEN") ;
 }
 
-void main_window_impl::set_title(std::string const &title)
+void main_window_impl::set_title(std::wstring const &title)
 {
     //setWindowTitle(QCoreApplication::applicationName() + " - " + QString::fromUtf8(title.c_str())) ;
 }

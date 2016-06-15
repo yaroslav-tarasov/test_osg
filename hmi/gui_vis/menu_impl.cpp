@@ -17,10 +17,12 @@ menu_impl::menu_impl(CEGUI::Window *parent,const String& type, const String& nam
 	base_ = dynamic_cast<CEGUI::MenuBase*>(CEGUI::WindowManager::getSingleton().createWindow(type, name));
 }
 
-size_t menu_impl::add_string(std::string const &text, target const &click, target const &hover)
+size_t menu_impl::add_string(std::wstring const &text, target const &click, target const &hover)
 {
     //QAction *act = addAction(QString::fromUtf8(text.c_str())) ;
     //connect(act, SIGNAL(triggered()), this, SLOT(action_slot())) ;
+    CEGUI::Win32StringTranscoder stc;
+    CEGUI::String stext = stc.stringFromStdWString(text);
 
 	CEGUI::String skin = base_->getType();
 	skin = skin.substr(0, skin.find_first_of('/'));
@@ -28,8 +30,8 @@ size_t menu_impl::add_string(std::string const &text, target const &click, targe
 	CEGUI::String popupMenuMapping = skin + "/PopupMenu";
 
 	CEGUI::WindowManager& windowManager = CEGUI::WindowManager::getSingleton();
-	auto menuItem = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, text + "_MenuItem"));
-	menuItem->setText(text);
+	auto menuItem = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, stext + "_MenuItem"));
+	menuItem->setText(stext);
 	base_->addItem(menuItem);
 
     if (click)
@@ -63,7 +65,7 @@ size_t menu_impl::add_string(std::string const &text, target const &click, targe
     return (size_t)act ;
 }
 
-app::menu_ptr menu_impl::add_pop_up(std::string const &text)
+app::menu_ptr menu_impl::add_pop_up(std::wstring const &text)
 {
     //popups_.append(boost::make_shared<menu_impl>((QWidget*)0)) ;
     //popups_.back()->setTitle(QString::fromUtf8(text.c_str())) ;

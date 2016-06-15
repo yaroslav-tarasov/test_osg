@@ -45,8 +45,8 @@ private:
     //app::tool_bar_ptr   create_task_bar  (std::string const &name, bool standard = true) override ;
     //app::status_bar_ptr create_status_bar(std::string const &name) override ;
 
-    app::menu_ptr add_main_menu      (std::string const &name) override ;
-    void          track_context_menu (std::string const &name, boost::function<void (app::menu &m)> fill_menu) override ;
+    app::menu_ptr add_main_menu      (std::wstring const &name) override ;
+    void          track_context_menu (std::wstring const &name, boost::function<void (app::menu &m)> fill_menu) override ;
 
     void          remove_widget (app::widget_ptr w) override ;
     app::widget*  find_widget   (std::string const &name) const override ;
@@ -54,7 +54,7 @@ private:
     void load_layout      (boost::optional<std::string> const &lname) override ;
     void save_layout      (boost::optional<std::string> const &lname) const override ;
 
-    void set_title        (std::string const &title) override ;
+    void set_title        (std::wstring const &title) override ;
 
     void bind_panel       (std::string const &toolbar_name, app::widget_ptr p) override ;
     void unbind_panel     (app::widget_ptr p) override ;

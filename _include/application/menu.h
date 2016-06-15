@@ -12,8 +12,8 @@ struct menu : widget
 {
     typedef boost::function<void ()> target;
 
-    virtual size_t   add_string(std::string const &text, target const &click = target(), target const &hover = target()) = 0 ;
-    virtual menu_ptr add_pop_up(std::string const &text) = 0 ;
+    virtual size_t   add_string(std::wstring const &text, target const &click = target(), target const &hover = target()) = 0 ;
+    virtual menu_ptr add_pop_up(std::wstring const &text) = 0 ;
     virtual void     add_separator() = 0 ;
 
     virtual void     set_enabled(bool enabled) = 0 ;

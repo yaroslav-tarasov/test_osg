@@ -48,8 +48,8 @@ struct main_window
     //virtual tool_bar_ptr   create_task_bar  (std::string const &name, bool standard = true) = 0 ;
     //virtual status_bar_ptr create_status_bar(std::string const &name) = 0 ;
 
-    virtual menu_ptr add_main_menu(std::string const &name) = 0 ;
-    virtual void track_context_menu(std::string const &name, boost::function<void (menu &m)> fill_menu) = 0 ;
+    virtual menu_ptr add_main_menu(std::wstring const &name) = 0 ;
+    virtual void track_context_menu(std::wstring const &name, boost::function<void (menu &m)> fill_menu) = 0 ;
 
     virtual void    remove_widget(app::widget_ptr w) = 0 ;
     virtual widget* find_widget(std::string const &name) const = 0 ;
@@ -57,7 +57,7 @@ struct main_window
     virtual void load_layout(boost::optional<std::string> const &lname = /*boost::*/none) = 0 ;
     virtual void save_layout(boost::optional<std::string> const &lname = /*boost::*/none) const = 0 ;
 
-    virtual void set_title(std::string const &title) = 0 ;
+    virtual void set_title(std::wstring const &title) = 0 ;
 
     virtual void bind_panel(std::string const &toolbar_name, widget_ptr p) = 0 ;
     virtual void unbind_panel(widget_ptr p) = 0 ;
