@@ -836,7 +836,7 @@ struct client
 		}
     }
     
-    #define ADD_INIT(msgs, msg) msgs.push_back(std::move(network::wrap_msg(msg)));
+    #define ADD_INIT(data, msg) data.push_back(std::move(network::wrap_msg(msg)));
 
 private:
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
@@ -871,7 +871,7 @@ private:
                 auto & peer = (*it).first;
 
                 #if 1
-                setup_msg::msgs_t msgs;
+                setup_msg::data_t msgs;
                 for (auto it_h = hp.begin(); it_h!=hp.end(); ++it_h )
                 {
                     if((*it_h).host.ip==peer.addr.to_string())

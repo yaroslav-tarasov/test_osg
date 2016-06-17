@@ -75,7 +75,7 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
     LOG_ODS_MSG( "pack_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
     
     if( auto f = fn_reg::function<kernel::obj_create_data (kernel::system*, net_layer::msg::create_msg const&)>( "pack_object"))
-        for (auto it = msg.msgs.begin(); it != msg.msgs.end(); ++it)
+        for (auto it = msg.data.begin(); it != msg.data.end(); ++it)
         {
                 net_layer::msg::create_msg m;
                 network::safe_read_msg(*it,m);

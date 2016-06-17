@@ -2,6 +2,8 @@
 
 
 #include "network/msg_base.h"
+#include "net_layer/net_configurator_data.h"
+
 using network::gen_msg;
 
 #include "common/meteo_local.h"
@@ -47,30 +49,42 @@ namespace net_layer
         struct setup_msg
             : network::msg_id<id_setup>
         {
-            typedef std::vector<bytes_t>  msgs_t;
+            typedef std::vector<bytes_t>  data_t;
 
-            explicit setup_msg(const std::string& icao_code = "URSS", uint32_t obj_num = 0)
+            explicit setup_msg(const std::string& icao_code = "URSS")
                 : icao_code (icao_code)
-                , obj_num   (obj_num)
             {
             }
 
-            setup_msg(const std::string& icao_code, msgs_t&&     msgs )
+            setup_msg(const std::string& icao_code, data_t&&     data )
                 : icao_code (icao_code)
-                , msgs      (msgs)
-                , obj_num   (msgs.size() + 1)
+                , data      (data)
+            {
+            }
+            
+            setup_msg(const std::string& icao_code, data_t&&     data, configuration_t config,
+                applications_t const& apps, hosts_t const& hosts )
+                : icao_code (icao_code )
+                , data      (data      )
+                , config    (config    )
+                , apps      (apps      )
+                , hosts     (hosts     )
             {
             }
 
             std::string      icao_code;
-            msgs_t           msgs;
-            uint32_t         obj_num;   
+            data_t           data;
+            configuration_t  config;
+            applications_t   apps;
+            hosts_t          hosts;
         };
         
         REFL_STRUCT(setup_msg)
             REFL_ENTRY(icao_code )
-            REFL_ENTRY(msgs)
-            REFL_ENTRY(obj_num)
+            REFL_ENTRY(data)
+            REFL_ENTRY(config)
+            REFL_ENTRY(apps)
+            REFL_ENTRY(hosts)
         REFL_END()
 
 

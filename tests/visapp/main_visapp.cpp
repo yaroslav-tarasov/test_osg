@@ -581,13 +581,13 @@ struct visapp
     {
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_session_clients(bts);
+        need_to_update_ = true;
     }
 
     void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
         gt_.set_factor(0.0);
-        obj_to_load_num_ =  msg.obj_num;
     }
     
     void do_create_session(create_session const& msg)
@@ -654,7 +654,6 @@ private:
 private:
     bool                                 done_;
     std::unique_ptr<boost::thread>     thread_;
-    boost::optional<uint32_t> obj_to_load_num_;
 private:
     msg_dispatcher<uint32_t>             disp_;
     kernel::msg_service           msg_service_;
