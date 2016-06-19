@@ -72,7 +72,7 @@ Object::Object()
 {
 }
 
-Object::Object(osg::Node& node , const std::string  & name)
+Object::Object(osg::Node& node , const std::string  & name, bool fhw_inst)
     : _node (&node)
     , _hw_instanced (false)
     , _name(name) 
@@ -82,6 +82,9 @@ Object::Object(osg::Node& node , const std::string  & name)
     _node->accept(finder);
     _manager  = finder.getBM();
     ObjectManager::get().Register(name,this);
+
+	if(fhw_inst)
+		setupInstanced();
 }
 
 Object::Object(const Object& object,const osg::CopyOp& copyop)
@@ -498,32 +501,28 @@ Object* createObject(std::string name, bool fclone)
         }
 #endif
 
-		/*objCache[name] =*/ object = new Object(*pat, name);
+		object = new Object(*pat, name, (data && data->hw_instanced) );
 		
 		if(data && !data->hw_instanced)
 		{			
-			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
-			const xml_model_t::animations_t&  anims = data->anims;
-			for(auto it = anims.begin();it!= anims.end();++it)
 			{
-				const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
-				if(!anim_file_name.empty())
-					object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
+				OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getReadFileMutex());
+				const xml_model_t::animations_t&  anims = data->anims;
+				for(auto it = anims.begin();it!= anims.end();++it)
+				{
+					const std::string anim_file_name = osgDB::findFileInPath(it->second, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+					if(!anim_file_name.empty())
+						object->addAnimation(it->first,osgDB::readNodeFile(anim_file_name));
+				}
 			}
-		}
-
-        if(data && data->hw_instanced)
-        {
-            object->setupInstanced();
-        }
-        else
+		
             if(fclone)
             {
                 object = osg::clone(object, copyop );
             }
             else
                 pat = dynamic_cast<osg::PositionAttitudeTransform *>(object->getNode());
-
+		}
 	}
 	
     if(!object->hwInstanced())

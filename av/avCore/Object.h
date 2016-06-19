@@ -23,7 +23,7 @@ namespace avCore
 		/** Copy constructor using CopyOp to manage deep vs shallow copy. */
 		Object(const Object& object, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 		  
-		Object(osg::Node& node, const std::string  & name);
+		Object(osg::Node& node, const std::string  & name, bool fhw_inst);
 		  
 	    META_Object(osg, Object);
 
