@@ -9,9 +9,21 @@ namespace avCore
 
 namespace avCore 
 {
-	class Object : public osg::Object
+	struct ObjectInfo 
 	{
-        friend Object* createObject(std::string name, bool fclone);
+		virtual bool        hwInstanced() const =0;;
+	};
+	
+	struct ObjectControl : ObjectInfo
+	{
+		 virtual osg::Node*  getOrCreateNode()=0;
+		 virtual bool        parentMainInstancedNode(osg::Group* parent)=0;
+	};
+
+	class Object : public osg::Object
+		         , public ObjectControl
+	{
+        friend ObjectControl* createObject(std::string name, bool fclone);
     public:
         typedef std::map<std::string, osg::ref_ptr<osg::Node> >  AnimationContainersType;
 
@@ -32,13 +44,14 @@ namespace avCore
 
         inline void  setName(const std::string& name ) {_name = name;}           
 		inline void  addAnimation(const std::string& name, osg::Node*);
-        inline bool  hwInstanced() const { return _hw_instanced;};
         
-        bool         parentMainInstancedNode(osg::Group* parent); 
+
       
     private:
         void         setupInstanced();
         inline osg::Node*   getNode() { return _node.get();}
+		bool         hwInstanced() const { return _hw_instanced;};
+        bool         parentMainInstancedNode(osg::Group* parent); 
 
 	private:
 		osg::ref_ptr<osg::Node>                           _node;
@@ -58,7 +71,7 @@ namespace avCore
     struct ObjectManager
     {
         friend class Object;
-        friend Object* createObject(std::string name, bool fclone);
+        friend ObjectControl* createObject(std::string name, bool fclone);
 
 
         boost::optional<ObjectMap::value_type> Find(const std::string& name);
@@ -77,7 +90,7 @@ namespace avCore
     };
 
 
-    Object*    createObject(std::string name, bool fclone=true);
+    ObjectControl*   createObject(std::string name, bool fclone=true);
     void       releaseObjectCache();
 
 }

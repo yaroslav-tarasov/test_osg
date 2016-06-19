@@ -1537,7 +1537,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         if(phys_ctrl && body)
         {
-             avCore::Object* obj = avCore::createObject("parachute" , true);
+             avCore::ObjectControl* obj = avCore::createObject("parachute" , true);
              osg::Node* obj_node = obj->getOrCreateNode();
              
              osg::Matrix mat;
@@ -1604,7 +1604,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
     using namespace creators;
     
-    avCore::Object* obj = avCore::createObject(path, clone);
+    avCore::ObjectControl* obj = avCore::createObject(path, clone);
     
     if( path == "su_27" )
     {

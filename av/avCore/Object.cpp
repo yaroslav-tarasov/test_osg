@@ -209,7 +209,7 @@ struct helper_t
     std::string    name;
 };
 
-Object* createObject(std::string name, bool fclone)
+ObjectControl* createObject(std::string name, bool fclone)
 {
 	::Database::fpl_wrap fpl(name);
 	osg::Node* object_file = nullptr;
