@@ -62,9 +62,11 @@ namespace net_layer
             {
             }
             
-            setup_msg(const std::string& icao_code, data_t&&     data, configuration_t config,
+            setup_msg(const boost::optional<binary::size_type>& task_id, const std::string& icao_code, data_t&&     data, configuration_t const& config,
                 applications_t const& apps, hosts_t const& hosts )
-                : icao_code (icao_code )
+                : 
+                  task_id   (task_id)
+                , icao_code (icao_code )
                 , data      (data      )
                 , config    (config    )
                 , apps      (apps      )
@@ -72,14 +74,16 @@ namespace net_layer
             {
             }
 
-            std::string      icao_code;
-            data_t           data;
-            configuration_t  config;
-            applications_t   apps;
-            hosts_t          hosts;
+            boost::optional<binary::size_type> task_id;
+            std::string       icao_code;
+            data_t            data;
+            configuration_t   config;
+            applications_t    apps;
+            hosts_t           hosts;
         };
         
         REFL_STRUCT(setup_msg)
+            REFL_ENTRY(task_id)
             REFL_ENTRY(icao_code )
             REFL_ENTRY(data)
             REFL_ENTRY(config)
@@ -310,7 +314,7 @@ namespace net_layer
 //
 //  Engines
 //
-
+      
     enum engine_state_t : int16_t
     {
         ES_STOPPED = 0 ,  

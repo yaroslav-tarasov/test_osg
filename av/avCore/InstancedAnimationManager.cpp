@@ -120,11 +120,12 @@ namespace avCore
 
 
 
-	osg::TextureRectangle* InstancedAnimationManager::_createTextureHardwareInstancedGeode(osg::Geometry* geometry) 
-	{
+    osg::TextureRectangle* InstancedAnimationManager::_createTextureInstancedData()
+    {
 		const unsigned int start = 0;
 		const unsigned int end = instancesData_.size();
 
+#if 0
 		// first turn on hardware instancing for every primitive set
 		for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
 		{
@@ -134,6 +135,7 @@ namespace avCore
 		// we need to turn off display lists for instancing to work
 		geometry->setUseDisplayList(false);
 		geometry->setUseVertexBufferObjects(true);
+#endif
 
 		// create texture to encode all matrices
         const size_t fixed_data_size =   4096u;
@@ -145,12 +147,14 @@ namespace avCore
 		image->setInternalTextureFormat(GL_RGBA32F_ARB);
 
 
+#if 0
 		for (unsigned int i = /*start*/0, j = 0; i < /*end*/instancesData_.size(); ++i, ++j)
 		{
 			const osg::Matrixf& matrix = instancesData_[i];
 			float * data = (float*)image->data((j % texture_row_data_size) *4u, j / texture_row_data_size);
 			memcpy(data, matrix.ptr(), 16 * sizeof(float));
 		}
+#endif
 
 		instTexture_ = new osg::TextureRectangle(image);
 		instTexture_->setInternalFormat(GL_RGBA32F_ARB);
@@ -182,6 +186,7 @@ namespace avCore
 		return mapVisitor.getBoneMap();
 	}
 
+#if 0
 	void InstancedAnimationManager::setInstanceData(size_t idx, const osg::Matrixf& matrix)
 	{
 		instancesData_[idx] = matrix;
@@ -189,6 +194,7 @@ namespace avCore
 		memcpy(data, matrix.ptr(), 16 * sizeof(float));
         instTexture_->getImage(0)->dirty();
 	}
+#endif
 
 
 	osg::Geode* InstancedAnimationManager::_createGeode()
@@ -208,8 +214,11 @@ namespace avCore
 		osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
 		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
+        // we need to turn off display lists for instancing to work
+        geometry->setUseDisplayList(false);
+        geometry->setUseVertexBufferObjects(true);
 
-		/*instTexture_ =*/  _createTextureHardwareInstancedGeode(geometry);
+		_createTextureInstancedData();
         
         _initSkinning(*geometry.get(), image_data_ );
 
@@ -235,6 +244,8 @@ namespace avCore
     {
         const size_t x_num = 16; 
         const size_t y_num = 16;
+        
+        instancesData_.reserve( x_num * y_num);
 
         // create some matrices
         srand(time(NULL));
@@ -318,7 +329,7 @@ namespace avCore
         return true;
     }
              
-    osg::Node *  InstancedAnimationManager::getInstancedNode()
+    osg::Node *  InstancedAnimationManager::getObjectInstance()
     {  
         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(mutex_);
 

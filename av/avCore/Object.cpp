@@ -151,8 +151,8 @@ bool   Object::parentMainInstancedNode(osg::Group* parent)
     if(_hw_instanced)
     {
         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getInstanceMutex());
-        if(_inst_manager->getInstGeode()->getNumParents()==0)
-            parent->addChild(_inst_manager->getInstGeode());
+        if(_inst_manager->getMainNode()->getNumParents()==0)
+            parent->addChild(_inst_manager->getMainNode());
 
         return true;
     }
@@ -164,7 +164,7 @@ osg::Node*   Object::getOrCreateNode()
 {
     if(_hw_instanced)
     {
-       return _inst_manager->getInstancedNode();
+       return _inst_manager->getObjectInstance();
     }
     else
         return _node.get(); 

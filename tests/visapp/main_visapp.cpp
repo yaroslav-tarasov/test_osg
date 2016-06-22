@@ -56,7 +56,6 @@ namespace
 
        sys_updater(kernel::system_ptr  sys, on_ready_f ready_f, double period = 0.001)
           : period_(period)
-          , old_val(0)
           , sys_(sys)
           , vis_sys_(sys)
           , vis_sys_props_(vis_sys_)
@@ -90,8 +89,7 @@ namespace
        }
 
     private:
-       double                                                   period_; 
-       double                                                   old_val;
+       double                                                   period_;
        kernel::system_ptr                                          sys_;
        kernel::visual_system_ptr                               vis_sys_;
        kernel::visual_system_props_ptr                   vis_sys_props_;
@@ -508,19 +506,18 @@ struct visapp
 {
     visapp( const  endpoint &  peer, const endpoint& mod_peer)
         : done_          (false)
-        , need_to_update_(false)
         , thread_        (new boost::thread(boost::bind(&visapp::run_empty, this )))
         , msg_service_   (boost::bind(&visapp::send, this, _1))
+        , ready_(true)
     {
         
-        props_.base_point = ::get_base();
-        props_.channel.camera_name = "camera 0";
+        void (visapp::*on_props_updated)         (props_updated const& msg)           = &visapp::on_props_updated;
 
         disp_
             .add<setup_msg             >(boost::bind(&visapp::on_setup          , this, _1))
             .add<create_session        >(boost::bind(&visapp::do_create_session , this, _1))
             .add<state_msg             >(boost::bind(&visapp::on_state          , this, _1))
-            .add<props_updated         >(boost::bind(&visapp::on_props_updated  , this, _1))
+            .add<props_updated         >(boost::bind(on_props_updated , this, _1))
             ;
 
         w_.reset (new net_worker( peer, mod_peer 
@@ -528,6 +525,10 @@ struct visapp
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0)
             , boost::bind(&visapp::update, this, _1)
             ));
+
+        props_ = in_place();
+        props_->base_point = ::get_base();
+        props_->channel.camera_name = "camera 0";
 
     }
 
@@ -558,10 +559,10 @@ struct visapp
 	
 	void update_properties(visapp_impl& vi)
 	{
-		if (need_to_update_)
+		if (ready_ && props_)
 		{
-			vi.update_property(props_);
-			need_to_update_ = false;
+			vi.update_property(*props_);
+			props_.reset();
 		}
 	}
 
@@ -581,13 +582,17 @@ struct visapp
     {
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_session_clients(bts);
-        need_to_update_ = true;
+        ready_ = true;
     }
 
     void on_setup(setup_msg const& msg)
     {
         w_->set_factor(0.0);
-        gt_.set_factor(0.0);
+        gt_.set_factor(0.0); 
+        if(msg.task_id && msg.config.tasks[*msg.task_id].properties.size()>0)
+        {
+          on_props_updated(msg.config.tasks[*msg.task_id].properties);
+        }
     }
     
     void do_create_session(create_session const& msg)
@@ -619,7 +624,7 @@ struct visapp
 
     void run( binary::bytes_t data )
     {   
-        visapp_impl  va( props_, data, msg_service_,  boost::bind(&visapp::on_ready, this));
+        visapp_impl  va( *props_, data, msg_service_,  boost::bind(&visapp::on_ready, this));
         while (!va.done() && !done_)
         {
           update_messages();
@@ -635,22 +640,26 @@ struct visapp
         done_ = true;
     }
     
-   
-    void on_props_updated(props_updated const& msg)
+    void on_props_updated(std::string const& prop)
     {
         kernel::vis_sys_props props;
-        std::stringstream is(msg.properties);
+        std::stringstream is(prop);
         prop_tree::read_from(is, props);
-        
+
         FIXME(Чего-то со свойствами надо делать);
         props_ = props;
-        props_.base_point = ::get_base();
-		need_to_update_ = true;
+        props_->base_point = ::get_base();
+
+    }
+
+    void on_props_updated(props_updated const& msg)
+    {
+        on_props_updated(msg.properties);
     }
 
 private:
-    kernel::vis_sys_props               props_;
-	bool								need_to_update_;
+    boost::optional<kernel::vis_sys_props>  props_;
+    bool                                    ready_;
 private:
     bool                                 done_;
     std::unique_ptr<boost::thread>     thread_;

@@ -29,25 +29,25 @@ inline std::string get_model(std::string const& kind)
         return "b_747_400";
     else if (kind == "B763")
         return "b_767_300";
-    else if (kind == "Mi8")
+    else if (kind == "Mi8" || kind == "ÌÈ-8")
         return "mi_8";
     else if (kind == "C525")
         return "cessna_525";
-    else if (kind == "AN26")
+    else if (kind == "AN26" || kind == "ÀÍ-26")
         return "an_26";
     else if (kind == "SB20")
         return "sb20"; 
-    else if (kind == "KA27")
+    else if (kind == "KA27" || kind == "ÊÀ-27")
         return "ka27";
-    else if (kind == "KA50")
+    else if (kind == "KA50"|| kind == "ÊÀ-50") 
         return "ka_50";
-    else if (kind == "KA52")
+    else if (kind == "KA52" || kind == "ÊÀ-52" )
         return "ka_52";
-    else if (kind == "L39")
+    else if (kind == "L39" || kind == "Ë-39")
         return "l_39";
-	else if (kind == "AN140")
+	else if (kind == "AN140" || kind == "ÀÍ-140")
 		return "an_140";
-    else if (kind == "SU25")
+    else if (kind == "SU25" || kind == "ÑÓ-25")
         return "su_25tm";
     else
         return "checker";

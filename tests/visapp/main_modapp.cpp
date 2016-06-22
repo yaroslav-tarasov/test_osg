@@ -539,20 +539,18 @@ private:
 
     void on_setup_deffered()
     {
-        // Airport & auto objects
-        //create_objects(setup_msg_.icao_code);
-        
         init_ = true;
-
-        //for(auto it=setup_msg_.msgs.begin(); it != setup_msg_.msgs.end(); ++it )
-        //    disp_.dispatch_bytes(*it);
-        std::string props =  "base_point\n{\n    lat 55.9724\n    lon 37.4131\n    height 0\n}\nchannel\n{\n    hfov 60\n    hdeflection 0\n    course 60\n    pixel_scale 1\n    camera_name \"\"\n    cylindric_geom_corr false\n}\nwindow\n{\n    ltcorner\n    {\n        x 0\n        y 0\n    }\n    size\n    {\n        x 500\n        y 500\n    }\n    fullscreen false\n}\n";
-
-        binary::bytes_t bts =  std::move(wrap_msg(props_updated(props)));
-        w_->send_session_clients(bts);
-
+        //send_props();
         create_objects(setup_msg_);
     }
+
+    void send_props() 
+    {
+        std::string props =  "base_point\n{\n    lat 55.9724\n    lon 37.4131\n    height 0\n}\nchannel\n{\n    hfov 60\n    hdeflection 0\n    course 60\n    pixel_scale 1\n    camera_name \"\"\n    cylindric_geom_corr false\n}\nwindow\n{\n    ltcorner\n    {\n        x 0\n        y 0\n    }\n    size\n    {\n        x 500\n        y 500\n    }\n    fullscreen false\n}\n";
+        binary::bytes_t bts =  std::move(wrap_msg(props_updated(props)));
+        w_->send_session_clients(bts);
+    }
+
 
     void on_state(state_msg const& msg)
     {

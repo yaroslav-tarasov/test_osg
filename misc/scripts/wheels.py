@@ -1,4 +1,4 @@
-###########################################
+﻿###########################################
 ###   Central pivot for wheels 
 ###
 
@@ -33,3 +33,4 @@ for sn in shassi_nodes :
 
         for wchild_node in wheel_children :
             cmds.setAttr(sn + '|' + w_node + '|' +  wchild_node + '.translate', -sn_piv[0], -piv_w[1], -piv_w[2], type="double3")
+        cmds.xform(sn + '|' + w_node,  cp=True)

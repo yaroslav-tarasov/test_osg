@@ -112,7 +112,8 @@ for line in inputfile:
                     cmds.duplicate(filename[0] + "_tr" , n=obj_name, rc=True, instanceLeaf=True)
                  else:
                     cmds.file(main_dir + "\\Land\\" + filename[0] + ".obj" ,i=True,f=True,typ="OBJ", gr=True, gn= obj_name, ra=True)
-
+                    
+                 obj_name = '|' + obj_name
                  cmds.setAttr( obj_name + '.rotatePivot', 0, 0, 0, type="double3")
                  cmds.setAttr( obj_name + '.scalePivot', 0, 0, 0, type="double3")
                  cmds.setAttr( obj_name + '.rotate', 90, 0, course, type="double3")
