@@ -200,7 +200,30 @@ namespace
         //parent->add(navid_group);
     }
 
+    inline void MaskNodes( osg::Node* root  )
+    {
+        findNodeVisitor::nodeNamesList list_name;
 
+        const char* names[] =
+        {
+            "kaponir",
+        };
+
+        for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
+        {
+            list_name.push_back(names[i]);
+        }
+
+        findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+        if(root) root->accept(findNodes);
+
+        const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+
+        for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+        {
+            (*it)->setNodeMask(0);
+        }
+    }
 
 }
 
@@ -393,6 +416,8 @@ void  Terrain::Create( const std::string& cFileName )
 
     addChild(baseModel);
     baseModel->setName("baseModel");
+    
+    MaskNodes(baseModel);
 
 #if 0
     auto ret_array  = creators::createMovingModel(center,radius*0.8f);

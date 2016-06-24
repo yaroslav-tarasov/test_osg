@@ -32,7 +32,9 @@ namespace aircraft_physless
         optional<double>  last_update_;
 
         nm::node_info_ptr engine_node_;
-        nm::node_info_ptr forsage_node_;
+        
+        std::vector<nm::node_info_ptr> forsage_nodes_;
+        std::vector<boost::shared_ptr<visual_objects::forsage_support>>     fs_;
 
         visual_object_ptr smoke_object_;
         
@@ -44,7 +46,7 @@ namespace aircraft_physless
     private:
         boost::shared_ptr<visual_objects::label_support>       ls_;
         boost::shared_ptr<visual_objects::parashute_support>   ps_;
-        boost::shared_ptr<visual_objects::forsage_support>     fs_;
+
         boost::shared_ptr<visual_objects::smoke_support>       smoke_sup_;
         boost::shared_ptr<visual_objects::landing_dust_support>  lds_;
 

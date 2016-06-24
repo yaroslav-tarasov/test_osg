@@ -143,3 +143,21 @@ for bn in body_nodes :
     body_children = cmds.listRelatives(bn) 
     for bc in body_children :
         cmds.setAttr( bn + '|' + bc + '.translate', -bn_trans[0][0],-bn_trans[0][1],-bn_trans[0][2], type="double3")
+
+
+#####################################
+#  For arresting gear helper
+#
+
+import maya.cmds as cmds
+
+nodes = cmds.ls( tr=True )
+tr_nodes = [ x for x in nodes if '_tros' in x.lower() ]
+
+
+for tn in tr_nodes :
+    bb = cmds.xform(tn, q=True, bb=True, ws=True)
+    print "params.ropes.push_back(std::make_pair( cg::point_3f( %0.2f, %0.2f ,%0.2f), cg::point_3f( %0.2f, %0.2f ,%0.2f) ));" % (bb[3]  , bb[1] ,(bb[2] + bb[5])/2, bb[0], bb[4], (bb[2] + bb[5])/2)
+
+
+

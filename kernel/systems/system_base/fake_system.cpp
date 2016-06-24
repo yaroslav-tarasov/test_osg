@@ -1408,7 +1408,7 @@ void visual_system_impl::load_exercise(dict_cref dict)
 
 visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-#if 1
+#if 0
     LogInfo("Objects to create: " << res << " seed = " << seed);
 #endif
     if (seed>0 && !ready_)
@@ -1424,7 +1424,7 @@ visual_object_ptr visual_system_impl::create_visual_object( std::string const & 
 
 visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
 {
-#if 1
+#if 0
     LogInfo("Objects to create: " << res << " seed = " << seed);
 #endif
     if (seed>0 && !ready_)
@@ -1444,7 +1444,7 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
       if(it!=objects_to_create_.end())
           objects_to_create_.erase(it);
 
-#if 1
+#if 0
       for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
                   LogInfo("Objects left to create: " << " seed = " << *it);
 #endif
@@ -1455,7 +1455,7 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
           ready_ = true;
       }
 
-#if 1
+#if 0
       LogInfo("Objects left to create: " << objects_to_create_.size() << " seed = " << seed);
 #endif
 }

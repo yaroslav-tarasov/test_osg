@@ -58,7 +58,7 @@ namespace aircraft_physless
             else
                 if (boost::starts_with(n->name(), "forsage"))
                 {
-                    this->forsage_node_ = n;
+                    this->forsage_nodes_.push_back(n);
                     return true;
                 }
                 else
@@ -101,9 +101,11 @@ namespace aircraft_physless
                 smoke_sup_->set_update_time(time);
 		}
 
-        if(fs_)
-            fs_->set_update_time(time);
-
+        if(fs_.size()>0)
+            std::for_each(fs_.begin(),fs_.end(),
+            [this,time](boost::shared_ptr<visual_objects::forsage_support>& fs) {
+                fs->set_update_time(time);
+        });
 
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
 #if 0
@@ -144,17 +146,13 @@ namespace aircraft_physless
 		}
 #endif
         
-        if(forsage_node_ && fs_)
+        if(forsage_nodes_.size()>0 && fs_.size()>0)
         {
-            if (root_visible)
-            {
-                (*fs_)->set_visible(true);
-                fs_->update(time, point_3f(), base);
-            }
-            else
-            {
-                (*fs_)->set_visible(false);
-            }
+            std::for_each(fs_.begin(),fs_.end(),
+                [=](boost::shared_ptr<visual_objects::forsage_support>& fs) {
+                    (*fs)->set_visible(root_visible);
+                    if(root_visible) fs->update(time, point_3f(), base); 
+            });
         }
 
         if (smoke_object_ && engine_node_)
@@ -249,16 +247,20 @@ namespace aircraft_physless
     {
         if (state.eng_state < aircraft::ES_FORSAGE)
         {
-            if(fs_)
-                fs_.reset();
+            if(fs_.size()>0)
+                fs_.clear();
         }
         else if (state.eng_state == aircraft::ES_FORSAGE)
         {
-            if(forsage_node_ && !fs_)
+            if(forsage_nodes_.size()>0 && fs_.size() == 0)
             {
-                fs_ = boost::make_shared<visual_objects::forsage_support>(
+                fs_.reserve(forsage_nodes_.size());
+                std::for_each(forsage_nodes_.begin(),forsage_nodes_.end(),
+                [this](nm::node_info_ptr fn) {
+                    fs_.push_back(boost::make_shared<visual_objects::forsage_support>(
                     vsys_->create_visual_object("sfx//forsage.scg",0,0,false),
-                    forsage_node_, root(), damned_offset() );
+                                    fn, root(), damned_offset() )); 
+                });
             }
         }
 

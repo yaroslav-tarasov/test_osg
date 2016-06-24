@@ -63,7 +63,7 @@ private:
     virtual void on_new_settings(){}
     virtual void on_model_changed(){}
     virtual void on_new_ropes_state(){}
-    virtual void on_target_changed (aircraft::info_ptr old_aerotow, const boost::optional<uint32_t> & id ) {}
+    virtual void on_target_changed (aircraft::info_ptr old_target, const boost::optional<uint32_t> & id ) {}
 protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
