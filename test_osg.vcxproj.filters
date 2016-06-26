@@ -255,6 +255,9 @@
     <Filter Include="Header Files\av\fx">
       <UniqueIdentifier>{29a53638-d161-4366-a3f3-e4e21a12d49b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\flex">
+      <UniqueIdentifier>{37332ad8-9cf1-41af-991e-42c2e77d8af4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -622,6 +625,9 @@
     </ClInclude>
     <ClInclude Include="utils\LoadManager.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\flex\FlexDrawable.h">
+      <Filter>Source Files\tests\flex</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1407,6 +1413,12 @@
     </ClCompile>
     <ClCompile Include="tests\grass_test2.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\flex\FlexDrawable.cpp">
+      <Filter>Source Files\tests\flex</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\flex\osgflex.cpp">
+      <Filter>Source Files\tests\flex</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

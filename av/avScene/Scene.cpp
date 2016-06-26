@@ -83,12 +83,15 @@
 //
 //  ext
 //
+
 #include "spark/osgspark.h"
 
 //#define PPU_TEST
 #ifdef PPU_TEST
+#include <osgPPU/UnitCamera.h>
+//#include <osgPPU/UnitText.h>
 #include "tests/simple.h"
-#include <osgPPU/UnitText.h>
+#include "tests/glow.h"
 #pragma comment(lib, "osgPPU.lib")
 #undef TEST_SHADOWS_FROM_OSG
 #endif
@@ -840,9 +843,10 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 #ifdef PPU_TEST
     auto const vp = _viewerPtr->getCamera()->getViewport();
 	osg::Camera* cam = _viewerPtr->getCamera();
+#if 0
     // setup an osgPPU pipeline to render the results
     osgPPU::Unit* lastUnit = NULL;
-    osgPPU::Processor* ppu = SimpleSSAO::createPipeline(/*vp->width()*/1280, /*vp->height()*/1024, cam, lastUnit, /*showAOMap*/false);
+    osgPPU::Processor* ppuNode = SimpleSSAO::createPipeline(/*vp->width()*/1280, /*vp->height()*/1024, cam, lastUnit, /*showAOMap*/false);
     // create a text unit, which will just print some info
     
     if (lastUnit)
@@ -856,8 +860,19 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         ppuout->setViewport(new osg::Viewport(0,0,1280, 1024));
         lastUnit->addChild(ppuout);
     }
+#endif
+#ifdef TEST_ANIMATION
+	auto ao = tests::createAnimatedObject();
+	addChild(ao);
+#endif
+	osg::Camera::RenderTargetImplementation renderImplementation = osg::Camera::FRAME_BUFFER_OBJECT;
 
-    addChild(ppu);
+	// setup camera and glower
+	osgPPU::Processor* processor = NULL;
+	osg::Group* ppuNode = ppu::setupGlow(cam, ao, /*tex_width*/1280, /*tex_height*/1024, /*windowWidth*/1280, /*windowHeight*/1024, renderImplementation, processor);
+	ppuNode->addChild(_terrainRoot);
+
+   addChild(ppuNode);
 #endif
     	
 	
@@ -1212,9 +1227,7 @@ FIXME(Чудеса с Ephemeris)
    _p->_trajectory_drawer = new Utils::TrajectoryDrawer(this,Utils::TrajectoryDrawer::LINES);
 #endif
 
-#ifdef TEST_ANIMATION
-   addChild(tests::createAnimatedObject());
-#endif
+
 
     return true;
 }
