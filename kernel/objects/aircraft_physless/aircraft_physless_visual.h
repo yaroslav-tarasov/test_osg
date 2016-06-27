@@ -31,7 +31,7 @@ namespace aircraft_physless
     private:
         optional<double>  last_update_;
 
-        nm::node_info_ptr engine_node_;
+        std::vector<nodes_management::node_info_ptr>        engines_nodes_;
         
         std::vector<nm::node_info_ptr> forsage_nodes_;
         std::vector<boost::shared_ptr<visual_objects::forsage_support>>     fs_;

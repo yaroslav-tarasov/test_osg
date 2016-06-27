@@ -54,7 +54,7 @@ namespace krv
             std::vector<data>    kd_;
             std::vector<cg::point_3> kp_;
 
-            data_getter(const std::string& file_name = std::string("log_AFL319.txt") )
+            data_getter(const std::string& file_name = std::string("log_AFL319.txt"), float time_start = 0, float time_shift = 0  )
             {
                 std::ifstream ifs(file_name);
 
@@ -80,10 +80,15 @@ namespace krv
                         //kd.w  = items.get<float>(15); 
                         //kd.vb = items.get<float>(17);
                         kd.tg   = items.get<float>(15);
-                        kd.time = items.get<float>(17);
+                        kd.time = items.get<float>(17) - time_shift ;
+                        
+                        if (kd.time >= 0.0 )
+                        {
+                            kd.time += time_start;
+                            kd_.push_back(kd);
+                            kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
+                        }
 
-                        kd_.push_back(kd);
-                        kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
                     }
 
 

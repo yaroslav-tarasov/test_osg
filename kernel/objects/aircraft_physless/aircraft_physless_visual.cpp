@@ -29,10 +29,12 @@ namespace aircraft_physless
 		: view      (oc,dict)
         , vsys_     (dynamic_cast<visual_system*>(sys_))  
 	{
+       
+        fill_nodes();
 
 #ifndef ASYNC_OBJECT_LOADING  
         
-        fill_nodes();
+
 
         ls_ = boost::make_shared<visual_objects::label_support>(
             vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg"), settings_.custom_label);
@@ -50,9 +52,9 @@ namespace aircraft_physless
     {
         nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
         {
-            if (boost::starts_with(n->name(), "engine_l"))
+            if (boost::starts_with(n->name(), "engine"))
             {
-                this->engine_node_ = n;
+                this->engines_nodes_.push_back(n);
                 return true;
             }
             else
@@ -140,7 +142,7 @@ namespace aircraft_physless
                     vsys_->create_visual_object("sfx//landing_dust.scg",0,0,false), root(), root(), damned_offset());
             }
 
-            fill_nodes();
+            // fill_nodes();
                      
 
 		}
@@ -155,7 +157,7 @@ namespace aircraft_physless
             });
         }
 
-        if (smoke_object_ && engine_node_)
+        if (smoke_object_ && engines_nodes_.size()>0)
         {
             if (root_visible)
             {
@@ -205,10 +207,10 @@ namespace aircraft_physless
             }
 #endif
             
-            if (!smoke_sup_ && has_smoke && engine_node_ )
+            if (!smoke_sup_ && has_smoke && engines_nodes_.size()>0 )
             {
                  smoke_sup_ = boost::make_shared<visual_objects::smoke_support>(
-                    vsys_->create_visual_object("sfx//smoke.scg",0,0,false), engine_node_, root(), damned_offset());
+                    vsys_->create_visual_object("sfx//smoke.scg",0,0,false), engines_nodes_[0], root(), damned_offset());
             }
 
             if (smoke_sup_)

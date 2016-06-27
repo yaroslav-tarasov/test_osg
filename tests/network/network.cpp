@@ -302,12 +302,12 @@ struct client
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
-        , traj_trp2_(fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin6.txt")))
+        , traj_trp2_(fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0, 250.0 )))
         , traj_cam_         (camera_moving::fill_trajectory())
         , traj_cam_reverse_ (camera_moving::fill_reverse_trajectory ())
         , net_cfgr_ (boost::make_shared<net_configurer>(peers))  
         , connect_helper_ (peers, this)
-        , period_   (.5)
+        , period_   (.1)
         , timer_    (boost::bind(&client::update, this))
     {
         disp_
@@ -335,11 +335,7 @@ struct client
 
 #if 1
 
-#if 1
-        ADD_EVENT(10.0 , create_msg(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
-        ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
-        ADD_EVENT(70.0,  fire_fight_msg(2))
-#endif
+
 
 #if 1
         ADD_EVENT(10.0 , create_msg(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
@@ -370,7 +366,13 @@ struct client
 
 #if 1
         ADD_EVENT(1.0  , create_msg(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
- 
+
+#if 1
+        ADD_EVENT(10.0 , create_msg(2,traj_->kp_value(traj_->base_length()) + cg::point_3(10.0,10.0,0.0),traj_->curs_value(traj_->base_length()),ok_vehicle,"pojarka", "2")) // "niva_chevrolet"
+        ADD_EVENT(10.0,  malfunction_msg(1,MF_FIRE_ON_BOARD,true)) 
+        ADD_EVENT(70.0,  fire_fight_msg(2))
+#endif
+
         run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
             binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                 id 
@@ -660,8 +662,10 @@ struct client
             //ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-            ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, "SU25"/*"L39"*/, "172") )
+            ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, /*"A319"*//*"SU25"*/"L39", "172") )
             
+            ADD_EVENT(180.0  , arrgear_target_msg( 172 ) )  
+
             ADD_EVENT(traj_trp2_->base_length() + 1.0   , engine_state_msg(172 , ES_LOW_THROTTLE)  )
             ADD_EVENT(traj_trp2_->base_length() + 82.0  , engine_state_msg(172 , ES_FULL_THROTTLE) )
             ADD_EVENT(traj_trp2_->base_length() + 75.0  , engine_state_msg(172 , ES_FORSAGE) )
@@ -672,7 +676,7 @@ struct client
 #if 1
             ADD_EVENT(traj_pos_->base_length()  , create_msg(173,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "173") )
             ADD_EVENT(4.0    , traj_assign_msg( 173, *traj_pos_) ) 
-            ADD_EVENT(/*232*/180.0  , set_target_msg( 173 ) ) 
+
 #endif
 
 #if 0

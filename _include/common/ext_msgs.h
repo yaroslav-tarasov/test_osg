@@ -420,7 +420,7 @@ namespace net_layer
 	
 	typedef gen_msg<vm_fire_fight, uint32_t>         fire_fight_msg;  
 
-    typedef gen_msg<ar_set_target, uint32_t>         set_target_msg; 
+    typedef gen_msg<ar_set_target, uint32_t>         arrgear_target_msg; 
 
 //
 //  Environment

@@ -36,7 +36,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_set_target)  (net_layer::msg::set_target_msg   const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg)  = &ctrl::inject_msg;
 
     
 
@@ -50,7 +50,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 		.add<net_layer::msg::fire_fight_msg        >(boost::bind(on_fire        , this, _1))
         .add<net_layer::msg::traj_assign_msg       >(boost::bind(on_traj_assign , this, _1)) 
         .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
-        .add<net_layer::msg::set_target_msg        >(boost::bind(on_set_target  , this, _1))
+        .add<net_layer::msg::arrgear_target_msg    >(boost::bind(on_set_target  , this, _1))
         	
         ;
 
@@ -258,7 +258,7 @@ void ctrl::inject_msg(net_layer::msg::fire_fight_msg  const& ext_id)
 	}
 }
    
-void ctrl::inject_msg(net_layer::msg::set_target_msg const& ext_id)  
+void ctrl::inject_msg(net_layer::msg::arrgear_target_msg const& ext_id)  
 {
     if(ext_id>0 )                          
     {

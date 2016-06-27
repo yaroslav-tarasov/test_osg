@@ -1332,7 +1332,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 	auto & mt_ = _p->_mt;
     mt_.push_back(new osg::MatrixTransform); 
     
-    LogInfo("Scene::load enter " << path);
+    // LogInfo("Scene::load enter " << path);
 
     if( path == "smoke" )
     {
@@ -1862,7 +1862,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
                 if((*it)->getName() == "port")
                 {   
-                    pnt._color      = green_color * 0.01f;
+                    pnt._color      = red_color * 0.01f;
                     need_to_add     = true;
                     pnt._sector = sector;
                     
@@ -1883,7 +1883,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
                 if((*it)->getName() == "starboard") 
                 {
-                    pnt._color = red_color * 0.01f ;
+                    pnt._color =  green_color * 0.01f ;
                     need_to_add     = true;
                     pnt._sector = sector;
                     
@@ -2002,7 +2002,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     OSG_WARN << "Scene::load: " << hr_timer.set_point() << "\n";
 
-    LogInfo("Scene::load exit " << path);
+    //LogInfo("Scene::load exit " << path);
 
 
 

@@ -7,16 +7,16 @@ struct decart_position
 
     decart_position(point_3 const& pos, quaternion const& orien)
         : pos  (pos)
-        , dpos (point_3(0.0,0.0,0.0))
-        , ddpos(point_3(0.0,0.0,0.0))
+        , dpos (point_3())
+        , ddpos(point_3())
         , orien(orien)
-        , omega(point_3(0.0,0.0,0.0))
+        , omega(point_3())
     {}
 
     decart_position(point_3 const& pos, point_3 const& dpos, quaternion const& orien, point_3 const& omega)
         : pos(pos)
         , dpos(dpos)
-        , ddpos(point_3(0.0,0.0,0.0))
+        , ddpos(point_3())
         , orien(orien)
         , omega(omega)
     {}
