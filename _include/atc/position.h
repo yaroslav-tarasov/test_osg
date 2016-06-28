@@ -75,12 +75,12 @@ struct geo_position
     geo_position() {}
     geo_position( geo_point_3 const& pos, quaternion const& orien )
         : pos(pos), orien(orien)
-        , dpos (point_3(0.0,0.0,0.0))
-        , ddpos(point_3(0.0,0.0,0.0))
-        , omega(point_3(0.0,0.0,0.0))
+        , dpos (point_3())
+        , ddpos(point_3())
+        , omega(point_3())
     {}
     geo_position( geo_point_3 const& pos, point_3 const& dpos, quaternion const& orien, point_3 const& omega )
-        : pos(pos), dpos(dpos), ddpos(point_3(0.0,0.0,0.0)) , orien(orien), omega(omega)
+        : pos(pos), dpos(dpos), ddpos(point_3()) , orien(orien), omega(omega)
     {}
 
     geo_position( decart_position const& decart, geo_base_3 const& base )

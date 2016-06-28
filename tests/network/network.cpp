@@ -662,9 +662,9 @@ struct client
             //ADD_EVENT(12.0  , create_msg(171,point_3(156,387,0),cg::cpr(173), ok_aircraft, "L39", "171") )
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-            ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, /*"A319"*//*"SU25"*/"L39", "172") )
+            ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, /*"A319"*/"SU25"/*"L39"*/, "172") )
             
-            ADD_EVENT(180.0  , arrgear_target_msg( 172 ) )  
+            ADD_EVENT(50.0  , arrgear_target_msg( 172 ) )  
 
             ADD_EVENT(traj_trp2_->base_length() + 1.0   , engine_state_msg(172 , ES_LOW_THROTTLE)  )
             ADD_EVENT(traj_trp2_->base_length() + 82.0  , engine_state_msg(172 , ES_FULL_THROTTLE) )

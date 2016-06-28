@@ -1846,7 +1846,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
                     data.transform  = mt;  
                     data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(tr.z() - 1.0,tr.z()/*4.f, 5.f*/);
+                    data.distanceFalloff = cg::range_2f(tr.z() - 2.0,tr.z() - 1/*4.f, 5.f*/);
                     FIXME( Damned offset )
                     data.position =  from_osg_vector3( tr + offset);
                     data.active = true;

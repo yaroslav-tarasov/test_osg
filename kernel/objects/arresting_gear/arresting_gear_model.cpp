@@ -79,7 +79,7 @@ void model::create_phys()
     params.ropes.push_back(std::make_pair( cg::point_3f( -2342.90, -368.16 ,0.17), cg::point_3f( -2346.57, -338.91 ,0.17) ));
     params.ropes.push_back(std::make_pair( cg::point_3f( -2330.30, -366.48 ,0.17), cg::point_3f( -2333.98, -337.22 ,0.17) ));
     params.ropes.push_back(std::make_pair( cg::point_3f( -2318.46, -365.02 ,0.17), cg::point_3f( -2322.13, -335.76 ,0.17) ));
-    params.ropes.push_back(std::make_pair( cg::point_3f( -2305.79, -363.45 ,0.17), cg::point_3f( -2309.47, -334.20 ,0.17) ));
+    params.ropes.push_back(std::make_pair( cg::point_3f( -2305.79, -363.45 ,0.17), cg::point_3f( -2309.47, -334.20 ,0.17) ));   // 12.7669
 
 
 #if 0
