@@ -174,7 +174,7 @@ struct UpdateNode2: public osg::NodeCallback
     UpdateNode2(osg::Node* node,  const std::string& name)
         : flag_delayed(false)
     {
-          _body =  findFirstNode(node,name,findNodeVisitor::not_exact);
+          _body =  findFirstNode(node,name,FindNodeVisitor::not_exact);
           _body =  _body.valid()?_body->getParent(0):nullptr;
           _pos  =  _body.valid()? _body->asTransform()->asMatrixTransform()->getMatrix().getTrans(): osg::Vec3d();
 

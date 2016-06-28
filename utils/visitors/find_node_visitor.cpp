@@ -33,7 +33,7 @@ namespace
 
 // Default constructor - initialize searchForName to "" and    
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor(match_type_t m, osg::NodeVisitor::TraversalMode tm, search_type_t st) 
+FindNodeVisitor::FindNodeVisitor(match_type_t m, osg::NodeVisitor::TraversalMode tm, search_type_t st) 
     : osg::NodeVisitor(tm)
     , searchForName()
     , m_(m)
@@ -44,7 +44,7 @@ findNodeVisitor::findNodeVisitor(match_type_t m, osg::NodeVisitor::TraversalMode
 // Constructor that accepts string argument   
 // Initializes searchForName to user string   
 // set the traversal mode to TRAVERSE_ALL_CHILDREN   
-findNodeVisitor::findNodeVisitor(const std::string &searchName, match_type_t m,osg::NodeVisitor::TraversalMode tm, search_type_t st ) 
+FindNodeVisitor::FindNodeVisitor(const std::string &searchName, match_type_t m,osg::NodeVisitor::TraversalMode tm, search_type_t st ) 
     : osg::NodeVisitor(tm)    
     , m_(m)
     , st_(st)
@@ -52,7 +52,7 @@ findNodeVisitor::findNodeVisitor(const std::string &searchName, match_type_t m,o
     searchForName.push_back(boost::to_lower_copy(searchName));
 }    
 
-findNodeVisitor::findNodeVisitor(const std::list<std::string> &searchNames, match_type_t m, osg::NodeVisitor::TraversalMode tm, search_type_t st) 
+FindNodeVisitor::FindNodeVisitor(const std::list<std::string> &searchNames, match_type_t m, osg::NodeVisitor::TraversalMode tm, search_type_t st) 
     : osg::NodeVisitor(tm)    
     , searchForName(searchNames)
     , m_(m)
@@ -63,7 +63,7 @@ findNodeVisitor::findNodeVisitor(const std::list<std::string> &searchNames, matc
 //The 'apply' method for 'node' type instances.   
 //Compare the 'searchForName' data member against the node's name.   
 //If the strings match, add this node to our list   
-void findNodeVisitor::apply(osg::Node &searchNode)    
+void FindNodeVisitor::apply(osg::Node &searchNode)    
 {    
     bool matching = false;
     const std::string value = st_ == user_id?([&searchNode]()->std::string{std::string name; searchNode.getUserValue("dae_node_id", name); return name;}()):searchNode.getName(); 
@@ -95,7 +95,7 @@ void findNodeVisitor::apply(osg::Node &searchNode)
 }    
 
 // Set the searchForName to user-defined string   
-void findNodeVisitor::setNameToFind(const std::string &searchName)    
+void FindNodeVisitor::setNameToFind(const std::string &searchName)    
 {    
     searchForName.clear();
     searchForName.push_back(boost::to_lower_copy(searchName));    
@@ -103,14 +103,14 @@ void findNodeVisitor::setNameToFind(const std::string &searchName)
 }    
 
 // Set the searchForName to user-defined string
-void findNodeVisitor::setNamesToFind(const std::list<std::string> &searchNames )
+void FindNodeVisitor::setNamesToFind(const std::list<std::string> &searchNames )
 {
     searchForName = searchNames;
     std::for_each(searchForName.begin(),searchForName.end(),[=](std::string& str){str = boost::to_lower_copy(str);});
     foundNodeList.clear();
 }
 
-osg::Node* findNodeVisitor::getFirst()   
+osg::Node* FindNodeVisitor::getFirst()   
 {   
     if(foundNodeList.size()>0) 
         return *(foundNodeList.begin());
@@ -118,7 +118,7 @@ osg::Node* findNodeVisitor::getFirst()
         return nullptr;
 }  
 
-osg::Node* findNodeVisitor::getLast()   
+osg::Node* FindNodeVisitor::getLast()   
 {   
     if(foundNodeList.size()>0) 
         return foundNodeList.back();

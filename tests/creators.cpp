@@ -560,16 +560,16 @@ namespace effects
             stateset->setDataVariance(osg::Object::DYNAMIC);
         }
 
-        findNodeVisitor::nodeNamesList list_name;
+        FindNodeVisitor::nodeNamesList list_name;
         list_name.push_back("white_blink");
         list_name.push_back("red");
         list_name.push_back("blue");
         list_name.push_back("green");
 
-        findNodeVisitor findNodes(list_name); 
+        FindNodeVisitor findNodes(list_name); 
         geom->accept(findNodes);
 
-        findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+        FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
         for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
         {
@@ -793,7 +793,7 @@ nodes_array_t loadAirplaneParts(std::string name)
         //    lod3->setNodeMask(0); // Убираем нафиг Lod3 
         
         root =  findFirstNode(model_file,"Root")->asGroup();
-        lod_ =  findFirstNode(model_file,"lod_",findNodeVisitor::not_exact)->asGroup();
+        lod_ =  findFirstNode(model_file,"lod_",FindNodeVisitor::not_exact)->asGroup();
 
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
             auto g_point =  findFirstNode(model_file,root.c_str());
@@ -812,7 +812,7 @@ nodes_array_t loadAirplaneParts(std::string name)
         auto port = addAsChild("port",green_light);
         auto star_board = addAsChild("starboard",red_light);
 
-        engine =  findFirstNode(model_file,"engine",findNodeVisitor::not_exact);
+        engine =  findFirstNode(model_file,"engine",FindNodeVisitor::not_exact);
         if (engine) engine_geode = engine->asGroup()->getChild(0);
 	}
 
@@ -859,7 +859,7 @@ osg::Node* loadVehicle(std::string name)
         lod3 =  findFirstNode(model_file,"Lod3");
 
         root =  findFirstNode(model_file,"Root")->asGroup();
-        lod_ =  findFirstNode(model_file,"lod_",findNodeVisitor::not_exact)->asGroup();
+        lod_ =  findFirstNode(model_file,"lod_",FindNodeVisitor::not_exact)->asGroup();
 
     }
 
@@ -912,7 +912,7 @@ osg::Node* applyBM(osg::Node* model, std::string name,bool set_env_tex )
 
     normalTex->setImage( im ); // "a_319_n.dds"  
 
-    auto shassis =  findFirstNode(model,"Shassis",findNodeVisitor::not_exact);
+    auto shassis =  findFirstNode(model,"Shassis",FindNodeVisitor::not_exact);
 
     if (/*shassis*/false)
     {
@@ -968,7 +968,7 @@ public:
             osg::Vec3 b = tx->getBound().center();
             osg::Vec3 tr = tx->getMatrix().getTrans();
             
-            findNodeByType<osg::Geode> findGeode; 
+            FindNodeByType<osg::Geode> findGeode; 
             node->accept(findGeode);
             auto g_node =  findGeode.getFirst();
             b = g_node->getBound().center();
@@ -1063,7 +1063,7 @@ osg::Node* loadHelicopter()
             lod3->setNodeMask(/*0xffffffff*/0); // Убираем нафиг Lod3 
         }
 
-        auto sag =  findFirstNode(model_file,"Sagged",findNodeVisitor::not_exact);
+        auto sag =  findFirstNode(model_file,"Sagged",FindNodeVisitor::not_exact);
 
         if(sag)
         { 
@@ -1071,14 +1071,14 @@ osg::Node* loadHelicopter()
             sag->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-0.075,0.89,0)));
         }
         
-        auto dyn =  findFirstNode(model_file,"Dynamic",findNodeVisitor::not_exact);
+        auto dyn =  findFirstNode(model_file,"Dynamic",FindNodeVisitor::not_exact);
 
         if(dyn)
         { 
             dyn->setNodeMask(0); 
         }
         
-        auto main_rotor =  findFirstNode(model_file,"main_rotor",findNodeVisitor::not_exact);
+        auto main_rotor =  findFirstNode(model_file,"main_rotor",FindNodeVisitor::not_exact);
 
         if(main_rotor)
         {   
@@ -1086,7 +1086,7 @@ osg::Node* loadHelicopter()
             main_rotor->setUpdateCallback(new rotateIt(osg::Z_AXIS,osg::Vec3f(-.01,0.89,0)));// osg::Vec3f(0.075,-0.85,0)
         }
 
-        auto tail_rotor =  findFirstNode(model_file,"tailrotorstatic",findNodeVisitor::not_exact);
+        auto tail_rotor =  findFirstNode(model_file,"tailrotorstatic",FindNodeVisitor::not_exact);
 
         const osg::Vec3 pivot(-0.1245227,-8.765233,4.587939); 
         if(tail_rotor)

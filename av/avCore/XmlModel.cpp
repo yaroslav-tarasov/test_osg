@@ -160,6 +160,15 @@ namespace avCore
                 cp.course =  cam.attribute("course").as_float(0.f);
                 data.cams.push_back(cp);
             }	
+
+			for (pugi::xml_node mn = root.child("MaskNode"); mn; mn = mn.next_sibling())
+			{
+
+				std::string name = 	mn.attribute("name").as_string("");
+				if (name.size()>0)
+					data.mask_nodes.push_back(name);
+			}	
+
         }
         else
         {

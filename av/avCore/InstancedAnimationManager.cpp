@@ -177,7 +177,7 @@ namespace avCore
 	
 	osgAnimation::BoneMap InstancedAnimationManager::_getBoneMap(osg::Node* base_model)
 	{
-		findNodeByType< osgAnimation::Skeleton> s_finder;  
+		FindNodeByType< osgAnimation::Skeleton> s_finder;  
 		s_finder.apply(*base_model);
 
 		auto* skel  = dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast());
@@ -199,7 +199,7 @@ namespace avCore
 
 	osg::Geode* InstancedAnimationManager::_createGeode()
 	{
-		findNodeByType< osg::Geode> geode_finder;  
+		FindNodeByType< osg::Geode> geode_finder;  
 		geode_finder.apply(*src_model_);
 
 		osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
@@ -363,7 +363,7 @@ namespace avCore
             auto & inst_data = instancesData_[idx];
 			if(!nd.second)
 			{
-                nd.second = findFirstNode(nd.first,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+                nd.second = findFirstNode(nd.first,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
             }
 
             if(nd.second && nd.second->getNumParents()>0)

@@ -1336,7 +1336,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
     if( path == "smoke" )
     {
-        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
        
         osg::Matrix mat; 
@@ -1392,7 +1392,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 	if( path == "sfx//smoke.scg" )
 	{
-		osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+		osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
 		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
 		osg::Matrix mat; 
@@ -1413,7 +1413,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
     if( path == "sfx//landing_dust.scg" )
     {
-        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
         osg::Matrix mat; 
@@ -1432,7 +1432,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 	if( path == "sfx//foam_stream.scg" )
 	{
-		osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+		osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
 		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
 		osg::Matrix mat; 
@@ -1457,12 +1457,12 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
     if( path == "text_label.scg" )
     {
-        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
         
         osg::MatrixTransform* root = nullptr;
         
-        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
 		
 		if(phys_ctrl)
 		{
@@ -1540,13 +1540,13 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
     if (path == "parachute.scg")
     {
-        osg::Node* pat =  parent?findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+        osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
         osg::MatrixTransform* root = nullptr;
 
-        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-        osg::MatrixTransform* body = findFirstNode(parent,"Body_",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)->asTransform()->asMatrixTransform();
+        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+        osg::MatrixTransform* body = findFirstNode(parent,"Body_",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)->asTransform()->asMatrixTransform();
 
         if(phys_ctrl && body)
         {
@@ -1654,16 +1654,16 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         if(mt!=nullptr)
         {
             
-            osg::Node* ld  =  findFirstNode(mt,"landing_lamp" ,findNodeVisitor::exact);
+            osg::Node* ld  =  findFirstNode(mt,"landing_lamp" ,FindNodeVisitor::exact);
             if(ld==nullptr)
-                ld =  findFirstNode(mt,"landing_lamp_r" ,findNodeVisitor::exact);
-			osg::Node* ld1 =  findFirstNode(mt,"landing_lamp1",findNodeVisitor::exact);
+                ld =  findFirstNode(mt,"landing_lamp_r" ,FindNodeVisitor::exact);
+			osg::Node* ld1 =  findFirstNode(mt,"landing_lamp1",FindNodeVisitor::exact);
             if(ld1==nullptr)
-                ld1 =  findFirstNode(mt,"landing_lamp_l" ,findNodeVisitor::exact);
+                ld1 =  findFirstNode(mt,"landing_lamp_l" ,FindNodeVisitor::exact);
 
-			osg::Node* sl  =  findFirstNode(mt,"steering_lamp",findNodeVisitor::not_exact);
-            osg::Node* pat =  findFirstNode(mt,"pat"          ,findNodeVisitor::not_exact);
-            osg::Node* hd  =  findFirstNode(mt,"headlight"    ,findNodeVisitor::not_exact);
+			osg::Node* sl  =  findFirstNode(mt,"steering_lamp",FindNodeVisitor::not_exact);
+            osg::Node* pat =  findFirstNode(mt,"pat"          ,FindNodeVisitor::not_exact);
+            osg::Node* hd  =  findFirstNode(mt,"headlight"    ,FindNodeVisitor::not_exact);
 
             const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3d(0.0,0.0,0.0);
 
@@ -1792,7 +1792,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 //#endif
             }
 
-            findNodeVisitor::nodeNamesList list_name;
+            FindNodeVisitor::nodeNamesList list_name;
             NavAidGroup*  obj_light  =  new NavAidGroup; 
 
             const char* names[] =
@@ -1813,10 +1813,10 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
                 list_name.push_back(names[i]);
             }
 
-            findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+            FindNodeVisitor findNodes(list_name,FindNodeVisitor::not_exact); 
             if(root) root->accept(findNodes);
 
-            const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+            const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
             auto shift_phase = cg::rand(cg::range_2(0, 255));
 
@@ -2342,7 +2342,7 @@ void Scene::setupDecals(const std::string& scene)
 	const size_t gnsize = sizeof(geoms_names) / sizeof(geoms_names[0]);
 	for( int i =0; i < gnsize; ++i )
 	{
-		auto marking = findFirstNode(this, geoms_names[i]  ,findNodeVisitor::not_exact);
+		auto marking = findFirstNode(this, geoms_names[i]  ,FindNodeVisitor::not_exact);
 		if(marking)
 		{
 			Utils::FindGeometry findVis; 

@@ -465,7 +465,7 @@ namespace avSky
 
     void Ephemeris::setStarFieldMask(osg::Node::NodeMask nm)
     {
-        auto sf =  findFirstNode(_d->_ephemerisModel,"StarField",findNodeVisitor::not_exact);
+        auto sf =  findFirstNode(_d->_ephemerisModel,"StarField",FindNodeVisitor::not_exact);
         if(sf) 
             sf->setNodeMask(nm); 
     }

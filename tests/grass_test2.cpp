@@ -229,16 +229,16 @@ int main_grass_test2( int argc, char** argv )
    
     osg::ref_ptr<osg::Node> sub_model = osgDB::readNodeFile( "blender/grass/ProceduralGrassShader_v3.dae" );
 
-	findNodeVisitor::nodeNamesList list_name;
+	FindNodeVisitor::nodeNamesList list_name;
 	list_name.push_back("sky");
 	list_name.push_back("obj");
 	//list_name.push_back("groundgrass");
 	//list_name.push_back("groundrender");
 
-	findNodeVisitor findNodes(list_name); 
+	FindNodeVisitor findNodes(list_name); 
 	sub_model->accept(findNodes);
 
-	const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+	const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
 	for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
 	{
@@ -246,10 +246,10 @@ int main_grass_test2( int argc, char** argv )
 	    (*it)->setNodeMask(0);
 	}
 
-	auto gg = findFirstNode(sub_model ,"GroundGrass",findNodeVisitor::not_exact);
+	auto gg = findFirstNode(sub_model ,"GroundGrass",FindNodeVisitor::not_exact);
 	_buildStateSet(gg);
 	
-	auto gr = findFirstNode(sub_model ,"GroundRender",findNodeVisitor::not_exact);
+	auto gr = findFirstNode(sub_model ,"GroundRender",FindNodeVisitor::not_exact);
 	createGRState(gr);
 
 

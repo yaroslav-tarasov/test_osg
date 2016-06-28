@@ -111,7 +111,7 @@ private:
 	
 	inline osgAnimation::BoneMap getBoneMap(osg::Node* base_model)
 	{
-		findNodeByType< osgAnimation::Skeleton> s_finder;  
+		FindNodeByType< osgAnimation::Skeleton> s_finder;  
 		s_finder.apply(*base_model);
 
 		auto* skel  = dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast());
@@ -501,7 +501,7 @@ int main_anim_test4( int argc, char** argv )
 #if 1
    ////////////////////////////////////////////////////////////////////////////
 
-   findNodeByType< osg::Geode> geode_finder;  
+   FindNodeByType< osg::Geode> geode_finder;  
    geode_finder.apply(*object_file);
 
    osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); // cNodeFinder.FindChildByName_nocase( "CrowMesh" ));

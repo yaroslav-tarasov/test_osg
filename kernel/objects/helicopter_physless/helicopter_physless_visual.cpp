@@ -103,7 +103,7 @@ namespace helicopter_physless
 					ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 	        }
             
-            findNodeVisitor findMorph("rotor_morph",findNodeVisitor::not_exact); 
+            FindNodeVisitor findMorph("rotor_morph",FindNodeVisitor::not_exact); 
             nm::vis_node_control_ptr(root())->vis_nodes()[0]->accept(findMorph);
             
             auto const& nl =  findMorph.getNodeList();

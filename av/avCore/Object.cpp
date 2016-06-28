@@ -303,14 +303,14 @@ ObjectControl* createObject(std::string name, bool fclone)
 #if 1
             if(data->morphs.size()>0)
             {
-                findNodeVisitor::nodeNamesList list_name;
+                FindNodeVisitor::nodeNamesList list_name;
                 const morph_params& mp = data->morphs["rotor_morph"];
 #if 0
                 list_name.push_back(mp.parent);
                 list_name.push_back(mp.source);
                 list_name.push_back(mp.target);
 #endif
-                findNodeVisitor findParents(mp.parent,findNodeVisitor::not_exact); 
+                FindNodeVisitor findParents(mp.parent,FindNodeVisitor::not_exact); 
                 object_file->accept(findParents);
                 
                 auto const& nl =  findParents.getNodeList();
@@ -322,17 +322,17 @@ ObjectControl* createObject(std::string name, bool fclone)
 
                 for(int i=0;i<count_lod0;i++)
                 {
-                    auto source = findFirstNode(findParents.getNodeList()[i],mp.source,findNodeVisitor::not_exact);
-                    auto target = findFirstNode(findParents.getNodeList()[i],mp.target,findNodeVisitor::not_exact);
+                    auto source = findFirstNode(findParents.getNodeList()[i],mp.source,FindNodeVisitor::not_exact);
+                    auto target = findFirstNode(findParents.getNodeList()[i],mp.target,FindNodeVisitor::not_exact);
 
                     source->setNodeMask(0);
                     target->setNodeMask(0);
 
-                    findNodeByType< osg::Geode> geode_source_finder;  
+                    FindNodeByType< osg::Geode> geode_source_finder;  
                     geode_source_finder.apply(*source);
                     osg::Geode*    geode_source = dynamic_cast<osg::Geode*>(geode_source_finder.getLast()); 
 
-                    findNodeByType< osg::Geode> geode_target_finder;  
+                    FindNodeByType< osg::Geode> geode_target_finder;  
                     geode_target_finder.apply(*target);
                     osg::Geode*    geode_target = dynamic_cast<osg::Geode*>(geode_target_finder.getLast()); 
                     
@@ -362,10 +362,10 @@ ObjectControl* createObject(std::string name, bool fclone)
 #endif
 		}
 
-        bool airplane = findFirstNode(object_file ,"shassi_"  ,findNodeVisitor::not_exact)!=nullptr;
-        bool vehicle  = findFirstNode(object_file ,"wheel"    ,findNodeVisitor::not_exact)!=nullptr;
+        bool airplane = findFirstNode(object_file ,"shassi_"  ,FindNodeVisitor::not_exact)!=nullptr;
+        bool vehicle  = findFirstNode(object_file ,"wheel"    ,FindNodeVisitor::not_exact)!=nullptr;
         FIXME(Палец пол и потолок при определении модели)
-        bool heli     = findFirstNode(object_file ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
+        bool heli     = findFirstNode(object_file ,"tailrotor",FindNodeVisitor::not_exact)!=nullptr;
 
 
 		osg::Node* lod0 =  findFirstNode(object_file,"Lod0"); 
@@ -389,7 +389,7 @@ ObjectControl* createObject(std::string name, bool fclone)
         //
 		//  А здесь будет чертов некошерный лод
 		//
-        osg::Node* lod_ =  findFirstNode(object_file,"lod_",findNodeVisitor::not_exact);
+        osg::Node* lod_ =  findFirstNode(object_file,"lod_",FindNodeVisitor::not_exact);
 
         if(lod_ && lod0 && lod3 && (data?data->lod3:true))  // Далеко не все модели имеют заданную структуру ха
         {

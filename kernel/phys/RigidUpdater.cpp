@@ -186,7 +186,7 @@ namespace bi
             half_length = osg::Vec3 ( (bb.xMax() - bb.xMin())/2.0f,(bb.yMax() - bb.yMin())/2.0f,(bb.zMax() - bb.zMin()) /2.0f );
         }
 
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
 
 #if 0
         _sys->createBox( id, half_length, mass );
@@ -199,7 +199,7 @@ namespace bi
 
     void RigidUpdater::addUFO(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
         int id = _physicsNodes.size();
         _sys->createUFO( lod3,id, mass );
 
@@ -210,7 +210,7 @@ namespace bi
 
     void RigidUpdater::addUFO2(osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
         int id = _physicsNodes.size();
         
         //nm::manager_ptr man = nm::create_manager(lod3);
@@ -320,8 +320,8 @@ namespace bi
         // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
 
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
-        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
+        osg::Node*  root =  findFirstNode(node,"root",FindNodeVisitor::not_exact);
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 
@@ -353,8 +353,8 @@ namespace bi
         // TODO FIXME И тут можно обдумать процесс управления всеми лодами сразу
 
         //osg::Node*  lod0 =  findFirstNode(node,"Lod0",findNodeVisitor::not_exact);
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
-        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact);
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
+        osg::Node*  root =  findFirstNode(node,"root",FindNodeVisitor::not_exact);
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 
@@ -387,8 +387,8 @@ namespace bi
     void RigidUpdater::addVehicle2(const string& model_name,osg::Node* node,const osg::Vec3& pos, const osg::Vec3& vel, double mass)
     {           
         int id = _physicsNodes.size();
-        osg::Node*  lod3 =  findFirstNode(node,"Lod3",findNodeVisitor::not_exact);
-        osg::Node*  root =  findFirstNode(node,"root",findNodeVisitor::not_exact); 
+        osg::Node*  lod3 =  findFirstNode(node,"Lod3",FindNodeVisitor::not_exact);
+        osg::Node*  root =  findFirstNode(node,"root",FindNodeVisitor::not_exact); 
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 

@@ -202,7 +202,7 @@ namespace
 
     inline void MaskNodes( osg::Node* root  )
     {
-        findNodeVisitor::nodeNamesList list_name;
+        FindNodeVisitor::nodeNamesList list_name;
 
         const char* names[] =
         {
@@ -214,10 +214,10 @@ namespace
             list_name.push_back(names[i]);
         }
 
-        findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+        FindNodeVisitor findNodes(list_name,FindNodeVisitor::not_exact); 
         if(root) root->accept(findNodes);
 
-        const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+        const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
         for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
         {
@@ -251,11 +251,14 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 void  Terrain::Create( const std::string& cFileName )
 {
-    
+
 
     auto wf =  [this](std::string cFileName)->osg::Node* {
     
     Database::fpl_wrap  fpl(cFileName);
+	
+	avCore::ModelReader mr;
+	avCore::xml_scene_t data;
 
     const   osg::Vec3 center(0.0f,0.0f,300.0f);
     const   float radius = 600.0f;
@@ -310,8 +313,8 @@ void  Terrain::Create( const std::string& cFileName )
     }
     else
     {
-        avCore::ModelReader mr;
-        avCore::xml_scene_t data;
+
+        
         mr.Load(scene_file_name, data);
 
         scene_name = data.main_model;  
@@ -343,7 +346,17 @@ void  Terrain::Create( const std::string& cFileName )
     baseModel->setMatrix(osg::Matrix::rotate(quat0));
     baseModel->addChild(scene);
 #endif
+	
+	FindNodeVisitor::nodeNamesList list_name(data.mask_nodes.begin(), data.mask_nodes.end());
+	FindNodeVisitor findNodes(list_name); 
+	baseModel->accept(findNodes);
 
+	const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+
+	for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+	{
+		(*it)->setNodeMask(0);
+	}
 
     MaterialVisitor::namesList nl;
     nl.push_back("building");
@@ -365,11 +378,11 @@ void  Terrain::Create( const std::string& cFileName )
     FIXME(Test code)
     if(cFileName == "eisk")
     {
-        auto terra = findFirstNode(scene,"Terrain",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
+        auto terra = findFirstNode(scene,"Terrain",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
 
         if(terra)
         {
-            findNodeByType< osg::Geode> geode_finder;  
+            FindNodeByType< osg::Geode> geode_finder;  
             geode_finder.apply(*terra);
 
             osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
@@ -428,7 +441,7 @@ void  Terrain::Create( const std::string& cFileName )
 
     OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.set_point() << "\n";
     
-    auto light_masts = findNodes(baseModel,"lightmast_",findNodeVisitor::not_exact);
+    auto light_masts = findNodes(baseModel,"lightmast_",FindNodeVisitor::not_exact);
 
     for (auto it = light_masts.begin();it != light_masts.end();++it)
     {   

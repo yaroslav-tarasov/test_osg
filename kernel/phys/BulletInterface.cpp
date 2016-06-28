@@ -128,15 +128,15 @@ namespace aircraft
 			//p.wingspan = xm;
 			p.length   = ym;
 
-			auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+			auto body   = findFirstNode(node,"Body",FindNodeVisitor::not_exact);
 
-			auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",findNodeVisitor::not_exact);
-			auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",findNodeVisitor::not_exact);
-			auto sh_f   = findFirstNode(node,"animgroup_shassi_f",findNodeVisitor::not_exact);
+			auto sh_r_l = findFirstNode(node,"animgroup_shassi_r_l",FindNodeVisitor::not_exact);
+			auto sh_r_r = findFirstNode(node,"animgroup_shassi_r_r",FindNodeVisitor::not_exact);
+			auto sh_f   = findFirstNode(node,"animgroup_shassi_f",FindNodeVisitor::not_exact);
 
-			auto sh_r_l_wheel = findFirstNode(sh_r_l,"wheel",findNodeVisitor::not_exact);
-			auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",findNodeVisitor::not_exact);
-			auto sh_f_wheel   = findFirstNode(sh_f,"wheel",findNodeVisitor::not_exact);
+			auto sh_r_l_wheel = findFirstNode(sh_r_l,"wheel",FindNodeVisitor::not_exact);
+			auto sh_r_r_wheel = findFirstNode(sh_r_r,"wheel",FindNodeVisitor::not_exact);
+			auto sh_f_wheel   = findFirstNode(sh_f,"wheel",FindNodeVisitor::not_exact);
 		
 			const bool is_front = true;
 			{
@@ -213,9 +213,9 @@ namespace ray_cast_vehicle
 
             cs.offset_ = cg::point_3(0,/*lod3?-zm/2:*/0,0);
 
-            auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
+            auto body   = findFirstNode(lod3?lod3:node,"Body",FindNodeVisitor::not_exact);
 
-            auto wheels = findNodes(node,"wheel",findNodeVisitor::not_exact);
+            auto wheels = findNodes(node,"wheel",FindNodeVisitor::not_exact);
 
             for (auto it = wheels.begin();it != wheels.end();++it)
             {   

@@ -76,14 +76,14 @@ int main_morph( int argc, char** argv )
 #endif
     
     auto rotor_node   = osgDB::readNodeFile("./rotor/test.dae");
-    auto rotor_sagged = findFirstNode(rotor_node ,"pSphere3" ,findNodeVisitor::not_exact);
-    auto rotor_static = findFirstNode(rotor_node ,"pSphere2",findNodeVisitor::not_exact);
+    auto rotor_sagged = findFirstNode(rotor_node ,"pSphere3" ,FindNodeVisitor::not_exact);
+    auto rotor_static = findFirstNode(rotor_node ,"pSphere2",FindNodeVisitor::not_exact);
 
-    findNodeByType< osg::Geode> geode_sagged_finder;  
+    FindNodeByType< osg::Geode> geode_sagged_finder;  
     geode_sagged_finder.apply(*rotor_sagged);
     osg::Geode*    geode_rsag = dynamic_cast<osg::Geode*>(geode_sagged_finder.getLast()); 
     
-    findNodeByType< osg::Geode> geode_static_finder;  
+    FindNodeByType< osg::Geode> geode_static_finder;  
     geode_static_finder.apply(*rotor_static);
     osg::Geode*    geode_stat = dynamic_cast<osg::Geode*>(geode_static_finder.getLast()); 
 

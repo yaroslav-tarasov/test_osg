@@ -145,7 +145,7 @@ private:
 	
 	inline osgAnimation::BoneMap getBoneMap(osg::Node* base_model)
 	{
-		findNodeByType< osgAnimation::Skeleton> s_finder;  
+		FindNodeByType< osgAnimation::Skeleton> s_finder;  
 		s_finder.apply(*base_model);
 
 		auto* skel  = dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast());

@@ -88,6 +88,7 @@ namespace avCore
     {
          std::vector<camera_params>   cams;
          std::vector<xml_model_base>  objs;  // ????????????????
+		 std::vector<std::string>     mask_nodes;
     };
     
     typedef xml_scene xml_scene_t;

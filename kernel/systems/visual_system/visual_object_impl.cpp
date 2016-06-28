@@ -36,7 +36,7 @@ namespace kernel
 		if(!async)
 		{
             p_->node_ = p_->scene_->load(res, nullptr, seed, async);
-            p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
+            p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact);
             loaded_ = true;
 
             using namespace avAnimation;
@@ -77,7 +77,7 @@ namespace kernel
 		if(!async && p_->node_ )
 		{
 
-        p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact);
+        p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact);
 
 		using namespace avAnimation;
 
@@ -103,7 +103,7 @@ namespace kernel
     {
          if(seed_==seed)
          {
-           p_->root_ = findFirstNode(p_->node_,"root",findNodeVisitor::not_exact); 
+           p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact); 
            loaded_ = true;
 
 		   using namespace avAnimation;
