@@ -74,7 +74,7 @@ void model::create_phys()
     phys::arresting_gear::params_t  params;
     
     const float step = 3.0;
-
+    params.seg_num   = 32;
 
     params.ropes.push_back(std::make_pair( cg::point_3f( -2342.90, -368.16 ,0.17), cg::point_3f( -2346.57, -338.91 ,0.17) ));
     params.ropes.push_back(std::make_pair( cg::point_3f( -2330.30, -366.48 ,0.17), cg::point_3f( -2333.98, -337.22 ,0.17) ));
@@ -218,7 +218,7 @@ void model::on_target_changed (aircraft::info_ptr old_target, const boost::optio
         cg::point_3 offset;
 
         FIXME(tow_offset)
-        phys::arresting_gear::control_ptr(phys_model_)->set_target(aircraft::model_info_ptr(target_)->get_rigid_body(), offset, aircraft::model_info_ptr(target_)->tow_offset());
+        phys::arresting_gear::control_ptr(phys_model_)->set_target(aircraft::model_info_ptr(target_)->get_rigid_body(), aircraft::model_info_ptr(target_)->tow_offset(), offset);
     }
     else
     {

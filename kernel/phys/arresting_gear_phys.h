@@ -66,11 +66,12 @@ namespace phys
 #endif
 
 	   std::vector<std::unique_ptr<soft_body_proxy>>			  ropes_;
-       polymorph_ptr<bt_body_user_info_t>     self_;
-	   system_impl_ptr						  sys_;
-       params_t     params_;
-       cg::point_3  wind_;
-       bool         has_chassis_contact_;
+       polymorph_ptr<bt_body_user_info_t>                         self_;
+	   system_impl_ptr						                      sys_;
+       params_t                                                   params_;
+       cg::point_3                                                wind_;
+       bool                                                       has_chassis_contact_;
+       cg::point_3                                                self_offset_ ;
 
        typedef cg::duplicate_points_fixed_id<cg::point_3> dup_points_t;
        dup_points_t  body_contact_points_;
@@ -91,6 +92,8 @@ namespace phys
 	   cg::rectangle_3f                  ropes_bound_;
        cg::rectangle_3f                  trap_bound_;
 	   rigid_body_ptr                    target_;
+
+       boost::optional<double>           time_to_release;
    };
 
 

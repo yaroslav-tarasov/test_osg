@@ -58,13 +58,13 @@ namespace
         
         inline void add_nodes(const std::string& name)
         {
-            auto ns = findNodes(node_,name,findNodeVisitor::not_exact);
+            auto ns = findNodes(node_,name,FindNodeVisitor::not_exact);
             nodes_list_.insert(nodes_list_.end(), ns.begin(), ns.end());
         }
 
     private:
         osg::Node* node_;
-        findNodeVisitor::nodeListType  nodes_list_;
+        FindNodeVisitor::nodeListType  nodes_list_;
         std::vector< std::string > a;
     };
     
@@ -87,7 +87,7 @@ namespace vehicle
         btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/0,0);
         offset = cg::point_3(0,0,0);
 
-        auto body   = findFirstNode(lod3?lod3:node,"Body",findNodeVisitor::not_exact);
+        auto body   = findFirstNode(lod3?lod3:node,"Body",FindNodeVisitor::not_exact);
 
 
         const char* nn[] = { "wheel"};
@@ -140,7 +140,7 @@ namespace aircraft
             btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
             offset = cg::point_3(0,-dz,0);
 #endif 
-            auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+            auto body   = findFirstNode(node,"Body",FindNodeVisitor::not_exact);
             
             const char* nn[] = { "shassi", "rotor"/*, "engine"*/ };
             nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
@@ -190,7 +190,7 @@ namespace heli
         btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
         offset = cg::point_3(0,-dz,0);
 
-        auto body   = findFirstNode(node,"Body",findNodeVisitor::not_exact);
+        auto body   = findFirstNode(node,"Body",FindNodeVisitor::not_exact);
 
         const char* nn[] = { "shassi", "rotor" };
         nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));
@@ -257,11 +257,11 @@ namespace default
 {
     auto lod3 =  findFirstNode(node,"lod3");
 
-    bool aircraft = findFirstNode(node ,"shassi_",findNodeVisitor::not_exact)!=nullptr;
-    bool got_rotor = findFirstNode(node ,"rotor",findNodeVisitor::not_exact)!=nullptr;
-    bool vehicle  = findFirstNode(node ,"wheel",findNodeVisitor::not_exact)!=nullptr;
+    bool aircraft = findFirstNode(node ,"shassi_",FindNodeVisitor::not_exact)!=nullptr;
+    bool got_rotor = findFirstNode(node ,"rotor",FindNodeVisitor::not_exact)!=nullptr;
+    bool vehicle  = findFirstNode(node ,"wheel",FindNodeVisitor::not_exact)!=nullptr;
     FIXME(Палец пол и потолок при определении модели)
-    bool heli     = findFirstNode(node ,"tailrotor",findNodeVisitor::not_exact)!=nullptr;
+    bool heli     = findFirstNode(node ,"tailrotor",FindNodeVisitor::not_exact)!=nullptr;
 
     if(aircraft /*&& !got_rotor*/)
         return  aircraft::fill_cs(lod3?lod3:node,offset);

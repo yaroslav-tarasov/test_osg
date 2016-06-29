@@ -348,8 +348,8 @@ void  Terrain::Create( const std::string& cFileName )
 #endif
 	
 	FindNodeVisitor::nodeNamesList list_name(data.mask_nodes.begin(), data.mask_nodes.end());
-	FindNodeVisitor findNodes(list_name); 
-	baseModel->accept(findNodes);
+	FindNodeVisitor findNodes(list_name, FindNodeVisitor::not_exact); 
+	scene->accept(findNodes);
 
 	const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 

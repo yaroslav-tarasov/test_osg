@@ -814,7 +814,7 @@ int main( int argc, char **argv )
         // optimize the scene graph, remove rendundent nodes and state etc.
         osgUtil::Optimizer optimizer;
 
-        findNodeVisitor::nodeNamesList list_name;
+        FindNodeVisitor::nodeNamesList list_name;
         
         for(int i=0; i<sizeof(do_not_optimize::names)/sizeof(do_not_optimize::names[0]);++i)
         {
@@ -822,10 +822,10 @@ int main( int argc, char **argv )
         }
         
 
-        findNodeVisitor findNodes(list_name,findNodeVisitor::not_exact); 
+        FindNodeVisitor findNodes(list_name,FindNodeVisitor::not_exact); 
         root->accept(findNodes);
 
-        const findNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+        const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
 
         for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
         {

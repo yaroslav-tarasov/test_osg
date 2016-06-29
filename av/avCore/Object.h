@@ -43,12 +43,13 @@ namespace avCore
         osg::Node*   getOrCreateNode();
 
         inline void  setName(const std::string& name ) {_name = name;}           
-		inline void  addAnimation(const std::string& name, osg::Node*);
+        inline void  addAnimation(const std::string& name, osg::Node*);
+		inline void  addAnimation(const std::string& hw_anim_file);
         
 
       
     private:
-        void         setupInstanced();
+        void         setupInstancedHWAnimated(const std::string& hw_anim_file);
         inline osg::Node*   getNode() { return _node.get();}
 		bool         hwInstanced() const { return _hw_instanced;};
         bool         parentMainInstancedNode(osg::Group* parent); 

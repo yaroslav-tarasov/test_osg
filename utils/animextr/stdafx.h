@@ -7,6 +7,10 @@
 
 #include "targetver.h"
 
+//////////////////////////////////
+//  Common includes
+//
+
 #include <stdio.h>
 #include <tchar.h>
 
@@ -15,3 +19,15 @@
 #include "common/osg_inc.h"
 #include "common/misc.h"
 
+#include "common/debug.h"
+
+/////////////////////////////////
+//  CG-Lib
+//
+#include "common/meta.h"
+#include "cg_math.h"
+
+#include "common/points.h"
+#include "common/util.h"
+#include "geometry/dup_points.h"
+#include "geometry/xmath.h"

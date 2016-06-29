@@ -126,6 +126,7 @@ namespace avCore
 		TextureCache            m_cTextureCacheMap;
 	};
 
+
 #define GetDatabase() Database::GetInstance()
 
 }

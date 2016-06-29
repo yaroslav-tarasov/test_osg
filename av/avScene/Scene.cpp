@@ -2111,7 +2111,7 @@ void Scene::update( osg::NodeVisitor * nv )
       }
 
       const unsigned base_hour = 10;
-      const unsigned time_coeff   = /*1*/500; 
+      const unsigned time_coeff   = 1/*500*/; 
       const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();

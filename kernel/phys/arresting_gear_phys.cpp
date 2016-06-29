@@ -196,10 +196,20 @@ namespace {
 			cg::transform_4f target_transform = from_bullet_transform(target->getWorldTransform());
 			if(trap_bound_.contains(target_transform.translation()))
 			{
-				append_anchor(target_,target_transform.translation());
+				append_anchor(target_,target_transform.translation() - cg::point_3(self_offset_.y, self_offset_.x , 0));
+                time_to_release = 5.0;
 			}
 		}
 
+        if(time_to_release)
+        {
+            *time_to_release -= dt;
+            if(*time_to_release<=0)
+            {
+                time_to_release.reset();
+                release_anchor(target_);
+            }
+        }
 	}
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
@@ -343,12 +353,14 @@ namespace {
 
     void   impl::release_anchor       (rigid_body_ptr body)
     {
-
+        auto& psb = *ropes_.back().get();
+        psb->m_anchors.clear();
     }
     
     void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
     {
 		target_ = rb;
+        self_offset_ = self_offset;
     }
 
     void impl::reset_target()
