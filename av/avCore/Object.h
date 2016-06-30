@@ -51,7 +51,7 @@ namespace avCore
     private:
         void         setupInstancedHWAnimated(const std::string& hw_anim_file);
         inline osg::Node*   getNode() { return _node.get();}
-		bool         hwInstanced() const { return _hw_instanced;};
+		bool         hwInstanced() const;
         bool         parentMainInstancedNode(osg::Group* parent); 
 
 	private:
@@ -62,7 +62,6 @@ namespace avCore
         osg::ref_ptr<avCore::InstancedAnimationManager>   _inst_manager;
 	//  Settings
 	private:
-		bool											  _hw_instanced;
         std::string                                       _name;
 	};
 

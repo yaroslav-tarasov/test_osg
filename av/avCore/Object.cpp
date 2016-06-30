@@ -68,13 +68,11 @@ namespace avCore
 
 // constructor and destructor
 Object::Object()
-    : _hw_instanced (false)
 {
 }
 
 Object::Object(osg::Node& node , const std::string  & name, bool fhw_inst)
     : _node (&node)
-    , _hw_instanced (fhw_inst)
     , _name(name) 
 {
 	if(!fhw_inst)
@@ -94,7 +92,6 @@ Object::Object(const Object& object,const osg::CopyOp& copyop)
 	, _anim_containers (copyop.getCopyFlags() == osg::CopyOp::SHALLOW_COPY?AnimationContainersType():object._anim_containers)
 	, _manager         (copyop.getCopyFlags() == osg::CopyOp::SHALLOW_COPY?nullptr:object._manager)
     , _inst_manager    (object._inst_manager)
-    , _hw_instanced    (object._hw_instanced)
     , _name            (object._name)
 {
      ObjectManager::get().Register(this);
@@ -124,7 +121,6 @@ void  Object::addAnimation(const std::string& name, osg::Node* anim_container)
 
 void  Object::addAnimation(const std::string& hw_anim_file)
 {
-     assert(_hw_instanced);     
      setupInstancedHWAnimated(hw_anim_file);
 }
 
@@ -140,8 +136,6 @@ void  Object::setupInstancedHWAnimated(const std::string& hw_anim_file)
         
         // Двойная регистрация кэш и клоны, для спец узла (последствия?)
         ObjectManager::get().Register(this);
-
-        _hw_instanced = true;
     }
 }
 
@@ -151,10 +145,15 @@ static OpenThreads::Mutex& getInstanceMutex()
     return _mutex;
 }
 
+bool   Object::hwInstanced() const 
+{
+    return _inst_manager.valid();
+}
+
 // FIXME брррррррр
 bool   Object::parentMainInstancedNode(osg::Group* parent) 
 {
-    if(_hw_instanced)
+    if(_inst_manager.valid())
     {
         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(getInstanceMutex());
         if(_inst_manager->getMainNode()->getNumParents()==0)
@@ -168,7 +167,7 @@ bool   Object::parentMainInstancedNode(osg::Group* parent)
 
 osg::Node*   Object::getOrCreateNode() 
 {
-    if(_hw_instanced)
+    if(_inst_manager.valid())
     {
        return _inst_manager->getObjectInstance();
     }
@@ -178,7 +177,7 @@ osg::Node*   Object::getOrCreateNode()
 
 bool Object::PreUpdate()
 {
-	if(_hw_instanced && _inst_manager.valid() && _node.valid())
+	if(_inst_manager.valid() && _node.valid())
 	{
 		_inst_manager->commitInstancePositions();
 	}
