@@ -21,7 +21,7 @@ namespace phys
 
 namespace {
 
-    inline bt_soft_body_ptr	create_rope(	btSoftBodyWorldInfo& worldInfo, const btVector3& from,
+    inline bt_soft_body_ptr	bt_create_rope(	btSoftBodyWorldInfo& worldInfo, const btVector3& from,
         const btVector3& to,
         int res,
         int fixeds)
@@ -144,20 +144,10 @@ namespace {
             {
                 ropes_.push_back(std::move(std::unique_ptr<soft_body_proxy>(new soft_body_proxy(bw))));
 
-                ropes_.back().get()->reset(create_rope(bw->getWorldInfo(),	
-                    to_bullet_vector3(propes_params[i].first),
-                    to_bullet_vector3(propes_params[i].second),
-                    params.seg_num,
-                    1+2));
+                create_rope(bw, propes_params[i], params.seg_num);
 
                 ropes_bound_ |= propes_params[i].first;
                 ropes_bound_ |= propes_params[i].second;
-                
-                auto& psb = *ropes_.back().get();
-                psb->m_cfg.piterations		=	4;
-                psb->m_materials[0]->m_kLST	=	0.1+((n - i)/(btScalar)(n-1))*0.9;
-                psb->setTotalMass(20);
-
 #if 0
                 if(i==0)
                 {
@@ -301,7 +291,7 @@ namespace {
         for (auto it = ropes_.begin(); it != ropes_.end(); ++it, ++i)
         {
             const btSoftBody::tNodeArray& nodes = it->get()->get()->m_nodes;
-            unsigned idx;
+            int idx;
             ::arresting_gear::rope_state_t ri;
             ri.resize(nodes.size());
             for( idx=0; idx<nodes.size(); idx++)
@@ -355,6 +345,20 @@ namespace {
     {
         auto& psb = *ropes_.back().get();
         psb->m_anchors.clear();
+
+        const unsigned n = params_.ropes.size();
+        if(n>0)
+        {
+ #if 0
+           bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys_->dynamics_world());
+            auto const & propes_params = params_.ropes;
+            create_rope(bw, propes_params[n-1], params_.seg_num);
+#endif
+
+            ropes_.back().get()->reset();
+            ropes_.pop_back();
+            params_.ropes.pop_back();
+        }
     }
     
     void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
@@ -372,6 +376,27 @@ namespace {
     {
         return params_;
     }
+
+    void impl::create_rope( bt_softrigid_dynamics_world_ptr bw, params_t::rope_t const& rope, unsigned seg_num)
+    {
+        ropes_.back().get()->reset(bt_create_rope(bw->getWorldInfo(),	
+            to_bullet_vector3(rope.first),
+            to_bullet_vector3(rope.second),
+            seg_num,
+            1+2));
+
+        auto& psb = *ropes_.back().get();
+        psb->m_cfg.piterations		=	5;/*4;*/
+        // psb->m_cfg.collisions	=	btSoftBody::fCollision::CL_SS; //btSoftBody::fCollision::CL_SS+	btSoftBody::fCollision::CL_RS;
+        // psb->m_cfg.kAHR	=	1.0; 
+
+        psb->m_materials[0]->m_kLST	=	0.2;// 0.1+((n - i)/(btScalar)(n-1))*0.9;
+        //psb->m_materials[0]->m_kVST	=	1.0;
+        //psb->m_materials[0]->m_kAST	=	1.0;
+
+        psb->setTotalMass(0.002);
+    }
+
 
 }
 

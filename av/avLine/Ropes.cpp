@@ -257,6 +257,13 @@ void  RopesNode::updateRopes( const arresting_gear::ropes_state_t& rss )
          else
             _geom->addPrimitiveSet(new osg::DrawElementsUInt ( osg::PrimitiveSet::TRIANGLE_STRIP, Indices.size() , (GLuint*)&Indices [ 0 ] ));
     }
+    
+    auto const prims = _geom->getNumPrimitiveSets() - rss.size();
+    
+    if(prims>0)
+    {
+       _geom->removePrimitiveSet(rss.size(), prims); 
+    }
 
     _coords->dirty();
 	_uv->dirty();

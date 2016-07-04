@@ -18,7 +18,10 @@ namespace phys
    {
    public:
       impl(system_impl_ptr,compound_sensor_ptr s, params_t const& params, decart_position const& pos);
-   
+
+      void create_rope( bt_softrigid_dynamics_world_ptr bw, params_t::rope_t const& rope, unsigned seg_num);
+
+
    
    private:
        void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;

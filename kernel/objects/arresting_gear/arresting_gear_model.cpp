@@ -73,22 +73,15 @@ void model::create_phys()
 
     phys::arresting_gear::params_t  params;
     
-    const float step = 3.0;
-    params.seg_num   = 32;
+    params.seg_num   = 25;
 
-    params.ropes.push_back(std::make_pair( cg::point_3f( -2342.90, -368.16 ,0.17), cg::point_3f( -2346.57, -338.91 ,0.17) ));
+#if 1
+    params.ropes.push_back(std::make_pair( cg::point_3f( -2342.90, -368.16 ,0.17), cg::point_3f( -2346.57, -338.91 ,0.17) )); 
     params.ropes.push_back(std::make_pair( cg::point_3f( -2330.30, -366.48 ,0.17), cg::point_3f( -2333.98, -337.22 ,0.17) ));
+#endif
     params.ropes.push_back(std::make_pair( cg::point_3f( -2318.46, -365.02 ,0.17), cg::point_3f( -2322.13, -335.76 ,0.17) ));
     params.ropes.push_back(std::make_pair( cg::point_3f( -2305.79, -363.45 ,0.17), cg::point_3f( -2309.47, -334.20 ,0.17) ));   // 12.7669
 
-
-#if 0
-    for (size_t i=0; i < 15; ++i)
-    {
-       params.ropes.push_back(std::make_pair(cg::point_3f(60 + i*step,0,0.1), cg::point_3f(60 + i*step,100,0.1) ));
-    }
-#endif
-    
 
     phys_model_ = phys_->get_system(*phys_zone_)->create_arresting_gear(params, phys::compound_sensor_ptr(), p);
 

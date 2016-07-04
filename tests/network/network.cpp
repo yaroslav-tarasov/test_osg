@@ -303,6 +303,7 @@ struct client
         , traj_pos_ (fill_trajectory(krv::data_getter("log_e_su_posadka.txt")))
         , traj_trp_ (fill_trajectory(krv::data_getter("log_e_su_vzlet_tramplin5.txt")))        
         , traj_trp2_(fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0, 250.0 )))
+        , traj_trp3_(fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt")))
         , traj_cam_         (camera_moving::fill_trajectory())
         , traj_cam_reverse_ (camera_moving::fill_reverse_trajectory ())
         , net_cfgr_ (boost::make_shared<net_configurer>(peers))  
@@ -663,13 +664,16 @@ struct client
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
             ADD_EVENT(traj_trp2_->base_length()  , create_msg(172,traj_trp2_->kp_value(traj_trp2_->base_length()),traj_trp2_->curs_value(traj_trp2_->base_length()), ok_aircraft, /*"A319"*/"SU25"/*"L39"*/, "172") )
-            
             ADD_EVENT(50.0  , arrgear_target_msg( 172 ) )  
 
-            ADD_EVENT(traj_trp2_->base_length() + 1.0   , engine_state_msg(172 , ES_LOW_THROTTLE)  )
-            ADD_EVENT(traj_trp2_->base_length() + 82.0  , engine_state_msg(172 , ES_FULL_THROTTLE) )
-            ADD_EVENT(traj_trp2_->base_length() + 75.0  , engine_state_msg(172 , ES_FORSAGE) )
-            ADD_EVENT(traj_trp2_->length()              , engine_state_msg(172 , ES_FULL_THROTTLE) )
+
+            ADD_EVENT(traj_trp3_->base_length()  , create_msg(173,traj_trp3_->kp_value(traj_trp3_->base_length()),traj_trp3_->curs_value(traj_trp3_->base_length()), ok_aircraft, /*"A319"*/"SU25"/*"L39"*/, "173") )
+            ADD_EVENT(300.0  , arrgear_target_msg( 173 ) )  
+
+            ADD_EVENT(traj_trp3_->base_length() + 1.0   , engine_state_msg(173 , ES_LOW_THROTTLE)  )
+            ADD_EVENT(traj_trp3_->base_length() + 82.0  , engine_state_msg(173 , ES_FULL_THROTTLE) )
+            ADD_EVENT(traj_trp3_->base_length() + 75.0  , engine_state_msg(173 , ES_FORSAGE) )
+            ADD_EVENT(traj_trp3_->length()              , engine_state_msg(173 , ES_FULL_THROTTLE) )
 
 #endif
 
@@ -709,6 +713,7 @@ struct client
             //ADD_EVENT(60.0 + 50.0  , engine_state_msg(150 , ES_STOPPED) )
 #endif
             
+#if 0
             run_f_trp_ = [this](uint32_t id, double time, double traj_offset)->void {
                 binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
@@ -722,19 +727,13 @@ struct client
 
                 this->send(&msg[0], msg.size());
             };
-
-            runs_.insert(make_pair(traj_trp_->base_length() + 30,
-                boost::bind( run_f_trp_ , 178, _1, /*traj_offset*/30)
-                ));
-
-
-
-            run_f_pos_ = [this](uint32_t id, double time, double traj_offset)->void {
+#endif
+            boost::function<void(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->void {
                 binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
-                    , traj_pos_->kp_value    (time)
-                    , traj_pos_->curs_value  (time)
-                    , *traj_pos_->speed_value(time)
+                    , traj_trp->kp_value    (time)
+                    , traj_trp->curs_value  (time)
+                    , *traj_trp->speed_value(time)
                     , time + traj_offset
                     , false
                     , meteo::local_params()
@@ -743,10 +742,18 @@ struct client
                 this->send(&msg[0], msg.size());
             };
 
-            runs_.insert(make_pair(traj_pos_->base_length(),
-                boost::bind( run_f_pos_, 173,_1,/*traj_offset*/0)
+            runs_.insert(make_pair(traj_trp_->base_length() + 30,
+                boost::bind( /*run_f_trp_*/run_f_pos , 178, _1, traj_trp_,/*traj_offset*/30)
                 ));
 
+
+
+
+            runs_.insert(make_pair(traj_pos_->base_length(),
+                boost::bind( run_f_pos, 171, _1, traj_pos_, /*traj_offset*/0)
+                ));
+
+#if 0
             run_wrap_f run_f_trp2 = [this](uint32_t id, double time, double traj_offset)->void {
                 binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                     id 
@@ -760,9 +767,30 @@ struct client
 
                 this->send(&msg[0], msg.size());
             };
+#endif
 
             runs_.insert(make_pair(traj_trp2_->base_length(),
-                boost::bind( run_f_trp2 , 172, _1, /*traj_offset*/0)
+                boost::bind( /*run_f_trp2*/run_f_pos , 172, _1, traj_trp2_,/*traj_offset*/0)
+                ));
+
+#if 0
+            run_wrap_f run_f_trp3 = [this](uint32_t id, double time,  double traj_offset)->void {
+                binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
+                    id 
+                    , traj_trp3_->kp_value    (time)
+                    , traj_trp3_->curs_value  (time)
+                    , *traj_trp3_->speed_value(time)
+                    , time + traj_offset
+                    , false
+                    , meteo::local_params()
+                    )));
+
+                this->send(&msg[0], msg.size());
+            };
+#endif
+
+            runs_.insert(make_pair(traj_trp3_->base_length(),
+                boost::bind( /*run_f_trp3*/ run_f_pos , 173, _1, traj_trp3_, /*traj_offset*/0)
                 ));
 
     }
@@ -1010,6 +1038,7 @@ private:
     fms::trajectory_ptr                                              traj_pos_;
     fms::trajectory_ptr                                              traj_trp_;
     fms::trajectory_ptr                                             traj_trp2_;
+    fms::trajectory_ptr                                             traj_trp3_;
     fms::trajectory_ptr                                              traj_cam_;
     fms::trajectory_ptr                                      traj_cam_reverse_;
 
