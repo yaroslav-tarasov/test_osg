@@ -9,6 +9,18 @@ namespace shaders
     namespace include_mat
     {
 
+#define  SHADERS_GETTER(getter_name,vs_name, fs_name) \
+        const char* getter_name(shader_t t)           \
+        {                                             \
+            if(t==VS)                                 \
+                return vs_name;                       \
+            else if(t==FS)                            \
+                return fs_name;                       \
+            else                                      \
+                return nullptr;                       \
+        }                                             \
+
+
 #define  LIGHT_MAPS                                                                                                  \
 "$define GET_LIGHTMAP(viewpos, in_frag) \\"                                                                          \
 "\n /*const*/ float height_world_lm = in_frag.lightmap_coord.z; \\"                                                  \
@@ -52,17 +64,6 @@ namespace shaders
     "\n  float shadow3##ind = shadow2D( shadowTexture##ind ,shadow_view##ind .xyz+vec3(-fTexelSize, fTexelSize,fZOffSet) ).r;   \\" \
     "\n  float shadow##ind = ( 2.0*shadowOrg##ind + shadow0##ind + shadow1##ind + shadow2##ind + shadow3##ind)/6.0;                    \\" \
     "\n  float term##ind = map##ind*(1.0-shadow##ind);                                                                          \n\n     " 
-
-#define  SHADERS_GETTER(getter_name,vs_name, fs_name) \
-        const char* getter_name(shader_t t)           \
-        {                                             \
-            if(t==VS)                                 \
-                return vs_name;                       \
-            else if(t==FS)                            \
-                return fs_name;                       \
-            else                                      \
-                return nullptr;                       \
-        }                                             \
 
 
 #define INCLUDE_FUNCS                                                                                    \
@@ -137,11 +138,10 @@ namespace shaders
 \n     uniform sampler2D       baseTexture;                                                            \
 \n     uniform int             baseTextureUnit;                                                        \
 \n     /*uniform sampler2DShadow shadowTexture0;*/                                                     \
-\n     /*uniform int             shadowTextureUnit0;*/                                                     \
+\n     /*uniform int             shadowTextureUnit0;*/                                                 \
 \n     uniform sampler2DShadow shadowTextureRGB;                                                       \
 \n     /*uniform mat4            shadowMatrix0;*/                                                      \
 \n     uniform mat4            lightmap_matrix;                                                        \
-\n     uniform mat4            shadow0_matrix;                                                         \
      )
 
 

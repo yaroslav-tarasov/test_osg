@@ -62,7 +62,7 @@ int main_flex( int argc, char** argv )
     osg::ArgumentParser arguments( &argc, argv );
     
     osg::ref_ptr<FlexDrawable> flex = new FlexDrawable;
-    if ( 1 ) createRigids( flex, 0.5f );
+    if ( 0 ) createRigids( flex, 0.5f );
     else createTestFluid( flex, 0.5f );
     
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;

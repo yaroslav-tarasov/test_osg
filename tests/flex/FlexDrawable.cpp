@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "FlexDrawable.h"
 
+#include "mesh.h"
+#include <cuda.h>
+
 #pragma comment(lib, "flexRelease_x86.lib")
+#pragma comment(lib, "flexExtRelease_x86.lib")
 
 static const char* flexVertCode = {
     "void main() {\n"

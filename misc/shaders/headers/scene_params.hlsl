@@ -18,7 +18,7 @@
     uniform sampler2DShadow  shadowTexture0;                                                            
     uniform int              shadowTextureUnit0;                                                                    
     uniform mat4             shadowMatrix0;                                                                                                                                                                    
-
-                                                                                                     
-    uniform mat4             shadow0_matrix;
+    uniform sampler2DShadow  shadowTextureRGB;                                                       
+    /*uniform mat4            shadowMatrix0;*/                                                      
+    uniform mat4             lightmap_matrix;                                                        
   

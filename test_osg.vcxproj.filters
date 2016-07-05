@@ -258,6 +258,9 @@
     <Filter Include="Source Files\tests\flex">
       <UniqueIdentifier>{37332ad8-9cf1-41af-991e-42c2e77d8af4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\flex\core">
+      <UniqueIdentifier>{ad6a4c62-b166-4247-af05-dfe07248f1d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1419,6 +1422,15 @@
     </ClCompile>
     <ClCompile Include="tests\flex\osgflex.cpp">
       <Filter>Source Files\tests\flex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flex-080\flex\core\maths.cpp">
+      <Filter>Source Files\tests\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flex-080\flex\core\mesh.cpp">
+      <Filter>Source Files\tests\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flex-080\flex\core\platform.cpp">
+      <Filter>Source Files\tests\flex\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

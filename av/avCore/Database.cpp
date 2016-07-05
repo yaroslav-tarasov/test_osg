@@ -150,7 +150,7 @@ std::string LoadShader(const std::string& name)
 
 
 
-#define SV_USE_MULTITHREADING 1
+#define AV_USE_MULTITHREADING 1
 
 namespace avCore
 {
