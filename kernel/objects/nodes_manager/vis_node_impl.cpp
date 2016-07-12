@@ -217,7 +217,7 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
 }
 
 void vis_node_impl::on_visibility(msg::visibility_msg const& m)
-{
+{	
     user_visible_ = m.visible;
     need_update_ = true;
 }

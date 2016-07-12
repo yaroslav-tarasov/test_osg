@@ -37,14 +37,18 @@
 
 #ifndef _DEBUG
 #pragma comment(lib, "osgwTools.lib")
+#if 0
 #pragma comment(lib, "osgbDynamics.lib")
 #pragma comment(lib, "osgbInteraction.lib")
 #pragma comment(lib, "osgbCollision.lib")
+#endif
 #else 
 #pragma comment(lib, "osgwToolsd.lib")
+#if 0
 #pragma comment(lib, "osgbDynamicsd.lib")
 #pragma comment(lib, "osgbInteractiond.lib")
 #pragma comment(lib, "osgbCollisiond.lib")
+#endif
 #endif
 
 #pragma warning(disable:4996)

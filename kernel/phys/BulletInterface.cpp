@@ -2,7 +2,6 @@
 
 #include "utils/high_res_timer.h"
 
-
 #include <btBulletDynamicsCommon.h> 
 #include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
@@ -28,7 +27,7 @@
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
-#include "GLDebugDrawer.h"
+#include "AVGLDebugDrawer.h"
 
 namespace phys {
     bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
@@ -49,6 +48,12 @@ FIXME("deprecated")
 #include "osgbullet_helpers.h"
 
 #define SOFTBODY_WORLD
+
+#ifdef _DEBUG
+#pragma comment(lib, "BulletSoftBody_Debug.lib")
+#else 
+#pragma comment(lib, "BulletSoftBody.lib")
+#endif
 
 using namespace phys;
 
@@ -706,6 +711,7 @@ void BulletInterface::createUFO(osg::Node* node,int id, double mass)
 }
 #endif
 
+#ifdef DEPRECATED
 aircraft::params_t fill_params( ada::data_t const & fsettings)
 {
     const double phys_mass_factor_ = 1000; 
@@ -735,7 +741,7 @@ aircraft::params_t fill_params( ada::data_t const & fsettings)
     return params;
 }
 
-#ifdef DEPRECATED
+
 aircraft::info_ptr BulletInterface::createUFO2(osg::Node* node,int id, double mass)
 {
 	wheels_info_t wi;
@@ -994,6 +1000,8 @@ static_convex_ptr BulletInterface::create_static_convex( sensor_ptr s, point_3 c
 {
     return boost::make_shared<static_convex_impl>(shared_from_this(), s, pos, orien);
 }
+
+
 
 aircraft::info_ptr BulletInterface::create_aircraft(const phys::aircraft::params_t & p,compound_sensor_ptr s,const decart_position & pos)
 {    	

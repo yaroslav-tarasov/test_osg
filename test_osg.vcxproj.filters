@@ -261,6 +261,9 @@
     <Filter Include="Source Files\tests\flex\core">
       <UniqueIdentifier>{ad6a4c62-b166-4247-af05-dfe07248f1d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\phys\osgBullet">
+      <UniqueIdentifier>{79d39576-84b2-4a6c-b9f0-54e3e967fbd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -643,28 +646,13 @@
     <ClCompile Include="av\EnvRenderer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="tests\bump_mapping.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\dubins_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\exp_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\main_scene.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="tests\main_shadows.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\main_shadows_2.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\select_geometry.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\shadow_map.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\SimpleHUD.cpp">
@@ -674,12 +662,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\teapot.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\tess_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\tex_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
@@ -725,9 +707,6 @@
       <Filter>Source Files\phys</Filter>
     </ClCompile>
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp">
-      <Filter>Source Files\phys</Filter>
-    </ClCompile>
-    <ClCompile Include="kernel\phys\GLDebugDrawer.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
     <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp">
@@ -889,9 +868,6 @@
     <ClCompile Include="tests\cegui\cegui_main.cpp">
       <Filter>Source Files\tests\cegui</Filter>
     </ClCompile>
-    <ClCompile Include="tests\common\CommonFunctions.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
     </ClCompile>
@@ -928,9 +904,6 @@
     <ClCompile Include="hmi\gui_vis\menu_impl.cpp">
       <Filter>Source Files\hmi</Filter>
     </ClCompile>
-    <ClCompile Include="tests\render_points.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\avSky\CelestialBodies.cpp">
       <Filter>Source Files\av\sky</Filter>
     </ClCompile>
@@ -954,9 +927,6 @@
     </ClCompile>
     <ClCompile Include="av\avSky\StarField.cpp">
       <Filter>Source Files\av\sky</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\grass_test.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="av\avShadows\ShadowedScene.cpp">
       <Filter>Source Files\av\sm</Filter>
@@ -1051,16 +1021,10 @@
     <ClCompile Include="av\avScene\ScreenTexture.cpp">
       <Filter>Source Files\av\scene</Filter>
     </ClCompile>
-    <ClCompile Include="tests\ssao\ffssao.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\avShadows\ParallelSplitShadowMap.cpp">
       <Filter>Source Files\av\sm</Filter>
     </ClCompile>
     <ClCompile Include="tests\osgsmartbody.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\osgshadowworks.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="av\avAnimation\AnimationPrototype.cpp">
@@ -1082,12 +1046,6 @@
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
     <ClCompile Include="tests\test_boost_timer.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\patch-lowlevel.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\noise_texture_test.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
@@ -1207,12 +1165,6 @@
     <ClCompile Include="tests\animation_test4.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\mrt_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\visapp\main_modapp.cpp">
       <Filter>Source Files\tests\separate</Filter>
     </ClCompile>
@@ -1260,9 +1212,6 @@
     </ClCompile>
     <ClCompile Include="kernel\phys\character_phys.cpp">
       <Filter>Source Files\phys</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\phys_viewer.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\DynamicCharacterController.cpp">
       <Filter>Source Files\tests</Filter>
@@ -1339,12 +1288,6 @@
     <ClCompile Include="av\avCore\DecalRender.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
-    <ClCompile Include="tests\sparse_texture.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\flame_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\objects\camera\camera_model.cpp">
       <Filter>Source Files\objects\camera</Filter>
     </ClCompile>
@@ -1362,9 +1305,6 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp">
       <Filter>Source Files\objects\mdd</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\light_test.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="av\avLights\CulturalLights\NavigationalLight.cpp">
       <Filter>Source Files\av\lights\cult_lights</Filter>
@@ -1414,9 +1354,6 @@
     <ClCompile Include="av\avFx\FireFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
-    <ClCompile Include="tests\grass_test2.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\flex\FlexDrawable.cpp">
       <Filter>Source Files\tests\flex</Filter>
     </ClCompile>
@@ -1431,6 +1368,48 @@
     </ClCompile>
     <ClCompile Include="..\flex-080\flex\core\platform.cpp">
       <Filter>Source Files\tests\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbDynamics\GroundPlane.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\GLDebugDrawer.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\CollisionShapes.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\common\CommonFunctions.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\CollectVerticesVisitor.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeCylinderVisitor.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeShapeVisitor.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeTriMeshVisitor.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\BoundingCylinder.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\BtUtils.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\Chart.cpp">
+      <Filter>Source Files\phys\osgBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Noise.cpp">
+      <Filter>Source Files\av\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -419,7 +419,7 @@ bool Database::LoadShaderInternal( const std::string & fileName, std::ostream & 
         const char * pLineBuffer = szLineBuffer;
 
         // trim left
-        while (*pLineBuffer == ' ')
+        while (*pLineBuffer == ' ' || *pLineBuffer == '\t')
             pLineBuffer++;
 
         //

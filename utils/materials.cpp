@@ -526,6 +526,9 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
     } 
 #endif   
 
+    if (mat_name.find("tree")   !=std::string::npos)
+			stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
 #if 0
     if (/*mat_name.find("tree")   !=std::string::npos
         ||*/ mat_name.find("building") !=std::string::npos 
@@ -538,7 +541,6 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
             || mat_name.find("sea")      !=std::string::npos     
             || mat_name.find("mountain") !=std::string::npos 
             || mat_name.find("concrete") !=std::string::npos 
-            //|| mat_name.find("tree") !=std::string::npos 
             )
             node->setNodeMask(~REFLECTION_MASK);
     

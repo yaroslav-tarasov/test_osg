@@ -49,7 +49,12 @@ class AnimatedDrawableComputeBoundingBoxCallback : public osg::Drawable::Compute
     osg::BoundingBox computeBound(const osg::Drawable &drawable) const  
     { 
         osg::BoundingBox BB;
-        BB = drawable.computeBound();
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+		BB = drawable.computeBoundingBox();
+#else
+		BB = drawable.computeBound();
+#endif
+        
         // Let's estimate possible BB change due to animation matrices application
         // supposed that all the animated model drawables are created relative to the model zero
         // and could be arbitrary rotated around it.

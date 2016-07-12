@@ -108,9 +108,10 @@ RopesNode::RopesNode()
 
     pCurStateSet->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
-	osg::ref_ptr<osg::Program> program;
-	program = createProgram("Arresting gear",vertexShaderSource,fragmentShaderSource);
-	pCurStateSet->setAttributeAndModes(program);	
+	osg::ref_ptr<osg::Program> pCurProgram = avCore::GetDatabase()->LoadProgram("rope/rope.vert","rope/rope.frag", NULL);
+	//pCurProgram = createProgram("Arresting gear",vertexShaderSource,fragmentShaderSource);
+	
+	pCurStateSet->setAttributeAndModes(pCurProgram);	
 	
 	pCurStateSet->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
 	osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;

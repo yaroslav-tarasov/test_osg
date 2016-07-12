@@ -283,7 +283,11 @@ bool SparkDrawable::update( double currentTime, const osg::Vec3d& eye )
     return active;
 }
 
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+osg::BoundingBox SparkDrawable::computeBoundingBox() const
+#else
 osg::BoundingBox SparkDrawable::computeBound() const
+#endif
 {
     osg::BoundingBox bb;
     SPK::Vector3D min, max;

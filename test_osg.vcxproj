@@ -260,6 +260,7 @@
     <ClCompile Include="av\avCore\LOD.cpp" />
     <ClCompile Include="av\avCore\Logo.cpp" />
     <ClCompile Include="av\avCore\NodeTracker.cpp" />
+    <ClCompile Include="av\avCore\Noise.cpp" />
     <ClCompile Include="av\avCore\Object.cpp" />
     <ClCompile Include="av\avCore\PreRender.cpp" />
     <ClCompile Include="av\avCore\Timer.cpp" />
@@ -319,6 +320,50 @@
     <ClCompile Include="core\cluster\net_layer\session_impl.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
+    <ClCompile Include="ext\osgBullet\osgbCollision\BoundingCylinder.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\BtUtils.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\Chart.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\CollectVerticesVisitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\CollisionShapes.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeCylinderVisitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeShapeVisitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeTriMeshVisitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbCollision\GLDebugDrawer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="ext\osgBullet\osgbDynamics\GroundPlane.cpp">
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedUsingFiles>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedUsingFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
     <ClCompile Include="ext\spark\fire_effect.cpp" />
     <ClCompile Include="ext\spark\osgspark.cpp" />
@@ -434,12 +479,14 @@
     <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
     <ClCompile Include="kernel\phys\arresting_gear_phys.cpp" />
+    <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp" />
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
-    <ClCompile Include="kernel\phys\BulletMTInterface.cpp" />
+    <ClCompile Include="kernel\phys\BulletMTInterface.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
     <ClCompile Include="kernel\phys\character_phys.cpp" />
     <ClCompile Include="kernel\phys\flock_child_phys.cpp" />
-    <ClCompile Include="kernel\phys\GLDebugDrawer.cpp" />
     <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp" />
     <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp" />
     <ClCompile Include="kernel\phys\RigidUpdater.cpp" />
@@ -453,29 +500,20 @@
     <ClCompile Include="tests\animation_test3.cpp" />
     <ClCompile Include="tests\animation_test4.cpp" />
     <ClCompile Include="tests\animation_test5.cpp" />
-    <ClCompile Include="tests\bump_mapping.cpp" />
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
     <ClCompile Include="tests\cegui\cegui_main.cpp" />
     <ClCompile Include="tests\common\CommonFunctions.cpp" />
     <ClCompile Include="tests\creators.cpp" />
     <ClCompile Include="tests\dubins_test.cpp" />
     <ClCompile Include="tests\DynamicCharacterController.cpp" />
-    <ClCompile Include="tests\exp_test.cpp" />
-    <ClCompile Include="tests\flame_test.cpp" />
     <ClCompile Include="tests\flex\FlexDrawable.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="tests\flex\osgflex.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="tests\grass_test.cpp" />
-    <ClCompile Include="tests\grass_test2.cpp" />
-    <ClCompile Include="tests\light_test.cpp" />
     <ClCompile Include="tests\main_scene.cpp" />
-    <ClCompile Include="tests\main_shadows.cpp" />
-    <ClCompile Include="tests\main_shadows_2.cpp" />
     <ClCompile Include="tests\morph_geometry.cpp" />
-    <ClCompile Include="tests\mrt_test.cpp" />
     <ClCompile Include="tests\MyGui\MYGUIManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -484,33 +522,21 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="tests\noise_texture_test.cpp" />
-    <ClCompile Include="tests\osgshadowworks.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="tests\osgsmartbody.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="tests\patch-lowlevel.cpp" />
-    <ClCompile Include="tests\phys_viewer.cpp" />
-    <ClCompile Include="tests\render_points.cpp" />
     <ClCompile Include="tests\select_geometry.cpp" />
-    <ClCompile Include="tests\shadow_map.cpp" />
     <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\SkyBox.cpp" />
-    <ClCompile Include="tests\sparse_texture.cpp" />
-    <ClCompile Include="tests\ssao\ffssao.cpp" />
     <ClCompile Include="tests\systems\factory_systems.cpp" />
     <ClCompile Include="tests\systems\systems_impl.cpp" />
     <ClCompile Include="tests\systems\systems_impl2.cpp" />
     <ClCompile Include="tests\systems\test_objects1.cpp" />
     <ClCompile Include="tests\systems\test_objects2.cpp" />
     <ClCompile Include="tests\teapot.cpp" />
-    <ClCompile Include="tests\tess_test.cpp" />
     <ClCompile Include="tests\test_boost_timer.cpp" />
     <ClCompile Include="tests\test_curves.cpp" />
-    <ClCompile Include="tests\tex_test.cpp" />
     <ClCompile Include="tests\visapp\main_modapp.cpp" />
     <ClCompile Include="tests\visapp\main_visapp.cpp" />
     <ClCompile Include="utils\animation_handler.cpp" />
@@ -518,7 +544,9 @@
     <ClCompile Include="utils\empty_scene.cpp" />
     <ClCompile Include="utils\LoadManager.cpp" />
     <ClCompile Include="utils\materials.cpp" />
-    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp" />
+    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="utils\workqueue.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />

@@ -1031,7 +1031,7 @@ private:
     net_layer::msg::container_msg::msgs_t                            messages_;
     size_t                                                      messages_size_;
 
-private:
+private:f
     
     fms::trajectory_ptr                                                  traj_;
     fms::trajectory_ptr                                                 traj2_;

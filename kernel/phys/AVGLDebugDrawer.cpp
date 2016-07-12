@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "GLDebugDrawer.h"
+#include "AVGLDebugDrawer.h"
 #include <osgbCollision/Utils.h>
 #define BULLET_CONV_ONLY
 #include "bullet_helpers.h"

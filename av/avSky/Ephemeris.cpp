@@ -14,6 +14,16 @@
 
 #include "utils/callbacks.h"
 
+#ifdef _DEBUG
+#pragma comment(lib, "osgEphemerisd.lib")
+#else
+#ifdef OSG_USE_MINREL
+#pragma comment(lib, "osgEphemeriss.lib")
+#else
+#pragma comment(lib, "osgEphemeris.lib")
+#endif
+#endif
+
 namespace avSky
 {
     struct Ephemeris::data : public osg::Referenced

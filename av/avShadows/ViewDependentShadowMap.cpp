@@ -304,7 +304,13 @@ public:
         {
             if (node.getDrawable(i))
             {
-                updateBound(node.getDrawable(i)->getBound());
+
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+				updateBound(node.getDrawable(i)->getBoundingBox());
+#else
+				updateBound(node.getDrawable(i)->getBound());
+#endif               
+				
             }
         }
 
@@ -2135,7 +2141,11 @@ struct RenderLeafBounds
             // OSG_INFO<<"Reusing light_mvp "<<light_mvp<<std::endl;
         }
 
-        const osg::BoundingBox& bb = renderLeaf->_drawable->getBound();
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+		const osg::BoundingBox& bb = renderLeaf->_drawable->getBoundingBox();
+#else
+		const osg::BoundingBox& bb = renderLeaf->_drawable->getBound();
+#endif       
         if (bb.valid())
         {
             // OSG_NOTICE<<"checked extents of "<<renderLeaf->_drawable->getName()<<std::endl;

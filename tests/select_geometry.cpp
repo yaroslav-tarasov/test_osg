@@ -46,7 +46,13 @@ public:
                 const osgUtil::LineSegmentIntersector::Intersection& result =
                     *(intersector->getIntersections().begin());
                 
-                osg::BoundingBox bb = result.drawable->getBound();
+                
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+				osg::BoundingBox bb = result.drawable->getBoundingBox();
+#else
+				osg::BoundingBox bb = result.drawable->getBound();
+#endif  
+
                 osg::Vec3 worldCenter = bb.center() * osg::computeLocalToWorld(result.nodePath);
                 _selectionBox->setMatrix(
                     osg::Matrix::scale(bb.xMax()-bb.xMin(), bb.yMax()-bb.yMin(), bb.zMax()-bb.zMin()) *

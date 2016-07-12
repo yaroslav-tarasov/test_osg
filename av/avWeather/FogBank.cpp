@@ -1,8 +1,6 @@
 #include <stdafx.h>
 #include "av/precompiled.h"
 
-
-
 #include "av/avCore/avCore.h"
 
 #include "av/avScene/Scene.h"
@@ -243,7 +241,13 @@ void LocalFogBank::cull( osgUtil::CullVisitor * pCV )
 void LocalFogBank::drawImplementation( osg::RenderInfo & renderInfo ) const
 {
     // set up tricky blend
-    osg::GL2Extensions * gl2e = osg::GL2Extensions::Get(renderInfo.getState()->getContextID(), true);
+
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+	osg::GLExtensions * gl2e = renderInfo.getState()->get<osg::GLExtensions>();
+#else
+	osg::GL2Extensions * gl2e = osg::GL2Extensions::Get(renderInfo.getState()->getContextID(), true);
+#endif
+
     if (gl2e)
         gl2e->glBlendEquationSeparate(/*0x8006*/GL_FUNC_ADD, /*0x8008*/GL_MAX);    
 

@@ -83,7 +83,11 @@ void ScreenTexture::drawImplementation( osg::RenderInfo & renderInfo ) const
     // instead of doing copyTexImage we would do FBO blit operation to ensure it correctly handles multisampled FBO
 
     // get fbo extension which provides us with the glGenerateMipmapEXT function
-    osg::FBOExtensions * fbo_ext = osg::FBOExtensions::instance(state.getContextID(), true);
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+	osg::GLExtensions * fbo_ext = renderInfo.getState()->get<osg::GLExtensions>();
+#else
+	osg::FBOExtensions * fbo_ext = osg::FBOExtensions::instance(state.getContextID(), true);
+#endif
 
     // get current draw binding
     GLint oldDrawFBO = 0;

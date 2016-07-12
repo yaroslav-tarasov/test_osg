@@ -61,7 +61,11 @@ public:
     /** Update the system, will be called by the SparkUpdatingHandler */
     virtual bool       update( double currentTime, const osg::Vec3d& eye );
     
-    virtual osg::BoundingBox computeBound() const;
+#if OSG_MIN_VERSION_REQUIRED(3,3,2)
+	virtual osg::BoundingBox computeBoundingBox() const;
+#else
+	virtual osg::BoundingBox computeBound() const;
+#endif
     virtual void       drawImplementation( osg::RenderInfo& renderInfo ) const;
     
 protected:
