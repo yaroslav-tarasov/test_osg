@@ -18,35 +18,22 @@
  *
  *************** <auto-copyright.pl END do not edit this line> ***************/
 
-#ifndef __OSGBULLET_GROUND_PLANE_H__
-#define __OSGBULLET_GROUND_PLANE_H__ 1
+#ifndef OSGBCOLLISION_EXPORT_
+#define OSGBCOLLISION_EXPORT_ 1
 
 
-#if 1
-#include <osgbDynamics/Export.h>
-#else 
-#define OSGBDYNAMICS_EXPORT
+#if defined( _MSC_VER ) || defined( __CYGWIN__ ) || defined( __MINGW32__ ) || defined( __BCPLUSPLUS__ ) || defined( __MWERKS__ )
+    #if defined( OSGBULLET_STATIC )
+        #define OSGBCOLLISION_EXPORT
+    #elif defined( OSGBULLET_SHARED ) && defined( OSGBCOLLISION_LIBRARY )
+        #define OSGBCOLLISION_EXPORT __declspec( dllexport )
+    #else
+        #define OSGBCOLLISION_EXPORT __declspec( dllimport )
+    #endif
+#else
+    #define OSGBCOLLISION_EXPORT
 #endif
-#include <btBulletDynamicsCommon.h>
-#include <osg/Vec4>
 
 
-namespace osg {
-    class Node;
-}
-
-namespace osgbDynamics
-{
-
-
-/** \brief Add a plane rigid body to the dynamics world and return an OSG subgraph to render the plane.
-*/
-OSGBDYNAMICS_EXPORT osg::Node* generateGroundPlane( const osg::Vec4& plane, btDynamicsWorld* bulletWorld, btRigidBody** rb=NULL, short group=0, short mask=0 );
-
-
-// osgbDynamics
-}
-
-
-// __OSGBULLET_GROUND_PLANE_H__
+// OSGBCOLLISION_EXPORT_
 #endif

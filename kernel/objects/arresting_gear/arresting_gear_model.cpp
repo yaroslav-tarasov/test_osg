@@ -79,8 +79,10 @@ void model::create_phys()
     params.ropes.push_back(std::make_pair( cg::point_3f( -2342.90, -368.16 ,0.17), cg::point_3f( -2346.57, -338.91 ,0.17) )); 
     params.ropes.push_back(std::make_pair( cg::point_3f( -2330.30, -366.48 ,0.17), cg::point_3f( -2333.98, -337.22 ,0.17) ));
 #endif
+#if 1
     params.ropes.push_back(std::make_pair( cg::point_3f( -2318.46, -365.02 ,0.17), cg::point_3f( -2322.13, -335.76 ,0.17) ));
     params.ropes.push_back(std::make_pair( cg::point_3f( -2305.79, -363.45 ,0.17), cg::point_3f( -2309.47, -334.20 ,0.17) ));   // 12.7669
+#endif
 
 
     phys_model_ = phys_->get_system(*phys_zone_)->create_arresting_gear(params, phys::compound_sensor_ptr(), p);
@@ -201,17 +203,22 @@ void model::sync_nodes_manager( double /*dt*/ )
     }
 }
 
-void model::on_target_changed (aircraft::info_ptr old_target, const boost::optional<uint32_t> & id )
+void model::on_target_changed (const boost::optional<uint32_t> &  old_id, const boost::optional<uint32_t> & id )
 {
     if (!phys_model_)
         return;
 
-    if (target_ && aircraft::model_info_ptr(target_)->get_rigid_body())
+    if (target_id_ )
     {
-        cg::point_3 offset;
+		auto target_ptr = aircraft::model_info_ptr(collection_->get_object(*target_id_));
+			
+		if(target_ptr->get_rigid_body())	
+		{
+			cg::point_3 offset;
 
-        FIXME(tow_offset)
-        phys::arresting_gear::control_ptr(phys_model_)->set_target(aircraft::model_info_ptr(target_)->get_rigid_body(), aircraft::model_info_ptr(target_)->tow_offset(), offset);
+			FIXME(tow_offset)
+			phys::arresting_gear::control_ptr(phys_model_)->set_target(target_ptr->get_rigid_body(), target_ptr->tow_offset(), offset);
+		}
     }
     else
     {

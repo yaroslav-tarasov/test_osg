@@ -125,6 +125,7 @@
 #pragma comment(lib, "OpenThreadsd.lib")
 #pragma comment(lib, "osgd.lib")
 #pragma comment(lib, "osgDBd.lib")
+#pragma comment(lib, "osgViewerd.lib")
 #pragma comment(lib, "osgAnimationd.lib")
 #pragma comment(lib, "osgGAd.lib")
 #pragma comment(lib, "osgUtild.lib")

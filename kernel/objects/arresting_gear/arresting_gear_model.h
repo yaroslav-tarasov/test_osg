@@ -40,7 +40,7 @@ private:
 
 //  view 
 private:
-    void on_target_changed (aircraft::info_ptr old_target, const boost::optional<uint32_t> & id ) override;
+    void on_target_changed (const boost::optional<uint32_t> &  old_id, const boost::optional<uint32_t> & id ) override;
 
 private:
     phys::static_mesh_ptr                  mesh_;

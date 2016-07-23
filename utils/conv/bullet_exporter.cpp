@@ -9,11 +9,11 @@
 //#include "phys/bullet_helpers.h"
 #include "visitors/find_node_visitor.h"
 
-#ifndef _DEBUG
-#pragma comment(lib, "osgbCollision.lib")
-#else 
-#pragma comment(lib, "osgbCollisiond.lib")
-#endif
+//#ifndef _DEBUG
+//#pragma comment(lib, "osgbCollision.lib")
+//#else 
+//#pragma comment(lib, "osgbCollisiond.lib")
+//#endif
 
 inline btVector3 to_bullet_vector3( osg::Vec3 const& v  )
 {

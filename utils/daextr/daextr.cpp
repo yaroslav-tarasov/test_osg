@@ -121,7 +121,9 @@ struct mat_reader
 		pugi::xml_document doc;
 		materials_t mats_;
 
-		std::string in_file_name = fs::path(full_path).leaf().string() + ".mat.xml";
+		fs::path fs_path(full_path);
+
+		std::string in_file_name = fs_path.parent_path().string() + '/' + fs_path.stem()/*leaf()*/.string() + ".mat.xml";
 		
 		bool l = doc.load_file(in_file_name.c_str());
 		
@@ -150,7 +152,8 @@ struct xml_helper
 	xml_helper(std::string full_path)
 	{
 		assert(outFileName().empty());
-		outFileName(/*fs::path(full_path).leaf().string()*/full_path + ".mat.xml");
+		fs::path fs_path(full_path);
+		outFileName(fs_path.parent_path().string() + '/' + fs_path.stem()/*leaf()*/.string() + ".mat.xml");
 	}
 
 	static pugi::xml_node& createNewMaterial(std::string name)

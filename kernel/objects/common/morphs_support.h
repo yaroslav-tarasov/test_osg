@@ -7,10 +7,12 @@ namespace visual_objects
     {
         void add(osg::Node * node)
         {
-            for(int i =0 ; i<  node->asGeode()->getNumDrawables(); ++i)
+            if(node->asGeode())
+			for(int i =0 ; i<  node->asGeode()->getNumDrawables(); ++i)
             {
                 morphs_.push_back(dynamic_cast<osgAnimation::MorphGeometry*>(node->asGeode()->getDrawable(i)->asGeometry()));
             }
+
         }
 
         void set_weight(unsigned int index, float morphWeight)

@@ -313,8 +313,7 @@ void  Terrain::Create( const std::string& cFileName )
     }
     else
     {
-
-        
+       
         mr.Load(scene_file_name, data);
 
         scene_name = data.main_model;  

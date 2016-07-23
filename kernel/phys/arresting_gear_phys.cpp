@@ -184,13 +184,17 @@ namespace {
 		{
 			auto target = rigid_body_impl_ptr(target_)->get_body();
 			cg::transform_4f target_transform = from_bullet_transform(target->getWorldTransform());
+			cg::point_3 target_point = target_transform * self_offset_;
+
 			if(trap_bound_.contains(target_transform.translation()))
 			{
-				append_anchor(target_,target_transform.translation() - cg::point_3(self_offset_.y, self_offset_.x , 0));
+				cg::point_3 delta = target_point - target_transform.translation();
+				append_anchor(target_, target_transform.translation()); //cg::point_3(/*self_offset_.y*/5, /*self_offset_.x*/0, 0)
                 time_to_release = 5.0;
 			}
 		}
 
+#if 1
         if(time_to_release)
         {
             *time_to_release -= dt;
@@ -200,6 +204,7 @@ namespace {
                 release_anchor(target_);
             }
         }
+#endif
 	}
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
@@ -323,11 +328,11 @@ namespace {
 		auto& psb = *ropes_.back().get();
         const btSoftBody::tNodeArray& nodes = psb.get()->m_nodes;
 		
-        int idx = psb->m_nodes.size()/2;
+        int idx = nodes.size()/2;
         double dist = cg::distance(from_bullet_vector3(nodes[idx].m_x), pos);
         for(int  i = 0;i < nodes.size(); ++i)
         {
-#if 1
+#if 0
             double d = cg::distance(from_bullet_vector3(nodes[i].m_x), pos);
             if( d < dist)
             {
@@ -349,15 +354,16 @@ namespace {
         const unsigned n = params_.ropes.size();
         if(n>0)
         {
- #if 0
+ #if 1
            bt_softrigid_dynamics_world_ptr bw = bt_softrigid_dynamics_world_ptr(sys_->dynamics_world());
             auto const & propes_params = params_.ropes;
             create_rope(bw, propes_params[n-1], params_.seg_num);
-#endif
 
+#else
             ropes_.back().get()->reset();
             ropes_.pop_back();
             params_.ropes.pop_back();
+#endif
         }
     }
     

@@ -1033,7 +1033,7 @@ void fake_system_base::process_destroy_object( size_t object_id )
     auto it = objects_.find(object_id);
     if(it == objects_.end())
     {
-        LogError("Destroying already destroyed object. Are you destroying object while playing history?");
+        LogError("Destroying already destroyed object. Are you destroying object while playing history?  oid = " << object_id);
         return;
     }
 
@@ -1206,7 +1206,7 @@ void fake_system_base::check_destroy(std::vector<object_info_wptr> const& objs_t
             LogTrace("object (id = " << it->lock()->object_id() << ", name = " << name << ", sys = " << sys_name(kind()) << ") can't be destroyed  (use_count = " << use_count << ")");
             {
                 force_log fl;
-                LOG_ODS_MSG ("object (id = " << it->lock()->object_id() << ", name = " << name << ", sys = " << sys_name(kind()) << ") can't be destroyed  (use_count = " << use_count << ")");
+                LOG_ODS_MSG ("object (id = " << it->lock()->object_id() << ", name = " << name << ", sys = " << sys_name(kind()) << ") can't be destroyed  (use_count = " << use_count << ") \n");
             }
 
 

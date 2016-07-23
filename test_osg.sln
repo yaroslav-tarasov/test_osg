@@ -16,6 +16,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "animextr", "utils\animextr\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests\tests.vcxproj", "{71AA0528-E2E1-4EF5-A03C-77CBAA11713E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "osgBulletLite", "ext\osgBullet\osgBulletLite\osgBulletLite.vcxproj", "{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -46,6 +48,10 @@ Global
 		{71AA0528-E2E1-4EF5-A03C-77CBAA11713E}.Debug|Win32.Build.0 = Debug|Win32
 		{71AA0528-E2E1-4EF5-A03C-77CBAA11713E}.Release|Win32.ActiveCfg = Release|Win32
 		{71AA0528-E2E1-4EF5-A03C-77CBAA11713E}.Release|Win32.Build.0 = Release|Win32
+		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Debug|Win32.Build.0 = Debug|Win32
+		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Release|Win32.ActiveCfg = Release|Win32
+		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

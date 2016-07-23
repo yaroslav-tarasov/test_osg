@@ -36,7 +36,9 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg)  = &ctrl::inject_msg;
+	void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg)  = &ctrl::inject_msg;
+	void (ctrl::*on_destroy)     (net_layer::msg::destroy_msg  const& msg)         = &ctrl::inject_msg;
+    void (ctrl::*on_create)      (net_layer::msg::create_msg  const& msg)         = &ctrl::inject_msg;
 
     
 
@@ -51,7 +53,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::traj_assign_msg       >(boost::bind(on_traj_assign , this, _1)) 
         .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
         .add<net_layer::msg::arrgear_target_msg    >(boost::bind(on_set_target  , this, _1))
-        	
+		.add<net_layer::msg::create_msg            >(boost::bind(on_create     , this, _1))	
+        .add<net_layer::msg::destroy_msg           >(boost::bind(on_destroy     , this, _1))	
         ;
 
 	create_object_f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
@@ -95,7 +98,7 @@ void ctrl::on_object_destroying(object_info_ptr object)
     }
 }
 
-void ctrl::create_object(net_layer::msg::create_msg const& msg)
+void ctrl::inject_msg(net_layer::msg::create_msg const& msg)
 {
     kernel::object_info_ptr  a = nullptr;
 
@@ -111,7 +114,7 @@ void ctrl::create_object(net_layer::msg::create_msg const& msg)
     }
 }
 
-void ctrl::destroy_object( net_layer::msg::destroy_msg const& msg)
+void ctrl::inject_msg( net_layer::msg::destroy_msg const& msg)
 {
     auto a = regs_objects_.find(msg);
 	if ( a != regs_objects_.end())

@@ -21,7 +21,7 @@
 #ifndef __OSGBCOLLISION_BOUNDINGCYLINDER_H__
 #define __OSGBCOLLISION_BOUNDINGCYLINDER_H__
 
-#if 0
+#if 1
 #include <osgbCollision/Export.h>
 #else 
 #define OSGBCOLLISION_EXPORT

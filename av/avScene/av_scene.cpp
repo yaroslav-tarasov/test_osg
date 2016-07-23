@@ -625,7 +625,6 @@ struct mod_app
 
         disp_
             .add<setup_msg                 >(boost::bind(&mod_app::on_setup      , this, _1))
-            .add<create_msg                >(boost::bind(&mod_app::on_create     , this, _1))
             .add<state_msg                 >(boost::bind(&mod_app::on_state      , this, _1))
             ;
 
@@ -687,6 +686,7 @@ private:
        gt_.set_factor(msg.factor);
     }
 
+#if 0
     void on_create(create_msg const& msg)
     {
 		reg_obj_->create_object(msg);
@@ -694,6 +694,7 @@ private:
         LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
 
     }
+#endif
 
 
     void inject_msg(const void* data, size_t size)

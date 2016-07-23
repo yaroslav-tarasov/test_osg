@@ -1,6 +1,5 @@
 #include <stdafx.h>
 
-#include "av/avScene/Scene.h"
 #include "av/avScene/ScreenTexture.h"
 
 

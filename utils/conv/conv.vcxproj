@@ -59,6 +59,7 @@
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;..\..;$(SolutionDir)\_include;ext\pugixml-1.4\src;common;$(SolutionDir)..\Externals\pugixml\1.0\Include;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(OSG_DIR)\SPARK-1.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm512 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -77,6 +78,7 @@
       <PreprocessorDefinitions>CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;..\..;$(SolutionDir)\_include;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)..\Externals\pugixml\1.0\Include;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(OSG_DIR)\SPARK-1.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,11 +106,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\av\avCore\Database.cpp" />
+    <ClCompile Include="..\..\av\avCore\Noise.cpp" />
     <ClCompile Include="..\..\av\avCore\Timer.cpp" />
     <ClCompile Include="..\..\av\avCore\Utils.cpp" />
     <ClCompile Include="..\..\av\shaders.cpp" />
     <ClCompile Include="..\..\core\config\config.cpp" />
-    <ClCompile Include="..\..\tests\noise_texture_test.cpp" />
     <ClCompile Include="..\materials.cpp" />
     <ClCompile Include="..\visitors\find_node_visitor.cpp" />
     <ClCompile Include="bullet_exporter.cpp" />
@@ -118,6 +120,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ext\osgBullet\osgBulletLite\osgBulletLite.vcxproj">
+      <Project>{39144d4d-283d-4cef-9a4e-d0972cca2ffe}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

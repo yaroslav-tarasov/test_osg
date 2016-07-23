@@ -487,8 +487,8 @@ struct mod_app
 
         disp_
             .add<setup_msg             >(boost::bind(&mod_app::on_setup      , this, _1))
-            .add<create_msg            >(boost::bind(&mod_app::on_create     , this, _1))
-			.add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
+            //.add<create_msg            >(boost::bind(&mod_app::on_create     , this, _1))
+			// .add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
             .add<state_msg             >(boost::bind(&mod_app::on_state      , this, _1))
             .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             .add<ready_msg             >(boost::bind(&mod_app::on_ready      , this, _1))
@@ -566,6 +566,7 @@ private:
     }
 
 
+#if 0
     void on_create(create_msg const& msg)
     {
 		if(init_)
@@ -576,13 +577,16 @@ private:
         LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
 
     }
+#endif
 
     void deffered_create()
     {
         if(init_ /*&& !dc_*/)
         {
-          for(auto it = creation_deque_.begin(); it != creation_deque_.end(); ++it )
+ #if 0
+         for(auto it = creation_deque_.begin(); it != creation_deque_.end(); ++it )
              on_create(*it);
+#endif
          
           creation_deque_.clear();
           
@@ -597,6 +601,7 @@ private:
     }
 
 
+#if 0
 	void on_destroy(destroy_msg const& msg)
 	{
 		reg_obj_->destroy_object(msg);
@@ -604,6 +609,7 @@ private:
 		// LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
 
 	}
+#endif
 
     void on_vis_peers(vis_peers_msg const& msg)
     {

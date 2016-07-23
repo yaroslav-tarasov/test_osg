@@ -100,7 +100,11 @@ void view::on_object_created(object_info_ptr object)
 void view::on_object_destroying(object_info_ptr object)
 {
     base_view_presentation::on_object_destroying(object);
-
+	
+	if(this == object.get())
+	{
+		remove_child(nodes_manager_);
+	}
     
 }
 

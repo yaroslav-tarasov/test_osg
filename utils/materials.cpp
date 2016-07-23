@@ -164,7 +164,7 @@ private:
         texs_.envTex->setUseHardwareMipMapGeneration(true);
 #endif
 
-FIXME(Все теже кривые плоскости)
+FIXME(Все те же кривые плоскости)
 #ifdef TEST_EVN_CUBE_MAP 
 #if 1
 /*        texs_.envTex->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP);
@@ -671,9 +671,7 @@ namespace mat
         pugi::xml_document doc;
         materials_t mats_;
 
-        std::string in_file_name = /*fs::path(*/full_path/*).leaf()*/ /*+ ".mat.xml"*/;
-
-        bool l = doc.load_file(in_file_name.c_str());
+		bool l = doc.load_file(full_path.c_str());
         if(l)
         {
             pugi::xml_node root = doc.child("root");
@@ -690,7 +688,6 @@ namespace mat
 
 					std::string name = std::string(m.attribute("name").as_string());
 					
-					
 					bool matching = valid_mats_.end() != std::find_if(valid_mats_.begin(),valid_mats_.end(),[&](const std::string& name_)->bool {
 						return name.find(name_) !=std::string::npos; }
 					);
@@ -704,7 +701,7 @@ namespace mat
 
         }
         else
-            std::cerr << "File not found: " << in_file_name;
+            std::cerr << "File not found: " << full_path;
 
         return mats_;
     }

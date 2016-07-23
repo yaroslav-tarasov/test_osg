@@ -32,3 +32,25 @@
 #include "logger/logger.hpp"
 #include "nfi/fn_reg.h"
 #include "config/config.h"
+
+
+/////////////////////////////////
+//  CG-Lib
+//
+#include "common/meta.h"
+#include "cg_math.h"
+
+#include "common/points.h"
+#include "common/util.h"
+#include "geometry/dup_points.h"
+#include "geometry/xmath.h"
+
+////////////////////////////////////////////
+
+
+////////////////////////////////////////////
+//  av 
+//
+
+#include "visitors/find_node_visitor.h"
+#include "visitors/visitors.h"

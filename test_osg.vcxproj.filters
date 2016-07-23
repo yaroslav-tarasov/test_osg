@@ -261,12 +261,8 @@
     <Filter Include="Source Files\tests\flex\core">
       <UniqueIdentifier>{ad6a4c62-b166-4247-af05-dfe07248f1d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\phys\osgBullet">
-      <UniqueIdentifier>{79d39576-84b2-4a6c-b9f0-54e3e967fbd7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="misc\shaders\tess_quad.tcs">
       <Filter>Source Files\shaders</Filter>
     </None>
@@ -375,6 +371,7 @@
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\FireFX.vs">
       <Filter>Source Files\shaders\fx</Filter>
     </None>
+    <None Include="Memo.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -1369,44 +1366,14 @@
     <ClCompile Include="..\flex-080\flex\core\platform.cpp">
       <Filter>Source Files\tests\flex\core</Filter>
     </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbDynamics\GroundPlane.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp">
       <Filter>Source Files\phys</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\GLDebugDrawer.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\CollisionShapes.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="tests\common\CommonFunctions.cpp">
       <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\CollectVerticesVisitor.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeCylinderVisitor.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeShapeVisitor.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeTriMeshVisitor.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\BoundingCylinder.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\BtUtils.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\Chart.cpp">
-      <Filter>Source Files\phys\osgBullet</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\Noise.cpp">
       <Filter>Source Files\av\core</Filter>

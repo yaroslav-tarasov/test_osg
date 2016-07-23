@@ -65,6 +65,13 @@ namespace phys
 		chassis_->setUserPointer(this);
     }
 
+	impl::~impl()
+	{
+		chassis_.reset();
+		sys_->unregister_rigid_body(this);
+		//sys_->dynamics_world()->removeAction(this);
+	}
+
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
 	{
         update_action(deltaTimeStep);

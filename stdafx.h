@@ -35,6 +35,7 @@
 //  osgBullet, osgWorks libs
 //
 
+#if 0
 #ifndef _DEBUG
 #pragma comment(lib, "osgwTools.lib")
 #if 0
@@ -48,6 +49,7 @@
 #pragma comment(lib, "osgbDynamicsd.lib")
 #pragma comment(lib, "osgbInteractiond.lib")
 #pragma comment(lib, "osgbCollisiond.lib")
+#endif
 #endif
 #endif
 

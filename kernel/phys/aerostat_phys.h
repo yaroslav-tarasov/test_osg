@@ -22,7 +22,7 @@ namespace phys
    {
    public:
       impl(system_impl_ptr,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos);
-   
+      ~impl();  
    
    private:
        void updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;

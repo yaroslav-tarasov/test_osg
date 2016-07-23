@@ -881,7 +881,7 @@ int main( int argc, char **argv )
 
         osgDB::FilePathList fpl_;
         fpl_.push_back(pathFileOut.parent_path().string() + "/");
-        std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", /*fpl.*/fpl_,osgDB::CASE_INSENSITIVE);
+        std::string mat_file_name = osgDB::findFileInPath(name+".mat.xml", /*fpl.*/fpl_,osgDB::CASE_INSENSITIVE);
 
         MaterialVisitor::namesList nl;
         nl.push_back("building");

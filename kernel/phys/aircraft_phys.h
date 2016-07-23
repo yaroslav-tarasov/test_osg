@@ -23,7 +23,7 @@ namespace phys
    {
    public:
       impl(system_impl_ptr,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos);
-   
+      ~impl();  
    
    public:
 	   size_t add_wheel   ( double mass, double width, double radius, point_3 const& offset, cpr const & orien, bool has_damper, bool is_front ) override;

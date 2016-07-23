@@ -286,7 +286,7 @@ Object* CreatePrototype( std::string name, bool fclone, osg::CopyOp copyop )
 
     ::Database::fpl_wrap fpl(name);
     std::string object_file_name =  osgDB::findFileInPath(name + ".xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
-    std::string mat_file_name = osgDB::findFileInPath(name+".dae.mat.xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+    std::string mat_file_name = osgDB::findFileInPath(name+".mat.xml", fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
     if(object_file_name.empty())
     {

@@ -71,8 +71,9 @@ void view::on_ropes_state(msg::ropes_state const& msg)
 
 void view::on_set_target( boost::optional<uint32_t> id)
 {
-    auto old_target = target_;
-    target_ = id ? collection_->get_object(*id) : nullptr;
+    auto old_target = target_id_;
+	//target_ = id ? collection_->get_object(*id) : nullptr;
+    target_id_ = id;
 
     on_target_changed(old_target, id) ;
 }

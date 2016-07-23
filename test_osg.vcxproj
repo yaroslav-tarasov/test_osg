@@ -61,6 +61,8 @@
       <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\kernel;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm512 /D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4355</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +126,7 @@
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs" />
+    <None Include="Memo.txt" />
     <None Include="misc\shaders\flame.frag" />
     <None Include="misc\shaders\flame.vert" />
     <None Include="misc\shaders\grass.frag" />
@@ -142,7 +145,6 @@
     <None Include="misc\shaders\tess_quad.tes" />
     <None Include="misc\shaders\tess_tri.tcs" />
     <None Include="misc\shaders\tess_tri.tes" />
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="av\avAnimation\AnimationObject.h" />
@@ -238,14 +240,20 @@
     <ClCompile Include="..\flex-080\flex\core\maths.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\flex-080\flex\core\mesh.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\flex-080\flex\core\platform.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="av\avAnimation\AnimationObject.cpp" />
     <ClCompile Include="av\avAnimation\AnimationPrototype.cpp" />
@@ -320,50 +328,6 @@
     <ClCompile Include="core\cluster\net_layer\session_impl.cpp" />
     <ClCompile Include="core\config\config.cpp" />
     <ClCompile Include="core\nfi\lib_loader.cpp" />
-    <ClCompile Include="ext\osgBullet\osgbCollision\BoundingCylinder.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\BtUtils.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\Chart.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\CollectVerticesVisitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\CollisionShapes.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeCylinderVisitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeShapeVisitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\ComputeTriMeshVisitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbCollision\GLDebugDrawer.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="ext\osgBullet\osgbDynamics\GroundPlane.cpp">
-      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ForcedUsingFiles>
-      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ForcedUsingFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp" />
     <ClCompile Include="ext\spark\fire_effect.cpp" />
     <ClCompile Include="ext\spark\osgspark.cpp" />
@@ -483,6 +447,7 @@
     <ClCompile Include="kernel\phys\BulletInterface.cpp" />
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
     <ClCompile Include="kernel\phys\character_phys.cpp" />
@@ -508,9 +473,13 @@
     <ClCompile Include="tests\DynamicCharacterController.cpp" />
     <ClCompile Include="tests\flex\FlexDrawable.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="tests\flex\osgflex.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="tests\main_scene.cpp" />
     <ClCompile Include="tests\morph_geometry.cpp" />
@@ -556,6 +525,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="test_osg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="ext\osgBullet\osgBulletLite\osgBulletLite.vcxproj">
+      <Project>{39144d4d-283d-4cef-9a4e-d0972cca2ffe}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

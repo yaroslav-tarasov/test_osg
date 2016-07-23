@@ -1,6 +1,4 @@
 #pragma once 
-#include <av/avCore/Global.h>
-#include <osg/TextureRectangle>
 
 namespace avScene
 {

@@ -21,7 +21,7 @@
 #ifndef __OSGCOLLISION_COMPUTE_SHAPE_VISITOR_H__
 #define __OSGCOLLISION_COMPUTE_SHAPE_VISITOR_H__ 1
 
-#if 0
+#if 1
 #include <osgbCollision/Export.h>
 #else 
 #define OSGBCOLLISION_EXPORT

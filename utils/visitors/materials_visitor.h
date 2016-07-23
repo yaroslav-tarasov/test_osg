@@ -10,7 +10,8 @@ namespace mat
         osg::Texture::WrapMode wrap_t;
     };
 
-    typedef std::multimap<std::string,texture_t> materials_t;
+    typedef std::multimap<std::string,texture_t>      materials_t;
+	typedef std::map     <std::string,materials_t>    materials_sets_t;
 }
 
 class MaterialVisitor : public osg::NodeVisitor

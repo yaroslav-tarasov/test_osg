@@ -22,7 +22,7 @@
 #define __OSGBCOLLISION_COLLISION_SHAPES_H__ 1
 
 
-#if 0
+#if 1
 #include <osgbCollision/Export.h>
 #else 
 #define OSGBCOLLISION_EXPORT
