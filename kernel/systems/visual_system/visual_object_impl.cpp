@@ -4,7 +4,6 @@
 
 #include "visual_object_impl.h"
 #include "av/avScene/Scene.h"
-#include "av/avCore/Utils.h"
 #include "animutils.h"
 #include "utils/visitors/cache_nodes_visitor.h"
 
@@ -94,8 +93,10 @@ namespace kernel
     visual_object_impl::~visual_object_impl()
     {
         if(p_->node_.get())
-            Utils::RemoveNodeFromAllParents( p_->node_.get() );
+			p_->scene_->remove(p_->node_.release());
+
         // scene_->get_objects()->remove(node_.get());
+	
     }
 
 #ifdef ASYNC_OBJECT_LOADING    

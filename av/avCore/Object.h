@@ -1,11 +1,13 @@
 #pragma once
 
-// frwds
+//
+// frwrds
+//
+
 namespace avCore
 {
-    class InstancedAnimationManager; 
+	struct  InstancesManager;
 }
-
 
 namespace avCore 
 {
@@ -23,7 +25,8 @@ namespace avCore
 	class Object : public osg::Object
 		         , public ObjectControl
 	{
-        friend ObjectControl* createObject(std::string name, bool fclone);
+        friend struct ObjectManager;
+		friend ObjectControl* createObject(std::string name, uint32_t seed,bool fclone);
     public:
         typedef std::map<std::string, osg::ref_ptr<osg::Node> >  AnimationContainersType;
 
@@ -53,36 +56,42 @@ namespace avCore
         inline osg::Node*   getNode() { return _node.get();}
 		bool         hwInstanced() const;
         bool         parentMainInstancedNode(osg::Group* parent); 
+		void         setSeed (uint32_t seed){ _seed = seed;}
+		uint32_t     getSeed () const { return _seed;}
 
 	private:
 		osg::ref_ptr<osg::Node>                           _node;
 		AnimationContainersType                           _anim_containers;
 		osgAnimation::AnimationMap                        _animations;
 		osg::ref_ptr<osgAnimation::BasicAnimationManager> _manager;
-        osg::ref_ptr<avCore::InstancedAnimationManager>   _inst_manager;
+        osg::ref_ptr<avCore::InstancesManager>            _inst_manager;
+
+		uint32_t                                          _seed;
 	//  Settings
 	private:
         std::string                                       _name;
 	};
 
     typedef std::map< std::string, osg::ref_ptr<Object> > ObjectMap; 
-	typedef std::vector< osg::ref_ptr<Object> >           ObjectClones; 
+	typedef std::list< osg::ref_ptr<Object> >           ObjectClones; 
 
     struct ObjectManager
     {
         friend class Object;
-        friend ObjectControl* createObject(std::string name, bool fclone);
-
+        friend ObjectControl* createObject(std::string name, uint32_t seed,bool fclone);
+		friend void           releaseObject( uint32_t seed );
 
         boost::optional<ObjectMap::value_type> Find(const std::string& name);
         void           releaseAll();
+	    void           releaseObject(uint32_t seed);
         bool           PreUpdate();
         
         static ObjectManager& get();
     
     private:
-        void           Register( Object* obj );
-        void           Register(const std::string& name, Object* obj );
+        void           RegisterClone( Object* obj );
+        void           RegisterPrototype(const std::string& name, Object* obj );
+
         ObjectManager(){};
     private:
         ObjectMap     objCache_;
@@ -90,7 +99,8 @@ namespace avCore
     };
 
 
-    ObjectControl*   createObject(std::string name, bool fclone=true);
-    void       releaseObjectCache();
+    ObjectControl*   createObject (std::string name, uint32_t seed, bool fclone=true);
+	void             releaseObject( osg::Node* node );
+    void             releaseObjectCache();
 
 }

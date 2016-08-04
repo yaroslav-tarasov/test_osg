@@ -1,5 +1,11 @@
 #pragma once 
 
+
+//
+//  Some useful defines
+//
+
+
 #define STRINGIFY(x) #x 
 
 #define STR(x) STRINGIFY(x)
@@ -41,9 +47,18 @@ struct force_log
 
 #define LOG_ODS_MSG( msg )                                                                \
     do {                                                                                  \
-    if(logger::need_to_log()) {                                                     \
+    if(logger::need_to_log()) {                                                           \
     std::stringstream logger__str;                                                        \
     logger__str << std::setprecision(8) << msg ;                                          \
-    OutputDebugStringA(logger__str.str().c_str());                                         \
+    OutputDebugStringA(logger__str.str().c_str());                                        \
     }                                                                                     \
     } while(0)
+
+
+//////////////////////////////////////////////////////////////////////////
+//
+//  For debugging purposes
+//
+
+
+// #define DEBUG_SET_CHECK_FOR_GL_ERRORS

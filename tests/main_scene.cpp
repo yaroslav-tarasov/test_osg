@@ -842,7 +842,7 @@ int main_scene( int argc, char** argv )
 
              osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
              fbo_node->addChild(ephemerisModel.get());
-             rootnode->addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+             rootnode->addChild(avEnv::createPrerender(fbo_node,/*osg::NodePath(),*/0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 #endif
 
 #ifdef  TEST_EPHEMERIS

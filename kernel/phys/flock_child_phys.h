@@ -61,7 +61,7 @@ namespace phys
 #endif
 
        rigid_body_proxy                       chassis_;
-       polymorph_ptr<bt_body_user_info_t>  self_;
+       polymorph_ptr<bt_body_user_info_t>     self_;
 	   system_impl_ptr						  sys_;
        params_t     params_;
        cg::point_3  wind_;

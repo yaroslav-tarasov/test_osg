@@ -37,7 +37,7 @@ Sky::Sky( osg::Group * pScene )
     fbo_node->addChild(_cSkydomePtr.get());
     // fbo_node->addChild(_cCloudsPtr.get());
 
-    addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+    addChild(avEnv::createPrerender(fbo_node,/*osg::NodePath(),*/0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
 
     // setStarFieldMask(NODE_STARFIELD_MASK);  
     // setNodeMask( DO_NOT_PICK_NODE_MASK );

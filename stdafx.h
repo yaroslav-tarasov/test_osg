@@ -30,7 +30,6 @@
 #include "common/misc.h"
 
 
-
 //////////////////////////////////
 //  osgBullet, osgWorks libs
 //

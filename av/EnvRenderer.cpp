@@ -6,6 +6,7 @@
 
 namespace avEnv
 {
+#if 0
     class TexMatCullCallback : public osg::NodeCallback
     {
     public:
@@ -32,6 +33,7 @@ namespace avEnv
 
         osg::ref_ptr<osg::TexMat>    _texmat;
     };
+#endif
 
 class UpdateCameraAndTexGenCallback : public osg::NodeCallback
 {
@@ -39,9 +41,9 @@ public:
 
     typedef std::vector< osg::ref_ptr<osg::Camera> >  CameraList;
 
-    UpdateCameraAndTexGenCallback(osg::NodePath& reflectorNodePath, CameraList& Cameras)
-        :  _reflectorNodePath(reflectorNodePath)
-        ,  _Cameras(Cameras)
+    UpdateCameraAndTexGenCallback(/*osg::NodePath& reflectorNodePath,*/ CameraList& Cameras)
+		:  /*_reflectorNodePath(reflectorNodePath)
+		   ,*/  _Cameras(Cameras)
     {
     }
 
@@ -86,11 +88,11 @@ protected:
 
     virtual ~UpdateCameraAndTexGenCallback() {}
 
-    osg::NodePath               _reflectorNodePath;        
+/*    osg::NodePath               _reflectorNodePath;   */     
     CameraList                  _Cameras;
 };
 
-osg::Group* createPrerender(osg::Node* reflectedSubgraph, osg::NodePath reflectorNodePath, unsigned int unit, const osg::Vec4& clearColor,  osg::Camera::RenderTargetImplementation renderImplementation)
+osg::Group* createPrerender(osg::Node* reflectedSubgraph, /*osg::NodePath reflectorNodePath,*/ unsigned int unit, const osg::Vec4& clearColor,  osg::Camera::RenderTargetImplementation renderImplementation)
 {
 
     osg::Group* group = new osg::Group;
@@ -161,7 +163,7 @@ osg::Group* createPrerender(osg::Node* reflectedSubgraph, osg::NodePath reflecto
     group->addChild(reflectedSubgraph);
 
     // set an update callback to keep moving the camera and tex gen in the right direction.
-    group->setUpdateCallback(new UpdateCameraAndTexGenCallback(reflectorNodePath, Cameras));
+    group->setUpdateCallback(new UpdateCameraAndTexGenCallback(/*reflectorNodePath,*/ Cameras));
 
     return group;
 }

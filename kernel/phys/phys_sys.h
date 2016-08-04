@@ -9,6 +9,7 @@
 #include "phys/aerostat.h"
 #include "phys/aircraft.h"
 #include "phys/arresting_gear.h"
+#include "phys/rocket_flare.h"
 #include "common/debug_render.h"
 
 namespace phys
@@ -59,9 +60,10 @@ namespace phys
 		virtual aircraft::info_ptr         create_aircraft_pl       ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual aircraft::info_ptr         create_helicopter_pl     ( aircraft::params_t const& params, compound_sensor_ptr s, decart_position const& pos ) = 0;
         virtual flock::info_ptr            create_flock_child       ( flock::params_t const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
-		virtual character::info_ptr        create_character         (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos)  = 0;
+		virtual character::info_ptr        create_character         ( const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos)  = 0;
 		virtual aerostat::info_ptr         create_aerostat          ( aerostat::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
-        virtual arresting_gear::info_ptr   create_arresting_gear    ( arresting_gear::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
+		virtual arresting_gear::info_ptr   create_arresting_gear    ( arresting_gear::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
+        virtual rocket_flare::info_ptr     create_rocket_flare      ( rocket_flare::params_t  const& p,compound_sensor_ptr s,const decart_position & pos) = 0;
         
 	};
 

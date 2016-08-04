@@ -61,6 +61,7 @@ public:
     aerostat::info_ptr          create_aerostat        (const phys::aerostat::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
     character::info_ptr         create_character       (const phys::character::params_t & p,compound_sensor_ptr s,const decart_position & pos) override;
     arresting_gear::info_ptr    create_arresting_gear  (const phys::arresting_gear::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
+    rocket_flare::info_ptr      create_rocket_flare    (const phys::rocket_flare::params_t  & p,compound_sensor_ptr s,const decart_position & pos) override;
 
     void                        update                 ( double step )  override ;     // former simulate
     virtual void                set_debug_renderer     (debug_render_ptr debug_render) override ;

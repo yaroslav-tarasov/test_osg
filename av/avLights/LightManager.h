@@ -6,6 +6,23 @@ namespace avScene
 class LightManager 
     : public osg::Node
 {
+	struct DelLight : osg::Referenced
+	{
+		DelLight(LightManager* lm, uint32_t lid)
+			: lid (lid), lm(lm) {}
+
+		~DelLight();
+
+		uint32_t      lid;
+	    LightManager* lm;
+	};
+
+	struct DelLights : osg::Referenced
+	{
+		~DelLights();
+		std::list<osg::ref_ptr<DelLight>> d_lights;
+	};
+
 private:
 
     LightManager();
@@ -15,8 +32,8 @@ private:
 public:
     struct Light
     {
-        osg::Transform * transform;
-
+        //osg::Transform * transform;
+		boost::optional<osg::observer_ptr<osg::Transform>> parent_transform;
         cg::range_2f     spotFalloff;
         cg::range_2f     distanceFalloff;
         cg::colorf       color;
@@ -29,7 +46,7 @@ public:
         bool             lm_only;
         float            normal_coeff;
 
-        inline Light() : transform(nullptr), active(false), high_priority(false), lm_only(false), normal_coeff(0.f) { }
+        inline Light() : /*transform(nullptr),*/ active(false), high_priority(false), lm_only(false), normal_coeff(0.f) { }
     };
 
 public:
@@ -43,15 +60,16 @@ public:
 public:
 
     void      update  ( osg::NodeVisitor * nv );
-    uint32_t  addLight( const Light& light);
-
-
-    FIXME(Check before return);
     
-    Light&   getLight(uint32_t id) {return _LightsMap[id];};
+	uint32_t  addLight( const Light& light);
+	uint32_t  addLight(const Light& data, osg::Node* remove_with);
+
+    void      removeAllLight();
+
+   Light*     getLight(uint32_t id) {auto it = _LightsMap.find(id); if(it!=_LightsMap.end()) return &(*it).second; else return nullptr;};
 
 private:
-	uint32_t genUID();
+	uint32_t  genUID();
 
 private:
 

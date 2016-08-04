@@ -10,19 +10,21 @@
 #include "visitors/materials_visitor.h"
 
 #include "utils/high_res_timer.h"
-#include "utils/callbacks.h"
 #include "utils/materials.h"
 
 #include "av/avScene/Scene.h"
 #include "av/avLights/LightManager.h"
 #include "av/avLights/NavAid.h"
 
+#include "av/avCore/Callbacks.h"
+#include "av/avCore/XmlModel.h"
+
 #include "av/shaders.h"
 #include "Terrain.h"
 #include "Grass.h"
 #include "Grass2.h"
 
-#include "av/avCore/XmlModel.h"
+
 
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"
@@ -169,7 +171,7 @@ namespace
                         pnt._radius = 0.6f;
 
 					avScene::LightManager::Light data;
-					data.transform  = nullptr;  
+					//data.transform  = nullptr;  
 					data.spotFalloff = cg::range_2f();
 					data.distanceFalloff = cg::range_2f(0.9f, 15.0f);
 					data.position =  from_osg_vector3(p);
@@ -450,7 +452,7 @@ void  Terrain::Create( const std::string& cFileName )
             std::string mast_index = node_name.substr(node_name.find("_")+1);
 			
 			avScene::LightManager::Light data;
-			data.transform = (*it)->asTransform()->asMatrixTransform();
+			data.parent_transform = (*it)->asTransform()->asMatrixTransform();
 
 			data.spotFalloff = cg::range_2f(cg::grad2rad(15.f), cg::grad2rad(45.f));
 			data.distanceFalloff = cg::range_2f(80.f, 220.f);

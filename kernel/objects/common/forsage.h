@@ -55,8 +55,10 @@ namespace visual_objects
                     {
                         effect_weak_ptr_->setFactor      (factor_ * traits_.factor_ratio() * cg::clamp(0., effect_end_duration_, 1., 0.)(time-last_update_time_));
                         effect_weak_ptr_->setIntensity   (factor_ * 15);
-                        effect_weak_ptr_->setEmitWorldPos( pos + root_orien.rotate_vector( damned_offset_.translation()) );
-                        effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(0., -15., 0.) ));  
+						//effect_weak_ptr_->setEmitWorldPos( pos + root_orien.rotate_vector( damned_offset_.translation()) );
+						//effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(0., -15., 0.) ));  
+						effect_weak_ptr_->setEmitWorldPos( pos );
+                        effect_weak_ptr_->setEmitterWorldVelocity( cg::point_3f(0., 15., 0.) );  
                     }
                 }
                 else

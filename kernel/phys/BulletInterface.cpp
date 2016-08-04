@@ -24,6 +24,7 @@
 #include "character_phys.h"
 #include "aerostat_phys.h"
 #include "arresting_gear_phys.h"
+#include "rocket_flare_phys.h"
 
 #include "ada/ada.h"
 #include "bada/bada_import.h"
@@ -1038,9 +1039,15 @@ aerostat::info_ptr BulletInterface::create_aerostat(const phys::aerostat::params
 	return  boost::make_shared<aerostat::impl>(shared_from_this(),s,p,pos);
 }
 
-arresting_gear::info_ptr   BulletInterface::create_arresting_gear    ( arresting_gear::params_t  const& p,compound_sensor_ptr s,const decart_position & pos)
+arresting_gear::info_ptr   BulletInterface::create_arresting_gear    (const  arresting_gear::params_t  & p,compound_sensor_ptr s,const decart_position & pos)
 {
     return  boost::make_shared<arresting_gear::impl>(shared_from_this(),s,p,pos);
+}
+
+
+rocket_flare::info_ptr      BulletInterface::create_rocket_flare      (const  rocket_flare::params_t  & p,compound_sensor_ptr s,const decart_position & pos)
+{
+	return  boost::make_shared<rocket_flare::impl>(shared_from_this(),s,p,pos);
 }
 
 boost::optional<double> BulletInterface::intersect_first(cg::point_3 const& p, cg::point_3 const& q) const

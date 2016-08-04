@@ -15,6 +15,8 @@
 
 #include "av/avCore/Logo.h"
 #include "av/avCore/PreRender.h"
+#include "av/avCore/Callbacks.h"
+#include "av/avCore/Utils.h"
 
 #include "trajectory_drawer.h"
 
@@ -544,7 +546,7 @@ struct Scene::_private
 
 //private:
 	Utils::LoadNodeThread*                          _lnt;
-	std::vector<osg::ref_ptr<osg::MatrixTransform>> _mt;
+	//std::vector<osg::ref_ptr<osg::MatrixTransform>> _mt;
 
 #if !defined(VISUAL_EXPORTS)
 	osg::ref_ptr<bi::RigidUpdater>                  _ru;
@@ -640,6 +642,7 @@ Scene::Scene()
     pSS->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
     // disable alpha writes for whole bunch
     pSS->setAttribute(new osg::ColorMask(true, true, true, false)); 
+	pSS->setMode( GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::OFF );
 
     setUpdateCallback(Utils::makeNodeCallback(this, &Scene::update));
 }
@@ -1077,9 +1080,12 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 FIXME(Чудеса с Ephemeris)
         s->setUseModelViewAndProjectionUniforms(true);
         s->setUseVertexAttributeAliasing(true);
-#endif 
+#endif
+
+#ifdef  DEBUG_SET_CHECK_FOR_GL_ERRORS 
         s->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
-    }
+#endif
+	}
 
 #else
     _ls = new osg::LightSource;
@@ -1329,8 +1335,11 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 {
     using namespace creators;
 
-	auto & mt_ = _p->_mt;
-    mt_.push_back(new osg::MatrixTransform); 
+	// auto & mt_ = _p->_mt;
+    // mt_.push_back(new osg::MatrixTransform); 
+    // auto res_node = mt_.back();
+    
+	osg::MatrixTransform* res_node = new osg::MatrixTransform;
     
     // LogInfo("Scene::load enter " << path);
 
@@ -1347,47 +1356,58 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         
         spark::spark_pair_t sp_fire =  spark::create(spark::FIRE,parent?mt_offset->asTransform():nullptr);
         sp_fire.first->setName("fire");
-        mt_.back()->addChild(sp_fire.first);
+        res_node->addChild(sp_fire.first);
 		
-		_terrainRoot->asGroup()->addChild(mt_.back());
+		_terrainRoot->asGroup()->addChild(res_node);
         sp_fire.first->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_PARTICLE_EFFECTS, "DepthSortedBin" );
 
         _viewerPtr->addEventHandler(sp_fire.second);
 
-        return mt_.back();
+        return res_node;
     }
 
     if( path == "arrested_gear.scg" )
     {
         avRopes::RopesNode* fs = new avRopes::RopesNode;
 
-        mt_.back()->addChild(fs);
-        _terrainRoot->asGroup()->addChild(mt_.back());
+        res_node->addChild(fs);
+        _terrainRoot->asGroup()->addChild(res_node);
 
-        return mt_.back();
+        return res_node;
     }
     
     if( path == "sfx//forsage.scg" )
     {
 #if 0
-        if(parent)
-        {
-            osg::Node* pat =  findFirstNode(parent,"pat",findNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-            const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
-
-            osg::Matrix mat; 
-            mat.setTrans(-offset/2);
-
-            auto mt_offset = new osg::MatrixTransform(mat);
-            parent->asGroup()->addChild(mt_offset);
-        }
-#endif
         avFx::FireFx* fs = new avFx::FireFx;
 
-        mt_.back()->addChild(fs);
-        _terrainRoot->asGroup()->addChild(mt_.back());
+        res_node->addChild(fs);
+        _terrainRoot->asGroup()->addChild(res_node);
+#endif
 
-        return mt_.back();
+		osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
+		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
+
+		osg::Matrix mat; 
+		mat.setTrans(-offset/2);
+
+		auto mt_offset = new osg::MatrixTransform(mat);
+		parent?parent->asGroup()->addChild(mt_offset):nullptr;
+
+		avFx::FireFx* fs = new avFx::FireFx;
+
+#ifdef TRACKNODE 		
+		fs->setTrackNode(parent);
+		res_node->addChild(fs);
+		_terrainRoot->asGroup()->addChild(res_node);
+#else
+		res_node->addChild(fs);
+		parent->asGroup()->addChild(res_node);
+#endif
+
+
+
+        return res_node;
     }
 
 	if( path == "sfx//smoke.scg" )
@@ -1405,10 +1425,10 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 		// fs->setTrackNode(parent);
 
-		mt_.back()->addChild(fs);
-		_terrainRoot/*parent*/->asGroup()->addChild(mt_.back());
+		res_node->addChild(fs);
+		_terrainRoot/*parent*/->asGroup()->addChild(res_node);
 
-		return mt_.back();
+		return res_node;
 	}
 
     if( path == "sfx//landing_dust.scg" )
@@ -1424,10 +1444,10 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         avFx::LandingDustFx* fs = new avFx::LandingDustFx;
 
-        mt_.back()->addChild(fs);
-        _terrainRoot->asGroup()->addChild(mt_.back());
+        res_node->addChild(fs);
+        _terrainRoot->asGroup()->addChild(res_node);
 
-        return mt_.back();
+        return res_node;
     }
 
 	if( path == "sfx//foam_stream.scg" )
@@ -1445,14 +1465,14 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 #ifdef TRACKNODE 		
 		fs->setTrackNode(parent);
-		mt_.back()->addChild(fs);
-		_terrainRoot->asGroup()->addChild(mt_.back());
+		res_node->addChild(fs);
+		_terrainRoot->asGroup()->addChild(res_node);
 #else
-        mt_.back()->addChild(fs);
-        parent->asGroup()->addChild(mt_.back());
+        res_node->addChild(fs);
+        parent->asGroup()->addChild(res_node);
 #endif
 
-		return mt_.back();
+		return res_node;
 	}
 
     if( path == "text_label.scg" )
@@ -1556,17 +1576,17 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
              osg::Matrix mat;
              mat.setTrans(body->getMatrix().getTrans() - offset/2.0 );
              
-             mt_.back()->setMatrix(osg::Matrix::scale(osg::Vec3f(0.25, 0.25, 0.25)) * mat );
-             mt_.back()->addChild( obj_node );
+             res_node->setMatrix(osg::Matrix::scale(osg::Vec3f(0.25, 0.25, 0.25)) * mat );
+             res_node->addChild( obj_node );
          
-             phys_ctrl->asGroup()->addChild(mt_.back());
+             phys_ctrl->asGroup()->addChild(res_node);
 
              osg::Node* root =  findFirstNode(obj_node,"root"); 
              if(root!=nullptr) root->setUserValue("id",seed);
 
         }
 
-        return mt_.back();
+        return res_node;
     }
 
     if (path == "adler" || path == "sheremetyevo" || path == "minsk" || path == "lipetsk" || path == "eisk" || path == "vnukovo")
@@ -1600,404 +1620,420 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 
     {
-        mt_.back()->setName("phys_ctrl");
-        mt_.back()->setUserValue("id",seed);
-        mt_.back()->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
+        res_node->setName("phys_ctrl");
+        res_node->setUserValue("id",seed);
+        res_node->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
     }
 
     high_res_timer hr_timer;
-
 	
 	auto sig = [&](uint32_t seed)->void {object_loaded_signal_(seed);};
 
-    auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* mt, bool async)->osg::Node* {
+    auto  wf =  [this](uint32_t seed, std::string path, osg::MatrixTransform* res_node, bool async)->osg::Node* 
+	{
+		using namespace creators;
+
+		bool clone = true;   
+		avCore::ObjectControl* obj_ctrl = avCore::createObject(path, seed, clone);
     
-    auto & mt_ = _p->_mt;
-    bool clone = true;
+		if( path == "su_27" )
+		{
+		   osg::Matrix trMatrix;
+		   trMatrix.setTrans(osg::Vec3d(971,50,0));
+		   trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
 
-    using namespace creators;
+		   res_node->setMatrix(trMatrix);
+		}
     
-    avCore::ObjectControl* obj = avCore::createObject(path, clone);
-    
-    if( path == "su_27" )
-    {
-       osg::Matrix trMatrix;
-       trMatrix.setTrans(osg::Vec3d(971,50,0));
-       trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
+		if( path == "mig_29" )
+		{
+			osg::Matrix trMatrix;
+			trMatrix.setTrans(osg::Vec3d(1000,25,0));
+			trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
 
-       mt_.back()->setMatrix(trMatrix);
-    }
-    
-    if( path == "mig_29" )
-    {
-        osg::Matrix trMatrix;
-        trMatrix.setTrans(osg::Vec3d(1000,25,0));
-        trMatrix.setRotate(osg::Quat(osg::inDegrees(139.0), osg::Z_AXIS));
+			res_node->setMatrix(trMatrix);
+		}
 
-        mt_.back()->setMatrix(trMatrix);
-    }
-
-    if(obj)
-    {
-        if(obj->hwInstanced())
-        {
-             obj->parentMainInstancedNode(_terrainRoot->asGroup());
-        }
-
-        osg::Node* obj_node = obj->getOrCreateNode();
-        
-        mt->addChild( obj_node );
-
-		osg::Node* root =  findFirstNode(obj_node,"root"); 
-        if(root!=nullptr) root->setUserValue("id",seed);
-        
-        if(mt!=nullptr)
-        {
-            
-            osg::Node* ld  =  findFirstNode(mt,"landing_lamp" ,FindNodeVisitor::exact);
-            if(ld==nullptr)
-                ld =  findFirstNode(mt,"landing_lamp_r" ,FindNodeVisitor::exact);
-			osg::Node* ld1 =  findFirstNode(mt,"landing_lamp1",FindNodeVisitor::exact);
-            if(ld1==nullptr)
-                ld1 =  findFirstNode(mt,"landing_lamp_l" ,FindNodeVisitor::exact);
-
-			osg::Node* sl  =  findFirstNode(mt,"steering_lamp",FindNodeVisitor::not_exact);
-            osg::Node* pat =  findFirstNode(mt,"pat"          ,FindNodeVisitor::not_exact);
-            osg::Node* hd  =  findFirstNode(mt,"headlight"    ,FindNodeVisitor::not_exact);
-
-            const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3d(0.0,0.0,0.0);
-
-            if(sl)
-            {
-                avScene::LightManager::Light data;
-                const osg::Vec3 tr = sl->asTransform()->asMatrixTransform()->getMatrix().getTrans();
-
-				data.transform       = mt;  
-				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
-				data.distanceFalloff = cg::range_2f(75.f, 140.f) * tr.z() * .5;
-				data.color.r = 0.92f;
-                data.color.g = 0.92f;
-                data.color.b = 0.85f;
-                FIXME(  Damned offset  );
-                data.position =  from_osg_vector3(tr + offset);
-
-                osg::Quat      rot   = sl->asTransform()->asMatrixTransform()->getMatrix().getRotate();
-                cg::quaternion orien = from_osg_quat(rot);
-                cg::cpr        cr    = orien.cpr(); 
-
-                const float heading = osg::DegreesToRadians(cr.course);
-                const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
-
-                data.direction = set_direction(pitch, heading);
-                data.active = true;
-//#ifndef ASYNC_OBJECT_LOADING
-                avScene::LightManager::GetInstance()->addLight(data);
-//#endif
-				auto nl = new avLights::NavigationalLight;
-				sl->asGroup()->addChild(nl);
-                nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
-                nl->SetColor(osg::Vec4ub(245,250,255,255));
-                nl->SetSectorRange(-90,90);
-                nl->SetSize(0.75);
-            }
-
-			if(ld)
+		if(obj_ctrl)
+		{
+			if(obj_ctrl->hwInstanced())
 			{
-				avScene::LightManager::Light data;
-				data.transform       = mt;  
-				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
-				data.distanceFalloff = cg::range_2f(55.f, 100.f);
-                data.color.r = 0.82f;
-                data.color.g = 0.82f;
-                data.color.b = 0.75f;
-
-				data.position =  from_osg_vector3(ld->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
-
-				osg::Quat      rot   = ld->asTransform()->asMatrixTransform()->getMatrix().getRotate();
-				cg::quaternion orien = from_osg_quat(rot);
-				cg::cpr        cr    = orien.cpr(); 
-
-				const float heading = osg::DegreesToRadians(cr.course);
-				const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
-
-				data.direction = set_direction(pitch, heading);
-				data.active = true;
-				//#ifndef ASYNC_OBJECT_LOADING
-				avScene::LightManager::GetInstance()->addLight(data);
-				//#endif
-				auto nl = new avLights::NavigationalLight;
-				ld->asGroup()->addChild(nl);
-				nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
-				nl->SetColor(osg::Vec4ub(245,250,255,255));
-				nl->SetSectorRange(-90,90);
-                nl->SetSize(0.75);
+				 obj_ctrl->parentMainInstancedNode(_terrainRoot->asGroup());
 			}
 
-			if(ld1)
+			osg::Node* obj_node = obj_ctrl->getOrCreateNode();
+        
+			res_node->addChild( obj_node );
+
+			osg::Node* root =  findFirstNode(obj_node,"root"); 
+			if(root!=nullptr) root->setUserValue("id",seed);
+        
+			if(res_node!=nullptr)
 			{
-				avScene::LightManager::Light data;
-				data.transform       = mt;  
-				data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
-				data.distanceFalloff = cg::range_2f(55.f, 100.f);
-				data.color.r = 0.82f;
-				data.color.g = 0.82f;
-				data.color.b = 0.75f;
+#if 0
+				struct DelLight : osg::Referenced
+				{
+					DelLight()
+						 {}
 
-				data.position =  from_osg_vector3(ld1->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+					~DelLight()
+					{
 
-				osg::Quat      rot   = ld1->asTransform()->asMatrixTransform()->getMatrix().getRotate();
-				cg::quaternion orien = from_osg_quat(rot);
-				cg::cpr        cr    = orien.cpr(); 
+						avScene::LightManager::GetInstance()->removeAllLight();
+					}
 
-				const float heading = osg::DegreesToRadians(cr.course);
-				const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
+				};
 
-				data.direction = set_direction(pitch, heading);
-				data.active = true;
-				//#ifndef ASYNC_OBJECT_LOADING
-				avScene::LightManager::GetInstance()->addLight(data);
-				//#endif
+			    //res_node->setUserData(new DelLight);	
+#endif
+
+
+				osg::Node* ld  =  findFirstNode(res_node,"landing_lamp" ,FindNodeVisitor::exact);
+				if(ld==nullptr)
+					ld =  findFirstNode(res_node,"landing_lamp_r" ,FindNodeVisitor::exact);
+				osg::Node* ld1 =  findFirstNode(res_node,"landing_lamp1",FindNodeVisitor::exact);
+				if(ld1==nullptr)
+					ld1 =  findFirstNode(res_node,"landing_lamp_l" ,FindNodeVisitor::exact);
+
+				osg::Node* sl  =  findFirstNode(res_node,"steering_lamp",FindNodeVisitor::not_exact);
+				osg::Node* pat =  findFirstNode(res_node,"pat"          ,FindNodeVisitor::not_exact);
+				osg::Node* hd  =  findFirstNode(res_node,"headlight"    ,FindNodeVisitor::not_exact);
+
+				const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3d(0.0,0.0,0.0);
+
+				if(sl)
+				{
+					avScene::LightManager::Light data;
+					const osg::Vec3 tr = sl->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+
+					data.parent_transform       = res_node;  
+					data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(25.f), osg::DegreesToRadians(33.f));
+					data.distanceFalloff = cg::range_2f(75.f, 140.f) * tr.z() * .5;
+					data.color.r = 0.92f;
+					data.color.g = 0.92f;
+					data.color.b = 0.85f;
+					FIXME(  Damned offset  );
+					data.position =  from_osg_vector3(tr + offset);
+
+					osg::Quat      rot   = sl->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+					cg::quaternion orien = from_osg_quat(rot);
+					cg::cpr        cr    = orien.cpr(); 
+
+					const float heading = osg::DegreesToRadians(cr.course);
+					const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
+
 				
-                auto nl = new avLights::NavigationalLight;
-				ld1->asGroup()->addChild(nl);
-                nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
-                nl->SetColor(osg::Vec4ub(245,250,255,255));
-                nl->SetSectorRange(-90,90);
-                nl->SetSize(0.75);
-			}
+					data.direction = set_direction(pitch, heading);
+					data.active = true;
+	//#ifndef ASYNC_OBJECT_LOADING
+					avScene::LightManager::GetInstance()->addLight(data,sl);
+	//#endif
+		
+				
+					auto nl = new avLights::NavigationalLight;
+					sl->asGroup()->addChild(nl);
+					nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
+					nl->SetColor(osg::Vec4ub(245,250,255,255));
+					nl->SetSectorRange(osg::DegreesToRadians(-75.f),osg::DegreesToRadians(75.f));
+					nl->SetSize(0.75);
+				}
 
-            if(hd)
-            {
-                avScene::LightManager::Light data;
-                data.transform  = mt;  
-                data.spotFalloff = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(32.f));  // FIXME градусы-радианы 
-                data.distanceFalloff = cg::range_2f(15.f, 70.f);
-                data.color.r = 0.55f;
-                data.color.g = 0.55f;
-                data.color.b = 0.5f;
-                FIXME(  Damned offset  );
-                data.position =  from_osg_vector3(hd->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+				if(ld)
+				{
+					avScene::LightManager::Light data;
+					data.parent_transform       = res_node;  
+					data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
+					data.distanceFalloff = cg::range_2f(55.f, 100.f);
+					data.color.r = 0.82f;
+					data.color.g = 0.82f;
+					data.color.b = 0.75f;
 
-                osg::Quat      rot   = hd->asTransform()->asMatrixTransform()->getMatrix().getRotate();
-                cg::quaternion orien = from_osg_quat(rot);
-                cg::cpr        cr    = orien.cpr(); 
+					data.position =  from_osg_vector3(ld->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
-                const float heading = osg::DegreesToRadians(cr.course);
-                const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
+					osg::Quat      rot   = ld->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+					cg::quaternion orien = from_osg_quat(rot);
+					cg::cpr        cr    = orien.cpr(); 
 
-                data.direction = set_direction(pitch, heading);
-                data.active = true;
-//#ifndef ASYNC_OBJECT_LOADING
-                avScene::LightManager::GetInstance()->addLight(data);
-//#endif
-            }
-
-            FindNodeVisitor::nodeNamesList list_name;
-            NavAidGroup*  obj_light  =  new NavAidGroup; 
-
-            const char* names[] =
-            {
-                "port",
-                "starboard",
-                "tail",
-                "steering_lamp",
-                "strobe_",
-                "landing_lamp",
-                "back_tail",
-                "headlight"
-                // "navaid_",
-            };
-
-            for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
-            {
-                list_name.push_back(names[i]);
-            }
-
-            FindNodeVisitor findNodes(list_name,FindNodeVisitor::not_exact); 
-            if(root) root->accept(findNodes);
-
-            const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
-
-            auto shift_phase = cg::rand(cg::range_2(0, 255));
-
-            osgSim::Sector* sector = new osgSim::AzimSector(-osg::inDegrees(45.0),osg::inDegrees(45.0),osg::inDegrees(90.0));
-
-            for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
-            {
-                osgSim::LightPoint pnt;
-                bool need_to_add = false;
-                avScene::LightManager::Light data;
-
-                if((*it)->getName() == "tail")
-                { 
-                    pnt._color      = creators::white_color * 0.01f;
-                    need_to_add     = true;
-                }
-                
-                if((*it)->getName() == "back_tail")
-                { 
-                    avScene::LightManager::Light data;
-
-                    data.color.r = 0.82f;
-                    data.color.g = 0.82f;
-                    data.color.b = 0.75f;
-                    
-                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
-
-                    data.transform  = mt;  
-                    data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(tr.z() - 2.0,tr.z() - 1/*4.f, 5.f*/);
-                    FIXME( Damned offset )
-                    data.position =  from_osg_vector3( tr + offset);
-                    data.active = true;
-                    const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f);
-                    
-                    data.high_priority = true;
-                    data.normal_coeff  = 1.0;   // XXX
-                    data.direction = set_direction(pitch, heading);
-
-                    avScene::LightManager::GetInstance()->addLight(data);
-                }
-
-                if((*it)->getName() == "port")
-                {   
-                    pnt._color      = red_color * 0.01f;
-                    need_to_add     = true;
-                    pnt._sector = sector;
-                    
-                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
-
-                    data.transform  = mt;  
-                    data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f) , tr.z() * 2/*10.f*/);
-                    FIXME( Damned offset )
-                    data.position =  from_osg_vector3(tr + offset);
-					data.lm_only = true;
-                    const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f);
+					const float heading = osg::DegreesToRadians(cr.course);
+					const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
 
 					data.direction = set_direction(pitch, heading);
+					data.active = true;
+					//#ifndef ASYNC_OBJECT_LOADING
+					avScene::LightManager::GetInstance()->addLight(data,ld);
+					//#endif
+					auto nl = new avLights::NavigationalLight;
+					ld->asGroup()->addChild(nl);
+					nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
+					nl->SetColor(osg::Vec4ub(245,250,255,255));
+					nl->SetSectorRange(osg::DegreesToRadians(-75.f),osg::DegreesToRadians(75.f));
+					nl->SetSize(0.75);
+				}
 
-                }
+				if(ld1)
+				{
+					avScene::LightManager::Light data;
+					data.parent_transform       = res_node;  
+					data.spotFalloff     = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(23.f));
+					data.distanceFalloff = cg::range_2f(55.f, 100.f);
+					data.color.r = 0.82f;
+					data.color.g = 0.82f;
+					data.color.b = 0.75f;
 
-                if((*it)->getName() == "starboard") 
-                {
-                    pnt._color =  green_color * 0.01f ;
-                    need_to_add     = true;
-                    pnt._sector = sector;
+					data.position =  from_osg_vector3(ld1->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+
+					osg::Quat      rot   = ld1->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+					cg::quaternion orien = from_osg_quat(rot);
+					cg::cpr        cr    = orien.cpr(); 
+
+					const float heading = osg::DegreesToRadians(cr.course);
+					const float pitch   = osg::DegreesToRadians(cr.pitch/*15.f*/);
+
+					data.direction = set_direction(pitch, heading);
+					data.active = true;
+					//#ifndef ASYNC_OBJECT_LOADING
+					avScene::LightManager::GetInstance()->addLight(data,ld1);
+					//#endif
+				
+					auto nl = new avLights::NavigationalLight;
+					ld1->asGroup()->addChild(nl);
+					nl->SetExhibitionCondition(avLights::NavigationalLight::NightTimeOnly);
+					nl->SetColor(osg::Vec4ub(245,250,255,255));
+					nl->SetSectorRange(osg::DegreesToRadians(-75.f),osg::DegreesToRadians(75.f));
+					nl->SetSize(0.75);
+				}
+
+				if(hd)
+				{
+					avScene::LightManager::Light data;
+					data.parent_transform  = res_node;  
+					data.spotFalloff = cg::range_2f(osg::DegreesToRadians(15.f), osg::DegreesToRadians(32.f));  // FIXME градусы-радианы 
+					data.distanceFalloff = cg::range_2f(15.f, 70.f);
+					data.color.r = 0.55f;
+					data.color.g = 0.55f;
+					data.color.b = 0.5f;
+					FIXME(  Damned offset  );
+					data.position =  from_osg_vector3(hd->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+
+					osg::Quat      rot   = hd->asTransform()->asMatrixTransform()->getMatrix().getRotate();
+					cg::quaternion orien = from_osg_quat(rot);
+					cg::cpr        cr    = orien.cpr(); 
+
+					const float heading = osg::DegreesToRadians(cr.course);
+					const float pitch = osg::DegreesToRadians(/*cr.pitch*/15.f);
+
+					data.direction = set_direction(pitch, heading);
+					data.active = true;
+	//#ifndef ASYNC_OBJECT_LOADING
+					avScene::LightManager::GetInstance()->addLight(data,hd);
+	//#endif
+				}
+
+				FindNodeVisitor::nodeNamesList list_name;
+				NavAidGroup*  obj_light  =  new NavAidGroup; 
+
+				const char* names[] =
+				{
+					"port",
+					"starboard",
+					"tail",
+					"steering_lamp",
+					"strobe_",
+					"landing_lamp",
+					"back_tail",
+					"headlight"
+					// "navaid_",
+				};
+
+				for(int i=0; i<sizeof(names)/sizeof(names[0]);++i)
+				{
+					list_name.push_back(names[i]);
+				}
+
+				FindNodeVisitor findNodes(list_name,FindNodeVisitor::not_exact); 
+				if(root) root->accept(findNodes);
+
+				const FindNodeVisitor::nodeListType& wln_list = findNodes.getNodeList();
+
+				auto shift_phase = cg::rand(cg::range_2(0, 255));
+
+				osgSim::Sector* sector = new osgSim::AzimSector(-osg::inDegrees(45.0),osg::inDegrees(45.0),osg::inDegrees(90.0));
+
+				for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
+				{
+					osgSim::LightPoint pnt;
+					bool need_to_add = false;
+					avScene::LightManager::Light data;
+
+					if((*it)->getName() == "tail")
+					{ 
+						pnt._color      = creators::white_color * 0.01f;
+						need_to_add     = true;
+					}
+                
+					if((*it)->getName() == "back_tail")
+					{ 
+						avScene::LightManager::Light data;
+
+						data.color.r = 0.82f;
+						data.color.g = 0.82f;
+						data.color.b = 0.75f;
                     
-                    const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+						const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 
-                    data.transform  = mt;  
-                    data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f), tr.z() * 2/*10.f*/);
-                    FIXME( Damned offset )
-                    data.position =  from_osg_vector3( tr + offset); 
-					data.lm_only = true;
+						data.parent_transform  = res_node;  
+						data.spotFalloff = cg::range_2f();
+						data.distanceFalloff = cg::range_2f(tr.z() - 2.0,tr.z() - 1/*4.f, 5.f*/);
+						FIXME( Damned offset )
+						data.position =  from_osg_vector3( tr + offset);
+						data.active = true;
+						const float heading = osg::DegreesToRadians(0.f);
+						const float pitch   = osg::DegreesToRadians(0.f);
+                    
+						data.high_priority = true;
+						data.normal_coeff  = 1.0;   // XXX
+						data.direction = set_direction(pitch, heading);
 
-                    const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f);
+						avScene::LightManager::GetInstance()->addLight(data,(*it));
+					}
 
-                    data.direction = set_direction(pitch, heading);
-                }
+					if((*it)->getName() == "port")
+					{   
+						pnt._color      = red_color * 0.01f;
+						need_to_add     = true;
+						pnt._sector = sector;
+                    
+						const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+
+						data.parent_transform  = res_node;  
+						data.spotFalloff = cg::range_2f();
+						data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f) , tr.z() * 2/*10.f*/);
+						FIXME( Damned offset )
+						data.position =  from_osg_vector3(tr + offset);
+						data.lm_only = true;
+						const float heading = osg::DegreesToRadians(0.f);
+						const float pitch   = osg::DegreesToRadians(0.f);
+
+						data.direction = set_direction(pitch, heading);
+
+					}
+
+					if((*it)->getName() == "starboard") 
+					{
+						pnt._color =  green_color * 0.01f ;
+						need_to_add     = true;
+						pnt._sector = sector;
+                    
+						const osg::Vec3 tr = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+
+						data.parent_transform  = res_node;  
+						data.spotFalloff = cg::range_2f();
+						data.distanceFalloff = cg::range_2f( cg::min (1.5f, tr.z() / 3.f), tr.z() * 2/*10.f*/);
+						FIXME( Damned offset )
+						data.position =  from_osg_vector3( tr + offset); 
+						data.lm_only = true;
+
+						const float heading = osg::DegreesToRadians(0.f);
+						const float pitch   = osg::DegreesToRadians(0.f);
+
+						data.direction = set_direction(pitch, heading);
+					}
 
 
-                if(boost::starts_with((*it)->getName(), "strobe_")) 
-                {
-                    pnt._color  = white_color * 0.01f;
-                    pnt._blinkSequence = new osgSim::BlinkSequence;
-                    pnt._blinkSequence->addPulse( 0.05,
-                        osg::Vec4( 1., 1., 1., 1. ) );
+					if(boost::starts_with((*it)->getName(), "strobe_")) 
+					{
+						pnt._color  = white_color * 0.01f;
+						pnt._blinkSequence = new osgSim::BlinkSequence;
+						pnt._blinkSequence->addPulse( 0.05,
+							osg::Vec4( 1., 1., 1., 1. ) );
 
-                    pnt._blinkSequence->addPulse( 1.5,
-                        osg::Vec4( 0., 0., 0., 0. ) );
+						pnt._blinkSequence->addPulse( 1.5,
+							osg::Vec4( 0., 0., 0., 0. ) );
 
-                    pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
+						pnt._sector = new osgSim::AzimSector(-osg::inDegrees(170.0),-osg::inDegrees(10.0),osg::inDegrees(90.0));
 
-                    pnt._blinkSequence->setPhaseShift(shift_phase);
-                    need_to_add     = true;
+						pnt._blinkSequence->setPhaseShift(shift_phase);
+						need_to_add     = true;
 
-                    data.transform  = mt;  
-                    data.spotFalloff = cg::range_2f();
-                    data.distanceFalloff = cg::range_2f(3.5f, 15.f);//cg::range_2f(3.5f, 40.f);
+						data.parent_transform  = res_node;  
+						data.spotFalloff = cg::range_2f();
+						data.distanceFalloff = cg::range_2f(3.5f, 15.f);//cg::range_2f(3.5f, 40.f);
 
-                    FIXME( Damned offset )
-                    data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
+						FIXME( Damned offset )
+						data.position =  from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans() + offset);
 
-                    const float heading = osg::DegreesToRadians(0.f);
-                    const float pitch   = osg::DegreesToRadians(0.f);
+						const float heading = osg::DegreesToRadians(0.f);
+						const float pitch   = osg::DegreesToRadians(0.f);
 
-                    data.direction = set_direction(pitch, heading);
-                }
+						data.direction = set_direction(pitch, heading);
+					}
 
-                pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
-                pnt._radius = 0.2f;
-                //И чего тут делать с огнями и колбеками
-                FIXME( Исправить структуру под mt)
-//#ifndef ASYNC_OBJECT_LOADING
-                if(need_to_add)
-                {
-                    obj_light->addLight(pnt, data);
-                }
-//#endif
-            }
+					pnt._position = (*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans();
+					pnt._radius = 0.2f;
+					//И чего тут делать с огнями и колбеками
+					FIXME( Исправить структуру под mt)
+	//#ifndef ASYNC_OBJECT_LOADING
+					if(need_to_add)
+					{
+						obj_light->addLight(pnt, data);
+					}
+	//#endif
+				}
 
-            //И чего тут делать с огнями и колбеками
-            FIXME( Исправить структуру под mt)
-//#ifndef ASYNC_OBJECT_LOADING
-                if(wln_list.size()>0)
-                    root->asGroup()->addChild(obj_light);
-//#endif
-
-        }
-
-//#ifndef ASYNC_OBJECT_LOADING
-        if(!async)
-            _terrainRoot->asGroup()->addChild(mt);
-//#endif
-
-#if 0
-		FIXME("Жесть с анимацией, кто на ком стоял")
-	    using namespace avAnimation;
-		if(path=="crow")
-		{
-			AnimationManagerFinder finder;
-			mt->accept(finder);
-			if(finder._am.valid())
-			{
-				SetupRigGeometry switcher(true, *mt);
-#ifdef ASYNC_OBJECT_LOADING
-				mt->setUpdateCallback(finder._am.get());
-#endif
+				//И чего тут делать с огнями и колбеками
+				FIXME( Исправить структуру под mt)
+	//#ifndef ASYNC_OBJECT_LOADING
+					if(wln_list.size()>0)
+						root->asGroup()->addChild(obj_light);
+	//#endif
 
 			}
+
+	//#ifndef ASYNC_OBJECT_LOADING
+			if(!async)
+				_terrainRoot->asGroup()->addChild(res_node);
+	//#endif
+
+	#if 0
+			FIXME("Жесть с анимацией, кто на ком стоял")
+			using namespace avAnimation;
+			if(path=="crow")
+			{
+				AnimationManagerFinder finder;
+				mt->accept(finder);
+				if(finder._am.valid())
+				{
+					SetupRigGeometry switcher(true, *mt);
+	#ifdef ASYNC_OBJECT_LOADING
+					mt->setUpdateCallback(finder._am.get());
+	#endif
+				}
+			}
+	#endif
+
+	#ifndef ASYNC_OBJECT_LOADING
+			object_loaded_signal_(seed);
+	#endif  
+
+			return res_node;
+
 		}
-#endif
 
-#ifndef ASYNC_OBJECT_LOADING
-        object_loaded_signal_(seed);
-#endif  
-
-		return mt;
-
-    }
-
-	return nullptr;
+		return nullptr;
  };
 
 
 
 #ifdef ASYNC_OBJECT_LOADING
     if(async)
-		dynamic_cast<avCore::LoadManager*>(_loadManager.get())->load(mt_.back(), boost::bind<osg::Node*>( wf, seed,path,mt_.back().get(), async),boost::bind<void>(sig, seed));
+		dynamic_cast<avCore::LoadManager*>(_loadManager.get())->load(boost::bind<osg::Node*>( wf, seed,path,res_node/*.get()*/, async),boost::bind<void>(sig, seed));
 	else
 		wf(seed, 
 		path, 
-		mt_.back().get(),
+		res_node/*.get()*/,
 		async);
 #else
-    wf(seed, path,mt_.back().get(),async);
+    wf(seed, path,res_node.get(),async);
 #endif
     
     OSG_WARN << "Scene::load: " << hr_timer.set_point() << "\n";
@@ -2006,8 +2042,14 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 
 
-    return mt_.back();
+    return res_node;
 }
+
+void   Scene::remove(osg::Node* node)
+{
+	avCore::releaseObject(node);
+}
+
 
 void   Scene::onSetMap(float val)
 {
@@ -2102,7 +2144,16 @@ void Scene::setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center)
 // update pass
 void Scene::update( osg::NodeVisitor * nv )
 {
-      const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+	  const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+      avCore::Environment::EnvironmentParameters & environmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
+
+	  
+	  if(environmentParameters.AirHumidity>100.f)
+		environmentParameters.AirHumidity = 0.0;
+	  else
+		environmentParameters.AirHumidity += 0.01f;
+
+
 	  const double lt = nv->getFrameStamp()->getSimulationTime();
       
       if(_p->_time_panel)
@@ -2111,7 +2162,7 @@ void Scene::update( osg::NodeVisitor * nv )
       }
 
       const unsigned base_hour = 10;
-      const unsigned time_coeff   = 1/*500*/; 
+      const unsigned time_coeff   = /*1*/500; 
       const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();

@@ -101,7 +101,8 @@ namespace avScene {
         void                                        setHomePosition(const osg::Vec3d& eye, const osg::Vec3d& center);
 
         osg::Node*                                  load(const std::string path, osg::Node* parent, uint32_t seed, bool& async);
-    
+        void                                        remove(osg::Node* node);
+
     private: // IScene interface declaration
         av::environment_weather*                    getEnvWeather() const override;
         av::ITrajectoryDrawer*                      GetTrajectoryDrawer() const override; 

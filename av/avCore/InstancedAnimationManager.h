@@ -1,11 +1,11 @@
 #pragma once
 
 #include "utils/cpp_utils/id_generator.h"
-#include "InstancedData.h"
+#include "InstancesManager.h"
 
 namespace avCore
 {
-	class  InstancedAnimationManager  : public osg::Object       
+	class  InstancedAnimationManager  : public InstancesManager
 	{
 		struct instanced_nodes_vector_t
 		{
@@ -28,16 +28,16 @@ namespace avCore
 	public:
 		typedef std::vector<osg::Matrixf>              InstancedDataType;
 	public:
-        
-        META_Object(avCore,InstancedAnimationManager);
-        
-        InstancedAnimationManager();
+       		
+		META_Object(avCore,InstancedAnimationManager);
 
-        InstancedAnimationManager(const InstancedAnimationManager& im,const osg::CopyOp& =osg::CopyOp::SHALLOW_COPY);
+        InstancedAnimationManager ();
 
-		InstancedAnimationManager   (osg::Node* base_model, const std::string anim_file);
+        InstancedAnimationManager (const InstancedAnimationManager& im,const osg::CopyOp& =osg::CopyOp::SHALLOW_COPY);
 
-        void                        commitInstancePositions();
+		InstancedAnimationManager (osg::Node* prototype, const std::string& anim_file);
+
+        void                        commitInstancesPositions();
 
 		inline void                 addMatrix(const osg::Matrixf& matrix) { instancesData_.push_back(matrix); }
 		inline osg::Matrixf         getMatrix(size_t index) const         { return instancesData_[index]; }
@@ -45,7 +45,6 @@ namespace avCore
         inline osg::Geode*          getMainNode()                         { return instGeode_.get(); }
         osg::Node *                 getObjectInstance();                    
 
-        osg::TextureRectangle*      createAnimationTexture( image_data& idata);
 
 #if 0
 		void                        setInstanceData(size_t idx, const osg::Matrixf& matrix);
@@ -54,7 +53,9 @@ namespace avCore
 #endif  
 
 	private:
-        osg::TextureRectangle* _createTextureInstancedData();
+
+		osg::TextureRectangle*      _createAnimationTexture( image_data& idata);
+        osg::TextureRectangle*      _createTextureInstancedData();
         bool                        _loadAnimationData(std::string const&  filename);
         bool                        _initSkinning(osg::Geometry& geom, const image_data& id );
         osg::Geode*                 _createGeode();

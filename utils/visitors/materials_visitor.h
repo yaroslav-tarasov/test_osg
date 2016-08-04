@@ -42,7 +42,28 @@ public:
 	            if(_cm) _cm(&node,_found_mat_name);
 	            if(_cr) _cr(&node, node.getStateSet(),_found_mat_name,_mats);
 	        }
-			
+			else
+			{
+				osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
+				if ( osgmat != NULL)
+				{
+					stateset->removeAttribute(osgmat);
+				}
+
+				osg::Material *osglm = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::LIGHTMODEL ));
+				if ( osglm != NULL )
+				{
+					stateset->removeAttribute(osglm);
+				}
+
+				osg::Material *osgte = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::TEXENV ));
+				if ( osgte != NULL )
+				{
+					stateset->removeAttribute(osgte);
+				}
+
+			}
+
 
 		}
         

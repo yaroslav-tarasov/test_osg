@@ -58,7 +58,7 @@ namespace avCore
 
         struct IlluminationParameters
         {
-            bool IsAutoIllumination;
+            bool  IsAutoIllumination;
             float Illumination;
             float NavigationLightsThreshold;
             float CulturalLightsLightsThreshold;
@@ -66,8 +66,8 @@ namespace avCore
             IlluminationParameters()
                 : IsAutoIllumination(true)
                 , Illumination(1.0f)
-                , NavigationLightsThreshold(0.5f)
-                , CulturalLightsLightsThreshold(0.5f)
+                , NavigationLightsThreshold(0.75f)
+                , CulturalLightsLightsThreshold(0.75f)
             {
             }
         };
@@ -121,9 +121,10 @@ namespace avCore
         static void          Create();
         static void          Release();
 
-        inline const WeatherParameters &      GetWeatherParameters()      const { return m_WeatherParameters;      }
-        inline const IlluminationParameters & GetIlluminationParameters() const { return m_IlluminationParameters; }
-        inline const EnvironmentParameters &  GetEnvironmentParameters()  const { return m_EnvironmentParameters;  }
+		inline const WeatherParameters &      GetWeatherParameters()      const { return m_WeatherParameters;      }
+		inline const IlluminationParameters & GetIlluminationParameters() const { return m_IlluminationParameters; }
+		inline const EnvironmentParameters &  GetEnvironmentParameters()  const { return m_EnvironmentParameters;  }
+        inline       EnvironmentParameters &  GetEnvironmentParameters()        { return m_EnvironmentParameters;  }
         inline const TimeParameters &         GetTimeParameters()         const { return m_TimeParameters;         }
         inline TimeParameters &               GetTimeParameters()               { return m_TimeParameters;         }
 

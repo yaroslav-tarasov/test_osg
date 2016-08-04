@@ -7,6 +7,9 @@
 
 #include "visitors/ct_visitor.h"
 
+
+
+
 namespace Database
 {
     bool LoadShaderInternal(const std::string & fileName, std::stringstream& file, std::ostream & text );
@@ -567,7 +570,23 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
 		stateset->addUniform( new osg::Uniform("aCol"     , aCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
 		stateset->addUniform( new osg::Uniform("dCol"     , dCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 		stateset->addUniform( new osg::Uniform("sCol"     , sCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
+	}
+	
+	if ( osgmat != NULL)
+	{
+		stateset->removeAttribute(osgmat);
+	}
 
+	osg::Material *osglm = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::LIGHTMODEL ));
+	if ( osglm != NULL )
+	{
+     	stateset->removeAttribute(osglm);
+	}
+	
+	osg::Material *osgte = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::TEXENV ));
+	if ( osgte != NULL )
+	{
+		stateset->removeAttribute(osgte);
 	}
 
     stateset->setAttributeAndModes( p.program.get(), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);

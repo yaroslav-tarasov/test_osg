@@ -261,6 +261,12 @@
     <Filter Include="Source Files\tests\flex\core">
       <UniqueIdentifier>{ad6a4c62-b166-4247-af05-dfe07248f1d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\rocket_flare">
+      <UniqueIdentifier>{fbceff17-78fa-42ec-a2d2-2779fd2e969a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\rocket_flare">
+      <UniqueIdentifier>{a41ebfcd-b726-43e0-a780-7ec7325e1427}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="misc\shaders\tess_quad.tcs">
@@ -632,6 +638,30 @@
     <ClInclude Include="tests\flex\FlexDrawable.h">
       <Filter>Source Files\tests\flex</Filter>
     </ClInclude>
+    <ClInclude Include="av\avCore\InstancesManager.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="av\avCore\InstancesManagerImpl.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_common.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_ctrl.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_model.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_msg.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_view.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_vis.h">
+      <Filter>Header Files\objects\rocket_flare</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -656,9 +686,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\SkyBox.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\teapot.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
@@ -1377,6 +1404,27 @@
     </ClCompile>
     <ClCompile Include="av\avCore\Noise.cpp">
       <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\InstancesManagerImpl.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\InstancesManager.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\rocket_flare_phys.cpp">
+      <Filter>Source Files\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_ctrl.cpp">
+      <Filter>Source Files\objects\rocket_flare</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_model.cpp">
+      <Filter>Source Files\objects\rocket_flare</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_view.cpp">
+      <Filter>Source Files\objects\rocket_flare</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_vis.cpp">
+      <Filter>Source Files\objects\rocket_flare</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

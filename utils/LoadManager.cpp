@@ -2,8 +2,9 @@
 #include "av/precompiled.h"
 
 #include "av/avScene/Scene.h"
+#include "av/avCore/Callbacks.h"
+
 #include "LoadManager.h"
-#include "utils/callbacks.h"
 
 namespace avCore
 {
@@ -45,7 +46,8 @@ namespace avCore
                 while ( (cur_task = lm_->to_work_.try_pop()) != nullptr )
                 {
                     cur_task->_node = cur_task->_worker();
-                    lm_->finished_.push(cur_task.get());
+					//cur_task->_node->unref();
+                    lm_->finished_.push(cur_task.release());
                 }
 
                OSG_WARN << "LoadNodeThread::run : " << hr_timer.set_point() << "\n";
@@ -117,7 +119,7 @@ namespace avCore
         double dt = 0;
         high_res_timer hr_timer;
  
-        LoadManager::Task* cur_task = nullptr;
+       osg::ref_ptr<LoadManager::Task> cur_task = nullptr;
         while ( dt < 0.01 && ((cur_task = finished_.try_pop()) != nullptr))
         {
             if(cur_task->_node.valid())
@@ -137,7 +139,7 @@ namespace avCore
 		}
     }
 
-    void LoadManager::load ( osg::MatrixTransform* mt, worker_f work , set_signal_f s)
+    void LoadManager::load ( worker_f work , set_signal_f s)
     {
         //
         to_work_.push(new Task( work, s ));

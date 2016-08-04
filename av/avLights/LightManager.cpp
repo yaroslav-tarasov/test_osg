@@ -6,8 +6,7 @@
 
 #include "LightManager.h"
 
-#include "utils/callbacks.h"
-
+#include "av/avCore/Callbacks.h"
 
 
 namespace avScene
@@ -94,6 +93,36 @@ uint32_t LightManager::addLight(const Light& data)
 	return lightID;
 }
 
+
+LightManager::DelLight::~DelLight()
+{
+	auto it = lm->_LightsMap.find(lid);
+	if(it!= lm->_LightsMap.end())
+		lm->_LightsMap.erase(it);
+}
+
+LightManager::DelLights::~DelLights()
+{
+	d_lights.clear();
+}
+
+uint32_t  LightManager::addLight(const Light& data, osg::Node* remove_with)
+{
+	uint32_t light_uid = addLight(data);
+	
+	if(!remove_with->getUserData())
+	   remove_with->setUserData(new DelLights);	
+
+	dynamic_cast<DelLights*>(remove_with->getUserData())->d_lights.push_back(new  DelLight(this, light_uid));
+
+	return light_uid;
+}
+
+void LightManager::removeAllLight()
+{
+	_LightsMap.clear();
+}
+
 void LightManager::update( osg::NodeVisitor * nv )
 {
     avScene::Scene * scene = GetScene();
@@ -107,6 +136,18 @@ void LightManager::update( osg::NodeVisitor * nv )
         return;
     
 	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_lightManagerMapMutex);
+
+#if 0
+	for (auto it = _LightsMap.begin(); it != _LightsMap.end(); ++it)
+	{
+		Light & light = it->second;
+		if (light.parent_transform && !(*light.parent_transform).valid())
+		{
+			_LightsMap.erase(it);
+		}
+	}
+#endif
+
 
     for (LightsMap::const_iterator it = _LightsMap.cbegin(); it != _LightsMap.cend(); ++it)
     {
@@ -122,15 +163,24 @@ void LightManager::update( osg::NodeVisitor * nv )
         
         osg::Matrix matrix; 
         
-        if(light.transform)
-        if(light.transform->asMatrixTransform())
-        {
-           osg::Node* parent = light.transform->getNumParents()>0?light.transform->getParent(0):nullptr;
-           if(parent && parent->asTransform())
-                matrix =  light.transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
-           else
-                matrix =  light.transform->asMatrixTransform()->getMatrix() ;
-        }
+        if (light.parent_transform)
+		{
+			auto transform = (*light.parent_transform);
+			if (transform.valid())
+			{
+				if(transform->asMatrixTransform())
+				{
+				   osg::Node* parent = transform->getNumParents()>0?transform->getParent(0):nullptr;
+				   if(parent && parent->asTransform())
+						matrix =  transform->asMatrixTransform()->getMatrix() * parent->asTransform()->asMatrixTransform()->getMatrix();
+				   else
+						matrix =  transform->asMatrixTransform()->getMatrix() ;
+				}
+			}
+			else
+				continue;
+		}
+			
 
         cg::matrix_4 trm = from_osg_matrix(matrix);
         cg::transform_4 transform = trm.transpose();

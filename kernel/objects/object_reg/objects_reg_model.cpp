@@ -23,7 +23,7 @@ AUTO_REG_NAME(aircraft_reg_model, model::create);
 model::model( kernel::object_create_t const& oc, dict_copt dict)
     : view                 (oc, dict)
 {
-    void (model::*on_run)  (net_layer::msg::run_msg const& msg)             = &model::on_inject_msg;
+    void (model::*on_run)  (net_layer::msg::run_msg const& msg)         = &model::on_inject_msg;
     void (model::*on_malf) (net_layer::msg::malfunction_msg const& msg) = &model::on_inject_msg;
 
     msg_disp()

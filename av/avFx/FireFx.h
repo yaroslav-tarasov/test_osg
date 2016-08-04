@@ -40,7 +40,7 @@ namespace avFx
 
     //
     // FireFx class
-    // Implements smoke effect
+    // Implements fire effect
     //
 
     class FireFx : public osg::Geode

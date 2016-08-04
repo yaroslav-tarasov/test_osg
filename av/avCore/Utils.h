@@ -144,6 +144,7 @@ private:
 /////////////////////////////////////////////////////////////////////
 //                          NodeCallback
 /////////////////////////////////////////////////////////////////////
+#if 0
 template <class T>
 class NodeCallback : public osg::NodeCallback
 {
@@ -184,6 +185,7 @@ inline NodeCallback<T> * makeNodeCallback( T * object, void (T::*func)( osg::Nod
 {
 	return new NodeCallback<T>(object, func, isPure);
 }
+#endif
 
 /////////////////////////////////////////////////////////////////////
 //              NodeBoundSubstitution

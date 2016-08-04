@@ -180,7 +180,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 	osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(pNV);
 	avAssert(pCV);
 
-	const osg::Matrixd mLocalToWorld = computeLocalToWorld(pNV->getNodePath());
+	//const osg::Matrixd mLocalToWorld = computeLocalToWorld(pNV->getNodePath());
 
 	const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 	
@@ -199,7 +199,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 
 	// update current
 	static const float break_sfx_dist = 1.5f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), data_.emit_pos, break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), /*data_.emit_pos*/cg::point_3f(), break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;

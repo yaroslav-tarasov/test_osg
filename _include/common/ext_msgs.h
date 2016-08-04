@@ -239,7 +239,9 @@ namespace net_layer
             ok_human,
             ok_horse,
             ok_cow,
-            ok_dog
+            ok_dog,
+			ok_something = 0x400,
+			ok_rocket_flare
             // ok_size
         };
 

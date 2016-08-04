@@ -71,6 +71,15 @@ namespace phys
         typedef polymorph_ptr<info> info_ptr;
         typedef polymorph_ptr<control> control_ptr;
     }
+	
+	namespace rocket_flare
+	{
+		struct info;
+		struct control;
+
+		typedef polymorph_ptr<info> info_ptr;
+		typedef polymorph_ptr<control> control_ptr;
+	}
 
     struct compound_sensor_t;
     typedef polymorph_ptr<compound_sensor_t> compound_sensor_ptr;

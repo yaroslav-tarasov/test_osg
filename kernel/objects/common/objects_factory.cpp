@@ -18,6 +18,7 @@
 #include "aerostat/aerostat_view.h"
 #include "human/human_view.h"
 #include "camera/camera_view.h"
+#include "rocket_flare/rocket_flare_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
@@ -238,9 +239,9 @@ namespace airport
         obj_create_data ocd(class_name, unique_name, dict::wrap(airport::port_data(sett,data)));
 
         ocd
-            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
-			.add_child(obj_create_data("environment", "environment", dict::wrap(environment::settings_t          ())))
-            .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t ())))
+            .add_child(obj_create_data("nodes_manager" , "nodes_manager" , dict::wrap(nodes_management::nodes_data ())))
+			.add_child(obj_create_data("environment"   , "environment"   , dict::wrap(environment::settings_t      ())))
+            .add_child(obj_create_data("arresting_gear", "arresting_gear", dict::wrap(arresting_gear::settings_t   ())))
             ;
 
         return  ocd;	
@@ -277,6 +278,26 @@ namespace camera
     {
         return sys_object_create(sys, pack( sys,  init_pos, name));
     }
+}
+
+namespace rocket_flare
+{
+	using namespace kernel;
+
+	obj_create_data pack(fake_objects_factory* sys,const settings_t& sett, const geo_position& init_pos)
+	{
+		const std::string class_name = "rocket_flare";
+		const std::string unique_name = sys->generate_unique_name(class_name);
+
+		rocket_flare::state_t s(init_pos.pos,init_pos.orien);
+		return obj_create_data(class_name, unique_name, dict::wrap(rocket_flare_data(sett,s)));	
+	}
+
+	object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+	{
+		return sys_object_create(sys, pack( sys, sett, init_pos));	
+	}
+
 }
 
 

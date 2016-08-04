@@ -260,7 +260,7 @@ namespace aircraft_physless
                 std::for_each(forsage_nodes_.begin(),forsage_nodes_.end(),
                 [this](nm::node_info_ptr fn) {
                     fs_.push_back(boost::make_shared<visual_objects::forsage_support>(
-                    vsys_->create_visual_object("sfx//forsage.scg",0,0,false),
+                    vsys_->create_visual_object(nm::node_control_ptr(fn),"sfx//forsage.scg",0,0,false),
                                     fn, root(), damned_offset() )); 
                 });
             }

@@ -36,8 +36,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
-	void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg)  = &ctrl::inject_msg;
-	void (ctrl::*on_destroy)     (net_layer::msg::destroy_msg  const& msg)         = &ctrl::inject_msg;
+	void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg) = &ctrl::inject_msg;
+	void (ctrl::*on_destroy)     (net_layer::msg::destroy_msg  const& msg)        = &ctrl::inject_msg;
     void (ctrl::*on_create)      (net_layer::msg::create_msg  const& msg)         = &ctrl::inject_msg;
 
     
@@ -312,8 +312,10 @@ void ctrl::pre_update(double time)
 
     while(messages_.size()>0)    
     {
-      disp_.dispatch_bytes(messages_.front());
-      messages_.pop_front();
+      if(messages_.front().size()>0)
+		  disp_.dispatch_bytes(messages_.front());
+	  
+	  messages_.pop_front();
     }
 }
 

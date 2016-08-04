@@ -11,7 +11,7 @@
 #include "av/avLights/LightManager.h"
 #include "av/avCore/Utils.h"
 #include "av/avCore/XmlModel.h"
-#include "av/avCore/InstancedAnimationManager.h"
+#include "av/avCore/InstancesManager.h"
 
 #include "materials.h"
 
@@ -26,12 +26,12 @@ namespace avCore
         return m;
     }
 
-    void ObjectManager::Register(const std::string& name, Object* obj )
+    void ObjectManager::RegisterPrototype(const std::string& name, Object* obj )
     {
         objCache_[name] = obj;
     }
 
-    void ObjectManager::Register( Object* obj )
+    void ObjectManager::RegisterClone( Object* obj )
     {
         objClones_.push_back(obj);
     }
@@ -44,6 +44,17 @@ namespace avCore
 
         return boost::none;
     }
+	
+	void ObjectManager::releaseObject(uint32_t seed)
+	{
+		auto it = std::find_if(objClones_.begin(),objClones_.end(),[=](const osg::ref_ptr<Object> obj)->bool {return obj->getSeed()==seed; });
+		if (it!=objClones_.end())
+		{
+			(*it).release();
+			objClones_.erase(it);
+		}
+
+	}
 
     void ObjectManager::releaseAll()
     {
@@ -83,7 +94,7 @@ Object::Object(osg::Node& node , const std::string  & name, bool fhw_inst)
         _manager  = finder.getBM();
     }
 
-    ObjectManager::get().Register(name,this);
+    ObjectManager::get().RegisterPrototype(name,this);
 }
 
 Object::Object(const Object& object,const osg::CopyOp& copyop)
@@ -94,7 +105,7 @@ Object::Object(const Object& object,const osg::CopyOp& copyop)
     , _inst_manager    (object._inst_manager)
     , _name            (object._name)
 {
-     ObjectManager::get().Register(this);
+     ObjectManager::get().RegisterClone(this);
 }
 
 
@@ -132,10 +143,10 @@ void  Object::setupInstancedHWAnimated(const std::string& hw_anim_file)
         
         std::string anim_file_name =  osgDB::findFileInPath(hw_anim_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
-        _inst_manager = new InstancedAnimationManager(_node.get(), anim_file_name);
+        _inst_manager = CreateInstancesManager(HW_ANIMATED,_node.get(), anim_file_name); //  new InstancedAnimationManager(_node.get(), anim_file_name);
         
         // Двойная регистрация кэш и клоны, для спец узла (последствия?)
-        ObjectManager::get().Register(this);
+        ObjectManager::get().RegisterClone(this);
     }
 }
 
@@ -179,7 +190,7 @@ bool Object::PreUpdate()
 {
 	if(_inst_manager.valid() && _node.valid())
 	{
-		_inst_manager->commitInstancePositions();
+		_inst_manager->commitInstancesPositions();
 	}
     return true;
 }
@@ -493,7 +504,7 @@ Object* CreatePrototype( std::string name, bool fclone, osg::CopyOp copyop )
         return  object;
 }
 
-ObjectControl* createObject(std::string name, bool fclone)
+ObjectControl* createObject(std::string name, uint32_t seed, bool fclone)
 {
 	Object*    object      = nullptr;
 
@@ -567,7 +578,19 @@ ObjectControl* createObject(std::string name, bool fclone)
     if(object->getNode())
         object->getNode()->setNodeMask( PICK_NODE_MASK | REFLECTION_MASK );
 
+	object->setSeed(seed);
+
 	return object;
 }
+
+void     releaseObject( osg::Node* node )
+{
+	size_t object_id = 0;
+	node->getUserValue("id",object_id);	 
+	Utils::RemoveNodeFromAllParents( node );	
+
+	ObjectManager::get().releaseObject( object_id );
+}
+
 
 }

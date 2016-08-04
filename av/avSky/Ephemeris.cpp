@@ -12,7 +12,7 @@
 
 #include <osgEphemeris/EphemerisModel.h>  
 
-#include "utils/callbacks.h"
+#include "av/avCore/Callbacks.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "osgEphemerisd.lib")
@@ -23,6 +23,8 @@
 #pragma comment(lib, "osgEphemeris.lib")
 #endif
 #endif
+
+
 
 namespace avSky
 {
@@ -49,6 +51,19 @@ namespace avSky
 
         {}
 
+		bool setTurbidityTemperature(osgEphemeris::EphemerisData *data, float turbidity, float temperature )
+		{
+			if ( data->turbidity   != turbidity ||
+				data->temperature != temperature )
+			{
+				data->turbidity   = turbidity;
+				data->temperature = temperature;
+				return true;
+			}
+
+			return false;
+		}
+
         void operator()( osgEphemeris::EphemerisData *data )
         {
             auto _fogLayer      = _ephem->_d->_fogLayer;
@@ -60,6 +75,9 @@ namespace avSky
             
             const osg::Light* sls = _ephem->_d->_ephemerisModel->getSunLightSource()->getLight();
 			const avCore::Environment::WeatherParameters & cWeatherParameters = avCore::GetEnvironment()->GetWeatherParameters();
+			const avCore::Environment::EnvironmentParameters & cEnvironmentParameters = avCore::GetEnvironment()->GetEnvironmentParameters();
+
+			setTurbidityTemperature(data,powf(cEnvironmentParameters.AirHumidity, 0.95f) * 30.0f,cEnvironmentParameters.AirTemperature);
 
             // Sun color and altitude little bit dummy 
 
@@ -130,9 +148,10 @@ namespace avSky
 
              ambient.w() = illumination;
              specular.w() = cWeatherParameters.RainDensity;                    
+			 
 
             _ephem->_specularUniform->set(specular);
-            _ephem->_ambientUniform->set(ambient);
+            _ephem->_ambientUniform->set( ambient.length()>osg::Vec4f(0.15f, 0.14f, 0.13f, illumination).length()? ambient:osg::Vec4f(0.15f, 0.14f, 0.13f, illumination));
             _ephem->_diffuseUniform->set(diffuse);
           
             _ephem->_lightDirUniform->set( lightpos * _ephem->getModelViewMatrix() /*osg::Vec4(lightDir,1.)*/);
@@ -355,13 +374,21 @@ namespace avSky
         setCullCallback(Utils::makeNodeCallback(this, &Ephemeris::cull, true));
     }
 
+
     bool Ephemeris::Initialize()
     {
         _d->_ephemerisModel = new osgEphemeris::EphemerisModel;
         _d->_ephemerisModel->setSkyDomeMirrorSouthernHemisphere(false);
         _d->_ephemerisModel->setAutoDateTime( false );
+		
+		auto& params = _d->_ephemerisModel->getParams();
+        
+		params.skyDomeXSize *= 16;
+		params.skyDomeYSize *= 16;
+		params.useOMP = true;
+		//params.ompThreads;
 
-        // Set some acceptable defaults.
+		// Set some acceptable defaults.
         double latitude  = 43.4444;                                  // Adler, RF
         double longitude = 39.9469;
         
@@ -400,7 +427,7 @@ namespace avSky
 
         osg::ref_ptr<osg::Group> fbo_node = new osg::Group;
         fbo_node->addChild(_d->_ephemerisModel.get());
-        _sceneRoot->asGroup()->addChild(avEnv::createPrerender(fbo_node,osg::NodePath(),0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
+        _sceneRoot->asGroup()->addChild(avEnv::createPrerender(fbo_node,/*osg::NodePath(),*/0,osg::Vec4(1.0f, 1.0f, 1.0f, 0.0f),osg::Camera::FRAME_BUFFER_OBJECT));
          
         setStarFieldMask(NODE_STARFIELD_MASK);
 #else

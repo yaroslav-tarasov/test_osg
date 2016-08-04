@@ -312,8 +312,8 @@ struct client
         , timer_    (boost::bind(&client::update, this))
     {
        
-		traj_trp2_.resize(10);
-		for (int i=0;i<10;++i)
+		traj_trp2_.resize(100);
+		for (int i=0;i<100;++i)
 		{ 
 			traj_trp2_[i] = fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0 + i * 25, 250.0 ));
 		}
@@ -681,6 +681,7 @@ struct client
             ADD_EVENT(19.0  , create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
+			ADD_EVENT(1.0  , create_msg(666,cg::point_3(0,0,10),cg::cpr(0)   , ok_rocket_flare, "rocket_flare", "666") )
 
 
 #if 1
@@ -694,7 +695,7 @@ struct client
 
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-			for (int i=0;i<10;++i)
+			for (int i=0;i<100;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
 				auto const model  = /*"A319"*/"SU25"/*"L39"*/;
@@ -702,7 +703,6 @@ struct client
 				ADD_EVENT(60.0 + i * 25 , arrgear_target_msg( hull_number ) )  
 
 				ADD_EVENT(78.0  + i * 25 , destroy_msg( hull_number ) )  
-
 
 				runs_.insert(make_pair(traj_trp2_[i]->base_length(),
 				boost::bind( run_f_pos , hull_number, _1, traj_trp2_[i],/*traj_offset*/0)

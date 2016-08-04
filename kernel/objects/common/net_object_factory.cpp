@@ -16,6 +16,9 @@
 #include "human/human_common.h"
 #include "common/human.h"
 
+#include "common/rocket_flare.h"
+#include "rocket_flare/rocket_flare_common.h"
+
 #include "arresting_gear/arresting_gear_common.h"
 #include "objects_factory.h"
 
@@ -231,6 +234,17 @@ inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg cons
     return camera::pack(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
 }
 
+
+inline object_info_ptr create_rocket_flare(kernel::system* csys, create_msg const& msg)
+{
+	decart_position dpos(msg.pos,msg.orien);
+	geo_position gp(dpos, get_base());
+
+	rocket_flare::settings_t vs;
+
+	return rocket_flare::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+}
+
 object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
 {
     if(msg.object_kind & ok_vehicle)
@@ -241,6 +255,8 @@ object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
         return create_character(csys, msg);
     else if ( msg.object_kind == ok_helicopter)
         return create_helicopter_phl(csys, msg); 
+	else if ( msg.object_kind == ok_rocket_flare)
+		return create_rocket_flare(csys, msg); 
     else if( msg.object_kind == ok_camera)
         return create_camera(csys, msg);
     else

@@ -48,7 +48,7 @@ namespace avScene
 		
 		assert(d.color.r <= 1.0 && d.color.g <= 1.0 && d.color.b <= 1.0);
 
-        const uint32_t uid = avScene::LightManager::GetInstance()->addLight(d); 
+        const uint32_t uid = avScene::LightManager::GetInstance()->addLight(d, this); 
 		
 		lm_.insert(std::make_pair(ind,uid));
     }
@@ -80,39 +80,43 @@ namespace avScene
 
 			const uint32_t uid = lm_[std::distance(list.begin(),itr)];
 
-			LightManager::Light&  light_data = LightManager::GetInstance()->getLight(uid);
+			LightManager::Light*  light_data = LightManager::GetInstance()->getLight(uid);
 
-			light_data.active = lp._on;
-
-			if (!lp._on)
-				continue;
-			
-			
-            FIXME(Над коэффициентом )
-			float fSizeFogFactor = sff_?sff_(bReflPass):1.0;
-
-            if(bReflPass)
-				lp._radius = 3.5f * fSizeFogFactor;
-			else
-				lp._radius = 0.2f * fSizeFogFactor;
-
-			bool doBlink = lp._blinkSequence.valid();
-			if (doBlink && _lightSystem.valid())
-				doBlink = (_lightSystem->getAnimationState() == osgSim::LightPointSystem::ANIMATION_ON);
-
-			if (doBlink)
+			if(light_data)
 			{
-				FIXME(Интервал тут не просто так)
-			    osg::Vec4 bs = lp._blinkSequence->color(time,0/*timeInterval*/);
-				if(bs.length2()>0)
-				{
-					light_data.active = true;
-				}
+				light_data->active = lp._on;
+
+				if (!lp._on)
+					continue;
+
+
+				FIXME(Над коэффициентом )
+					float fSizeFogFactor = sff_?sff_(bReflPass):1.0;
+
+				if(bReflPass)
+					lp._radius = 3.5f * fSizeFogFactor;
 				else
+					lp._radius = 0.2f * fSizeFogFactor;
+
+				bool doBlink = lp._blinkSequence.valid();
+				if (doBlink && _lightSystem.valid())
+					doBlink = (_lightSystem->getAnimationState() == osgSim::LightPointSystem::ANIMATION_ON);
+
+				if (doBlink)
 				{
-					light_data.active = false;
+					FIXME(Интервал тут не просто так)
+						osg::Vec4 bs = lp._blinkSequence->color(time,0/*timeInterval*/);
+					if(bs.length2()>0)
+					{
+						light_data->active = true;
+					}
+					else
+					{
+						light_data->active = false;
+					}
 				}
 			}
+
 
 		}
 	}

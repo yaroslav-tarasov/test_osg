@@ -286,7 +286,7 @@ namespace {
         osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
         cSkinningProg->setName("SkinningShader");
 
-        int attribIndex = 11;
+        const int attribIndex = 11;
         int nbAttribs = getNumVertexAttrib();
         for (int i = 0; i < nbAttribs; i++)
         {

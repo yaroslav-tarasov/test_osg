@@ -64,13 +64,13 @@ namespace avCore
     }
 
     InstancedAnimationManager::InstancedAnimationManager(const InstancedAnimationManager& object,const osg::CopyOp& copyop)
-        : osg::Object(object,copyop)
+        : InstancesManager(object,copyop)
     {
-    
+
     }
 
-	InstancedAnimationManager::InstancedAnimationManager(osg::Node* base_model, const std::string anim_file_name)
-        : src_model_     (base_model)
+	InstancedAnimationManager::InstancedAnimationManager(osg::Node* prototype, const std::string& anim_file_name)
+        : src_model_     (prototype)
         , inst_num_ (0)
 	{ 
 
@@ -92,7 +92,7 @@ namespace avCore
     }
 
 
-	osg::TextureRectangle* InstancedAnimationManager::createAnimationTexture( image_data& idata)
+	osg::TextureRectangle* InstancedAnimationManager::_createAnimationTexture( image_data& idata)
 	{
 		osg::ref_ptr<osg::Image> image = new osg::Image;
 		image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
@@ -125,36 +125,14 @@ namespace avCore
 		const unsigned int start = 0;
 		const unsigned int end = instancesData_.size();
 
-#if 0
-		// first turn on hardware instancing for every primitive set
-		for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
-		{
-			geometry->getPrimitiveSet(i)->setNumInstances(instancesData_.size());
-		}
-
-		// we need to turn off display lists for instancing to work
-		geometry->setUseDisplayList(false);
-		geometry->setUseVertexBufferObjects(true);
-#endif
-
 		// create texture to encode all matrices
         const size_t fixed_data_size =   4096u;
 
 		unsigned int height = ((/*end-start*//*instancesData_.size()*/fixed_data_size) / texture_row_data_size) + 1u;
 
 		osg::ref_ptr<osg::Image>       image = new osg::Image; 
-		image->allocateImage(16384, height, 1, GL_RGBA, GL_FLOAT);
+		image->allocateImage(fixed_data_size * 4, height, 1, GL_RGBA, GL_FLOAT);
 		image->setInternalTextureFormat(GL_RGBA32F_ARB);
-
-
-#if 0
-		for (unsigned int i = /*start*/0, j = 0; i < /*end*/instancesData_.size(); ++i, ++j)
-		{
-			const osg::Matrixf& matrix = instancesData_[i];
-			float * data = (float*)image->data((j % texture_row_data_size) *4u, j / texture_row_data_size);
-			memcpy(data, matrix.ptr(), 16 * sizeof(float));
-		}
-#endif
 
 		instTexture_ = new osg::TextureRectangle(image);
 		instTexture_->setInternalFormat(GL_RGBA32F_ARB);
@@ -185,16 +163,6 @@ namespace avCore
 		skel->accept(mapVisitor);
 		return mapVisitor.getBoneMap();
 	}
-
-#if 0
-	void InstancedAnimationManager::setInstanceData(size_t idx, const osg::Matrixf& matrix)
-	{
-		instancesData_[idx] = matrix;
-		float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
-		memcpy(data, matrix.ptr(), 16 * sizeof(float));
-        instTexture_->getImage(0)->dirty();
-	}
-#endif
 
 
 	osg::Geode* InstancedAnimationManager::_createGeode()
@@ -284,7 +252,7 @@ namespace avCore
 			data.resize(boost::filesystem::file_size(filename));
 			image_data_file.read(data.data(), data.size());
 			binary::unwrap(data, image_data_);
-			animTexture_ = createAnimationTexture(image_data_);
+			animTexture_ = _createAnimationTexture(image_data_);
 			return true;
 		}
 
@@ -304,7 +272,7 @@ namespace avCore
         osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
         cSkinningProg->setName("SkinningShader");
 
-        int attribIndex = 11;
+        const int attribIndex = cAttribSkinningBaseIndex;
         int nbAttribs = id.bonesWeights.size();
         for (int i = 0; i < nbAttribs; i++)
         {
@@ -337,18 +305,11 @@ namespace avCore
         const unsigned  inst_id = inst_id_gen_.create();
         root->setUserValue("inst_id", inst_id);
 
-#if 0
-        osg::PositionAttitudeTransform* pat = new osg::PositionAttitudeTransform; 
-        pat->addChild(root);
-        pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
-        pat->setName("pat");
-#endif
-
         inst_nodes_.push_back(instanced_nodes_vector_t(root,nullptr));
         return root; 
     }
 
-    void InstancedAnimationManager::commitInstancePositions()
+    void InstancedAnimationManager::commitInstancesPositions()
     {
         bool bcommit = false;
         size_t inst_counter=0;

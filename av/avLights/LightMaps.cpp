@@ -502,7 +502,7 @@ void _private::traverse(osg::NodeVisitor& nv)
     frustum_.camera() = cg::camera_f(vPosition, rOrientation);
     
     const avCore::Environment::IlluminationParameters & cIlluminationParameters = avCore::GetEnvironment()->GetIlluminationParameters();
-    SetupProjection(frustum_, 3300.f, cIlluminationParameters.Illumination < 0.8/*night_mode*/);
+    SetupProjection(frustum_, 3300.f, cIlluminationParameters.Illumination < cIlluminationParameters.NavigationLightsThreshold/*night_mode*/);
 
     cull( cv );
     
