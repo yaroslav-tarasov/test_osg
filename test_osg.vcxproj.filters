@@ -673,9 +673,6 @@
     <ClCompile Include="av\EnvRenderer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="tests\dubins_test.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\main_scene.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
@@ -683,9 +680,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\SimpleHUD.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\SkyBox.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
@@ -916,9 +910,6 @@
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp">
       <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
-    <ClCompile Include="tests\test_curves.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\scn_parser.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
@@ -1018,9 +1009,6 @@
     <ClCompile Include="av\avCore\Environment.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
-    <ClCompile Include="av\avScene\av_scene.cpp">
-      <Filter>Source Files\av\scene</Filter>
-    </ClCompile>
     <ClCompile Include="av\avScene\Scene.cpp">
       <Filter>Source Files\av\scene</Filter>
     </ClCompile>
@@ -1048,9 +1036,6 @@
     <ClCompile Include="av\avShadows\ParallelSplitShadowMap.cpp">
       <Filter>Source Files\av\sm</Filter>
     </ClCompile>
-    <ClCompile Include="tests\osgsmartbody.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\avAnimation\AnimationPrototype.cpp">
       <Filter>Source Files\av\animation</Filter>
     </ClCompile>
@@ -1069,17 +1054,11 @@
     <ClCompile Include="av\avCore\Timer.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
-    <ClCompile Include="tests\test_boost_timer.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
       <Filter>Source Files\objects\aircraft_physless</Filter>
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\time_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\animation_test.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\human\human_ctrl.cpp">
       <Filter>Source Files\objects\human</Filter>
@@ -1119,9 +1098,6 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp">
       <Filter>Source Files\objects\flock_manager</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\animation_test2.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp">
       <Filter>Source Files\objects\flock_manager</Filter>
@@ -1183,12 +1159,6 @@
     <ClCompile Include="core\cluster\net_layer\net_worker.cpp">
       <Filter>Source Files\net_layer</Filter>
     </ClCompile>
-    <ClCompile Include="tests\animation_test3.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\animation_test4.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="tests\visapp\main_modapp.cpp">
       <Filter>Source Files\tests\separate</Filter>
     </ClCompile>
@@ -1231,14 +1201,8 @@
     <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
-    <ClCompile Include="tests\morph_geometry.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\phys\character_phys.cpp">
       <Filter>Source Files\phys</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\DynamicCharacterController.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="tests\systems\systems_impl.cpp">
       <Filter>Source Files\tests\systems</Filter>
@@ -1339,9 +1303,6 @@
     <ClCompile Include="av\avLights\CulturalLights\PointLightsManager.cpp">
       <Filter>Source Files\av\lights\cult_lights</Filter>
     </ClCompile>
-    <ClCompile Include="tests\animation_test5.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="av\avLine\Line.cpp">
       <Filter>Source Files\av\line</Filter>
     </ClCompile>
@@ -1425,6 +1386,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_vis.cpp">
       <Filter>Source Files\objects\rocket_flare</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avScene\av_scene.cpp">
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

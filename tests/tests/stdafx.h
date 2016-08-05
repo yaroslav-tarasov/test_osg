@@ -33,6 +33,13 @@
 #include "nfi/fn_reg.h"
 #include "config/config.h"
 
+#include "cpp_utils/polymorph_ptr.h"
+#include "utils/high_res_timer.h"
+#include "common/ref_counter.h"
+
+#include <tinyxml2/tinyxml2.h>
+#include "xml/tixml_xinclude.h"
+
 
 /////////////////////////////////
 //  CG-Lib
@@ -47,10 +54,32 @@
 
 ////////////////////////////////////////////
 
+enum objects_t{
+    NONE_TYPE    ,
+    AIRCRAFT_TYPE,
+    VEHICLE_TYPE
+};
+
+////////////////////////////////
+//  Common includes
+//
+
+#include "common/event.h"
+
+////////////////////////////////////////////
+//  Common includes (wrong place)
+//
+
+#include "impl/local_position.h" // FIXME объекты надо прятать 
+#include "fms/trajectory.h" 
 
 ////////////////////////////////////////////
 //  av 
 //
 
+#include "av/avCore/Database.h"
 #include "visitors/find_node_visitor.h"
 #include "visitors/visitors.h"
+#include "av/avScene.h"
+
+

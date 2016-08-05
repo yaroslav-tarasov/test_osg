@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glut.h>
+#include <osg/Version>
 
 class TeapotDrawable : public osg::Drawable
 {

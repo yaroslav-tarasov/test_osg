@@ -4,6 +4,8 @@
 #include <osg/ref_ptr>
 #include <osg/GLExtensions>
 #include <GL/glut.h>
+#include <osg/Version>
+
 
 namespace  {
     

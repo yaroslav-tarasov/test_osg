@@ -54,10 +54,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\glm_971\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>pugixmld.lib;tinyxml2.lib;meteo.lib;logger.lib;fms.lib;alloc.lib;async_services.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -68,7 +70,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\ext\osgBullet;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\$(OSG_WITH_VER)\build\include;$(OSG_DIR)\$(OSG_WITH_VER)\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BULLET_DIR)\Extras\Serialize\BulletFileLoader;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\ext\osgBullet;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\$(OSG_WITH_VER)\build\include;$(OSG_DIR)\$(OSG_WITH_VER)\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BULLET_DIR)\Extras\Serialize\BulletFileLoader;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;$(OSG_DIR)\glm_971\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -76,6 +78,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>pugixml.lib;tinyxml2.lib;meteo.lib;logger.lib;fms.lib;alloc.lib;async_services.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -86,30 +89,94 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\bump_mapping.cpp" />
+    <ClCompile Include="..\..\av\avCore\Database.cpp" />
+    <ClCompile Include="..\..\av\avCore\InstancedAnimationManager.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\InstancesManager.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\InstancesManagerImpl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\LOD.cpp" />
+    <ClCompile Include="..\..\av\avCore\Noise.cpp" />
+    <ClCompile Include="..\..\av\avCore\Object.cpp" />
+    <ClCompile Include="..\..\av\avCore\Timer.cpp" />
+    <ClCompile Include="..\..\av\avCore\Utils.cpp" />
+    <ClCompile Include="..\..\av\avCore\XmlModel.cpp" />
+    <ClCompile Include="..\..\av\shaders.cpp" />
+    <ClCompile Include="..\..\core\config\config.cpp" />
+    <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
+    <ClCompile Include="..\..\utils\empty_scene.cpp" />
+    <ClCompile Include="..\..\utils\materials.cpp" />
+    <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="..\..\_include\objects\bullet_importer.cpp" />
+    <ClCompile Include="..\animation_test.cpp" />
+    <ClCompile Include="..\animation_test2.cpp" />
+    <ClCompile Include="..\animation_test3.cpp" />
+    <ClCompile Include="..\animation_test4.cpp" />
+    <ClCompile Include="..\animation_test5.cpp" />
+    <ClCompile Include="..\bump_mapping.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\creators.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\dubins_test.cpp" />
+    <ClCompile Include="..\DynamicCharacterController.cpp" />
     <ClCompile Include="..\exp_test.cpp" />
     <ClCompile Include="..\flame_test.cpp" />
-    <ClCompile Include="..\grass_test.cpp" />
+    <ClCompile Include="..\grass_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\grass_test2.cpp" />
     <ClCompile Include="..\light_test.cpp" />
     <ClCompile Include="..\main_shadows.cpp" />
-    <ClCompile Include="..\main_shadows_2.cpp" />
+    <ClCompile Include="..\main_shadows_2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\morph_geometry.cpp" />
     <ClCompile Include="..\mrt_test.cpp" />
-    <ClCompile Include="..\osgshadowworks.cpp" />
-    <ClCompile Include="..\patch-lowlevel.cpp" />
+    <ClCompile Include="..\osgshadowworks.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\osgsmartbody.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\patch-lowlevel.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\phys_viewer.cpp" />
     <ClCompile Include="..\render_points.cpp" />
     <ClCompile Include="..\shadow_map.cpp" />
+    <ClCompile Include="..\SkyBox.cpp" />
     <ClCompile Include="..\sparse_texture.cpp" />
-    <ClCompile Include="..\ssao\ffssao.cpp" />
+    <ClCompile Include="..\ssao\ffssao.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\teapot.cpp" />
-    <ClCompile Include="..\tess_test.cpp" />
-    <ClCompile Include="..\tex_test.cpp" />
+    <ClCompile Include="..\tess_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\test_boost_timer.cpp" />
+    <ClCompile Include="..\test_curves.cpp" />
+    <ClCompile Include="..\tex_test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ext\osgBullet\osgBulletLite\osgBulletLite.vcxproj">
+      <Project>{39144d4d-283d-4cef-9a4e-d0972cca2ffe}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -114,14 +114,14 @@ namespace avSky
             const float fSpecularOvercastCoef = pow(1.f - fDiffuseOvercast, 0.5f);
             auto cFogSpec = sls->getSpecular() * fSpecularOvercastCoef;
             
-            FIXME (Нелепые цветные фантазии) 
+            FIXME( "Нелепые цветные фантазии" ) 
             osg::Vec4 diffuse =  cFogDif*1.8f;     //sls->getDiffuse();
             osg::Vec4 ambient =  cFogAmb * 3.0 *(1 - 0.75 * _skyClouds->getOvercastCoef());      //sls->getAmbient();  // 1.2
             osg::Vec4 specular = cFogSpec*1.8;     // sls->getSpecular();
 
             // recalc illumination based on new foggy values
             const float fIllumDiffuseFactor = 1.f - _skyClouds->getOvercastCoef();
-            FIXME (Нелепые цветные фантазии) 
+            FIXME( "Нелепые цветные фантазии" ) 
             // auto illumination = cg::luminance_crt(cFogAmb + cFogDif * fIllumDiffuseFactor);
             auto illumination = cg::luminance_crt(ambient + diffuse * fIllumDiffuseFactor);
 
@@ -383,10 +383,10 @@ namespace avSky
 		
 		auto& params = _d->_ephemerisModel->getParams();
         
-		params.skyDomeXSize *= 16;
-		params.skyDomeYSize *= 16;
+		params.skyDomeXSize *= 4;
+		params.skyDomeYSize *= 4;
 		params.useOMP = true;
-		//params.ompThreads;
+		params.ompThreads = 4;
 
 		// Set some acceptable defaults.
         double latitude  = 43.4444;                                  // Adler, RF

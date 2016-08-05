@@ -116,7 +116,7 @@ int main_phys_viewer( int argc, char** argv )
     
     std::string         model_name = "eisk";
     
-    auto obj = avCore::createObject(model_name);
+    auto obj = avCore::createObject(model_name, 10);
     osg::ref_ptr< osg::Node > rootModel( obj->getOrCreateNode() );
     if( !rootModel.valid() )
     {

@@ -278,7 +278,7 @@ namespace avCore
         {
             osg::ref_ptr<osg::Vec4Array> array = new osg::Vec4Array(osg::Array::BIND_PER_VERTEX);
             const image_data::weights_t&  w = id.bonesWeights[i];
-            for (int j = 0; j < w.size(); j+=id.divisor)
+            for (unsigned j = 0; j < w.size(); j+=id.divisor)
             {
                 array->push_back(osg::Vec4(w.at(j),w.at(j+1),w.at(j+2),w.at(j+3)));
             }		
@@ -355,7 +355,7 @@ namespace avCore
 
             instGeode_->setNodeMask(inst_counter>0?REFLECTION_MASK:0);
 
-            for(int i=0;i<instGeode_->getNumDrawables(); ++i)
+            for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
             { 
                 instGeode_->getDrawable(i)->dirtyBound();
                         
@@ -364,7 +364,7 @@ namespace avCore
                 {
                     auto geometry = instGeode_->getDrawable(i)->asGeometry();
                     // first turn on hardware instancing for every primitive set
-                    for (unsigned int i = 0; i < geometry->getNumPrimitiveSets(); ++i)
+                    for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
                     {
                         geometry->getPrimitiveSet(i)->setNumInstances(inst_counter);
                     }

@@ -61,32 +61,21 @@ namespace
 	void   _buildStateSet(osg::Node* node)
 	{
 		std::string grass_vert = Database::LoadShader("blender/grass/grass.vert");     
+        
+        osg::Shader* vertexShader = osgDB::readShaderFile(osg::Shader::VERTEX, "blender/grass/grass.vert");
 
-		if (grass_vert.empty())
+		if (!vertexShader)
 			return;
 
-		std::string grass_geom = Database::LoadShader("blender/grass/grass.geom");     
+        osg::Shader* geomShader = osgDB::readShaderFile(osg::Shader::GEOMETRY, "blender/grass/grass.geom");
 
-		if (grass_geom.empty())
-			return;
+        if (!vertexShader)
+            return;
 
-		std::string grass_frag = Database::LoadShader("blender/grass/grass.frag");     
+        osg::Shader* fragShader = osgDB::readShaderFile(osg::Shader::FRAGMENT, "blender/grass/grass.frag");
 
-		if (grass_frag.empty())
-			return;
-
-
-		osg::Shader* vertexShader = new osg::Shader();
-		vertexShader->setType( osg::Shader::VERTEX );
-		vertexShader->setShaderSource(grass_vert);
-
-		osg::Shader* geomShader = new osg::Shader();
-		geomShader->setType( osg::Shader::GEOMETRY );
-		geomShader->setShaderSource(grass_geom);
-
-		osg::Shader* fragShader = new osg::Shader();
-		fragShader->setType( osg::Shader::FRAGMENT );
-		fragShader->setShaderSource(grass_frag);
+        if (!vertexShader)
+            return;
 
 		osg::Program*  program = new osg::Program();
 		program->addShader( vertexShader );
