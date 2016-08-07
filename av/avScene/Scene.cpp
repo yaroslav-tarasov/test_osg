@@ -1610,7 +1610,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         load("mig_29",_terrainRoot, 15000, false); 
 #endif
         // load("an_26",_terrainRoot, 15000, false);
-        load("trees",_terrainRoot, 15000, async);
+        // load("trees",_terrainRoot, 15000, async);
         // load("ka_50",_terrainRoot, 15000, false);
 
          /*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
@@ -2162,7 +2162,7 @@ void Scene::update( osg::NodeVisitor * nv )
       }
 
       const unsigned base_hour = 10;
-      const unsigned time_coeff   = /*1*/500; 
+      const unsigned time_coeff   = 1/*500*/; 
       const double et = lt * time_coeff;
 
       avCore::Environment::TimeParameters & vTime = avCore::GetEnvironment()->GetTimeParameters();

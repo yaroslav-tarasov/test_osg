@@ -333,11 +333,10 @@ struct client
 
 #if 0
         ADD_EVENT(10.0 , create_msg(333, cg::point_3(0.0,0.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds, "crow", "", 50)) 
-#if 0
+#if 1
         ADD_EVENT(25.0 , destroy_msg(333)) 
 #endif
 #endif
-        
 
 		set_weather();
 

@@ -3,6 +3,16 @@
 #include "utils/cpp_utils/id_generator.h"
 #include "InstancesManager.h"
 
+//
+// Local includes
+//
+
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
+#include <osg/BufferTemplate>
+#else
+#include "osg/BufferTemplate_3_4"
+#endif
+
 namespace avCore
 {
 	class  InstancesManagerImpl  : public InstancesManager
@@ -24,9 +34,34 @@ namespace avCore
 			bool                    parented;
 		};
 
+		struct StaticInstance
+		{
+			StaticInstance( unsigned int typeID, unsigned int id, const osg::Matrixf& m/*, const osg::Vec4& params*/ )
+				: position(m),/* extraParams(params),*/ idParams(typeID,id,0,0)
+			{
+			}
+			osg::Vec3d getPosition() const
+			{
+				return position.getTrans();
+			}
+			osg::Matrixf position;
+			//osg::Vec4f   extraParams;
+			osg::Vec4i   idParams;
+		};
+
 		typedef std::vector< instanced_nodes_vector_t > InstancedNodesVectorType;
+
+		typedef osg::BufferTemplate< std::vector<StaticInstance> >  BufferInstancesT;
+		typedef osg::Matrixf::value_type                            ElementValueT;
+		typedef const osg::Matrixf::value_type &                    ConstRefElementT;
+
+
 	public:
 		typedef std::vector<osg::Matrixf>              InstancedDataType;
+
+
+
+
 	public:
         
 		META_Object(avCore,InstancesManagerImpl);
@@ -55,6 +90,8 @@ namespace avCore
 	private:
 		osg::TextureRectangle*      _createAnimationTexture( image_data& idata);
         osg::TextureRectangle*      _createTextureInstancedData();
+		osg::TextureBuffer*         _createTextureBuffer(); 
+
         bool                        _loadAnimationData(std::string const&  filename);
         bool                        _initSkinning(osg::Geometry& geom, const image_data& id );
         osg::Geode*                 _createGeode();
@@ -74,6 +111,12 @@ namespace avCore
 
 		osg::ref_ptr<osg::TextureRectangle>      animTexture_;
 		osg::ref_ptr<osg::TextureRectangle>      instTexture_;
+
+
+#if 1
+		osg::ref_ptr<BufferInstancesT>            bufferMatrices_;
+#endif
+
     private:
         utils::fixed_id_generator<unsigned>      inst_id_gen_;
 

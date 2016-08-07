@@ -18,6 +18,9 @@
 
 #include "av/avCore/Callbacks.h"
 #include "av/avCore/XmlModel.h"
+#include "av/avCore/Object.h"
+#include "av/avCore/InstancesManager.h"
+
 
 #include "av/shaders.h"
 #include "Terrain.h"
@@ -253,8 +256,6 @@ Terrain::Terrain (osg::Group* sceneRoot)
 
 void  Terrain::Create( const std::string& cFileName )
 {
-
-
     auto wf =  [this](std::string cFileName)->osg::Node* {
     
     Database::fpl_wrap  fpl(cFileName);
@@ -372,11 +373,12 @@ void  Terrain::Create( const std::string& cFileName )
     nl.push_back("default");
     nl.push_back("color");
 
-    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,cFileName,sp::_3,sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + cFileName + "/"+mat_file_name));
+    MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,cFileName,sp::_3,"",sp::_4),creators::computeAttributes,utils::singleton<mat::reader>::instance().read(cfg().path.data + "/areas/" + cFileName + "/"+mat_file_name));
     scene->accept(mv);
-    
+  
 
     FIXME(Test code)
+#if 0
     if(cFileName == "eisk")
     {
         auto terra = findFirstNode(scene,"Terrain",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN);
@@ -396,7 +398,7 @@ void  Terrain::Create( const std::string& cFileName )
         }
 
     } 
-
+#endif
 
 
     // All solid objects
@@ -433,13 +435,6 @@ void  Terrain::Create( const std::string& cFileName )
     
     MaskNodes(baseModel);
 
-#if 0
-    auto ret_array  = creators::createMovingModel(center,radius*0.8f);
-    osg::Node* movingModel = ret_array[0];
-    addChild(movingModel);
-    movingModel->setName("movingModel");
-#endif
-
     OSG_WARN << "Время загрузки копирования моделей: " << _hr_timer.set_point() << "\n";
     
     auto light_masts = findNodes(baseModel,"lightmast_",FindNodeVisitor::not_exact);
@@ -469,8 +464,33 @@ void  Terrain::Create( const std::string& cFileName )
 
         }
     }
+	
+	if(data.objs.size()>0)
+	{
+		avCore::xml_object_data_t obj_data;
 
-    force_log fl;
+		std::string data_file_name =  osgDB::findFileInPath(data.objs[0].data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+		mr.Load(data_file_name, obj_data);
+
+		avCore::ObjectControl* obj_ctrl = avCore::createObject("trees" , true);
+
+		if(obj_ctrl && obj_ctrl->hwInstanced())
+		{
+			obj_ctrl->parentMainInstancedNode(/*this*/baseModel);
+			auto mgr = obj_ctrl->getInstancesManager();
+
+			for(auto it=obj_data.begin() ; it!=obj_data.end();++it)
+			{
+				mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(it->pos.z()/33.f,it->pos.z()/33.f,it->pos.z()/33.f)) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),0)));
+			}
+
+
+		}
+
+	}
+
+
+    force_log fl;						   
     LOG_ODS_MSG( "Terrain::create  " << hr_timer.set_point() << "\n");
 
     return nullptr;

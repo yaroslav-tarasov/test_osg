@@ -42,6 +42,7 @@ namespace avCore
                 au_val			  = param_node.attribute("axis_up").as_string("Z");
                 data.lod3		  = param_node.attribute("lod3").as_string("on")!=std::string("off");
 				data.hw_instanced = param_node.attribute("hw_instanced").as_string("no")==std::string("yes");
+				data.hw_data      = param_node.attribute("hw_data").as_string("");
             }
             else
             {
@@ -85,13 +86,11 @@ namespace avCore
                     mp.target = params.attribute("target").as_string();
                 }
             }
-
-			
-			
+ 			
         }
         else
         {
-            std::cerr << "File not found: " << full_path;
+            std::cerr << "ModelReader: File not found: " << full_path;
             return false;
         }
 
@@ -169,15 +168,59 @@ namespace avCore
 					data.mask_nodes.push_back(name);
 			}	
 
+			for (pugi::xml_node obj = root.child("Object"); obj; obj = obj.next_sibling())
+			{
+
+				const std::string main_model = 	obj.attribute("model").as_string("");
+				const std::string data_file = 	obj.attribute("data_file").as_string("");
+				if (main_model.size()>0 && data_file.size()>0)
+				{
+					xml_static_model v;
+					v.main_model = main_model;
+					v.data_file  = data_file;
+					data.objs.push_back(v);
+				}
+			}	
+
         }
         else
         {
-            std::cerr << "File not found: " << full_path;
+            std::cerr << "ModelReader: File not found: " << full_path;
             return false;
         }
 
         return true;
     }
 
+	bool  ModelReader::Load (const std::string& full_path, xml_object_data_t& data )
+	{
+		pugi::xml_document  doc;
+
+		bool l = doc.load_file(full_path.c_str());
+		if(l)
+		{
+			pugi::xml_node root = doc.child("root");
+
+			for (pugi::xml_node obj = root.child("value"); obj; obj = obj.next_sibling())
+			{
+
+				const float  x = 	obj.attribute("x").as_float(0.f);
+				const float  y = 	obj.attribute("y").as_float(0.f);
+				const float  h = 	obj.attribute("h").as_float(0.f);
+
+				xml_object_data v;
+				v.pos =  osg::Vec3(x,y,h);
+				data.push_back(v);
+			}
+
+		}
+		else
+		{
+			std::cerr << "ModelReader: File not found: " << full_path;
+			return false;
+		}
+
+		return true;
+	}
 
 }

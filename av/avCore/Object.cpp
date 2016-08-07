@@ -453,7 +453,7 @@ Object* CreatePrototype( std::string name, bool fclone, osg::CopyOp copyop )
         nl.push_back("tree");
         nl.push_back("rotor"); 
 
-        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,(data && data->hw_instanced)?"inst":"",sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
         pat->accept(mv);
 
         pat->setName("pat");
@@ -495,7 +495,7 @@ Object* CreatePrototype( std::string name, bool fclone, osg::CopyOp copyop )
             }
             else
             {
-                  object->addAnimation("data.row");
+                  object->addAnimation(data->hw_data);
             }
 
             

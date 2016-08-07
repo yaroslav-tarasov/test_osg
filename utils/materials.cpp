@@ -378,12 +378,12 @@ class programsHolder: public programsHolder_base
 {
 
 public:
-    static inline const program_t& Create(const std::string& mat_name , const std::string& preprocessorDefinitions = std::string())
+    static inline const program_t& Create(const std::string& mat_name , const std::string& mat_suffix, const std::string& preprocessorDefinitions = std::string())
     {
         const uint16_t version = GLSL_VERSION;
         const std::string  comp_str = GLSL_VERSION>=150 ?" compatibility":"";
 
-        const std::string  mat_name_cut = GetMaterialName(mat_name);
+        const std::string  mat_name_cut = GetMaterialName(mat_name) + (mat_suffix.size()>0?(mat_suffix):"");
 
         if(GetPrograms().find(mat_name_cut)==GetPrograms().end())
         {
@@ -505,12 +505,12 @@ programsHolder_base::program_t  createProgram(const std::string& mat_name, const
 }
 
 
-void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name,const mat::materials_t& m)
+void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name, const std::string& mat_suffix,const mat::materials_t& m)
 {
     const std::string& mat_name_low = boost::to_lower_copy(mat_name);   
 
     texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
-    programsHolder::program_t  p = programsHolder::Create(mat_name_low);
+    programsHolder::program_t  p = programsHolder::Create(mat_name_low, mat_suffix);
     
 #if 0
     force_log fl;

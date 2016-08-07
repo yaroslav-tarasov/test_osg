@@ -1406,6 +1406,71 @@ $endif
 
     }  // ns tree_mat
 
+
+	namespace tree_inst_mat 
+	{
+		const char* vs = {  
+
+			"#extension GL_ARB_gpu_shader5 : enable \n"
+			"//       tree_inst_mat \n"
+
+			INCLUDE_VS
+			INCLUDE_COMPABILITY
+			SHADOW_INCLUDE
+
+			STRINGIFY ( 
+\n			
+\n			uniform sampler2DRect instanceMatrixTexture;
+\n
+\n			out mat4 viewworld_matrix;
+\n
+\n			out block
+\n			{
+\n				vec2 texcoord;
+\n				vec3 normal;
+\n				vec3 vnormal;
+\n				vec3 viewpos;
+\n				vec4 shadow_view;
+\n				vec4 lightmap_coord;
+\n			} v_out;
+\n
+\n			void main()
+\n			{
+\n				vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
+\n
+\n				mat4 instanceModelMatrix = mat4(vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (0, 0)).xyz,0.0),
+\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (1, 0)).xyz,0.0),
+\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (2, 0)).xyz,0.0),
+\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (3, 0)).xyz,1.0)
+\n					);
+\n				
+\n				mat3 normalMatrix = mat3(instanceModelMatrix[0][0], instanceModelMatrix[0][1], instanceModelMatrix[0][2],
+\n					instanceModelMatrix[1][0], instanceModelMatrix[1][1], instanceModelMatrix[1][2],
+\n					instanceModelMatrix[2][0], instanceModelMatrix[2][1], instanceModelMatrix[2][2]);
+\n
+\n
+\n				vec3 normal = normalize(gl_NormalMatrix * normalMatrix * gl_Normal);
+\n				vec4 viewpos = gl_ModelViewMatrix * instanceModelMatrix * gl_Vertex;
+\n				viewworld_matrix = inverse(gl_ModelViewMatrix);
+\n
+\n				gl_Position = gl_ModelViewProjectionMatrix * instanceModelMatrix *  gl_Vertex;
+\n
+\n				v_out.normal    = normal;
+\n				v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
+\n				v_out.viewpos   = viewpos.xyz;
+\n				v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n				shadow_vs_main(viewpos);
+\n			}       
+			)
+		};
+
+
+    	SHADERS_GETTER(get_shader, vs, shaders::tree_mat::fs)
+
+		AUTO_REG_NAME(treeinst, shaders::tree_inst_mat::get_shader)
+
+	}  // ns tree_inst_mat
+
     namespace ground_mat 
     {
         const char* vs = {

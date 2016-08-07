@@ -63,6 +63,11 @@ namespace avCore
         up_axis_t      axis_up;
         osg::Vec3      pivot_point;
 	};
+	
+	struct xml_static_model : xml_model_base 
+	{
+		std::string	    data_file;
+	} ;
 
     struct xml_model : xml_model_base 
     {
@@ -73,7 +78,7 @@ namespace avCore
         morphs_t       morphs;
         bool           lod3;
         bool		   hw_instanced;
-
+		std::string    hw_data;
     } ;
 
     typedef xml_model xml_model_t;
@@ -86,18 +91,27 @@ namespace avCore
 
     struct xml_scene  : xml_model_base 
     {
-         std::vector<camera_params>   cams;
-         std::vector<xml_model_base>  objs;  // ????????????????
+         std::vector<camera_params>         cams;
+         std::vector<xml_static_model>      objs;  
 		 std::vector<std::string>     mask_nodes;
     };
     
     typedef xml_scene xml_scene_t;
 
-    struct ModelReader
+	struct xml_object_data
+	{
+		 osg::Vec3 pos;
+	};
+   
+	typedef std::vector<xml_object_data>  xml_object_data_t;
+
+	struct ModelReader
     {
         bool  Load (const std::string& full_path, xml_model_t& );
-        bool  Load (const std::string& full_path, xml_scene_t& );
+		bool  Load (const std::string& full_path, xml_scene_t& );
+        bool  Load (const std::string& full_path, xml_object_data_t& );
     };
+
 
 }
 

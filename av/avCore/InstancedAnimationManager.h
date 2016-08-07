@@ -7,13 +7,13 @@ namespace avCore
 {
 	class  InstancedAnimationManager  : public InstancesManager
 	{
-		struct instanced_nodes_vector_t
+		struct InstancedNodeType
 		{
-			instanced_nodes_vector_t()
+			InstancedNodeType()
 				: parented(false)
 			{}
 
-			instanced_nodes_vector_t(osg::Node* first, osg::Node* second )
+			InstancedNodeType(osg::Node* first, osg::Node* second )
 				: parented(false)
 				, first   (first)
 				, second  (second)
@@ -24,9 +24,9 @@ namespace avCore
 			bool                    parented;
 		};
 
-		typedef std::vector< instanced_nodes_vector_t > InstancedNodesVectorType;
+		typedef std::vector< InstancedNodeType > InstancedNodesVectorType;
 	public:
-		typedef std::vector<osg::Matrixf>              InstancedDataType;
+		typedef std::vector<osg::Matrixf>               InstancedDataType;
 	public:
        		
 		META_Object(avCore,InstancedAnimationManager);
@@ -35,7 +35,7 @@ namespace avCore
 
         InstancedAnimationManager (const InstancedAnimationManager& im,const osg::CopyOp& =osg::CopyOp::SHALLOW_COPY);
 
-		InstancedAnimationManager (osg::Node* prototype, const std::string& anim_file);
+		InstancedAnimationManager (osg::Node* prototype, const std::string& anim_file, size_t  const  max_instances = 4096u - 1);
 
         void                        commitInstancesPositions();
 
@@ -55,7 +55,7 @@ namespace avCore
 	private:
 
 		osg::TextureRectangle*      _createAnimationTexture( image_data& idata);
-        osg::TextureRectangle*      _createTextureInstancedData();
+        osg::TextureRectangle*      _createTextureInstancesData();
         bool                        _loadAnimationData(std::string const&  filename);
         bool                        _initSkinning(osg::Geometry& geom, const image_data& id );
         osg::Geode*                 _createGeode();
@@ -63,20 +63,22 @@ namespace avCore
         void                        _initData();
 
 	private:
-		osg::observer_ptr<osg::Node>             src_model_;
-		osg::Quat                                src_quat_;
+		osg::observer_ptr<osg::Node>             srcModel_;
+		osg::Quat                                srcQuat_;
      // Instanced staff   
         osg::ref_ptr<osg::Geode>                 instGeode_;
 
-        image_data                               image_data_;
+        image_data                               imageData_;
         InstancedDataType                        instancesData_;
-        InstancedNodesVectorType                 inst_nodes_; 
-        size_t                                   inst_num_;
+        InstancedNodesVectorType                 instancesNodes_; 
+        size_t                                   instNum_;
+		size_t      							 maxInstances_;
 
-		osg::ref_ptr<osg::TextureRectangle>      animTexture_;
-		osg::ref_ptr<osg::TextureRectangle>      instTexture_;
+		bool								     animDataLoaded_;
+		osg::ref_ptr<osg::TextureRectangle>      animTextureBuffer_;
+		osg::ref_ptr<osg::TextureRectangle>      instTextureBuffer_;
     private:
-        utils::fixed_id_generator<unsigned>      inst_id_gen_;
+        utils::fixed_id_generator<unsigned>      instIdGen_;
 
     private:
         OpenThreads::Mutex                       mutex_;

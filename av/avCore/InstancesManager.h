@@ -13,13 +13,13 @@ namespace avCore
 	
 	struct  InstancesManager : public osg::Object    
 	{
-		struct instanced_nodes_vector_t
+		struct InstancedNodeType
 		{
-			instanced_nodes_vector_t()
+			InstancedNodeType()
 				: parented(false)
 			{}
 
-			instanced_nodes_vector_t(osg::Node* first, osg::Node* second )
+			InstancedNodeType(osg::Node* first, osg::Node* second )
 				: parented(false)
 				, first   (first)
 				, second  (second)
@@ -37,7 +37,7 @@ namespace avCore
 			: osg::Object(object,copyop)
 		{}
 
-		typedef std::vector< instanced_nodes_vector_t > InstancedNodesVectorType;
+		typedef std::vector< InstancedNodeType > InstancedNodesVectorType;
 		typedef std::vector<osg::Matrixf>               InstancedDataType;
         
 		virtual void                 addMatrix(const osg::Matrixf& matrix) = 0;

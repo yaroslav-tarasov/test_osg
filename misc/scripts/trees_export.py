@@ -2,6 +2,7 @@ import maya.cmds as cmds
 import json
 import itertools
 import operator
+import xml.etree.cElementTree as ET
 
 nodes = cmds.ls( tr=True )
 th_node = [ x for x in nodes if 'Trees_High' in x ]
@@ -22,3 +23,11 @@ print out_list
      
 with open('data_json.txt', 'w') as outfile:
     json.dump(out_list, outfile)
+    
+root = ET.Element("root")
+
+for el in out_list :
+    ET.SubElement(root, "value", x='%.5f' % el[0], y='%.5f' %el[1], h='%.5f' %el[2])
+
+tree = ET.ElementTree(root)
+tree.write("data0.xml")

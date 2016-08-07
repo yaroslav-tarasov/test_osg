@@ -20,6 +20,7 @@ namespace avCore
 	{
 		 virtual osg::Node*  getOrCreateNode()=0;
 		 virtual bool        parentMainInstancedNode(osg::Group* parent)=0;
+		 virtual avCore::InstancesManager*        getInstancesManager() =0;
 	};
 
 	class Object : public osg::Object
@@ -58,6 +59,8 @@ namespace avCore
         bool         parentMainInstancedNode(osg::Group* parent); 
 		void         setSeed (uint32_t seed){ _seed = seed;}
 		uint32_t     getSeed () const { return _seed;}
+		
+		virtual avCore::InstancesManager*        getInstancesManager() {return _inst_manager.get();};
 
 	private:
 		osg::ref_ptr<osg::Node>                           _node;

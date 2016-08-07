@@ -152,7 +152,32 @@ namespace avCore
 
 		return instTexture_.get();
 	}
-	
+
+
+	osg::TextureBuffer* InstancesManagerImpl::_createTextureBuffer() 
+	{
+		const size_t sizeoffarray = 1024;
+		bufferMatrices_ = new BufferInstancesT;
+		bufferMatrices_->getData().reserve(sizeoffarray);
+
+
+		const osg::Matrixf matrix;
+
+		for (unsigned int j = 0; j < sizeoffarray; ++j)
+		{
+			bufferMatrices_->getData().push_back( StaticInstance(0, j, matrix));
+		}
+
+
+		osg::Image* instancesImage = new osg::Image;
+		instancesImage->setImage( bufferMatrices_->getTotalDataSize() / sizeof(osg::Vec4f), 1, 1, GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT, (unsigned char*)bufferMatrices_->getDataPointer(), osg::Image::NO_DELETE );
+		osg::TextureBuffer* instancesTextureBuffer = new osg::TextureBuffer(instancesImage);
+		instancesTextureBuffer->setUsageHint(GL_STATIC_DRAW);
+		instancesTextureBuffer->setUnRefImageDataAfterApply(false);
+		
+		return instancesTextureBuffer;
+	}	
+
 	osgAnimation::BoneMap InstancesManagerImpl::_getBoneMap(osg::Node* base_model)
 	{
 		FindNodeByType< osgAnimation::Skeleton> s_finder;  
