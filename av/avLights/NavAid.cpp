@@ -116,6 +116,10 @@ namespace avScene
 					}
 				}
 			}
+			else
+			{
+				assert(false);
+			}
 
 
 		}
