@@ -100,7 +100,7 @@ namespace avCore
 
 	struct xml_object_data
 	{
-		 osg::Vec3 pos;
+		 osg::Vec4 pos;
 	};
    
 	typedef std::vector<xml_object_data>  xml_object_data_t;

@@ -32,6 +32,8 @@
 #include "utils/empty_scene.h"
 #include "utils/async_load.h"
 
+#include "common/randgen.h"
+
 namespace
 {
     //typedef osg::ref_ptr<osgSim::LightPointNode> navaid_group_node_ptr;
@@ -468,6 +470,8 @@ void  Terrain::Create( const std::string& cFileName )
 	if(data.objs.size()>0)
 	{
 		avCore::xml_object_data_t obj_data;
+        
+        simplerandgen rnd;
 
 		std::string data_file_name =  osgDB::findFileInPath(data.objs[0].data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 		mr.Load(data_file_name, obj_data);
@@ -481,7 +485,8 @@ void  Terrain::Create( const std::string& cFileName )
 
 			for(auto it=obj_data.begin() ; it!=obj_data.end();++it)
 			{
-				mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(it->pos.z()/33.f,it->pos.z()/33.f,it->pos.z()/33.f)) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),0)));
+				auto alpha = rnd.random_range(0, 360);
+                mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(it->pos.w()/33.f,it->pos.w()/33.f,it->pos.w()/33.f)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),it->pos.z())));
 			}
 
 

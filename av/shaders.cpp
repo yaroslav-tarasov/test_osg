@@ -1323,19 +1323,16 @@ $endif
 
             void main()
             {
-                vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+                //vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
                 vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
                 viewworld_matrix = inverse(gl_ModelViewMatrix);
 
-                gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
+                gl_Position = gl_ProjectionMatrix * viewpos;
 
-                v_out.normal    = normal;
-                v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
+                //v_out.normal    = normal;
+                //v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
                 v_out.viewpos   = viewpos.xyz;
                 v_out.texcoord  = gl_MultiTexCoord1.xy;
-                //v_out.shadow_view = get_shadow_coords(viewpos, shadowTextureUnit0);
-                //mat4 EyePlane =  transpose(shadowMatrix0); 
-                //v_out.shadow_view = vec4(dot( viewpos, EyePlane[0]),dot( viewpos, EyePlane[1] ),dot( viewpos, EyePlane[2]),dot( viewpos, EyePlane[3] ) );
                 shadow_vs_main(viewpos);
             }       
             )
@@ -1379,11 +1376,6 @@ $endif
 
             void main (void)
             {
-                // GET_SHADOW(f_in.viewpos, f_in);
-                //float shadow = 1.0; 
-                //if(ambient.a > 0.35)
-                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
-                
                 float shadow =  shadow_fs_main(ambient.a);
 
                 vec3 normal = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
@@ -1439,24 +1431,22 @@ $endif
 \n				vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
 \n
 \n				mat4 instanceModelMatrix = mat4(vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (0, 0)).xyz,0.0),
-\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (1, 0)).xyz,0.0),
-\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (2, 0)).xyz,0.0),
-\n					vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (3, 0)).xyz,1.0)
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (1, 0)).xyz,0.0),
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (2, 0)).xyz,0.0),
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (3, 0)).xyz,1.0)
 \n					);
 \n				
-\n				mat3 normalMatrix = mat3(instanceModelMatrix[0][0], instanceModelMatrix[0][1], instanceModelMatrix[0][2],
-\n					instanceModelMatrix[1][0], instanceModelMatrix[1][1], instanceModelMatrix[1][2],
-\n					instanceModelMatrix[2][0], instanceModelMatrix[2][1], instanceModelMatrix[2][2]);
-\n
-\n
+\n              mat3 normalMatrix = mat3(instanceModelMatrix);
+\n              mat4 instanceModelView = gl_ModelViewMatrix * instanceModelMatrix; 
+\n                  
 \n				vec3 normal = normalize(gl_NormalMatrix * normalMatrix * gl_Normal);
-\n				vec4 viewpos = gl_ModelViewMatrix * instanceModelMatrix * gl_Vertex;
-\n				viewworld_matrix = inverse(gl_ModelViewMatrix);
+\n				vec4 viewpos =  instanceModelView * gl_Vertex; 
+\n				viewworld_matrix = inverse( instanceModelView );
 \n
 \n				gl_Position = gl_ModelViewProjectionMatrix * instanceModelMatrix *  gl_Vertex;
 \n
 \n				v_out.normal    = normal;
-\n				v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
+\n				// v_out.vnormal   = mat3(instanceModelView)  * normal;
 \n				v_out.viewpos   = viewpos.xyz;
 \n				v_out.texcoord  = gl_MultiTexCoord1.xy;
 \n				shadow_vs_main(viewpos);
@@ -1465,7 +1455,60 @@ $endif
 		};
 
 
-    	SHADERS_GETTER(get_shader, vs, shaders::tree_mat::fs)
+        const char* fs = {
+
+            "#extension GL_ARB_gpu_shader5 : enable \n "
+            "//       tree_mat \n"
+
+            INCLUDE_UNIFORMS
+
+            STRINGIFY ( 
+
+            in mat4 viewworld_matrix;
+            )
+
+                INCLUDE_FUNCS
+                INCLUDE_FOG_FUNCS
+                INCLUDE_VS
+                //			INCLUDE_PCF_EXT
+                INCLUDE_SCENE_PARAM
+                SHADOW_INCLUDE
+                STRINGIFY ( 
+
+                uniform sampler2D       colorTex;
+            uniform sampler2D       nightTex;
+
+            in block
+            {
+                vec2 texcoord;
+                vec3 normal;
+                vec3 vnormal;
+                vec3 viewpos;
+                vec4 shadow_view;
+                vec4 lightmap_coord;
+            } f_in;
+
+            out vec4  aFragColor;
+
+            void main (void)
+            {
+                float shadow =  shadow_fs_main(ambient.a);
+
+                vec3 normal = f_in.normal; // vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+                float n_dot_l = shadow * saturate(fma(dot(normal, light_vec_view.xyz), 0.5, 0.5));
+
+                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
+                vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
+
+                aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), dif_tex_col.a);
+
+            }
+
+            )
+
+        }; 
+
+    	SHADERS_GETTER(get_shader, vs, fs)
 
 		AUTO_REG_NAME(treeinst, shaders::tree_inst_mat::get_shader)
 

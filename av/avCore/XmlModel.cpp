@@ -205,11 +205,12 @@ namespace avCore
 			{
 
 				const float  x = 	obj.attribute("x").as_float(0.f);
-				const float  y = 	obj.attribute("y").as_float(0.f);
+                const float  y = 	obj.attribute("y").as_float(0.f);
+				const float  z = 	obj.attribute("z").as_float(0.f);
 				const float  h = 	obj.attribute("h").as_float(0.f);
 
 				xml_object_data v;
-				v.pos =  osg::Vec3(x,y,h);
+				v.pos =  osg::Vec4(x,y,z,h);
 				data.push_back(v);
 			}
 
