@@ -1378,7 +1378,9 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     if( path == "rocket_flare" )
     {
-        osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+       	 async = false;
+		
+		osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
         osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
         sd->setColor( osg::Vec4( 0.f, 0.f, 1.f, 1.f ) );
         sd->setName( "A nice sphere" );
@@ -1401,16 +1403,20 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         res_node->setName("phys_ctrl");
         res_node->setUserValue("id",seed);
         res_node->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
-        
+
         auto root = new osg::MatrixTransform();
         root->setName("root");
         root->setUserValue("id",seed);
         root->asGroup()->addChild(geode);
 
-        res_node->addChild(root);
+		auto pat = new osg::PositionAttitudeTransform; 
+		pat->addChild(root);
+		pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
+		pat->setName("pat");
+		pat->setPosition(osg::Vec3(0.,0.f,2.));
+        res_node->addChild(pat);
 
         _terrainRoot->asGroup()->addChild(res_node);
-
         return res_node;
     }
 
