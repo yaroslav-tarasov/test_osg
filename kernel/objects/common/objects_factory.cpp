@@ -290,7 +290,14 @@ namespace rocket_flare
 		const std::string unique_name = sys->generate_unique_name(class_name);
 
 		rocket_flare::state_t s(init_pos.pos,init_pos.orien);
-		return obj_create_data(class_name, unique_name, dict::wrap(rocket_flare_data(sett,s)));	
+
+        obj_create_data ocd(class_name, unique_name, dict::wrap(rocket_flare_data(sett,s)));
+
+        ocd
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data ())))
+            ;
+
+        return  ocd;	
 	}
 
 	object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)

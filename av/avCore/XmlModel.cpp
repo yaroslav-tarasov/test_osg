@@ -209,8 +209,14 @@ namespace avCore
 				const float  z = 	obj.attribute("z").as_float(0.f);
 				const float  h = 	obj.attribute("h").as_float(0.f);
 
+                const float  rx = 	obj.attribute("rx").as_float(0.f);
+                const float  ry = 	obj.attribute("ry").as_float(0.f);
+                const float  rz = 	obj.attribute("rz").as_float(0.f);
+
+
 				xml_object_data v;
 				v.pos =  osg::Vec4(x,y,z,h);
+                v.orien = osg::Vec3(rx,ry,rz);
 				data.push_back(v);
 			}
 

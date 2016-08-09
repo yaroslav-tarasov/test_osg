@@ -467,26 +467,27 @@ void  Terrain::Create( const std::string& cFileName )
         }
     }
 	
-	if(data.objs.size()>0)
+    for(auto it = data.objs.begin(); it != data.objs.end(); ++it)
 	{
 		avCore::xml_object_data_t obj_data;
         
         simplerandgen rnd;
 
-		std::string data_file_name =  osgDB::findFileInPath(data.objs[0].data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+		std::string data_file_name =  osgDB::findFileInPath((*it).data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 		mr.Load(data_file_name, obj_data);
 
-		avCore::ObjectControl* obj_ctrl = avCore::createObject("trees" , true);
+		avCore::ObjectControl* obj_ctrl = avCore::createObject((*it).main_model , true);
 
 		if(obj_ctrl && obj_ctrl->hwInstanced())
 		{
-			obj_ctrl->parentMainInstancedNode(/*this*/baseModel);
+			obj_ctrl->parentMainInstancedNode(this);
 			auto mgr = obj_ctrl->getInstancesManager();
 
 			for(auto it=obj_data.begin() ; it!=obj_data.end();++it)
 			{
-				auto alpha = rnd.random_range(0, 360);
-                mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(it->pos.w()/33.f,it->pos.w()/33.f,it->pos.w()/33.f)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),it->pos.z())));
+				auto alpha = it->pos.w()>0?rnd.random_range(0, 360):it->orien.z();
+                auto const scale =  it->pos.w()>0?it->pos.w()/33.f:1.f;
+                mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(scale,scale,scale)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),it->pos.z())));
 			}
 
 

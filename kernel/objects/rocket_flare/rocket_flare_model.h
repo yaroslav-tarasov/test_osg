@@ -13,7 +13,7 @@ namespace rocket_flare
 
 
 struct model
-    : model_presentation        // базовый класс, виртуальрость
+    : model_presentation        // базовый класс, 
     , view                      // базовое представление
     , phys_object_model_base    // базовый класс для объектов с физическими моделями
 {

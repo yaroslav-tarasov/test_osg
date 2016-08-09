@@ -146,7 +146,6 @@ void model::sync_nodes_manager( double /*dt*/ )
     if (phys_model_ && root_)
     {
         cg::geo_base_3 base = phys_->get_base(*phys_zone_);
-#if 0
         decart_position bodypos = phys_model_->get_position();
         decart_position root_pos = bodypos /** body_transform_inv_*/;// FIXME Модельно зависимое решение 
 
@@ -162,7 +161,9 @@ void model::sync_nodes_manager( double /*dt*/ )
 
         // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
         root_->set_position(root_node_pos);
-#endif
+
+        //root_next_pos_ = pos.pos;
+        //root_next_orien_ = pos.orien;
 
     }
 }

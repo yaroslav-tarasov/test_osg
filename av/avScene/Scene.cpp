@@ -1376,6 +1376,44 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         return res_node;
     }
     
+    if( path == "rocket_flare" )
+    {
+        osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+        osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
+        sd->setColor( osg::Vec4( 0.f, 0.f, 1.f, 1.f ) );
+        sd->setName( "A nice sphere" );
+
+        osg::Geode* geode = new osg::Geode;
+        geode->addDrawable( sd );
+
+        // Set material for basic lighting and enable depth tests. Else, the sphere
+        // will suffer from rendering errors.
+        {
+            osg::StateSet* stateSet = geode->getOrCreateStateSet();
+            osg::Material* material = new osg::Material;
+
+            material->setColorMode( osg::Material::AMBIENT_AND_DIFFUSE );	
+
+            stateSet->setAttributeAndModes( material, osg::StateAttribute::ON );
+            stateSet->setMode( GL_DEPTH_TEST, osg::StateAttribute::ON );
+        }
+        
+        res_node->setName("phys_ctrl");
+        res_node->setUserValue("id",seed);
+        res_node->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
+        
+        auto root = new osg::MatrixTransform();
+        root->setName("root");
+        root->setUserValue("id",seed);
+        root->asGroup()->addChild(geode);
+
+        res_node->addChild(root);
+
+        _terrainRoot->asGroup()->addChild(res_node);
+
+        return res_node;
+    }
+
     if( path == "sfx//forsage.scg" )
     {
 #if 0
@@ -1611,7 +1649,8 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 #endif
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000, async);
-        // load("ka_50",_terrainRoot, 15000, false);
+        // load("caponier",_terrainRoot, 15000, async);
+        // load("ka_50",_terrainRoot, 15000, false); 
 
          /*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 

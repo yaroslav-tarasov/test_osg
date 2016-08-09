@@ -56,7 +56,7 @@ namespace {
 	btCompoundShape*  create_compound_shape()
 	{
 		btCompoundShape* cs = new btCompoundShape;
-		cs->addChildShape(btTransform(),new btBoxShape(btVector3(.2,.2,.2)));
+		cs->addChildShape(btTransform(),new btBoxShape(btVector3(.6,.6,.6)));
 		return cs;
 	}
 
@@ -83,8 +83,9 @@ namespace {
 		btVector3 aabbMin,aabbMax;
 
 #if 1
+        FIXME(chassis_shape_)
         chassis_shape_->getAabb(tr,aabbMin,aabbMax);
-
+       
         const float  fake_mass = 20;
 
 		btScalar dxx = btScalar((aabbMax.x() - aabbMin.x()) / 2);
@@ -94,7 +95,7 @@ namespace {
 		btVector3 inertia = m12 * btVector3(dyy*dyy + dzz*dzz, dxx*dxx + dzz*dzz, dyy*dyy + dxx*dxx);
 
         btDefaultMotionState* motionState = new btDefaultMotionState(tr);
-		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(fake_mass), /*NULL*//*new custom_ms*/motionState, chassis_shape_/*&*chassis_shape_.get()*/, inertia);
+		btRigidBody::btRigidBodyConstructionInfo chassis_construction_info(btScalar(fake_mass), /*NULL*//*new custom_ms*/motionState,  new btBoxShape(btVector3(.6,.6,.6))/*chassis_shape_*//*&*chassis_shape_.get()*/, inertia);
 		chassis_.reset(boost::make_shared<btRigidBody>(chassis_construction_info));
 
 		// FIXME TODO
@@ -108,7 +109,7 @@ namespace {
 		chassis_->setFriction(0.3f);
 #endif
 
-        sys_->dynamics_world()->addAction(this);
+        //sys_->dynamics_world()->addAction(this);
 
 		sys_->register_rigid_body(this);
 
@@ -121,7 +122,7 @@ namespace {
 	{
 		chassis_.reset();
 		sys_->unregister_rigid_body(this);
-		sys_->dynamics_world()->removeAction(this);
+		//sys_->dynamics_world()->removeAction(this);
 	}
 
 	void impl::update(double dt)

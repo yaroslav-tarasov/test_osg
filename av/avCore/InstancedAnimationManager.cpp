@@ -173,28 +173,31 @@ namespace avCore
 		geode_finder.apply(*srcModel_);
 
 		osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
-		osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
 
 		osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
 		osg::StateSet* pSS = geode->getOrCreateStateSet();
-		osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
-			& ~osg::CopyOp::DEEP_COPY_CALLBACKS
-			);
 
-		osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
-		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
+        for(size_t drb = 0; drb < gnode->getNumDrawables(); ++drb )
+        {
+            osg::Geometry* mesh = gnode->getDrawable(drb)->asGeometry();
+		    osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
+			    & ~osg::CopyOp::DEEP_COPY_CALLBACKS
+			    );
 
-        // we need to turn off display lists for instancing to work
-        geometry->setUseDisplayList(false);
-        geometry->setUseVertexBufferObjects(true);
+		    osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
+		    geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
-		_createTextureInstancesData();
-		
-		if(animDataLoaded_)
-			_initSkinning(*geometry.get(), imageData_ );
+            // we need to turn off display lists for instancing to work
+            geometry->setUseDisplayList(false);
+            geometry->setUseVertexBufferObjects(true);
 
-		geode->addDrawable(geometry);
+		    if(animDataLoaded_)
+			    _initSkinning(*geometry.get(), imageData_ );
 
+		    geode->addDrawable(geometry);
+        }
+
+        _createTextureInstancesData();
 #if 0
 		pSS->setTextureAttributeAndModes(BASE_COLOR_TEXTURE_UNIT, texture, osg::StateAttribute::ON);
 		pSS->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
@@ -386,7 +389,7 @@ namespace avCore
                     // first turn on hardware instancing for every primitive set
                     for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
                     {
-                        geometry->getPrimitiveSet(i)->setNumInstances(instCounter);
+                        geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
                     }
                 }
 

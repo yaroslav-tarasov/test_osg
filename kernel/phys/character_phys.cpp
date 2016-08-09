@@ -49,13 +49,13 @@ namespace phys
 		chassis_.reset(phys::bt_rigid_body_ptr(boost::make_shared<btRigidBody>(chassis_construction_info)));
         
 		// FIXME TODO
-#if 0
+
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
 		chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
-#endif
+
 		// chassis_->setDamping(0.05f, 0.5f);
 		chassis_->setRestitution(0.1f);
-		chassis_->setActivationState(DISABLE_SIMULATION);
+		//chassis_->setActivationState(DISABLE_SIMULATION);
 		chassis_->setFriction(0.01f);
 
 		// sys_->dynamics_world()->addAction(this);

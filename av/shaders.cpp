@@ -1294,7 +1294,190 @@ $endif
 
     }  // ns building_mat    
 
-    
+    namespace building_inst_mat 
+    {
+        const char* vs = {  
+			
+            "#extension GL_ARB_gpu_shader5 : enable \n"
+ 		    "//       building_inst_mat \n"
+
+            INCLUDE_VS
+            INCLUDE_COMPABILITY
+            
+            "\n"       
+            LIGHT_MAPS
+            SHADOW_INCLUDE
+
+            STRINGIFY ( 
+\n
+\n			uniform sampler2DRect instanceMatrixTexture;
+\n            
+\n          out mat4 viewworld_matrix;
+\n
+\n            out block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 vnormal;
+\n                vec3 viewpos;
+\n                vec4 shadow_view;
+\n                vec4 lightmap_coord;
+\n            } v_out;
+\n             
+\n            void main()
+\n            {
+\n				vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
+\n
+\n				mat4 instanceModelMatrix = mat4(vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (0, 0)).xyz,0.0),
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (1, 0)).xyz,0.0),
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (2, 0)).xyz,0.0),
+\n					                            vec4(textureOffset(instanceMatrixTexture, instanceCoord, ivec2 (3, 0)).xyz,1.0)
+\n					);
+\n				
+\n              mat3 normalMatrix = mat3(instanceModelMatrix);
+\n              mat4 instanceModelView = gl_ModelViewMatrix * instanceModelMatrix; 
+\n                  
+\n				vec3 normal = normalize(gl_NormalMatrix * normalMatrix * gl_Normal);
+\n				vec4 viewpos =  instanceModelView * gl_Vertex; 
+\n				viewworld_matrix = inverse( instanceModelView );
+\n
+\n				gl_Position = gl_ModelViewProjectionMatrix * instanceModelMatrix *  gl_Vertex;
+\n
+\n				v_out.normal    = normal;
+\n				v_out.vnormal   = mat3(instanceModelView)  * normal;
+\n				v_out.viewpos   = viewpos.xyz;
+\n				v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n				shadow_vs_main(viewpos);
+                SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
+            }       
+
+
+            )
+        };
+
+
+        const char* fs = { 
+            
+            "#extension GL_ARB_gpu_shader5 : enable \n "
+ 		    "//       building_inst_mat \n"
+
+            INCLUDE_UNIFORMS
+
+            STRINGIFY ( 
+
+             in mat4 viewworld_matrix;
+            )
+
+            INCLUDE_FUNCS
+            INCLUDE_FOG_FUNCS
+            INCLUDE_VS
+//			INCLUDE_PCF_EXT
+            INCLUDE_DL
+            INCLUDE_DL2
+            INCLUDE_SCENE_PARAM
+"\n"            
+            LIGHT_MAPS
+            SHADOW_INCLUDE
+
+            STRINGIFY ( 
+\n
+\n            uniform sampler2D           colorTex;
+\n            uniform sampler2D           nightTex;
+\n
+\n            in block
+\n            {
+\n                vec2 texcoord;
+\n                vec3 normal;
+\n                vec3 vnormal;
+\n                vec3 viewpos;
+\n                vec4 shadow_view;
+\n                vec4 lightmap_coord;
+\n            } f_in;
+\n            
+\n            out vec4  aFragColor;
+\n
+\n            void main (void)
+\n            {
+\n                // GET_SHADOW(f_in.viewpos, f_in);
+\n                //float shadow = 1.0; 
+\n                //if(ambient.a > 0.35)
+\n                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
+\n                
+\n                float shadow =  shadow_fs_main(ambient.a);
+\n
+\n                // get dist to point and normalized to-eye vector
+\n                float dist_to_pnt_sqr = dot(f_in.viewpos, f_in.viewpos);
+\n                float dist_to_pnt_rcp = inversesqrt(dist_to_pnt_sqr);
+\n                float dist_to_pnt     = dist_to_pnt_rcp * dist_to_pnt_sqr;
+\n                vec3  to_eye          = -dist_to_pnt_rcp * f_in.viewpos;
+\n
+\n                vec3  normal = normalize(f_in.normal);
+\n                float incidence_dot = dot(to_eye, normal);
+\n                vec3  refl_vec_view = -to_eye + (2.0 * incidence_dot) * normal;
+\n
+\n                vec3  view_up_vec = vec3(viewworld_matrix[0][2], viewworld_matrix[1][2], viewworld_matrix[2][2]);
+\n                float normal_world_space_z = dot(view_up_vec, normal);
+\n
+\n                // diffuse color and glass factor (make windows color look darker)
+\n                vec4 dif_tex_col = texture2D(colorTex, f_in.texcoord);
+\n                dif_tex_col.rgb *= fma(dif_tex_col.a, 0.6, 0.4);
+\n                float glass_factor = 1.0 - dif_tex_col.a;
+\n
+\n                // get diffuse and specular value
+\n                float n_dot_l = ramp_up(shadow * saturate(dot(normal, light_vec_view.xyz)));
+\n                float specular_val = shadow * pow(saturate(dot(refl_vec_view, light_vec_view.xyz)), 10.0) * 2.0;
+\n                vec3 spec_color = specular.rgb * specular_val;
+\n
+\n                // lightmaps
+\n                vec3 non_ambient_term = n_dot_l * diffuse.rgb;
+\n
+\n              // Apply spot lights
+\n              vec3 vLightsSpecAddOn;
+\n                vec3 light_res = vec3(0.0);  
+\n                  
+\n                // ComputeDynamicLights(f_in.viewpos.xyz, f_in.normal, /*vec3(0)*/f_in.normal, light_res, vLightsSpecAddOn);
+\n              // vec3 lightmap_color = light_res ; 
+\n
+\n              GET_LIGHTMAP(f_in.viewpos, f_in);
+\n
+\n                //    LIGHTMAP_BUILDING_HEIGHT_TRICK;
+\n                float up_dot_clamped = saturate(fma(normal_world_space_z, 0.4, 0.6));
+\n                non_ambient_term = max(lightmap_color * up_dot_clamped, non_ambient_term);
+\n
+\n                // overall lighting
+\n                vec3 light_color = ambient.rgb + non_ambient_term;
+\n
+\n                // apply detail texture
+\n                float detail_factor = dif_tex_col.a * tex_detail_factor(f_in.texcoord * textureSize2D(colorTex, 0), -0.075);
+\n                if (detail_factor > 0.01)
+\n                    dif_tex_col.rgb = hardlight(dif_tex_col.rgb, detail_factor * fma(texture2D(detailTex, f_in.texcoord * 9.73f).rrr, vec3(0.5), vec3(-0.25)));
+\n
+\n                vec3 day_result = light_color * dif_tex_col.rgb;
+\n                vec3 night_tex = vec3(0.0f,0.0f,0.0f); // I'm not sure
+\n                if (glass_factor > 0.25)
+\n                {
+\n                   vec3 refl_vec_world = mat3(viewworld_matrix) * refl_vec_view;
+\n                   refl_vec_world.z = abs(refl_vec_world.z);
+\n                   float fresnel = saturate(fma(pow(1.0 - incidence_dot, 2.0), 0.65, 0.35)) * fma(refl_vec_world.z, 0.15, 0.85);
+\n                   vec3 cube_color = texture(envTex, refl_vec_world).rgb;
+\n                   day_result = mix(day_result, cube_color, glass_factor * fresnel) + spec_color * glass_factor;
+\n                   night_tex = texture2D(nightTex, f_in.texcoord).rgb;
+\n                }
+
+                float night_factor = step(ambient.a, 0.35);
+                vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
+               
+                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+            }
+            )
+
+        };   
+
+        SHADERS_GETTER(get_shader,vs, fs)
+
+        AUTO_REG_NAME( buildinginst , shaders::building_inst_mat::get_shader)
+
+    }  // ns building_inst_mat 
 
     namespace tree_mat 
     {

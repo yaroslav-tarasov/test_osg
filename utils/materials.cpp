@@ -430,7 +430,7 @@ public:
          std::string mat_name_cut = mat_name.substr(0, mat_name.find("_"));
          FIXME( "Есть где-то buildingtrack" ) 
 
-         if (mat_name.find("building") !=std::string::npos)
+         if (mat_name.find("building") !=std::string::npos && mat_name.find("buildinginst") ==std::string::npos)
          {
               return"building"; 
          }
