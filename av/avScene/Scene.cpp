@@ -1378,15 +1378,10 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     if( path == "rocket_flare" )
     {
-<<<<<<< .mine
        	 async = false;
 		
-		osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
-=======
-        async = false;
+		 osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
 
-        osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
->>>>>>> .theirs
         osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
         sd->setColor( osg::Vec4( 0.f, 0.f, 1.f, 1.f ) );
         sd->setName( "A nice sphere" );

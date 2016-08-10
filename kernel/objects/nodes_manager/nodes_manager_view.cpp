@@ -288,6 +288,7 @@ void view::init_logic_tree()
         write(stream, 1);
         model_structure::node_data ndata;
         ndata.name = "root";
+		ndata.victory_nodes.push_back("root");
         write(stream, ndata);
         write(stream, 0);
 
