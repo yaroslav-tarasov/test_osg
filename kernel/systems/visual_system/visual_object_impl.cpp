@@ -30,6 +30,7 @@ namespace kernel
         , p_     (boost::make_shared<private_t>(res))
         , seed_  (seed)
         , ol_    (f)
+        , async_ (async)
     {
 
 		if(!async)
@@ -54,10 +55,9 @@ namespace kernel
 #endif
             p_->node_ = p_->scene_->load(res, nullptr, seed, async);
             
-            if(!async) 
-                object_loaded( seed );
         }
-
+       
+        async_ = async;
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async, on_object_loaded_f f )
@@ -65,6 +65,7 @@ namespace kernel
         , p_     (boost::make_shared<private_t>(res))
         , seed_  (seed)
         , ol_    (f)
+        , async_ (async)
     {
 #ifdef ASYNC_OBJECT_LOADING           
         p_->scene_->subscribe_object_loaded(boost::bind(&visual_object_impl::object_loaded,this,_1));
@@ -72,8 +73,8 @@ namespace kernel
 
         auto const& vn = nm::vis_node_control_ptr(parent)->vis_nodes();
         p_->node_ = p_->scene_->load(res,vn.size()>0?vn[0]:nullptr, seed, async);
-
-		if(!async && p_->node_ )
+        
+        if(!async && p_->node_ )
 		{
 
         p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact);
@@ -88,6 +89,8 @@ namespace kernel
 		SetupRigGeometry switcher(true, *node_.get());
 #endif
 		}
+
+        async_ = async;
     }
 
     visual_object_impl::~visual_object_impl()
@@ -97,6 +100,12 @@ namespace kernel
 
         // scene_->get_objects()->remove(node_.get());
 	
+    }
+    
+    void visual_object_impl::set_object_loaded()
+    {
+        if(!async_) 
+            object_loaded( seed_ );
     }
 
 #ifdef ASYNC_OBJECT_LOADING    

@@ -1,6 +1,9 @@
 	#version 430 compatibility  
 	#extension GL_ARB_gpu_shader5 : enable  
-   
+    // 
+	//    rope.frag
+	//
+
     in block 
     {         
 		centroid in vec2 texcoord;  

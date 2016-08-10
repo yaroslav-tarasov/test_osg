@@ -680,7 +680,7 @@ struct client
             ADD_EVENT(19.0  , create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
-			ADD_EVENT(1.0  , create_msg(666,cg::point_3(0,0,20),cg::cpr(0)   , ok_rocket_flare, "rocket_flare", "666") )
+			ADD_EVENT(7.0  , create_msg(6666,cg::point_3(0,0,5),cg::cpr(0,90)   , ok_rocket_flare, "rocket_flare", "6666") )
 
 
 #if 1

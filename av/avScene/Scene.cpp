@@ -1378,9 +1378,15 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     if( path == "rocket_flare" )
     {
+<<<<<<< .mine
        	 async = false;
 		
 		osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+=======
+        async = false;
+
+        osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+>>>>>>> .theirs
         osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
         sd->setColor( osg::Vec4( 0.f, 0.f, 1.f, 1.f ) );
         sd->setName( "A nice sphere" );
@@ -1404,11 +1410,11 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         res_node->setUserValue("id",seed);
         res_node->getOrCreateStateSet()->setRenderBinDetails( RENDER_BIN_SCENE, "DepthSortedBin" );
 
-        auto root = new osg::MatrixTransform();
-        root->setName("root");
-        root->setUserValue("id",seed);
+        auto root = new osg::Group; 
+        root->setName("Root");
         root->asGroup()->addChild(geode);
-
+        root->setUserValue("id",seed);
+        
 		auto pat = new osg::PositionAttitudeTransform; 
 		pat->addChild(root);
 		pat->setAttitude(osg::Quat(osg::inDegrees(0.0),osg::X_AXIS));
@@ -1416,7 +1422,17 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 		pat->setPosition(osg::Vec3(0.,0.f,2.));
         res_node->addChild(pat);
 
-        _terrainRoot->asGroup()->addChild(res_node);
+        _terrainRoot->addChild(res_node);
+        
+        avFx::FireFx* fs = new avFx::FireFx;
+        root->addChild(fs);
+        auto fire_sfx_weak_ptr = dynamic_cast<FireSfxNode*>(fs);
+        fire_sfx_weak_ptr->setEmitWorldPos( cg::point_3f(0., 0., 0.) );
+        fire_sfx_weak_ptr->setEmitterWorldVelocity( cg::point_3f(0., -15., 0.) ); 
+        auto const intensity = 4.0f;   
+        fire_sfx_weak_ptr->setFactor(intensity );
+        fire_sfx_weak_ptr->setIntensity(intensity * 20);
+
         return res_node;
     }
 
@@ -1429,6 +1445,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         _terrainRoot->asGroup()->addChild(res_node);
 #endif
 
+#if 0
 		osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
 		const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
@@ -1437,13 +1454,15 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 		auto mt_offset = new osg::MatrixTransform(mat);
 		parent?parent->asGroup()->addChild(mt_offset):nullptr;
+#endif
 
-		avFx::FireFx* fs = new avFx::FireFx;
+		avFx::FireFx* fs = new avFx::FireFx(avFx::useLocalCoordinates);
+
 
 #ifdef TRACKNODE 		
 		fs->setTrackNode(parent);
 		res_node->addChild(fs);
-		_terrainRoot->asGroup()->addChild(res_node);
+		_terrainRoot->addChild(res_node);
 #else
 		res_node->addChild(fs);
 		parent->asGroup()->addChild(res_node);

@@ -45,6 +45,9 @@ private:
 	float							     _damping;
     double                                 _speed;
 	float                            _targetSpeed;
+
+    bool                                    _down;
+
 //  phys staff
 private:
     model_system *                           sys_;

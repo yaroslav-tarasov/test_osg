@@ -1417,9 +1417,7 @@ visual_object_ptr visual_system_impl::create_visual_object( std::string const & 
         obj_counter_++;
     }
 
-    auto  vo = boost::make_shared<visual_object_impl>( res, seed, async, [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
-
-    return vo;
+    return boost::make_shared<visual_object_impl>( res, seed, async, [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
 }
 
 visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
@@ -1433,9 +1431,7 @@ visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr
         obj_counter_++;
     }
 
-    auto  vo = boost::make_shared<visual_object_impl>( parent, res, seed, async,  [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
-
-    return vo;
+    return boost::make_shared<visual_object_impl>( parent, res, seed, async,  [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
 }
 
 void    visual_system_impl::visual_object_created( uint32_t seed )

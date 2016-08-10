@@ -1,6 +1,9 @@
 	#version 430 compatibility  
 	#extension GL_ARB_gpu_shader5 : enable  
-    
+    // 
+	//    rope.vert
+	//
+
 	#include "scene_params.hlsl"
 
 	vec3 light_dir = light_vec_view.xyz;  //normalize(vec3(-0.79f, 0.39f, 0.47f));  
