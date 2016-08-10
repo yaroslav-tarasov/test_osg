@@ -23,7 +23,8 @@ using namespace avFx;
 //
 
 // constructor
-FireFx::FireFx()
+FireFx::FireFx( UseCoordinates uc )
+    : _uc (uc)
 {
     setName("FireFx");
 
@@ -199,7 +200,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 
 	// update current
 	static const float break_sfx_dist = 1.5f;
-	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), /*data_.emit_pos*/cg::point_3f(), break_sfx_dist, cpu_updater);
+	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), (_uc==useWorldCoordinates)?data_.emit_pos:cg::point_3f(), break_sfx_dist, cpu_updater);
 
 	// new particles emitter
 	const float factor_val = data_.factor;

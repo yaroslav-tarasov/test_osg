@@ -42,18 +42,12 @@ void visual::apply_vis_model()
     {
 
         visual_object_ = sys_->create_visual_object(settings_.model, boost::bind(&visual::object_loaded,this,_1), object_id()) ;
-
-#if 0
-#ifdef ASYNC_OBJECT_LOADING
-        visual_object_->subscribe_object_loaded(boost::bind(&visual::object_loaded,this,_1));
-#endif 
-#endif 
-
+        visual_object_->set_object_loaded();
     }
     else 
         visual_object_.reset();
 
-#if 0
+#if 0                                    
 #ifndef ASYNC_OBJECT_LOADING
     object_loaded( object_id() );
 #endif

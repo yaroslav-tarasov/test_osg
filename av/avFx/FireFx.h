@@ -38,19 +38,25 @@ namespace avFx
 
 	using namespace av::part_sys;
 
+    enum UseCoordinates
+    {
+        useWorldCoordinates,
+        useLocalCoordinates,
+    };
+
     //
     // FireFx class
     // Implements fire effect
     //
 
     class FireFx : public osg::Geode
-				  ,	public FireSfxNode
+				 ,	public FireSfxNode
     {
 
     public:
 
         // constructor
-        FireFx();
+        FireFx( UseCoordinates uc = useWorldCoordinates);
 
 
         //
@@ -143,6 +149,9 @@ namespace avFx
         // AABB data for clipping
         osg::BoundingBox			 _aabbEllipsoid;
 		osg::Geometry *              _geom;
+    
+    private:
+        UseCoordinates                 _uc;
     };
 
 }

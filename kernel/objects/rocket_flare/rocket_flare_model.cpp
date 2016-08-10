@@ -20,7 +20,8 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     : view                  (oc, dict)
     , phys_object_model_base(collection_)
     , sys_(dynamic_cast<model_system *>(oc.sys))
-	, _speed                (50.0 )
+	, _speed                (40.0 )
+    , _down (false)
 {
     _damping = 1.0f;
 	_targetSpeed = rnd_.random_range(/*settings._minSpeed*/6.f ,/* settings._maxSpeed*/10.f);
@@ -110,7 +111,6 @@ void model::sync_phys(double dt)
 
 	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
-#if 1
     decart_position cur_pos = phys_model_->get_position();
 
     geo_position cur_glb_pos(cur_pos, base);
@@ -135,9 +135,15 @@ void model::sync_phys(double dt)
 	if(_targetSpeed > -1){
 		phys::rocket_flare::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
 	}
+    
+   
+    if(cur_pos.pos.z > 300)
+        _down = true;
 
-    phys::rocket_flare::control_ptr(phys_model_)->set_linear_velocity(forward_dir * _speed );
-#endif
+    if(!_down)
+        phys::rocket_flare::control_ptr(phys_model_)->set_linear_velocity(forward_dir * _speed );
+
+
 
 }
 
@@ -161,7 +167,7 @@ void model::sync_nodes_manager( double /*dt*/ )
 
         // nodes_management::node_position rnp = local_position(0,0,cg::geo_base_3(get_base())(root_node_pos.global().pos),root_node_pos.global().orien);
         root_->set_position(root_node_pos);
-
+        
         //root_next_pos_ = pos.pos;
         //root_next_orien_ = pos.orien;
 
