@@ -19,6 +19,7 @@
 #include "human/human_view.h"
 #include "camera/camera_view.h"
 #include "rocket_flare/rocket_flare_view.h"
+#include "cloud_zone/cloud_zone_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
 #include "kernel/systems/fake_system.h"
@@ -305,6 +306,29 @@ namespace rocket_flare
 		return sys_object_create(sys, pack( sys, sett, init_pos));	
 	}
 
+}
+
+namespace cloud_zone
+{
+
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett)
+    {
+        const std::string class_name = "cloud_zone";
+        const std::string unique_name = sys->generate_unique_name(class_name);
+
+        obj_create_data ocd(class_name, unique_name, dict::wrap(wrap_settings<settings_t>(sett)));
+#if 0
+        ocd
+            .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data  ())));
+#endif
+
+        return ocd;	
+    }
+
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    {
+        return sys_object_create(sys, pack( sys, sett));	
+    }
 }
 
 

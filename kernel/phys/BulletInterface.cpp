@@ -509,8 +509,8 @@ BulletInterface::BulletInterface()
 
 
 
- #if 0
-   d_->_dw->setInternalTickCallback(internal_tick_callback); 
+ #if 1
+   p_->_dw->setInternalTickCallback(internal_tick_callback); 
 #endif   
 
 
@@ -1108,7 +1108,7 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 			size_t numContacts = (size_t)contactManifold->getNumContacts();
 			if (numContacts)
 			{
-				if (rbA->rigid_body_kind() == rb_aircraft)
+				if (rbA->rigid_body_kind() == rb_aircraft || rbA->rigid_body_kind() == rb_simple)
 				{
 					for (size_t i = 0; i < numContacts; ++i)
 					{
@@ -1120,7 +1120,7 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 					}
 				}
 
-				if (rbB->rigid_body_kind() == rb_aircraft)
+				if (rbB->rigid_body_kind() == rb_aircraft || rbB->rigid_body_kind() == rb_simple)
 				{
 					for (size_t i = 0; i < numContacts; ++i)
 					{

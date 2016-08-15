@@ -19,12 +19,9 @@ enum id
     ar_settings      ,
     ar_phys_pos      ,
     ar_contact_effect,
-    ar_ropes_state   ,
-    ar_set_target    ,
 };
 
 typedef gen_msg<ar_settings,     rocket_flare::settings_t>    settings_msg;
-typedef gen_msg<ar_set_target, boost::optional<uint32_t>>       target_msg;
 
 //! сообщение "физическая позиция ВС"
 struct phys_pos_msg
@@ -70,18 +67,6 @@ struct contact_effect
     double time;
 };
 
-struct ropes_state
-    : network::msg_id<ar_ropes_state>
-{
-    ropes_state() {}
-
-    ropes_state(std::vector<rope_state_t>&& state, double time)
-        : state(move(state)), time(time)
-    {}
-
-    std::vector<rope_state_t> state;
-    double time;
-};
 
 REFL_STRUCT(phys_pos_msg)
     REFL_ENTRY(pos)
@@ -94,10 +79,6 @@ REFL_STRUCT(contact_effect)
     REFL_ENTRY(time)
 REFL_END()
 
-REFL_STRUCT(ropes_state)
-    REFL_ENTRY(state)
-    REFL_ENTRY(time)
-REFL_END()
 
 } // msg
 } // aircraft

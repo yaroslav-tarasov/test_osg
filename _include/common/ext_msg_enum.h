@@ -34,6 +34,7 @@ namespace net_layer
             ar_set_target       ,
 
 			id_environment      ,   
+            id_cloud_zone       ,
 
             sm_container_msg    
        

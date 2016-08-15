@@ -122,6 +122,16 @@ namespace rocket_flare
 }
 
 
+namespace cloud_zone
+{
+    using namespace kernel;
+
+    struct settings_t;
+
+    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett);
+    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett);
+}
+
 namespace auto_object
 {
 

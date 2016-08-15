@@ -17,7 +17,6 @@ protected:
 
     // control
 private:
-    void set_target(const boost::optional<uint32_t>&   target_id) override;
 
     // base_presentation
 private:

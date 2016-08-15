@@ -119,7 +119,7 @@ namespace {
         "void main(void) \n"
         "{ \n"
         "\n"
-        "    FragColor = vec4(texture2D(colorTex, uv).xyz, 0.4);"
+        "    FragColor = vec4(texture2D(colorTex, uv).rgb, 0.4);"
         "}\n";
 
     osg::Program* createProgram( const std::string& name, const std::string& vertexSource, const std::string& fragmentSource  )

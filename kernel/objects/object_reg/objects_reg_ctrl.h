@@ -34,8 +34,9 @@ private:
     void inject_msg   (net_layer::msg::environment_msg    const& msg);
     void inject_msg   (net_layer::msg::traj_assign_msg    const& msg);
     void inject_msg   (net_layer::msg::arrgear_target_msg const& msg);
-	void inject_msg   ( net_layer::msg::create_msg       const& msg);
+	void inject_msg   ( net_layer::msg::create_msg        const& msg);    
     void inject_msg   ( net_layer::msg::destroy_msg       const& msg);
+    void inject_msg   ( net_layer::msg::update_cloud_zone_msg       const& msg);
 
     virtual void inject_msg     ( const void* data, size_t size          ) override;
 	// virtual void create_object  ( net_layer::msg::create_msg const& msg  ) override;

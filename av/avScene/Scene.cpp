@@ -762,9 +762,17 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _p->settings_->clouds[0].x = 1000.0f;
     _p->settings_->clouds[0].y = 1000.0f;
     _p->settings_->clouds[0].height = 100.0f;
-    _p->settings_->clouds[0].p_type = avWeather::/*PrecipitationRain*/PrecipitationFog;
+    _p->settings_->clouds[0].p_type = avWeather::PrecipitationFog;
     _p->settings_->clouds[0].intensity = 0.51f;
     _p->settings_->intensity = 0.0f;
+
+    _p->settings_->clouds[1].radius_x = 1000.0f;
+    _p->settings_->clouds[1].radius_y = 1000.0f;
+    _p->settings_->clouds[1].x = -1000.0f;
+    _p->settings_->clouds[1].y = -1000.0f;
+    _p->settings_->clouds[1].height = 150.0f;
+    _p->settings_->clouds[1].p_type = avWeather::PrecipitationRain;
+    _p->settings_->clouds[1].intensity = 0.81f;
 
     if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
@@ -1113,21 +1121,41 @@ FIXME(Чудеса с Ephemeris)
 #ifdef TEST_WEATHER
 	avWeather::Weather * pWeatherNode = avScene::GetScene()->getWeather();
 
-	const avWeather::Weather::WeatherBankIdentifier nID = 666;
-	const double dLatitude   = _p->settings_->clouds[0].x;
-	const double dLongitude  = _p->settings_->clouds[0].y;
-	const float fHeading     = 45;
-	const float fEllipseRadX = _p->settings_->clouds[0].radius_x;
-	const float fEllipseRadY = _p->settings_->clouds[0].radius_y;
-	const float fHeight      = _p->settings_->clouds[0].height;
-	const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
-	const float fIntensity   = _p->settings_->clouds[0].intensity;
-	const float fCentralPortion = 0.75;
+    {
+        const avWeather::Weather::WeatherBankIdentifier nID = 666;
+        const double dLatitude   = _p->settings_->clouds[0].x;
+        const double dLongitude  = _p->settings_->clouds[0].y;
+        const float fHeading     = 45;
+        const float fEllipseRadX = _p->settings_->clouds[0].radius_x;
+        const float fEllipseRadY = _p->settings_->clouds[0].radius_y;
+        const float fHeight      = _p->settings_->clouds[0].height;
+        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
+        const float fIntensity   = _p->settings_->clouds[0].intensity;
+        const float fCentralPortion = 0.75;
 
-	pWeatherNode->UpdateLocalWeatherBank(nID, 
-		dLatitude, dLongitude, fHeading, 
-		fEllipseRadX, fEllipseRadY, fHeight, 
-		ptType, fIntensity, fCentralPortion);
+        pWeatherNode->UpdateLocalWeatherBank(nID, 
+            dLatitude, dLongitude, fHeading, 
+            fEllipseRadX, fEllipseRadY, fHeight, 
+            ptType, fIntensity, fCentralPortion);
+    }
+
+    {
+        const avWeather::Weather::WeatherBankIdentifier nID = 667;
+        const double dLatitude   = _p->settings_->clouds[1].x;
+        const double dLongitude  = _p->settings_->clouds[1].y;
+        const float fHeading     = 45;
+        const float fEllipseRadX = _p->settings_->clouds[1].radius_x;
+        const float fEllipseRadY = _p->settings_->clouds[1].radius_y;
+        const float fHeight      = _p->settings_->clouds[1].height;
+        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[1].p_type)/*avWeather::PrecipitationRain*/;
+        const float fIntensity   = _p->settings_->clouds[1].intensity;
+        const float fCentralPortion = 0.75;
+
+        pWeatherNode->UpdateLocalWeatherBank(nID, 
+            dLatitude, dLongitude, fHeading, 
+            fEllipseRadX, fEllipseRadY, fHeight, 
+            ptType, fIntensity, fCentralPortion);
+    }
 
 #endif
 
@@ -1375,12 +1403,23 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         return res_node;
     }
-    
+
+    if( path == "sfx//rocket_flare.scg" )
+    {
+        avFx::FireFx* fs = new avFx::FireFx;
+
+        res_node->addChild(fs);
+        //parent->asGroup()->addChild(res_node);
+        _terrainRoot->addChild(res_node);
+
+        return res_node;
+    }
+
     if( path == "rocket_flare" )
     {
        	 async = false;
 		
-		 osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), 0.25f );
+		 osg::Sphere* sphere    = new osg::Sphere( osg::Vec3( 0.f, 0.f, 0.f ), .5f );
 
         osg::ShapeDrawable* sd = new osg::ShapeDrawable( sphere );
         sd->setColor( osg::Vec4( 0.f, 0.f, 1.f, 1.f ) );
@@ -1419,6 +1458,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         _terrainRoot->addChild(res_node);
         
+#if 0
         avFx::FireFx* fs = new avFx::FireFx;
         root->addChild(fs);
         auto fire_sfx_weak_ptr = dynamic_cast<FireSfxNode*>(fs);
@@ -1427,6 +1467,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         auto const intensity = 4.0f;   
         fire_sfx_weak_ptr->setFactor(intensity );
         fire_sfx_weak_ptr->setIntensity(intensity * 20);
+#endif
 
         return res_node;
     }

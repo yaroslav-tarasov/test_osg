@@ -34,10 +34,6 @@ void ctrl::update( double time )
     view::update(time);
 }
 
-void ctrl::set_target(const boost::optional<uint32_t>&   target_id)
-{
-      set(msg::target_msg(target_id));
-}
 
 } // rocket_flare 
 

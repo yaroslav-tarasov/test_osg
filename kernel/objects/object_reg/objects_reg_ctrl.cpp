@@ -39,6 +39,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 	void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg) = &ctrl::inject_msg;
 	void (ctrl::*on_destroy)     (net_layer::msg::destroy_msg  const& msg)        = &ctrl::inject_msg;
     void (ctrl::*on_create)      (net_layer::msg::create_msg  const& msg)         = &ctrl::inject_msg;
+    void (ctrl::*on_update_cloud_zone)      (net_layer::msg::update_cloud_zone_msg  const& msg)         = &ctrl::inject_msg;
 
     
 
@@ -55,6 +56,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::arrgear_target_msg    >(boost::bind(on_set_target  , this, _1))
 		.add<net_layer::msg::create_msg            >(boost::bind(on_create     , this, _1))	
         .add<net_layer::msg::destroy_msg           >(boost::bind(on_destroy     , this, _1))	
+        .add<net_layer::msg::update_cloud_zone_msg >(boost::bind(on_update_cloud_zone     , this, _1))	
         ;
 
 	create_object_f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
@@ -126,7 +128,33 @@ void ctrl::inject_msg( net_layer::msg::destroy_msg const& msg)
     }
 	
 }
+ 
+void ctrl::inject_msg(net_layer::msg::update_cloud_zone_msg const& msg)
+{
+    // 
+    auto a = regs_objects_.find(msg.ext_id);
+    if ( a != regs_objects_.end())
+    {
 
+    }
+    else
+    {
+        kernel::object_info_ptr  obj = nullptr;
+        
+        auto create_object_f = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::update_cloud_zone_msg const&)>( "create_cloud_zone");
+        if(create_object_f)
+        {
+             obj = create_object_f(sys_, msg);
+
+            if (obj)
+            {
+                e2o_[msg.ext_id] = obj->object_id();
+                regs_objects_[msg.ext_id] = obj;
+            }
+        }
+    }
+
+}
 
 void ctrl::inject_msg(const void* data, size_t size)
 {

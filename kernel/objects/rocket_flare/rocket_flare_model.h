@@ -36,7 +36,7 @@ private:
     void sync_phys          ( double dt );
     void sync_nodes_manager ( double dt );
     void update_model       ( double time, double dt );
-
+    void update_contact_effects(double time);
 
 private:
     phys::static_mesh_ptr                  mesh_;

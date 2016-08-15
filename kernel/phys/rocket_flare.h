@@ -32,6 +32,7 @@ namespace phys
         {
             virtual ~info() {}
             virtual decart_position get_position() const = 0;
+            virtual std::vector<contact_info_t> get_body_contacts() const = 0;
         };
 
         struct control

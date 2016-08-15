@@ -143,7 +143,7 @@ void  Object::setupInstancedHWAnimated(const std::string& hw_anim_file)
         
         std::string anim_file_name =  osgDB::findFileInPath(hw_anim_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
-        _inst_manager = CreateInstancesManager(HW_ANIMATED,_node.get(), anim_file_name); //  new InstancedAnimationManager(_node.get(), anim_file_name);
+        _inst_manager = CreateInstancesManager(HW_DEFAULT/*HW_ANIMATED*/,_node.get(), anim_file_name); 
         
         // Двойная регистрация кэш и клоны, для спец узла (последствия?)
         ObjectManager::get().RegisterClone(this);

@@ -58,7 +58,8 @@ namespace avCore
 
 
     InstancesManagerImpl::InstancesManagerImpl() 
-        : inst_num_ (0)
+        : instNum_ (0)
+        , animDataLoaded_(false)
     {
 
     }
@@ -66,182 +67,158 @@ namespace avCore
     InstancesManagerImpl::InstancesManagerImpl(const InstancesManagerImpl& object,const osg::CopyOp& copyop)
         : InstancesManager(object,copyop)
     {
-    
+
     }
 
-	InstancesManagerImpl::InstancesManagerImpl(osg::Node* prototype, const std::string& anim_file_name)
-        : src_model_     (prototype)
-        , inst_num_ (0)
-	{ 
+    InstancesManagerImpl::InstancesManagerImpl(osg::Node* prototype, const std::string& anim_file_name, size_t  const  max_instances)
+        : srcModel_     (prototype)
+        , instNum_ (0)
+        , animDataLoaded_(false)
+        , maxInstances_(max_instances)
+    { 
 
         _initData();
-        _loadAnimationData(anim_file_name);
+        animDataLoaded_ = _loadAnimationData(anim_file_name);
 
         instGeode_  = _createGeode();
 
-		auto tr = src_model_->asTransform();
-	    if(tr->asPositionAttitudeTransform())
-		{
-			src_quat_ = tr->asPositionAttitudeTransform()->getAttitude();
-		}
-		
-		if(tr->asMatrixTransform())
-		{
-			src_quat_ = tr->asMatrixTransform()->getMatrix().getRotate();
-		}
+        auto tr = srcModel_->asTransform();
+        if(tr->asPositionAttitudeTransform())
+        {
+            srcQuat_ = tr->asPositionAttitudeTransform()->getAttitude();
+        }
+        else
+            if(tr->asMatrixTransform())
+            {
+                srcQuat_ = tr->asMatrixTransform()->getMatrix().getRotate();
+            }
     }
 
 
-	osg::TextureRectangle* InstancesManagerImpl::_createAnimationTexture( image_data& idata)
-	{
-		osg::ref_ptr<osg::Image> image = new osg::Image;
-		image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
-
-		osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
-		texture->setInternalFormat(GL_RGBA32F_ARB);
-		texture->setSourceFormat(GL_RGBA);
-		texture->setSourceType(GL_FLOAT);
-		texture->setTextureSize(4, idata.data_len);
-		texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-		texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-
-		image_data_.data.resize(texture->getImage()->getTotalSizeInBytes());
-		unsigned char* dest_ptr = &image_data_.data[0];
-		for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
-		{
-			memcpy(dest_ptr, itr.data(), itr.size());
-			dest_ptr += itr.size();
-		}
-
-		return texture.release();
-	}
-
-
-
-    osg::TextureRectangle* InstancesManagerImpl::_createTextureInstancedData()
+    osg::TextureRectangle* InstancesManagerImpl::_createAnimationTexture( image_data& idata)
     {
-		const unsigned int start = 0;
-		const unsigned int end = instancesData_.size();
+        osg::ref_ptr<osg::Image> image = new osg::Image;
+        image->setImage(idata.s, idata.t, idata.r, idata.internalFormat, idata.pixelFormat, idata.type, &idata.data[0], osg::Image::NO_DELETE);
 
-		// create texture to encode all matrices
-        const size_t fixed_data_size =   4096u;
+        osg::ref_ptr<osg::TextureRectangle> texture = new osg::TextureRectangle(image);
+        texture->setInternalFormat(GL_RGBA32F_ARB);
+        texture->setSourceFormat(GL_RGBA);
+        texture->setSourceType(GL_FLOAT);
+        texture->setTextureSize(4, idata.data_len);
+        texture->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
+        texture->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
+        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
 
-		unsigned int height = ((/*end-start*//*instancesData_.size()*/fixed_data_size) / texture_row_data_size) + 1u;
+        imageData_.data.resize(texture->getImage()->getTotalSizeInBytes());
+        unsigned char* dest_ptr = &imageData_.data[0];
+        for(osg::Image::DataIterator itr(texture->getImage()); itr.valid(); ++itr)
+        {
+            memcpy(dest_ptr, itr.data(), itr.size());
+            dest_ptr += itr.size();
+        }
 
-		osg::ref_ptr<osg::Image>       image = new osg::Image; 
-		image->allocateImage(fixed_data_size * 4, height, 1, GL_RGBA, GL_FLOAT);
-		image->setInternalTextureFormat(GL_RGBA32F_ARB);
+        return texture.release();
+    }
 
-		instTexture_ = new osg::TextureRectangle(image);
-		instTexture_->setInternalFormat(GL_RGBA32F_ARB);
-		instTexture_->setSourceFormat(GL_RGBA);
-		instTexture_->setSourceType(GL_FLOAT);
-		instTexture_->setTextureSize(4, end-start);
-		instTexture_->setFilter(osg::Texture::MAG_FILTER, osg::Texture::NEAREST);
-		instTexture_->setFilter(osg::Texture::MIN_FILTER, osg::Texture::NEAREST);
-		instTexture_->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-		instTexture_->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
 
-		// copy part of matrix list and create bounding box callback
-		//std::vector<osg::Matrixd> matrices;
-		//matrices.insert(matrices.begin(), instancesData_.begin(), instancesData_.end());
-		// Этим тоже можно fps убить 
+
+    osg::TextureBuffer* InstancesManagerImpl::_createTextureInstancesData()
+    {
+        // create texture to encode all matrices
+
+        osg::ref_ptr<osg::Image>       image = new osg::Image; 
+        image->allocateImage(maxInstances_ * 4, 1, 1, GL_RGBA, GL_FLOAT);
+        image->setInternalTextureFormat(GL_RGBA32F_ARB);
+
+        instTextureBuffer_ = new osg::TextureBuffer(image);
+        instTextureBuffer_->setInternalFormat(GL_RGBA32F_ARB);
+        //instTextureBuffer_->setSourceFormat(GL_RGBA);
+        //instTextureBuffer_->setSourceType(GL_FLOAT);
+
+
+        // copy part of matrix list and create bounding box callback
+        //std::vector<osg::Matrixd> matrices;
+        //matrices.insert(matrices.begin(), instancesData_.begin(), instancesData_.end());
+        // Этим тоже можно fps убить 
         //geometry->setComputeBoundingBoxCallback(new ComputeTextureBoundingBoxCallback(instancesData_));
 
-		return instTexture_.get();
-	}
+        return instTextureBuffer_.get();
+    }
+
+    osgAnimation::BoneMap InstancesManagerImpl::_getBoneMap(osg::Node* base_model)
+    {
+        FindNodeByType< osgAnimation::Skeleton> s_finder;  
+        s_finder.apply(*base_model);
+
+        auto* skel  = dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast());
+        osgAnimation::BoneMapVisitor mapVisitor;
+        skel->accept(mapVisitor);
+        return mapVisitor.getBoneMap();
+    }
 
 
-	osg::TextureBuffer* InstancesManagerImpl::_createTextureBuffer() 
-	{
-		const size_t sizeoffarray = 1024;
-		bufferMatrices_ = new BufferInstancesT;
-		bufferMatrices_->getData().reserve(sizeoffarray);
+    osg::Geode* InstancesManagerImpl::_createGeode()
+    {
+        FindNodeByType< osg::Geode> geode_finder;  
+        geode_finder.apply(*srcModel_);
 
+        osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
 
-		const osg::Matrixf matrix;
+        osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
+        osg::StateSet* pSS = geode->getOrCreateStateSet();
 
-		for (unsigned int j = 0; j < sizeoffarray; ++j)
-		{
-			bufferMatrices_->getData().push_back( StaticInstance(0, j, matrix));
-		}
+        for(size_t drb = 0; drb < gnode->getNumDrawables(); ++drb )
+        {
+            osg::Geometry* mesh = gnode->getDrawable(drb)->asGeometry();
+            osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
+                & ~osg::CopyOp::DEEP_COPY_CALLBACKS
+                );
 
+            osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
+            geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
 
-		osg::Image* instancesImage = new osg::Image;
-		instancesImage->setImage( bufferMatrices_->getTotalDataSize() / sizeof(osg::Vec4f), 1, 1, GL_RGBA32F_ARB, GL_RGBA, GL_FLOAT, (unsigned char*)bufferMatrices_->getDataPointer(), osg::Image::NO_DELETE );
-		osg::TextureBuffer* instancesTextureBuffer = new osg::TextureBuffer(instancesImage);
-		instancesTextureBuffer->setUsageHint(GL_STATIC_DRAW);
-		instancesTextureBuffer->setUnRefImageDataAfterApply(false);
-		
-		return instancesTextureBuffer;
-	}	
+            // we need to turn off display lists for instancing to work
+            geometry->setUseDisplayList(false);
+            geometry->setUseVertexBufferObjects(true);
 
-	osgAnimation::BoneMap InstancesManagerImpl::_getBoneMap(osg::Node* base_model)
-	{
-		FindNodeByType< osgAnimation::Skeleton> s_finder;  
-		s_finder.apply(*base_model);
+            if(animDataLoaded_)
+                _initSkinning(*geometry.get(), imageData_ );
 
-		auto* skel  = dynamic_cast<osgAnimation::Skeleton*>(s_finder.getLast());
-		osgAnimation::BoneMapVisitor mapVisitor;
-		skel->accept(mapVisitor);
-		return mapVisitor.getBoneMap();
-	}
+            geode->addDrawable(geometry);
+        }
 
+        _createTextureInstancesData();
 
-	osg::Geode* InstancesManagerImpl::_createGeode()
-	{
-		FindNodeByType< osg::Geode> geode_finder;  
-		geode_finder.apply(*src_model_);
-
-		osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
-		osg::Geometry* mesh = gnode->getDrawable(0)->asGeometry();
-
-		osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
-		osg::StateSet* pSS = geode->getOrCreateStateSet();
-		osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry(*mesh, osg::CopyOp::DEEP_COPY_ALL
-			& ~osg::CopyOp::DEEP_COPY_CALLBACKS
-			);
-
-		osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
-		geometry->setComputeBoundingBoxCallback(pDummyBBCompute);
-
-        // we need to turn off display lists for instancing to work
-        geometry->setUseDisplayList(false);
-        geometry->setUseVertexBufferObjects(true);
-
-		_createTextureInstancedData();
-        
-        _initSkinning(*geometry.get(), image_data_ );
-
-		geode->addDrawable(geometry);
 #if 0
-		pSS->setTextureAttributeAndModes(BASE_COLOR_TEXTURE_UNIT, texture, osg::StateAttribute::ON);
-		pSS->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
-		//pSS->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
+        pSS->setTextureAttributeAndModes(BASE_COLOR_TEXTURE_UNIT, texture, osg::StateAttribute::ON);
+        pSS->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
+        //pSS->setAttributeAndModes(new osg::AlphaFunc(osg::AlphaFunc::GEQUAL, 0.8f), osg::StateAttribute::ON);
 #endif
-        
-        pSS->setTextureAttributeAndModes(BASE_HW_INST_TEXTURE_UNIT, instTexture_.get(), osg::StateAttribute::ON);
+
+        pSS->setTextureAttributeAndModes(BASE_HW_INST_TEXTURE_UNIT, instTextureBuffer_.get(), osg::StateAttribute::ON);
         pSS->addUniform(new osg::Uniform("instanceMatrixTexture", BASE_HW_INST_TEXTURE_UNIT));
 
-		pSS->setTextureAttributeAndModes(BASE_HW_ANIMATION_TEXTURE_UNIT, animTexture_.get(), osg::StateAttribute::ON);
-		pSS->addUniform(new osg::Uniform("animationTex", BASE_HW_ANIMATION_TEXTURE_UNIT));
+        if(animDataLoaded_)
+        {
+            pSS->setTextureAttributeAndModes(BASE_HW_ANIMATION_TEXTURE_UNIT, animTextureBuffer_.get(), osg::StateAttribute::ON);
+            pSS->addUniform(new osg::Uniform("animationTex", BASE_HW_ANIMATION_TEXTURE_UNIT));
+        }
 
 
-
-		return geode.release();
-	}
+        return geode.release();
+    }
 
     void  InstancesManagerImpl::_initData()
     {
         const size_t x_num = 16; 
         const size_t y_num = 16;
-        
-        instancesData_.reserve( x_num * y_num);
 
+        instancesData_.reserve( x_num * y_num);
+#if 0
         // create some matrices
         srand(time(NULL));
+
         for (unsigned int i = 0; i < x_num; ++i)
         {
             for (unsigned int j = 0; j < y_num; ++j)
@@ -264,25 +241,27 @@ namespace avCore
                 addMatrix(modelMatrix);
             }
         }
+#endif
+
     }
 
 
-	bool  InstancesManagerImpl::_loadAnimationData(std::string const&  filename)
-	{
-		std::ifstream image_data_file(filename, std::ios_base::binary);
+    bool  InstancesManagerImpl::_loadAnimationData(std::string const&  filename)
+    {
+        std::ifstream image_data_file(filename, std::ios_base::binary);
 
-		if (image_data_file.good())
-		{
-			binary::bytes_t data;
-			data.resize(boost::filesystem::file_size(filename));
-			image_data_file.read(data.data(), data.size());
-			binary::unwrap(data, image_data_);
-			animTexture_ = _createAnimationTexture(image_data_);
-			return true;
-		}
+        if (image_data_file.good())
+        {
+            binary::bytes_t data;
+            data.resize(boost::filesystem::file_size(filename));
+            image_data_file.read(data.data(), data.size());
+            binary::unwrap(data, imageData_);
+            animTextureBuffer_ = _createAnimationTexture(imageData_);
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     bool InstancesManagerImpl::_initSkinning(osg::Geometry& geom, const image_data& id )
     {
@@ -321,83 +300,95 @@ namespace avCore
 
         return true;
     }
-             
+
     osg::Node *  InstancesManagerImpl::getObjectInstance()
     {  
         OpenThreads::ScopedLock<OpenThreads::Mutex> lock(mutex_);
 
         osg::Group* root = new osg::Group;
-        const unsigned  inst_id = inst_id_gen_.create();
+        const unsigned  inst_id = instIdGen_.create();
         root->setUserValue("inst_id", inst_id);
 
-        inst_nodes_.push_back(instanced_nodes_vector_t(root,nullptr));
+        instancesNodes_.push_back(InstancedNodeType(root,nullptr));
         return root; 
     }
 
     void InstancesManagerImpl::commitInstancesPositions()
     {
-        bool bcommit = false;
-        size_t inst_counter=0;
+        bool bCommit = false;
+        size_t instCounter=0;
 
-        inst_nodes_.erase(std::remove_if(inst_nodes_.begin(), inst_nodes_.end(),
-                                        [](const InstancedNodesVectorType::value_type& v){return v.second && (v.second->getNumParents()==0) && v.parented;})
-                                        , inst_nodes_.end());
-
-        for ( size_t idx = 0; idx < inst_nodes_.size(); ++idx )
+        if(animDataLoaded_)
         {
-            auto & nd = inst_nodes_[idx];
-            auto & inst_data = instancesData_[idx];
-			if(!nd.second)
-			{
-                nd.second = findFirstNode(nd.first,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-            }
+            instancesNodes_.erase(std::remove_if(instancesNodes_.begin(), instancesNodes_.end(),
+                [](const InstancedNodesVectorType::value_type& v){return v.second && (v.second->getNumParents()==0) && v.parented;})
+                , instancesNodes_.end());
 
-            if(nd.second && nd.second->getNumParents()>0)
-			{
-			  nd.parented  = true;
-			  osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
-              osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
-                                       * osg::Matrix::rotate(src_quat_ * matrix.getRotate())
-                                       * osg::Matrixf::translate(matrix.getTrans());
+            for ( size_t idx = 0; idx < instancesNodes_.size(); ++idx )
+            {
+                auto & nd = instancesNodes_[idx];
+                auto & inst_data = instancesData_[idx];
+                if(!nd.second)
+                {
+                    nd.second = findFirstNode(nd.first,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
+                }
 
-			  instancesData_[idx] = modelMatrix;
+                if(nd.second && nd.second->getNumParents()>0)
+                {
+                    nd.parented  = true;
+                    osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
+                    osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
+                        * osg::Matrix::rotate(srcQuat_ * matrix.getRotate())
+                        * osg::Matrixf::translate(matrix.getTrans());
 
-              float * data = (float*)instTexture_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
-              memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
-			  bcommit = true;
-              inst_counter++;
-			}
-            
-        } 
+                    instancesData_[idx] = modelMatrix;
 
-        if (inst_num_!=inst_counter)
-             bcommit = true;
-		
-        if(bcommit)
+                    float * data = (float*)instTextureBuffer_->getImage(0)->data( idx  *4u);
+                    memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
+                    bCommit = true;
+                    instCounter++;
+                }
+
+            } 
+        }
+        else
         {
-            instTexture_->getImage(0)->dirty();
+            instCounter = 	instancesData_.size();
+            float * data = (float*)instTextureBuffer_->getImage(0)->data(0);
 
-            instGeode_->setNodeMask(inst_counter>0?REFLECTION_MASK:0);
+            if (instNum_!=instCounter)
+                memcpy(data, instancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
+        }
+
+
+
+        if (instNum_!=instCounter)
+            bCommit = true;
+
+        if(bCommit)
+        {
+            instTextureBuffer_->getImage(0)->dirty();
+
+            instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
 
             for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
             { 
                 instGeode_->getDrawable(i)->dirtyBound();
-                        
-                //if(inst_counter != inst_nodes_.size())
-                if (inst_num_!=inst_counter)
+
+                if (instNum_!=instCounter)
                 {
                     auto geometry = instGeode_->getDrawable(i)->asGeometry();
                     // first turn on hardware instancing for every primitive set
-                    for (unsigned j = 0; j < geometry->getNumPrimitiveSets(); ++j)
+                    for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
                     {
-                        geometry->getPrimitiveSet(j)->setNumInstances(inst_counter);
+                        geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
                     }
                 }
 
             }
         }
-        
-        inst_num_ = inst_counter;
+
+        instNum_ = instCounter;
     }
- 
+
 }

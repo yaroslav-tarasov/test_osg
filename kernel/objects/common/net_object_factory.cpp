@@ -16,6 +16,8 @@
 #include "human/human_common.h"
 #include "common/human.h"
 
+#include "common/cloud_zone.h"
+
 #include "common/rocket_flare.h"
 #include "rocket_flare/rocket_flare_common.h"
 
@@ -234,6 +236,11 @@ inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg cons
     return camera::pack(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
 }
 
+object_info_ptr create_cloud_zone(kernel::system* csys, update_cloud_zone_msg const& msg)
+{
+    return  cloud_zone::create(dynamic_cast<fake_objects_factory*>(csys), msg.settings);
+}
+
 
 inline object_info_ptr create_rocket_flare(kernel::system* csys, create_msg const& msg)
 {
@@ -282,6 +289,10 @@ kernel::obj_create_data pack_object( kernel::system* csys, create_msg const& msg
 }
 
 }
+
+
+
+AUTO_REG_NAME(create_cloud_zone, create_cloud_zone)
 
 AUTO_REG_NAME(create_object, create_object)
 AUTO_REG_NAME(pack_object, pack_object)

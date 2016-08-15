@@ -42,6 +42,8 @@ void model::update(double time)
         sync_phys(dt);
 
         sync_nodes_manager(dt);
+        
+        update_contact_effects(time);
 
     }
 
@@ -146,6 +148,26 @@ void model::sync_phys(double dt)
 
 
 }
+
+
+void model::update_contact_effects(double time)
+{
+    if (!phys_model_)
+        return;
+
+    auto contacts = std::move(phys_model_->get_body_contacts());
+    if (!contacts.empty())
+    {
+        vector<msg::contact_effect::contact_t> contacts_to_send;
+
+        for (auto it = contacts.begin(); it != contacts.end(); ++it)
+            contacts_to_send.push_back(msg::contact_effect::contact_t(it->offset, it->vel));
+
+        set(msg::contact_effect(move(contacts_to_send), time), false);
+    }
+
+}
+
 
 void model::sync_nodes_manager( double /*dt*/ )
 {

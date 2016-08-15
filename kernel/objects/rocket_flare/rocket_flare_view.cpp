@@ -28,8 +28,7 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 
     msg_disp()
         .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1))
-        .add<msg::ropes_state> (boost::bind(&view::on_ropes_state, this, _1))
-        
+        .add<msg::contact_effect>(boost::bind(&view::on_contact_effect      , this, _1))
          
         ; 
 }
@@ -49,9 +48,9 @@ settings_t const& view::settings() const
     return settings_;
 }
 
-ropes_state_t const& view::ropes_state() const
+nodes_management::node_info_ptr view::root() const
 {
-    return ropes_state_;
+    return nodes_manager_->get_node(0);
 }
 
 void view::on_settings(msg::settings_msg const& msg)
@@ -60,14 +59,6 @@ void view::on_settings(msg::settings_msg const& msg)
 	settings_ = msg;
     on_new_settings();
 }
-
-void view::on_ropes_state(msg::ropes_state const& msg)
-{
-    ropes_state_ =  std::move(msg.state);
-
-    on_new_state();
-}
-
 
 
 void view::on_model_changed_internal()
@@ -85,7 +76,10 @@ void view::update(double time)
 {
 }
 
-
+void view::on_contact_effect(msg::contact_effect const& eff)      
+{
+    on_new_contact_effect(eff.time, eff.contacts);
+}
 
 } // rocket_flare 
 

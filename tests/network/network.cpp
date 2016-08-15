@@ -331,7 +331,7 @@ struct client
 
         ADD_EVENT(time , state_msg(0.0,time,factor))
 
-#if 0
+#if 1
         ADD_EVENT(10.0 , create_msg(333, cg::point_3(0.0,0.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds, "crow", "", 50)) 
 #if 1
         ADD_EVENT(25.0 , destroy_msg(333)) 
@@ -344,7 +344,7 @@ struct client
 
 
 
-#if 0
+#if 1
         ADD_EVENT(10.0 , create_msg(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create_msg(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
@@ -532,7 +532,17 @@ struct client
 
 	inline void set_weather()
 	{
-		environment::weather_t  weather; 
+		
+        cloud_zone::settings_t   settings;
+        settings.points.push_back(cg::geo_point_2(1000,1000));
+        settings.points.push_back(cg::geo_point_2(1000,0));
+        settings.points.push_back(cg::geo_point_2(0,0));
+        settings.points.push_back(cg::geo_point_2(0,1000));
+
+        ADD_EVENT(2.0, update_cloud_zone_msg(90000, settings))
+        
+        
+        environment::weather_t  weather; 
 		weather.fog_density  = 0.2f; 
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
 		weather.wind_dir     = cg::point_2f(2.0, 4.0);
@@ -680,7 +690,7 @@ struct client
             ADD_EVENT(19.0  , create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
-			ADD_EVENT(7.0  , create_msg(6666,cg::point_3(0,0,5),cg::cpr(0,90)   , ok_rocket_flare, "rocket_flare", "6666") )
+			ADD_EVENT(20.0  , create_msg(6666,cg::point_3(0,0,5),cg::cpr(0,90)   , ok_rocket_flare, "rocket_flare", "6666") )
 
 
 #if 1

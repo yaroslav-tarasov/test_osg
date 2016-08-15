@@ -139,14 +139,7 @@ namespace {
     {
     }
 
-    bool impl::has_contact() const
-    {
-        if (has_chassis_contact_)
-            return true;
-
-        return false;
-    }
-    
+   
     void  impl::set_linear_velocity (point_3 const& v)
     {
         chassis_->setLinearVelocity(to_bullet_vector3(v));
@@ -178,6 +171,14 @@ namespace {
 		body_contact_points_.clear();
 		body_contacts_.clear();
 	}
+    
+    bool impl::has_contact() const
+    {
+        if (has_chassis_contact_)
+            return true;
+
+        return false;
+    }
 
     void impl::has_contact(bt_body_user_info_t const* /*other*/, point_3 const& local_point, point_3 const& vel)
     {

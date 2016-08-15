@@ -1398,10 +1398,6 @@ $endif
 \n
 \n            void main (void)
 \n            {
-\n                // GET_SHADOW(f_in.viewpos, f_in);
-\n                //float shadow = 1.0; 
-\n                //if(ambient.a > 0.35)
-\n                //    shadow = PCF_Ext(shadowTexture0, f_in.shadow_view, ambient.a);
 \n                
 \n                float shadow =  shadow_fs_main(ambient.a);
 \n
@@ -1467,7 +1463,7 @@ $endif
                 float night_factor = step(ambient.a, 0.35);
                 vec3 result = mix(day_result, night_tex,  night_factor * glass_factor ); // 
                
-                aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
+                aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), 1.0);
             }
             )
 
@@ -2109,6 +2105,19 @@ $endif
         SHADERS_GETTER(get_shader, vs, skinning_mat::fs)
 
         AUTO_REG_NAME(skininst, skinning_inst_mat::get_shader)
+    }
+    
+    namespace skinning_inst2_mat
+    {
+
+        const char* vs =  STRINGIFY(
+            \n#include "data/materials/misc/skinning_inst2.vert"
+            );
+
+
+        SHADERS_GETTER(get_shader, vs, skinning_mat::fs)
+
+        AUTO_REG_NAME(skininst2, skinning_inst2_mat::get_shader)
     }
 
     namespace concrete_mat 

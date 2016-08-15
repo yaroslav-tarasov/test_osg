@@ -267,6 +267,9 @@
     <Filter Include="Header Files\objects\rocket_flare">
       <UniqueIdentifier>{a41ebfcd-b726-43e0-a780-7ec7325e1427}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\cloud_zone">
+      <UniqueIdentifier>{5909032c-4a62-45f1-8440-623375530313}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="misc\shaders\tess_quad.tcs">
@@ -1389,6 +1392,15 @@
     </ClCompile>
     <ClCompile Include="av\avScene\av_scene.cpp">
       <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_ctrl.cpp">
+      <Filter>Source Files\objects\cloud_zone</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_view.cpp">
+      <Filter>Source Files\objects\cloud_zone</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_vis.cpp">
+      <Filter>Source Files\objects\cloud_zone</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

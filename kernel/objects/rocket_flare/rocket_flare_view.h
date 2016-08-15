@@ -39,6 +39,11 @@ struct view
     static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
 protected:
+    typedef 
+        msg::contact_effect::contact_t 
+        contact_t;
+
+protected:
     view( kernel::object_create_t const& oc, dict_copt dict );
 
     // base_presentation
@@ -52,23 +57,29 @@ protected:
 
 protected:
     settings_t    const& settings() const;
-    ropes_state_t const& ropes_state() const;
 
+    nodes_management::node_info_ptr root() const;
+
+     // msg dispatching
 private:
     void on_settings              ( msg::settings_msg const& msg );
-    void on_model_changed_internal();
-    void on_ropes_state           ( msg::ropes_state const& msg );
+    void on_contact_effect      (msg::contact_effect    const& eff     );
+
 private:
     virtual void on_new_settings(){}
     virtual void on_model_changed(){}
     virtual void on_new_state(){}
+    
+    void on_model_changed_internal();
+
+    virtual void on_new_contact_effect      (double /*time*/, std::vector<contact_t> const& /*contacts*/){}
+
 protected:
     nodes_management::manager_ptr       nodes_manager_;
     nodes_management::node_control_ptr  root_;
 
-   	//aircraft::info_ptr                     target_;
 	 boost::optional<uint32_t>            target_id_;
-	     std_simple_randgen                      rnd_;
+	 std_simple_randgen                        rnd_;
 private:
     ropes_state_t                       ropes_state_;
 

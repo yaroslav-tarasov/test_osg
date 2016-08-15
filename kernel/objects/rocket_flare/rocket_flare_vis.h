@@ -2,6 +2,12 @@
 
 #include "rocket_flare_view.h"
 
+namespace visual_objects
+{
+    struct fire_trace_support;
+}
+
+#include "av/avFx/Fx.h"
 
 namespace rocket_flare
 {
@@ -22,10 +28,13 @@ private:
     // view
 private:
     void on_new_state() override;
+    void on_new_contact_effect(double time, std::vector<contact_t> const& contacts) override;
 
 private:
-    visual_object_ptr    flare_object_;
-    // RopesNodePtr         flare_weak_ptr_;
+    // visual_object_ptr    flare_object_;
+    visual_system*                                         vsys_;
+
+    boost::shared_ptr<visual_objects::fire_trace_support>     fs_;
 
 
 };

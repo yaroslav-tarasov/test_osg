@@ -7,6 +7,7 @@
 using network::gen_msg;
 
 #include "common/meteo_local.h"
+#include "common/cloud_zone.h"
 
 #include "ext_msg_enum.h"
 
@@ -448,8 +449,27 @@ namespace net_layer
     REFL_END()
     
 
+    struct update_cloud_zone_msg
+        : network::msg_id<id_cloud_zone>
+    {
+        update_cloud_zone_msg( uint32_t ext_id, const cloud_zone::settings_t & settings)
+            : ext_id ( ext_id )
+            , settings (settings)
+        {
+        }
 
-    }
+        update_cloud_zone_msg() {}
+        
+        uint32_t                 ext_id;
+        cloud_zone::settings_t   settings;
+    };
+
+    REFL_STRUCT(update_cloud_zone_msg)
+        REFL_SER( ext_id   )
+        REFL_SER( settings )
+    REFL_END()
+
+}  // msg
 
 
 }
