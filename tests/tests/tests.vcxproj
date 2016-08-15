@@ -150,7 +150,9 @@
     <ClCompile Include="..\patch-lowlevel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\phys_viewer.cpp" />
+    <ClCompile Include="..\phys_viewer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\render_points.cpp" />
     <ClCompile Include="..\shadow_map.cpp" />
     <ClCompile Include="..\SkyBox.cpp" />

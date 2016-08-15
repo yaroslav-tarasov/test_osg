@@ -381,6 +381,9 @@
       <Filter>Source Files\shaders\fx</Filter>
     </None>
     <None Include="Memo.txt" />
+    <None Include="misc\shaders\skinning_inst2.vert">
+      <Filter>Source Files\shaders\animation</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

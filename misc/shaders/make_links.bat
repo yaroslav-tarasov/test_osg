@@ -3,6 +3,7 @@ mklink  %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\grass\grass.frag
 mklink  %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\grass\grass.vert %~dp0\grass.vert 
 mklink  %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\skinning.vert    %~dp0\skinning.vert 
 mklink  %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\skinning_inst.vert    %~dp0\skinning_inst.vert 
+mklink  %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\skinning_inst2.vert    %~dp0\skinning_inst2.vert 
 
 IF NOT EXIST %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\flame (
 mkdir   %OSG_DIR%\OpenSceneGraph-3.2.1\build\bin\data\materials\flame

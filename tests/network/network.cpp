@@ -333,7 +333,7 @@ struct client
 
 #if 1
         ADD_EVENT(10.0 , create_msg(333, cg::point_3(0.0,0.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds, "crow", "", 50)) 
-#if 1
+#if 0
         ADD_EVENT(25.0 , destroy_msg(333)) 
 #endif
 #endif
@@ -348,8 +348,10 @@ struct client
         ADD_EVENT(10.0 , create_msg(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
         ADD_EVENT(50.0 , create_msg(4, cg::point_3(0.0,0.0,0.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow", "", 20)) 
 
+#if 0
         ADD_EVENT(52.0 , destroy_msg(3)) 
         ADD_EVENT(80.0 , destroy_msg(4)) 
+#endif
 #endif
 
 

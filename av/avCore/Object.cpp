@@ -143,7 +143,7 @@ void  Object::setupInstancedHWAnimated(const std::string& hw_anim_file)
         
         std::string anim_file_name =  osgDB::findFileInPath(hw_anim_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
 
-        _inst_manager = CreateInstancesManager(HW_DEFAULT/*HW_ANIMATED*/,_node.get(), anim_file_name); 
+        _inst_manager = CreateInstancesManager(/*HW_DEFAULT*/HW_ANIMATED,_node.get(), anim_file_name); 
         
         // Двойная регистрация кэш и клоны, для спец узла (последствия?)
         ObjectManager::get().RegisterClone(this);
@@ -453,7 +453,7 @@ Object* CreatePrototype( std::string name, bool fclone, osg::CopyOp copyop )
         nl.push_back("tree");
         nl.push_back("rotor"); 
 
-        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,(data && data->hw_instanced)?"inst":"",sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
+        MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,name,sp::_3,(data && data->hw_instanced && data->hw_data.size()==0)?"inst":"",sp::_4),/*nullptr*//*[=](osg::Node* model,std::string mat_name){}*/creators::computeAttributes,utils::singleton<mat::reader>::instance().read(mat_file_name));
         pat->accept(mv);
 
         pat->setName("pat");

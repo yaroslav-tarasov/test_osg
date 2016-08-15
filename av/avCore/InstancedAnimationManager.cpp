@@ -223,7 +223,7 @@ namespace avCore
         const size_t y_num = 16;
         
         instancesData_.reserve( x_num * y_num);
-#if 0
+#if 1
         // create some matrices
         srand(time(NULL));
 

@@ -273,7 +273,7 @@ namespace avCore
             return false;
         }
 
-        osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst").program; 
+        osg::ref_ptr<osg::Program> cSkinningProg = creators::createProgram("skininst2").program; 
         cSkinningProg->setName("SkinningShader");
 
         const int attribIndex = cAttribSkinningBaseIndex;
