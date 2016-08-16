@@ -86,6 +86,7 @@ namespace avCore
 	    if(tr->asPositionAttitudeTransform())
 		{
 			srcQuat_ = tr->asPositionAttitudeTransform()->getAttitude();
+            srcScale_  = tr->asPositionAttitudeTransform()->getScale();
 		}
 		else
 		if(tr->asMatrixTransform())
@@ -223,7 +224,7 @@ namespace avCore
         const size_t y_num = 16;
         
         instancesData_.reserve( x_num * y_num);
-#if 1
+#if 0
         // create some matrices
         srand(time(NULL));
 
@@ -345,7 +346,7 @@ namespace avCore
 				{
 				  nd.parented  = true;
 				  osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
-				  osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
+				  osg::Matrixf modelMatrix = osg::Matrixf::scale(/*instancesData_[idx].getScale()*/srcScale_) 
 										   * osg::Matrix::rotate(srcQuat_ * matrix.getRotate())
 										   * osg::Matrixf::translate(matrix.getTrans());
 

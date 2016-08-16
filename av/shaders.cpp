@@ -1646,15 +1646,14 @@ $endif
             in mat4 viewworld_matrix;
             )
 
-                INCLUDE_FUNCS
-                INCLUDE_FOG_FUNCS
-                INCLUDE_VS
-                //			INCLUDE_PCF_EXT
-                INCLUDE_SCENE_PARAM
-                SHADOW_INCLUDE
-                STRINGIFY ( 
+            INCLUDE_FUNCS
+            INCLUDE_FOG_FUNCS
+            INCLUDE_VS
+            INCLUDE_SCENE_PARAM
+            SHADOW_INCLUDE
+            STRINGIFY ( 
 
-                uniform sampler2D       colorTex;
+            uniform sampler2D       colorTex;
             uniform sampler2D       nightTex;
 
             in block

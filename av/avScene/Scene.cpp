@@ -1710,6 +1710,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 #endif
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000, async);
+        // load("birch",_terrainRoot, 15000, async);
         // load("caponier",_terrainRoot, 15000, async);
         // load("ka_50",_terrainRoot, 15000, false); 
 

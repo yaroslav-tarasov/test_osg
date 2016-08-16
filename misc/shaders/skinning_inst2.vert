@@ -28,7 +28,7 @@ vec4    position;
 vec3    normal;
 
 uniform sampler2DRect          animationTex;
-uniform samplerBuffer instanceMatrixTexture;
+uniform samplerBuffer		instancesBuffer;
 
 mat4  getBoneMatrix ( int idx )
 {
@@ -86,14 +86,12 @@ out block
 
 void main( void )
 {
-    
-	vec2 instanceCoord = vec2((gl_InstanceID % 4096) * 4.0, gl_InstanceID / 4096);
-	int instanceAddress = gl_InstanceID * 4;
+    int instanceAddress = gl_InstanceID * 4;
 
-	mat4 instanceModelMatrix = mat4(vec4(texelFetch(dataBuffer, instanceAddress).xyz),0.0),
-									vec4(texelFetch(dataBuffer, instanceAddress + 1).xyz,0.0),
-									vec4(texelFetch(dataBuffer, instanceAddress + 2).xyz,0.0),
-									vec4(texelFetch(dataBuffer, instanceAddress + 3).xyz,1.0)
+	mat4 instanceModelMatrix = mat4(vec4(texelFetch(instancesBuffer, instanceAddress).xyz    ,0.0),
+									vec4(texelFetch(instancesBuffer, instanceAddress + 1).xyz,0.0),
+									vec4(texelFetch(instancesBuffer, instanceAddress + 2).xyz,0.0),
+									vec4(texelFetch(instancesBuffer, instanceAddress + 3).xyz,1.0)
 									);
 										
 	mat3 normalMatrix = mat3(instanceModelMatrix[0][0], instanceModelMatrix[0][1], instanceModelMatrix[0][2],

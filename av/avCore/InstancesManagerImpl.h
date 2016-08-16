@@ -75,6 +75,7 @@ namespace avCore
     private:
         osg::observer_ptr<osg::Node>             srcModel_;
         osg::Quat                                srcQuat_;
+ 		osg::Vec3                                srcScale_;
         // Instanced staff   
         osg::ref_ptr<osg::Geode>                 instGeode_;
 

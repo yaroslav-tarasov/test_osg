@@ -668,7 +668,7 @@ struct client
 
 #if 1
 
-#if 0
+#if 1
         ADD_EVENT(10.0  , create_msg(151,point_3(-435,162,0),cg::cpr(353), ok_helicopter, "KA50", "151") )
         ADD_EVENT(11.0  , create_msg(152,point_3(-485,309,0),cg::cpr(353), ok_helicopter, "KA50", "152") )
 

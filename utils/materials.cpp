@@ -380,7 +380,7 @@ class programsHolder: public programsHolder_base
 public:
     static inline const program_t& Create(const std::string& mat_name , const std::string& mat_suffix, const std::string& preprocessorDefinitions = std::string())
     {
-        const uint16_t version = GLSL_VERSION;
+        const uint16_t version = /*mat_name == "skininst25"? 420 :*/ GLSL_VERSION;
         const std::string  comp_str = GLSL_VERSION>=150 ?" compatibility":"";
 
         const std::string  mat_name_cut = GetMaterialName(mat_name) + (mat_suffix.size()>0?(mat_suffix):"");
@@ -415,7 +415,7 @@ public:
 
         if(shader_text)
         {
-            std::string prog = "#version " + boost::lexical_cast<string>(version) +  comp_str + "\n " 
+            std::string prog = "#version " + boost::lexical_cast<string>(version) +  " " + comp_str + "\n " 
                 + preprocessorDefinitions                                                     + "\n " 
                 + osg_modification(version,Utils::format(*shader_text));
             return new osg::Shader( static_cast<osg::Shader::Type>(t), prog );

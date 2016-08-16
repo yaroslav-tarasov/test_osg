@@ -86,6 +86,7 @@ namespace avCore
         if(tr->asPositionAttitudeTransform())
         {
             srcQuat_ = tr->asPositionAttitudeTransform()->getAttitude();
+            srcScale_  = tr->asPositionAttitudeTransform()->getScale();
         }
         else
             if(tr->asMatrixTransform())
@@ -133,8 +134,8 @@ namespace avCore
 
         instTextureBuffer_ = new osg::TextureBuffer(image);
         instTextureBuffer_->setInternalFormat(GL_RGBA32F_ARB);
-        //instTextureBuffer_->setSourceFormat(GL_RGBA);
-        //instTextureBuffer_->setSourceType(GL_FLOAT);
+        instTextureBuffer_->setSourceFormat(GL_RGBA);
+        instTextureBuffer_->setSourceType(GL_FLOAT);
 
 
         // copy part of matrix list and create bounding box callback
@@ -197,7 +198,7 @@ namespace avCore
 #endif
 
         pSS->setTextureAttributeAndModes(BASE_HW_INST_TEXTURE_UNIT, instTextureBuffer_.get(), osg::StateAttribute::ON);
-        pSS->addUniform(new osg::Uniform("instanceMatrixTexture", BASE_HW_INST_TEXTURE_UNIT));
+        pSS->addUniform(new osg::Uniform("instancesBuffer", BASE_HW_INST_TEXTURE_UNIT));
 
         if(animDataLoaded_)
         {
@@ -337,7 +338,7 @@ namespace avCore
                 {
                     nd.parented  = true;
                     osg::Matrixf matrix = nd.second->asTransform()->asMatrixTransform()->getMatrix();
-                    osg::Matrixf modelMatrix = osg::Matrixf::scale(instancesData_[idx].getScale()) 
+                    osg::Matrixf modelMatrix = osg::Matrixf::scale(/*instancesData_[idx].getScale()*/srcScale_) 
                         * osg::Matrix::rotate(srcQuat_ * matrix.getRotate())
                         * osg::Matrixf::translate(matrix.getTrans());
 
@@ -389,6 +390,7 @@ namespace avCore
         }
 
         instNum_ = instCounter;
+
     }
 
 }
