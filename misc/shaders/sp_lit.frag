@@ -1,7 +1,16 @@
 //      sp_lit.frag
 
-#define saturate(x) clamp(x, 0.0, 1.0)
 #define kPi 3.1415926535897
+
+float saturate( const in float x )
+{                                 
+    return clamp(x, 0.0, 1.0);
+}
+ 
+vec3 saturate( const in vec3 x )
+{                                 
+    return clamp(x, vec3(0.0), vec3(1.0));
+} 
 
 vec3 LinearToSrgb(vec3 rgb)
 {
@@ -199,6 +208,7 @@ in       vec3     normal;
 
 void main()
 {
+
 	vec3 surfacePos    = gl_TexCoord[0].xyz;
 	vec3 surfaceNormal = gl_TexCoord[1].xyz;
 	vec3 cameraPos     = gl_ModelViewMatrixInverse[3].xyz;
@@ -214,16 +224,18 @@ void main()
 	vec3 scatter = g_lightCol.xyz * vec3(0.2, 0.5, 0.8) * InScatter(cameraPos, dir, lightPos, l) * g_scatteringCoefficient;
 	
 	// calculate contribution from diffuse reflection
-	float diffuse;
-	float specular;
+	float diffuse = 0.0f;
+	float specular = 0.0f;
 
-	float specularExponent = 15.0;
-	float specularIntensity = 0.02;
-
+	float specularExponent = 15.0f;
+	float specularIntensity = 0.02f;
+ 
 	Li(/*surfacePos*/pos, /*surfaceNormal*/normal, lightPos, cameraPos, specularExponent, diffuse, specular);
 
 	vec3 r = LinearToSrgb(g_lightCol.xyz * (diffuse + specular * specularIntensity) + scatter);
+	// vec3 r = any(isnan(vec3(diffuse, specular, specularIntensity)))? vec3(1.0):vec3(0.0,1.0,0.0);
 
 	gl_FragColor = vec4(r, length(r) * length(r) * saturate(dot(cameraPos, normal ))) ;
-	//gl_FragColor = vec4(texture3D( g_noiseTexture, surfacePos * 0.1).xyz, 1.0);
+	// gl_FragColor = vec4(texture3D( g_noiseTexture, surfacePos * 0.1).xyz, 1.0);
+	// gl_FragColor = vec4(1.0);
 }

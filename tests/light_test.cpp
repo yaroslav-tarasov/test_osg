@@ -113,12 +113,14 @@ namespace {
         "#version 430 compatibility \n"
         "#extension GL_ARB_gpu_shader5 : enable \n"
         "uniform sampler2D colorTex; \n"
+        "uniform sampler3D testTex; \n"
         "in vec2 uv;  \n"
         "out vec4 FragColor;   \n"
         "\n"
         "void main(void) \n"
         "{ \n"
         "\n"
+        "    vec4 ttt = vec4(texelFetch(testTex,ivec3(0,0,0),0).r);"
         "    FragColor = vec4(texture2D(colorTex, uv).rgb, 0.4);"
         "}\n";
 
@@ -180,9 +182,46 @@ osg::Camera* createHUD()
         osg::StateSet* pCurStateSet = geode->getOrCreateStateSet();
         pCurStateSet->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
+#if 0
         osg::ref_ptr<osg::Program> program;
         program = createProgram("Logo",vertexShaderSource,fragmentShaderSource);
-        pCurStateSet->setAttributeAndModes(program);	
+        pCurStateSet->setAttributeAndModes(program);
+#endif	
+
+#if 1
+
+        osg::Matrix m;
+        osg::Matrix mi;
+
+        m.makeTranslate(osg::Vec3(0,0,0));
+        pCurStateSet->addUniform(new osg::Uniform("g_lightToWorld"  , m));
+
+        mi = osg::Matrix::inverse(m);
+        pCurStateSet->addUniform(new osg::Uniform("g_worldToLight"           , mi));
+        pCurStateSet->addUniform(new osg::Uniform("g_lightCol"               , osg::Vec4(1,1,1,0.87)));
+        pCurStateSet->addUniform(new osg::Uniform("g_scatteringCoefficient"  , 1.f));
+
+
+        osg::ref_ptr<osg::Program> cLightProg = creators::createProgram("splight").program; 
+        cLightProg->setName("LightShader2");
+        pCurStateSet->setAttributeAndModes(cLightProg.get(), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+        //pCurStateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
+#if 1
+        pCurStateSet->setMode( GL_ALPHA_TEST, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+        //pStateSet->setAttribute( new osg::AlphaFunc(osg::AlphaFunc::GREATER, 0.99f), osg::StateAttribute::ON );
+
+
+        // setup blending
+        osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+        pCurStateSet->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
+
+        osg::BlendEquation* pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
+        pCurStateSet->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+#endif
+
+#endif
+
+
 
 #if 0
         pCurStateSet->addUniform(new osg::Uniform("colorTex", BASE_COLOR_TEXTURE_UNIT));
@@ -272,11 +311,6 @@ osg::Camera* createHUD()
 
         {
             osg::BoundingBox bb(osg::Vec3f(0,0,0),osg::Vec3f(1280,1024,0));
-            //for(unsigned int i=0;i<geode->getNumDrawables();++i)
-            //{
-            //	bb.expandBy(geode->getDrawable(i)->getBound());
-            //}
-
 
             osg::Geometry* geom = new osg::Geometry;
 
@@ -293,7 +327,7 @@ osg::Camera* createHUD()
             geom->setNormalArray(normals, osg::Array::BIND_OVERALL);
 
             osg::Vec4Array* colors = new osg::Vec4Array;
-            colors->push_back(osg::Vec4(1.0f,0.0,0.2f,0.2f));
+            colors->push_back(osg::Vec4(1.0f,1.0,0.2f,0.2f));
             geom->setColorArray(colors, osg::Array::BIND_OVERALL);
 
             osg::Vec2Array* uv = new osg::Vec2Array;
@@ -307,10 +341,13 @@ osg::Camera* createHUD()
 
             geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
 
-            osg::StateSet* stateset = geom->getOrCreateStateSet();
-            stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
+
+            osg::StateSet* pStateSet = geom->getOrCreateStateSet();
+#if 0
+            pStateSet->setMode(GL_BLEND,osg::StateAttribute::ON);
             //stateset->setAttribute(new osg::PolygonOffset(1.0f,1.0f),osg::StateAttribute::ON);
-            stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+            pStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+#endif
 
             geode->addDrawable(geom);
         }
@@ -319,10 +356,6 @@ osg::Camera* createHUD()
     }
 #endif
      
-    //osg::Geode* geode = new osg::Geode();
-    //geode->addDrawable(createGeometry());
-    //camera->addChild(geode);
-
 
     return camera;
 }
@@ -349,14 +382,6 @@ bool Create( osgViewer::Viewer* vw )
 
     vw->addSlave(hudCamera, false);
 
-    // set the scene to render
-    // vw->setSceneData(scene.get());
-
-    //if (!vw->getCameraManipulator() && vw->getCamera()->getAllowEventFocus())
-    //{
-    //    vw->setCameraManipulator(new osgGA::TrackballManipulator());
-    //}
-
     return true;
 }
 
@@ -375,7 +400,7 @@ int main_light_test( int argc, char** argv )
 
     osg::ref_ptr<osg::MatrixTransform> root = new osg::MatrixTransform;
 
-
+    osg::setNotifyLevel( osg::INFO );
 
     osg::Geode*		geodeLit = new osg::Geode();	
     osg::ref_ptr<osg::Geometry> geom = createGeometry();
@@ -409,28 +434,36 @@ int main_light_test( int argc, char** argv )
 	pStateSet->addUniform(new osg::Uniform("g_scatteringCoefficient"  , 1.f));
 
 
+#if 1
     osg::ref_ptr<osg::Program> cLightProg = creators::createProgram("splight").program; 
     cLightProg->setName("LightShader");
     pStateSet->setAttributeAndModes(cLightProg.get());
 	pStateSet->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
 	
-	pStateSet->setMode( GL_ALPHA_TEST, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+	//pStateSet->setMode( GL_ALPHA_TEST, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 	//pStateSet->setAttribute( new osg::AlphaFunc(osg::AlphaFunc::GREATER, 0.99f), osg::StateAttribute::ON );
 
 	// setup blending
 	osg::BlendFunc * pBlendFunc = new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-	pStateSet->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
+	//pStateSet->setAttributeAndModes(pBlendFunc, osg::StateAttribute::ON);
 
 	osg::BlendEquation* pBlendEquation = new osg::BlendEquation(osg::BlendEquation::FUNC_ADD);
-	pStateSet->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
-	
-	//pStateSet->setRenderBinDetails(0, "DepthSortedBin");
-	//pStateSet->setRenderBinDetails(1, "DepthSortedBin");
-	//pStateSet->setNestRenderBins(false);
+	//pStateSet->setAttributeAndModes(pBlendEquation,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
+#endif	
 
 	viewer.apply(new osgViewer::SingleScreen(1));
 
     Create(&viewer);
+
+    osgViewer::Viewer::Windows windows;
+    viewer.getWindows(windows);
+    for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
+        itr != windows.end();
+        ++itr)
+    {
+        osg::State *s=(*itr)->getState();
+        s->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
+    }
 
     // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
