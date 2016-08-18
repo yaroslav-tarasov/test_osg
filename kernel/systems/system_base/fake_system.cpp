@@ -1297,6 +1297,7 @@ struct visual_system_impl
     : visual_system
     , visual_system_props
     , fake_system_base
+	, av::IFreeViewControl
     //, victory::widget_control
 {
     visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props);
@@ -1330,6 +1331,10 @@ private:
     void            object_destroying(object_info_ptr object);
 
 private:
+	virtual void   FreeViewOn() ;
+	virtual void   FreeViewOff();
+
+private:
     av::IVisualPtr            visual  () override;
     av::IScenePtr             scene   () override;
 
@@ -1350,10 +1355,14 @@ private:
 
 private:
     visual_control_ptr      eye_;
+	bool                    free_cam_;
+
 
     std::set<uint32_t>      objects_to_create_;
     bool                    ready_;
     uint32_t                obj_counter_;
+
+	
 };
 
 
@@ -1367,8 +1376,10 @@ visual_system_impl::visual_system_impl(msg_service& service, av::IVisualPtr vis,
 
     , props_(props)
     , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&visual_system_impl::object_destroying, this, _1)))
+	, free_cam_(false)
 {
     LogInfo("Create Visual Subsystem");
+	vis_->SetFreeViewControl(this);
 }
 
 av::IVisualPtr   visual_system_impl::visual()
@@ -1386,7 +1397,8 @@ void visual_system_impl::update(double time)
     fake_system_base::update(time);
 
     // scene_->update(time);
-    update_eye();
+    if(!free_cam_)
+		update_eye();
 }
 
 vis_sys_props const& visual_system_impl::vis_props() const
@@ -1506,6 +1518,13 @@ void visual_system_impl::object_destroying(object_info_ptr object)
     //else if (debug_eye_ && debug_eye_->track_object == object)
     //    debug_eye_.reset();
 }
+
+
+void visual_system_impl::FreeViewOn()  {free_cam_ = true;}
+void visual_system_impl::FreeViewOff() {free_cam_ = false;} 
+
+
+
 #pragma  endregion
 
 

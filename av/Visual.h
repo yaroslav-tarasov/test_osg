@@ -16,6 +16,8 @@ public:
 
     void   Update(double ref_time)           override;
     void   Render(double ref_time)           override;
+    
+	void   SetFreeViewControl(IFreeViewControl * fvc) override; 
 
     double GetInternalTime ()               override;
     void   CreateScene     ()               override;
@@ -42,7 +44,6 @@ private:
 
 private:
     osg::ref_ptr<osgViewer::Viewer>             _viewerPtr;
-
 };
 
 }

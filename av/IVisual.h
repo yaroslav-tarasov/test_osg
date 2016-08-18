@@ -5,16 +5,24 @@
 
 namespace av
 {
-    struct VISUAL_API IVisual 
+   	struct  IFreeViewControl
+	{
+		virtual void  FreeViewOn()   = 0;
+		virtual void  FreeViewOff()   = 0;
+	};
+
+	struct VISUAL_API IVisual 
     {
         virtual void  Initialize()   = 0;
         virtual void  Deinitialize() = 0;
 
         virtual void  Update(double ref_time = -1.0)       = 0;
         virtual void  Render(double ref_time = -1.0)       = 0;
+														    
+        virtual void  SetFreeViewControl(IFreeViewControl * fvc) = 0;
 
         virtual osgViewer::Viewer* GetViewer() const       = 0;
-        virtual IScenePtr          GetScene() const       = 0;
+        virtual IScenePtr          GetScene() const        = 0;
 
         virtual void  SetPosition (const cg::point_3f&, const cg::quaternion&) =0;
 

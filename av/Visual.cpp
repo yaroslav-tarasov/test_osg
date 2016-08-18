@@ -344,6 +344,46 @@ void Visual::PreUpdate   (double ref_time)
      ObjectManager::get().PreUpdate();
 }
 
+ 
+namespace 
+{
+ class FreeViewControl : public osgGA::GUIEventHandler
+ {
+
+ public:  
+	 FreeViewControl(IFreeViewControl *  fvc) 
+		 : _fvc (fvc)
+	 {}
+
+	 virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
+	 {
+		 if (!ea.getHandled() && ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN)
+		 {
+			 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Space)
+			 {
+				  _fvc->FreeViewOff();
+				 return true;
+			 }
+
+			 _fvc->FreeViewOn();
+		 }
+
+		 return false;
+	 } 
+
+ private:
+	IFreeViewControl *                          _fvc;
+
+ };
+
+}
+
+
+void  Visual::SetFreeViewControl(IFreeViewControl * fvc) 
+{
+	 _viewerPtr->addEventHandler(new FreeViewControl(fvc));
+}
+
 void  Visual::Render(double ref_time)
 {
     static bool run_once = false;
@@ -399,6 +439,6 @@ IVisual *  CreateVisual()
     iv->Initialize();
     return iv;
 }
-
+         
 
 }
