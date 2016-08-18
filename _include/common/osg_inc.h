@@ -6,6 +6,7 @@
 //
 #include <osg/io_utils>
 
+#include <osg/Version>
 #include <osg/Notify>
 #include <osg/MatrixTransform>
 #include <osg/PositionAttitudeTransform>

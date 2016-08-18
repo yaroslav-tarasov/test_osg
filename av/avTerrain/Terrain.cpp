@@ -495,6 +495,15 @@ void  Terrain::Create( const std::string& cFileName )
 
 	}
 
+    for(auto it = data.cams.begin(); it != data.cams.end(); ++it)
+    {
+        const avCore::camera_params& cp = *it;
+        
+        auto mt = new osg::MatrixTransform( osg::Matrix::rotate(to_osg_quat(cg::cpr(cp.course))) * osg::Matrix::translate(cp.pos));
+        mt->setName(cp.name);
+        baseModel->addChild(mt);
+    }
+
 
     force_log fl;						   
     LOG_ODS_MSG( "Terrain::create  " << hr_timer.set_point() << "\n");

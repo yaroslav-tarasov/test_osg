@@ -10,7 +10,6 @@ namespace fms
 };
 
 
-
 namespace av
 {
 
@@ -78,6 +77,14 @@ namespace av
         virtual void set(const fms::trajectory_ptr traj,const cg::coloraf& color) = 0;
     };
 
+    struct CameraParam
+    {
+        cg::point_3     pos;
+        cg::quaternion  orien;
+    };
+
+    typedef vector<CameraParam>  SceneCamsList;
+
     // interface declaration
     struct IScene /*: ref_counter*/
     {
@@ -88,7 +95,10 @@ namespace av
 #if 0
         virtual debug_render_ptr        get_scene_debug_renderer() const = 0;
 #endif
-        virtual ITrajectoryDrawer*      GetTrajectoryDrawer() const = 0; 
+        virtual ITrajectoryDrawer*      GetTrajectoryDrawer() const = 0;
+
+        virtual const SceneCamsList&    GetSceneCamsList()  const = 0;
+
     };
 
 

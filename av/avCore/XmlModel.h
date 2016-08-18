@@ -85,6 +85,7 @@ namespace avCore
     
     struct camera_params
     {
+        std::string name;
         osg::Vec3 pos;
         float     course;
     };

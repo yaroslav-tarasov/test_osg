@@ -10,7 +10,7 @@ namespace airport
 struct vis
     : view 
     , vis_info
-//  , visual_control
+    , visual_control
 {
     static object_info_ptr create(object_create_t const& oc, dict_copt dict);
 
@@ -35,6 +35,11 @@ private:
     geo_point_3 camera_pos  () const;
     cpr         camera_orien() const;
     double      zoom () const; 
+
+
+private:
+    geo_point_3 pos  () const override;
+    cpr         orien() const override;
 
 private:
     kernel::visual_system     * vis_sys_;

@@ -43,7 +43,7 @@ void vis::on_new_settings()
     //place_lights();
     //place_marking();
 
-    //retreive_camera();
+    retreive_camera();
     
 #if 0
     const static std::string lights_list[] = 
@@ -176,11 +176,39 @@ void vis::on_model_changed()
 
 void vis::retreive_camera()
 {
-    nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(this);
+    using namespace nodes_management;
+    
+    manager_ptr manager = find_first_child<manager_ptr>(this);
     Assert(manager);
 
-    nodes_management::node_info_ptr camera = manager->find_node("camera_tower");
+#if 0
+    node_info_ptr camera = manager->find_node("camera_tower");
     camera_pos_ = camera->position().global();
+#endif
+
+    auto const& vis_nodes = vis_node_control_ptr(manager->get_node(0))->vis_nodes();
+    Assert(vis_nodes.size() == 1);
+
+    if(!vis_nodes.empty())
+    {
+        FindNodeVisitor findCameras("camera ",FindNodeVisitor::not_exact); 
+        vis_nodes[0]->accept(findCameras);
+
+        auto const& nl =  findCameras.getNodeList();
+
+        if(nl.size()>0)
+        {
+            cg::quaternion orien =  from_osg_quat(nl[0]->asTransform()->asMatrixTransform()->getMatrix().getRotate());
+            cg::point_3f pos = from_osg_vector3(nl[0]->asTransform()->asMatrixTransform()->getMatrix().getTrans());
+
+            decart_position dpos(pos,orien);
+            camera_pos_ = geo_position(dpos, ::get_base());
+
+        }
+
+    }
+
+
 }
 
 #if 0
@@ -264,6 +292,18 @@ cpr vis::camera_orien() const
 {
     return camera_pos_.orien.cpr();
 }
+
+geo_point_3 vis::pos() const
+{
+    return camera_pos_.pos;
+}
+
+cpr vis::orien() const
+{
+    return camera_pos_.orien.cpr();
+}
+
+
 
 double vis::zoom() const
 {

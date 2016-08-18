@@ -1386,7 +1386,7 @@ void visual_system_impl::update(double time)
     fake_system_base::update(time);
 
     // scene_->update(time);
-    // update_eye();
+    update_eye();
 }
 
 vis_sys_props const& visual_system_impl::vis_props() const
@@ -1488,6 +1488,8 @@ void visual_system_impl::update_eye()
 cg::camera_f visual_system_impl::eye_camera() const
 {
     typedef cg::rotation_3f rot_f;
+
+    auto const & cam_list = scene_->GetSceneCamsList();
 
     cg::camera_f cam = eye_ 
         ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))

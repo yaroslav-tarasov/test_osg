@@ -51,7 +51,7 @@ namespace avCore
             }
 
 
-			for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling())
+			for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling("Pivot"))
 			{			
 				data.pivot_point = osg::Vec3(
 					pivot_node.attribute("x").as_double(0.0),
@@ -68,7 +68,7 @@ namespace avCore
 							   (au_val=="-Z"?xml_model_t::NEG_Z_UP:
 							   xml_model_t::Z_UP)))));
 
-			for (pugi::xml_node anim = root.child("Animation"); anim; anim = anim.next_sibling())
+			for (pugi::xml_node anim = root.child("Animation"); anim; anim = anim.next_sibling("Animation"))
             {
                 for (pugi::xml_node file = anim.first_child(); file; file = file.next_sibling())
                 {
@@ -76,7 +76,7 @@ namespace avCore
                 }
             }	
 
-            for (pugi::xml_node morph = root.child("Morph"); morph; morph = morph.next_sibling())
+            for (pugi::xml_node morph = root.child("Morph"); morph; morph = morph.next_sibling("Morph"))
             {
                 for (pugi::xml_node params = morph.first_child(); params; params = params.next_sibling())
                 {
@@ -130,7 +130,7 @@ namespace avCore
             }
 
 
-            for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling())
+            for (pugi::xml_node pivot_node = MainModel.child("Pivot"); pivot_node; pivot_node = pivot_node.next_sibling("Pivot"))
             {			
                 data.pivot_point = osg::Vec3(
                     pivot_node.attribute("x").as_double(0.0),
@@ -147,7 +147,7 @@ namespace avCore
                 (au_val=="-Z"?xml_model_t::NEG_Z_UP:
                 xml_model_t::Z_UP)))));
             
-            for (pugi::xml_node cam = root.child("Camera"); cam; cam = cam.next_sibling())
+            for (pugi::xml_node cam = root.child("Camera"); cam; cam = cam.next_sibling("Camera"))
             {
                 camera_params cp;
                 cp.pos = osg::Vec3(
@@ -156,11 +156,14 @@ namespace avCore
                     cam.attribute("z").as_double(0.0)
                     );
 
+
                 cp.course =  cam.attribute("course").as_float(0.f);
+                cp.name   =  cam.attribute("name").as_string("");
+                
                 data.cams.push_back(cp);
             }	
 
-			for (pugi::xml_node mn = root.child("MaskNode"); mn; mn = mn.next_sibling())
+			for (pugi::xml_node mn = root.child("MaskNode"); mn; mn = mn.next_sibling("MaskNode"))
 			{
 
 				std::string name = 	mn.attribute("name").as_string("");
@@ -168,7 +171,7 @@ namespace avCore
 					data.mask_nodes.push_back(name);
 			}	
 
-			for (pugi::xml_node obj = root.child("Object"); obj; obj = obj.next_sibling())
+			for (pugi::xml_node obj = root.child("Object"); obj; obj = obj.next_sibling("Object"))
 			{
 
 				const std::string main_model = 	obj.attribute("model").as_string("");
@@ -201,7 +204,7 @@ namespace avCore
 		{
 			pugi::xml_node root = doc.child("root");
 
-			for (pugi::xml_node obj = root.child("value"); obj; obj = obj.next_sibling())
+			for (pugi::xml_node obj = root.child("value"); obj; obj = obj.next_sibling("value"))
 			{
 
 				const float  x = 	obj.attribute("x").as_float(0.f);

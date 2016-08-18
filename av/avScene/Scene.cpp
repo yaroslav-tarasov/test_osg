@@ -662,6 +662,12 @@ av::ITrajectoryDrawer*    Scene::GetTrajectoryDrawer() const
     return _p->_trajectory_drawer.get();
 }
 
+const av::SceneCamsList&  Scene::GetSceneCamsList()  const 
+{
+    return _sceneCamsList;
+}
+
+
 avSky::ISky*  Scene::getSky()
 { 
 #ifdef ORIG_EPHEMERIS

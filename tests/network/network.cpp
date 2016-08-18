@@ -900,9 +900,12 @@ private:
                         ADD_INIT( msgs, create_msg(159,point_3(-333,451,0),cg::cpr(0)  , ok_helicopter, "KA50", "159") )
                         ADD_INIT( msgs, create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
+
+#if 0
                         ADD_INIT( msgs, create_msg(1500, point_3f(57.872086f, 642.839783f, 48.0f ), quaternion(cprf(86.38665036/*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 0", "") )
                         ADD_INIT( msgs, create_msg(1501, point_3f(-2383.51, -524.20, 30.50f), quaternion(cprf(86.38665036 /*cg::rad2grad() * 7.790917f*/)) , ok_camera, "camera 1", "") )
-                        
+#endif                     
+
                         binary::bytes_t bts =  std::move(network::wrap_msg(setup_msg(std::move(std::string(g_icao_code)), std::move(msgs))));
                         it->second->send(&bts[0], bts.size());
                     }
