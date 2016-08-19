@@ -174,6 +174,14 @@ void vis::on_model_changed()
 #endif
 }
 
+void vis::update(double time)
+{
+    view::update(time);
+    
+    app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
+
+}
+
 void vis::retreive_camera()
 {
     using namespace nodes_management;
@@ -204,6 +212,9 @@ void vis::retreive_camera()
             decart_position dpos(pos,orien);
             camera_pos_ = geo_position(dpos, ::get_base());
 
+
+            app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
+            
         }
 
     }

@@ -532,21 +532,15 @@ struct Scene::_private
 	app::time_panel_ptr                             _time_panel;
 	app::main_window_ptr						    _mw;
 	connection_holder                               _conn_holder;
+	app::settings_t*                                 _settings;
 
 	// uniforms	
-//private:
 	osg::ref_ptr<osg::Uniform>                      _windTime;
 
     osg::ref_ptr<avShadow::ShadowTechnique>         _st;  
-
-//private:
 	osg::ref_ptr<osg::Node>                         _logo;
-
 	avCore::RandomNumber						    _rndGen;
-
-//private:
 	Utils::LoadNodeThread*                          _lnt;
-	//std::vector<osg::ref_ptr<osg::MatrixTransform>> _mt;
 
 #if !defined(VISUAL_EXPORTS)
 	osg::ref_ptr<bi::RigidUpdater>                  _ru;
@@ -554,8 +548,7 @@ struct Scene::_private
 	
 	osg::ref_ptr<PickHandler>                       _pickHandler; 
 
-//private:
-	app::settings_t*                               settings_;
+
 	
 	//
 	// Something for debug 
@@ -652,10 +645,6 @@ Scene::~Scene()
 {
 }
 
-const av::SceneCamsList&      Scene::GetSceneCamsList()  const
-{
-	return _sceneCamsList;
-}
 
 av::environment_weather* Scene::getEnvWeather() const
 {
@@ -665,6 +654,11 @@ av::environment_weather* Scene::getEnvWeather() const
 av::ITrajectoryDrawer*    Scene::GetTrajectoryDrawer() const 
 {
     return _p->_trajectory_drawer.get();
+}
+
+app::main_window_ptr           Scene::GetMainGUIWindow() const
+{
+    return _p->_mw;
 }
 
 avSky::ISky*  Scene::getSky()
@@ -757,27 +751,27 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     //
 
     _p->_pickHandler = new PickHandler();
-    _p->settings_ = new  app::settings_t;
+    _p->_settings = new  app::settings_t;
     
-    _p->settings_->shadow           = true;
-    _p->settings_->shadow_for_smoke = true;
+    _p->_settings->shadow           = true;
+    _p->_settings->shadow_for_smoke = true;
 
-    _p->settings_->clouds[0].radius_x = 1000.0f;
-    _p->settings_->clouds[0].radius_y = 1000.0f;
-    _p->settings_->clouds[0].x = 1000.0f;
-    _p->settings_->clouds[0].y = 1000.0f;
-    _p->settings_->clouds[0].height = 100.0f;
-    _p->settings_->clouds[0].p_type = avWeather::PrecipitationFog;
-    _p->settings_->clouds[0].intensity = 0.51f;
-    _p->settings_->intensity = 0.0f;
+    _p->_settings->clouds[0].radius_x = 1000.0f;
+    _p->_settings->clouds[0].radius_y = 1000.0f;
+    _p->_settings->clouds[0].x = 1000.0f;
+    _p->_settings->clouds[0].y = 1000.0f;
+    _p->_settings->clouds[0].height = 100.0f;
+    _p->_settings->clouds[0].p_type = avWeather::PrecipitationFog;
+    _p->_settings->clouds[0].intensity = 0.51f;
+    _p->_settings->intensity = 0.0f;
 
-    _p->settings_->clouds[1].radius_x = 1000.0f;
-    _p->settings_->clouds[1].radius_y = 1000.0f;
-    _p->settings_->clouds[1].x = -1000.0f;
-    _p->settings_->clouds[1].y = -1000.0f;
-    _p->settings_->clouds[1].height = 150.0f;
-    _p->settings_->clouds[1].p_type = avWeather::PrecipitationRain;
-    _p->settings_->clouds[1].intensity = 0.81f;
+    _p->_settings->clouds[1].radius_x = 1000.0f;
+    _p->_settings->clouds[1].radius_y = 1000.0f;
+    _p->_settings->clouds[1].x = -1000.0f;
+    _p->_settings->clouds[1].y = -1000.0f;
+    _p->_settings->clouds[1].height = 150.0f;
+    _p->_settings->clouds[1].p_type = avWeather::PrecipitationRain;
+    _p->_settings->clouds[1].intensity = 0.81f;
 
     if(true) _viewerPtr->addEventHandler( 
         gui::createCEGUI( _commonNode, [this]()
@@ -805,7 +799,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 				pthis->_mw->set_visible(false);
 
-				pthis->_vis_settings_panel = app::create_vis_settings_panel( zones_, *this->_p->settings_ );
+				pthis->_vis_settings_panel = app::create_vis_settings_panel( zones_, *this->_p->_settings );
 
                 pthis->_vis_settings_panel->subscribe_zone_changed     (boost::bind(&Scene::onZoneChanged,this,_1));
                 pthis->_vis_settings_panel->subscribe_exit_app         (boost::bind(&Scene::onExit,this));
@@ -1128,14 +1122,14 @@ FIXME(Чудеса с Ephemeris)
 
     {
         const avWeather::Weather::WeatherBankIdentifier nID = 666;
-        const double dLatitude   = _p->settings_->clouds[0].x;
-        const double dLongitude  = _p->settings_->clouds[0].y;
+        const double dLatitude   = _p->_settings->clouds[0].x;
+        const double dLongitude  = _p->_settings->clouds[0].y;
         const float fHeading     = 45;
-        const float fEllipseRadX = _p->settings_->clouds[0].radius_x;
-        const float fEllipseRadY = _p->settings_->clouds[0].radius_y;
-        const float fHeight      = _p->settings_->clouds[0].height;
-        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
-        const float fIntensity   = _p->settings_->clouds[0].intensity;
+        const float fEllipseRadX = _p->_settings->clouds[0].radius_x;
+        const float fEllipseRadY = _p->_settings->clouds[0].radius_y;
+        const float fHeight      = _p->_settings->clouds[0].height;
+        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->_settings->clouds[0].p_type)/*avWeather::PrecipitationRain*/;
+        const float fIntensity   = _p->_settings->clouds[0].intensity;
         const float fCentralPortion = 0.75;
 
         pWeatherNode->UpdateLocalWeatherBank(nID, 
@@ -1146,14 +1140,14 @@ FIXME(Чудеса с Ephemeris)
 
     {
         const avWeather::Weather::WeatherBankIdentifier nID = 667;
-        const double dLatitude   = _p->settings_->clouds[1].x;
-        const double dLongitude  = _p->settings_->clouds[1].y;
+        const double dLatitude   = _p->_settings->clouds[1].x;
+        const double dLongitude  = _p->_settings->clouds[1].y;
         const float fHeading     = 45;
-        const float fEllipseRadX = _p->settings_->clouds[1].radius_x;
-        const float fEllipseRadY = _p->settings_->clouds[1].radius_y;
-        const float fHeight      = _p->settings_->clouds[1].height;
-        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->settings_->clouds[1].p_type)/*avWeather::PrecipitationRain*/;
-        const float fIntensity   = _p->settings_->clouds[1].intensity;
+        const float fEllipseRadX = _p->_settings->clouds[1].radius_x;
+        const float fEllipseRadY = _p->_settings->clouds[1].radius_y;
+        const float fHeight      = _p->_settings->clouds[1].height;
+        const avWeather::PrecipitationType ptType = static_cast<avWeather::PrecipitationType>(_p->_settings->clouds[1].p_type)/*avWeather::PrecipitationRain*/;
+        const float fIntensity   = _p->_settings->clouds[1].intensity;
         const float fCentralPortion = 0.75;
 
         pWeatherNode->UpdateLocalWeatherBank(nID, 

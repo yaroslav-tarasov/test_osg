@@ -104,9 +104,10 @@ namespace avScene {
         void                                        remove(osg::Node* node);
 
     private: // IScene interface declaration
-        av::environment_weather*                    getEnvWeather() const override;
+        av::environment_weather*                    getEnvWeather()       const override;
         av::ITrajectoryDrawer*                      GetTrajectoryDrawer() const override; 
-        const av::SceneCamsList&                    GetSceneCamsList()  const override;
+        app::main_window_ptr                        GetMainGUIWindow()    const override;
+
     private:
 
         Scene();
@@ -155,8 +156,6 @@ namespace avScene {
 
         avCore::IDecalRendererPtr                   _decal_map;
         
-        av::SceneCamsList                           _sceneCamsList;
-
         FireSfxNode *                               fire_sfx_weak_ptr_;
 #if 0
 		SmokeSfxNode *                              smoke_sfx_weak_ptr_;

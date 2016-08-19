@@ -46,7 +46,10 @@ private:
     //app::status_bar_ptr create_status_bar(std::string const &name) override ;
 
     app::menu_ptr add_main_menu      (std::wstring const &name) override ;
+    app::menu_ptr get_main_menu      (std::wstring const &name) override ;
     void          track_context_menu (std::wstring const &name, boost::function<void (app::menu &m)> fill_menu) override ;
+
+
 
     void          remove_widget (app::widget_ptr w) override ;
     app::widget*  find_widget   (std::string const &name) const override ;

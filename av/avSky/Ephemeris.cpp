@@ -383,10 +383,12 @@ namespace avSky
 		
 		auto& params = _d->_ephemerisModel->getParams();
         
+#if 0
 		params.skyDomeXSize *= 4;
 		params.skyDomeYSize *= 4;
 		params.useOMP = true;
 		params.ompThreads = 4;
+#endif
 
 		// Set some acceptable defaults.
         double latitude  = 43.4444;                                  // Adler, RF

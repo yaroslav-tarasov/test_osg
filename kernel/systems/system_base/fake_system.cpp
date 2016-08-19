@@ -1472,12 +1472,24 @@ void visual_system_impl::init_eye()
 {
     // no eye is selected if camera name is incorrect to show problem visually!!!
     // please don't change selection logic
+#if 0
     eye_ = (!props_.channel.camera_name.empty()) 
         ? find_object<visual_control_ptr>(this, props_.channel.camera_name)
         : find_first_object<visual_control_ptr>(this) ;
 
     if (!eye_ && !props_.channel.camera_name.empty())
         LogWarn("Can't find camera: " << props_.channel.camera_name);
+
+#else
+    eye_ = find_object<visual_control_ptr>(this, props_.channel.camera_name);
+    
+    if (!eye_ && !props_.channel.camera_name.empty())
+            LogWarn("Can't find camera: " << props_.channel.camera_name);
+
+    if(!eye_)
+        eye_ = find_first_object<visual_control_ptr>(this) ;
+#endif
+
 
 #if 0
     viewport_->SetClarityScale(props_.channel.pixel_scale);
@@ -1500,8 +1512,6 @@ void visual_system_impl::update_eye()
 cg::camera_f visual_system_impl::eye_camera() const
 {
     typedef cg::rotation_3f rot_f;
-
-    auto const & cam_list = scene_->GetSceneCamsList();
 
     cg::camera_f cam = eye_ 
         ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))

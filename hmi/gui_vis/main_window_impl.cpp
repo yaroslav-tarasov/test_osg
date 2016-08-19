@@ -210,7 +210,7 @@ bool  main_window_impl::visible ()
 app::menu_ptr main_window_impl::add_main_menu(std::wstring const &name)
 {
     CEGUI::Win32StringTranscoder stc;
-    CEGUI::String sname = stc.stringFromStdWString(name);
+    const CEGUI::String sname = stc.stringFromStdWString(name);
     CEGUI::String skin = menuBar->getType();
 	skin = skin.substr(0, skin.find_first_of('/'));
 	CEGUI::String menuItemMapping = skin + "/MenuItem";
@@ -230,6 +230,20 @@ app::menu_ptr main_window_impl::add_main_menu(std::wstring const &name)
     // m->setTitle(QString::fromUtf8(name.c_str())) ;
 
     return m ;
+}
+
+app::menu_ptr main_window_impl::get_main_menu(std::wstring const &name)
+{
+    CEGUI::Win32StringTranscoder stc;
+    const CEGUI::String sname = stc.stringFromStdWString(name);
+    for( auto m = widgets_.begin(); m != widgets_.end(); ++m)
+    {
+        auto p = dynamic_cast<menu_impl*>(&*(*m));
+        if (p && p->get_name()==sname)
+            return  boost::dynamic_pointer_cast<app::menu>(*m);
+    }
+
+    return app::menu_ptr() ;
 }
 
 void main_window_impl::track_context_menu(std::wstring const &/*name*/, boost::function<void (app::menu &m)> fill_menu)

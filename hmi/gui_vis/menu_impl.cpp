@@ -3,11 +3,6 @@
 #include <cegui/CEGUI.h>
 
 #include "menu_impl.h"
-//#include "application_impl.h"
-
-//#include "application/document.h"
-
-//#include "common/qt_dispatch.h"
 
 using namespace CEGUI;
 
@@ -19,8 +14,6 @@ menu_impl::menu_impl(CEGUI::Window *parent,const String& type, const String& nam
 
 size_t menu_impl::add_string(std::wstring const &text, target const &click, target const &hover)
 {
-    //QAction *act = addAction(QString::fromUtf8(text.c_str())) ;
-    //connect(act, SIGNAL(triggered()), this, SLOT(action_slot())) ;
     CEGUI::Win32StringTranscoder stc;
     CEGUI::String stext = stc.stringFromStdWString(text);
 
@@ -30,14 +23,16 @@ size_t menu_impl::add_string(std::wstring const &text, target const &click, targ
 	CEGUI::String popupMenuMapping = skin + "/PopupMenu";
 
 	CEGUI::WindowManager& windowManager = CEGUI::WindowManager::getSingleton();
-	auto menuItem = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, stext + "_MenuItem"));
+	CEGUI::MenuItem* menuItem = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, stext + "_MenuItem"));
 	menuItem->setText(stext);
 	base_->addItem(menuItem);
+    
+
 
     if (click)
-    //    actions_.insert(act, click) ;
 	{
-		menuItem->subscribeEvent(MenuItem::EventClicked, 
+		actions_.insert(std::make_pair(menuItem, click)) ;
+        menuItem->subscribeEvent(MenuItem::EventClicked, 
 			Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
 			{
 				click(); 
@@ -48,9 +43,9 @@ size_t menu_impl::add_string(std::wstring const &text, target const &click, targ
 	}	
 
     if (hover)
-    //    hovers_.insert(act, hover) ;
 	{
-		menuItem->subscribeEvent(MenuItem::EventMouseEntersArea, 
+	    hovers_.insert(std::make_pair(menuItem, hover)) ;
+        menuItem->subscribeEvent(MenuItem::EventMouseEntersArea, 
 			Event::Subscriber([=](const CEGUI::EventArgs& args)->bool 
 			{
 				hover(); 
@@ -60,9 +55,12 @@ size_t menu_impl::add_string(std::wstring const &text, target const &click, targ
 			); 	
 	}
 
-	size_t act = 0;
+    return (size_t)menuItem ;
+}
 
-    return (size_t)act ;
+size_t    menu_impl::get_string(std::wstring const &text) const
+{
+    return 0;
 }
 
 app::menu_ptr menu_impl::add_pop_up(std::wstring const &text)

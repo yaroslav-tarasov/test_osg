@@ -31,6 +31,9 @@ private:
     void place_marking  ();
 #endif
 
+protected:
+    void update(double time);
+
 private:
     geo_point_3 camera_pos  () const;
     cpr         camera_orien() const;

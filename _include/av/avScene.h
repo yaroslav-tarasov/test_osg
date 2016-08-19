@@ -2,6 +2,7 @@
 
 #include "avVisualFwd.h"
 #include "avEnvironmentParams.h"
+#include "application_fwd.h"
 
 namespace fms
 {
@@ -90,15 +91,13 @@ namespace av
     {
         virtual environment_weather*    getEnvWeather         () const = 0;
 
-
         virtual bool                    PreUpdate() = 0;
 #if 0
         virtual debug_render_ptr        get_scene_debug_renderer() const = 0;
 #endif
         virtual ITrajectoryDrawer*      GetTrajectoryDrawer() const = 0;
 
-        virtual const SceneCamsList&    GetSceneCamsList()  const = 0;
-
+        virtual app::main_window_ptr    GetMainGUIWindow()  const = 0;
     };
 
 
