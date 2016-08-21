@@ -14,6 +14,17 @@ struct vis
 {
     static object_info_ptr create(object_create_t const& oc, dict_copt dict);
 
+	struct camera_t
+	{
+		camera_t( const std::string&  name, const geo_position& pos)
+			: name ( name )
+			, gp  ( pos  )
+		    {}
+
+		std::string  name;
+		geo_position gp;  
+	};
+
 private:
     vis(object_create_t const& oc, dict_copt dict);
 
@@ -24,15 +35,14 @@ private:
 private:
     void on_new_settings() override;
     void on_model_changed() override;
-
+    
+	void on_gui_ready();
+	void on_switch_current_camera(uint32_t num );
     void retreive_camera();
 #if 0
     void place_lights   ();
     void place_marking  ();
 #endif
-
-protected:
-    void update(double time);
 
 private:
     geo_point_3 camera_pos  () const;
@@ -51,7 +61,12 @@ private:
 #if 0
     vector<victory::node_ptr>   lamps_;
 #endif
-    geo_position                camera_pos_;
+
+
+    vector<camera_t>            cameras_;
+	uint32_t                    current_camera_;
+	vector<size_t>              menu_items_;
+
 };
 
 } // airport 

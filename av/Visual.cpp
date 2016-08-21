@@ -362,10 +362,15 @@ namespace
 			 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Space)
 			 {
 				  _fvc->FreeViewOff();
-				 return true;
+				 return false;
 			 }
-
-			 _fvc->FreeViewOn();
+			 else
+			 if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Return)
+			 {
+				 _fvc->FreeViewOn();
+				 return false;
+			 }
+			 
 		 }
 
 		 return false;

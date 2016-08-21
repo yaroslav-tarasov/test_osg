@@ -4,6 +4,8 @@
 
 #include "objects/nodes_management.h"
 
+#include "application/main_window.h"
+#include "application/menu.h"
 
 namespace airport 
 {
@@ -18,6 +20,7 @@ AUTO_REG_NAME(airport_visual, vis::create);
 vis::vis(object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
     , vis_sys_(dynamic_cast<visual_system *>(oc.sys))
+	, current_camera_ (0)
 {
 #if 0
     place_lights();
@@ -25,6 +28,7 @@ vis::vis(object_create_t const& oc, dict_copt dict)
 #endif
 
     on_new_settings();
+	vis_sys_->scene()->subscribe_gui_ready(boost::bind(&vis::on_gui_ready,this));
 }
 
 bool vis::is_visible() const
@@ -166,20 +170,36 @@ void vis::on_new_settings()
     
 }
 
+void vis::on_gui_ready()
+{
+    app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
+
+	app::menu_ptr vm = mw->add_main_menu(L"Камеры");
+	for(int i = 0; i < cameras_.size(); ++i)
+	{
+	   	std::wstring wstr(cameras_[i].name.begin(), cameras_[i].name.end());
+		menu_items_.push_back(vm->add_string(wstr, boost::bind(&vis::on_switch_current_camera,this, i )));
+	}
+	
+	if(cameras_.size())
+		mw->get_main_menu(L"Камеры")->set_checked(menu_items_[current_camera_],true); 
+}
+
+void vis::on_switch_current_camera(uint32_t num )
+{
+	auto  mm  = vis_sys_->scene()->GetMainGUIWindow()->get_main_menu(L"Камеры");
+	mm->set_checked(menu_items_[current_camera_],false); 
+	current_camera_ = num;
+    mm->set_checked(menu_items_[current_camera_],true); 
+	 
+}
+
 void vis::on_model_changed()
 {
 #if 0
     place_lights();
     place_marking();
 #endif
-}
-
-void vis::update(double time)
-{
-    view::update(time);
-    
-    app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
-
 }
 
 void vis::retreive_camera()
@@ -204,16 +224,16 @@ void vis::retreive_camera()
 
         auto const& nl =  findCameras.getNodeList();
 
-        if(nl.size()>0)
+        for (auto it = nl.begin(); it != nl.end(); ++it)
         {
-            cg::quaternion orien =  from_osg_quat(nl[0]->asTransform()->asMatrixTransform()->getMatrix().getRotate());
-            cg::point_3f pos = from_osg_vector3(nl[0]->asTransform()->asMatrixTransform()->getMatrix().getTrans());
+            cg::quaternion orien =  from_osg_quat((*it)->asTransform()->asMatrixTransform()->getMatrix().getRotate());
+            cg::point_3f pos = from_osg_vector3((*it)->asTransform()->asMatrixTransform()->getMatrix().getTrans());
 
             decart_position dpos(pos,orien);
-            camera_pos_ = geo_position(dpos, ::get_base());
+            cameras_.push_back(camera_t((*it)->getName(), geo_position(dpos, ::get_base())));
 
 
-            app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
+            // app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
             
         }
 
@@ -296,22 +316,22 @@ void vis::place_marking()
 
 geo_point_3 vis::camera_pos() const
 {
-    return camera_pos_.pos;
+    return cameras_[current_camera_].gp.pos;
 }
 
 cpr vis::camera_orien() const
 {
-    return camera_pos_.orien.cpr();
+    return cameras_[current_camera_].gp.orien.cpr();
 }
 
 geo_point_3 vis::pos() const
 {
-    return camera_pos_.pos;
+    return cameras_[current_camera_].gp.pos;
 }
 
 cpr vis::orien() const
 {
-    return camera_pos_.orien.cpr();
+    return cameras_[current_camera_].gp.orien.cpr();
 }
 
 

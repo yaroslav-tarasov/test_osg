@@ -98,6 +98,8 @@ namespace av
         virtual ITrajectoryDrawer*      GetTrajectoryDrawer() const = 0;
 
         virtual app::main_window_ptr    GetMainGUIWindow()  const = 0;
+
+		DECLARE_EVENT(gui_ready, ()) ;
     };
 
 

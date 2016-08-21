@@ -789,12 +789,14 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 				app::menu_ptr fm = pthis->_mw->add_main_menu(L"Файл");
 				fm->add_string(L"Выход" , boost::bind(&Scene::onExit,this)); // [&]() { /*exit(0);*/});
 
+#if 0
 				app::menu_ptr vm = pthis->_mw->add_main_menu(L"Вид");
 				vm->add_string(L"Установки" , [pthis]() { 
                     pthis->_vis_settings_panel->set_visible(!pthis->_vis_settings_panel->visible());
                 });
+#endif
                 
-                app::menu_ptr am = pthis->_mw->add_main_menu(L"О программе");
+                //app::menu_ptr am = pthis->_mw->add_main_menu(L"О программе");
                 // vm->add_string("Lights" , [=]() {  });
 
 				pthis->_mw->set_visible(false);
@@ -813,6 +815,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
                 pthis->_time_panel = app::create_time_panel();
 
+				this->gui_ready_signal_();
             }
         } )
     );

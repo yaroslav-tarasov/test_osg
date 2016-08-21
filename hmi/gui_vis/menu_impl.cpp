@@ -25,9 +25,9 @@ size_t menu_impl::add_string(std::wstring const &text, target const &click, targ
 	CEGUI::WindowManager& windowManager = CEGUI::WindowManager::getSingleton();
 	CEGUI::MenuItem* menuItem = static_cast<CEGUI::MenuItem*>(windowManager.createWindow(menuItemMapping, stext + "_MenuItem"));
 	menuItem->setText(stext);
+
 	base_->addItem(menuItem);
     
-
 
     if (click)
 	{
@@ -92,6 +92,12 @@ void menu_impl::set_checked(size_t string_id, bool checked)
     //    act->setCheckable(true) ;
     //    act->setChecked(checked) ;
     //}
+
+	CEGUI::MenuItem* menuItem = (CEGUI::MenuItem*)string_id ;
+	if (actions_.find(menuItem)!=actions_.end())
+	{
+		menuItem->setProperty("NormalTextColour", checked?"FFEFE000":"FFFFFFFF");
+	}
 }
 
 void menu_impl::set_enabled(size_t string_id, bool enabled)

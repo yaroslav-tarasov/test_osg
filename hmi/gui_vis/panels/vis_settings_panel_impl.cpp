@@ -43,12 +43,6 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
     mainWindow->setMinSize(USize(cegui_reldim(0.1f), cegui_reldim(0.1f)));
     mainWindow->setText( "Choose Zone" );
 
-    //PushButton* demoButtonOK = static_cast<PushButton*>(
-    //    WindowManager::getSingleton().createWindow("TaharezLook/Button", "DemoButtonOK") );
-    //demoButtonOK->setPosition(UVector2(cegui_reldim(0.3f), cegui_reldim(0.75f)));
-    //demoButtonOK->setSize( USize(cegui_reldim(0.4f), cegui_reldim(0.15f)) );
-    //demoButtonOK->setText( "OK" );
-
 	auto fn_exit = [=](const CEGUI::EventArgs& args)->bool 
         {
 			CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
@@ -59,10 +53,9 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
         };
 
     mainWindow->subscribeEvent( CEGUI::FrameWindow::EventCloseClicked,Event::Subscriber(fn_exit));
-	//demoButtonOK->subscribeEvent( CEGUI::PushButton::EventClicked,Event::Subscriber(fn_exit));
 
 
-
+#if 0
 	PushButton* btnExit = static_cast<PushButton*>(
         WindowManager::getSingleton().createWindow("TaharezLook/Button", btn_exit_name) );
 
@@ -80,13 +73,13 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
 
         })
         ); 
+#endif
     
 
     Combobox* cbbo = static_cast<Combobox*>( CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Combobox", combo_name));
     cbbo->setPosition(UVector2(cegui_reldim(0.15f), cegui_reldim( 0.1f)));
     //cbbo->setSize(USize(cegui_reldim(0.66f), cegui_reldim( 0.33f)));
     mainWindow->addChild(cbbo);
-	//demoWindow->addChild( demoButtonOK );
     root->addChild( mainWindow );
 
     mainWindow->setVisible(false);
@@ -249,12 +242,6 @@ vis_settings_panel_impl::vis_settings_panel_impl(  const app::zones_t &zones, co
 
     }));
 
-	//CEGUI::Menubar* menuBar = dynamic_cast<CEGUI::Menubar*>(CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/Menubar", main_menu_name));
-	//if(menuBar)
-	//{     
-	//	init_menu_bar(menuBar);
-	//	root->addChild(menuBar);
-	//}
 }
 
 vis_settings_panel_impl::~vis_settings_panel_impl()
@@ -265,17 +252,16 @@ void vis_settings_panel_impl::set_visible(bool visible)
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
-    // root->getChild(combo_name)->setVisible(visible);
-    root->getChild(btn_exit_name)->setVisible(visible);
-    root->getChild(setting_dlg)->setVisible(visible);
-    //root->getChild(main_menu_name)->setVisible(visible);
+
+	if(root->getChild(btn_exit_name)) root->getChild(btn_exit_name)->setVisible(visible);
+    if(root->getChild(setting_dlg))root->getChild(setting_dlg)->setVisible(visible);
 }
 
 bool vis_settings_panel_impl::visible()
 {
     CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
     CEGUI::Window* root = context.getRootWindow();
-    return root->getChild(btn_exit_name)->isVisible() ||     root->getChild(setting_dlg)->isVisible(); /*|| root->getChild(combo_name)->isVisible()*/;
+    return (root->getChild(btn_exit_name)?root->getChild(btn_exit_name)->isVisible():false) ||    root->getChild(setting_dlg)?root->getChild(setting_dlg)->isVisible():false; 
 }
 
 void vis_settings_panel_impl::set_light(bool on)
