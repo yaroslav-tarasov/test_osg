@@ -22,6 +22,7 @@ model::model( kernel::object_create_t const& oc, dict_copt dict )
     , sys_(dynamic_cast<model_system *>(oc.sys))
 	, _speed                (40.0 )
     , _down (false)
+    , _off  (false)
 {
     _damping = 1.0f;
 	_targetSpeed = rnd_.random_range(/*settings._minSpeed*/6.f ,/* settings._maxSpeed*/10.f);
@@ -134,7 +135,7 @@ void model::sync_phys(double dt)
 
 
     
-	if(_targetSpeed > -1){
+	if(_targetSpeed > -1 && !_down && !_off){
 		phys::rocket_flare::control_ptr(phys_model_)->set_angular_velocity(omega_rel);
 	}
     
@@ -164,6 +165,13 @@ void model::update_contact_effects(double time)
             contacts_to_send.push_back(msg::contact_effect::contact_t(it->offset, it->vel));
 
         set(msg::contact_effect(move(contacts_to_send), time), false);
+
+        if(_down)
+        {
+           _speed = 0.0;
+           _down  =  false;
+           _off   =  true;
+        }
     }
 
 }

@@ -85,10 +85,14 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\flex\FlexDrawable.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\flex-080\flex\core\maths.cpp" />
+    <ClCompile Include="..\..\..\flex-080\flex\core\mesh.cpp" />
+    <ClCompile Include="..\..\..\flex-080\flex\core\platform.cpp" />
     <ClCompile Include="..\..\av\avCore\Database.cpp" />
     <ClCompile Include="..\..\av\avCore\InstancedAnimationManager.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
@@ -113,6 +117,9 @@
     <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
     <ClCompile Include="..\..\utils\empty_scene.cpp" />
     <ClCompile Include="..\..\utils\materials.cpp" />
+    <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="..\..\_include\objects\bullet_importer.cpp" />
     <ClCompile Include="..\animation_test.cpp" />
@@ -123,6 +130,8 @@
     <ClCompile Include="..\bump_mapping.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\cegui\cegui_main.cpp" />
+    <ClCompile Include="..\common\CommonFunctions.cpp" />
     <ClCompile Include="..\creators.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -130,6 +139,8 @@
     <ClCompile Include="..\DynamicCharacterController.cpp" />
     <ClCompile Include="..\exp_test.cpp" />
     <ClCompile Include="..\flame_test.cpp" />
+    <ClCompile Include="..\flex\FlexDrawable.cpp" />
+    <ClCompile Include="..\flex\osgflex.cpp" />
     <ClCompile Include="..\grass_test.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -160,7 +171,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\render_points.cpp" />
+    <ClCompile Include="..\select_geometry.cpp" />
     <ClCompile Include="..\shadow_map.cpp" />
+    <ClCompile Include="..\SimpleHUD.cpp" />
     <ClCompile Include="..\SkyBox.cpp" />
     <ClCompile Include="..\sparse_texture.cpp" />
     <ClCompile Include="..\ssao\ffssao.cpp">

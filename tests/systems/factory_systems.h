@@ -21,6 +21,7 @@ struct systems
     virtual void               update_messages()      = 0;
     virtual void               update_vis_messages()  = 0;
     virtual systems_ptr        get_this()             = 0;
+    virtual void               push_back (binary::bytes_cref bytes) = 0;
 
 protected:
    

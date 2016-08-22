@@ -19,6 +19,18 @@
     <Filter Include="Source Files\mygui">
       <UniqueIdentifier>{96190050-4c55-4a6c-9d07-0bcedc7af55c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\flex">
+      <UniqueIdentifier>{29414ee0-6d01-491b-9f49-32731d29f045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\flex\core">
+      <UniqueIdentifier>{07591e23-e6fb-4d57-a9ea-73f545bce5a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cegui">
+      <UniqueIdentifier>{9a92a06a-5004-4b25-b60d-88ef9ccfda4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{3c3df4cf-024f-4a24-8458-8e536f7cc1ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -29,6 +41,9 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\flex\FlexDrawable.h">
+      <Filter>Source Files\flex</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +205,36 @@
     </ClCompile>
     <ClCompile Include="..\MyGui\osgmygui.cpp">
       <Filter>Source Files\mygui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimpleHUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flex\FlexDrawable.cpp">
+      <Filter>Source Files\flex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\flex\osgflex.cpp">
+      <Filter>Source Files\flex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\flex-080\flex\core\maths.cpp">
+      <Filter>Source Files\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\flex-080\flex\core\mesh.cpp">
+      <Filter>Source Files\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\flex-080\flex\core\platform.cpp">
+      <Filter>Source Files\flex\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cegui\cegui_main.cpp">
+      <Filter>Source Files\cegui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\select_geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\CommonFunctions.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -199,7 +199,7 @@ void FireFx::cull( osg::NodeVisitor * pNV )
 	};
 
 	// update current
-	static const float break_sfx_dist = 1.5f;
+	static const float break_sfx_dist = 15.f;//; 1.5f;
 	emitter_.trace_and_update(pNV->getFrameStamp()->getSimulationTime(), (_uc==useWorldCoordinates)?data_.emit_pos:cg::point_3f(), break_sfx_dist, cpu_updater);
 
 	// new particles emitter

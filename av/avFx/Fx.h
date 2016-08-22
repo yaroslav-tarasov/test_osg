@@ -74,8 +74,12 @@ struct FireSfxNode : particles_effect_info
     virtual void setEmitterWorldVelocity( cg::point_3f const & velocity ) = 0;
     virtual cg::point_3f const & getEmitterWorldVelocity() const = 0;
 
-    virtual void setFactor( float factor ) = 0;
+    virtual void  setFactor( float factor ) = 0;
     virtual float getFactor() const = 0;
+
+    virtual void  setBreakDistance( float break_sfx_distance ) = 0 ;
+    virtual float getBreakDistance() const = 0 ;
+
 };
 
 // Sparks

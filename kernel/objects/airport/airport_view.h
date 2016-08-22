@@ -53,7 +53,7 @@ protected:
 private:
     void on_settings(msg::settings_msg const& msg);
     void on_model_changed_internal();
-    void on_changed_pov(msg::changed_point_of_view_msg_t const& msg);
+    void on_changed_pov(msg::changed_pov_msg_t const& msg);
 private:
     virtual void on_new_settings(){}
     virtual void on_new_pov(uint32_t old_pov){}

@@ -99,4 +99,10 @@ void model::create_phys()
 
 }
 
+void model::on_new_pov(uint32_t old_pov)
+{
+    send_cmd(msg::update_pov_msg_t(current_camera_));
+}
+
+
 } // end of airport

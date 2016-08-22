@@ -32,6 +32,8 @@ private:
     void on_zone_destroyed( size_t id );
 
     void create_phys();
+    
+    void on_new_pov(uint32_t old_pov) override;
 
 private:
     //! менеджер нод аэропорта (составных частей)

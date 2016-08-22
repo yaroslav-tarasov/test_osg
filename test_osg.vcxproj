@@ -165,6 +165,7 @@
     <ClInclude Include="av\avCore\Object.h" />
     <ClInclude Include="av\avCore\PreRender.h" />
     <ClInclude Include="av\avCore\Utils.h" />
+    <ClInclude Include="av\avGui\CEGUIDrawable.h" />
     <ClInclude Include="av\avLights\CulturalLights\NavigationalLight.h" />
     <ClInclude Include="av\avLights\CulturalLights\PointLightGroup.h" />
     <ClInclude Include="av\avLights\CulturalLights\PointLightsManager.h" />
@@ -234,9 +235,6 @@
     <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_view.h" />
     <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_vis.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="tests\flex\FlexDrawable.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="tests\systems\factory_systems.h" />
     <ClInclude Include="tests\systems\systems_impl.h" />
     <ClInclude Include="tests\systems\systems_impl2.h" />
@@ -246,24 +244,6 @@
     <ClInclude Include="_include\objects\object_creators.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\flex-080\flex\core\maths.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\flex-080\flex\core\mesh.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="..\flex-080\flex\core\platform.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
     <ClCompile Include="av\avAnimation\AnimationObject.cpp" />
     <ClCompile Include="av\avAnimation\AnimationPrototype.cpp" />
     <ClCompile Include="av\avAnimation\AnimTest.cpp" />
@@ -294,6 +274,7 @@
     <ClCompile Include="av\avFx\LandingDustFx.cpp" />
     <ClCompile Include="av\avFx\SmokeFx.cpp" />
     <ClCompile Include="av\avFx\SparksFx.cpp" />
+    <ClCompile Include="av\avGui\CEGUIDrawable.cpp" />
     <ClCompile Include="av\avLights\CulturalLights\NavigationalLight.cpp" />
     <ClCompile Include="av\avLights\CulturalLights\PointLightGroup.cpp" />
     <ClCompile Include="av\avLights\CulturalLights\PointLightsManager.cpp" />
@@ -488,23 +469,8 @@
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
     <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
-    <ClCompile Include="tests\cegui\CEGUIDrawable.cpp" />
-    <ClCompile Include="tests\cegui\cegui_main.cpp" />
-    <ClCompile Include="tests\common\CommonFunctions.cpp" />
     <ClCompile Include="tests\creators.cpp" />
-    <ClCompile Include="tests\flex\FlexDrawable.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="tests\flex\osgflex.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
     <ClCompile Include="tests\main_scene.cpp" />
-    <ClCompile Include="tests\select_geometry.cpp" />
-    <ClCompile Include="tests\SimpleHUD.cpp" />
     <ClCompile Include="tests\systems\factory_systems.cpp" />
     <ClCompile Include="tests\systems\systems_impl.cpp" />
     <ClCompile Include="tests\systems\systems_impl2.cpp" />
@@ -517,9 +483,6 @@
     <ClCompile Include="utils\empty_scene.cpp" />
     <ClCompile Include="utils\LoadManager.cpp" />
     <ClCompile Include="utils\materials.cpp" />
-    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
     <ClCompile Include="utils\workqueue.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />

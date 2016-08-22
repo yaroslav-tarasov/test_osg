@@ -101,8 +101,9 @@ namespace environment
             env.utc_time        = utc_time;
             env.geo_pos         = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point; // TODO
 
-            FIXME (Интерфейс к погоде)
+            FIXME ("Погода и время, utc_time useless")
             //sys_->scene()->get_env_weather()->set_environment(env);
+            sys_->scene()->getEnvWeather()->SetEnvironment(env) ;
 
             if (settings_.demo_weather)
             {  
@@ -138,8 +139,9 @@ namespace environment
                 wth.clouds_type    = dur.hours() >= 20 ? next_clouds : clouds ;
                 wth.clouds_density = settings_.weather.clouds_density ;
                 
-                FIXME (Интерфейс к погоде)
                 // sys_->scene()->get_env_weather()->set_weather(wth) ;
+                sys_->scene()->getEnvWeather()->SetEnvironment(env) ;
+                sys_->scene()->getEnvWeather()->SetWeather(wth) ;
             }
         }
 
@@ -187,8 +189,8 @@ namespace environment
         wth.clouds_density = settings_.weather.clouds_density ;
         wth.lightning_intensity = settings_.weather.lightning_intensity ;
 
-        FIXME (Интерфейс к погоде)
         //sys_->scene()->get_env_weather()->set_environment(env);
+        sys_->scene()->getEnvWeather()->SetEnvironment(env) ;
         sys_->scene()->getEnvWeather()->SetWeather(wth) ;
     }   
 

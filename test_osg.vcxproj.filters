@@ -60,9 +60,6 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tests\cegui">
-      <UniqueIdentifier>{17c8c559-16b2-4002-a51f-6f5cc127b377}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\hmi">
       <UniqueIdentifier>{812b7a33-058f-4dc5-9f1d-8064f54d4bfb}</UniqueIdentifier>
     </Filter>
@@ -252,12 +249,6 @@
     <Filter Include="Header Files\av\fx">
       <UniqueIdentifier>{29a53638-d161-4366-a3f3-e4e21a12d49b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tests\flex">
-      <UniqueIdentifier>{37332ad8-9cf1-41af-991e-42c2e77d8af4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\tests\flex\core">
-      <UniqueIdentifier>{ad6a4c62-b166-4247-af05-dfe07248f1d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects\rocket_flare">
       <UniqueIdentifier>{fbceff17-78fa-42ec-a2d2-2779fd2e969a}</UniqueIdentifier>
     </Filter>
@@ -269,6 +260,9 @@
     </Filter>
     <Filter Include="Source Files\av\gui">
       <UniqueIdentifier>{48b95866-c6fe-4899-9db6-a61ae3ed6d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\gui">
+      <UniqueIdentifier>{181a47af-4584-46cd-8b5c-0ea2f602c25f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -641,9 +635,6 @@
     <ClInclude Include="utils\LoadManager.h">
       <Filter>Header Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="tests\flex\FlexDrawable.h">
-      <Filter>Source Files\tests\flex</Filter>
-    </ClInclude>
     <ClInclude Include="av\avCore\InstancesManager.h">
       <Filter>Header Files\av\core</Filter>
     </ClInclude>
@@ -668,6 +659,9 @@
     <ClInclude Include="kernel\objects\rocket_flare\rocket_flare_vis.h">
       <Filter>Header Files\objects\rocket_flare</Filter>
     </ClInclude>
+    <ClInclude Include="av\avGui\CEGUIDrawable.h">
+      <Filter>Header Files\av\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -680,12 +674,6 @@
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="tests\main_scene.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\select_geometry.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\SimpleHUD.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="utils\visitors\find_node_visitor.cpp">
@@ -879,12 +867,6 @@
     </ClCompile>
     <ClCompile Include="kernel\fms\trajectory.cpp">
       <Filter>Source Files\fms</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\cegui\CEGUIDrawable.cpp">
-      <Filter>Source Files\tests\cegui</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\cegui\cegui_main.cpp">
-      <Filter>Source Files\tests\cegui</Filter>
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
@@ -1339,29 +1321,8 @@
     <ClCompile Include="av\avFx\FireFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
-    <ClCompile Include="tests\flex\FlexDrawable.cpp">
-      <Filter>Source Files\tests\flex</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\flex\osgflex.cpp">
-      <Filter>Source Files\tests\flex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flex-080\flex\core\maths.cpp">
-      <Filter>Source Files\tests\flex\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flex-080\flex\core\mesh.cpp">
-      <Filter>Source Files\tests\flex\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\flex-080\flex\core\platform.cpp">
-      <Filter>Source Files\tests\flex\core</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp">
       <Filter>Source Files\phys</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\visitors\ComputeTriMeshVisitor.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\common\CommonFunctions.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\Noise.cpp">
       <Filter>Source Files\av\core</Filter>
@@ -1398,6 +1359,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_vis.cpp">
       <Filter>Source Files\objects\cloud_zone</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avGui\CEGUIDrawable.cpp">
+      <Filter>Source Files\av\gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

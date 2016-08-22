@@ -5,7 +5,9 @@
 //#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
 #include "CEGUIDrawable.h"
 
-#include "../common/CommonFunctions"
+
+#include  "av/avCore/Utils.h"
+//#include "../common/CommonFunctions"
 
 #ifdef _DEBUG
 #pragma comment(lib, "CEGUIBase-0_d.lib")
@@ -166,7 +168,7 @@ namespace avGui
         geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
         //geode->getOrCreateStateSet()->setRenderBinDetails( -4, "RenderBin" );
 
-        osg::ref_ptr<osg::Camera> hudCamera = osgCookBook::createHUDCamera(1920, 0, 1920, 1200/*0, 800, 0, 600*/);
+        osg::ref_ptr<osg::Camera> hudCamera = Utils::createHUDCamera(1920, 0, 1920, 1200/*0, 800, 0, 600*/);
         hudCamera->setAllowEventFocus( true );
         hudCamera->addChild( geode.get() );
 

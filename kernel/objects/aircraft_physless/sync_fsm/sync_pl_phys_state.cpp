@@ -250,7 +250,7 @@ namespace sync_fsm
             if(traj_->speed_value(tar_len))
             {
                 const double speed = *traj_->speed_value(tar_len);
-                force_log fl;       
+                //force_log fl;       
                 LOG_ODS_MSG( "phys_state2::update " << tar_len << "  speed= " << speed << "\n"
                     );
 

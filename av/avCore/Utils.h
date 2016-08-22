@@ -20,6 +20,8 @@ namespace Utils
     bool        IsPowerOf2( unsigned int nValue );
     bool        CheckIfAFileExists( const std::string& cAbsolutePath );
 
+    osg::Camera* createHUDCamera( double left, double right, double bottom, double top );
+
     osg::BoundingBox CalculateModelAABB( osg::Node * pNode );
 
     float ConvertTraineeDensityToExpSceneFog( float fTraineeDensity, float * fVisDistPtr = NULL );

@@ -206,10 +206,11 @@ struct net_worker
          std::vector<endpoint>                                               vis_peers_;
      };
 
-     net_worker(const  endpoint &  peer,  on_ses_receive_f on_ses_recv , on_update_f on_update, on_all_connected_f on_all_connected)
+     net_worker(const  endpoint &  peer,  on_ses_receive_f on_ses_recv , on_receive_f on_recv , on_update_f on_update, on_all_connected_f on_all_connected)
          : period_     (cfg().model_params.msys_step)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , on_ses_recv_(on_ses_recv)
+         , on_receive_ (on_recv)
          , on_update_  (on_update)
          , on_all_connected_ (on_all_connected)
          , done_       (false)
@@ -497,6 +498,7 @@ struct mod_app
 
         w_.reset (new net_worker( peer 
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0/*, id*/)
+            , boost::bind(&mod_app::on_recv, this, _1, _2)
             , boost::bind(&mod_app::update, this, _1)
             , boost::bind(&mod_app::on_setup_deffered, this)
             ));
@@ -518,6 +520,11 @@ private:
     void send (binary::bytes_cref bytes)
     {
         w_->send_clients(bytes);
+    }
+    
+    void on_recv (void const* data, size_t size)
+    {
+        systems_->push_back(std::move(binary::make_bytes(data,size)));
     }
 
     void update(double time)

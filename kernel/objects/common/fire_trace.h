@@ -57,7 +57,7 @@ namespace visual_objects
                         effect_weak_ptr_->setIntensity   (factor_ * 15);
 						effect_weak_ptr_->setEmitWorldPos( pos + root_orien.rotate_vector( damned_offset_.translation()) );
 						effect_weak_ptr_->setEmitterWorldVelocity(root_orien.rotate_vector( cg::point_3f(0., /*-15.*/0. , 0.) ));  
-
+                        effect_weak_ptr_->setBreakDistance (15.f);
                     }
                 }
                 else

@@ -29,7 +29,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
 
     msg_disp()
         .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1))
-        .add<msg::changed_point_of_view_msg_t>(boost::bind(&view::on_changed_pov , this, _1));
+        .add<msg::changed_pov_msg_t>(boost::bind(&view::on_changed_pov , this, _1));
+
 }
 
 geo_point_3 view::pos() const
@@ -54,7 +55,7 @@ void view::on_settings(msg::settings_msg const& msg)
     on_new_settings();
 }
 
-void view::on_changed_pov(msg::changed_point_of_view_msg_t const& msg)
+void view::on_changed_pov(msg::changed_pov_msg_t const& msg)
 {
     uint32_t  old_pov = current_camera_;
     current_camera_ = msg;

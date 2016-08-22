@@ -36,6 +36,8 @@ private:
     void on_new_settings() override;
     void on_model_changed() override;
     void on_new_pov(uint32_t old_pov) override;
+    
+    void on_changed_pov(msg::update_pov_msg_t const& msg);
 
 	void on_gui_ready();
 	void on_switch_current_camera(uint32_t num );

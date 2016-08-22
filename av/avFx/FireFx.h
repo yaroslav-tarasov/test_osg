@@ -21,8 +21,9 @@ struct fire_sfx_data /*: node_data*/
 	cg::point_3f      emit_pos;
 	cg::point_3f      emit_dir;
 	cg::point_3f      emit_vel;
+    float             break_sfx_distance;
 
-	fire_sfx_data() : intensity(0), factor(1.f), alpha(0.4f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()) {}
+	fire_sfx_data() : intensity(0), factor(1.f), alpha(0.4f), emit_dir(0.f, 0.f, 1.f), emit_pos(cg::point_3f()), break_sfx_distance(1.5f) {}
 };
 
 
@@ -101,6 +102,8 @@ namespace avFx
 		void                 setFactor( float factor ) override { data_.factor = cg::bound(factor, 0.0f, 10.f); }
 		float                getFactor() const override { return data_.factor; }
 
+        void                 setBreakDistance( float break_sfx_distance ) override { data_.break_sfx_distance = break_sfx_distance; }
+        float                getBreakDistance() const override { return data_.break_sfx_distance; }
 	private:
 
 		// data

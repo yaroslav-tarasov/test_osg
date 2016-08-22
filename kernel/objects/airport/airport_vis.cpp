@@ -25,6 +25,10 @@ vis::vis(object_create_t const& oc, dict_copt dict)
     place_lights();
     place_marking();
 #endif
+    
+    msg_disp()
+        .add<msg::update_pov_msg_t>(boost::bind(&vis::on_changed_pov , this, _1));
+    
 
     on_new_settings();
 	vis_sys_->scene()->subscribe_gui_ready(boost::bind(&vis::on_gui_ready,this));
@@ -186,7 +190,14 @@ void vis::on_gui_ready()
 
 void vis::on_switch_current_camera(uint32_t num )
 {
-    send_cmd(msg::changed_point_of_view_msg_t(num));
+    send_cmd(msg::changed_pov_msg_t(num));
+}
+
+void vis::on_changed_pov(msg::update_pov_msg_t const& msg)
+{
+    uint32_t  old_pov = current_camera_;
+    current_camera_ = msg;
+    on_new_pov(old_pov);
 }
 
 void vis::on_model_changed()

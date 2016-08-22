@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include <cegui/CEGUI.h>
-#include "CEGUIDrawable.h"
+#include "av/avGui/CEGUIDrawable.h"
 
 #include "../common/CommonFunctions"
 

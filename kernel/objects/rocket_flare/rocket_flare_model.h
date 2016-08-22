@@ -47,6 +47,7 @@ private:
 	float                            _targetSpeed;
 
     bool                                    _down;
+    bool                                    _off;
 
 //  phys staff
 private:
