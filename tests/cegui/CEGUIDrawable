@@ -9,6 +9,24 @@
 #include <osg/Drawable>
 #include <OpenThreads/Mutex>
 
+namespace gui 
+{
+    class CEGUIEventHandler : public osgGA::GUIEventHandler
+    {
+    public:
+        CEGUIEventHandler( osg::Camera* camera ) : _camera(camera) {}
+
+        virtual bool handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa );
+
+
+    protected:
+        CEGUI::MouseButton convertMouseButton( int button );
+
+        osg::observer_ptr<osg::Camera> _camera;
+    };
+
+}
+
 class CEGUIDrawable : public osg::Drawable
 {
 public:

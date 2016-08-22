@@ -16,6 +16,9 @@
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{62576320-5480-43c5-a1fe-e7eaa4cda5e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\mygui">
+      <UniqueIdentifier>{96190050-4c55-4a6c-9d07-0bcedc7af55c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -181,6 +184,12 @@
     </ClCompile>
     <ClCompile Include="..\..\_include\objects\bullet_importer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyGui\MYGUIManager.cpp">
+      <Filter>Source Files\mygui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MyGui\osgmygui.cpp">
+      <Filter>Source Files\mygui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

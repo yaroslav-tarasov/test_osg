@@ -141,6 +141,12 @@
     </ClCompile>
     <ClCompile Include="..\morph_geometry.cpp" />
     <ClCompile Include="..\mrt_test.cpp" />
+    <ClCompile Include="..\MyGui\MYGUIManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\MyGui\osgmygui.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\osgshadowworks.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>

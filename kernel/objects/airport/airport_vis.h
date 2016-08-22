@@ -35,7 +35,8 @@ private:
 private:
     void on_new_settings() override;
     void on_model_changed() override;
-    
+    void on_new_pov(uint32_t old_pov) override;
+
 	void on_gui_ready();
 	void on_switch_current_camera(uint32_t num );
     void retreive_camera();
@@ -64,7 +65,6 @@ private:
 
 
     vector<camera_t>            cameras_;
-	uint32_t                    current_camera_;
 	vector<size_t>              menu_items_;
 
 };

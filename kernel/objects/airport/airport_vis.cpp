@@ -20,7 +20,6 @@ AUTO_REG_NAME(airport_visual, vis::create);
 vis::vis(object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
     , vis_sys_(dynamic_cast<visual_system *>(oc.sys))
-	, current_camera_ (0)
 {
 #if 0
     place_lights();
@@ -187,11 +186,7 @@ void vis::on_gui_ready()
 
 void vis::on_switch_current_camera(uint32_t num )
 {
-	auto  mm  = vis_sys_->scene()->GetMainGUIWindow()->get_main_menu(L"Камеры");
-	mm->set_checked(menu_items_[current_camera_],false); 
-	current_camera_ = num;
-    mm->set_checked(menu_items_[current_camera_],true); 
-	 
+    send_cmd(msg::changed_point_of_view_msg_t(num));
 }
 
 void vis::on_model_changed()
@@ -200,6 +195,13 @@ void vis::on_model_changed()
     place_lights();
     place_marking();
 #endif
+}
+
+void vis::on_new_pov(uint32_t old_pov)
+{
+    auto  mm  = vis_sys_->scene()->GetMainGUIWindow()->get_main_menu(L"Камеры");
+    mm->set_checked(menu_items_[old_pov],false); 
+    mm->set_checked(menu_items_[current_camera_],true); 
 }
 
 void vis::retreive_camera()
@@ -232,9 +234,6 @@ void vis::retreive_camera()
             decart_position dpos(pos,orien);
             cameras_.push_back(camera_t((*it)->getName(), geo_position(dpos, ::get_base())));
 
-
-            // app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
-            
         }
 
     }

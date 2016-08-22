@@ -19,6 +19,7 @@ AUTO_REG_NAME(airport_view, view::create);
 view::view(kernel::object_create_t const& oc, dict_copt dict)
     : base_view_presentation(oc)
     , obj_data_base         (dict)
+    , current_camera_       (0)
 {
 
     if (nodes_manager_ = find_first_child<nodes_management::manager_ptr>(this))
@@ -27,7 +28,8 @@ view::view(kernel::object_create_t const& oc, dict_copt dict)
     }
 
     msg_disp()
-        .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1));
+        .add<msg::settings_msg>(boost::bind(&view::on_settings, this, _1))
+        .add<msg::changed_point_of_view_msg_t>(boost::bind(&view::on_changed_pov , this, _1));
 }
 
 geo_point_3 view::pos() const
@@ -50,6 +52,13 @@ void view::on_settings(msg::settings_msg const& msg)
 {
     settings_ = msg.settings;
     on_new_settings();
+}
+
+void view::on_changed_pov(msg::changed_point_of_view_msg_t const& msg)
+{
+    uint32_t  old_pov = current_camera_;
+    current_camera_ = msg;
+    on_new_pov(old_pov);
 }
 
 void view::on_model_changed_internal()

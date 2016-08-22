@@ -294,38 +294,6 @@ struct settings_t
 };
 
 
-
-namespace msg
-{
-
-//! сообщение аэропорта
-enum msg_type
-{
-    mt_settings
-};
-
-//! тело сообщения аэропорта
-struct settings_msg
-    : network::msg_id<mt_settings>
-{
-    settings_t settings;
-
-    settings_msg(settings_t const& settings)
-        : settings(settings)
-    {
-    }
-    
-    settings_msg()
-    {
-    }
-};
-
-REFL_STRUCT(settings_msg)
-    REFL_ENTRY(settings)
-REFL_END()
-} // messages 
-
-
 //! а это вот такой способ определения модели по коду (очевидно заглушка)
 inline string get_model(string icao_code)
 {

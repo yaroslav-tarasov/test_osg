@@ -60,9 +60,6 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tests\mygui">
-      <UniqueIdentifier>{dfe60ed9-4841-4e3a-9bf4-9d0491d4b4c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\tests\cegui">
       <UniqueIdentifier>{17c8c559-16b2-4002-a51f-6f5cc127b377}</UniqueIdentifier>
     </Filter>
@@ -269,6 +266,9 @@
     </Filter>
     <Filter Include="Source Files\objects\cloud_zone">
       <UniqueIdentifier>{5909032c-4a62-45f1-8440-623375530313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\gui">
+      <UniqueIdentifier>{48b95866-c6fe-4899-9db6-a61ae3ed6d29}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -879,12 +879,6 @@
     </ClCompile>
     <ClCompile Include="kernel\fms\trajectory.cpp">
       <Filter>Source Files\fms</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\MyGui\MYGUIManager.cpp">
-      <Filter>Source Files\tests\mygui</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\MyGui\osgmygui.cpp">
-      <Filter>Source Files\tests\mygui</Filter>
     </ClCompile>
     <ClCompile Include="tests\cegui\CEGUIDrawable.cpp">
       <Filter>Source Files\tests\cegui</Filter>
