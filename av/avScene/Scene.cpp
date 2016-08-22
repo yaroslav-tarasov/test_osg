@@ -115,7 +115,7 @@
 #endif
 
 
-namespace gui 
+namespace avGui 
 { 
     osgGA::GUIEventHandler*  createCEGUI(osg::Group* root, std::function<void()> init_gui_handler);
     void    releaseCEGUI();
@@ -582,7 +582,7 @@ void Scene::Release()
         // Release smart pointer with cross references
         _scenePtr->_viewerPtr	= NULL;
         
-        gui::releaseCEGUI();
+        avGui::releaseCEGUI();
 
 #if !defined(VISUAL_EXPORTS)
         _scenePtr->_p->_ru->stopSession();
@@ -774,7 +774,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     _p->_settings->clouds[1].intensity = 0.81f;
 
     if(true) _viewerPtr->addEventHandler( 
-        gui::createCEGUI( _commonNode, [this]()
+        avGui::createCEGUI( _commonNode, [this]()
         {
             if (!this->_p->_vis_settings_panel )
             {

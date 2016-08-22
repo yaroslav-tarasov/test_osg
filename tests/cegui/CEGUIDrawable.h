@@ -1,15 +1,9 @@
-/* -*-c++-*- OpenSceneGraph Cookbook
- * Chapter 9 Recipe 4
- * Author: Wang Rui <wangray84 at gmail dot com>
-*/
-
-#ifndef H_COOKBOOK_CH9_CEGUIDRAWABLE
-#define H_COOKBOOK_CH9_CEGUIDRAWABLE
+#pragma once
 
 #include <osg/Drawable>
 #include <OpenThreads/Mutex>
 
-namespace gui 
+namespace avGui 
 {
     class CEGUIEventHandler : public osgGA::GUIEventHandler
     {
@@ -25,7 +19,7 @@ namespace gui
         osg::observer_ptr<osg::Camera> _camera;
     };
 
-}
+
 
 class CEGUIDrawable : public osg::Drawable
 {
@@ -49,4 +43,4 @@ protected:
     static   bool    _initialized;
 };
 
-#endif
+}

@@ -1,13 +1,9 @@
-/* -*-c++-*- OpenSceneGraph Cookbook
- * Chapter 9 Recipe 4
- * Author: Wang Rui <wangray84 at gmail dot com>
-*/
 #include "stdafx.h"
 
 #include <cegui/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
 //#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>
-#include "CEGUIDrawable"
+#include "CEGUIDrawable.h"
 
 #include "../common/CommonFunctions"
 
@@ -19,8 +15,8 @@
 #pragma comment(lib, "CEGUIOpenGLRenderer-0.lib")
 #endif
 
-OpenThreads::Mutex  CEGUIDrawable::_mutex;
-bool                CEGUIDrawable::_initialized = false;
+OpenThreads::Mutex  avGui::CEGUIDrawable::_mutex;
+bool                avGui::CEGUIDrawable::_initialized = false;
 
 using namespace CEGUI;
 
@@ -81,7 +77,7 @@ namespace {
 }
 
 
-namespace gui 
+namespace avGui 
 {
 
     bool CEGUIEventHandler::handle( const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa )
@@ -187,7 +183,7 @@ namespace gui
 
         CEGUI::System::destroy();
     }
-}
+
 
 
 CEGUIDrawable::CEGUIDrawable()
@@ -286,3 +282,6 @@ bool CEGUIDrawable::handleClose( const CEGUI::EventArgs& e )
     root->getChild("DemoWindow")->setVisible(false);
     return true;
 }
+
+
+} // avGui

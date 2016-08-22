@@ -11,7 +11,7 @@
 #include <iostream>
 
 #include <cegui/CEGUI.h>
-#include "CEGUIDrawable"
+#include "CEGUIDrawable.h"
 
 #include "../common/CommonFunctions"
 
@@ -21,7 +21,7 @@ int main_cegui( int argc, char** argv )
     
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
     geode->setCullingActive( false );
-    geode->addDrawable( new CEGUIDrawable );
+    geode->addDrawable( new avGui::CEGUIDrawable );
     geode->getOrCreateStateSet()->setAttributeAndModes( new osg::BlendFunc );
     geode->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
     
@@ -35,7 +35,7 @@ int main_cegui( int argc, char** argv )
     
     osgViewer::Viewer viewer(arguments);
     viewer.setSceneData( root.get() );
-    viewer.addEventHandler( new gui::CEGUIEventHandler(hudCamera.get()) );
+    viewer.addEventHandler( new avGui::CEGUIEventHandler(hudCamera.get()) );
     viewer.addEventHandler( new osgViewer::WindowSizeHandler );
     viewer.addEventHandler( new osgViewer::StatsHandler );
     return viewer.run();
