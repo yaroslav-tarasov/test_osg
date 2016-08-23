@@ -1,4 +1,5 @@
-    
+
+
     float fog_decay_factor( const in vec3 view_pos )                                                 
     {                                                                                                
         return exp(-/*fog_params*/SceneFogParams.a * dot(view_pos, view_pos));                       

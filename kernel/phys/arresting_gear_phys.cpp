@@ -401,6 +401,8 @@ namespace {
         //psb->m_materials[0]->m_kAST	=	1.0;
 
         psb->setTotalMass(0.002);
+
+        psb->setUserPointer(this);
     }
 
 

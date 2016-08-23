@@ -146,8 +146,6 @@ void model::sync_phys(double dt)
     if(!_down)
         phys::rocket_flare::control_ptr(phys_model_)->set_linear_velocity(forward_dir * _speed );
 
-
-
 }
 
 

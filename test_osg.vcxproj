@@ -126,6 +126,8 @@
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.fs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.gs" />
     <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\misc\SparksFX.vs" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\rope\rope.frag" />
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\rope\rope.vert" />
     <None Include="Memo.txt" />
     <None Include="misc\shaders\flame.frag" />
     <None Include="misc\shaders\flame.vert" />

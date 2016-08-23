@@ -378,6 +378,12 @@
     <None Include="misc\shaders\skinning_inst2.vert">
       <Filter>Source Files\shaders\animation</Filter>
     </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\rope\rope.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="..\..\OSG\OpenSceneGraph-3.2.1\build\bin\data\materials\rope\rope.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">

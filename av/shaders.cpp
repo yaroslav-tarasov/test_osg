@@ -1487,7 +1487,6 @@ $endif
             SHADOW_INCLUDE
             STRINGIFY ( 
 
-            //varying   vec3  lightDir;
             out mat4 viewworld_matrix;
 
             out block
@@ -1527,7 +1526,7 @@ $endif
             
             STRINGIFY ( 
 
-             in mat4 viewworld_matrix;
+               in mat4 viewworld_matrix;
             )
             
             INCLUDE_FUNCS

@@ -31,7 +31,7 @@ namespace phys
 
         virtual ~bt_body_user_info_t() {}
 
-        bt_body_kind_t rigid_body_kind() const
+        bt_body_kind_t bt_body_kind() const
         {
             return kind_;
         }
@@ -68,14 +68,14 @@ namespace phys
 
                 if (!info0->has_collision() || !info1->has_collision())
                     collides = false;
-                else if (info0->rigid_body_kind() == rb_plant && info1->rigid_body_kind() == rb_plant)
+                else if (info0->bt_body_kind() == rb_plant && info1->bt_body_kind() == rb_plant)
                     collides = false;
 
-                if (info0->rigid_body_kind() == rb_static_collision)
+                if (info0->bt_body_kind() == rb_static_collision)
                     if (!info0->has_collision_with(col1))
                         collides = false;
 
-                if (info1->rigid_body_kind() == rb_static_collision)
+                if (info1->bt_body_kind() == rb_static_collision)
                     if (!info1->has_collision_with(col0))
                         collides = false;
             }

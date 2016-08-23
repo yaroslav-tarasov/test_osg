@@ -709,7 +709,7 @@ struct client
 			for (int i=0;i<100;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
-				auto const model  = /*"A319"*/"MIG29"/*"L39"*/;
+				auto const model  = /*"A319"*/"SU25"/*"MIG29"*//*"L39"*/;
 				ADD_EVENT(traj_trp2_[i]->base_length()  , create_msg(hull_number,traj_trp2_[i]->kp_value(traj_trp2_[i]->base_length()),traj_trp2_[i]->curs_value(traj_trp2_[i]->base_length()), ok_aircraft, model, boost::lexical_cast<std::string>(hull_number)) )
 				ADD_EVENT(60.0 + i * 25 , arrgear_target_msg( hull_number ) )  
 

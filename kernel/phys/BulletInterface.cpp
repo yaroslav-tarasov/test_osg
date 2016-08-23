@@ -415,7 +415,7 @@ namespace phys
         btCollisionDispatcher*                _dispatcher;
         btBroadphaseInterface*                _overlappingPairCache;
         btSequentialImpulseConstraintSolver*  _solver;
-        //btSoftBodyWorldInfo	*                 _worldInfo;
+        //btSoftBodyWorldInfo	*             _worldInfo;
 
 
         boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
@@ -460,6 +460,37 @@ namespace phys
         const btCollisionObjectWrapper* colObj1,
         int partId1, int index1);
 
+namespace 
+{
+    struct YourOwnFilterCallback : public btOverlapFilterCallback
+    {
+        // return true when pairs need collision
+        virtual bool needBroadphaseCollision(btBroadphaseProxy* proxy0,btBroadphaseProxy* proxy1) const
+        {
+            {
+                btCollisionObject const* obA = static_cast<btCollisionObject const*>(proxy0->m_clientObject);
+                btCollisionObject const* obB = static_cast<btCollisionObject const*>(proxy1->m_clientObject);
+
+                if (obA->getUserPointer() && obB->getUserPointer())
+                {
+                    bt_body_user_info_t * rbA = (bt_body_user_info_t *)(obA->getUserPointer());
+                    bt_body_user_info_t * rbB = (bt_body_user_info_t *)(obB->getUserPointer());
+                    if (rbA->bt_body_kind() == rb_aircraft && rbB->bt_body_kind() == bt_soft_body)
+                    {
+                        return false;
+                    }
+                }
+
+            }
+
+            bool collides = (proxy0->m_collisionFilterGroup & proxy1->m_collisionFilterMask) != 0;
+            collides = collides && (proxy1->m_collisionFilterGroup & proxy0->m_collisionFilterMask);
+            //add some additional logic here that modified 'collides'
+            return collides;
+        }
+    };
+}
+
 
 BulletInterface::BulletInterface()
     : on_collision_(nullptr)
@@ -481,10 +512,14 @@ BulletInterface::BulletInterface()
     p_->_overlappingPairCache = new btAxisSweep3( worldAabbMin, worldAabbMax, 1000 );
 
     //p_->_overlappingPairCache = new btDbvtBroadphase;
+    
+
 
     p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
     auto & worldInfo = bt_softrigid_dynamics_world_ptr(p_->_dw)->getWorldInfo();   
     
+
+
     worldInfo.m_broadphase = p_->_overlappingPairCache;
     worldInfo.m_dispatcher = p_->_dispatcher;
 
@@ -494,6 +529,9 @@ BulletInterface::BulletInterface()
     worldInfo.water_normal = btVector3( 0, 0, 0 );
     worldInfo.m_gravity = btVector3(0,0,-9.8);
     worldInfo.m_sparsesdf.Initialize();   
+    
+    btOverlapFilterCallback * filterCallback = new YourOwnFilterCallback();
+    p_->_dw->getPairCache()->setOverlapFilterCallback(filterCallback);
 
 #else
     p_->_overlappingPairCache = new btDbvtBroadphase;
@@ -1108,7 +1146,7 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 			size_t numContacts = (size_t)contactManifold->getNumContacts();
 			if (numContacts)
 			{
-				if (rbA->rigid_body_kind() == rb_aircraft || rbA->rigid_body_kind() == rb_simple)
+				if (rbA->bt_body_kind() == rb_aircraft || rbA->bt_body_kind() == rb_simple)
 				{
 					for (size_t i = 0; i < numContacts; ++i)
 					{
@@ -1120,7 +1158,7 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 					}
 				}
 
-				if (rbB->rigid_body_kind() == rb_aircraft || rbB->rigid_body_kind() == rb_simple)
+				if (rbB->bt_body_kind() == rb_aircraft || rbB->bt_body_kind() == rb_simple)
 				{
 					for (size_t i = 0; i < numContacts; ++i)
 					{
@@ -1132,8 +1170,8 @@ static void internal_tick_callback(btDynamicsWorld *world, btScalar /*timeStep*/
 					}
 				}
 
-                if (rbB->rigid_body_kind() == rb_aircraft && rbA->rigid_body_kind() == rb_terrain ||
-                    rbA->rigid_body_kind() == rb_aircraft && rbB->rigid_body_kind() == rb_terrain
+                if (rbB->bt_body_kind() == rb_aircraft && rbA->bt_body_kind() == rb_terrain ||
+                    rbA->bt_body_kind() == rb_aircraft && rbB->bt_body_kind() == rb_terrain
                    )
                 {
                      //btVector3 rel_vel = obB->getInterpolationLinearVelocity() - obA->getInterpolationLinearVelocity();
