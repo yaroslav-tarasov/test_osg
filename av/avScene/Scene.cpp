@@ -1713,9 +1713,9 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000, async);
         // load("elaeagnus_umbellate",_terrainRoot, 15000, async);  // viburnum_opulus
-        // load("viburnum_opulus",_terrainRoot, 15000, async);  // viburnum_opulus
+        // load("viburnum_opulus",_terrainRoot, 15000, async);      // viburnum_opulus
         // load("caponier",_terrainRoot, 15000, async);
-        // load("ka_50",_terrainRoot, 15000, false); 
+        load("ka_50",_terrainRoot, 15000, async); 
         
          /*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
 

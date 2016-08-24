@@ -253,6 +253,8 @@ namespace sync_fsm
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = traj_->curs_value(tar_len);
+
+            FIXME(dirty tangage trick)
             target_pos.orien = cpr(target_pos.orien.get_course(),-target_pos.orien.get_pitch(),target_pos.orien.get_roll());
             geo_position gtp(target_pos, get_base());
 

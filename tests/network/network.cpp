@@ -48,6 +48,7 @@ namespace
     }
 
     std::string              g_icao_code = "URSS";
+    std::string              g_cfg_file  = "1vis.ncfg";
 }
 
 
@@ -217,7 +218,7 @@ struct client
        net_configurer(endpoints& peers)
            : cfgr_    (net_layer::create_configurator(123)) 
        {
-           cfgr_->load_config("1vis.ncfg", cfg_);
+           cfgr_->load_config(g_cfg_file, cfg_);
            refill_peers(peers);
        }
        
@@ -1056,13 +1057,19 @@ int _tmain(int argc, _TCHAR* argv[])
     __main_srvc__ = &(asi.get_service());
     
     cmd_line::arg_map am;
-    if (!am.parse(cmd_line::naive_parser().add_arg("icao_code", true), argc, argv))
+    cmd_line::naive_parser prs;
+
+    prs.add_arg("icao_code", true)
+       .add_arg("cfg", true);
+
+    if (!am.parse(prs, argc, argv))
     {
         LogError("Invalid command line");
         return 1;
     }
     
     g_icao_code = am.extract<string>("icao_code"    , "URSS");
+    g_cfg_file  = am.extract<string>("cfg"    , "1vis.ncfg");
 
     try
     {

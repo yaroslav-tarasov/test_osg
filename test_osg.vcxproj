@@ -67,8 +67,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\$(OSG_WITH_VER)\build\lib\debug;$(OSG_DIR)\$(OSG_WITH_VER)\build\lib;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;$(SIMEX_DIR)\ext\lib\boost;..\..\external-libs\boost\lib\vc10;$(OSG_DIR)\$(OSG_WITH_VER)\build\lib\debug;$(OSG_DIR)\$(OSG_WITH_VER)\build\lib;$(OSG_DIR)\cegui-0.8.4\build\lib;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;C:\Work\bullet-2.82-r2704\build\lib\Debug;$(OSG_DIR)\3rdparty\lib;$(OSG_DIR)\SPARK-1.5.5\lib\vc2008\static;$(BULLET_DIR)\build\lib\Debug;$(BULLET_DIR)\lib;$(SIMEX_DIR)/ext/lib/tinyxml2/debug\;$(SIMEX_DIR)\bin\release;$(SolutionDir)\ext\bada\debug;$(SolutionDir)\ext\alloc;$(SIMEX_DIR)\ext\lib\gmp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -385,12 +385,15 @@
     <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_ctrl.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_view.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_vis.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\common\net_object_factory.cpp" />
     <ClCompile Include="kernel\objects\common\objects_factory.cpp" />
