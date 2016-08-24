@@ -148,7 +148,8 @@ public:
             osg::Material *osgmat = static_cast<osg::Material*>(stateset->getAttribute( osg::StateAttribute::MATERIAL ));
             if ( osgmat != NULL && !ret )
             {
-                _found_mat_name = "color_" + name;
+                
+				_found_mat_name = (name.find("color_")==std::string::npos?"color_":"") + name;
                 _found_mat_names.insert(_found_mat_name);
                 ret = true;
             }

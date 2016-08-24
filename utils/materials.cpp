@@ -82,7 +82,8 @@ public:
             || mat_name.find("railing")  !=std::string::npos
             || mat_name.find("panorama") !=std::string::npos
             || mat_name.find("plane") !=std::string::npos
-            || mat_name.find("rotor") !=std::string::npos
+			|| mat_name.find("rotor") !=std::string::npos
+            || mat_name.find("color") !=std::string::npos
             || mat_name.find("default") !=std::string::npos
             )
         {
@@ -683,6 +684,7 @@ namespace mat
 		valid_mats_.insert("panorama");
 		valid_mats_.insert("plane");
 		valid_mats_.insert("rotor"); 
+		valid_mats_.insert("color"); 
 	}
 
     materials_t  reader::read (std::string full_path)

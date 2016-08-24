@@ -893,7 +893,8 @@ int main( int argc, char **argv )
         nl.push_back("sea");
         nl.push_back("railing");
         nl.push_back("panorama");
-        nl.push_back("plane");
+		nl.push_back("plane");
+        nl.push_back("color");
         //nl.push_back("rotor"); /// Õללללללללללללל נאסךמלוםעאנטעü ט הטםאלטקוסךטי ףבתועסÿ
 
         MaterialVisitor mv ( nl, std::bind(&creators::createMaterial,sp::_1,sp::_2,sp::_3,name,"",sp::_4),creators::computeAttributes,mat::reader::read(mat_file_name));

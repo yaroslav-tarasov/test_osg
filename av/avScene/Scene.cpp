@@ -1700,10 +1700,14 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         _terrainNode->Create(path);
 
         _terrainRoot->asGroup()->addChild(_terrainNode);
-		
+         
+		/*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
+
 #ifdef DECAL_RENDERER
         setupDecals(path);
 #endif
+		
+
 
 #if 0 
         load("su_27",_terrainRoot, 15000, false);
@@ -1717,7 +1721,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         // load("caponier",_terrainRoot, 15000, async);
         load("ka_50",_terrainRoot, 15000, async); 
         
-         /*_commonNode*/_terrainRoot->setCullCallback(new DynamicLightsObjectCull(/*GlobalInfluence*/LocalInfluence));
+
 
         return _terrainNode;
     }
