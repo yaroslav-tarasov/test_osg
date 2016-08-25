@@ -1719,7 +1719,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         // load("elaeagnus_umbellate",_terrainRoot, 15000, async);  // viburnum_opulus
         // load("viburnum_opulus",_terrainRoot, 15000, async);      // viburnum_opulus
         // load("caponier",_terrainRoot, 15000, async);
-        load("ka_50",_terrainRoot, 15000, async); 
+        // load("ka_50",_terrainRoot, 15000, async); 
         
 
 

@@ -5,12 +5,13 @@
 
 #include "av/avFx/Fx.h"
 
-
+#include "common/labels_management.h"
 
 namespace aircraft_physless
 {
 	struct visual
 			: view
+            , labels_management::label_provider_getter
 	{
 		static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
@@ -28,6 +29,9 @@ namespace aircraft_physless
     private:
         void fill_nodes();
     
+    private:    
+        labels_management::label_provider *      get_label_provider() const;
+
     private:
         optional<double>  last_update_;
 
@@ -44,13 +48,15 @@ namespace aircraft_physless
 #endif
 
     private:
-        boost::shared_ptr<visual_objects::label_support>       ls_;
-        boost::shared_ptr<visual_objects::parashute_support>   ps_;
+        visual_objects::label_support_ptr                       ls_;
+        boost::shared_ptr<visual_objects::parashute_support>    ps_;
 
-        boost::shared_ptr<visual_objects::smoke_support>       smoke_sup_;
-        boost::shared_ptr<visual_objects::landing_dust_support>  lds_;
+        boost::shared_ptr<visual_objects::smoke_support>        smoke_sup_;
+        boost::shared_ptr<visual_objects::landing_dust_support> lds_;
 
-        visual_system*                                         vsys_;
+        visual_system*                                          vsys_;
+    
+
 
 	private: 
 		boost::function<void()>                                start_ ;

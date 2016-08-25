@@ -569,7 +569,7 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
 
         stateset->addUniform( new osg::Uniform("eCol"     , eCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 		stateset->addUniform( new osg::Uniform("aCol"     , aCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
-		stateset->addUniform( new osg::Uniform("dCol"     , dCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+		stateset->addUniform( new osg::Uniform("dCol"     , dCol + osg::Vec4(0.2,0.2,0.2,0.0)), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 		stateset->addUniform( new osg::Uniform("sCol"     , sCol), osg::StateAttribute::ON | osg::StateAttribute::PROTECTED ); 
 	}
 	

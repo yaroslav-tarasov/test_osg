@@ -375,7 +375,7 @@ namespace sync_fsm
 	}
 
     void phys_state2::sync_rotors(double dt)
-    {
+    {                                                                                         
         self_.get_rotors()->visit_rotors([this, dt](aircraft::rotors_group_t const& rg,size_t& id)
         {
             auto rnode = rg.node;

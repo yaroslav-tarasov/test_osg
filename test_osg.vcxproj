@@ -226,6 +226,8 @@
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.h" />
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.h" />
     <ClInclude Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.h" />
+    <ClInclude Include="kernel\objects\labels_manager\labels_manager_view.h" />
+    <ClInclude Include="kernel\objects\labels_manager\labels_manager_vis.h" />
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_model.h" />
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_view.h" />
     <ClInclude Include="kernel\objects\model_debug_drawer\mdd_visual.h" />
@@ -425,6 +427,14 @@
     <ClCompile Include="kernel\objects\human\human_model_states.cpp" />
     <ClCompile Include="kernel\objects\human\human_view.cpp" />
     <ClCompile Include="kernel\objects\human\human_visual.cpp" />
+    <ClCompile Include="kernel\objects\labels_manager\labels_manager_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\labels_manager\labels_manager_vis.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_model.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp" />
     <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp" />

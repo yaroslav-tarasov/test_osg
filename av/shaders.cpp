@@ -971,21 +971,20 @@ $endif
 \n           void main()
 \n           {
 \n               vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
-\n               // mat3 rotation = mat3(tangent, binormal, normal);
 \n               vec4 viewpos = gl_ModelViewMatrix * gl_Vertex;
 \n               viewworld_matrix = inverse(gl_ModelViewMatrix);
-\n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 \n
 \n               v_out.tangent   = tangent;
 \n               v_out.binormal  = binormal;//cross(normal,tangent);
 \n               v_out.normal    = normal;
 \n               v_out.vnormal   = mat3(gl_ModelViewMatrix) * normal;
 \n               v_out.viewpos   = viewpos.xyz;
-\n               v_out.texcoord  = gl_MultiTexCoord1.xy;
+\n               v_out.texcoord  = gl_MultiTexCoord0.xy;
 \n               v_out.detail_uv = gl_Vertex.xy;// * 0.03;
 \n               shadow_vs_main(viewpos);
 \n
 \n               SAVE_LIGHTMAP_VARYINGS_VP(v_out, viewpos);
+\n               gl_Position = gl_ModelViewProjectionMatrix *  gl_Vertex;
 \n           }       
        )
        };
@@ -1107,7 +1106,7 @@ $endif
 \n
 \n               aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0);
 \n			     // aFragColor = vec4(1.0,0.0,0.0,1.0);
-\n               // aFragColor = vec4(bump,1.0);    
+\n               // aFragColor = vec4(texture2D(normalTex, f_in.texcoord).xyz,1.0);    
 \n           }
        )
 

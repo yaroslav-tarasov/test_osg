@@ -59,6 +59,7 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
     obj_list.push_back(std::move(auto_object::pack( fact,"airports_manager")));
     obj_list.push_back(std::move(auto_object::pack( fact,"ada")));
     obj_list.push_back(std::move(auto_object::pack( fact,"meteo_proxy")));
+    obj_list.push_back(std::move(auto_object::pack( fact,"labels_manager")));
     obj_list.push_back(std::move(auto_object::pack( fact,"aircraft_reg")));
     
     {

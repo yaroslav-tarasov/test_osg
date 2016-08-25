@@ -264,6 +264,12 @@
     <Filter Include="Header Files\av\gui">
       <UniqueIdentifier>{181a47af-4584-46cd-8b5c-0ea2f602c25f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\objects\labels_manager">
+      <UniqueIdentifier>{ddaa542c-32e4-424e-bf4b-90ac64ad582e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objects\labels_manager">
+      <UniqueIdentifier>{afcd8920-8812-41f1-999c-7373d46529e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="misc\shaders\tess_quad.tcs">
@@ -667,6 +673,12 @@
     </ClInclude>
     <ClInclude Include="av\avGui\CEGUIDrawable.h">
       <Filter>Header Files\av\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\labels_manager\labels_manager_view.h">
+      <Filter>Header Files\objects\labels_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="kernel\objects\labels_manager\labels_manager_vis.h">
+      <Filter>Header Files\objects\labels_manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1368,6 +1380,12 @@
     </ClCompile>
     <ClCompile Include="av\avGui\CEGUIDrawable.cpp">
       <Filter>Source Files\av\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\labels_manager\labels_manager_vis.cpp">
+      <Filter>Source Files\objects\labels_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\labels_manager\labels_manager_view.cpp">
+      <Filter>Source Files\objects\labels_manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

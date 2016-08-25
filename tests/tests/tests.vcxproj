@@ -85,7 +85,9 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\flex\FlexDrawable.h" />
+    <ClInclude Include="..\flex\FlexDrawable.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -139,8 +141,12 @@
     <ClCompile Include="..\DynamicCharacterController.cpp" />
     <ClCompile Include="..\exp_test.cpp" />
     <ClCompile Include="..\flame_test.cpp" />
-    <ClCompile Include="..\flex\FlexDrawable.cpp" />
-    <ClCompile Include="..\flex\osgflex.cpp" />
+    <ClCompile Include="..\flex\FlexDrawable.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\flex\osgflex.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\grass_test.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
