@@ -41,7 +41,7 @@ namespace labels_management
     
     struct label_provider_getter
     {
-        virtual label_provider * get_label_provider() const = 0;
+        virtual labels_provider_ptr get_label_provider() const = 0;
     };
 
     struct labels_manager

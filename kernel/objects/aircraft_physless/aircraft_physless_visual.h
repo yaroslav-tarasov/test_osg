@@ -30,7 +30,7 @@ namespace aircraft_physless
         void fill_nodes();
     
     private:    
-        labels_management::label_provider *      get_label_provider() const;
+        labels_management::labels_provider_ptr      get_label_provider() const;
 
     private:
         optional<double>  last_update_;
@@ -48,7 +48,7 @@ namespace aircraft_physless
 #endif
 
     private:
-        visual_objects::label_support_ptr                       ls_;
+        visual_objects::label_support_proxy_ptr                 ls_;
         boost::shared_ptr<visual_objects::parashute_support>    ps_;
 
         boost::shared_ptr<visual_objects::smoke_support>        smoke_sup_;

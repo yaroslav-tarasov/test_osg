@@ -31,6 +31,8 @@ namespace aircraft_physless
 	{
        
         fill_nodes();
+		
+		ls_ =  boost::make_shared<visual_objects::label_support_proxy>(); 
 
 #ifndef ASYNC_OBJECT_LOADING  
 
@@ -280,12 +282,9 @@ namespace aircraft_physless
 
     }
 
-    labels_management::label_provider *  visual::get_label_provider() const
+    labels_management::labels_provider_ptr  visual::get_label_provider() const
     {
-         if(ls_)
-             return ls_.get();
-
-         return nullptr;
+         return ls_;
     }
 }
 

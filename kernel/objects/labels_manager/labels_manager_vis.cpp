@@ -84,11 +84,21 @@ void visual::add_label(object_info_ptr object)
 {
     if (aircraft::info_ptr airc = object)
     {
+#if 0
         labels_provider_ptr fp = find_first_child<labels_provider_ptr>(object.get());
         Assert(fp);
-
-        insert(fp);
-        air_managed_providers_.insert(std::make_pair(object->object_id(), fp));
+#endif
+		labels_management::label_provider_getter* getter = dynamic_cast<labels_management::label_provider_getter*>(object.get());
+		if(getter)
+		{
+			labels_provider_ptr fp = getter->get_label_provider();
+			Assert(fp);
+			
+			fp->set_visible(false);
+			
+			insert(fp);
+			air_managed_providers_.insert(std::make_pair(object->object_id(), fp));
+		}
     }
 }
 

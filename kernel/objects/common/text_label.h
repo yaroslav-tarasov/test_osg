@@ -7,9 +7,11 @@
 namespace visual_objects
 {
     struct label_support : labels_management::label_provider
-
     {
-        SAFE_BOOL_OPERATOR(visual_object_)
+        
+		friend  struct label_support_proxy;
+
+		SAFE_BOOL_OPERATOR(visual_object_)
 
         label_support(visual_object_ptr obj,const std::string& text )
             : visual_object_(obj)
@@ -97,38 +99,71 @@ namespace visual_objects
     
     struct label_support_proxy : labels_management::label_provider
     {
+		SAFE_BOOL_OPERATOR(ls_)
 
-        label_support_proxy(label_support_ptr ls)
-            : ls_ (ls)
-        {}
+ 		label_support_proxy& operator= ( label_support_ptr const& rhs )
+		{
+			 ls_ = rhs;
+			 init_();
+		}
 
     private:
         void set_labels_manager( labels_management::labels_manager * man  )     override
         {
             labels_man_ = man;
-        }
 
-        void set_font( std::string const & name  , unsigned size ) override
+			if(ls_)
+				ls_->set_labels_manager(labels_man_);
+        }
+		
+		labels_management::labels_manager * get_labels_manager()    const  override
+		{
+			if(ls_)
+				return ls_->get_labels_manager();
+
+			return labels_man_;
+		}
+
+        void set_font( std::string const & name  , unsigned size )  override
         {
-            name_ = name;
-            size_ = size;
+            if(ls_)
+				ls_->set_font(name, size);
+
+			name_ = name;
+			size_ = size;
+ 
         }
 
         virtual void set_visible (bool v) override
         {
-            visibility_ = v;
+			if(ls_)
+				ls_->set_visible(v);
+
+		    visibility_ = v;
         }
 
         virtual bool get_visible () override
         {
-            return visibility_;
+            return *visibility_;
         }
+
+		void init_()
+		{
+			if(visibility_)
+			 ls_->set_visible(*visibility_);
+
+			if(name_)
+		     ls_->set_font(*name_, size_);
+
+			if(labels_man_)
+		       ls_->set_labels_manager(labels_man_);
+		}
 
     private:
         label_support_ptr                    ls_;    
         labels_management::labels_manager *  labels_man_;
-        bool                                 visibility_;
-        std::string                          name_;
+        optional<bool>                       visibility_;
+        optional<std::string>                name_;
         unsigned                             size_;
     };
 
