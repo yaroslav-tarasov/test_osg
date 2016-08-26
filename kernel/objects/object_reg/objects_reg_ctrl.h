@@ -24,25 +24,25 @@ private:
 
     // control
 private:
-    void inject_msg   (net_layer::msg::run_msg            const& msg);  
-    void inject_msg   (net_layer::msg::container_msg      const& msg);
-    void inject_msg   (net_layer::msg::attach_tow_msg_t   const& msg);  
-    void inject_msg   (net_layer::msg::detach_tow_msg_t   const& msg); 
-    void inject_msg   (net_layer::msg::malfunction_msg    const& msg); 
-	void inject_msg   (net_layer::msg::fire_fight_msg     const& msg); 
-    void inject_msg   (net_layer::msg::engine_state_msg   const& msg);
-    void inject_msg   (net_layer::msg::environment_msg    const& msg);
-    void inject_msg   (net_layer::msg::traj_assign_msg    const& msg);
-    void inject_msg   (net_layer::msg::arrgear_target_msg const& msg);
-	void inject_msg   ( net_layer::msg::create_msg        const& msg);    
-    void inject_msg   ( net_layer::msg::destroy_msg       const& msg);
-    void inject_msg   ( net_layer::msg::update_cloud_zone_msg       const& msg);
+    void inject_msg   ( net_layer::msg::container_msg       const& msg );
+    void inject_msg   ( net_layer::msg::create_msg          const& msg );    
+    void inject_msg   ( net_layer::msg::destroy_msg         const& msg );
+    void inject_msg   ( net_layer::msg::run_msg             const& msg );  
+
+    void inject_msg   ( net_layer::msg::attach_tow_msg_t    const& msg );  
+    void inject_msg   ( net_layer::msg::detach_tow_msg_t    const& msg ); 
+    void inject_msg   ( net_layer::msg::malfunction_msg     const& msg ); 
+	void inject_msg   ( net_layer::msg::fire_fight_msg      const& msg ); 
+    void inject_msg   ( net_layer::msg::engine_state_msg    const& msg );
+    void inject_msg   ( net_layer::msg::parachute_state_msg const& msg );
+    void inject_msg   ( net_layer::msg::environment_msg     const& msg );
+    void inject_msg   ( net_layer::msg::traj_assign_msg     const& msg );
+    void inject_msg   ( net_layer::msg::arrgear_target_msg  const& msg );
+    void inject_msg   ( net_layer::msg::update_cloud_zone_msg  const& msg);
 
     virtual void inject_msg     ( const void* data, size_t size          ) override;
-	// virtual void create_object  ( net_layer::msg::create_msg const& msg  ) override;
-    // virtual void destroy_object ( net_layer::msg::destroy_msg const& msg ) override;
-    
-	virtual void set_sender     (remote_send_f s)                    override;
+
+    virtual void set_sender     (remote_send_f s)                    override;
 
     // info
 private:

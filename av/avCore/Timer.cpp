@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <utils/performance_counter.h>
 
 

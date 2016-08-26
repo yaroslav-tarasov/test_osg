@@ -3,7 +3,8 @@
 
 #include "common/aircraft.h"
 
-
+#include "application/main_window.h"
+#include "application/menu.h"
 
 namespace labels_manager
 {
@@ -19,12 +20,14 @@ AUTO_REG_NAME(labels_manager_visual, visual::create);
 // ctor
 visual::visual( kernel::object_create_t const& oc, dict_copt dict )
     : view(oc, dict)
+    , vis_sys_(dynamic_cast<visual_system *>(oc.sys))
     , update_timer_(boost::bind(&visual::update_impl, this))
     , rolled_id_(0)
 {
 
     // start timer
     // update_timer_.wait(pt::milliseconds(in_atc_ ? 1000 : 250), true);
+    vis_sys_->scene()->subscribe_gui_ready(boost::bind(&visual::on_gui_ready,this));
 }
 
 // dtor
@@ -94,8 +97,6 @@ void visual::add_label(object_info_ptr object)
 			labels_provider_ptr fp = getter->get_label_provider();
 			Assert(fp);
 			
-			fp->set_visible(false);
-			
 			insert(fp);
 			air_managed_providers_.insert(std::make_pair(object->object_id(), fp));
 		}
@@ -132,5 +133,23 @@ void visual::on_new_settings()
     settings_ = new_settings_;
 }
 
+void visual::on_gui_ready()
+{
+    app::main_window_ptr  mw  = vis_sys_->scene()->GetMainGUIWindow();
+
+    app::menu_ptr vm = mw->get_main_menu(L"Вид");
+    if(!vm)
+        vm = mw->add_main_menu(L"Вид");
+
+    vm->add_string(L"Метки", boost::bind(&visual::on_check_callsign,this));
+}
+
+void visual::on_check_callsign ()
+{
+    for (auto it = labels_.begin(), it_end = labels_.end(); it != it_end; ++it)
+    {
+        (*it)->set_visible(!(*it)->get_visible());
+    }
+}
 
 }

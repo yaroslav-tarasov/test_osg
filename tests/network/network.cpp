@@ -714,7 +714,11 @@ struct client
 				ADD_EVENT(traj_trp2_[i]->base_length()  , create_msg(hull_number,traj_trp2_[i]->kp_value(traj_trp2_[i]->base_length()),traj_trp2_[i]->curs_value(traj_trp2_[i]->base_length()), ok_aircraft, model, boost::lexical_cast<std::string>(hull_number)) )
 				ADD_EVENT(60.0 + i * 25 , arrgear_target_msg( hull_number ) )  
 
+                ADD_EVENT(55.0  + i * 25 , parachute_state_msg( hull_number, PS_SHOW ) )  
+
 				ADD_EVENT(78.0  + i * 25 , destroy_msg( hull_number ) )  
+
+                ADD_EVENT(72.0  + i * 25 , parachute_state_msg( hull_number, PS_HIDE ) ) 
 
 				runs_.insert(make_pair(traj_trp2_[i]->base_length(),
 				boost::bind( run_f_pos , hull_number, _1, traj_trp2_[i],/*traj_offset*/0)

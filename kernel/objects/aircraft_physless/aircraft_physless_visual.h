@@ -9,6 +9,9 @@
 
 namespace aircraft_physless
 {
+
+    using namespace visual_objects;
+
 	struct visual
 			: view
             , labels_management::label_provider_getter
@@ -38,7 +41,7 @@ namespace aircraft_physless
         std::vector<nodes_management::node_info_ptr>        engines_nodes_;
         
         std::vector<nm::node_info_ptr> forsage_nodes_;
-        std::vector<boost::shared_ptr<visual_objects::forsage_support>>     fs_;
+        std::vector<forsage_support_ptr>     fs_;
 
         visual_object_ptr smoke_object_;
         
@@ -48,11 +51,13 @@ namespace aircraft_physless
 #endif
 
     private:
-        visual_objects::label_support_proxy_ptr                 ls_;
-        boost::shared_ptr<visual_objects::parashute_support>    ps_;
+        label_support_proxy_ptr                                 ls_;
 
-        boost::shared_ptr<visual_objects::smoke_support>        smoke_sup_;
-        boost::shared_ptr<visual_objects::landing_dust_support> lds_;
+        std::vector<nm::node_info_ptr>             parachute_nodes_;
+        std::vector<parashute_support_ptr>                      ps_;
+
+        smoke_support_ptr                                smoke_sup_;
+        landing_dust_support_ptr                               lds_;
 
         visual_system*                                          vsys_;
     

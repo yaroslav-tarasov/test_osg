@@ -315,9 +315,13 @@ namespace net_layer
         REFL_END()
 
 //
+//  Equipment
+//
+
+//
 //  Engines
 //
-      
+
     enum engine_state_t : int16_t
     {
         ES_STOPPED = 0 ,  
@@ -346,6 +350,33 @@ namespace net_layer
     };
 
     REFL_STRUCT(engine_state_msg)
+        REFL_ENTRY(ext_id)
+        REFL_ENTRY(state)
+    REFL_END()
+
+    enum parachute_state_t : int16_t
+    {
+        PS_NONE = 0,
+        PS_HIDE = 1,
+        PS_SHOW = 2,
+
+        PS_SIZE
+    };
+
+    struct parachute_state_msg
+        : network::msg_id<am_parachute_state>
+    {
+        parachute_state_msg() {}
+
+        parachute_state_msg(uint32_t id, parachute_state_t state)
+            : ext_id      (id),state(state)
+        {}
+
+        uint32_t           ext_id;
+        parachute_state_t   state;
+    };
+
+    REFL_STRUCT(parachute_state_msg)
         REFL_ENTRY(ext_id)
         REFL_ENTRY(state)
     REFL_END()

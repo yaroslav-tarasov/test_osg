@@ -86,7 +86,7 @@ namespace visual_objects
 
         virtual bool get_visible () override
         {
-             return true;
+             return visual_object_->get_visible();
         }
 
     private:
@@ -99,7 +99,10 @@ namespace visual_objects
     
     struct label_support_proxy : labels_management::label_provider
     {
-		SAFE_BOOL_OPERATOR(ls_)
+		label_support_ptr  get_ls() const
+        {          
+             return ls_;
+        }
 
  		label_support_proxy& operator= ( label_support_ptr const& rhs )
 		{

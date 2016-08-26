@@ -33,6 +33,7 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
     void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
     void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_parachute_state)(net_layer::msg::parachute_state_msg const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
     void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
@@ -49,7 +50,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::attach_tow_msg_t      >(boost::bind(on_atow        , this, _1))
         .add<net_layer::msg::detach_tow_msg_t      >(boost::bind(on_dtow        , this, _1))
         .add<net_layer::msg::malfunction_msg       >(boost::bind(on_malfunction , this, _1))
-	    .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
+        .add<net_layer::msg::engine_state_msg      >(boost::bind(on_engine_state, this, _1))
+	    .add<net_layer::msg::parachute_state_msg   >(boost::bind(on_parachute_state, this, _1))
 		.add<net_layer::msg::fire_fight_msg        >(boost::bind(on_fire        , this, _1))
         .add<net_layer::msg::traj_assign_msg       >(boost::bind(on_traj_assign , this, _1)) 
         .add<net_layer::msg::environment_msg       >(boost::bind(on_environment , this, _1))
@@ -235,7 +237,21 @@ void ctrl::inject_msg(net_layer::msg::engine_state_msg const& msg)
 
         if (aircraft::control_ptr pa = a)
         {
-            pa->set_equipment_state(aircraft::equipment_state_t((aircraft::engine_state_t)msg.state));
+            pa->set_equipment_state(aircraft::equipment_state_t((aircraft::engine_state_t)msg.state, aircraft::PS_SIZE));
+        }
+    }
+
+}
+
+void ctrl::inject_msg(net_layer::msg::parachute_state_msg const& msg) 
+{
+    if(msg.ext_id>0 )                          
+    {
+        auto a = regs_objects_[msg.ext_id];
+
+        if (aircraft::control_ptr pa = a)
+        {
+            pa->set_equipment_state(aircraft::equipment_state_t(aircraft::ES_SIZE, (aircraft::parachute_state_t)msg.state));
         }
     }
 

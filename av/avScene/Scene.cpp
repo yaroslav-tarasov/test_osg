@@ -784,7 +784,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
                 zones_.push_back(std::make_pair(1,std::wstring(L"Шереметьево")));
                 zones_.push_back(std::make_pair(2,std::wstring(L"Сочи")));
 
-
 				pthis->_mw = app::create_main_win();
 				app::menu_ptr fm = pthis->_mw->add_main_menu(L"Файл");
 				fm->add_string(L"Выход" , boost::bind(&Scene::onExit,this)); // [&]() { /*exit(0);*/});
@@ -795,7 +794,6 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
                     pthis->_vis_settings_panel->set_visible(!pthis->_vis_settings_panel->visible());
                 });
 #endif
-                
                 //app::menu_ptr am = pthis->_mw->add_main_menu(L"О программе");
                 // vm->add_string("Lights" , [=]() {  });
 
@@ -810,7 +808,7 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
                 pthis->_vis_settings_panel->subscribe_set_shadows_part (boost::bind(&Scene::onSetShadows,this,boost::none,_1));
 				pthis->_vis_settings_panel->subscribe_set_map          (boost::bind(&Scene::onSetMap,this,_1));
                 pthis->_vis_settings_panel->subscribe_set_cloud_param  (boost::bind(&Scene::onSetCloudParams,this,_1));
-                pthis->_vis_settings_panel->subscribe_set_global_intensity       (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
+                pthis->_vis_settings_panel->subscribe_set_global_intensity  (boost::bind(&Scene::onSetGlobalIntensity,this,_1));
                 pthis->_vis_settings_panel->set_light(true);
 
                 pthis->_time_panel = app::create_time_panel();
@@ -1659,28 +1657,26 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         return root;
     }
 
-    if (path == "parachute.scg")
+    if ( path.find("parachute") != std::string::npos)
     {
         osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
         const auto offset =  pat?pat->asTransform()->asPositionAttitudeTransform()->getPosition():osg::Vec3(0.0,0.0,0.0);
 
         osg::MatrixTransform* root = nullptr;
-
-        osg::Node* phys_ctrl = findFirstNode(parent,"phys_ctrl",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS);
-        osg::MatrixTransform* body = findFirstNode(parent,"Body_",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_ALL_CHILDREN)->asTransform()->asMatrixTransform();
-
-        if(phys_ctrl && body)
+        
+        // (path == "parachute.scg" || path == "parachute_r.scg" || path == "parachute_l.scg")
+        
+        if(parent )
         {
              avCore::ObjectControl* obj = avCore::createObject("parachute" , true);
              osg::Node* obj_node = obj->getOrCreateNode();
              
              osg::Matrix mat;
-             mat.setTrans(body->getMatrix().getTrans() - offset/2.0 );
-             
-             res_node->setMatrix(osg::Matrix::scale(osg::Vec3f(0.25, 0.25, 0.25)) * mat );
+             mat.setRotate(osg::Quat(osg::inDegrees(path == "parachute_r.scg"? 0.0:-180), osg::Y_AXIS));
+             res_node->setMatrix(osg::Matrix::scale(osg::Vec3f(0.1, 0.1, 0.1)) * mat );
              res_node->addChild( obj_node );
          
-             phys_ctrl->asGroup()->addChild(res_node);
+             parent->asGroup()->addChild(res_node);
 
              osg::Node* root =  findFirstNode(obj_node,"root"); 
              if(root!=nullptr) root->setUserValue("id",seed);

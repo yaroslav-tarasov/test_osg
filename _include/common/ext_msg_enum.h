@@ -25,6 +25,7 @@ namespace net_layer
 
             am_malfunction      ,
             am_engines_state    ,
+            am_parachute_state  ,
 
             vm_attach_tow       ,
             vm_detach_tow       ,

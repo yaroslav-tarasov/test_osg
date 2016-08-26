@@ -19,6 +19,7 @@
 
 #include "common/util.h"
 #include "common/debug.h"
+#include "common/event.h"
 
 #include "geometry/xmath.h"
 

@@ -26,8 +26,7 @@ namespace kernel
     };
 
     visual_object_impl::visual_object_impl( std::string const & res, uint32_t seed, bool async, on_object_loaded_f f )
-        : loaded_(false)
-        , p_     (boost::make_shared<private_t>(res))
+        : p_     (boost::make_shared<private_t>(res))
         , seed_  (seed)
         , ol_    (f)
         , async_ (async)
@@ -37,7 +36,7 @@ namespace kernel
 		{
             p_->node_ = p_->scene_->load(res, nullptr, seed, async);
             p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact);
-            loaded_ = true;
+
 
             using namespace avAnimation;
 
@@ -61,8 +60,7 @@ namespace kernel
     }
 
     visual_object_impl::visual_object_impl(  nm::node_control_ptr parent, std::string const & res, uint32_t seed, bool async, on_object_loaded_f f )
-        : loaded_(false)
-        , p_     (boost::make_shared<private_t>(res))
+        : p_     (boost::make_shared<private_t>(res))
         , seed_  (seed)
         , ol_    (f)
         , async_ (async)
@@ -114,7 +112,6 @@ namespace kernel
          if(seed_==seed)
          {
            p_->root_ = findFirstNode(p_->node_,"root",FindNodeVisitor::not_exact); 
-           loaded_ = true;
 
 		   using namespace avAnimation;
 
@@ -164,7 +161,15 @@ namespace kernel
 
     void visual_object_impl::set_visible(bool visible)
     {
-        if(loaded_)
+        if(p_->node_) 
             p_->node_->setNodeMask(visible?/*0xffffffff*/0x00010000:0);
+    }
+
+    bool visual_object_impl::get_visible()
+    {
+        if(p_->node_) 
+            return p_->node_->getNodeMask()!=0;
+
+        return true;
     }
 }

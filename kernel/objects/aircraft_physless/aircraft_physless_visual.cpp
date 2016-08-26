@@ -64,6 +64,12 @@ namespace aircraft_physless
                     return true;
                 }
                 else
+                if (boost::starts_with(n->name(), "parachute"))
+                {
+                    this->parachute_nodes_.push_back(n);
+                    return true;
+                }
+                else
                 if (boost::starts_with(n->name(), "rotordyn") || boost::starts_with(n->name(), "rotorsag"))
                 {
                     nm::vis_node_control_ptr(n)->set_visibility(false);
@@ -116,9 +122,9 @@ namespace aircraft_physless
 #endif
 
 #ifdef ASYNC_OBJECT_LOADING 
-		if( !ls_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
+		if( !(ls_->get_ls()) && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
 		{ 
-            ls_ = boost::make_shared<visual_objects::label_support>(
+            *ls_ = boost::make_shared<visual_objects::label_support>(
                     vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
 
 
@@ -268,16 +274,19 @@ namespace aircraft_physless
 
         if(state.para_state == aircraft::PS_SHOW)
         {
-            if(!ps_)
-               ps_ = boost::make_shared<visual_objects::parashute_support>(
-                vsys_->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
+            if(parachute_nodes_.size()>0 && ps_.size() == 0)
+            {
+                std::for_each(parachute_nodes_.begin(),parachute_nodes_.end(),
+                    [this](nm::node_info_ptr fn) {
+                        ps_.push_back(boost::make_shared<visual_objects::parashute_support>(
+                            vsys_->create_visual_object(nm::node_control_ptr(fn),fn->name() + ".scg" /*"parachute.scg"*/,0,0,false)
+                            )); 
+                });
+            }
             
         }
         else
-        {
-            if(ps_)
-                ps_.reset();
-        }
+            ps_.clear();
 
 
     }

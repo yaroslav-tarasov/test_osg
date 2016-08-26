@@ -253,7 +253,10 @@
     <ClCompile Include="av\avAnimation\AnimTest.cpp" />
     <ClCompile Include="av\avAnimation\Bone.cpp" />
     <ClCompile Include="av\avAnimation\XFileParser.cpp" />
-    <ClCompile Include="av\avCore\Database.cpp" />
+    <ClCompile Include="av\avCore\Database.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="av\avCore\DebugRenderer.cpp" />
     <ClCompile Include="av\avCore\DecalRender.cpp" />
     <ClCompile Include="av\avCore\Environment.cpp" />
@@ -266,11 +269,20 @@
     <ClCompile Include="av\avCore\LOD.cpp" />
     <ClCompile Include="av\avCore\Logo.cpp" />
     <ClCompile Include="av\avCore\NodeTracker.cpp" />
-    <ClCompile Include="av\avCore\Noise.cpp" />
+    <ClCompile Include="av\avCore\Noise.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="av\avCore\Object.cpp" />
     <ClCompile Include="av\avCore\PreRender.cpp" />
-    <ClCompile Include="av\avCore\Timer.cpp" />
-    <ClCompile Include="av\avCore\Utils.cpp" />
+    <ClCompile Include="av\avCore\Timer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="av\avCore\Utils.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="av\avCore\XmlModel.cpp" />
     <ClCompile Include="av\avFx\FireFx.cpp" />
     <ClCompile Include="av\avFx\FoamStreamFx.cpp" />
@@ -321,7 +333,10 @@
     <ClCompile Include="av\avWeather\Weather.cpp" />
     <ClCompile Include="av\EnvRenderer.cpp" />
     <ClCompile Include="av\scn_parser.cpp" />
-    <ClCompile Include="av\shaders.cpp" />
+    <ClCompile Include="av\shaders.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="av\Visual.cpp" />
     <ClCompile Include="core\cluster\net_layer\net_worker.cpp" />
     <ClCompile Include="core\cluster\net_layer\session_impl.cpp" />
@@ -497,8 +512,14 @@
     <ClCompile Include="utils\async_load.cpp" />
     <ClCompile Include="utils\empty_scene.cpp" />
     <ClCompile Include="utils\LoadManager.cpp" />
-    <ClCompile Include="utils\materials.cpp" />
-    <ClCompile Include="utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="utils\materials.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="utils\visitors\find_node_visitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="utils\workqueue.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />

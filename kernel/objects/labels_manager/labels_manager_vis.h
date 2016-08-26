@@ -54,6 +54,11 @@ private:
     // own
 private:
     void on_new_settings();
+    void on_gui_ready();
+
+    // gui
+private:
+    void on_check_callsign ();
 
 private:
     async_timer update_timer_;
@@ -66,6 +71,10 @@ private:
 private:
     typedef ph_map<uint32_t, labels_provider_ptr>::map_t labels_provider_list_t;
     labels_provider_list_t                               air_managed_providers_;
+
+private:
+    kernel::visual_system     * vis_sys_;
+
 private:
     settings_t          settings_;
     settings_t          new_settings_;

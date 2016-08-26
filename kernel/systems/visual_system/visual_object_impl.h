@@ -23,6 +23,8 @@ struct visual_object_impl
     osg::Node* get_node(const std::string& name) const override;
 
     void set_visible(bool visible)       override;
+    bool get_visible()                   override;
+
     void set_object_loaded()             override;
 
 #ifdef ASYNC_OBJECT_LOADING
@@ -30,7 +32,6 @@ private:
     void object_loaded( uint32_t seed );
 #endif
     uint32_t                            seed_;
-    bool                              loaded_;
     on_object_loaded_f                    ol_;
     bool                               async_;
 private:

@@ -92,9 +92,15 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\flex-080\flex\core\maths.cpp" />
-    <ClCompile Include="..\..\..\flex-080\flex\core\mesh.cpp" />
-    <ClCompile Include="..\..\..\flex-080\flex\core\platform.cpp" />
+    <ClCompile Include="..\..\..\flex-080\flex\core\maths.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\flex-080\flex\core\mesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\flex-080\flex\core\platform.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\av\avCore\Database.cpp" />
     <ClCompile Include="..\..\av\avCore\InstancedAnimationManager.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
