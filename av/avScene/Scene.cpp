@@ -1664,8 +1664,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         osg::MatrixTransform* root = nullptr;
         
-        // (path == "parachute.scg" || path == "parachute_r.scg" || path == "parachute_l.scg")
-        
+      
         if(parent )
         {
              avCore::ObjectControl* obj = avCore::createObject("parachute" , true);

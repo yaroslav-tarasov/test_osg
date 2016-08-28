@@ -398,7 +398,30 @@ namespace sync_fsm
             rotor_node_pos.local().omega = omega_rel;
 
             rnode->set_position(rotor_node_pos);   
-            
+
+//
+//          Init
+//
+
+
+			if(rg.dyn_rotor_node && !rg.dyn_rotor_node->get_visibility())
+			{
+				rg.dyn_rotor_node->set_visibility(false);
+			}
+
+			if(rg.sag_rotor_node&& !rg.sag_rotor_node->get_visibility() )
+			{
+				rg.sag_rotor_node->set_visibility(false);
+			}
+
+			if(rg.rotor_node && !rg.rotor_node->get_visibility() )
+			{
+				rg.rotor_node->set_visibility(false);
+			}
+
+//
+//			Dependent on speed
+//
             if(abs_speed>150.)
             {
                 if(rg.dyn_rotor_node)
@@ -409,6 +432,13 @@ namespace sync_fsm
                         rg.dyn_rotor_node->set_position(rg.dyn_rotor_node->position());
 
                         // self_.set_rotors_state(1.0,1.0);
+
+						if(rg.rotor_node)
+						{
+							rg.rotor_node->set_visibility(false);
+							rg.rotor_node->set_position(rg.rotor_node->position());
+						}
+
                     }
                 }
 

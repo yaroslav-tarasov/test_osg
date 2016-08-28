@@ -231,11 +231,7 @@ void processMorphAnimation( boost::optional<xml_model_t> data, osg::Node* object
     {
         FindNodeVisitor::nodeNamesList list_name;
         const morph_params& mp = data->morphs["rotor_morph"];
-#if 0
-        list_name.push_back(mp.parent);
-        list_name.push_back(mp.source);
-        list_name.push_back(mp.target);
-#endif
+
         FindNodeVisitor findParents(mp.parent,FindNodeVisitor::not_exact); 
         object_file->accept(findParents);
 
@@ -250,6 +246,19 @@ void processMorphAnimation( boost::optional<xml_model_t> data, osg::Node* object
         {
             auto source = findFirstNode(findParents.getNodeList()[i],mp.source,FindNodeVisitor::not_exact);
             auto target = findFirstNode(findParents.getNodeList()[i],mp.target,FindNodeVisitor::not_exact);
+
+			osg::Group* source_copy = new osg::Group;
+			osg::Group* target_copy = new osg::Group;
+			std::string str_user_id; 
+
+			source_copy->setName(source->getName());
+			target_copy->setName(target->getName());
+
+			if(source->getUserValue("dae_node_id",str_user_id))
+				  source_copy->setUserValue("dae_node_id",str_user_id);
+
+			if(target->getUserValue("dae_node_id",str_user_id))
+				target_copy->setUserValue("dae_node_id",str_user_id);
 
             source->setNodeMask(0);
             target->setNodeMask(0);
@@ -278,10 +287,17 @@ void processMorphAnimation( boost::optional<xml_model_t> data, osg::Node* object
             }
 
 
+			
+
             geode->setUpdateCallback( new osgAnimation::UpdateMorph("MorphCallback") );
             geode->setName("rotor_morph");
 
-            findParents.getNodeList()[i]->asGroup()->addChild(geode);
+			source_copy->addChild(geode);
+            target_copy->addChild(geode);
+
+			findParents.getNodeList()[i]->asGroup()->addChild(source_copy);
+			findParents.getNodeList()[i]->asGroup()->addChild(target_copy);
+
         }
 
     }

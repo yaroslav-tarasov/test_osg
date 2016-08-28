@@ -126,14 +126,9 @@ AUTO_REG_NAME(vehicle_visual, visual::create);
 
 visual::visual(object_create_t const& oc, dict_copt dict)
     : view(oc, dict)
+	, vsys_     (dynamic_cast<visual_system*>(sys_))  
 {
-
-
-#ifndef ASYNC_OBJECT_LOADING 
-    visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-    label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg");
-    ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
-#endif
+     ls_ =  boost::make_shared<visual_objects::label_support_proxy>();
 }
 
 void visual::settings_changed()
@@ -150,12 +145,10 @@ void visual::update(double time)
     {
 
 #ifdef ASYNC_OBJECT_LOADING 
-		if(!label_object_ && nm::vis_node_control_ptr(root_)->vis_nodes().size()>0)
+		if(!(ls_->get_ls()) && nm::vis_node_control_ptr(root_)->vis_nodes().size()>0)
 		{
-			visual_system* vsys = dynamic_cast<visual_system*>(sys_);
-			label_object_ = vsys->create_visual_object(nm::node_control_ptr(root_),"text_label.scg", 0,0 ,false);
-		    if(label_object_->root())
-				ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
+			*ls_ = boost::make_shared<visual_objects::label_support>(
+				vsys_->create_visual_object(nm::node_control_ptr(root_),"text_label.scg",0,0,false), settings_.custom_label);
 		}
 #endif
 		
@@ -298,5 +291,10 @@ void visual::update(double time)
 	}
 }
 
+
+labels_management::labels_provider_ptr  visual::get_label_provider() const
+{
+	return ls_;
+}
 
 } // vehicle

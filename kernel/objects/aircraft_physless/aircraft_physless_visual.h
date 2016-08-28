@@ -1,7 +1,7 @@
 #pragma once
 
 #include "aircraft_physless_view.h"
-#include "common/aircraft_support_fwd.h"
+#include "common/visual_objects_support_fwd.h"
 
 #include "av/avFx/Fx.h"
 
@@ -32,24 +32,20 @@ namespace aircraft_physless
     private:
         void fill_nodes();
     
+		///  labels_management::label_provider_getter
     private:    
         labels_management::labels_provider_ptr      get_label_provider() const;
 
     private:
         optional<double>  last_update_;
 
-        std::vector<nodes_management::node_info_ptr>        engines_nodes_;
+        std::vector<nodes_management::node_info_ptr>   engines_nodes_;
         
-        std::vector<nm::node_info_ptr> forsage_nodes_;
-        std::vector<forsage_support_ptr>     fs_;
+        std::vector<nm::node_info_ptr>                 forsage_nodes_;
+        std::vector<forsage_support_ptr>               fs_;
 
         visual_object_ptr smoke_object_;
         
-#if 0
-        visual_object_ptr    landing_dust_object_;
-        LandingDustSfxNode * landing_dust_weak_ptr_;
-#endif
-
     private:
         label_support_proxy_ptr                                 ls_;
 

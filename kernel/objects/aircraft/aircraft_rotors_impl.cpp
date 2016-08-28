@@ -144,7 +144,7 @@ namespace aircraft
             const std::string& name = node->name();
             const rotors_group t = static_cast<rotors_group>(i); 
 
-            LogInfo("rotors_support_impl::find_rotors: " << name << "group #" << i );
+            LogInfo("rotors_support_impl::find_rotors: " << name << "   group #" << i );
            
             if (boost::starts_with(node->name(), "rotordyn"))
             {

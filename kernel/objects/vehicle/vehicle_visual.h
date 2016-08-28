@@ -4,17 +4,20 @@
 #include "objects/impl/local_position.h"
 #include "kernel/systems/vis_system.h"
 
+#include "common/visual_objects_support_fwd.h"
+
 #include "av/avFx/Fx.h"
 
-namespace visual_objects
-{
-    struct label_support;
-}
+#include "common/labels_management.h"
+
 
 namespace vehicle
 {
-    struct visual
+    using namespace visual_objects;
+	
+	struct visual
         : view 
+        , labels_management::label_provider_getter
     {
         static object_info_ptr create(object_create_t const& oc, dict_copt dict);
 
@@ -26,20 +29,28 @@ namespace vehicle
 
     private:
         void settings_changed   ()             override;
+		
+		///  labels_management::label_provider_getter
+	private:    
+		labels_management::labels_provider_ptr      get_label_provider() const;
+
     private:
         optional<visual_object_ptr>      tow_visual_object_;
         nodes_management::node_info_ptr  aero_tow_point_; 
-        // experimental part
+
+        // experimental part												   
     private:
         struct tow_support;
         boost::shared_ptr<tow_support>   ts_;
 
     private:
-        visual_object_ptr                       label_object_;
 		FoamStreamSfxNode *         foam_stream_sfx_weak_ptr_;
 		visual_object_ptr                 foam_stream_object_;
-    private:
-        boost::shared_ptr<visual_objects::label_support>   ls_;
+   
+	private:
+        label_support_proxy_ptr    ls_;
+        
+		visual_system*           vsys_;
 
 	private:
 		double                  last_fs_time_;

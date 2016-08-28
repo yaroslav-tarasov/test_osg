@@ -2,7 +2,7 @@
 
 #include "common/unicode_support.h"
 #include "common/labels_management.h"
-#include "common/aircraft_support_fwd.h"
+#include "common/visual_objects_support_fwd.h"
 
 namespace visual_objects
 {
@@ -38,7 +38,14 @@ namespace visual_objects
             {
                 if(auto dtext =  dynamic_cast<osgText::Text*>(geode->getDrawable(i)))
                 {
-                    dtext->setText(unicode::a2w(text).c_str());
+#if 0
+                    std::string t("Текст");
+					std::wstring wstr(t.begin(), t.end());
+					std::wstring wstr2 = unicode::a2w(t).c_str();
+					std::wstring wstrt(L"hhhhhhТекст");
+					dtext->setText("Текст", osgText::String::ENCODING_UTF8);
+#endif					
+					dtext->setText(unicode::a2w(text).c_str());
                 }
             }
         }
@@ -109,6 +116,11 @@ namespace visual_objects
 			 ls_ = rhs;
 			 init_();
 		}
+
+        inline void set_text(const std::string&  text)
+        {
+			 ls_->set_text(text);
+        }
 
     private:
         void set_labels_manager( labels_management::labels_manager * man  )     override

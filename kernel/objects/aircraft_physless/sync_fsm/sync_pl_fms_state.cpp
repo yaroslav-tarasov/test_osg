@@ -84,7 +84,7 @@ namespace sync_fsm
                 self_.switch_sync_state(create_sync_phys_state(self_, phys_aircraft, /*base*/::get_base()));
             }
             {
-                FIXME(extern state)
+                 FIXME(extern state)
                 if(auto traj_ = self_.get_trajectory())
                 {
                     traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0);

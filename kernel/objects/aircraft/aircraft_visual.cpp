@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 #include "aircraft_visual.h"
+#include "common/text_label.h"
 
 namespace aircraft
 {
@@ -13,10 +14,14 @@ namespace aircraft
 	AUTO_REG_NAME(aircraft_visual, visual::create);
 
 	visual::visual( kernel::object_create_t const& oc, dict_copt dict )
-		: view(oc,dict)
+		: view  (oc,dict)
+        , vsys_ (dynamic_cast<visual_system*>(sys_))  
 	{
         visual_system* vsys = dynamic_cast<visual_system*>(sys_);
         
+		
+		ls_ =  boost::make_shared<visual_objects::label_support_proxy>();
+
         nm::visit_sub_tree(get_nodes_manager()->get_node_tree_iterator(root()->node_id()), [this](nm::node_info_ptr n)->bool
         {
             if (boost::starts_with(n->name(), "engine_l"))
@@ -60,8 +65,13 @@ namespace aircraft
         geo_base_3 base = dynamic_cast<visual_system_props*>(sys_)->vis_props().base_point;
         geo_base_3 root_pos = root()->get_global_pos();
         quaternion root_orien = root()->get_global_orien();
+		
+		if(!(ls_->get_ls()) && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
+		{
+			*ls_ = boost::make_shared<visual_objects::label_support>(
+				vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
+		}
 
-        
         if (smoke_object_ && engine_node_)
         {
             if (nodes_management::vis_node_info_ptr(root())->is_visible())
@@ -133,6 +143,12 @@ namespace aircraft
 #endif
         }
     }
+
+
+	labels_management::labels_provider_ptr  visual::get_label_provider() const
+	{
+		return ls_;
+	}
 }
 
 

@@ -31,6 +31,8 @@ namespace helicopter_physless
         , vsys_     (dynamic_cast<visual_system*>(sys_))  
 	{
 
+	 	ls_ =  boost::make_shared<visual_objects::label_support_proxy>();
+
 #ifndef ASYNC_OBJECT_LOADING         
         //fill_nodes();
         label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
@@ -94,14 +96,10 @@ namespace helicopter_physless
 #endif
 
 #ifdef ASYNC_OBJECT_LOADING 
-        if(deffered_init_ && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
+        if(deffered_init_ && !(ls_->get_ls()) && nm::vis_node_control_ptr(root())->vis_nodes().size()>0)
         {
-            if(!label_object_ )
-	        { 
-		        label_object_ = vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false);
-				if(label_object_->root())
-					ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
-	        }
+			*ls_ = boost::make_shared<visual_objects::label_support>(
+				vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg",0,0,false), settings_.custom_label);
             
             FindNodeVisitor findMorph("rotor_morph",FindNodeVisitor::not_exact); 
             nm::vis_node_control_ptr(root())->vis_nodes()[0]->accept(findMorph);
@@ -190,6 +188,10 @@ namespace helicopter_physless
           }
     }
 
+	labels_management::labels_provider_ptr  visual::get_label_provider() const
+	{
+		return ls_;
+	}
 }
 
 
