@@ -97,6 +97,8 @@ void visual::add_label(object_info_ptr object)
 			labels_provider_ptr fp = getter->get_label_provider();
 			Assert(fp);
 			
+            (fp)->set_visible(false);
+
 			insert(fp);
 			air_managed_providers_.insert(std::make_pair(object->object_id(), fp));
 		}

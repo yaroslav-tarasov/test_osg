@@ -634,7 +634,7 @@ $endif
 \n            float night_factor = step(ambient.a, 0.35);
 \n            vec3  result = mix(day_result, vec3(0.90, 0.90, 0.86), night_factor * glass_factor);
 \n
-\n            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0); // vec4(1.0,0.0,0.0,1.0); //
+\n            aFragColor = vec4(apply_scene_fog(f_in.viewpos, result), 1.0); 
         }
     )
 
