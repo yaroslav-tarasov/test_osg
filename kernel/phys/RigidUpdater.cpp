@@ -392,14 +392,8 @@ namespace bi
         size_t object_id = 0;
         root->getUserValue("id",object_id);
 
-#ifdef  OSG_NODE_IMPL
-        lod3?lod3->setNodeMask(0):0;
-        nm::manager_ptr man = nm::create_manager(_p->_msys,dict_t(),node);
-        //lod3?lod3->setNodeMask(0xffffffff):0;
-#else
         nm::manager_ptr man = nm::create_manager(_p->_msys,dict_t(),nullptr/*lod3?lod3:node*/);
         object_id  = man->get_node(0)->object_id();
-#endif
 
         FIXME("Костыль")
         man->set_model(model_name);

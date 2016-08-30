@@ -318,37 +318,7 @@ namespace aircraft
 
         double const wheel_mass = mass / 10;
 
-#ifdef OSG_NODE_IMPL 
-        shassis_->visit_chassis([this, wheel_mass, &body_node,&s](shassis_group_t const& group, shassis_t & shassis)
-        {
-            auto node = shassis.wheel_node;
 
-            if (!group.opened)
-                return;
-
-            double mass = wheel_mass;
-            size_t fake_count = 0;
-
-            //if (group.is_front)
-            //    mass = wheel_mass*10, fake_count = 2;
-
-            //cg::transform_4 wt = nm::get_relative_transform(this->nodes_manager_, node, body_node);
-            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ node);
-            point_3 wheel_offset = wt.translation() /*+ s->get_offset()*/;
-
-            //cg::rectangle_3 bound = model_structure::bounding(*node->get_collision());
-            const double radius = 0.75 * node->get_bound().radius ;
-
-            size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
-            shassis.phys_wheels.push_back(wid);
-
-            for (size_t j = 0; j < fake_count; ++j)
-            {
-                size_t wid = phys_aircraft_->add_wheel(/*mass*/0.f, /*bound.size().x / 2.*/0.f, /*0.75 * (bound.size().y / 2.)*/radius, /*wt.translation()*/wheel_offset, wt.rotation().cpr(), true, group.is_front);
-                shassis.phys_wheels.push_back(wid);
-            }
-        });
-#else
         shassis_->visit_chassis([this, wheel_mass, &body_node,&s](shassis_group_t const& group, shassis_t & shassis)
         {
             auto node = shassis.wheel_node;
@@ -378,7 +348,7 @@ namespace aircraft
                 shassis.phys_wheels.push_back(wid);
             }
         });
-#endif
+
 
         phys_aircraft_->reset_suspension();
     }

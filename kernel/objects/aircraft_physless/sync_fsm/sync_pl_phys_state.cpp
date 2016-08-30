@@ -324,11 +324,8 @@ namespace sync_fsm
             //quaternion(cpr(wpos_rel_orien_orig.get_course(), global_orien.get_pitch(),0))/*wpos.orien*/;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(/*wpos.pos*/global_pos));
            
-#ifdef OSG_NODE_IMPL
-            nodes_management::node_info_ptr rel_node = wnode;
-#else
             nodes_management::node_info_ptr rel_node = wnode->rel_node();
-#endif            
+          
 
             transform_4 rel_node_root_tr = rel_node->get_root_transform();
 

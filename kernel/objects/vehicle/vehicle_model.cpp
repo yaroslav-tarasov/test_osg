@@ -587,8 +587,7 @@ void model::sync_nodes_manager( double dt )
         decart_position bodypos = phys_vehicle_->get_position();
         decart_position root_pos = bodypos * body_transform_inv_;
 
-#if !defined(OSG_NODE_IMPL) 
-        geo_position pos(root_pos, base);
+         geo_position pos(root_pos, base);
 
         // FIXME Глобальные локальные преобразования 
         nodes_management::node_position root_node_pos = root_->position();
@@ -603,7 +602,6 @@ void model::sync_nodes_manager( double dt )
 
         root_next_pos_ = pos.pos;
         root_next_orien_ = pos.orien;
-#endif
 
         geo_position body_pos(phys_vehicle_->get_position() * body_transform_inv_, base);
 
@@ -614,11 +612,7 @@ void model::sync_nodes_manager( double dt )
             cg::quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             cg::point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
 
-#ifdef OSG_NODE_IMPL
-            nodes_management::node_info_ptr rel_node = wheels_[i].node;
-#else
             nodes_management::node_info_ptr rel_node = wheels_[i].node->rel_node();
-#endif  
 
             //cg::geo_base_3 global_pos = wheels_[i].node->get_global_pos();
             //cg::quaternion global_orien = wheels_[i].node->get_global_orien();
@@ -635,11 +629,6 @@ void model::sync_nodes_manager( double dt )
             cg::point_3 omega_rel     = cg::get_rotate_quaternion(node_pos.local().orien, desired_orien_in_rel).rot_axis().omega() / (sys_->calc_step());
 
             node_pos.local().omega = omega_rel;
-
-#ifdef OSG_NODE_IMPL
-            // FIXME отсутствие промежуточной логики приводит к странным решениям
-            node_pos.local().orien = desired_orien_in_rel;
-#endif
 
             wheels_[i].node->set_position(node_pos);
         }
@@ -762,30 +751,7 @@ void model::create_phys_vehicle()
     phys_vehicle_ = phys_->get_system(*phys_zone_)->create_ray_cast_vehicle(cfg().model_params.vehicle_mass, s, p);
 
     // implementation
-#ifdef OSG_NODE_IMPL 
-    nm::visit_sub_tree(nodes_manager_->get_node(0), [this](nm::node_info_ptr wheel_node)->bool
-    {
-        std::string name = wheel_node->name();
-        if (boost::starts_with(wheel_node->name(), "wheel"))
-        {
-            // Поиск имени симекса нам не походит
-            // cg::transform_4 wt = nm::get_relative_transform(nodes_manager_, wheel_node, this->body_node_);
-            cg::transform_4 wt = this->nodes_manager_->get_relative_transform(/*this->nodes_manager_,*/ wheel_node,this->body_node_);
-            cg::point_3 wheel_offset = wt.translation();
-            wheel_offset.z = -wheel_offset.z; 
 
-            //auto const *wnc = wheel_node->get_collision() ;
-            //Assert(wnc) ;
-            //cg::rectangle_3 bound = model_structure::bounding(*wnc);
-            double radius = 0.75 * wheel_node->get_bound().radius;
-
-            this->phys_vehicle_->add_wheel(30, /*bound.size().x / 2*/radius, /*bound.size().y/ 2*/radius, wheel_offset, wt.rotation().cpr(), true);
-
-            this->wheels_.push_back(model::wheel_t(wheel_node));
-        }
-        return true;
-    });
-#else
     nm::visit_sub_tree(nodes_manager_->get_node_tree_iterator(0), [this](nm::node_info_ptr wheel_node)->bool
     {
         std::string name = wheel_node->name();
@@ -810,7 +776,6 @@ void model::create_phys_vehicle()
         }
         return true;
     });
-#endif
 
 
     phys::ray_cast_vehicle::control_ptr(phys_vehicle_)->reset_suspension();
