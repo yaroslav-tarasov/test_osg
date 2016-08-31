@@ -65,12 +65,25 @@ namespace aircraft
             double                                 desired_velocity_;
         };
 
+        // from phl
+        struct phys_state3 : phys_state
+        {
+            phys_state3(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+                : phys_state(self,phys_aircraft,base)
+                , desired_velocity_(aircraft::min_desired_velocity())
+            { }
+
+            void update(double /*time*/, double dt) override;
+
+            double                                 desired_velocity_;
+        };
+
         sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
         {
             if(type!=TEST_NEW)
                 return boost::make_shared<phys_state>(self,phys_aircraft,base);
             else
-                return boost::make_shared<phys_state2>(self,phys_aircraft,base);
+                return boost::make_shared<phys_state3>(self,phys_aircraft,base);
         }
 
     }
@@ -241,6 +254,81 @@ namespace sync_fsm
         sync_rotors(dt);
 
     }
+
+
+    const double packet_delay = 0.0;
+
+
+    const double comfortable_acceleration  = 2.5;
+    const double max_dx =   aircraft::max_desired_velocity() * aircraft::max_desired_velocity() / comfortable_acceleration *.5; 
+
+    void phys_state3::update(double time, double dt) 
+    {
+        if (!phys_aircraft_)
+            return;
+
+        FIXME(extern state);
+        if(auto traj_ = self_.get_trajectory())
+        {
+
+            traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0/*traj_->cur_len() + dt*/);
+            const double  tar_len = traj_->cur_len();
+            decart_position target_pos;
+
+#if 1
+            if(tar_len > traj_->length())
+            {
+                force_log fl;       
+                LOG_ODS_MSG( "phys_state3::update " << tar_len << "  traj_->length() - traj_->base_length()= " << traj_->length() - traj_->base_length() << "\n"
+                    << "  traj_->length() " << traj_->length() << " traj_->base_length()= " << traj_->base_length()    << "\n" 
+                    );           
+            }
+#endif
+            if(traj_->speed_value(tar_len))
+            {
+                const double speed = *traj_->speed_value(tar_len);
+                //force_log fl;       
+                LOG_ODS_MSG( "phys_state3::update " << tar_len << "  speed= " << speed << "\n"
+                    );
+
+                // self_.set_desired_nm_speed(speed);
+            }
+
+
+            target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
+            target_pos.orien = traj_->curs_value(tar_len);
+            // Очень необходимо для движения физ модели.
+            // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
+            // target_pos.omega = 
+            geo_position gtp(target_pos, get_base());
+
+            force_log fl;
+            LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "  <<  target_pos.pos.x << "    y: " << target_pos.pos.y << "    course: " << target_pos.orien.get_course() << "\n" );
+
+
+            phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+
+            //self_.set_desired_nm_pos(gtp.pos);
+            //self_.set_desired_nm_orien(gtp.orien);
+
+            auto physpos = phys_aircraft_->get_position();
+
+            LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lat << "    course: " << physpos.orien.get_course() << "\n" );
+
+            self_.set_desired_nm_pos(physpos.pos);
+            self_.set_desired_nm_orien(physpos.orien);
+
+            //phys_aircraft_->go_to_pos(gtp);
+            phys_aircraft_->update();
+        }
+
+        sync_wheels(dt);
+        sync_rotors(dt);
+
+    }
+
+
+
 
     void phys_state::on_zone_destroyed( size_t id )
     {

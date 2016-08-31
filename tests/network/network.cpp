@@ -374,7 +374,7 @@ struct client
  
 #endif
 
-#if 1
+#if 0
         ADD_EVENT(1.0  , create_msg(1,traj_->kp_value(traj_->base_length()),traj_->curs_value(traj_->base_length()), ok_aircraft, "A319", "1") )
 
 #if 1
@@ -707,10 +707,12 @@ struct client
 
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
-			for (int i=0;i<100;++i)
+			
+#if 0       // Arrested gear test
+            for (int i=0;i<100;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
-				auto const model  = "MIG29K"/*"A319"*//*"SU25"*//*"MIG29"*//*"L39"*/;
+				auto const model  = /*"MIG29K"*//*"A319"*//*"SU25"*//*"MIG29"*/"L39";
 				ADD_EVENT(traj_trp2_[i]->base_length()  , create_msg(hull_number,traj_trp2_[i]->kp_value(traj_trp2_[i]->base_length()),traj_trp2_[i]->curs_value(traj_trp2_[i]->base_length()), ok_aircraft, model, boost::lexical_cast<std::string>(hull_number)) )
 				ADD_EVENT(60.0 + i * 25 , arrgear_target_msg( hull_number ) )  
 
@@ -725,7 +727,10 @@ struct client
 				));
 
 			}
+#endif
 
+
+#if 0       // Forsage test
 
             ADD_EVENT(traj_trp3_->base_length()  , create_msg(200,traj_trp3_->kp_value(traj_trp3_->base_length()),traj_trp3_->curs_value(traj_trp3_->base_length()), ok_aircraft, /*"A319"*/"SU25"/*"L39"*/, "200") )
             ADD_EVENT(300.0  , arrgear_target_msg( 200 ) )  
@@ -738,16 +743,22 @@ struct client
 			runs_.insert(make_pair(traj_trp3_->base_length(),
 			boost::bind( run_f_pos , 200, _1, traj_trp3_, /*traj_offset*/0)
 			));
+
 #endif
 
-#if 1
+
+#endif
+
+#if 0
             ADD_EVENT(traj_pos_->base_length()  , create_msg(201,traj_pos_->kp_value(traj_pos_->base_length()),traj_pos_->curs_value(traj_pos_->base_length()), ok_aircraft, "A319", "201") )
             ADD_EVENT(4.0    , traj_assign_msg( 201, *traj_pos_) ) 
 #endif
             
+#if 0
             ADD_EVENT(12.0  , create_msg(1176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "IL76", "1176") )
             ADD_EVENT(13.0  , create_msg(1177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "IL76", "1177") )
-            ADD_EVENT(14.0  , create_msg(1178,point_3(286,400,0),cg::cpr(173), ok_aircraft, "IL76", "1178") )
+#endif
+            ADD_EVENT(14.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length())/*point_3(286,400,0),cg::cpr(173)*/, ok_aircraft, "TU154", "1178") )
             
             runs_.insert(make_pair(traj_trp_->base_length() + 30,
             boost::bind( run_f_pos , 1178, _1, traj_trp_, 30)

@@ -47,7 +47,7 @@ void  releaseCache()
 
 bool loadBulletFile(std::string name, btCompoundShape*& compoundShape)
 {
-    hr_helper   hr(name);
+    // hr_helper   hr(name);
      
     compoundShapeMap::iterator it;
 
@@ -64,7 +64,7 @@ bool loadBulletFile(std::string name, btCompoundShape*& compoundShape)
 
         if (import.loadFile(name.c_str()))
         {
-            hr_helper   hr(name);
+            // hr_helper   hr(name);
 
             int numBvh = import.getNumBvhs();
             int numBRB = import.getNumRigidBodies();

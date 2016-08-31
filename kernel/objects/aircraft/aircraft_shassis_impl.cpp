@@ -65,6 +65,7 @@ namespace aircraft
     }
 
 
+#if 0
     void shassis_support_impl::find_shassis( shasis_group i, nm::node_info_ptr group_node )
     {
 
@@ -72,13 +73,13 @@ namespace aircraft
 
         nm::visit_sub_tree(it, [this, i](nm::node_info_ptr node)->bool
         {
-            std::string name = node->name();
+            const std::string & name = node->name();
             if (boost::starts_with(node->name(), "shassi_"))
             {
                 nm::node_info_ptr wheel_node;
                 nm::visit_sub_tree(this->nodes_manager_->get_node_tree_iterator(node->node_id()), [&wheel_node](nm::node_info_ptr n)->bool
                 {
-                    if (boost::starts_with(n->name(), "wheel"))
+                    if (boost::starts_with(n->name(), "wheel_"))
                     {
                         wheel_node = n;
                         return false;
@@ -112,6 +113,55 @@ namespace aircraft
 
 
     }
+#else
+    void shassis_support_impl::find_shassis( shasis_group i, nm::node_info_ptr group_node )
+    {
+
+        auto it = nodes_manager_->get_node_tree_iterator(group_node->node_id());
+
+        nm::visit_sub_tree(it, [this, i](nm::node_info_ptr node)->bool
+        {
+            const std::string & name = node->name();
+            if (boost::starts_with(node->name(), "shassi_"))
+            {
+                std::vector<nm::node_info_ptr> wheel_nodes;
+                nm::visit_sub_tree(this->nodes_manager_->get_node_tree_iterator(node->node_id()), [&wheel_nodes](nm::node_info_ptr n)->bool
+                {
+                    if (boost::starts_with(n->name(), "wheel_"))
+                    {
+                        wheel_nodes.push_back(n);
+                    }
+                    return true;
+                });
+
+                for (auto it = wheel_nodes.begin(); it != wheel_nodes.end(); ++it )
+                {
+                    FIXME ("We don't have collision volumes")
+                        auto wheel_node = (*it);
+
+                        if (auto collision = wheel_node->get_collision())
+                        {
+                            cg::rectangle_3 bound = model_structure::bounding(*collision);
+                            double radius = 0.75 * (bound.size().y / 2.);
+
+                            this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node, radius));
+                        }
+                        else
+                        {
+                            double radius = get_wheel_radius(node);//0.75 * (node->get_bound().size().z / 2.);
+                            this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node,  radius/*0.75 * node->get_bound().radius*/));
+                        }
+
+                }
+            }
+
+            return true;
+        });
+
+
+
+    }
+#endif
 
 
 }

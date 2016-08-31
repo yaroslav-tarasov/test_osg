@@ -8,12 +8,9 @@
 #include "atc/position.h"
 
 
-//! самолет
-
 namespace aircraft
 {
 
-//! получение имени модели по имени типа ВС (да, вот следствие того что опираются только на БАДУ а не на свою базу)
 inline std::string get_model(std::string const& kind)
 {
     // TODO : move to external config
@@ -49,7 +46,8 @@ inline std::string get_model(std::string const& kind)
 		return "an_140";
     else if (kind == "IL76" || kind == "ИЛ-76")
         return "il_76";
-    
+    else if (kind == "TU154" || kind == "ТУ-154")
+        return "tu_154";    
     else if (kind == "SU25" || kind == "СУ-25")
         return "su_25tm";
     else if (kind == "MIG29" || kind == "МИГ-29")
@@ -60,7 +58,6 @@ inline std::string get_model(std::string const& kind)
         return "checker";
 }
 
-//! получение имени текстуры по имен типа ВС и авиакомпании (да, у нас тоже нет промежуточной сущности уровня "самолет" в БД района)
 inline std::string get_texture(std::string const& kind, std::string const& company_name)
 {
     // TODO : move to external config

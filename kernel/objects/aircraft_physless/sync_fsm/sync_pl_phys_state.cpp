@@ -343,9 +343,7 @@ namespace sync_fsm
 			
 			double wr = get_wheel_radius(wnode);
 			cg::rectangle_3 wbb = wnode->get_bound();
-#if 0
-            const float angular_speed = 45 * 2 * cg::pif/60.0; 
-#endif
+
             point_3 forward_dir = cg::normalized_safe(body_pos.orien.rotate_vector(point_3(0, 1, 0))) ;
 
             point_3 wpos_rp = (!body_pos.orien).rotate_vector(body_pos.dpos);

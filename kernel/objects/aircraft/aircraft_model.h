@@ -19,6 +19,7 @@ namespace aircraft
         : view
         , model_info                // интерфейс информации о модели
         , model_control             // интерфейс управления моделью
+        , model_ext_control
         , int_control
         , sync_fsm::self_t
         , phys_object_model_base 
@@ -56,6 +57,11 @@ namespace aircraft
         void                 set_steer                ( double steer ) override;
         void                 set_brake                ( double brake ) override;
         void                 set_rotors_angular_speed ( double val ) override;
+        
+        // model_ext_control
+    private: 
+        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed)    override;
+        void set_ext_wind       (double speed, double azimuth)                                                        override;
 
         // sync_fsm::self_t
     private:

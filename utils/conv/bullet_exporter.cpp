@@ -259,7 +259,7 @@ namespace default
 
     bool aircraft = findFirstNode(node ,"shassi_",FindNodeVisitor::not_exact)!=nullptr;
     bool got_rotor = findFirstNode(node ,"rotor",FindNodeVisitor::not_exact)!=nullptr;
-    bool vehicle  = findFirstNode(node ,"wheel",FindNodeVisitor::not_exact)!=nullptr;
+    bool vehicle  = findFirstNode(node ,"wheel_",FindNodeVisitor::not_exact)!=nullptr;
     FIXME(Палец пол и потолок при определении модели)
     bool heli     = findFirstNode(node ,"tailrotor",FindNodeVisitor::not_exact)!=nullptr;
 

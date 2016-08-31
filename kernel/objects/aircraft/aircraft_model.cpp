@@ -149,6 +149,27 @@ void model::sync_nm_root(double /*dt*/)
 }
 
 
+void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
+{
+    decart_position target_pos;
+
+    target_pos.pos   = pos;
+    target_pos.orien = orien;
+    geo_position gtp(target_pos, get_base());
+
+    if(!traj_)
+        traj_ = fms::trajectory::create();
+
+    traj_->append(time, pos, orien, speed);
+
+
+}
+
+void model::set_ext_wind       (double speed, double azimuth) 
+{
+    FIXME(Need some wind)
+}
+
 airports_manager::info_ptr model::get_airports_manager() const
 {
     return airports_manager_;

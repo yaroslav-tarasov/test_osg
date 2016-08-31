@@ -267,7 +267,7 @@ object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
     else if( msg.object_kind == ok_camera)
         return create_camera(csys, msg);
     else
-        return create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
+        return create_aircraft(csys, msg); // create_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 
 }
 
@@ -284,7 +284,7 @@ kernel::obj_create_data pack_object( kernel::system* csys, create_msg const& msg
     else if( msg.object_kind == ok_camera)
         return pack_camera(csys, msg);
     else
-        return pack_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
+        return pack_aircraft(csys, msg); // pack_aircraft_phl(csys, msg);  // FIXME вместо чекера можно создать какой-нибудь более дурной объект
 
 }
 

@@ -484,9 +484,9 @@ namespace aircraft
             {
                 // force_log fl;
 
-                LOG_ODS_MSG(
-                    "desired_speed_signed:  "                << desired_speed_signed << "\n" 
-                    );
+                //LOG_ODS_MSG(
+                //    "desired_speed_signed:  "                << desired_speed_signed << "\n" 
+                //    );
             }
 
 // FIXME TYV      ј не то при рулении взлетаем хвостом вперед хо-хо   
