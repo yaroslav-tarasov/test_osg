@@ -520,9 +520,8 @@ void model::set_brake( double brake )
  
 geo_position model::fms_pos() const
 {
- 
     point_3 dir = cg::polar_point_3(1., get_fms_info()->get_state().orien().course, get_fms_info()->get_state().orien().pitch);
-    return geo_position(get_fms_info()->get_state().dyn_state.pos, get_fms_info()->get_state().dyn_state.TAS * dir, get_fms_info()->get_state().orien(), point_3());
+    return geo_position(get_fms_info()->get_state().dyn_state.pos, /*get_fms_info()->get_state().dyn_state.TAS * dir*/point_3(), get_fms_info()->get_state().orien(), point_3());
 }
 
 void model::switch_sync_state(sync_fsm::state_ptr state)

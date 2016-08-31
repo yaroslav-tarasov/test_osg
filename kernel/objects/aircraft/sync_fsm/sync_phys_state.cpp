@@ -303,17 +303,20 @@ namespace sync_fsm
             geo_position gtp(target_pos, get_base());
 
             force_log fl;
-            LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "  <<  target_pos.pos.x << "    y: " << target_pos.pos.y << "    course: " << target_pos.orien.get_course() << "\n" );
+			LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "  <<  target_pos.pos.x << "    y: " << target_pos.pos.y << "    course: " << target_pos.orien.get_course() << "\n" );
 
 
             phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
 
-            //self_.set_desired_nm_pos(gtp.pos);
-            //self_.set_desired_nm_orien(gtp.orien);
+			if(gtp.pos.height > 0)
+			{
+				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
+			}
 
             auto physpos = phys_aircraft_->get_position();
 
             LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lat << "    course: " << physpos.orien.get_course() << "\n" );
+			LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos :   x:  "  <<  phys_aircraft_->get_local_position().pos.x << "    y: " << phys_aircraft_->get_local_position().pos.y << "    course: " << phys_aircraft_->get_local_position().orien.get_course() << "\n" );
 
             self_.set_desired_nm_pos(physpos.pos);
             self_.set_desired_nm_orien(physpos.orien);
