@@ -284,26 +284,43 @@ namespace sync_fsm
                     );           
             }
 #endif
+            double desired_speed = 80.f;
             if(traj_->speed_value(tar_len))
             {
                 const double speed = *traj_->speed_value(tar_len);
-                //force_log fl;       
+                force_log fl;       
                 LOG_ODS_MSG( "phys_state3::update " << tar_len << "  speed= " << speed << "\n"
                     );
 
+                 desired_speed = speed;
                 // self_.set_desired_nm_speed(speed);
             }
 
 
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
-            target_pos.orien = traj_->curs_value(tar_len);
+            target_pos.orien = cg::cpr(traj_->curs_value(tar_len).get_course(),abs(traj_->curs_value(tar_len).get_pitch()), traj_->curs_value(tar_len).get_roll());
+            
+            force_log fl;
+            LOG_ODS_MSG( "phys_state3::update  before corection target_pos.pos :   x:  "     << target_pos.pos.x 
+                << "    y: "      << target_pos.pos.y  
+                << "    z: "      << target_pos.pos.z 
+                << "    course: " << target_pos.orien.get_course()
+                << "    pitch: "  << target_pos.orien.get_pitch()
+                << "\n" );
+#if 0
+            target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
+#endif
             // Очень необходимо для движения физ модели.
             // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
-            // target_pos.omega = 
             geo_position gtp(target_pos, get_base());
 
-            force_log fl;
-			LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "  <<  target_pos.pos.x << "    y: " << target_pos.pos.y << "    course: " << target_pos.orien.get_course() << "\n" );
+
+			LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "     << target_pos.pos.x 
+                                                           << "    y: "      << target_pos.pos.y  
+                                                           << "    z: "      << target_pos.pos.z 
+                                                           << "    course: " << target_pos.orien.get_course()
+                                                           << "    pitch: "  << target_pos.orien.get_pitch()
+                                                           << "\n" );
 
 
             phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
@@ -312,16 +329,26 @@ namespace sync_fsm
 			{
 				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
 			}
-
+ #if 0
             auto physpos = phys_aircraft_->get_position();
 
-            LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lat << "    course: " << physpos.orien.get_course() << "\n" );
-			LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos :   x:  "  <<  phys_aircraft_->get_local_position().pos.x << "    y: " << phys_aircraft_->get_local_position().pos.y << "    course: " << phys_aircraft_->get_local_position().orien.get_course() << "\n" );
+            // LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lon  << "    course: " << physpos.orien.get_course() << "\n" );
+			LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos :   x:  "  <<  phys_aircraft_->get_local_position().pos.x
+                          << "    y: "      << phys_aircraft_->get_local_position().pos.y 
+                          << "    z: "      << phys_aircraft_->get_local_position().pos.z 
+                          << "    course: " << phys_aircraft_->get_local_position().orien.get_course()
+                          << "    pitch: "  << phys_aircraft_->get_local_position().orien.get_pitch()
+                          << "\n" );
 
             self_.set_desired_nm_pos(physpos.pos);
             self_.set_desired_nm_orien(physpos.orien);
+            
+#else
+            self_.set_desired_nm_pos(gtp.pos);
+            self_.set_desired_nm_orien(gtp.orien);
 
-            //phys_aircraft_->go_to_pos(gtp);
+            phys_aircraft_->go_to_pos(gtp);
+#endif
             phys_aircraft_->update();
         }
 

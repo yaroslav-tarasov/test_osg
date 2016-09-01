@@ -758,7 +758,7 @@ struct client
             ADD_EVENT(12.0  , create_msg(1176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "IL76", "1176") )
             ADD_EVENT(13.0  , create_msg(1177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "IL76", "1177") )
 #endif
-            ADD_EVENT(14.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length())/*point_3(286,400,0),cg::cpr(173)*/, ok_aircraft, "TU154", "1178") )
+            ADD_EVENT(14.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length())/*point_3(286,400,0),cg::cpr(173)*/, ok_aircraft, "TU134", "1178") )
             
             runs_.insert(make_pair(traj_trp_->base_length() + 30,
             boost::bind( run_f_pos , 1178, _1, traj_trp_, 30)
