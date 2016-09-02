@@ -122,13 +122,15 @@ namespace aircraft
             float xm = abs(bb.xMax()) + abs(bb.xMin());
             float ym = abs(bb.yMax()) + abs(bb.yMin());
             float zm = abs(bb.zMax()) + abs(bb.zMin());
-
+            
+            auto body   = findFirstNode(node,"Body",FindNodeVisitor::not_exact);
+            osg::Vec3 body_offset = body->asTransform()->asMatrixTransform()->getMatrix().getTrans();
 #if 1
-            float dx = -xm / 4.f; // abs(bb.xMax()) - xm / 2.f;
-            float dy = -ym / 4.f; // abs(bb.yMax()) - ym / 2.f;
-            float dz = -zm / 4.f; // abs(bb.zMax()) - zm / 2.f;
+            float dx = -xm / 4.f;       
+            float dy = -body_offset.y(); 
+            float dz = -zm / 4.f;       
 
-            btVector3 offset_ = btVector3(0,dy /*+ (abs(bb.yMax()) - ym / 2.f)*2*/,0);
+            btVector3 offset_ = btVector3(0,dy,0);
             offset = cg::point_3(offset_.x(),offset_.y(),offset_.z());
 
 #else
@@ -140,7 +142,7 @@ namespace aircraft
             btVector3 offset_ = btVector3(0,/*lod3?-zm/2:*/-dz,0);
             offset = cg::point_3(0,-dz,0);
 #endif 
-            auto body   = findFirstNode(node,"Body",FindNodeVisitor::not_exact);
+
             
             const char* nn[] = { "shassi", "rotor"/*, "engine"*/ };
             nodes_hider nh(node,std::vector< std::string >( nn, nn + array_size(nn) ));

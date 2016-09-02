@@ -262,6 +262,8 @@ namespace sync_fsm
     const double comfortable_acceleration  = 2.5;
     const double max_dx =   aircraft::max_desired_velocity() * aircraft::max_desired_velocity() / comfortable_acceleration *.5; 
 
+#define MODEL_ONLY
+
     void phys_state3::update(double time, double dt) 
     {
         if (!phys_aircraft_)
@@ -307,7 +309,7 @@ namespace sync_fsm
                 << "    course: " << target_pos.orien.get_course()
                 << "    pitch: "  << target_pos.orien.get_pitch()
                 << "\n" );
-#if 0
+#if defined(MODEL_ONLY)
             target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
 #endif
             // Очень необходимо для движения физ модели.
@@ -329,7 +331,7 @@ namespace sync_fsm
 			{
 				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
 			}
- #if 0
+ #if defined(MODEL_ONLY)
             auto physpos = phys_aircraft_->get_position();
 
             // LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lon  << "    course: " << physpos.orien.get_course() << "\n" );
@@ -392,7 +394,7 @@ namespace sync_fsm
             if (shassis.phys_wheels.empty())
                 return;
 
-            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
+            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[1]);
             
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
@@ -410,10 +412,11 @@ namespace sync_fsm
 
             desired_orien_in_rel = quaternion(cpr(0, 0, -root_next_orien.get_roll())) * desired_orien_in_rel;
             
-            //LOG_ODS_MSG( "  desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
-            //    "  desired_orien_in_rel.get_pitch() = " <<  desired_orien_in_rel.get_pitch() <<
-            //    "  desired_orien_in_rel.get_roll() = " <<  desired_orien_in_rel.get_roll() << "\n"                 
-            //    );
+            LOG_ODS_MSG( " shassis.wheel_node->name()        = " << shassis.wheel_node->name()   <<
+                         " desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
+                         " desired_orien_in_rel.get_pitch()  = " << desired_orien_in_rel.get_pitch() <<
+                         " desired_orien_in_rel.get_roll()   = " << desired_orien_in_rel.get_roll() << "\n"                 
+                );
 
             nodes_management::node_position wheel_node_pos = wnode->position();
             nodes_management::node_position chassis_node_pos = chassis_node->position();

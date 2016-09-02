@@ -148,7 +148,7 @@ namespace aircraft
                         }
                         else
                         {
-                            double radius = get_wheel_radius(node);//0.75 * (node->get_bound().size().z / 2.);
+                            double radius = get_wheel_radius(node);    //0.75 * (node->get_bound().size().z / 2.);
                             this->shassis_groups_[i]->add_chassis(shassis_t(node, wheel_node,  radius/*0.75 * node->get_bound().radius*/));
                         }
 

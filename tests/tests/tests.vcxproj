@@ -101,7 +101,9 @@
     <ClCompile Include="..\..\..\flex-080\flex\core\platform.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\av\avCore\Database.cpp" />
+    <ClCompile Include="..\..\av\avCore\Database.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\av\avCore\InstancedAnimationManager.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
@@ -114,31 +116,53 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="..\..\av\avCore\LOD.cpp" />
-    <ClCompile Include="..\..\av\avCore\Noise.cpp" />
-    <ClCompile Include="..\..\av\avCore\Object.cpp" />
-    <ClCompile Include="..\..\av\avCore\Timer.cpp" />
-    <ClCompile Include="..\..\av\avCore\Utils.cpp" />
-    <ClCompile Include="..\..\av\avCore\XmlModel.cpp" />
-    <ClCompile Include="..\..\av\shaders.cpp" />
+    <ClCompile Include="..\..\av\avCore\LOD.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\Noise.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\Object.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\Timer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\Utils.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\XmlModel.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\shaders.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\core\config\config.cpp" />
     <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
+    <ClCompile Include="..\..\utils\animation_handler.cpp" />
     <ClCompile Include="..\..\utils\empty_scene.cpp" />
-    <ClCompile Include="..\..\utils\materials.cpp" />
+    <ClCompile Include="..\..\utils\materials.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\_include\objects\bullet_importer.cpp" />
     <ClCompile Include="..\animation_test.cpp" />
     <ClCompile Include="..\animation_test2.cpp" />
     <ClCompile Include="..\animation_test3.cpp" />
     <ClCompile Include="..\animation_test4.cpp" />
     <ClCompile Include="..\animation_test5.cpp" />
+    <ClCompile Include="..\anim_test.cpp" />
     <ClCompile Include="..\bump_mapping.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\cegui\cegui_main.cpp" />
+    <ClCompile Include="..\cegui\cegui_main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\common\CommonFunctions.cpp" />
     <ClCompile Include="..\creators.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

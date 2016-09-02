@@ -15,7 +15,6 @@ AnimationHandler::AnimationHandler(osg::Node* model,const std::string animationN
     , on_lod_effect_ (on_lod_effect)
 {
 
-    //auto p = model_->getUpdateCallback();
     manager_ =  dynamic_cast<osgAnimation::BasicAnimationManager*> ( model_->getUpdateCallback() );
 
     if ( manager_ )
@@ -58,9 +57,12 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
             }
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3)
             {
-                osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
-                if(on_fire_) 
-                    on_fire_();
+                
+                osg::notify(osg::NOTICE)<<"Play third animation"<<std::endl;
+                AnimateIt(osgAnimation::Animation::STAY);
+                //osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+                //if(on_fire_) 
+                //    on_fire_();
             }
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F7)
             {
@@ -78,25 +80,67 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
                 if(on_lod_effect_)
                     on_lod_effect_(low);
             }
- 
-            return false;
+            else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F11)
+            {
+                osg::notify(osg::NOTICE)<<"KEY_F11 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+                
+                if ( manager_ )
+                {   
+
+                    const osgAnimation::AnimationList& animations =
+                        manager_->getAnimationList();
+                   
+                    for ( unsigned int i=0; i<animations.size(); ++i )
+                    {
+                        const std::string& name = animations[i]->getName();
+                        animations[i]->computeDuration();
+                        double d = animations[i]->getDuration();
+                        if ( name==animationName_ )
+                        {
+                            // animations[i]->setStartTime(d/2.f);
+                            animations[i]->update(0);
+                            // animations[i]->setPlayMode(/*pm*/osgAnimation::Animation::ONCE);                   
+                            // manager_->playAnimation( animations[i].get());
+                        }
+
+                    }
+
+                    manager_->update(0);
+                }
+            } 
+            else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F12)
+            {
+                osg::notify(osg::NOTICE)<<"KEY_F12 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+
+                if ( manager_ )
+                {   
+
+                    const osgAnimation::AnimationList& animations =
+                        manager_->getAnimationList();
+                    
+                    double d = 0.0;
+                    
+                    for ( unsigned int i=0; i<animations.size(); ++i )
+                    {
+                        const std::string& name = animations[i]->getName();
+                        animations[i]->computeDuration();
+                        d = animations[i]->getDuration();
+                        if ( name==animationName_ )
+                        {
+                            // animations[i]->setStartTime(d/2.f);
+                            animations[i]->update(d/2.f);
+                            // animations[i]->setPlayMode(/*pm*/osgAnimation::Animation::ONCE);                   
+                            // manager_->playAnimation( animations[i].get());
+                        }
+
+                    }
+
+                    manager_->update(d/2.f);
+                }
+            } 
+
+            return true;
         }
-        //case(osgGA::GUIEventAdapter::PUSH):
-        //case(osgGA::GUIEventAdapter::MOVE):
-        //    {
-        //        _mx = ea.getX();
-        //        _my = ea.getY();
-        //        return false;
-        //    }
-        //case(osgGA::GUIEventAdapter::RELEASE):
-        //    {
-        //        if (_mx == ea.getX() && _my == ea.getY())
-        //        {
-        //            // only do a pick if the mouse hasn't moved
-        //            pick(ea,viewer);
-        //        }
-        //        return true;
-        //    }    
 
     default:
         return false;
@@ -116,13 +160,8 @@ void AnimationHandler::AnimateIt(osgAnimation::Animation::PlayMode pm)
             const std::string& name = animations[i]-> getName();
             if ( name==animationName_ )
             {
-                // auto anim = (osg::clone(animations[i].get(), "Animation_clone", osg::CopyOp::DEEP_COPY_ALL)); 
-                // manager->unregisterAnimation(animations[i].get());
-                // manager->registerAnimation  (anim/*.get()*/);
-
                 animations[i]->setPlayMode(pm);                   
-                manager_->playAnimation( /*anim*/ animations[i].get(),2,2.0 );
-
+                manager_->playAnimation( animations[i].get()/*,2,2.0*/ );
             }
 
         }

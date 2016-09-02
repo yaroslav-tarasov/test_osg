@@ -459,7 +459,7 @@ struct client
         ));
 #endif
 
-#if 1
+#if 0
         runs_once_.insert(make_pair( 25,
             [this]( double time )->void {
 
@@ -914,8 +914,8 @@ private:
                 {
                     if((*it_h).host.ip==peer.addr.to_string())
                     {
-                        ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
-                        //ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+                        //ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
+                        ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
 #if 0
                         ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
                         ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )
