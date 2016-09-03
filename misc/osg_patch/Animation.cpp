@@ -132,9 +132,15 @@ bool Animation::update (double time, int priority)
         }
         break;
     case ONCE_BACKWARDS: 
-        t = _originalDuration - t;
-        if (t < 0) return false;
-        break;
+		t = _originalDuration - t;
+		if (t < 0)
+		{	
+			for (ChannelList::const_iterator chan = _channels.begin();
+				chan != _channels.end(); ++chan)
+				(*chan)->update(0, _weight, priority);
+			return false;
+		}
+		break;
     }
 
     ChannelList::const_iterator chan;
