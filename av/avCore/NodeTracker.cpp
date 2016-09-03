@@ -1,6 +1,3 @@
-
-
-#include <stdafx.h>
 #include "av/precompiled.h"
 
 #include "NodeTracker.h"

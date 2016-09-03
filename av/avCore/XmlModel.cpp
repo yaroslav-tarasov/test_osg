@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "av/precompiled.h"
 #include "av/avCore/Utils.h"
 #include "av/avCore/XmlModel.h"

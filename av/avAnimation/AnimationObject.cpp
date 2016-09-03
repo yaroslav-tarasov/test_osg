@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <osgDB/FileUtils>
 
 #include "AnimationObject.h"

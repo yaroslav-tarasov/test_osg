@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "DebugRenderer.h"
 #include <osgbCollision/Utils.h>
 

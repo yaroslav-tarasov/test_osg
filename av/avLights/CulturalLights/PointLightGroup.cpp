@@ -3,8 +3,6 @@
 // Module includes
 //
 
-#include <stdafx.h>
-
 #include "av/avCore/avCore.h"
 #include "av/avScene/Scene.h"
 

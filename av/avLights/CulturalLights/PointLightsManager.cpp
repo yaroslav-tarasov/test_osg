@@ -2,8 +2,6 @@
 // Module includes
 //
 
-#include <stdafx.h>
-
 #include "av/avCore/avCore.h"
 #include "av/avCore/Global.h"
 

@@ -11,8 +11,6 @@
  * OpenSceneGraph Public License for more details.
 */
 
-#include "stdafx.h"
-
 #include "ShadowMap.h"
 #include "ShadowedScene.h"
 

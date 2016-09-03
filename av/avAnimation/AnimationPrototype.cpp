@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 //#include <avDebug.h>
 #include "av/avCore/Database.h"
 

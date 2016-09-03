@@ -2,8 +2,6 @@
 // Module includes
 //
 
-#include <stdafx.h>
-
 #include <osg/LineWidth>
 
 #include "av/avCore/avCore.h"

@@ -56,14 +56,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;DOM_DYNAMIC;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SolutionDir)\ext\pugixml-1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\collada-dom\dom\include;$(OSG_DIR)\collada-dom\dom\include\1.4;..\..\external-libs\boost;$(SIMEX_DIR)\ext\include;$(SolutionDir)\ext\pugixml-1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libcollada14dom22-d.lib;pugixmld.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4-d;C:\simex\ext\lib\boost</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BOOST_DIR)\stage\lib;..\..\external-libs\boost\lib\vc10;$(SolutionDir)\ext\pugixml-1.4\scripts\vs2010\x32;$(OSG_DIR)\collada-dom\dom\build\vc10-1.4-d;$(SIMEX_DIR)\ext\lib\boost</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

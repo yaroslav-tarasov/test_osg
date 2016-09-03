@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include  "Visual.h"
 
 #include "avScene/Scene.h"

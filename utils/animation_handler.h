@@ -16,7 +16,7 @@ public:
     bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa);
 
 protected:
-    void AnimateIt(osgAnimation::Animation::PlayMode pm);
+    void AnimateIt(osgAnimation::Animation::PlayMode pm, double duration);
  
 protected:
     osg::ref_ptr<osgAnimation::BasicAnimationManager> manager_;

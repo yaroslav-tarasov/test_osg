@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "scn_lights.h"
 
 using namespace cg;

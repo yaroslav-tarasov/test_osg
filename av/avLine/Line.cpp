@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "av/avLine/Line.h"
 #include "av/avCore/avCore.h"
 #include "av/avLine/LineManager.h"

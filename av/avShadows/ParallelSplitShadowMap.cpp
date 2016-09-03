@@ -25,8 +25,6 @@
 /*                                                                                                       */
 /* ##################################################################################################### */
 
-#include "stdafx.h"
-
 #include "ParallelSplitShadowMap.h"
 #include "ShadowedScene.h"
 

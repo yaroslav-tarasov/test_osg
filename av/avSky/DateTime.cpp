@@ -11,7 +11,6 @@
  * OpenSceneGraph Public License for more details.
 */
 
-#include "stdafx.h"
 #include "DateTime.h"
 
 using namespace avSky;

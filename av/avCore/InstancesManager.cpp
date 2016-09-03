@@ -1,5 +1,3 @@
-#pragma once
-
 #include "InstancesManager.h"
 
 #include <osgAnimation/RigGeometry>

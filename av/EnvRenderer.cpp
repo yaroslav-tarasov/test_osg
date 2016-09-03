@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "materials.h"
 
 #include "av/precompiled.h"

@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "av/precompiled.h"
+﻿#include "av/precompiled.h"
 
 #include "utils/high_res_timer.h"
 #include "utils/pickhandler.h"

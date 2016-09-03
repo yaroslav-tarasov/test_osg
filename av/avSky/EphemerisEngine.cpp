@@ -11,7 +11,6 @@
  * OpenSceneGraph Public License for more details.
 */
 
-#include "stdafx.h"
 #include "av/precompiled.h"
 
 #include "EphemerisEngine.h"

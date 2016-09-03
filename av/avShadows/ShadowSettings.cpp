@@ -11,7 +11,6 @@
  * OpenSceneGraph Public License for more details.
 */
 
-#include "stdafx.h"
 #include "ShadowSettings.h"
 #include <float.h>
 

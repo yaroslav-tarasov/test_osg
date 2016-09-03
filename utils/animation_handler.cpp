@@ -48,18 +48,19 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
             if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F1/*'1'*/)
             {
                 osg::notify(osg::NOTICE)<<"Play first animation"<<std::endl;
-                AnimateIt(osgAnimation::Animation::ONCE);
+                AnimateIt(osgAnimation::Animation::ONCE, .1);
             }                
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F2/*'2'*/)
             {
                 osg::notify(osg::NOTICE)<<"Play second animation"<<std::endl;
-                AnimateIt(osgAnimation::Animation::ONCE_BACKWARDS);
+				                        
+                AnimateIt(osgAnimation::Animation::ONCE_BACKWARDS, .1);							
             }
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3)
             {
                 
                 osg::notify(osg::NOTICE)<<"Play third animation"<<std::endl;
-                AnimateIt(osgAnimation::Animation::STAY);
+                AnimateIt(osgAnimation::Animation::STAY, .1);
                 //osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
                 //if(on_fire_) 
                 //    on_fire_();
@@ -93,8 +94,9 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
                     for ( unsigned int i=0; i<animations.size(); ++i )
                     {
                         const std::string& name = animations[i]->getName();
-                        animations[i]->computeDuration();
-                        double d = animations[i]->getDuration();
+                        //animations[i]->computeDuration();
+
+						double d = animations[i]->getDuration();
                         if ( name==animationName_ )
                         {
                             // animations[i]->setStartTime(d/2.f);
@@ -147,7 +149,7 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
     }
 }
 
-void AnimationHandler::AnimateIt(osgAnimation::Animation::PlayMode pm)
+void AnimationHandler::AnimateIt(osgAnimation::Animation::PlayMode pm, double duration)
 {
     if ( manager_ )
     {   
@@ -160,7 +162,8 @@ void AnimationHandler::AnimateIt(osgAnimation::Animation::PlayMode pm)
             const std::string& name = animations[i]-> getName();
             if ( name==animationName_ )
             {
-                animations[i]->setPlayMode(pm);                   
+                animations[i]->setDuration(duration);
+				animations[i]->setPlayMode(pm);                   
                 manager_->playAnimation( animations[i].get()/*,2,2.0*/ );
             }
 

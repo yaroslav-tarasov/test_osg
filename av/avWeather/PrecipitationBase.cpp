@@ -3,9 +3,6 @@
 // Module includes
 //
 
-#include <stdafx.h>
-
-
 #include "av/avCore/HalfTypeHeader.h"
 
 #include "av/avCore/avCore.h"

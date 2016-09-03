@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <cegui/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
 //#include <CEGUI/RendererModules/OpenGL/GL3Renderer.h>

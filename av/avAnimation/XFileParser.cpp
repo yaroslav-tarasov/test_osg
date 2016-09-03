@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <osg/MatrixTransform>
 #include <osgDB/FileUtils>
 

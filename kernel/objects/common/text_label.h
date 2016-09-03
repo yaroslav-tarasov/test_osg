@@ -115,6 +115,7 @@ namespace visual_objects
 		{
 			 ls_ = rhs;
 			 init_();
+			 return *this;
 		}
 
         inline void set_text(const std::string&  text)

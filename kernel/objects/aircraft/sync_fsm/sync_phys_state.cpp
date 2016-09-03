@@ -394,7 +394,7 @@ namespace sync_fsm
             if (shassis.phys_wheels.empty())
                 return;
 
-            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[1]);
+            geo_position wpos = this->phys_aircraft_->get_wheel_position(shassis.phys_wheels[0]);
             
             quaternion wpos_rel_orien = (!body_pos.orien) * wpos.orien;
             point_3 wpos_rel_pos = (!body_pos.orien).rotate_vector(body_pos.pos(wpos.pos));
