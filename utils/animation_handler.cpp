@@ -35,6 +35,7 @@ AnimationHandler::AnimationHandler(osg::Node* model,const std::string animationN
 
 }
 
+const double time_time = .5; 
 
 bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa)
 {
@@ -48,19 +49,19 @@ bool AnimationHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIAction
             if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F1/*'1'*/)
             {
                 osg::notify(osg::NOTICE)<<"Play first animation"<<std::endl;
-                AnimateIt(osgAnimation::Animation::ONCE, .1);
+                AnimateIt(osgAnimation::Animation::ONCE, time_time);
             }                
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F2/*'2'*/)
             {
                 osg::notify(osg::NOTICE)<<"Play second animation"<<std::endl;
 				                        
-                AnimateIt(osgAnimation::Animation::ONCE_BACKWARDS, .1);							
+                AnimateIt(osgAnimation::Animation::ONCE_BACKWARDS, time_time);							
             }
             else if (ea.getKey()==osgGA::GUIEventAdapter::KEY_F3)
             {
                 
                 osg::notify(osg::NOTICE)<<"Play third animation"<<std::endl;
-                AnimateIt(osgAnimation::Animation::STAY, .1);
+                AnimateIt(osgAnimation::Animation::STAY, time_time);
                 //osg::notify(osg::NOTICE)<<"Fire !!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
                 //if(on_fire_) 
                 //    on_fire_();
