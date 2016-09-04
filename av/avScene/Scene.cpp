@@ -1702,19 +1702,16 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 #endif
 		
 
-
-#if 0 
-        load("su_27",_terrainRoot, 15000, false);
-        load("mi_24",_terrainRoot, 15000, false);
-        load("mig_29",_terrainRoot, 15000, false); 
-#endif
+        //load("su_27",_terrainRoot, 15000, async);
+        //load("mi_24",_terrainRoot, 15000, async);
+        //load("mig_29",_terrainRoot, 15000, async); 
         // load("an_26",_terrainRoot, 15000, false);
         // load("trees",_terrainRoot, 15000, async);
         // load("elaeagnus_umbellate",_terrainRoot, 15000, async);  // viburnum_opulus
         // load("viburnum_opulus",_terrainRoot, 15000, async);      // viburnum_opulus
         // load("caponier",_terrainRoot, 15000, async);
         // load("ka_50",_terrainRoot, 15000, async); 
-        
+      
 
 
         return _terrainNode;
@@ -1788,7 +1785,6 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 			    //res_node->setUserData(new DelLight);	
 #endif
-
 
 				osg::Node* ld  =  findFirstNode(res_node,"landing_lamp" ,FindNodeVisitor::exact);
 				if(ld==nullptr)

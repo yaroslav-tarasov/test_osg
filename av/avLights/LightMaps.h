@@ -6,11 +6,6 @@ typedef osg::ref_ptr<osg::Texture2D> ITexturePtr;
 
 struct LightMapRenderer : osg::Group
 {
-    // get matrix
-    virtual cg::matrix_4f const & GetViewTextureMatrix() const = 0; 
-    // get night mode
-    virtual bool                GetNightMode()         const = 0;
-
     // add spot light
     struct SpotData
     {
@@ -20,8 +15,6 @@ struct LightMapRenderer : osg::Group
         cg::range_2f         dist_falloff;
         cg::range_2f         angle_falloff;
     };
-
-    virtual void AddSpotLight( SpotData const & spot ) = 0;
 };
 
 typedef osg::ref_ptr<LightMapRenderer> ILightMapRendererPtr;

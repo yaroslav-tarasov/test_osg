@@ -74,16 +74,16 @@ char fragmentShaderSource[] =  {
     void main()                                                                                                    \n
     {                                                                                                              \n
         // get dist falloff                                                                                        \n
-\n      const float dist_rcp = inversesqrt(dot(f_in.from_l, f_in.from_l));                                         \n
+        const float dist_rcp = inversesqrt(dot(f_in.from_l, f_in.from_l));                                         \n
         const vec3 from_l_nrm = dist_rcp * f_in.from_l;                                                            \n
         const float dist_atten = clamp(fma(dist_rcp, f_in.dist_falloff.x, f_in.dist_falloff.y), 0.0, 1.0);         \n
         // get conical falloff                                                                                     \n
-\n      const float angle_dot = dot(from_l_nrm, f_in.l_dir);                                                       \n
+        const float angle_dot = dot(from_l_nrm, f_in.l_dir);                                                       \n
         const float angle_atten = clamp(fma(angle_dot, f_in.cone_falloff.x, f_in.cone_falloff.y), 0.0, 1.0);       \n
         // diffuse-like term for planar surfaces                                                                   \n
         //const float ndotl = clamp(fma(-from_l_nrm.z, 0.35, 0.65), 0.0, 1.0);                                     \n
         // write color                                                                                             \n
-\n      const float height_packed = -f_in.from_l.z;                                                                \n
+        const float height_packed = -f_in.from_l.z;                                                                \n
         const float angledist_atten = angle_atten * dist_atten;                                                    \n
         const float angledist_atten_ramped = angledist_atten * (2.0 - angledist_atten);                            \n
         FragColor = vec4(f_in.l_color * (angledist_atten/* * ndotl*/), height_packed * angledist_atten_ramped);    \n
