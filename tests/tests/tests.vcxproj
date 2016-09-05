@@ -231,6 +231,7 @@
     </ClCompile>
     <ClCompile Include="..\phys_viewer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\render_points.cpp" />
     <ClCompile Include="..\select_geometry.cpp" />

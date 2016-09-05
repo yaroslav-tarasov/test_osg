@@ -115,13 +115,15 @@ struct trajectory_impl : trajectory
 
     }
 
-    void append(double len, const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed)  override
+    void append(double len, const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed, optional<air_config_t> air_config=boost::none)  override
     {
         kp_seg_.back().insert(make_pair<>(len,pos));
         curs_seg_.back().insert(make_pair<>(len,orien));
         if(speed)
             (*speed_seg_).back().insert(make_pair<>(len,*speed));
 
+		if(air_config)
+			(*ac_seg_).back().insert(make_pair<>(len,*air_config));
     }
 
     double length() const
@@ -154,6 +156,15 @@ struct trajectory_impl : trajectory
         else
             return boost::none;
     }
+	
+	boost::optional<air_configs_t::value_type> air_config_value(double arg) /*const*/
+	{ 
+		size_t ind = current_segment(arg);
+		if(ac_seg_ && ac_seg_->size() > ind && ac_seg_->size() > 0 )
+			return ac_seg_->at(ind).value(arg);
+		else
+			return boost::none;
+	}
 
     std::vector<keypoints_t::value_type> extract_values() const
     {
