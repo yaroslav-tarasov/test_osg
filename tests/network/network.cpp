@@ -654,7 +654,19 @@ struct client
 			this->send(&msg[0], msg.size());
 		};
 
+        boost::function<void(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos2 = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->void {
+            binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
+                id 
+                , traj_trp->kp_value    (time - traj_offset)
+                , traj_trp->curs_value  (time - traj_offset)
+                , *traj_trp->speed_value(time - traj_offset)
+                , time 
+                , false
+                , meteo::local_params()
+                )));
 
+            this->send(&msg[0], msg.size());
+        };
 
 #if 0
         ADD_EVENT(0.0  , create_msg(1500, point_3f(-2383.51f,-524.20f, 21.0f ), quaternion(cprf(cg::rad2grad() * -5.10f)) , ok_camera, "camera 0", "") )
@@ -757,12 +769,31 @@ struct client
 #if 0
             ADD_EVENT(12.0  , create_msg(1176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "IL76", "1176") )
             ADD_EVENT(13.0  , create_msg(1177,point_3(245,398,0),cg::cpr(173), ok_aircraft, "IL76", "1177") )
+            /*point_3(286,400,0),cg::cpr(173)*/
 #endif
-            ADD_EVENT(14.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length())/*point_3(286,400,0),cg::cpr(173)*/, ok_aircraft, "TU134", "1178") )
             
-            runs_.insert(make_pair(traj_trp_->base_length() + 30,
-            boost::bind( run_f_pos , 1178, _1, traj_trp_, 30)
+            
+            const double time_to_start = traj_trp_->base_length();
+
+            ADD_EVENT(15.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "SU27", "1178") )
+            
+            runs_.insert(make_pair(traj_trp_->base_length() + 15,
+            boost::bind( run_f_pos , 1178, _1, traj_trp_, 15)
             ));
+
+
+            ADD_EVENT( (15.0 + 30.0 + 45.0) , create_msg(1179,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "TU154", "1179") )
+
+            runs_.insert(make_pair(traj_trp_->base_length() + (15.0 + 30.0 + 45.0),
+            boost::bind( run_f_pos2 , 1179, _1, traj_trp_, (15.0 + 30.0 + 45.0))
+            ));
+
+            ADD_EVENT( (90.0 + 30.0 + 45.0) , create_msg(1180,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "IL76", "1180") )
+
+            runs_.insert(make_pair(traj_trp_->base_length() + (90.0 + 30.0 + 45.0),
+            boost::bind( run_f_pos2 , 1180, _1, traj_trp_, (90.0 + 30.0 + 45.0))
+            ));
+
 
 #if 0
             ADD_EVENT(12.0  , create_msg(176,point_3(201,392,0),cg::cpr(173), ok_aircraft, "AN140", "176") )

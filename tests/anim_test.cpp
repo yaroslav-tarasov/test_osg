@@ -17,8 +17,9 @@ int main_anim_test( int argc, char** argv )
 
 
 /////////////////////////////////////////////////////////////////////////    
-//    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/tu_154/tu_154.dae" );
-    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/tu_134/tu_134.dae" );
+    //osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/tu_154/tu_154.dae" );
+//    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/tu_134/tu_134.dae" );
+    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/su_27/su_27.dae" );
 //    osg::ref_ptr<osg::Node> model = osgDB::readNodeFile( "./data/models/a_319/a_319.dae" );
     osg::Node* lod3 =  findFirstNode(model,"Lod3"); 
     if(lod3)

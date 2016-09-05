@@ -262,7 +262,7 @@ namespace sync_fsm
     const double comfortable_acceleration  = 2.5;
     const double max_dx =   aircraft::max_desired_velocity() * aircraft::max_desired_velocity() / comfortable_acceleration *.5; 
 
-#define MODEL_ONLY
+// #define MODEL_ONLY
 
     void phys_state3::update(double time, double dt) 
     {
@@ -312,6 +312,9 @@ namespace sync_fsm
 #if defined(MODEL_ONLY)
             target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
 #endif
+            if(false && target_pos.pos.z < 0.1)
+              target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, desired_speed / dt, 0.f ));
+
             // Очень необходимо для движения физ модели.
             // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
             geo_position gtp(target_pos, get_base());
@@ -331,6 +334,7 @@ namespace sync_fsm
 			{
 				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
 			}
+
  #if defined(MODEL_ONLY)
             auto physpos = phys_aircraft_->get_position();
 
@@ -346,10 +350,28 @@ namespace sync_fsm
             self_.set_desired_nm_orien(physpos.orien);
             
 #else
-            self_.set_desired_nm_pos(gtp.pos);
-            self_.set_desired_nm_orien(gtp.orien);
+            if(cg::point_3(traj_->kp_value(tar_len)).z > 0.0)
+            {
+                self_.set_desired_nm_pos(gtp.pos);
+                self_.set_desired_nm_orien(gtp.orien);
 
-            phys_aircraft_->go_to_pos(gtp);
+                phys_aircraft_->go_to_pos(gtp);
+            }
+            else
+            {
+                auto physpos = phys_aircraft_->get_position();
+
+                // LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lon  << "    course: " << physpos.orien.get_course() << "\n" );
+                LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos :   x:  "  <<  phys_aircraft_->get_local_position().pos.x
+                    << "    y: "      << phys_aircraft_->get_local_position().pos.y 
+                    << "    z: "      << phys_aircraft_->get_local_position().pos.z 
+                    << "    course: " << phys_aircraft_->get_local_position().orien.get_course()
+                    << "    pitch: "  << phys_aircraft_->get_local_position().orien.get_pitch()
+                    << "\n" );
+
+                self_.set_desired_nm_pos(physpos.pos);
+                self_.set_desired_nm_orien(physpos.orien);
+            }
 #endif
             phys_aircraft_->update();
         }
