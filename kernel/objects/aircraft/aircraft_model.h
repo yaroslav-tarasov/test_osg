@@ -60,7 +60,7 @@ namespace aircraft
         
         // model_ext_control
     private: 
-        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed)    override;
+        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed, fms::trajectory::air_config_t ac )    override;
         void set_ext_wind       (double speed, double azimuth)                                                        override;
 
         // sync_fsm::self_t

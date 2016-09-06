@@ -17,9 +17,9 @@ trajectory_ptr trajectory::create(const traj_data& data)
     return boost::make_shared<trajectory_impl>(data);
 }
 
-trajectory_ptr trajectory::create(const keypoints_t& kpts,curses_t const& crs,speed_t const& vel)
+trajectory_ptr trajectory::create(const keypoints_t& kpts,curses_t const& crs,speed_t const& vel, optional<air_configs_t> const& ac)
 {
-    return boost::make_shared<trajectory_impl>(kpts,crs,vel);
+    return boost::make_shared<trajectory_impl>(kpts,crs,vel,ac);
 }
 
 
@@ -41,13 +41,18 @@ struct trajectory_impl : trajectory
         curs_seg_.push_back(crs);
     }
     
-    trajectory_impl(const keypoints_t& kpts ,curses_t const& crs,speed_t const& vel )   
+    trajectory_impl(const keypoints_t& kpts ,curses_t const& crs,speed_t const& vel,optional<air_configs_t> const& ac=boost::none )   
         : curr_pos_(0)
     {
-
         kp_seg_.push_back(kpts);
         curs_seg_.push_back(crs);
         (*speed_seg_).push_back(vel);
+        
+        if (ac)
+        {
+            ac_seg_ = ac_segments_t(); 
+            (*ac_seg_).push_back(*ac);
+        }
     }
 
     trajectory_impl(const trajectory_impl_ptr& other)
@@ -117,13 +122,21 @@ struct trajectory_impl : trajectory
 
     void append(double len, const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed, optional<air_config_t> air_config=boost::none)  override
     {
-        kp_seg_.back().insert(make_pair<>(len,pos));
-        curs_seg_.back().insert(make_pair<>(len,orien));
+        kp_seg_.back().insert(make_pair(len,pos));
+        curs_seg_.back().insert(make_pair(len,orien));
         if(speed)
-            (*speed_seg_).back().insert(make_pair<>(len,*speed));
+            (*speed_seg_).back().insert(make_pair(len,*speed));
 
 		if(air_config)
-			(*ac_seg_).back().insert(make_pair<>(len,*air_config));
+        {
+            if(!ac_seg_)
+            {
+                ac_seg_ = ac_segments_t();
+               (*ac_seg_).resize(1);
+            }
+
+			(*ac_seg_).back().insert(make_pair(len,*air_config));
+        }
     }
 
     double length() const
@@ -213,6 +226,56 @@ private:
 
         return 0;
     }        
+
+ #if 0
+   double closest(cg::point_3 const& pos, boost::optional<double> low_bound = boost::none, boost::optional<double> up_bound = boost::none) const
+    {
+        if (base_type::points().size() <= 1)
+            return 0;
+
+        distance_t distance;
+
+        optional<double> param;
+        optional<double> dist;
+
+        auto begin = base_type::points().begin();
+        if (low_bound)
+        {
+            begin = base_type::points().lower_bound(*low_bound);
+
+            if (begin == base_type::points().end())
+            {
+                --begin;
+                return begin->first;
+            }
+
+            if (begin != base_type::points().begin())
+                --begin;
+        }
+
+        const auto end = up_bound ? base_type::points().upper_bound(*up_bound) : base_type::points().end();
+
+        for (auto it = begin; it != end; ++it)
+        {
+            const auto next_it = boost::next(it);
+            if (next_it == base_type::points().end())
+                break;
+
+            const segment_t seg(it->second, next_it->second, true);
+            const geo_point_2 clst = seg.closest_point(pos);
+            const double dst = distance(clst, pos);
+            if (!dist || dst < *dist)
+            {
+                dist = dst;
+                param = cg::blend(it->first, next_it->first, seg(clst));
+            }
+        }
+
+        Assert(param);
+        return *param;
+    }
+#endif
+
 
 
     double          curr_pos_;

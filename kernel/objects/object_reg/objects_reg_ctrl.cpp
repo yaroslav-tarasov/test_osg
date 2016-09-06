@@ -27,20 +27,20 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
 	, _sys(oc.sys)
 {
 
-    void (ctrl::*on_run)         (net_layer::msg::run_msg const& msg)           = &ctrl::inject_msg;
-    void (ctrl::*on_container)   (net_layer::msg::container_msg    const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_atow)        (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_dtow)        (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
-    void (ctrl::*on_malfunction) (net_layer::msg::malfunction_msg  const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_engine_state)(net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_parachute_state)(net_layer::msg::parachute_state_msg const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_fire)        (net_layer::msg::fire_fight_msg   const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_environment) (net_layer::msg::environment_msg  const& msg)  = &ctrl::inject_msg;
-    void (ctrl::*on_traj_assign) (net_layer::msg::traj_assign_msg  const& msg)  = &ctrl::inject_msg;
-	void (ctrl::*on_set_target)  (net_layer::msg::arrgear_target_msg  const& msg) = &ctrl::inject_msg;
-	void (ctrl::*on_destroy)     (net_layer::msg::destroy_msg  const& msg)        = &ctrl::inject_msg;
-    void (ctrl::*on_create)      (net_layer::msg::create_msg  const& msg)         = &ctrl::inject_msg;
-    void (ctrl::*on_update_cloud_zone)      (net_layer::msg::update_cloud_zone_msg  const& msg)         = &ctrl::inject_msg;
+    void (ctrl::*on_run)               (net_layer::msg::run_msg const& msg)           = &ctrl::inject_msg;
+    void (ctrl::*on_container)         (net_layer::msg::container_msg    const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_atow)              (net_layer::msg::attach_tow_msg_t const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_dtow)              (net_layer::msg::detach_tow_msg_t const& msg)  = &ctrl::inject_msg;    
+    void (ctrl::*on_malfunction)       (net_layer::msg::malfunction_msg  const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_engine_state)      (net_layer::msg::engine_state_msg const& msg)  = &ctrl::inject_msg;
+    void (ctrl::*on_parachute_state)   (net_layer::msg::parachute_state_msg const& msg)    = &ctrl::inject_msg;
+    void (ctrl::*on_fire)              (net_layer::msg::fire_fight_msg   const& msg)       = &ctrl::inject_msg;
+    void (ctrl::*on_environment)       (net_layer::msg::environment_msg  const& msg)       = &ctrl::inject_msg;
+    void (ctrl::*on_traj_assign)       (net_layer::msg::traj_assign_msg  const& msg)       = &ctrl::inject_msg;
+	void (ctrl::*on_set_target)        (net_layer::msg::arrgear_target_msg  const& msg)    = &ctrl::inject_msg;
+	void (ctrl::*on_destroy)           (net_layer::msg::destroy_msg  const& msg)           = &ctrl::inject_msg;
+    void (ctrl::*on_create)            (net_layer::msg::create_msg  const& msg)            = &ctrl::inject_msg;
+    void (ctrl::*on_update_cloud_zone) (net_layer::msg::update_cloud_zone_msg  const& msg) = &ctrl::inject_msg;
 
     
 

@@ -25,7 +25,7 @@ struct traj_data
 { 
 
 	// from fms state
-	enum air_config_t
+	enum air_config_t : uint16_t
 	{
 		// order is important
 		CFG_TO = 0,     // takeoff
@@ -33,7 +33,8 @@ struct traj_data
 		CFG_CR,         // cruise
 		CFG_AP,         // approach
 		CFG_LD,         // landing
-		CFG_GD,         // ground
+        CFG_GD,         // ground
+		CFG_SIZE        // 
 	};	
 	
 	struct air_config_lerp
@@ -79,7 +80,7 @@ struct trajectory : traj_data
 {
     static trajectory_ptr create(const decart_position& begin_pos,decart_position const& end_pos,double radius, double step = 1); 
     static trajectory_ptr create(const traj_data& data); 
-    static trajectory_ptr create(const keypoints_t& kpts = keypoints_t() ,curses_t const& crs = curses_t(),speed_t const& vel=speed_t());
+    static trajectory_ptr create(const keypoints_t& kpts = keypoints_t() ,curses_t const& crs = curses_t(),speed_t const& vel=speed_t(),  optional<air_configs_t> const& ac=boost::none);
 
     virtual ~trajectory() {}
     virtual void                                       append        (const trajectory_ptr other) = 0;

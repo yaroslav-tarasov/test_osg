@@ -149,7 +149,7 @@ void model::sync_nm_root(double /*dt*/)
 }
 
 
-void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
+void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed, fms::trajectory::air_config_t ac )
 {
     decart_position target_pos;
 
@@ -160,8 +160,7 @@ void    model::set_desired        (double time, const cg::point_3& pos, const cg
     if(!traj_)
         traj_ = fms::trajectory::create();
 
-    traj_->append(time, pos, orien, speed);
-
+    traj_->append(time, pos, orien, speed, ac);
 
 }
 

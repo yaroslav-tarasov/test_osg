@@ -104,7 +104,7 @@ namespace helicopter_physless
         void on_state(msg::state_msg const& msg) override;   // fms
 
     private: 
-        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed)    override;
+        void set_desired        (double time, const cg::point_3& pos, const cg::quaternion& q, const double speed, fms::trajectory::air_config_t ac)    override;
         void set_ext_wind       (double speed, double azimuth)                                                        override;
     
     public:

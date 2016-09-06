@@ -10,9 +10,9 @@ for line in inputfile:
            continue
 
     if out_str =='' :
-            out_str = line
-            out_str = ''.join(out_str.split('\n'))
-            continue
+           out_str = line
+           out_str = ''.join(out_str.split('\n'))
+           continue
     out_str = out_str + line
     outputfile.write(out_str )
     out_str= ''

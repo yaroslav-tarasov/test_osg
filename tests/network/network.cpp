@@ -58,6 +58,9 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
     fms::trajectory::keypoints_t  kpts;
     fms::trajectory::curses_t      crs;
     fms::trajectory::speed_t       vls;
+    fms::trajectory::air_configs_t ac;
+
+    auto  ac_val = fms::trajectory::CFG_SIZE;
 
     const unsigned start_idx = 0;
     cg::point_2 prev(kdg.kd_[start_idx].x,kdg.kd_[start_idx].y);
@@ -75,14 +78,21 @@ inline fms::trajectory_ptr fill_trajectory (const krv::data_getter& kdg)
             if (it->h - std::prev(it)->h < 0) tang = abs(tang);
         }
 
-
         crs.insert (std::make_pair(it->time,cpr(it->fiw, tang, it->kr )));
         kpts.insert(std::make_pair(it->time,cg::point_3(p,it->h)));
+        
+        if(ac_val != static_cast<fms::trajectory::air_config_t>(it->air_state)  || it == kdg.kd_.begin())
+        {
+           ac_val = static_cast<fms::trajectory::air_config_t>(it->air_state);
+           ac.insert(std::make_pair(it->time,ac_val));
+        }
+
+
 
         prev = p;
     }
 
-    return fms::trajectory::create(kpts,crs,vls);
+    return fms::trajectory::create(kpts,crs,vls,ac);
 }
 
 namespace camera_moving
@@ -342,8 +352,6 @@ struct client
 		set_weather();
 
 #if 1
-
-
 
 #if 1
         ADD_EVENT(10.0 , create_msg(3,traj_->kp_value(traj_->base_length())+ cg::point_3(10.0,10.0,150.0),traj_->curs_value(traj_->base_length()),ok_flock_of_birds,"crow","", 70)) 
@@ -649,6 +657,7 @@ struct client
 				, time + traj_offset
 				, false
 				, meteo::local_params()
+                , traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE
 				)));
 
 			this->send(&msg[0], msg.size());
@@ -663,6 +672,7 @@ struct client
                 , time 
                 , false
                 , meteo::local_params()
+                , traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE
                 )));
 
             this->send(&msg[0], msg.size());
@@ -782,6 +792,7 @@ struct client
             ));
 
 
+#if 0
             ADD_EVENT( (15.0 + 30.0 + 45.0) , create_msg(1179,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "TU154", "1179") )
 
             runs_.insert(make_pair(traj_trp_->base_length() + (15.0 + 30.0 + 45.0),
@@ -793,6 +804,7 @@ struct client
             runs_.insert(make_pair(traj_trp_->base_length() + (90.0 + 30.0 + 45.0),
             boost::bind( run_f_pos2 , 1180, _1, traj_trp_, (90.0 + 30.0 + 45.0))
             ));
+#endif
 
 
 #if 0

@@ -326,22 +326,22 @@ void vis::place_marking()
 
 geo_point_3 vis::camera_pos() const
 {
-    return cameras_[current_camera_].gp.pos;
+    return cameras_.size()>0?cameras_[current_camera_].gp.pos:geo_point_3();
 }
 
 cpr vis::camera_orien() const
 {
-    return cameras_[current_camera_].gp.orien.cpr();
+    return cameras_.size()>0?cameras_[current_camera_].gp.orien.cpr():cpr();
 }
 
 geo_point_3 vis::pos() const
 {
-    return cameras_[current_camera_].gp.pos;
+    return cameras_.size()>0?cameras_[current_camera_].gp.pos:geo_point_3();
 }
 
 cpr vis::orien() const
 {
-    return cameras_[current_camera_].gp.orien.cpr();
+    return cameras_.size()>0?cameras_[current_camera_].gp.orien.cpr():cpr();
 }
 
 

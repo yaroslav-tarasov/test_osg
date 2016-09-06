@@ -172,7 +172,7 @@ void model::sync_nm_root(double dt)
     root_->set_position(root_node_pos);
 }
 
-void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed )
+void    model::set_desired        (double time, const cg::point_3& pos, const cg::quaternion& orien, const double speed, fms::trajectory::air_config_t ac )
 {
     decart_position target_pos;
 

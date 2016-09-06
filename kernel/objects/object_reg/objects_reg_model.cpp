@@ -47,7 +47,7 @@ void model::on_inject_msg(net_layer::msg::run_msg const& msg)
              }
              
              cg::cpr vc(msg.orien.cpr());
-             pa->set_desired  (msg.time,msg.keypoint,msg.reverse?cg::cpr(cg::norm360(msg.orien.get_course() + msg.reverse * 180), msg.orien.get_pitch(), msg.orien.get_roll()):msg.orien,msg.speed);
+             pa->set_desired  (msg.time,msg.keypoint,msg.reverse?cg::cpr(cg::norm360(msg.orien.get_course() + msg.reverse * 180), msg.orien.get_pitch(), msg.orien.get_roll()):msg.orien,msg.speed, msg.ac);
 
              // pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
              pa->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth ); 

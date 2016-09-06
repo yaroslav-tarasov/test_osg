@@ -143,7 +143,7 @@ struct model_control
 struct model_ext_control
 {
 	virtual ~model_ext_control() {}
-	virtual void                 set_desired   (double time,const cg::point_3& pos, const cg::quaternion& q, const double speed)     = 0;
+	virtual void                 set_desired   (double time,const cg::point_3& pos, const cg::quaternion& q, const double speed, fms::trajectory::air_config_t ac =  fms::trajectory::CFG_SIZE )     = 0;
 	virtual void                 set_ext_wind  (double speed, double azimuth) =0;
 };
 

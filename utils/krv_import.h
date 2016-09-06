@@ -4,17 +4,18 @@ namespace krv
 {
         struct data
         {
-            float x;
-            float y; 
-            float h;
-            float fi;
-            float fiw;
-            float kr;
-            float v;
-            float w; 
-            float vb;
-            float tg;
-            float time;
+            float     x;
+            float     y; 
+            float     h;
+            float     fi;
+            float     fiw;
+            float     kr;
+            float     v;
+            float     w; 
+            float     vb;
+            float     tg;
+            float     time;
+            unsigned  air_state; 
         };
 
         __forceinline std::ostream &operator <<(std::ostream &os, const data &kp) {
@@ -33,9 +34,12 @@ namespace krv
             }
 
             template <class T>
-            T get(size_t index)
+            boost::optional<T> get(size_t index)
             {
-                return boost::lexical_cast<T>(values_[index]);
+                if (values_.size() > index)
+                    return boost::lexical_cast<T>(values_[index]);
+
+                return boost::none;
             }
 
             bool valid()
@@ -68,19 +72,21 @@ namespace krv
                     value_getter items(line);
                     data kd;
 
-                    if(items.valid())
+                    if(line.size()>0 && items.valid())
                     {
-                        kd.x = items.get<float>(1);
-                        kd.y = items.get<float>(3); 
-                        kd.h = items.get<float>(5);
+                        kd.x = *(items.get<float>(1));
+                        kd.y = *(items.get<float>(3)); 
+                        kd.h = *(items.get<float>(5));
                         //kd.fi = items.get<float>(7);
-                        kd.fiw = items.get<float>(7);
-                        kd.kr  = items.get<float>(9);
+                        kd.fiw = *(items.get<float>(7));
+                        kd.kr  = *(items.get<float>(9));
                         //kd.v  = items.get<float>(13);
                         //kd.w  = items.get<float>(15); 
                         //kd.vb = items.get<float>(17);
-                        kd.tg   = items.get<float>(15);
-                        kd.time = items.get<float>(17) - time_shift ;
+                        kd.tg   = *(items.get<float>(15));
+                        kd.time = *(items.get<float>(17)) - time_shift ;
+
+                        kd.air_state =  items.get<unsigned>(19)?*(items.get<unsigned>(19)):fms::trajectory::CFG_SIZE;
                         
                         if (kd.time >= 0.0 )
                         {
@@ -88,6 +94,10 @@ namespace krv
                             kd_.push_back(kd);
                             kp_.push_back( cg::point_3(kd.x,kd.y,kd.h));
                         }
+
+
+
+                        
 
                     }
 

@@ -76,6 +76,7 @@ namespace aircraft
             void update(double /*time*/, double dt) override;
 
             double                                 desired_velocity_;
+            boost::optional<double>                traj_time_offset_;
         };
 
         sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
@@ -268,12 +269,13 @@ namespace sync_fsm
     {
         if (!phys_aircraft_)
             return;
+        
+        
 
-        FIXME(extern state);
         if(auto traj_ = self_.get_trajectory())
         {
-
-            traj_->set_cur_len ((time-packet_delay>0)? time - packet_delay:0.0/*traj_->cur_len() + dt*/);
+            
+            traj_->set_cur_len (/*(time-packet_delay>0)? time - packet_delay:0.0*/traj_time_offset_? time - *traj_time_offset_ : time);
             const double  tar_len = traj_->cur_len();
             decart_position target_pos;
 
@@ -286,15 +288,21 @@ namespace sync_fsm
                     );           
             }
 #endif
-            double desired_speed = 80.f;
+
+            bool takeoff = traj_->air_config_value(tar_len) && *traj_->air_config_value(tar_len) < fms::trajectory::CFG_GD;
+
+            if(traj_->air_config_value(tar_len) )
+            {
+                boost::optional<fms::trajectory::air_configs_t::value_type> v =  *traj_->air_config_value(tar_len);
+            }
+
+
             if(traj_->speed_value(tar_len))
             {
                 const double speed = *traj_->speed_value(tar_len);
                 force_log fl;       
                 LOG_ODS_MSG( "phys_state3::update " << tar_len << "  speed= " << speed << "\n"
                     );
-
-                 desired_speed = speed;
                 // self_.set_desired_nm_speed(speed);
             }
 
@@ -312,8 +320,6 @@ namespace sync_fsm
 #if defined(MODEL_ONLY)
             target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
 #endif
-            if(false && target_pos.pos.z < 0.1)
-              target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, desired_speed / dt, 0.f ));
 
             // Очень необходимо для движения физ модели.
             // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
@@ -350,7 +356,7 @@ namespace sync_fsm
             self_.set_desired_nm_orien(physpos.orien);
             
 #else
-            if(cg::point_3(traj_->kp_value(tar_len)).z > 0.0)
+            if( traj_->kp_value(tar_len).z > 0.0 || takeoff && traj_time_offset_)
             {
                 self_.set_desired_nm_pos(gtp.pos);
                 self_.set_desired_nm_orien(gtp.orien);
@@ -374,6 +380,10 @@ namespace sync_fsm
             }
 #endif
             phys_aircraft_->update();
+
+
+            if( takeoff && !traj_time_offset_)
+                traj_time_offset_ = 5.0;
         }
 
         sync_wheels(dt);

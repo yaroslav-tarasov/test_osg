@@ -181,6 +181,8 @@ namespace net_layer
         struct run_msg
             : network::msg_id<id_run>
         {
+            typedef fms::trajectory::traj_data::air_config_t air_config_t;
+
             run_msg()
                 : ext_id(0)
                 , keypoint (cg::point_3())
@@ -189,27 +191,28 @@ namespace net_layer
                 , speed    (0)
                 , reverse  (false)
 				, mlp      (meteo::local_params())
-            {
-            }
+                , ac       (fms::trajectory::CFG_SIZE)
+            {}
 
-            run_msg( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time,  bool reverse, const meteo::local_params& mlp)
-                : ext_id(id)
+            run_msg( const uint32_t id, const cg::point_3&       keypoint, const cg::quaternion& orien, double speed, double time,  bool reverse, const meteo::local_params& mlp, air_config_t ac)
+                : ext_id   (id)
                 , keypoint (keypoint)
-                , orien (orien) 
-                , time (time)
-                , speed(speed)
-				, reverse (reverse)
-				, mlp  (mlp)
-            {
-            }
+                , orien    (orien) 
+                , time     (time)
+                , speed    (speed)
+				, reverse  (reverse)
+				, mlp      (mlp)
+                , ac       (ac)
+            {}
 
-            uint32_t            ext_id;
-            cg::point_3         keypoint;
-            cg::quaternion      orien;
-			double              time;
-            double              speed;
-			bool			    reverse;
-			meteo::local_params mlp;
+            uint32_t                 ext_id;
+            cg::point_3              keypoint;
+            cg::quaternion           orien;
+			double                   time;
+            double                   speed;
+			bool			         reverse;
+			meteo::local_params      mlp;
+            fms::trajectory::air_config_t ac;
         };
 
         REFL_STRUCT(run_msg)
@@ -220,6 +223,7 @@ namespace net_layer
             REFL_ENTRY( orien     )
 			REFL_ENTRY( reverse   )
             REFL_ENTRY( mlp       )
+            REFL_ENTRY( ac        )
         REFL_END()
         
         enum object_kind_t : int16_t
