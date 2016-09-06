@@ -291,11 +291,6 @@ namespace sync_fsm
 
             bool takeoff = traj_->air_config_value(tar_len) && *traj_->air_config_value(tar_len) < fms::trajectory::CFG_GD;
 
-            if(traj_->air_config_value(tar_len) )
-            {
-                boost::optional<fms::trajectory::air_configs_t::value_type> v =  *traj_->air_config_value(tar_len);
-            }
-
 
             if(traj_->speed_value(tar_len))
             {
@@ -356,7 +351,7 @@ namespace sync_fsm
             self_.set_desired_nm_orien(physpos.orien);
             
 #else
-            if( traj_->kp_value(tar_len).z > 0.0 || takeoff && traj_time_offset_)
+            if( /*traj_->kp_value(tar_len).z > 0.0 || takeoff &&*/ traj_time_offset_)
             {
                 self_.set_desired_nm_pos(gtp.pos);
                 self_.set_desired_nm_orien(gtp.orien);
@@ -383,7 +378,7 @@ namespace sync_fsm
 
 
             if( takeoff && !traj_time_offset_)
-                traj_time_offset_ = 5.0;
+                traj_time_offset_ = 2.0;
         }
 
         sync_wheels(dt);

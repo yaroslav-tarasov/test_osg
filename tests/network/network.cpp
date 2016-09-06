@@ -659,7 +659,11 @@ struct client
 				, meteo::local_params()
                 , traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE
 				)));
-
+			 
+#if 0
+			fms::traj_data::air_config_t a_cfg = traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE;
+			printf("%d", a_cfg);
+#endif
 			this->send(&msg[0], msg.size());
 		};
 

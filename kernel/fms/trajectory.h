@@ -41,7 +41,7 @@ struct traj_data
 	{
 		__forceinline air_config_t operator()(const air_config_t &a, const air_config_t &b, double t) const
 		{
-			return a;
+			return t>=0.8?b:a;
 		}
 	};    
 	
