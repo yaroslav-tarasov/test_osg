@@ -227,43 +227,49 @@ private:
         return 0;
     }        
 
- #if 0
-   double closest(cg::point_3 const& pos, boost::optional<double> low_bound = boost::none, boost::optional<double> up_bound = boost::none) const
+
+    double closest(cg::point_3 const& pos, boost::optional<double> low_bound = boost::none, boost::optional<double> up_bound = boost::none) const
     {
-        if (base_type::points().size() <= 1)
+        
+        typedef cg::segment_2 segment_t;
+        auto const current_segment = 0;
+        
+        auto & points = kp_seg_[current_segment].points();
+
+        if (points.size() <= 1)
             return 0;
 
-        distance_t distance;
+        //distance_t distance;
 
         optional<double> param;
         optional<double> dist;
 
-        auto begin = base_type::points().begin();
+        auto begin = points.begin();
         if (low_bound)
         {
-            begin = base_type::points().lower_bound(*low_bound);
+            begin = points.lower_bound(*low_bound);
 
-            if (begin == base_type::points().end())
+            if (begin == points.end())
             {
                 --begin;
                 return begin->first;
             }
 
-            if (begin != base_type::points().begin())
+            if (begin != points.begin())
                 --begin;
         }
 
-        const auto end = up_bound ? base_type::points().upper_bound(*up_bound) : base_type::points().end();
+        const auto end = up_bound ? points.upper_bound(*up_bound) : points.end();
 
         for (auto it = begin; it != end; ++it)
         {
             const auto next_it = boost::next(it);
-            if (next_it == base_type::points().end())
+            if (next_it == points.end())
                 break;
 
-            const segment_t seg(it->second, next_it->second, true);
-            const geo_point_2 clst = seg.closest_point(pos);
-            const double dst = distance(clst, pos);
+            const segment_t seg(it->second, next_it->second/*, true*/);
+            const auto clst = seg.closest_point(pos);
+            const double dst = cg::distance(clst, pos);
             if (!dist || dst < *dist)
             {
                 dist = dst;
@@ -274,7 +280,7 @@ private:
         Assert(param);
         return *param;
     }
-#endif
+
 
 
 

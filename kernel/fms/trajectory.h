@@ -41,7 +41,14 @@ struct traj_data
 	{
 		__forceinline air_config_t operator()(const air_config_t &a, const air_config_t &b, double t) const
 		{
-			return t>=0.8?b:a;
+			
+            force_log fl;
+            LOG_ODS_MSG( "air_config_t operator() : "
+                << "    a: " << unsigned(a) 
+                << "    b: " << unsigned(b) 
+                << "    t: " << t 
+                << "\n" );
+            return t>=1.0?b:a;
 		}
 	};    
 	
@@ -84,8 +91,9 @@ struct trajectory : traj_data
 
     virtual ~trajectory() {}
     virtual void                                       append        (const trajectory_ptr other) = 0;
-    virtual void  append(double len,const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed=boost::none, optional<air_config_t> air_config=boost::none) = 0;
-	virtual double                                     length        () const                     = 0;
+    virtual void                                       append        (double len,const cg::point_3& pos,const cg::quaternion& orien, optional<double> speed=boost::none, optional<air_config_t> air_config=boost::none) = 0;
+	virtual double                                     closest       (cg::point_3 const& pos, boost::optional<double> low_bound = boost::none, boost::optional<double> up_bound = boost::none) const = 0;
+    virtual double                                     length        () const                     = 0;
     virtual double                                     base_length   () const                     = 0;
     virtual const keypoints_t::value_type              kp_value      (double arg)                 = 0; 
     virtual curses_t::value_type                       curs_value    (double arg)                 = 0; 

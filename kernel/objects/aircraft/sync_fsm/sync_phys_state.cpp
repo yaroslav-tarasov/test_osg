@@ -291,27 +291,19 @@ namespace sync_fsm
 
             bool takeoff = traj_->air_config_value(tar_len) && *traj_->air_config_value(tar_len) < fms::trajectory::CFG_GD;
 
-
             if(traj_->speed_value(tar_len))
             {
                 const double speed = *traj_->speed_value(tar_len);
                 force_log fl;       
                 LOG_ODS_MSG( "phys_state3::update " << tar_len << "  speed= " << speed << "\n"
                     );
+                
                 // self_.set_desired_nm_speed(speed);
             }
 
-
             target_pos.pos = cg::point_3(traj_->kp_value(tar_len));
             target_pos.orien = cg::cpr(traj_->curs_value(tar_len).get_course(),abs(traj_->curs_value(tar_len).get_pitch()), traj_->curs_value(tar_len).get_roll());
-            
-            force_log fl;
-            LOG_ODS_MSG( "phys_state3::update  before corection target_pos.pos :   x:  "     << target_pos.pos.x 
-                << "    y: "      << target_pos.pos.y  
-                << "    z: "      << target_pos.pos.z 
-                << "    course: " << target_pos.orien.get_course()
-                << "    pitch: "  << target_pos.orien.get_pitch()
-                << "\n" );
+
 #if defined(MODEL_ONLY)
             target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
 #endif
@@ -320,13 +312,15 @@ namespace sync_fsm
             // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
             geo_position gtp(target_pos, get_base());
 
-
-			LOG_ODS_MSG( "phys_state3::update   target_pos.pos :   x:  "     << target_pos.pos.x 
-                                                           << "    y: "      << target_pos.pos.y  
-                                                           << "    z: "      << target_pos.pos.z 
-                                                           << "    course: " << target_pos.orien.get_course()
-                                                           << "    pitch: "  << target_pos.orien.get_pitch()
-                                                           << "\n" );
+            force_log fl;
+            LOG_ODS_MSG( "phys_state3::update  before corection target_pos.pos : "
+                << "    tar_len: " << tar_len 
+                << "    x: "       << target_pos.pos.x 
+                << "    y: "       << target_pos.pos.y  
+                << "    z: "       << target_pos.pos.z 
+                << "    course: "  << target_pos.orien.get_course()
+                << "    pitch: "   << target_pos.orien.get_pitch()
+                << "\n" );
 
 
             phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
@@ -361,9 +355,11 @@ namespace sync_fsm
             else
             {
                 auto physpos = phys_aircraft_->get_position();
-
-                // LOG_ODS_MSG( "phys_state3::update   physpos.pos :   x:  "  <<  physpos.pos.lat << "    y: " << physpos.pos.lon  << "    course: " << physpos.orien.get_course() << "\n" );
-                LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos :   x:  "  <<  phys_aircraft_->get_local_position().pos.x
+                auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
+                LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos : "
+                    << "    tar_len: " << tar_len 
+                    << "    closest_tar_len: " << closest_tar_len 
+                    << "    x: "      << phys_aircraft_->get_local_position().pos.x 
                     << "    y: "      << phys_aircraft_->get_local_position().pos.y 
                     << "    z: "      << phys_aircraft_->get_local_position().pos.z 
                     << "    course: " << phys_aircraft_->get_local_position().orien.get_course()
@@ -378,7 +374,10 @@ namespace sync_fsm
 
 
             if( takeoff && !traj_time_offset_)
-                traj_time_offset_ = 2.0;
+            {
+                auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
+                traj_time_offset_ = abs(tar_len - closest_tar_len);
+            }
         }
 
         sync_wheels(dt);
@@ -439,11 +438,13 @@ namespace sync_fsm
 
             desired_orien_in_rel = quaternion(cpr(0, 0, -root_next_orien.get_roll())) * desired_orien_in_rel;
             
+#if 0
             LOG_ODS_MSG( " shassis.wheel_node->name()        = " << shassis.wheel_node->name()   <<
                          " desired_orien_in_rel.get_course() = " << desired_orien_in_rel.get_course() <<   
                          " desired_orien_in_rel.get_pitch()  = " << desired_orien_in_rel.get_pitch() <<
                          " desired_orien_in_rel.get_roll()   = " << desired_orien_in_rel.get_roll() << "\n"                 
                 );
+#endif
 
             nodes_management::node_position wheel_node_pos = wnode->position();
             nodes_management::node_position chassis_node_pos = chassis_node->position();

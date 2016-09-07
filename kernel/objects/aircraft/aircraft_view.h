@@ -18,6 +18,8 @@
 #include "common/chassis_common.h"
 #include "common/rotors_common.h"
 
+#include "common/meteo_local.h"
+
 namespace aircraft
 {
 #if 0 // FIXME Need to realize
@@ -310,6 +312,7 @@ protected:
 protected:
     //////////////////////////////////////
     fms::trajectory_ptr            traj_;
+    meteo::local_params            lp_;
     /////////////////////////////////////
 
 private:

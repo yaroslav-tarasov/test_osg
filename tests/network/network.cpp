@@ -660,11 +660,7 @@ struct client
                 , traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE
 				)));
 			 
-#if 0
-			fms::traj_data::air_config_t a_cfg = traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE;
-			printf("%d", a_cfg);
-#endif
-			this->send(&msg[0], msg.size());
+    		this->send(&msg[0], msg.size());
 		};
 
         boost::function<void(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos2 = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->void {
@@ -719,7 +715,7 @@ struct client
             ADD_EVENT(19.0  , create_msg(160,point_3(-307,470,0),cg::cpr(0)  , ok_helicopter, "KA50", "160") )
 #endif
 
-			ADD_EVENT(20.0  , create_msg(6666,cg::point_3(0,0,5),cg::cpr(0,90)   , ok_rocket_flare, "rocket_flare", "6666") )
+			ADD_EVENT(20.0  , create_msg(6666,cg::point_3(0,0,5),cg::cpr(0,90) , ok_rocket_flare, "rocket_flare", "6666") )
 
 
 #if 1
@@ -792,11 +788,15 @@ struct client
             ADD_EVENT(15.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "SU27", "1178") )
             
             runs_.insert(make_pair(traj_trp_->base_length() + 15,
-            boost::bind( run_f_pos , 1178, _1, traj_trp_, 15)
+            boost::bind( run_f_pos2 , 1178, _1, traj_trp_, 15)
             ));
+            
+            ADD_EVENT(traj_trp_->base_length() + 15 + 1.0     , engine_state_msg(1178 , ES_LOW_THROTTLE)  )
+            //ADD_EVENT(traj_trp_->base_length() + 15.0 + 30.0  , engine_state_msg(1178 , ES_FULL_THROTTLE) )
+            ADD_EVENT(traj_trp_->base_length() + 65.0         , engine_state_msg(1178 , ES_FORSAGE) )
+            ADD_EVENT(traj_trp_->length()                     , engine_state_msg(1178 , ES_FULL_THROTTLE) )
 
-
-#if 0
+#if 1
             ADD_EVENT( (15.0 + 30.0 + 45.0) , create_msg(1179,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "TU154", "1179") )
 
             runs_.insert(make_pair(traj_trp_->base_length() + (15.0 + 30.0 + 45.0),

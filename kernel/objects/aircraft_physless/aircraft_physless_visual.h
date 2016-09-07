@@ -2,10 +2,9 @@
 
 #include "aircraft_physless_view.h"
 #include "common/visual_objects_support_fwd.h"
+#include "common/labels_management.h"
 
 #include "av/avFx/Fx.h"
-
-#include "common/labels_management.h"
 
 namespace aircraft_physless
 {
@@ -37,12 +36,12 @@ namespace aircraft_physless
         labels_management::labels_provider_ptr      get_label_provider() const;
 
     private:
-        optional<double>  last_update_;
+        optional<double>                           last_update_;
 
-        std::vector<nodes_management::node_info_ptr>   engines_nodes_;
-        
-        std::vector<nm::node_info_ptr>                 forsage_nodes_;
-        std::vector<forsage_support_ptr>               fs_;
+        std::vector<nm::node_info_ptr>             engines_nodes_;
+
+        std::vector<nm::node_info_ptr>             forsage_nodes_;
+        std::vector<forsage_support_ptr>           fs_;
 
         visual_object_ptr smoke_object_;
         
@@ -55,12 +54,10 @@ namespace aircraft_physless
         smoke_support_ptr                                smoke_sup_;
         landing_dust_support_ptr                               lds_;
 
-        visual_system*                                          vsys_;
-    
-
+        visual_system*                                        vsys_;
 
 	private: 
-		boost::function<void()>                                start_ ;
+		boost::function<void()>                             start_ ;
 	
 	private:
 		static const double sparks_end_duration_;
