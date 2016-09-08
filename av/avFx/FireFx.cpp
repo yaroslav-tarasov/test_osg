@@ -93,7 +93,7 @@ FireFx::FireFx( UseCoordinates uc )
 	// textures
 
     // setup texture for point quads
-    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/fire2.dds", osg::Texture::REPEAT));
+    pCurStateSet->setTextureAttribute(0, avCore::GetDatabase()->LoadTexture("images/sfx/fire.dds", osg::Texture::REPEAT));
 
 	
 	setCullCallback(Utils::makeNodeCallback(this, &FireFx::cull));

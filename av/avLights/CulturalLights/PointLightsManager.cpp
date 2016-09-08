@@ -230,7 +230,7 @@ PointLightsManager::PointLightsManager()
     pLightsStateSet->setMode(GL_SAMPLE_ALPHA_TO_COVERAGE, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
 
     // setup texture for point quads
-    osg::Texture2D * pLightTex = avCore::GetDatabase()->LoadTexture("light_tex.tga", osg::Texture::CLAMP_TO_EDGE);
+    osg::Texture2D * pLightTex = avCore::GetDatabase()->LoadTexture("lights/star.dds"/*"light_tex.tga"*/, osg::Texture::CLAMP_TO_EDGE);
     pLightTex->setMaxAnisotropy(4.0f);
     pLightsStateSet->setTextureAttribute(0, pLightTex);
 

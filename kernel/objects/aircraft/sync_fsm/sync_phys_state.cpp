@@ -290,7 +290,8 @@ namespace sync_fsm
 #endif
 
             bool takeoff = traj_->air_config_value(tar_len) && *traj_->air_config_value(tar_len) < fms::trajectory::CFG_GD;
-
+            
+            double desired_speed = 0.0;
             if(traj_->speed_value(tar_len))
             {
                 const double speed = *traj_->speed_value(tar_len);
@@ -298,6 +299,7 @@ namespace sync_fsm
                 LOG_ODS_MSG( "phys_state3::update " << tar_len << "  speed= " << speed << "\n"
                     );
                 
+                desired_speed = speed;
                 // self_.set_desired_nm_speed(speed);
             }
 
@@ -307,6 +309,8 @@ namespace sync_fsm
 #if defined(MODEL_ONLY)
             target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, target_pos.pos.z > 1.2 ? desired_speed / dt : 0.f, 0.f ));
 #endif
+            //if( takeoff && !traj_time_offset_)
+            //   target_pos.pos = target_pos.pos + target_pos.orien.rotate_vector(cg::point_3(0.f, desired_speed * dt, 0.f ));
 
             // Очень необходимо для движения физ модели.
             // target_pos.dpos = (target_pos.pos - cg::point_3(traj_->kp_value(tar_len - dt))) / (/*sys_->calc_step()*/dt);
@@ -316,7 +320,7 @@ namespace sync_fsm
             LOG_ODS_MSG( "phys_state3::update  before corection target_pos.pos : "
                 << "    tar_len: " << tar_len 
                 << "    x: "       << target_pos.pos.x 
-                << "    y: "       << target_pos.pos.y  
+                << "    y: "       << target_pos.pos.y 
                 << "    z: "       << target_pos.pos.z 
                 << "    course: "  << target_pos.orien.get_course()
                 << "    pitch: "   << target_pos.orien.get_pitch()
