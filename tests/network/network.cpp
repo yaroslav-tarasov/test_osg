@@ -730,8 +730,8 @@ struct client
             //ADD_EVENT(13.0  , create_msg(172,point_3(322,404,0),cg::cpr(173), ok_aircraft, "L39", "172") )
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
 			
-#if 0       // Arrested gear test
-            for (int i=0;i<100;++i)
+#if 1       // Arrested gear test
+            for (int i=0;i<1 /*100*/;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
 				auto const model  = /*"MIG29K"*//*"A319"*//*"SU25"*//*"MIG29"*/"L39";
@@ -783,8 +783,7 @@ struct client
 #endif
             
             
-            const double time_to_start = traj_trp_->base_length();
-
+#if 0
             ADD_EVENT(15.0  , create_msg(1178,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "SU27", "1178") )
             
             runs_.insert(make_pair(traj_trp_->base_length() + 15,
@@ -796,7 +795,7 @@ struct client
             ADD_EVENT(traj_trp_->base_length() + 65.0         , engine_state_msg(1178 , ES_FORSAGE) )
             ADD_EVENT(traj_trp_->length()                     , engine_state_msg(1178 , ES_FULL_THROTTLE) )
 
-#if 1
+
             ADD_EVENT( (15.0 + 30.0 + 45.0) , create_msg(1179,traj_trp_->kp_value(traj_trp_->base_length()),traj_trp_->curs_value(traj_trp_->base_length()), ok_aircraft, "TU154", "1179") )
 
             runs_.insert(make_pair(traj_trp_->base_length() + (15.0 + 30.0 + 45.0),

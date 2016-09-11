@@ -99,7 +99,7 @@ namespace first
         create_auto_object(_csys,"meteo_proxy","meteo_proxy");
         create_auto_object(_csys,"labels_manager","labels_manager");
         create_auto_object(_csys,"aircraft_reg","aircraft_reg");
-        // create_auto_object(_csys,"mdd","mdd");
+        create_auto_object(_csys,"mdd","mdd");
     }                                                             
 
 
