@@ -103,7 +103,7 @@ struct texture_t
 	std::string path;
 };
 
-typedef std::multimap<std::string,texture_t> materials_t;
+typedef std::multimap<std::string,texture_t> mat_profiles_t;
 
 struct mat_reader
 {
@@ -116,10 +116,10 @@ struct mat_reader
 		mats_ = read (full_path);
 	}
 
-	static materials_t  read (std::string full_path)
+	static mat_profiles_t  read (std::string full_path)
 	{
 		pugi::xml_document doc;
-		materials_t mats_;
+		mat_profiles_t mats_;
 
 		fs::path fs_path(full_path);
 
@@ -136,7 +136,7 @@ struct mat_reader
 				texture_t tex;
 				tex.path = t.attribute("path").as_string();
 				tex.unit = t.attribute("unit").as_int();
-				mats_.insert(materials_t::value_type(std::string(m.attribute("name").as_string()),tex));
+				mats_.insert(mat_profiles_t::value_type(std::string(m.attribute("name").as_string()),tex));
 			}
 		}	
 
@@ -144,7 +144,7 @@ struct mat_reader
 	}
 
 private:
-	materials_t mats_;
+	mat_profiles_t mats_;
 };
 
 struct xml_helper
@@ -195,7 +195,11 @@ private:
 	{
 		root_wrap()
 			: root_node(getDoc().append_child("root"))
-		{}
+		{
+			root_node.append_attribute("xmlns:xi") = "http://www.w3.org/2001/XInclude";
+			auto xi_node = root_node.append_child("xi:include");
+			xi_node.append_attribute("href") = "materials_ext.xml";
+		}
 
 		~root_wrap()
 		{ getDoc().save_file(outFileName().c_str());}

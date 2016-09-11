@@ -449,7 +449,7 @@ static void usage( const char *prog, const char *msg )
     osg::notify(osg::NOTICE)<<"                         i.e. -l osgdb_pfb"<< std::endl;
     osg::notify(osg::NOTICE)<<"                         Useful for loading reader/writers which can load"<< std::endl;
     osg::notify(osg::NOTICE)<<"                         other file formats in addition to its extension."<< std::endl;
-    osg::notify(osg::NOTICE)<<"    -e extensionName   - load reader/wrter plugin for file extension"<< std::endl;
+    osg::notify(osg::NOTICE)<<"    -e extensionName   - load reader/writer plugin for file extension"<< std::endl;
     osg::notify(osg::NOTICE)<<"                         i.e. -e pfb"<< std::endl;
     osg::notify(osg::NOTICE)<<"                         Useful short hand for specifying full library name as"<< std::endl;
     osg::notify(osg::NOTICE)<<"                         done with -l above, as it automatically expands to the"<< std::endl;

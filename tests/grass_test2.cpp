@@ -17,7 +17,7 @@ namespace
 		"{ \n"
 		"    color       = vec4(vec3(0.0),1.0);\n"
 		"    texcoord    = gl_MultiTexCoord1.xy;  \n"
-		"    gl_Position = gl_ProjectionMatrix  * gl_ModelViewMatrix * gl_Vertex ;\n"
+		"    gl_Position = gl_ModelViewProjectionMatrix  * gl_Vertex ;\n"
 		"}\n";
 
 	// * instanceModelMatrix

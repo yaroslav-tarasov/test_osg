@@ -2521,7 +2521,7 @@ $if 0
             void main (void)
             {
                vec4 posEye    =  gl_ModelViewMatrix * gl_Vertex;
-               gl_Position    =  gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;                        
+               gl_Position    =  gl_ModelViewProjectionMatrix  * gl_Vertex;                        
                gl_TexCoord[0] =  gl_MultiTexCoord1;                  
                gl_FrontColor  =  gl_Color;                          
                gl_BackColor   =  gl_Color;                          

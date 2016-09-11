@@ -25,23 +25,23 @@ namespace creators
 
 class texturesHolder  : public texturesHolder_base
 {
-    osg::Texture2D *createLMTexture(int width, int height)
-    {
-        osg::Texture2D* texture = new osg::Texture2D;
-        texture->setTextureSize(width,height);
-        texture->setInternalFormat(/*GL_RGBA*/GL_RGBA16F);
-        texture->setSourceFormat(GL_RGBA);
-        texture->setSourceType(GL_UNSIGNED_BYTE);
-        texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
-        texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
-        texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-        texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-        texture->setBorderColor(osg::Vec4d(0,0,0,0));
-        // texture->setUseHardwareMipMapGeneration(false);
-        texture->setNumMipmapLevels(4);
+	osg::Texture2D *createLMTexture(int width, int height)
+	{
+		osg::Texture2D* texture = new osg::Texture2D;
+		texture->setTextureSize(width,height);
+		texture->setInternalFormat(/*GL_RGBA*/GL_RGBA16F);
+		texture->setSourceFormat(GL_RGBA);
+		texture->setSourceType(GL_UNSIGNED_BYTE);
+		texture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_BORDER);
+		texture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_BORDER);
+		texture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+		texture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
+		texture->setBorderColor(osg::Vec4d(0,0,0,0));
+		// texture->setUseHardwareMipMapGeneration(false);
+		texture->setNumMipmapLevels(4);
 
-        return texture;
-    }
+		return texture;
+	}
 
 	osg::Texture2D * createTexture(int width, int height)
 	{
@@ -57,20 +57,24 @@ class texturesHolder  : public texturesHolder_base
 	}
 
 public:
-    struct textures_t
-    {
-        osg::ref_ptr<osg::Texture2D>      colorTex;
-        osg::ref_ptr<osg::Texture2D>      normalTex;
-        osg::ref_ptr<osg::Texture2D>      nightTex;
-        osg::ref_ptr<osg::Texture2D>      detailsTex;
-        osg::ref_ptr<osg::TextureCubeMap> envTex;
-        osg::ref_ptr<osg::Texture2D>      decalTex;
-        osg::ref_ptr<osg::Texture2D>      lmTex;
+	struct textures_t
+	{
+		osg::ref_ptr<osg::Texture2D>      colorTex;
+		osg::ref_ptr<osg::Texture2D>      normalTex;
+		osg::ref_ptr<osg::Texture2D>      nightTex;
+		osg::ref_ptr<osg::Texture2D>      detailsTex;
+		osg::ref_ptr<osg::TextureCubeMap> envTex;
+		osg::ref_ptr<osg::Texture2D>      decalTex;
+		osg::ref_ptr<osg::Texture2D>      lmTex;
 		osg::ref_ptr<osg::Texture2D>      reflTex;
-    };
+	};
+	
+	
+	typedef std::map<std::string, textures_t> materials_t;
+	typedef std::map<std::string, materials_t> mat_profiles_t;
 
 public:
-    static inline const textures_t& Create(const mat::materials_t&  mats, const std::string& mat_name,const std::string& model_name)
+    static inline const textures_t& Create(const mat::mat_profiles_t&  mats, const std::string& profile_mat, const std::string& mat_name,const std::string& model_name)
     {
         if (   mat_name.find("building") !=std::string::npos
             || mat_name.find("ground")   !=std::string::npos
@@ -86,10 +90,10 @@ public:
             || mat_name.find("default") !=std::string::npos
             )
         {
-            return texCreator(mats,mat_name,model_name); 
+            return texCreator(mats,profile_mat,mat_name,model_name); 
         }
 
-        return texCreator(mats,"default",model_name);
+        return texCreator(mats, profile_mat,"default",model_name);
     }
 
     osg::ref_ptr<osg::TextureCubeMap>   getEnvTexture()   override
@@ -214,100 +218,121 @@ FIXME(Все те же кривые плоскости)
         return th;
     }
 
-    static inline const textures_t&  texCreator(const mat::materials_t&  mats, const std::string& mat_name,const std::string& model_name)
+    static inline const textures_t&  texCreator(const mat::mat_profiles_t&  mats_profile, const std::string& profile_mat, const std::string& mat_name,const std::string& model_name)
     {
         texturesHolder& th = getTextureHolder();
+		 
+		texturesHolder::mat_profiles_t& mp = GetTextures(); 
+	
+		auto it_p = mp.find(profile_mat); 
+		
+		if(it_p==mp.end())
+		{   
+			it_p = mp.find("default");
+			if(it_p==mp.end())
+			{
+				mp["default"] = texturesHolder::materials_t();
+				it_p = mp.find("default");
+			}
 
-        if(GetTextures().find(mat_name)==GetTextures().end())
-        {
-            textures_t  t /*= th*/; 
-            t.colorTex = new osg::Texture2D;
-            t.nightTex = new osg::Texture2D;
-            t.normalTex  = new osg::Texture2D;
-            t.detailsTex = th.texs_.detailsTex;
-            t.envTex = th.texs_.envTex;
-            t.lmTex  = th.texs_.lmTex;
+		}					  
 
-            auto range = mats.equal_range(mat_name);
 
-            bool night_tex  = false; 
-            bool normal_tex = false;
+		texturesHolder::materials_t & th_mats = (*it_p).second;
 
-            for (auto it = range.first; it != range.second; ++it)
-            {
-                osgDB::FilePathList fpl = osgDB::getDataFilePathList();
+		if(th_mats.find(mat_name)==th_mats.end())
+		{
+			textures_t  t /*= th*/; 
+			t.colorTex = new osg::Texture2D;
+			t.nightTex = new osg::Texture2D;
+			t.normalTex  = new osg::Texture2D;
+			t.detailsTex = th.texs_.detailsTex;
+			t.envTex = th.texs_.envTex;
+			t.lmTex  = th.texs_.lmTex;
+			
+			const mat::materials_t& mats = mats_profile.at(profile_mat);
+
+			auto range = mats.equal_range(mat_name);
+
+			bool night_tex  = false; 
+			bool normal_tex = false;
+
+			for (auto it = range.first; it != range.second; ++it)
+			{
+				osgDB::FilePathList fpl = osgDB::getDataFilePathList();
                 
-                std::for_each(fpl.begin(),fpl.end(),[=](std::string& path){path += "/" + model_name; });
+				std::for_each(fpl.begin(),fpl.end(),[=](std::string& path){path += "/" + model_name; });
 
-                std::string name = osgDB::findFileInPath(it->second.path, fpl,osgDB::CASE_INSENSITIVE);
+				std::string name = osgDB::findFileInPath(it->second.path, fpl,osgDB::CASE_INSENSITIVE);
 
-                if(it->second.unit == 0) 
-                {   
-                    auto imf = osgDB::readImageFile(name);
-                    t.colorTex->setImage( imf );
-                    t.colorTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
-                    t.colorTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
-                    t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    t.colorTex->setMaxAnisotropy(16.0f);
+				if(it->second.unit == 0) 
+				{   
+					auto imf = osgDB::readImageFile(name);
+					t.colorTex->setImage( imf );
+					t.colorTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
+					t.colorTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
+					t.colorTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+					t.colorTex->setMaxAnisotropy(16.0f);
 
-                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
-                    //t.colorTex->setInternalFormatMode(
-                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
-                    t.colorTex->setUnRefImageDataAfterApply( true );
-                } 
-                else
-                if(it->second.unit == 1) 
-                {   
-                    if(it->second.path=="generate_noise")
-                       t.normalTex = avCore::Noise::generate2DTex(/*baseFreq*//*4.0f*/32.0f, /*persistence*/0.5, /*w*/512, /*h*/512, /*periodic*/true);
-                    else
-                    {
-                        auto imf = osgDB::readImageFile(name);
-                        t.normalTex->setImage( imf );
-                        t.normalTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::CLAMP*/ );
-                        t.normalTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::CLAMP*/ );
-                        t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                        t.normalTex->setMaxAnisotropy(16.0f);
-                    }
-
-
-                    normal_tex = true;
-                } 
-                else 	
-                if(it->second.unit == 2)
-                {
-                    t.nightTex->setImage( osgDB::readImageFile(name) );
-                    t.nightTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
-                    t.nightTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
-                    t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
-                    t.nightTex->setMaxAnisotropy(16.0f);
-
-                    // Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
-                    //t.nightTex->setInternalFormatMode(
-                    //    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
-                    //t.nightTex->setUnRefImageDataAfterApply( true );
-
-                    night_tex = true;
-                }
-            }
-
-            if(!night_tex)
-                t.nightTex = th.emptyTex;  
-
-            if(!normal_tex)
-                t.normalTex = th.emptyTex;
+					// Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
+					//t.colorTex->setInternalFormatMode(
+					//    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
+					t.colorTex->setUnRefImageDataAfterApply( true );
+				} 
+				else
+				if(it->second.unit == 1) 
+				{   
+					if(it->second.path=="generate_noise")
+						t.normalTex = avCore::Noise::generate2DTex(/*baseFreq*//*4.0f*/32.0f, /*persistence*/0.5, /*w*/512, /*h*/512, /*periodic*/true);
+					else
+					{
+						auto imf = osgDB::readImageFile(name);
+						t.normalTex->setImage( imf );
+						t.normalTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::CLAMP*/ );
+						t.normalTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::CLAMP*/ );
+						t.normalTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+						t.normalTex->setMaxAnisotropy(16.0f);
+					}
 
 
+					normal_tex = true;
+				} 
+				else 	
+				if(it->second.unit == 2)
+				{
+					t.nightTex->setImage( osgDB::readImageFile(name) );
+					t.nightTex->setWrap(  osg::Texture::WRAP_S, it->second.wrap_s/*osg::Texture::REPEAT*/ );
+					t.nightTex->setWrap(  osg::Texture::WRAP_T, it->second.wrap_t/*osg::Texture::REPEAT*/ );
+					t.nightTex->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR_MIPMAP_LINEAR);
+					t.nightTex->setMaxAnisotropy(16.0f);
 
-            GetTextures()[mat_name] = t;
-        }
+					// Существенной разницы не заметно метров 40-60 виртуальной и 10-20 графической
+					//t.nightTex->setInternalFormatMode(
+					//    osg::Texture2D::USE_S3TC_DXT1_COMPRESSION );
+					//t.nightTex->setUnRefImageDataAfterApply( true );
 
-        return  GetTextures()[mat_name];
+					night_tex = true;
+				}
+			}
+
+			if(!night_tex)
+				t.nightTex = th.emptyTex;  
+
+			if(!normal_tex)
+				t.normalTex = th.emptyTex;
+
+
+
+			th_mats[mat_name] = t;
+		}
+
+
+        return  th_mats[mat_name];
     }
 
-    static inline std::map<std::string,textures_t>& GetTextures()
+    static inline mat_profiles_t & GetTextures()
     {
-        static std::map<std::string,textures_t>     textures;
+        static mat_profiles_t   textures;
         return textures;
     }
 
@@ -505,11 +530,11 @@ programsHolder_base::program_t  createProgram(const std::string& mat_name, const
 }
 
 
-void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name, const std::string& mat_suffix,const mat::materials_t& m)
+void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name, const std::string& mat_suffix,const mat::mat_profiles_t& m)
 {
     const std::string& mat_name_low = boost::to_lower_copy(mat_name);   
 
-    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
+    texturesHolder::textures_t t = texturesHolder::Create(m, "default", mat_name, model_name);
     programsHolder::program_t  p = programsHolder::Create(mat_name_low, mat_suffix);
     
 #if 0
@@ -620,9 +645,9 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
 }
 
 
-void createMaterialLite(osg::Node* node,osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name,const mat::materials_t& m)
+void createMaterialLite(osg::Node* node,osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name,const mat::mat_profiles_t& m)
 {
-    texturesHolder::textures_t t = texturesHolder::Create(m,mat_name,model_name);
+    texturesHolder::textures_t t = texturesHolder::Create(m,"default", mat_name,model_name);
    
     osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
     stateset->setTextureAttributeAndModes( BASE_COLOR_TEXTURE_UNIT , t.colorTex.get(), value );
@@ -635,6 +660,21 @@ void createMaterialLite(osg::Node* node,osg::StateSet* stateset,const std::strin
     stateset->setTextureAttributeAndModes( BASE_LM_TEXTURE_UNIT     , getTextureHolder().getLightMapTexture().get(), value ); 
 
     stateset->setMode(GL_TEXTURE_CUBE_MAP_SEAMLESS_ARB, osg::StateAttribute::ON); 
+}
+
+
+void changeMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& model_name,const std::string& mat_name, const std::string& mat_suffix,const mat::mat_profiles_t& m)
+{
+    const std::string& mat_name_low = boost::to_lower_copy(mat_name);   
+
+    texturesHolder::textures_t t = texturesHolder::Create(m, "default", mat_name, model_name);
+
+    osg::StateAttribute::GLModeValue value = osg::StateAttribute::ON|osg::StateAttribute::OVERRIDE;
+    stateset->setTextureAttributeAndModes( BASE_COLOR_TEXTURE_UNIT, t.colorTex.get(), value );
+#if 0
+    stateset->setTextureAttributeAndModes( BASE_NORMAL_TEXTURE_UNIT, t.normalTex.get(), value );
+    stateset->setTextureAttributeAndModes( BASE_NIGHT_TEXTURE_UNIT, t.nightTex.get(), value );
+#endif
 }
 
 } //namespace creators 
@@ -686,17 +726,20 @@ namespace mat
 		valid_mats_.insert("color"); 
 	}
 
-    materials_t  reader::read (std::string full_path)
+    mat_profiles_t  reader::read (std::string full_path)
     {
         pugi::xml_document doc;
-        materials_t mats_;
+        mat_profiles_t mat_profiles;
 
 		bool l = doc.load_file(full_path.c_str());
         if(l)
         {
             pugi::xml_node root = doc.child("root");
-
-            for (pugi::xml_node m = root.first_child(); m; m = m.next_sibling())
+			pugi::xml_node xi_include = root.child("xi:include");
+			
+			mat::materials_t mats;
+            
+		    for (pugi::xml_node m = root.first_child(); m; m = m.next_sibling())
             {
                 for (pugi::xml_node t = m.first_child(); t; t = t.next_sibling())
                 {
@@ -715,15 +758,16 @@ namespace mat
 					if(!matching)
 						name = "default_" + name;
 
-				    mats_.insert(materials_t::value_type(name,tex));
+				    mats.insert(materials_t::value_type(name,tex));	  
                 }
             }	
-
+			
+			mat_profiles.insert(mat_profiles_t::value_type("default", mats));
         }
         else
             std::cerr << "File not found: " << full_path;
 
-        return mats_;
+        return mat_profiles;
     }
 
 }
