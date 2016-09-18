@@ -10,6 +10,16 @@ namespace aircraft
 {
     namespace sync_fsm
     {
+
+
+		sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base);
+
+		sync_fsm::state_ptr create_sync_phys_state(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
+		{
+			return create_sync_phys_state(EXTERNAL, self, phys_aircraft, base);
+		};
+
+
         struct phys_state : state_t
         {
             phys_state(self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
@@ -81,7 +91,7 @@ namespace aircraft
 
         sync_fsm::state_ptr create_sync_phys_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, geo_base_3 const& base)
         {
-            if(type!=TEST_NEW)
+            if( type != EXTERNAL )
                 return boost::make_shared<phys_state>(self,phys_aircraft,base);
             else
                 return boost::make_shared<phys_state3>(self,phys_aircraft,base);
@@ -135,7 +145,7 @@ namespace sync_fsm
 
         if (fmspos.pos.height > phys_height())
         {
-            self_.switch_sync_state(boost::make_shared<transition_phys_fms_state>(self_, phys_aircraft_, time));
+            self_.switch_sync_state(create_transition_phys_fms_state(self_, phys_aircraft_, time));
         }
     }
 
@@ -269,8 +279,7 @@ namespace sync_fsm
     {
         if (!phys_aircraft_)
             return;
-        
-        
+       
 
         if(auto traj_ = self_.get_trajectory())
         {
@@ -326,13 +335,14 @@ namespace sync_fsm
                 << "    pitch: "   << target_pos.orien.get_pitch()
                 << "\n" );
 
-
-            phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
-
 			if(gtp.pos.height > 0)
 			{
 				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
 			}
+
+            phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+
+
 
  #if defined(MODEL_ONLY)
             auto physpos = phys_aircraft_->get_position();
@@ -349,20 +359,20 @@ namespace sync_fsm
             self_.set_desired_nm_orien(physpos.orien);
             
 #else
-            if( /*traj_->kp_value(tar_len).z > 0.0 || takeoff &&*/ traj_time_offset_)
+            if( /*traj_->kp_value(tar_len).z > 0.0 || takeoff &&*/true || traj_time_offset_)
             {
                 self_.set_desired_nm_pos(gtp.pos);
                 self_.set_desired_nm_orien(gtp.orien);
 
-                phys_aircraft_->go_to_pos(gtp);
+                //phys_aircraft_->go_to_pos(gtp);
             }
             else
             {
                 auto physpos = phys_aircraft_->get_position();
-                auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
+                // auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
                 LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos : "
                     << "    tar_len: " << tar_len 
-                    << "    closest_tar_len: " << closest_tar_len 
+                    // << "    closest_tar_len: " << closest_tar_len 
                     << "    x: "      << phys_aircraft_->get_local_position().pos.x 
                     << "    y: "      << phys_aircraft_->get_local_position().pos.y 
                     << "    z: "      << phys_aircraft_->get_local_position().pos.z 
@@ -401,7 +411,7 @@ namespace sync_fsm
     void phys_state::on_fast_session( bool fast )
     {
         if (fast)
-            self_.switch_sync_state(boost::make_shared<fms_state>(self_));
+            self_.switch_sync_state(create_fms_state(self_));
     }
 
 

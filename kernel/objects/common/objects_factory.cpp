@@ -51,9 +51,10 @@ using namespace kernel;
         obj_create_data ocd(class_name, unique_name, dict::wrap(aircraft::craft_data(sett,state_t(init_pos.pos,init_pos.orien)/*, fpl_id*/)));
 
         ocd
-            .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
+		 // .add_child(obj_create_data("fms"          , "fms"          , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
+            .add_child(obj_create_data("fms_external" , "fms_external" , dict::wrap(aircraft::aircraft_fms::craft_fms_data())))
             .add_child(obj_create_data("nodes_manager", "nodes_manager", dict::wrap(nodes_management::nodes_data          ())))
-            //.add_child(obj_create_data("gui"          , "gui"       , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
+         // .add_child(obj_create_data("gui"          , "gui"          , dict::wrap(aircraft::aircraft_gui::gui_data      ())));
             ;
 
         return ocd;	

@@ -205,7 +205,7 @@ namespace aircraft_physless
                 height += 10 - 20. * *isection;
         }
 #else
-        double height = 0.0;
+        double height = initial_position.pos.height;
 #endif
 
         transform_4 veh_transform = cg::transform_4(as_translation(base_(geo_point_3(initial_position.pos, height))), 

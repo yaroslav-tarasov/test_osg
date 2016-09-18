@@ -56,14 +56,14 @@ namespace aircraft
     }
 #endif
 
-    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
-                                    phys::system_ptr phys, 
-                                    //meteo::meteo_cursor_ptr meteo_cursor, 
-                                    nodes_management::manager_ptr nodes_manager, 
-                                    geo_position const& initial_position, 
-                                    ada::data_t const& fsettings, 
-                                    shassis_support_ptr shassis,
-                                    size_t zone)
+    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const&         base,
+											     phys::system_ptr              phys, 
+												 //meteo::meteo_cursor_ptr     meteo_cursor, 
+												 nodes_management::manager_ptr nodes_manager, 
+												 geo_position const&           initial_position, 
+												 ada::data_t const&            fsettings, 
+												 shassis_support_ptr           shassis,
+												 size_t                        zone)
     {
         // phys::compound_sensor_t s;
         // if (!fill_sensor(nodes_manager, s))
@@ -271,7 +271,7 @@ namespace aircraft
                 height += 10 - 20. * *isection;
         }
 #else
-        double height = 0.0;
+        double height = initial_position.pos.height/*0.0*/;
 #endif
 
         transform_4 veh_transform = cg::transform_4(as_translation(base_(geo_point_3(initial_position.pos, height))), 

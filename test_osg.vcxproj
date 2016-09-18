@@ -569,6 +569,7 @@
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp" />
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
     <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_ext_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp" />
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp" />
     <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp" />

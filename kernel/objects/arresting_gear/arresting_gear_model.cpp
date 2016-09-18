@@ -212,7 +212,7 @@ void model::on_target_changed (const boost::optional<uint32_t> &  old_id, const 
     {
 		auto target_ptr = aircraft::model_info_ptr(collection_->get_object(*target_id_));
 			
-		if(target_ptr->get_rigid_body())	
+		if(target_ptr && target_ptr->get_rigid_body())	
 		{
 			cg::point_3 offset;
 

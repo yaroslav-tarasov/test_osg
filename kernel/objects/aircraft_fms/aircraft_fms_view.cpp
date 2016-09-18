@@ -869,6 +869,7 @@ void view::make_aircraft_info()
 }
 
 AUTO_REG_NAME(aircraft_fms_view, view::create);
+AUTO_REG_NAME(aircraft_fms_external_view, view::create);
 
 }
 }

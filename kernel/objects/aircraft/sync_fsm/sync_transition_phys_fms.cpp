@@ -10,6 +10,45 @@ namespace aircraft
     namespace sync_fsm
     {
 
+		sync_fsm::state_ptr create_transition_phys_fms_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft,  double time);
+
+		sync_fsm::state_ptr create_transition_phys_fms_state(self_t &self, phys_aircraft_ptr phys_aircraft,  double time)
+		{
+			return create_transition_phys_fms_state(EXTERNAL, self, phys_aircraft, time);
+		};
+
+
+		struct transition_phys_fms_state : state_t
+		{
+			transition_phys_fms_state(self_t &self, phys_aircraft_ptr phys_aircraft, double time)
+				: self_(self)
+				, start_transition_time_(time)
+				, phys_aircraft_(phys_aircraft)
+			{
+			}
+
+			void update(double time, double dt);
+			void on_zone_destroyed( size_t id );
+
+		private:
+		private:
+			self_t &self_;
+			double start_transition_time_;
+			geo_base_3 base_;
+
+			phys_aircraft_ptr phys_aircraft_;
+		};
+
+
+		sync_fsm::state_ptr create_transition_phys_fms_state(phys_state_t type,self_t &self, phys_aircraft_ptr phys_aircraft, double time)
+		{
+			if( type != EXTERNAL )
+				return boost::make_shared<transition_phys_fms_state>(self,phys_aircraft, time);
+			else
+				return boost::make_shared<transition_phys_fms_state>(self,phys_aircraft, time);
+		}
+
+
         void transition_phys_fms_state::update(double time, double /*dt*/) 
         {
             if (!phys_aircraft_)
@@ -39,7 +78,7 @@ namespace aircraft
 
             if (time >= start_transition_time_ + transition_time)
             {
-                self_.switch_sync_state(boost::make_shared<fms_state>(self_));
+                self_.switch_sync_state(create_fms_state(self_));
             }
         }
 

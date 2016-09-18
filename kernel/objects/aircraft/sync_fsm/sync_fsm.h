@@ -61,5 +61,7 @@ namespace aircraft
 
         inline static double phys_height() { return 80.0; }
 
+
+		enum phys_state_t { ORIGINAL, EXTERNAL };
     }
 }

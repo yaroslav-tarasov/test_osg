@@ -24,9 +24,6 @@
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{d661de74-78c0-4f05-8863-35984fc49d74}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\fms">
-      <UniqueIdentifier>{78b7d137-c2a8-484d-aa52-0d5dc4accf72}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\objects">
       <UniqueIdentifier>{1bb2266e-2979-4c3d-80ed-96c93ff77ee9}</UniqueIdentifier>
     </Filter>
@@ -269,6 +266,9 @@
     </Filter>
     <Filter Include="Header Files\objects\labels_manager">
       <UniqueIdentifier>{afcd8920-8812-41f1-999c-7373d46529e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hmi\fms">
+      <UniqueIdentifier>{78b7d137-c2a8-484d-aa52-0d5dc4accf72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -860,7 +860,7 @@
       <Filter>Source Files\phys</Filter>
     </ClCompile>
     <ClCompile Include="kernel\fms\dubins.cpp">
-      <Filter>Source Files\fms</Filter>
+      <Filter>Source Files\hmi\fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files\systems</Filter>
@@ -884,7 +884,7 @@
       <Filter>Source Files\objects\dubin_route</Filter>
     </ClCompile>
     <ClCompile Include="kernel\fms\trajectory.cpp">
-      <Filter>Source Files\fms</Filter>
+      <Filter>Source Files\hmi\fms</Filter>
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
@@ -1386,6 +1386,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\labels_manager\labels_manager_view.cpp">
       <Filter>Source Files\objects\labels_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_ext_model.cpp">
+      <Filter>Source Files\objects\aircraft_fms</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

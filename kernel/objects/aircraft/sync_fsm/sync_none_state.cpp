@@ -18,7 +18,7 @@ namespace sync_fsm
             if (air)
             {
                 if (cg::distance2d(air->pos(), fms_pos.pos) < sync_none_dist)
-                    self_.switch_sync_state(boost::make_shared<fms_state>(self_));
+                    self_.switch_sync_state(create_fms_state(self_));
 
             }
         }
