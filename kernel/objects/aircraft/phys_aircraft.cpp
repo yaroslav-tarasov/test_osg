@@ -74,18 +74,20 @@ namespace aircraft
     }
 
     phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor,*/ nodes_management::manager_ptr nodes_manager, geo_position const& initial_position, ada::data_t const& fsettings, shassis_support_ptr shassis, phys::compound_sensor_ptr s, size_t zone)
-        : base_(base)
-        , zone_(zone)
-        , phys_sys_(phys)
-        , nodes_manager_(nodes_manager)
+        : base_            (base)
+        , zone_            (zone)
+        , phys_sys_        (phys)
+        , nodes_manager_   (nodes_manager)
         , desired_position_(initial_position.pos)
-        , desired_orien_(initial_position.orien)
-        , shassis_(shassis)
-        //, meteo_cursor_(meteo_cursor)
-        , tow_attached_(false)
-        , has_malfunction_(false)
-        , prediction_(30.)
-        , freeze_(true)
+        , desired_orien_   (initial_position.orien)
+        // , desired_geo_position_
+        , shassis_         (shassis)
+        //, meteo_cursor_  (meteo_cursor)
+        , tow_attached_    (false)
+        , has_malfunction_ (false)
+        , prediction_      (30.)
+        , freeze_          (true)
+        , force_pos_setup_ (false)
     {
         create_phys_aircraft(initial_position, fsettings, s);
     }
@@ -139,17 +141,24 @@ namespace aircraft
             phys_aircraft_->set_steer(0);
         }
     }
+    
+    void phys_aircraft_impl::force_pos_setup(bool f)
+    {
+        force_pos_setup_ = f;    
+        phys_aircraft_->force_pos_setup(f);                                 
+    }
 
     void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
     {
         desired_position_ = pos;
-        desired_orien_ = orien;
+        desired_orien_    = orien;
     }
     
     void  phys_aircraft_impl::go_to_pos(geo_position const& pos)  
     {
-        desired_position_ = pos.pos;
-        desired_orien_ = pos.orien;
+        desired_position_     = pos.pos;
+        desired_orien_        = pos.orien;
+        desired_geo_position_ = pos;
     }
 
     geo_position phys_aircraft_impl::get_position() const
@@ -597,17 +606,20 @@ namespace aircraft
         }   
 
 
-        phys_aircraft_->set_steer(steer);
-        phys_aircraft_->set_thrust(thrust);
-        phys_aircraft_->set_brake(brake);
+        phys_aircraft_->set_steer   (steer);
+        phys_aircraft_->set_thrust  (thrust);
+        phys_aircraft_->set_brake   (brake);
         phys_aircraft_->set_elevator(elevator);
         phys_aircraft_->set_ailerons(ailerons);
-        phys_aircraft_->set_rudder(rudder);
-        phys_aircraft_->set_wind(wind);
+        phys_aircraft_->set_rudder  (rudder);
+        phys_aircraft_->set_wind    (wind);
 
 
        // TODO
        //         send(msg::phys_pos_msg(root_glb_pos.pos, root_glb_pos.orien.get_course()));
+
+       if(force_pos_setup_)
+         phys_aircraft_->set_position(decart_position(base_(desired_position_),desired_geo_position_.dpos,desired_orien_,point_3f()));
     }
 
     void phys_aircraft_impl::calc_phys_controls(double & slide_angle, double & thrust, double & attack_angle, double q, cg::rotation_3 const& vel_rotation, cg::point_3 const& desired_accel, cg::point_3 const& /*wind*/, bool reverse, bool low_attack)

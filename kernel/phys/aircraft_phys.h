@@ -62,8 +62,10 @@ namespace phys
 
        void   update_aerodynamics(double dt)    override;
        void   reset_suspension()                override;
+       
        void   set_position(const decart_position& pos) override;
-
+       void   force_pos_setup       (bool f)           override;
+   
    // rigid_body_impl
    private:
 	   bt_rigid_body_ptr get_body() const;
@@ -78,25 +80,25 @@ namespace phys
 #endif
        rigid_body_proxy                       chassis_;
        raycast_vehicle_proxy                  raycast_veh_;
-       polymorph_ptr<bt_body_user_info_t>  self_;
+       polymorph_ptr<bt_body_user_info_t>     self_;
        btRaycastVehicle::btVehicleTuning      tuning_;
 	   system_impl_ptr						  sys_;
 
-       std::function<void(double)> control_manager_;
+       std::function<void(double)>            control_manager_;
 
-       params_t params_;
+       params_t                               params_;
 
-       double   steer_;
-       double   elevator_;
-       double   ailerons_;
-       double   rudder_;
-       double   thrust_;
+       double                                 steer_;
+       double                                 elevator_;
+       double                                 ailerons_;
+       double                                 rudder_;
+       double                                 thrust_;
 
-       cg::point_3  wind_;
+       cg::point_3                            wind_;
 
-       double   prev_attack_angle_;
+       double                                 prev_attack_angle_;
 
-       bool     has_chassis_contact_;
+       bool                                   has_chassis_contact_;
 
        typedef cg::duplicate_points_fixed_id<cg::point_3> dup_points_t;
        dup_points_t  body_contact_points_;
@@ -115,7 +117,9 @@ namespace phys
 
        fixed_id_vector<contact_t> body_contacts_;
 
-       fixed_id_vector<size_t> wheels_ids_;
+       fixed_id_vector<size_t>    wheels_ids_;
+
+       bool                       force_pos_setup_;
    };
 
 

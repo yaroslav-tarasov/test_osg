@@ -13,20 +13,21 @@ namespace phys
 	{
 
     impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
-        : bt_body_user_info_t(rb_aircraft)
-		, sys_ (sys)
-		, chassis_    (sys->dynamics_world())
-		, raycast_veh_(sys->dynamics_world())
-        , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
-		, params_(params)
-        , elevator_(0)
-        , ailerons_(0)
-        , rudder_(0)
-        , thrust_(0)
-        , steer_(0)
-        , prev_attack_angle_(0)
+        : bt_body_user_info_t (rb_aircraft)
+		, sys_                (sys)
+		, chassis_            (sys->dynamics_world())
+		, raycast_veh_        (sys->dynamics_world())
+        , chassis_shape_      (compound_sensor_impl_ptr(s)->cs_)
+		, params_             (params)
+        , elevator_           (0)
+        , ailerons_           (0)
+        , rudder_             (0)
+        , thrust_             (0)
+        , steer_              (0)
+        , prev_attack_angle_  (0)
         , has_chassis_contact_(false)
         , body_contact_points_(1.5)
+        , force_pos_setup_    (false)
     {
 		tuning_.m_maxSuspensionTravelCm = 500;
 
@@ -286,6 +287,11 @@ FIXME("Off point for bullet")
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
         chassis_->setLinearVelocity(to_bullet_vector3(pos.dpos));
 	}
+    
+    void impl::force_pos_setup(bool f)
+    {
+        force_pos_setup_ = f;                                 
+    }
 
     decart_position impl::get_position() const
     {

@@ -731,12 +731,12 @@ struct client
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
 			
 #if 1       // Arrested gear test
-            for (int i=0;i<1 /*100*/;++i)
+            for (int i=0;i<100;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
-				auto const model  = /*"MIG29K"*//*"A319"*//*"SU25"*//*"MIG29"*/"L39";
+				auto const model  = /*"MIG29K"*/"A319"/*"SU25"*//*"MIG29"*//*"L39"*/;
 				ADD_EVENT(traj_trp2_[i]->base_length()  , create_msg(hull_number,traj_trp2_[i]->kp_value(traj_trp2_[i]->base_length()),traj_trp2_[i]->curs_value(traj_trp2_[i]->base_length()), ok_aircraft, model, boost::lexical_cast<std::string>(hull_number)) )
-				ADD_EVENT(65.0 + i * 25 , arrgear_target_msg( hull_number ) )  
+				ADD_EVENT(60.0 + i * 25 , arrgear_target_msg( hull_number ) )  
 
                 ADD_EVENT(55.0  + i * 25 , parachute_state_msg( hull_number, PS_SHOW ) )  
 

@@ -50,6 +50,7 @@ namespace phys
        bool   has_wheel_contact(size_t id) const;
        double wheel_skid_info(size_t id) const;
 
+
    private:
 	   void   set_steer   (double steer)            override;
 	   void   set_brake   (double brake)            override;
@@ -64,7 +65,8 @@ namespace phys
 	   void   update_aerodynamics(double dt)        override;
        void   reset_suspension()                    override;
 	   
-	   void   set_position(const decart_position& pos)  override;
+	   void   set_position(const decart_position& pos) override;
+       void   force_pos_setup       (bool f)           override;
 
    // rigid_body_impl
    private:
@@ -118,6 +120,8 @@ namespace phys
        fixed_id_vector<contact_t> body_contacts_;
 
        fixed_id_vector<size_t> wheels_ids_;
+
+       bool force_pos_setup_;
    };
 
 

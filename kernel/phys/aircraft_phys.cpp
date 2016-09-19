@@ -14,19 +14,20 @@ namespace phys
 
     impl::impl(system_impl_ptr sys,compound_sensor_ptr s,/*compound_shape_proxy& s,*/ params_t const& params, decart_position const& pos)
         : bt_body_user_info_t(rb_aircraft)
-		, sys_ (sys)
-		, chassis_    (sys->dynamics_world())
-		, raycast_veh_(sys->dynamics_world())
-        , chassis_shape_(compound_sensor_impl_ptr(s)->cs_)
-		, params_(params)
-        , elevator_(0)
-        , ailerons_(0)
-        , rudder_(0)
-        , thrust_(0)
-        , steer_(0)
-        , prev_attack_angle_(0)
+		, sys_               (sys)
+		, chassis_           (sys->dynamics_world())
+		, raycast_veh_       (sys->dynamics_world())
+        , chassis_shape_     (compound_sensor_impl_ptr(s)->cs_)
+		, params_            (params)
+        , elevator_          (0)
+        , ailerons_          (0)
+        , rudder_            (0)
+        , thrust_            (0)
+        , steer_             (0)
+        , prev_attack_angle_ (0)
         , has_chassis_contact_(false)
         , body_contact_points_(1.5)
+        , force_pos_setup_   (false)
     {
 		tuning_.m_maxSuspensionTravelCm = 500;
 
@@ -76,7 +77,7 @@ FIXME("Off point for bullet")
 	{
 		chassis_.reset();
 		sys_->unregister_rigid_body(this);
-		// sys_->dynamics_world()->removeAction(this);
+		sys_->dynamics_world()->removeAction(this);
 	}
 
 	void impl::updateAction( btCollisionWorld* collisionWorld, btScalar deltaTimeStep)
@@ -91,33 +92,33 @@ FIXME("Off point for bullet")
     {
         using namespace cg;
 
-        if (!chassis_->isActive())
+        if (!chassis_->isActive() ||  force_pos_setup_)
             return;
 
         // special aircraft forces
-            point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
+        point_3 vel = from_bullet_vector3(chassis_->getLinearVelocity());
         double speed = cg::norm(vel - wind_);
 
-            quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
-            point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
-            point_3 omega_loc = (!orien).rotate_vector(omega);
+        quaternion orien = from_bullet_quaternion(chassis_->getOrientation());
+        point_3 omega = cg::rad2grad() * from_bullet_vector3(chassis_->getAngularVelocity());
+        point_3 omega_loc = (!orien).rotate_vector(omega);
         dcpr cur_dcpr = cg::rot_axis2dcpr(orien.cpr(), rot_axis(omega));
 
         double const air_density = 1.225;
 //            double const g = 9.8;
         double const q = 0.5 * air_density * speed * speed; // dynamic pressure
 
-            point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(point_3(0, 1, 0))) ;
-            point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(point_3(1, 0, 0))) ;
-            point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(point_3(0, 0, 1))) ;
+        point_3 forward_dir = cg::normalized_safe(orien.rotate_vector(point_3(0, 1, 0))) ;
+        point_3 right_dir   = cg::normalized_safe(orien.rotate_vector(point_3(1, 0, 0))) ;
+        point_3 up_dir      = cg::normalized_safe(orien.rotate_vector(point_3(0, 0, 1))) ;
 
-            point_3 vk = vel - wind_;
-            point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
+        point_3 vk = vel - wind_;
+        point_3 Y = !cg::eq_zero(cg::norm(vk)) ? cg::normalized(vk) : forward_dir;
 
-            point_3 Z = cg::normalized_safe(right_dir ^ Y);
-            point_3 X = cg::normalized_safe(Y ^ Z);
+        point_3 Z = cg::normalized_safe(right_dir ^ Y);
+        point_3 X = cg::normalized_safe(Y ^ Z);
 
-            point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
+        point_3 Y_right_dir_proj =  Y - Y * right_dir * right_dir;
         double attack_angle = cg::rad2grad(cg::angle(Y_right_dir_proj, forward_dir)) * (-cg::sign(Y * up_dir));
         double slide_angle = cg::rad2grad(cg::angle(Y, Y_right_dir_proj))  * (-cg::sign(Y * right_dir));
 
@@ -165,14 +166,14 @@ FIXME("Off point for bullet")
 
 //            double zmoment = -Izz() * cg::rad2grad() * params_.Cl * params_.S * 0.5 * air_density * speed * sin(cg::grad2rad(orien.get_roll())) / params_.mass;
 
-            point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
+        point_3 torq = M_pitch * right_dir + M_roll * forward_dir + M_course * up_dir;
         //chassis_->applyTorque(to_bullet_vector3(torq*cg::grad2rad()));
 FIXME("Off point for bullet")
 #if 1
         chassis_->applyTorqueImpulse(to_bullet_vector3(torq*(cg::grad2rad()*dt)));
 #endif
 
-            point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
+        point_3 force = ((lift + liftAOA) * Z - drag * Y + slide * X + params_.thrust * thrust_ * forward_dir);
 
         //LogTrace("lift " << lift << " liftAOA " << liftAOA << " drag " << drag << " thrust_ " << thrust_ );
 
@@ -417,6 +418,11 @@ FIXME("Off point for bullet")
 	{
 		chassis_->setCenterOfMassTransform(to_bullet_transform(pos.pos, pos.orien.cpr()));
 	}
+    
+    void impl::force_pos_setup(bool f)
+    {
+        force_pos_setup_ = f;                                 
+    }
 
     decart_position impl::get_wheel_position( size_t id ) const
     {

@@ -364,10 +364,12 @@ namespace sync_fsm
                 self_.set_desired_nm_pos(gtp.pos);
                 self_.set_desired_nm_orien(gtp.orien);
 
-                //phys_aircraft_->go_to_pos(gtp);
+                phys_aircraft_->force_pos_setup(true);
+                phys_aircraft_->go_to_pos(gtp);
             }
             else
             {
+                phys_aircraft_->force_pos_setup(false);
                 auto physpos = phys_aircraft_->get_position();
                 // auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
                 LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos : "

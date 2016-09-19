@@ -27,7 +27,10 @@ namespace aircraft
         virtual size_t               get_zone() const = 0;
         virtual void                 set_malfunction(bool malfunction) = 0;
         virtual void                 freeze(bool freeze) = 0;
-        virtual ~phys_aircraft() {}
+        
+        virtual void                 force_pos_setup(bool f) = 0;
+
+        virtual                      ~phys_aircraft() {}
     };
 
     typedef polymorph_ptr<phys_aircraft> phys_aircraft_ptr;

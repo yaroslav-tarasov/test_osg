@@ -63,7 +63,8 @@ namespace aircraft
         size_t       get_zone              () const override;
         void         set_malfunction       (bool malfunction)  override;
         void         freeze                (bool freeze) override;
-        // double       get_damned_offset() override;
+        
+        void         force_pos_setup       (bool f) override;
 
     private:
         void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s);
@@ -87,9 +88,13 @@ namespace aircraft
 
         cg::geo_point_3                 desired_position_;
         quaternion                      desired_orien_;
+        geo_position                    desired_geo_position_;
+
         bool                            tow_attached_;
         bool                            has_malfunction_;
         size_t                          zone_;
+
+        bool                            force_pos_setup_;
     };
 
 }

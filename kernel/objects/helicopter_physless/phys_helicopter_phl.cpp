@@ -72,6 +72,11 @@ namespace helicopter_physless
             phys_aircraft_->set_steer(0);
         }
     }
+    
+    void phys_aircraft_impl::force_pos_setup(bool f)
+    {
+        //phys_aircraft_->force_pos_setup(f);                                 
+    }
 
     void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
     {

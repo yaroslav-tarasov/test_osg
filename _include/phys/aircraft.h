@@ -94,9 +94,9 @@ namespace phys
 		virtual double drag() const = 0;
 		virtual double lift() const = 0;
 		virtual double thrust() const = 0;
-		virtual bool has_contact() const = 0;
+		virtual bool   has_contact() const = 0;
 		virtual std::vector<contact_info_t> get_body_contacts() const = 0;
-		virtual bool has_wheel_contact(size_t id) const = 0;
+		virtual bool   has_wheel_contact(size_t id) const = 0;
 		virtual double wheel_skid_info(size_t id) const = 0;
 	};  
 
@@ -120,6 +120,8 @@ namespace phys
 		virtual void   reset_suspension() = 0;
 
 		virtual void   set_position(const decart_position& pos)  = 0;
+        virtual void   force_pos_setup(bool f) = 0;
+
 	};
 
 

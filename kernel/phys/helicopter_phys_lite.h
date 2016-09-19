@@ -65,7 +65,7 @@ namespace phys
        void   reset_suspension()                    override;
 	   
 	   void   set_position(const decart_position& pos)  override;
-
+       void   force_pos_setup       (bool f)            override;
    // rigid_body_impl
    private:
 	   bt_rigid_body_ptr get_body() const;
@@ -118,6 +118,9 @@ namespace phys
        fixed_id_vector<contact_t> body_contacts_;
 
        fixed_id_vector<size_t> wheels_ids_;
+
+
+       bool force_pos_setup_;
    };
 
 

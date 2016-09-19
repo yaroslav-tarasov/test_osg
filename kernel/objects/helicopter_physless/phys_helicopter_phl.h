@@ -62,7 +62,7 @@ namespace helicopter_physless
         size_t               get_zone              ()            const override;
         void                 set_malfunction       (bool malfunction)  override;
         void                 freeze                (bool freeze)       override;
-
+        void                 force_pos_setup       (bool f) override;
 
     private:
         void create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s);

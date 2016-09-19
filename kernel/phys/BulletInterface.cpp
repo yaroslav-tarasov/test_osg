@@ -475,7 +475,8 @@ namespace
                 {
                     bt_body_user_info_t * rbA = (bt_body_user_info_t *)(obA->getUserPointer());
                     bt_body_user_info_t * rbB = (bt_body_user_info_t *)(obB->getUserPointer());
-                    if (rbA->bt_body_kind() == rb_aircraft && rbB->bt_body_kind() == bt_soft_body)
+                    if ( (rbA->bt_body_kind() == rb_aircraft && rbB->bt_body_kind() == bt_soft_body)
+                    || (rbB->bt_body_kind() == rb_aircraft && rbA->bt_body_kind() == bt_soft_body) )
                     {
                         return false;
                     }
