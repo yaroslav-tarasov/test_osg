@@ -183,7 +183,10 @@ struct client
     DECL_LOGGER("visa_control");
 	
     typedef std::vector<std::pair<endpoint, bool> > endpoints;
-	
+
+    typedef boost::function<bool(double /*time*/)>   run_f;
+	typedef std::multimap<double, run_f>  time_queue_run_t;
+
 	struct connect_helper
 	{
 		connect_helper(const endpoints& peers, client* cl)
@@ -391,7 +394,7 @@ struct client
         ADD_EVENT(70.0,  fire_fight_msg(2))
 #endif
 
-        run_f_ = [this](uint32_t id, double time, double traj_offset)->void {
+        run_f_ = [this](uint32_t id, double time, double traj_offset)->bool {
             binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                 id 
                 , traj_->kp_value    (time)
@@ -403,6 +406,7 @@ struct client
                 )));
 
             this->send(&msg[0], msg.size());
+            return true;
         };
 
         runs_.insert(make_pair(traj_->base_length(),
@@ -429,7 +433,7 @@ struct client
 #endif 
 
 #if 0
-        run_f2_ = [this](uint32_t id, double time, double traj_offset)->void {
+        run_f2_ = [this](uint32_t id, double time, double traj_offset)->bool {
             binary::bytes_t msg =  std::move(network::wrap_msg(run(
                 id 
                 , traj2_->kp_value    (time)
@@ -441,6 +445,7 @@ struct client
                 )));
 
             this->send(&msg[0], msg.size());
+
         };
 
         runs_.insert(make_pair(traj2_->base_length(),
@@ -450,7 +455,7 @@ struct client
 
 #if 1
         runs_once_.insert(make_pair( 1,
-            [this]( double time )->void {
+            [this]( double time )->bool {
 
                 client::net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
 
@@ -462,14 +467,15 @@ struct client
                             binary::bytes_t bts =  std::move(network::wrap_msg(props_updated((*it).task.properties)));
                             it_p->second->send(&bts[0], bts.size());
                         }
-                }	
+                }
+                return true;
         }
         ));
 #endif
 
 #if 0
         runs_once_.insert(make_pair( 25,
-            [this]( double time )->void {
+            [this]( double time )->bool {
 
             client::net_configurer::hosts_props_t& hp = net_cfgr_->get_apps("visapp");
 
@@ -489,6 +495,8 @@ struct client
                     it_p->second->send(&bts[0], bts.size());
                 }
             }	
+
+            return true;
         }
         ));
 #endif
@@ -496,7 +504,7 @@ struct client
         
 #if 0
         runs_.insert(make_pair(traj_cam_->base_length(),
-                    [this](double time)->void {
+                    [this](double time)->bool {
                         uint32_t id =  1501;
                         double traj_offset = 0.0;
                         binary::bytes_t msg =  std::move(network::wrap_msg(run(
@@ -510,6 +518,8 @@ struct client
                             )));
 
                         this->send(&msg[0], msg.size());
+
+                        return true;
                 }
             ));
 #endif
@@ -648,7 +658,7 @@ struct client
         //Camera: ÊÄÏ        48.89 28.50  411.65 -2.14 -0.13 0.66 5.00 50000.00 0 0.00 0.00 0.00
         //Camera: ÊÄÏ_óòê -2383.51 21.00 -524.20 -5.10 -0.07 0.57 5.00 50000.00 0 0.00 0.00 0.00
 
-		boost::function<void(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->void {
+		boost::function<bool(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->bool {
 			binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
 				id 
 				, traj_trp->kp_value    (time)
@@ -660,10 +670,15 @@ struct client
                 , traj_trp->air_config_value(time - traj_offset)? *traj_trp->air_config_value(time - traj_offset):fms::traj_data::CFG_SIZE
 				)));
 			 
-    		this->send(&msg[0], msg.size());
+    		if(time + traj_offset < traj_trp->length())
+              this->send(&msg[0], msg.size());
+            else
+                return false;
+
+            return true;
 		};
 
-        boost::function<void(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos2 = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->void {
+        boost::function<bool(uint32_t,double, fms::trajectory_ptr, double)> run_f_pos2 = [this](uint32_t id, double time, fms::trajectory_ptr traj_trp, double traj_offset)->bool {
             binary::bytes_t msg =  std::move(network::wrap_msg(run_msg(
                 id 
                 , traj_trp->kp_value    (time - traj_offset)
@@ -676,6 +691,8 @@ struct client
                 )));
 
             this->send(&msg[0], msg.size());
+
+            return true;
         };
 
 #if 0
@@ -1040,26 +1057,36 @@ private:
             }
         }
 
-        typedef std::multimap<double, run_f>  time_queue_run_t;
-        time_queue_run_t                         run_queque_f_;
+                    
+        {
+	        std::vector<time_queue_run_t::iterator> to_delete;
+	        for(time_queue_run_t::iterator it = runs_.begin(); it != runs_.end(); ++it ) {
+	            if (it->first <= time) {
+	                if(!it->second(time))
+                        to_delete.push_back(it);
+	            }
+	        }
 
-        for(time_queue_run_t::iterator it = runs_.begin(); it != runs_.end(); ++it ) {
-            if (it->first <= time) {
-                it->second(time);
+            for(auto it = to_delete.begin(); it != to_delete.end(); ++it ) {
+                runs_.erase(*it);
+            }
+
+        }
+
+        {
+            std::vector<time_queue_run_t::iterator> to_delete;
+            for(time_queue_run_t::iterator it = runs_once_.begin(); it != runs_once_.end(); ++it ) {
+                if (it->first <= time) {
+                    it->second(time);
+                    to_delete.push_back(it);
+                }
+            }
+
+            for(auto it = to_delete.begin(); it != to_delete.end(); ++it ) {
+                runs_once_.erase(*it);
             }
         }
 
-        std::vector<time_queue_run_t::iterator> to_delete;
-        for(time_queue_run_t::iterator it = runs_once_.begin(); it != runs_once_.end(); ++it ) {
-            if (it->first <= time) {
-                it->second(time);
-                to_delete.push_back(it);
-            }
-        }
-        
-        for(auto it = to_delete.begin(); it != to_delete.end(); ++it ) {
-             runs_once_.erase(*it);
-        }
         
         time += period_ * factor;
 
@@ -1108,9 +1135,9 @@ private:
     run_wrap_f                                                      run_f_pos_;
                                                           
 
-    typedef boost::function<void(double /*time*/)>   run_f;
 
-    typedef std::multimap<double, run_f>  time_queue_run_t;
+
+
     time_queue_run_t                                                     runs_;
     time_queue_run_t                                                runs_once_;
 

@@ -293,6 +293,7 @@ namespace {
         std::vector<::arresting_gear::rope_state_t> res;
         res.reserve(ropes_.size());
         unsigned i = 0;
+#ifdef SOFTBODY_WORLD
         for (auto it = ropes_.begin(); it != ropes_.end(); ++it, ++i)
         {
             const btSoftBody::tNodeArray& nodes = it->get()->get()->m_nodes;
@@ -307,6 +308,7 @@ namespace {
             }
             res.push_back(std::move(ri));
         }
+#endif
 
         return res;
     }
@@ -325,7 +327,8 @@ namespace {
     
     void   impl::append_anchor        (rigid_body_ptr body, cg::point_3 const& pos)
     {
-		auto& psb = *ropes_.back().get();
+#ifdef SOFTBODY_WORLD
+ 		auto& psb = *ropes_.back().get();
         const btSoftBody::tNodeArray& nodes = psb.get()->m_nodes;
 		
         int idx = nodes.size()/2;
@@ -344,10 +347,12 @@ namespace {
         }
 
         psb->appendAnchor(idx, rigid_body_impl_ptr(body)->get_body().get());
+#endif
     }
 
     void   impl::release_anchor       (rigid_body_ptr body)
     {
+#ifdef SOFTBODY_WORLD
         auto& psb = *ropes_.back().get();
         psb->m_anchors.clear();
 
@@ -365,6 +370,7 @@ namespace {
             params_.ropes.pop_back();
 #endif
         }
+#endif
     }
     
     void impl::set_target(rigid_body_ptr rb, cg::point_3 const& self_offset, cg::point_3 const& offset)
@@ -385,6 +391,9 @@ namespace {
 
     void impl::create_rope( bt_softrigid_dynamics_world_ptr bw, params_t::rope_t const& rope, unsigned seg_num)
     {
+        if(!bw)
+            return;
+
         ropes_.back().get()->reset(bt_create_rope(bw->getWorldInfo(),	
             to_bullet_vector3(rope.first),
             to_bullet_vector3(rope.second),

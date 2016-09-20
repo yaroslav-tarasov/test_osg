@@ -48,7 +48,7 @@ namespace phys {
 FIXME("deprecated")
 #include "osgbullet_helpers.h"
 
-#define SOFTBODY_WORLD
+//#define SOFTBODY_WORLD
 
 #ifdef _DEBUG
 #pragma comment(lib, "BulletSoftBody_Debug.lib")
@@ -415,7 +415,8 @@ namespace phys
         btCollisionDispatcher*                _dispatcher;
         btBroadphaseInterface*                _overlappingPairCache;
         btSequentialImpulseConstraintSolver*  _solver;
-        //btSoftBodyWorldInfo	*             _worldInfo;
+
+        bt_softrigid_dynamics_world_ptr       _sr_dw;
 
 
         boost::scoped_ptr<btBroadphaseInterface>           broadphase_;
@@ -513,13 +514,12 @@ BulletInterface::BulletInterface()
     p_->_overlappingPairCache = new btAxisSweep3( worldAabbMin, worldAabbMax, 1000 );
 
     //p_->_overlappingPairCache = new btDbvtBroadphase;
-    
 
 
     p_->_dw = boost::make_shared<btSoftRigidDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
-    auto & worldInfo = bt_softrigid_dynamics_world_ptr(p_->_dw)->getWorldInfo();   
+    p_->_sr_dw  = bt_softrigid_dynamics_world_ptr(p_->_dw);
     
-
+    auto & worldInfo = p_->_sr_dw->getWorldInfo();   
 
     worldInfo.m_broadphase = p_->_overlappingPairCache;
     worldInfo.m_dispatcher = p_->_dispatcher;
@@ -536,7 +536,7 @@ BulletInterface::BulletInterface()
 
 #else
     p_->_overlappingPairCache = new btDbvtBroadphase;
-    p_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(d_->_dispatcher,d_->_overlappingPairCache, d_->_solver, d_->_configuration);
+    p_->_dw = boost::make_shared<btDiscreteDynamicsWorld>(p_->_dispatcher,p_->_overlappingPairCache, p_->_solver, p_->_configuration);
 #endif
 
 	p_->_dw->setGravity( btVector3(0,0,-9.8) );
@@ -906,6 +906,8 @@ osg::Matrix BulletInterface::getMatrix( int id )
 
 void BulletInterface::update( double step )
 {
+    // time_measure_helper_t th("BulletInterface::update: ");
+
 	for (auto it = p_->rigid_bodies_.begin(); it != p_->rigid_bodies_.end(); ++it)
 		(*it)->pre_update(step);
     
@@ -928,7 +930,7 @@ void BulletInterface::update( double step )
 	}
 
 #ifdef SOFTBODY_WORLD
-    auto & worldInfo = bt_softrigid_dynamics_world_ptr(p_->_dw)->getWorldInfo();  
+    auto & worldInfo = p_->_sr_dw->getWorldInfo();  
     worldInfo.m_sparsesdf.GarbageCollect();
 #endif
 

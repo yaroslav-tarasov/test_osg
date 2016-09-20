@@ -27,6 +27,8 @@ model::~model()
 
 void model::update( double time )
 {
+    time_measure_helper_t th("-------------------------------------------------------------phys_sys_object::model::update: ", [=](double t)->bool{return t > cfg().model_params.msys_step; }); 
+
     double dt = time - last_time_;
 
     double const calc_step = /*0.1*//*0.01*/cfg().model_params.bullet_step;

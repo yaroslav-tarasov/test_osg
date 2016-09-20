@@ -207,6 +207,9 @@ static OpenThreads::Mutex& getReadFileMutex()
 	return _mutex;
 }
 
+namespace 
+{
+
 struct helper_t
 {
     helper_t(const std::string& name)
@@ -223,6 +226,8 @@ struct helper_t
     high_res_timer hr_timer;
     std::string    name;
 };
+
+}
 
 void processMorphAnimation( boost::optional<xml_model_t> data, osg::Node* object_file )
 {

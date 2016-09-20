@@ -10,9 +10,9 @@ namespace phys
 {
 
     struct model
-        : model_presentation
-        , view
-        , control
+           : model_presentation
+           , view
+           , control
     {
         static object_info_ptr create(kernel::object_create_t const& oc, dict_copt dict);
 
