@@ -71,8 +71,8 @@ public:
 protected:
     virtual ~SparkDrawable();
     
-    struct _private;
-    _private*     p_; 
+    struct Private;
+    Private*     p_; 
     
     GLuint             compileInternalTexture( osg::Image* image, GLuint type, GLuint clamp ) const;
     void               convertData( osg::Image* image, GLuint type, unsigned int numCurrent, unsigned int numRequired ) const;

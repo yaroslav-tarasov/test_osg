@@ -525,8 +525,6 @@ struct client
 #endif
 
 
-
-
 #if 0         
          cg::point_3 poss[] = {cg::point_3(0.907 * 1000 , -0.060 * 1000, 0.0), 
                                cg::point_3(0.883 * 1000 , -0.030 * 1000, 0.0),
@@ -646,8 +644,29 @@ struct client
 		weather.fog_density  = 0.1f; 
 		weather.clouds_type  = static_cast<unsigned>(av::weather_params::cirrus);
 		weather.wind_dir     = cg::point_2f(0.0, 0.0);
+        weather.air_humidity     = 1.0;
+		
+        ADD_EVENT(160.0, environment_msg(weather))
 
-		ADD_EVENT(160.0, environment_msg(weather))
+
+        weather.air_humidity     = 0.0;
+        ADD_EVENT(180.0, environment_msg(weather))
+
+        weather.air_humidity     = .1;
+        ADD_EVENT(200.0, environment_msg(weather))
+
+        weather.air_humidity     = .5;
+        ADD_EVENT(220.0, environment_msg(weather))
+
+        weather.air_humidity     = .9;
+        ADD_EVENT(240.0, environment_msg(weather))
+
+        weather.air_humidity     =  2.0;
+        ADD_EVENT(260.0, environment_msg(weather))
+
+        weather.air_humidity     = 10.0;
+        ADD_EVENT(280.0, environment_msg(weather))
+
 
 #endif;
 	}

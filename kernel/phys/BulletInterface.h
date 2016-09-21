@@ -105,8 +105,8 @@ private:
     };
 
    
-    struct _private;
-    _private*  p_;
+    struct Private;
+    Private*  p_;
     
     on_collision_f                        on_collision_;
     cg::geo_base_3                        base_;

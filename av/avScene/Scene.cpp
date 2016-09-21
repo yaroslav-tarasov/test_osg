@@ -521,7 +521,7 @@ protected:
 
 } // namespace avGUI
 
-struct Scene::_private 
+struct Scene::Private 
 {
 	//
 	// GUI
@@ -608,7 +608,7 @@ Scene* Scene::GetInstance()
 
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene()
-	: _p (std::make_shared<_private>())
+	: _p (std::make_shared<Private>())
 {      
     setName("Scene");
 
@@ -2246,10 +2246,12 @@ void Scene::update( osg::NodeVisitor * nv )
       avCore::Environment::EnvironmentParameters & environmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 
 	  
-	  if(environmentParameters.AirHumidity>100.f)
+#if 0
+	  if(environmentParameters.AirHumidity>10.f)
 		environmentParameters.AirHumidity = 0.0;
 	  else
 		environmentParameters.AirHumidity += 0.01f;
+#endif
 
 
 	  const double lt = nv->getFrameStamp()->getSimulationTime();

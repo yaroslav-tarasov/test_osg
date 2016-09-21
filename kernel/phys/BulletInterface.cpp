@@ -396,9 +396,9 @@ namespace phys
     typedef std::pair<const btRigidBody*, const btRigidBody*> CollisionPair;
     typedef std::set<CollisionPair>                           CollisionPairs;
 
-    struct BulletInterface::_private
+    struct BulletInterface::Private
     {
-        _private()
+        Private()
             :_dd (nullptr), _dw(nullptr)
         {}
 
@@ -497,7 +497,7 @@ namespace
 BulletInterface::BulletInterface()
     : on_collision_(nullptr)
     , base_(::get_base())
-    , p_(new _private())
+    , p_(new Private())
 {
 #ifdef SOFTBODY_WORLD
     p_->_configuration = new btSoftBodyRigidBodyCollisionConfiguration();

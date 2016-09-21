@@ -203,7 +203,7 @@ protected:
 typedef std::vector<cg::point_2f>  inter_points_vector;
 typedef std::array<cg::point_2f,4> inter_points_array_4;
 
-class _private : public LightMapRenderer
+class Private : public LightMapRenderer
 {
  
     friend struct LightMapCullCallback;
@@ -243,7 +243,7 @@ public: // ILightMapRenderer
 
 protected:
 
-    _private(osg::Group * sceneRoot);
+    Private(osg::Group * sceneRoot);
 
     void							    _createArrays();
     osg::Geometry *                     _createGeometry();
@@ -291,7 +291,7 @@ private:
 // create
 ILightMapRendererPtr createLightMapRenderer(osg::Group * sceneRoot)
 {
-    return new _private(sceneRoot);
+    return new Private(sceneRoot);
 }
 
 
@@ -419,7 +419,7 @@ __forceinline static void make_intersection(inter_points_array_4& ipa, const cg:
 
 struct LightMapCullCallback : public osg::NodeCallback
 {
-    LightMapCullCallback(_private * p)
+    LightMapCullCallback(Private * p)
         : p_(p)
     {
 
@@ -463,12 +463,12 @@ struct LightMapCullCallback : public osg::NodeCallback
     }
 private:
 
-    _private*           p_;
+    Private*           p_;
 
 };
 
 
-void _private::traverse(osg::NodeVisitor& nv)
+void Private::traverse(osg::NodeVisitor& nv)
 {
     if (nv.getVisitorType() != osg::NodeVisitor::CULL_VISITOR )
     {
@@ -521,7 +521,7 @@ void _private::traverse(osg::NodeVisitor& nv)
 
 }
 
-osg::Geometry * _private::_createGeometry()
+osg::Geometry * Private::_createGeometry()
 {
     // dummy bounding box callback
     osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
@@ -548,7 +548,7 @@ osg::Geometry * _private::_createGeometry()
 }
 
 // ctor
-_private::_private(osg::Group * sceneRoot)
+Private::Private(osg::Group * sceneRoot)
     : tex_dim_(0)
     , we_see_smth_(false)
     , lightmap_clipper_(cg::matrix_4f())
@@ -595,7 +595,7 @@ _private::_private(osg::Group * sceneRoot)
  
 
 // add spot on cull pass
-void _private::AddSpotLight( SpotData const & spot )
+void Private::AddSpotLight( SpotData const & spot )
 {
     // check visibility
     const cg::point_3f world_light_pos = mv_.treat_point(spot.view_pos, false);
@@ -637,7 +637,7 @@ void _private::AddSpotLight( SpotData const & spot )
 }
 
 // set camera frustum and calculate all transformations
-void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode )
+void Private::SetupProjection( cg::frustum_f const & view_frustum, float dist_max, bool night_mode )
 {
     // clear vertex buffer
     vertices_.resize(0);
@@ -670,7 +670,7 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, float dist_m
 }
 
 // update uniform
-void _private::UpdateTextureMatrix( bool enabled )
+void Private::UpdateTextureMatrix( bool enabled )
 {
     if (enabled && we_see_smth_ && !vertices_.empty())
     {
@@ -679,18 +679,18 @@ void _private::UpdateTextureMatrix( bool enabled )
 }
 
 // texture matrix for specific split
-cg::matrix_4f const & _private::GetViewTextureMatrix() const
+cg::matrix_4f const & Private::GetViewTextureMatrix() const
 {
     return tex_matr_;
 }
 
 // get night mode
-bool _private::GetNightMode() const
+bool Private::GetNightMode() const
 {
     return we_see_smth_;
 }
 
-void _private::_createArrays()
+void Private::_createArrays()
 {
     from_l_ = new osg::Vec3Array();
     _geom->setVertexAttribArray(1, from_l_.get(),osg::Array::BIND_PER_VERTEX);
@@ -717,7 +717,7 @@ void _private::_createArrays()
     _geom->addPrimitiveSet(new osg::DrawArrays() );
 }
 
-void _private::_clearArrays()
+void Private::_clearArrays()
 {
     from_l_->clear();
     ldir_->clear();
@@ -731,7 +731,7 @@ void _private::_clearArrays()
 //
 
 template <typename T >
-void _private::add_light( T const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
+void Private::add_light( T const & light_contour, cg::point_3f const & world_lightpos, cg::point_3f const & world_lightdir, SpotData const & spot )
 {
     // convert angular falloffs
     cg::point_2f dot_falloff(0, 1);
@@ -777,7 +777,7 @@ void _private::add_light( T const & light_contour, cg::point_3f const & world_li
 }
 
 
-void _private::_commitLights()
+void Private::_commitLights()
 {
     geom_array_ = static_cast<osg::Vec3Array *>(_geom->getVertexArray());
     geom_array_->resize(0);
@@ -823,7 +823,7 @@ void _private::_commitLights()
 
 
 
-void _private::cull( osg::NodeVisitor * nv )
+void Private::cull( osg::NodeVisitor * nv )
 {
     using namespace avScene;
 

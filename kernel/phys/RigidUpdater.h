@@ -84,8 +84,8 @@ namespace bi
 #endif        
 
 
-    	struct _private;
-	    _private*  _p;
+    	struct Private;
+	    Private*  _p;
 
 private:
         double                                   _last_frame_time;

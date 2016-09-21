@@ -42,9 +42,9 @@
 
 namespace bi
 {
-	struct RigidUpdater::_private
+	struct RigidUpdater::Private
 	{
-		        _private()
+		        Private()
                     : _krv_data_getter("log_minsk.txt")
 #ifdef DEPRECATED_DEBUG_MODE
                     , _sys            (phys::create_phys_system())
@@ -76,7 +76,7 @@ namespace bi
 		, _needDebugDrawer(false)
 		, _last_frame_time(0)
 		, selected_obj_id_(0)
-		, _p(new _private)
+		, _p(new Private)
 		, _trajectory_drawer2(new Utils::TrajectoryDrawer(root,Utils::TrajectoryDrawer::LINES))
 	{
         using namespace kernel;

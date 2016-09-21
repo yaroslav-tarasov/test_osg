@@ -168,8 +168,8 @@ namespace avScene {
        
 
     private:
-		struct _private;
-		std::shared_ptr<_private>  _p; 
+		struct Private;
+		std::shared_ptr<Private>  _p; 
 
 
     public:

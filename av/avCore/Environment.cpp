@@ -51,8 +51,8 @@ void Environment::SetEnvironment( environment_params const & p )
     float           night_threshold;
 #endif
 
-    m_EnvironmentParameters.AirHumidity    = p.air_temperature;
-    m_EnvironmentParameters.AirTemperature = p.air_humidity;
+    m_EnvironmentParameters.AirHumidity    = p.air_humidity;
+    m_EnvironmentParameters.AirTemperature = p.air_temperature;
 
 }
 

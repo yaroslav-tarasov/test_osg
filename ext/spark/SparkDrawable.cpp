@@ -11,9 +11,9 @@ typedef std::map<std::string, SparkDrawable::ImageAttribute> TextureObjMap;
 typedef std::vector<SPK::System*>             ParticleSystemList;
 
 
-struct SparkDrawable::_private
+struct SparkDrawable::Private
 {
-       _private(SparkDrawable* parent)
+       Private(SparkDrawable* parent)
        : _baseSystemCreator(NULL)
        , _baseSystemID(SPK::NO_ID)
        , _protoSystem(NULL)
@@ -124,7 +124,7 @@ SparkDrawable::SparkDrawable()
     , _useProtoSystem(true)
     , _autoUpdateBound(true)
     , _dirty(true)
-    , p_ (new _private(this))
+    , p_ (new Private(this))
 {
     _activeContextID = 0;
     setUpdateCallback( new DeferredSystemHandler );
@@ -361,7 +361,7 @@ void SparkDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
     state->setActiveTextureUnit( tex_unit );
 }
 
-SPK::System* SparkDrawable::_private::createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle )
+SPK::System* SparkDrawable::Private::createParticleSystem( const SPK::Vector3D& pos, const SPK::Vector3D& rot, float angle )
 {
     SPK::System* system = SPK_Copy( SPK::System, _baseSystemID );
     if ( !system ) return NULL;

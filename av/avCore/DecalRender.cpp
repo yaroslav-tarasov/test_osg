@@ -144,7 +144,7 @@ protected:
     osg::ref_ptr<osg::Texture2D>         _texture;
 };
 
-class _private : public DecalRenderer
+class Private : public DecalRenderer
 {
  
     friend IDecalRendererPtr createDecalRenderer(osg::Group * sceneRoot);
@@ -183,7 +183,7 @@ private:
 
 protected:
 
-    _private(osg::Group * sceneRoot);
+    Private(osg::Group * sceneRoot);
 
     void							    _createArrays();
     osg::Geometry *                     _createGeometry();
@@ -231,20 +231,20 @@ private:
 // create
 IDecalRendererPtr createDecalRenderer(osg::Group * sceneRoot)
 {
-    return new _private(sceneRoot);
+    return new Private(sceneRoot);
 }
 
-void _private::SetVisible( bool vis )
+void Private::SetVisible( bool vis )
 {
 
 }
 
-void _private::Clear()
+void Private::Clear()
 {
 
 }
     
-void _private::AddGeometry( osg::Geometry * g )
+void Private::AddGeometry( osg::Geometry * g )
 {
 	std::string ls = boost::to_lower_copy(g->getStateSet()->getName());
 	g->setStateSet(_stateset);
@@ -276,7 +276,7 @@ void _private::AddGeometry( osg::Geometry * g )
 	g->setDataVariance(osg::Object::DYNAMIC);
 }
 
-void _private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w )
+void Private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w )
 {
     if (positions.size() < 2)
         return;
@@ -327,7 +327,7 @@ void _private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::col
     dirty_ = true;
 }
 
-void _private::traverse(osg::NodeVisitor& nv)
+void Private::traverse(osg::NodeVisitor& nv)
 {
     if (nv.getVisitorType() != osg::NodeVisitor::CULL_VISITOR )
     {
@@ -373,7 +373,7 @@ void _private::traverse(osg::NodeVisitor& nv)
 
 }
 
-osg::Geometry * _private::_createGeometry()
+osg::Geometry * Private::_createGeometry()
 {
     // dummy bounding box callback
     osg::Drawable::ComputeBoundingBoxCallback * pDummyBBCompute = new osg::Drawable::ComputeBoundingBoxCallback();
@@ -400,7 +400,7 @@ osg::Geometry * _private::_createGeometry()
 }
 
 // ctor
-_private::_private(osg::Group * sceneRoot)
+Private::Private(osg::Group * sceneRoot)
     : tex_dim_(0)
     , we_see_smth_(false)
     , _NeedToUpdateFBO(false)
@@ -463,7 +463,7 @@ _private::_private(osg::Group * sceneRoot)
 
 
 // set camera frustum and calculate all transformations
-void _private::SetupProjection( cg::frustum_f const & view_frustum, cg::range_2f const & z_range )
+void Private::SetupProjection( cg::frustum_f const & view_frustum, cg::range_2f const & z_range )
 {
     // clear vertex buffer
 #if 0
@@ -493,7 +493,7 @@ void _private::SetupProjection( cg::frustum_f const & view_frustum, cg::range_2f
 }
 
 // update uniform
-void _private::UpdateTextureMatrix( bool enabled )
+void Private::UpdateTextureMatrix( bool enabled )
 {
     if (enabled && we_see_smth_ && !vertices_.empty())
     {
@@ -504,7 +504,7 @@ void _private::UpdateTextureMatrix( bool enabled )
 
 
 
-void _private::_createArrays()
+void Private::_createArrays()
 {
 
     lcolor_ = new osg::Vec3Array();
@@ -519,7 +519,7 @@ void _private::_createArrays()
     _geom->addPrimitiveSet(new osg::DrawElementsUInt() );
 }
 
-void _private::_clearArrays()
+void Private::_clearArrays()
 {
     lcolor_->clear();
     indices_->clear();
@@ -530,7 +530,7 @@ void _private::_clearArrays()
 //
 
 
-void _private::_commitData()
+void Private::_commitData()
 {
     geom_array_ = static_cast<osg::Vec3Array *>(_geom->getVertexArray());
     geom_array_->resize(0);
@@ -570,7 +570,7 @@ void _private::_commitData()
 
 
 
-void _private::cull( osg::NodeVisitor * nv )
+void Private::cull( osg::NodeVisitor * nv )
 {
     using namespace avScene;
 
