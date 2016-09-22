@@ -311,6 +311,8 @@ struct client
         hosts_props_by_app_t                                                     hp_;
     };
 
+    static const int  stress_landing = 500;
+
     client(endpoints peers)
         : traj_     (fill_trajectory(krv::data_getter("log_minsk.txt")))
         , traj2_    (fill_trajectory(krv::data_getter("log_e_ka50.txt")))
@@ -326,8 +328,8 @@ struct client
         , timer_    (boost::bind(&client::update, this))
     {
        
-		traj_trp2_.resize(100);
-		for (int i=0;i<100;++i)
+		traj_trp2_.resize(stress_landing);
+		for (int i=0;i<stress_landing;++i)
 		{ 
 			traj_trp2_[i] = fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0 + i * 25, 250.0 ));
 		}
@@ -767,7 +769,7 @@ struct client
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
 			
 #if 1       // Arrested gear test
-            for (int i=0;i<100;++i)
+            for (int i=0;i<stress_landing;++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
 				auto const model  = /*"MIG29K"*/"A319"/*"SU25"*//*"MIG29"*//*"L39"*/;
