@@ -377,7 +377,7 @@ private:
             LogInfo("Client " << peer << " accepted");
          }
          else
-            LogError("Client " << peer << " rejected. Connection already esteblished");
+            LogError("Client " << peer << " rejected. Connection already established");
      }
 #endif
 
@@ -488,8 +488,6 @@ struct mod_app
 
         disp_
             .add<setup_msg             >(boost::bind(&mod_app::on_setup      , this, _1))
-            //.add<create_msg            >(boost::bind(&mod_app::on_create     , this, _1))
-			// .add<destroy_msg           >(boost::bind(&mod_app::on_destroy    , this, _1))
             .add<state_msg             >(boost::bind(&mod_app::on_state      , this, _1))
             .add<vis_peers_msg         >(boost::bind(&mod_app::on_vis_peers  , this, _1))
             .add<ready_msg             >(boost::bind(&mod_app::on_ready      , this, _1))
@@ -529,9 +527,13 @@ private:
 
     void update(double time)
     {   
+        time_measure_helper_t th("mod_app::update: ", [=](double t)->bool{return true; }); 
+
         systems_->update_messages();
         ctrl_sys_->update(time);
         systems_->update_messages();
+        
+        time_measure_helper_t th1("impl::update_messages ( mod_sys ): ", [=](double t)->bool{return true; }); 
         mod_sys_->update(time);
         deffered_create();
     }
@@ -573,19 +575,6 @@ private:
     }
 
 
-#if 0
-    void on_create(create_msg const& msg)
-    {
-		if(init_)
-            reg_obj_->create_object(msg);
-        else
-            creation_deque_.push_back(msg);
-
-        LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
-
-    }
-#endif
-
     void deffered_create()
     {
         if(init_ /*&& !dc_*/)
@@ -607,16 +596,6 @@ private:
         w_->send_proxy(&bts[0], bts.size());
     }
 
-
-#if 0
-	void on_destroy(destroy_msg const& msg)
-	{
-		reg_obj_->destroy_object(msg);
-
-		// LogInfo("Got create message: " << msg.model_name << "   " << (short)msg.object_kind << "   "<< msg.orien.get_course() << " : " << msg.pos.x << " : " << msg.pos.y  );
-
-	}
-#endif
 
     void on_vis_peers(vis_peers_msg const& msg)
     {

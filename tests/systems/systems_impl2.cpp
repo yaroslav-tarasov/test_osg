@@ -45,6 +45,7 @@ namespace second
 
     void impl::update_messages()
     {
+        time_measure_helper_t th("impl::update_messages: ", [=](double t)->bool{return true; }); 
         while(queue_.size()>0)
         {
             if(queue_.front().size()>0)

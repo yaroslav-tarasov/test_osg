@@ -663,10 +663,10 @@ struct client
         weather.air_humidity     = .9;
         ADD_EVENT(240.0, environment_msg(weather))
 
-        weather.air_humidity     =  2.0;
+        weather.air_humidity     = 2.0;
         ADD_EVENT(260.0, environment_msg(weather))
 
-        weather.air_humidity     = 10.0;
+        weather.air_humidity     = 5.0;
         ADD_EVENT(280.0, environment_msg(weather))
 
 
