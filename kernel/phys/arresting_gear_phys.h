@@ -29,16 +29,16 @@ namespace phys
    
    //info
    private:
-       decart_position get_position() const override;
-       params_t const& params() const ;
-       bool has_contact() const;
-       std::vector<contact_info_t> get_body_contacts() const;
+       decart_position                                get_position() const override;
+       params_t const&                                params() const ;
+       bool                                           has_contact() const;
+       std::vector<contact_info_t>                    get_body_contacts() const;
        std::vector<::arresting_gear::rope_state_t>    get_ropes_info() const override;                               
 
    // control
    private:
-       void   set_wind    (cg::point_3 const& wind)    override;
-       void   apply_force (point_3 const& f)           override;
+       void   set_wind             (cg::point_3 const& wind)    override;
+       void   apply_force          (point_3 const& f)           override;
 
        void   set_position         (const decart_position& pos) override;
        void   set_linear_velocity  (point_3 const& v)           override;
