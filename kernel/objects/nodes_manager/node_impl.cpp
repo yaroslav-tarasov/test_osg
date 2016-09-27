@@ -316,7 +316,7 @@ void node_impl::on_position(msg::node_pos_descr const& m)
            
 #ifdef TIME_DEBUG
             force_log fl;
-#endif
+
             LOG_ODS_MSG( "on_position node name :" << name() << " time_ "   << time_  << "  extrapolated_position_.global().pos : lat: "  <<  e_pos.x << "  lon: " << e_pos.y << "  z: " << e_pos.z 
                 << " dpos.x "   << position_.global().dpos.x
                 << " dpos.y "   << position_.global().dpos.y
@@ -329,6 +329,7 @@ void node_impl::on_position(msg::node_pos_descr const& m)
                 //<< " ddpos.y "  << position_.global().ddpos.y
                 //<< " ddpos.z "  << position_.global().ddpos.z
                 << "\n" );
+#endif
         }
     }
     extrapolated_position_reseted();
