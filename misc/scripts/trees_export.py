@@ -5,7 +5,7 @@ import operator
 import xml.etree.cElementTree as ET
 
 nodes = cmds.ls( tr=True )
-th_node = [ x for x in nodes if 'Trees_High' in x or 'trees00' in x ]
+th_node = [ x for x in nodes if 'Trees_High' in x or 'trees00' in x or 'Trees_bushes' in x]
 th_children = cmds.listRelatives(th_node) 
     
 thc_nodes = [ x for x in th_children if 'polySurface' in x ]

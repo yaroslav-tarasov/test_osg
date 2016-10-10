@@ -92,7 +92,7 @@ for line in inputfile:
     tokens = list(filter(lambda x: x!= '', tokens))
     if len(tokens)<2 or line[:1]=="//" :
             continue
-    if tokens[0]=="Land:" :	 
+    if tokens[0]=="Land:"  or tokens[0]=="TrLand:" :	 
             land_line = tokens
     if tokens[0]=="LCustom:" :
             filename = land_line[1].split('.')

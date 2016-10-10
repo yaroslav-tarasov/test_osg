@@ -481,10 +481,14 @@ void  Terrain::Create( const std::string& cFileName )
 			obj_ctrl->parentMainInstancedNode(this);
 			auto mgr = obj_ctrl->getInstancesManager();
 
+            auto avrg = std::accumulate(std::next(obj_data.begin()), obj_data.end(), obj_data[0].pos.w() ,
+                []( float a, const avCore::xml_object_data& b) {
+                    return a + b.pos.w();})  /  obj_data.size(); 
+
 			for(auto it=obj_data.begin() ; it!=obj_data.end();++it)
 			{
 				auto alpha = it->pos.w()>0?rnd.random_range(0, 360):it->orien.z();
-                auto const scale =  it->pos.w()>0?it->pos.w()/33.f:1.f;
+                auto const scale =  it->pos.w()>0?it->pos.w()/avrg:1.f;
                 mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(scale,scale,scale)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),it->pos.z())));
 			}
 

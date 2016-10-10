@@ -49,6 +49,7 @@ void model::on_inject_msg(net_layer::msg::run_msg const& msg)
              cg::cpr vc(msg.orien.cpr());
              pa->set_desired  (msg.time,msg.keypoint,msg.reverse?cg::cpr(cg::norm360(msg.orien.get_course() + msg.reverse * 180), msg.orien.get_pitch(), msg.orien.get_roll()):msg.orien,msg.speed, msg.ac);
              
+#if 0
              force_log fl;
              LOG_ODS_MSG( "on_inject_msg(net_layer::msg::run_msg const& msg) target_pos.pos : "
                  << "    msg.time: " << msg.time 
@@ -59,6 +60,7 @@ void model::on_inject_msg(net_layer::msg::run_msg const& msg)
                  //<< "    course: "  << target_pos.orien.get_course()
                  //<< "    pitch: "   << target_pos.orien.get_pitch()
                  << "\n" );
+#endif
 
              // pa->set_desired  (msg.time,msg.keypoint,msg.orien,msg.speed);
              pa->set_ext_wind (msg.mlp.wind_speed, msg.mlp.wind_azimuth ); 
