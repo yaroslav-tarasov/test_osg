@@ -97,4 +97,9 @@ namespace Utils
         return new NodeCallback<T>(object, /*func*/std::bind(func,object,sp::_1), isPure);
     }
 
+    template<class T, class U>
+    inline NodeCallback<T> * makeNodeCallback( T * object, U * callback_owner, void (U::*func)( osg::NodeVisitor * nv ), bool isPure = false )
+    {
+        return new NodeCallback<T>(object, /*func*/std::bind(func,callback_owner,sp::_1), isPure);
+    }
 }

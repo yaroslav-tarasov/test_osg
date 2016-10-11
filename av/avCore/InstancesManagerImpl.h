@@ -17,26 +17,7 @@ namespace avCore
 {
     class  InstancesManagerImpl  : public InstancesManager
     {
-        struct InstancedNodeType
-        {
-            InstancedNodeType()
-                : parented(false)
-            {}
 
-            InstancedNodeType(osg::Node* first, osg::Node* second )
-                : parented(false)
-                , first   (first)
-                , second  (second)
-            {}
-
-            osg::ref_ptr<osg::Node> first;
-            osg::ref_ptr<osg::Node> second;
-            bool                    parented;
-        };
-
-        typedef std::vector< InstancedNodeType > InstancedNodesVectorType;
-    public:
-        typedef std::vector<osg::Matrixf>               InstancedDataType;
     public:
 
         META_Object(avCore,InstancesManagerImpl);
@@ -71,6 +52,12 @@ namespace avCore
         osg::Geode*                 _createGeode();
         osgAnimation::BoneMap       _getBoneMap(osg::Node* base_model);
         void                        _initData();
+    
+    private:
+        // update callback
+        // void update( osg::NodeVisitor * nv );
+        // cull callback
+        void cull( osg::NodeVisitor * nv );
 
     private:
         osg::observer_ptr<osg::Node>             srcModel_;

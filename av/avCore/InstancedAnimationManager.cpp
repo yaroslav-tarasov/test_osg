@@ -9,6 +9,7 @@
 #include "utils/visitors/find_node_visitor.h"
 #include "utils/materials.h"
 
+#include "av/avCore/Callbacks.h"
 
 using namespace avCore;
 
@@ -57,7 +58,7 @@ namespace avCore
 
 
     InstancedAnimationManager::InstancedAnimationManager() 
-        : instNum_ (0)
+        : instNum_       (0)
 		, animDataLoaded_(false)
     {
 
@@ -65,15 +66,18 @@ namespace avCore
 
     InstancedAnimationManager::InstancedAnimationManager(const InstancedAnimationManager& object,const osg::CopyOp& copyop)
         : InstancesManager(object,copyop)
+        , animDataLoaded_ (object.animDataLoaded_)
+        , instNum_        (object.instNum_)
+        , maxInstances_   (object.maxInstances_)
     {
 
     }
 
 	InstancedAnimationManager::InstancedAnimationManager(osg::Node* prototype, const std::string& anim_file_name, size_t  const  max_instances)
-        : srcModel_     (prototype)
-        , instNum_ (0)
+        : srcModel_      (prototype)
+        , instNum_       (0)
 		, animDataLoaded_(false)
-		, maxInstances_(max_instances)
+		, maxInstances_  (max_instances)
 	{ 
 
         _initData();
@@ -92,6 +96,9 @@ namespace avCore
 		{
 			srcQuat_ = tr->asMatrixTransform()->getMatrix().getRotate();
 		}
+
+        instGeode_->setCullCallback(Utils::makeNodeCallback(instGeode_.get(), this, &InstancedAnimationManager::cull));
+        
     }
 
 
@@ -361,11 +368,11 @@ namespace avCore
 		}
 		else
 		{
-			 instCounter = 	instancesData_.size();
+			 instCounter = 	processedInstancesData_.size();
 			 float * data = (float*)instTextureBuffer_->getImage(0)->data(0);
 			 
 			 if (instNum_!=instCounter)
-				memcpy(data, instancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
+				memcpy(data, processedInstancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
 		}
  
 
@@ -377,7 +384,7 @@ namespace avCore
         {
             instTextureBuffer_->getImage(0)->dirty();
 
-            instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
+            // instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
 
             for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
             { 
@@ -399,4 +406,54 @@ namespace avCore
         instNum_ = instCounter;
     }
  
+
+    //
+    // OSG callbacks
+    //
+
+#if 0
+    // update pass
+    void InstancedAnimationManager::update( osg::NodeVisitor * nv )
+    {
+    }
+#endif
+    
+    inline double distance(const osg::Vec3& coord,const osg::Matrix& matrix)
+    {
+        return -((double)coord[0]*(double)matrix(0,2)+(double)coord[1]*(double)matrix(1,2)+(double)coord[2]*(double)matrix(2,2)+matrix(3,2));
+    }
+
+    // cull pass
+    void InstancedAnimationManager::cull(osg::NodeVisitor * nv)
+    {
+        // get cull visitor
+        osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(nv);
+        assert(pCV);
+        
+        if(animDataLoaded_)
+            return;
+
+        auto const & bs = srcModel_->getBound();
+
+        processedInstancesData_.resize(0);
+        for (unsigned i = 0; i < instancesData_.size(); ++i)
+        {
+            const auto & inst_data = instancesData_[i];
+            const osg::Vec3& vWorldPos = inst_data.getTrans();
+
+            //if (pCV->isCulled(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
+            osg::Polytope& fr = pCV->getCurrentCullingSet().getFrustum();
+            if (!fr.contains(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
+            {
+                // osg::RefMatrix& matrix = *pCV->getModelViewMatrix();
+                // if(distance(vWorldPos,matrix)>50000.0)
+                    continue;
+            }
+            processedInstancesData_.push_back(inst_data);
+        }
+
+        
+    }
+
+
 }

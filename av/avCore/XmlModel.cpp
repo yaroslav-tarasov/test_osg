@@ -175,11 +175,13 @@ namespace avCore
 
 				const std::string main_model = 	obj.attribute("model").as_string("");
 				const std::string data_file = 	obj.attribute("data_file").as_string("");
+                unsigned divisor = obj.attribute("divisor").as_uint(1);
 				if (main_model.size()>0 && data_file.size()>0)
 				{
 					xml_static_model v;
 					v.main_model = main_model;
 					v.data_file  = data_file;
+                    v.divisor    = divisor;
 					data.objs.push_back(v);
 				}
 			}	

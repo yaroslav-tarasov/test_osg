@@ -9,6 +9,7 @@
 #include "utils/visitors/find_node_visitor.h"
 #include "utils/materials.h"
 
+#include "av/avCore/Callbacks.h"
 
 using namespace avCore;
 
@@ -92,6 +93,8 @@ namespace avCore
             {
                 srcQuat_ = tr->asMatrixTransform()->getMatrix().getRotate();
             }
+
+        instGeode_->setCullCallback(Utils::makeNodeCallback(instGeode_.get(), this, &InstancesManagerImpl::cull));
     }
 
 
@@ -164,7 +167,6 @@ namespace avCore
         geode_finder.apply(*srcModel_);
 
         osg::Geode*    gnode = dynamic_cast<osg::Geode*>(geode_finder.getLast()); 
-
         osg::ref_ptr<osg::Geode>	   geode = new osg::Geode;
         osg::StateSet* pSS = geode->getOrCreateStateSet();
 
@@ -389,6 +391,26 @@ namespace avCore
         }
 
         instNum_ = instCounter;
+
+    }
+
+    //
+    // OSG callbacks
+    //
+
+#if 0
+    // update pass
+    void InstancesManagerImpl::update( osg::NodeVisitor * nv )
+    {
+    }
+#endif
+
+    // cull pass
+    void InstancesManagerImpl::cull(osg::NodeVisitor * nv)
+    {
+        // get cull visitor
+        osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(nv);
+        assert(pCV);
 
     }
 

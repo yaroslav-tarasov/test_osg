@@ -466,15 +466,16 @@ void  Terrain::Create( const std::string& cFileName )
     }
 	
     for(auto it = data.objs.begin(); it != data.objs.end(); ++it)
-	{
+    { 
 		avCore::xml_object_data_t obj_data;
-        
+        const avCore::xml_static_model&  xsm = *(it);
+
         simplerandgen rnd;
 
-		std::string data_file_name =  osgDB::findFileInPath((*it).data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE);
+		std::string data_file_name =  osgDB::findFileInPath( xsm.data_file, fpl.get_file_list(),osgDB::CASE_INSENSITIVE );
 		mr.Load(data_file_name, obj_data);
 
-		avCore::ObjectControl* obj_ctrl = avCore::createObject((*it).main_model , true);
+		avCore::ObjectControl* obj_ctrl = avCore::createObject( xsm.main_model , true );
 
 		if(obj_ctrl && obj_ctrl->hwInstanced())
 		{
@@ -485,11 +486,14 @@ void  Terrain::Create( const std::string& cFileName )
                 []( float a, const avCore::xml_object_data& b) {
                     return a + b.pos.w();})  /  obj_data.size(); 
 
-			for(auto it=obj_data.begin() ; it!=obj_data.end();++it)
+			for(auto it_od=obj_data.begin() ; it_od!=obj_data.end();++it_od)
 			{
-				auto alpha = it->pos.w()>0?rnd.random_range(0, 360):it->orien.z();
-                auto const scale =  it->pos.w()>0?it->pos.w()/avrg:1.f;
-                mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(scale,scale,scale)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it->pos.x(),it->pos.y(),it->pos.z())));
+				if(std::distance(it_od,obj_data.begin()) % xsm.divisor != 0 )
+                    continue;
+
+                auto alpha = it_od->pos.w()>0?rnd.random_range(0, 360):it_od->orien.z();
+                auto const scale =  it_od->pos.w()>0?it_od->pos.w()/avrg:1.f;
+                mgr->addMatrix(osg::Matrixf::scale(osg::Vec3(scale,scale,scale)) * osg::Matrix::rotate(osg::Quat(osg::inDegrees(alpha)  , osg::Z_AXIS )) * osg::Matrix::translate(osg::Vec3(it_od->pos.x(),it_od->pos.y(),it_od->pos.z())));
 			}
 
 

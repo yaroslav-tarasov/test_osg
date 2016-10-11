@@ -67,6 +67,7 @@ namespace avCore
 	struct xml_static_model : xml_model_base 
 	{
 		std::string	    data_file;
+        unsigned        divisor;
 	} ;
 
     struct xml_model : xml_model_base 

@@ -41,17 +41,17 @@ void Lights::AddLight( LightInfluence dlInfluence, LightType dlType, bool bHighP
                        const cg::colorf & cDiffuse, const float & fAmbRatio, const float & fSpecRatio, const float & fNormalCoeff)
 {
     LightExternalInfo newLightInfo;
-    newLightInfo.uPriority = (unsigned)dlInfluence;
-    newLightInfo.vPosWorld = vWorldPos;
-    newLightInfo.vDirWorld = vWorldDir;
-    newLightInfo.rDistAtt = rDistAtt;
-    newLightInfo.rConeAtt = (dlType == ConicalLight) ? rConeAtt : cg::range_2f();
-    newLightInfo.cDiffuse = cDiffuse;
-    newLightInfo.fAmbRatio = fAmbRatio;
-    newLightInfo.fSpecRatio = fSpecRatio;
-    newLightInfo.bHighPriority =  bHighPriority;
-    newLightInfo.bLMOnly =  bLMOnly; 
-    newLightInfo.fNormalCoeff = fNormalCoeff;
+    newLightInfo.uPriority     = (unsigned)dlInfluence;
+    newLightInfo.vPosWorld     = vWorldPos;
+    newLightInfo.vDirWorld     = vWorldDir;
+    newLightInfo.rDistAtt      = rDistAtt;
+    newLightInfo.rConeAtt      = (dlType == ConicalLight) ? rConeAtt : cg::range_2f();
+    newLightInfo.cDiffuse      = cDiffuse;
+    newLightInfo.fAmbRatio     = fAmbRatio;
+    newLightInfo.fSpecRatio    = fSpecRatio;
+    newLightInfo.bHighPriority = bHighPriority;
+    newLightInfo.bLMOnly       = bLMOnly; 
+    newLightInfo.fNormalCoeff  = fNormalCoeff;
 
     m_aFrameActiveLights.push_back(newLightInfo);
 }
