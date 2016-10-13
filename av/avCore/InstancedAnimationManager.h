@@ -20,6 +20,9 @@ namespace avCore
 
         void                        commitInstancesPositions();
 
+
+
+
 		inline void                 addMatrix(const osg::Matrixf& matrix) { instancesData_.push_back(matrix); }
 		inline osg::Matrixf         getMatrix(size_t index) const         { return instancesData_[index]; }
 		inline void                 clearMatrices()                       { instancesData_.clear(); }
@@ -42,7 +45,8 @@ namespace avCore
         osg::Geode*                 _createGeode();
 		osgAnimation::BoneMap       _getBoneMap(osg::Node* base_model);
         void                        _initData();
-    
+        void                        _commit( size_t instCounter );
+
     private:
         // update callback
         // void update( osg::NodeVisitor * nv );

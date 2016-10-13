@@ -10,6 +10,7 @@
 #include "utils/materials.h"
 
 #include "av/avCore/Callbacks.h"
+#include "av/avScene/Scene.h"
 
 using namespace avCore;
 
@@ -330,7 +331,6 @@ namespace avCore
 
     void InstancedAnimationManager::commitInstancesPositions()
     {
-        bool bCommit = false;
         size_t instCounter=0;
  		
 		if(animDataLoaded_)
@@ -360,50 +360,18 @@ namespace avCore
 
 				  float * data = (float*)instTextureBuffer_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
 				  memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
-				  bCommit = true;
 				  instCounter++;
 				}
             
 			} 
+
+            if (instNum_!=instCounter)
+                _commit(instCounter);
+
+
+            instNum_ = instCounter;
 		}
-		else
-		{
-			 instCounter = 	processedInstancesData_.size();
-			 float * data = (float*)instTextureBuffer_->getImage(0)->data(0);
-			 
-			 if (instNum_!=instCounter)
-				memcpy(data, processedInstancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
-		}
- 
 
-
-        if (instNum_!=instCounter)
-             bCommit = true;
-		
-        if(bCommit)
-        {
-            instTextureBuffer_->getImage(0)->dirty();
-
-            // instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
-
-            for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
-            { 
-                instGeode_->getDrawable(i)->dirtyBound();
-                        
-                if (instNum_!=instCounter)
-                {
-                    auto geometry = instGeode_->getDrawable(i)->asGeometry();
-                    // first turn on hardware instancing for every primitive set
-                    for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
-                    {
-                        geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
-                    }
-                }
-
-            }
-        }
-        
-        instNum_ = instCounter;
     }
  
 
@@ -436,24 +404,62 @@ namespace avCore
         auto const & bs = srcModel_->getBound();
 
         processedInstancesData_.resize(0);
+        
+        osg::Polytope& fr = pCV->getCurrentCullingSet().getFrustum();
+
         for (unsigned i = 0; i < instancesData_.size(); ++i)
         {
             const auto & inst_data = instancesData_[i];
             const osg::Vec3& vWorldPos = inst_data.getTrans();
 
             //if (pCV->isCulled(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
-            osg::Polytope& fr = pCV->getCurrentCullingSet().getFrustum();
+
             if (!fr.contains(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
             {
                 // osg::RefMatrix& matrix = *pCV->getModelViewMatrix();
                 // if(distance(vWorldPos,matrix)>50000.0)
                     continue;
             }
+
             processedInstancesData_.push_back(inst_data);
         }
 
-        
+        size_t instCounter = 	processedInstancesData_.size();
+        float * data = (float*)instTextureBuffer_->getImage(0)->data(0);
+
+        if (instNum_!=instCounter)
+        {
+            memcpy(data, processedInstancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
+            _commit(instCounter);
+        }
+
+        instNum_ = instCounter;
+
     }
+
+    void InstancedAnimationManager::_commit( size_t instCounter )
+    {
+        instTextureBuffer_->getImage(0)->dirty();
+
+        // instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
+
+        for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
+        { 
+            instGeode_->getDrawable(i)->dirtyBound();
+
+            if (instNum_!=instCounter)
+            {
+                auto geometry = instGeode_->getDrawable(i)->asGeometry();
+                // first turn on hardware instancing for every primitive set
+                for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
+                {
+                    geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
+                }
+            }
+
+        }
+    }
+
 
 
 }

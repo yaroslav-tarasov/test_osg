@@ -434,14 +434,14 @@ struct LightMapCullCallback : public osg::NodeCallback
 
         const  osg::Camera* cam = avScene::GetScene()->getCamera();
 
-        double  m_fLeft(-1.0f)
-            , m_fRight(+1.0f)
-            , m_fBottom(-1.0f)
-            , m_fTop(+1.0f)
-            , m_fNear(1.0f)
-            , m_fFar(1000.0f);
+        double  fLeft(-1.0f)
+              , fRight(+1.0f)
+              , fBottom(-1.0f)
+              , fTop(+1.0f)
+              , fNear(1.0f)
+              , fFar(1000.0f);
 
-        cam->getProjectionMatrixAsFrustum(m_fLeft, m_fRight, m_fBottom, m_fTop, m_fNear, m_fFar);
+        cam->getProjectionMatrixAsFrustum(fLeft, fRight, fBottom, fTop, fNear, fFar);
 
         osg::Vec3f eye, center, up;
         cam->getViewMatrixAsLookAt(eye, center, up);
@@ -450,7 +450,7 @@ struct LightMapCullCallback : public osg::NodeCallback
         auto dir = cg::polar_point_3f(from_osg_vector3(center - eye));
         const cg::cprf      rOrientation = cg::cprf(dir.course,dir.pitch,0);
 
-        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(m_fNear, m_fFar), 2.0f * cg::rad2grad(atan(m_fRight / m_fNear)), 2.0f * cg::rad2grad(atan(m_fTop / m_fNear)));
+        cg::frustum_perspective_f frustum_(cg::camera_f(), cg::range_2f(fNear, fFar), 2.0f * cg::rad2grad(atan(fRight / fNear)), 2.0f * cg::rad2grad(atan(fTop / fNear)));
         frustum_.camera() = cg::camera_f(vPosition, rOrientation);
 
         p_->SetupProjection(frustum_, 3300.f, true/*night_mode*/);
