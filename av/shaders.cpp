@@ -1652,6 +1652,8 @@ $endif
 
             uniform sampler2D       colorTex;
             uniform sampler2D       nightTex;
+            
+            uniform  int    counter;
 
             in block
             {
@@ -1676,7 +1678,10 @@ $endif
                 vec3 result = (ambient.rgb + diffuse.rgb * n_dot_l) * dif_tex_col.rgb;
 
                 aFragColor = vec4(apply_clear_fog(f_in.viewpos, result), dif_tex_col.a);
-
+                if(counter==1)
+                    aFragColor = vec4(1.0,0.0,0.0,1.0);
+                else if(counter==2)
+                    aFragColor = vec4(0.0,1.0,0.0,1.0);
             }
 
             )

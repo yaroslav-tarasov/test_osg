@@ -7,6 +7,30 @@ namespace avCore
 {
 	class  InstancedAnimationManager  : public InstancesManager
 	{
+        struct CullStatePacks : osg::Referenced 
+        {
+           typedef  std::vector<uint32_t>  CullIndexes;
+            
+           struct Pack : osg::Referenced 
+           {
+              Pack();
+
+              osg::ref_ptr<osg::StateSet>                ss;
+              osg::ref_ptr<osg::Uniform>                 uniCounter;
+              size_t                                     last_len;
+           };
+            
+            
+           CullStatePacks(osg::Geode* ig, uint8_t max_stages, uint32_t max_elements_on_stage);
+           const Pack& getOrCreatePack(uint8_t num);
+           void        commit (uint8_t num, const CullIndexes& ci); 
+           size_t      packs_len(uint8_t num);
+
+           osg::ref_ptr<osg::TextureBuffer>           cullTextureBuffer;
+           std::vector<osg::ref_ptr<Pack>>                       states;
+           osg::Geode*                                      instanced_g;
+        };
+
 
 	public:
        		
@@ -26,7 +50,7 @@ namespace avCore
 		inline void                 addMatrix(const osg::Matrixf& matrix) { instancesData_.push_back(matrix); }
 		inline osg::Matrixf         getMatrix(size_t index) const         { return instancesData_[index]; }
 		inline void                 clearMatrices()                       { instancesData_.clear(); }
-        inline osg::Geode*          getMainNode()                         { return instGeode_.get(); }
+        inline osg::Node*           getMainNode()                         { return instGeodeParent_.get(); }
         osg::Node *                 getObjectInstance();                    
 
 
@@ -51,7 +75,7 @@ namespace avCore
         // update callback
         // void update( osg::NodeVisitor * nv );
         // cull callback
-        void cull( osg::NodeVisitor * nv );
+        osg::StateSet*               cull( osg::NodeVisitor * nv );
 
 	private:
 		osg::observer_ptr<osg::Node>             srcModel_;
@@ -59,10 +83,12 @@ namespace avCore
 		osg::Vec3                                srcScale_;
      // Instanced staff   
         osg::ref_ptr<osg::Geode>                 instGeode_;
+        osg::ref_ptr<osg::Group>                 instGeodeParent_;
 
         image_data                               imageData_;
         InstancedDataType                        instancesData_;
-        InstancedDataType                        processedInstancesData_;
+        std::vector<uint32_t>                    processedIndexes_;
+
 
         InstancedNodesVectorType                 instancesNodes_; 
         size_t                                   instNum_;
@@ -71,6 +97,9 @@ namespace avCore
 		bool								     animDataLoaded_;
 		osg::ref_ptr<osg::TextureRectangle>      animTextureBuffer_;
 		osg::ref_ptr<osg::TextureRectangle>      instTextureBuffer_;
+
+        osg::ref_ptr<CullStatePacks>             cullStatePack_;
+        unsigned                                 counter_;
     private:
         utils::fixed_id_generator<unsigned>      instIdGen_;
 

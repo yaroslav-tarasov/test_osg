@@ -12,6 +12,8 @@
 #include "av/avCore/Callbacks.h"
 #include "av/avScene/Scene.h"
 
+#include "InstancesNum.h"
+
 using namespace avCore;
 
 namespace
@@ -61,6 +63,7 @@ namespace avCore
     InstancedAnimationManager::InstancedAnimationManager() 
         : instNum_       (0)
 		, animDataLoaded_(false)
+        , instGeodeParent_ (new osg::Group)
     {
 
     }
@@ -73,18 +76,20 @@ namespace avCore
     {
 
     }
-
+    
 	InstancedAnimationManager::InstancedAnimationManager(osg::Node* prototype, const std::string& anim_file_name, size_t  const  max_instances)
-        : srcModel_      (prototype)
-        , instNum_       (0)
-		, animDataLoaded_(false)
-		, maxInstances_  (max_instances)
+        : srcModel_        (prototype)
+        , instNum_         (0)
+		, animDataLoaded_  (false)
+		, maxInstances_    (max_instances)
+        , instGeodeParent_ (new osg::Group)
 	{ 
 
         _initData();
         animDataLoaded_ = _loadAnimationData(anim_file_name);
 
         instGeode_  = _createGeode();
+        instGeodeParent_->addChild(instGeode_);
 
 		auto tr = srcModel_->asTransform();
 	    if(tr->asPositionAttitudeTransform())
@@ -98,7 +103,12 @@ namespace avCore
 			srcQuat_ = tr->asMatrixTransform()->getMatrix().getRotate();
 		}
 
-        instGeode_->setCullCallback(Utils::makeNodeCallback(instGeode_.get(), this, &InstancedAnimationManager::cull));
+
+        if(!animDataLoaded_)
+        {
+            instGeodeParent_->setCullCallback(Utils::makeNodeCallback(instGeodeParent_.get(), this, &InstancedAnimationManager::cull));
+            cullStatePack_ = new CullStatePacks(instGeode_.get(), 3, max_instances);
+        }
         
     }
 
@@ -125,7 +135,7 @@ namespace avCore
 			memcpy(dest_ptr, itr.data(), itr.size());
 			dest_ptr += itr.size();
 		}
-
+        
 		return texture.release();
 	}
 
@@ -231,6 +241,7 @@ namespace avCore
         const size_t y_num = 16;
         
         instancesData_.reserve( x_num * y_num);
+
 #if 0
         // create some matrices
         srand(time(NULL));
@@ -332,7 +343,8 @@ namespace avCore
     void InstancedAnimationManager::commitInstancesPositions()
     {
         size_t instCounter=0;
- 		
+ 		counter_ = 0;
+
 		if(animDataLoaded_)
 		{
 			instancesNodes_.erase(std::remove_if(instancesNodes_.begin(), instancesNodes_.end(),
@@ -358,20 +370,34 @@ namespace avCore
 
 				  instancesData_[idx] = modelMatrix;
 
-				  float * data = (float*)instTextureBuffer_->getImage(0)->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
+				  float * data = (float*)instTextureBuffer_->getImage()->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
 				  memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
 				  instCounter++;
 				}
             
 			} 
 
-            if (instNum_!=instCounter)
-                _commit(instCounter);
+            instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
 
-
-            instNum_ = instCounter;
 		}
+        else
+        {
+            instCounter =  instancesData_.size();
+            if (instNum_!=instCounter)
+            {
+                float * data = (float*)instTextureBuffer_->getImage()->data(0);
+                memcpy(data, instancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
+                
+            }
+        }
+        
+        if (instNum_!=instCounter)
+        {
+            instTextureBuffer_->getImage()->dirty();
+            _commit(instCounter);
+        }
 
+        instNum_ = instCounter;
     }
  
 
@@ -392,19 +418,18 @@ namespace avCore
     }
 
     // cull pass
-    void InstancedAnimationManager::cull(osg::NodeVisitor * nv)
+    osg::StateSet* InstancedAnimationManager::cull(osg::NodeVisitor * nv)
     {
         // get cull visitor
         osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(nv);
         assert(pCV);
         
         if(animDataLoaded_)
-            return;
+            return nullptr;
 
         auto const & bs = srcModel_->getBound();
 
-        processedInstancesData_.resize(0);
-        
+        processedIndexes_.resize(0);
         osg::Polytope& fr = pCV->getCurrentCullingSet().getFrustum();
 
         for (unsigned i = 0; i < instancesData_.size(); ++i)
@@ -421,26 +446,22 @@ namespace avCore
                     continue;
             }
 
-            processedInstancesData_.push_back(inst_data);
+            processedIndexes_.push_back(i);
         }
 
-        size_t instCounter = 	processedInstancesData_.size();
-        float * data = (float*)instTextureBuffer_->getImage(0)->data(0);
 
-        if (instNum_!=instCounter)
-        {
-            memcpy(data, processedInstancesData_[0].ptr(), 16 * sizeof(float) * instCounter );
-            _commit(instCounter);
-        }
-
-        instNum_ = instCounter;
-
+        auto & currentPack = cullStatePack_->getOrCreatePack(counter_);
+        cullStatePack_->commit(counter_, processedIndexes_);
+       
+        currentPack.uniCounter->set(int( counter_ + 1 )); 
+        
+        
+        counter_++;
+        return currentPack.ss.get();
     }
 
     void InstancedAnimationManager::_commit( size_t instCounter )
     {
-        instTextureBuffer_->getImage(0)->dirty();
-
         // instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
 
         for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
@@ -460,6 +481,78 @@ namespace avCore
         }
     }
 
+    InstancedAnimationManager::CullStatePacks::Pack::Pack()
+        : ss         (new osg::StateSet)
+        , uniCounter (new osg::Uniform("counter", int( 0 )))
+    {
+        ss->addUniform(uniCounter);
+    }
+   
+
+
+    InstancedAnimationManager::CullStatePacks::CullStatePacks(osg::Geode* ig, uint8_t max_stages, uint32_t max_elements_on_stage )
+        : instanced_g (ig)
+    {
+        states.reserve(max_stages);
+
+        osg::Image* cullImage = new osg::Image;
+        // cullImage->setImage( max_elements_on_stage * max_stages, 1, 1, GL_R32I, GL_RED, GL_UNSIGNED_INT, (unsigned char*)indirectCommands->getDataPointer(), osg::Image::NO_DELETE );
+        cullImage->allocateImage(  max_elements_on_stage * max_stages , 1, 1, GL_RED, GL_UNSIGNED_INT);
+        cullTextureBuffer = new osg::TextureBuffer(cullImage);
+        cullTextureBuffer->setInternalFormat( GL_R32I );
+        cullTextureBuffer->setUsageHint(GL_DYNAMIC_DRAW);
+        cullTextureBuffer->bindToImageUnit(BASE_CULL_TEXTURE_UNIT, osg::Texture::READ_WRITE);
+        cullTextureBuffer->setUnRefImageDataAfterApply(false);
+
+        
+    }
+
+    const InstancedAnimationManager::CullStatePacks::Pack& InstancedAnimationManager::CullStatePacks::getOrCreatePack(uint8_t num)
+    {
+        bool on_new = false;
+        if(states.size() <= num)
+        {
+            states.push_back(new Pack);
+            on_new = true;
+        }
+
+        auto & currentPack = *states[num].get();
+        
+        auto pStateSet = currentPack.ss;
+
+        if(on_new) 
+        {
+            pStateSet->setTextureAttributeAndModes(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
+            pStateSet->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));
+            // setup inst
+            osg::InstancesNum * pINFunc = new osg::InstancesNum(instanced_g, 0);
+            pStateSet->setAttributeAndModes(pINFunc, osg::StateAttribute::ON);
+        }
+
+        return  currentPack;
+    }
+    
+    size_t   InstancedAnimationManager::CullStatePacks::packs_len(uint8_t num)
+    {
+        size_t s = 0;
+        for(int i = 0; i < std::min(states.size(), size_t(num)); ++i )
+             s += states[i].get()->last_len;
+
+        return s;
+    }
+
+    void InstancedAnimationManager::CullStatePacks::commit (uint8_t num, const CullIndexes& ci)
+    {
+        auto & currentPack = *states[num].get();
+        currentPack.last_len = ci.size();
+        uint32_t * data = (uint32_t*)cullTextureBuffer->getImage()->data(packs_len(num));
+        memcpy(data, &ci[0], sizeof(uint32_t) * ci.size() );
+        cullTextureBuffer->getImage()->dirty();
+
+        auto ia = static_cast<osg::InstancesNum*>(currentPack.ss->getAttribute(static_cast<osg::StateAttribute::Type>(INSTANCES_NUM_OBJECT),0));
+        if(ia)
+            ia->setNum(ci.size());
+    }
 
 
 }

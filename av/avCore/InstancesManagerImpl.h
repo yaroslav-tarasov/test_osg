@@ -33,7 +33,7 @@ namespace avCore
         inline void                 addMatrix(const osg::Matrixf& matrix) { instancesData_.push_back(matrix); }
         inline osg::Matrixf         getMatrix(size_t index) const         { return instancesData_[index]; }
         inline void                 clearMatrices()                       { instancesData_.clear(); }
-        inline osg::Geode*          getMainNode()                         { return instGeode_.get(); }
+        inline osg::Node*           getMainNode()                         { return instGeode_.get(); }
         osg::Node *                 getObjectInstance();                    
 
 

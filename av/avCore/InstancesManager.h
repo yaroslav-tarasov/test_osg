@@ -43,7 +43,7 @@ namespace avCore
 		virtual void                 addMatrix(const osg::Matrixf& matrix) = 0;
 		virtual osg::Matrixf         getMatrix(size_t index) const         = 0;
 		virtual void                 clearMatrices()					   = 0;
-        virtual osg::Geode*          getMainNode()                         = 0;
+        virtual osg::Node*           getMainNode()                         = 0;
         virtual osg::Node *          getObjectInstance()                   = 0;                   
         virtual void                 commitInstancesPositions()            = 0;
 	};

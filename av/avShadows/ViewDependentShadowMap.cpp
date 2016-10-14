@@ -11,6 +11,8 @@
  * OpenSceneGraph Public License for more details.
 */
 
+#include "av/avCore/Global.h"
+
 #include "ShadowSettings.h"
 #include "ViewDependentShadowMap.h"
 #include "ShadowedScene.h"
@@ -526,6 +528,8 @@ ViewDependentShadowMap::ShadowData::ShadowData(ViewDependentShadowMap::ViewDepen
     _camera = new osg::Camera;
     _camera->setName("ShadowCamera");
     _camera->setReferenceFrame(osg::Camera::ABSOLUTE_RF_INHERIT_VIEWPOINT);
+    //_camera->setCullMask(SHADOWS_MASK);
+
 
     //_camera->setClearColor(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
     _camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));

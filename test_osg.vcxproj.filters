@@ -680,6 +680,9 @@
     <ClInclude Include="kernel\objects\labels_manager\labels_manager_vis.h">
       <Filter>Header Files\objects\labels_manager</Filter>
     </ClInclude>
+    <ClInclude Include="av\avCore\InstancesNum.h">
+      <Filter>Source Files\av\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1389,6 +1392,9 @@
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_ext_model.cpp">
       <Filter>Source Files\objects\aircraft_fms</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avCore\InstancesNum.cpp">
+      <Filter>Source Files\av\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
