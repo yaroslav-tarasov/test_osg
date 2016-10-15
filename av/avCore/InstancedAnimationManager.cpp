@@ -342,7 +342,8 @@ namespace avCore
 
     void InstancedAnimationManager::commitInstancesPositions()
     {
-        size_t instCounter=0;
+        bool bCommit = false;
+		size_t instCounter=0;
  		counter_ = 0;
 
 		if(animDataLoaded_)
@@ -372,6 +373,7 @@ namespace avCore
 
 				  float * data = (float*)instTextureBuffer_->getImage()->data((idx % texture_row_data_size) *4u, idx / texture_row_data_size);
 				  memcpy(data, instancesData_[idx].ptr(), 16 * sizeof(float));
+				  bCommit = true;
 				  instCounter++;
 				}
             
@@ -391,7 +393,7 @@ namespace avCore
             }
         }
         
-        if (instNum_!=instCounter)
+        if (instNum_!=instCounter || bCommit)
         {
             instTextureBuffer_->getImage()->dirty();
             _commit(instCounter);
@@ -399,7 +401,27 @@ namespace avCore
 
         instNum_ = instCounter;
     }
- 
+
+	void InstancedAnimationManager::_commit( size_t instCounter )
+	{
+		// instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
+
+		for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
+		{ 
+			instGeode_->getDrawable(i)->dirtyBound();
+
+			if (instNum_!=instCounter)
+			{
+				auto geometry = instGeode_->getDrawable(i)->asGeometry();
+				// first turn on hardware instancing for every primitive set
+				for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
+				{
+					geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
+				}
+			}
+
+		}
+	} 
 
     //
     // OSG callbacks
@@ -437,9 +459,8 @@ namespace avCore
             const auto & inst_data = instancesData_[i];
             const osg::Vec3& vWorldPos = inst_data.getTrans();
 
-            //if (pCV->isCulled(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
-
-            if (!fr.contains(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
+            if (pCV->isCulled(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
+            // if (!fr.contains(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
             {
                 // osg::RefMatrix& matrix = *pCV->getModelViewMatrix();
                 // if(distance(vWorldPos,matrix)>50000.0)
@@ -452,40 +473,19 @@ namespace avCore
 
         auto & currentPack = cullStatePack_->getOrCreatePack(counter_);
         cullStatePack_->commit(counter_, processedIndexes_);
-       
-        currentPack.uniCounter->set(int( counter_ + 1 )); 
-        
+  
         
         counter_++;
         return currentPack.ss.get();
     }
 
-    void InstancedAnimationManager::_commit( size_t instCounter )
-    {
-        // instGeode_->setNodeMask(instCounter>0?REFLECTION_MASK:0);
 
-        for(unsigned i=0;i<instGeode_->getNumDrawables(); ++i)
-        { 
-            instGeode_->getDrawable(i)->dirtyBound();
-
-            if (instNum_!=instCounter)
-            {
-                auto geometry = instGeode_->getDrawable(i)->asGeometry();
-                // first turn on hardware instancing for every primitive set
-                for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
-                {
-                    geometry->getPrimitiveSet(j)->setNumInstances(instCounter);
-                }
-            }
-
-        }
-    }
-
+												
     InstancedAnimationManager::CullStatePacks::Pack::Pack()
         : ss         (new osg::StateSet)
-        , uniCounter (new osg::Uniform("counter", int( 0 )))
+        , baseInstance (new osg::Uniform("baseInstance", int( 0 )))
     {
-        ss->addUniform(uniCounter);
+        ss->addUniform(baseInstance);
     }
    
 
@@ -509,27 +509,18 @@ namespace avCore
 
     const InstancedAnimationManager::CullStatePacks::Pack& InstancedAnimationManager::CullStatePacks::getOrCreatePack(uint8_t num)
     {
-        bool on_new = false;
         if(states.size() <= num)
         {
             states.push_back(new Pack);
-            on_new = true;
+			auto pStateSet = states.back()->ss;
+			pStateSet->setTextureAttributeAndModes(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
+			pStateSet->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));
+			// setup inst
+			osg::InstancesNum * pINFunc = new osg::InstancesNum(instanced_g, 0);
+			pStateSet->setAttributeAndModes(pINFunc, osg::StateAttribute::ON);
         }
 
-        auto & currentPack = *states[num].get();
-        
-        auto pStateSet = currentPack.ss;
-
-        if(on_new) 
-        {
-            pStateSet->setTextureAttributeAndModes(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
-            pStateSet->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));
-            // setup inst
-            osg::InstancesNum * pINFunc = new osg::InstancesNum(instanced_g, 0);
-            pStateSet->setAttributeAndModes(pINFunc, osg::StateAttribute::ON);
-        }
-
-        return  currentPack;
+        return *states[num].get();
     }
     
     size_t   InstancedAnimationManager::CullStatePacks::packs_len(uint8_t num)
@@ -545,13 +536,19 @@ namespace avCore
     {
         auto & currentPack = *states[num].get();
         currentPack.last_len = ci.size();
-        uint32_t * data = (uint32_t*)cullTextureBuffer->getImage()->data(packs_len(num));
+		size_t baseInstance = packs_len(num);
+        uint32_t * data = (uint32_t*)cullTextureBuffer->getImage()->data(baseInstance);
         memcpy(data, &ci[0], sizeof(uint32_t) * ci.size() );
         cullTextureBuffer->getImage()->dirty();
-
+#if 0
+		force_log fl;       
+		LOG_ODS_MSG( " CullStatePacks::commit num = " << uint32_t(num) << "  baseInstance = " << baseInstance<<  "\n");
+#endif
         auto ia = static_cast<osg::InstancesNum*>(currentPack.ss->getAttribute(static_cast<osg::StateAttribute::Type>(INSTANCES_NUM_OBJECT),0));
         if(ia)
             ia->setNum(ci.size());
+
+		currentPack.baseInstance->set(int(baseInstance));
     }
 
 

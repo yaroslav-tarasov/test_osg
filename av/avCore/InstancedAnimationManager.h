@@ -16,7 +16,7 @@ namespace avCore
               Pack();
 
               osg::ref_ptr<osg::StateSet>                ss;
-              osg::ref_ptr<osg::Uniform>                 uniCounter;
+              osg::ref_ptr<osg::Uniform>                 baseInstance;
               size_t                                     last_len;
            };
             

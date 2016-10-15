@@ -548,8 +548,10 @@ struct visapp
     
     void update_messages()
     {
+#if 0
         force_log fl;       
         LOG_ODS_MSG( " update_messages() queue_vis_.size() = " << queue_vis_.size() << "\n");
+#endif
         while(queue_vis_.size()>0)
         {
             if(queue_vis_.front().size()>0)

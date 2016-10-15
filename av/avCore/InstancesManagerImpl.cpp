@@ -363,11 +363,7 @@ namespace avCore
         }
 
 
-
-        if (instNum_!=instCounter)
-            bCommit = true;
-
-        if(bCommit)
+        if(instNum_!=instCounter || bCommit)
         {
             instTextureBuffer_->getImage(0)->dirty();
 

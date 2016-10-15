@@ -14,6 +14,6 @@
 #define BASE_HW_INST_TEXTURE_UNIT  12
 
 #define BASE_LIGHTS_TEXTURE_UNIT   13
-#define BASE_CULL_TEXTURE_UNIT     13
+#define BASE_CULL_TEXTURE_UNIT     14
 
 #define GLSL_VERSION             130
