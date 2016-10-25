@@ -1172,7 +1172,11 @@ $endif
         const char* fs = { 
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
+            "#extension GL_ARB_shader_image_load_store : enable \n"
+            "#extension GL_ARB_explicit_attrib_location : enable \n"
  		    "//       building_mat \n"
+             
+            "layout(early_fragment_tests) in;  \n"
 
             INCLUDE_UNIFORMS
 

@@ -356,37 +356,41 @@ std::string osg_modification(uint16_t version, const std::string& prog)
           };
           
           const char* header_attr[] = {
-              "in vec4 osg_Vertex;\n",
-              "in vec3 osg_Normal;\n",
-              "in vec4 osg_Color;\n",
-              "in vec4 osg_SecondaryColor; \n",
-              "in vec4 osg_FogCoord; \n",
-              "in vec2 osg_MultiTexCoord0; \n",
-              "in vec2 osg_MultiTexCoord1; \n",
-              "in vec2 osg_MultiTexCoord2; \n",
-              "in vec2 osg_MultiTexCoord3; \n",
-              "in vec2 osg_MultiTexCoord4; \n",
-              "in vec2 osg_MultiTexCoord5; \n",
-              "in vec2 osg_MultiTexCoord6; \n",
-              "in vec2 osg_MultiTexCoord7; \n"
+              "layout (location = 0)  in vec4 osg_Vertex;\n",
+              "layout (location = 2)  in vec3 osg_Normal;\n",
+              "layout (location = 3)  in vec4 osg_Color;\n",
+              "layout (location = 4)  in vec4 osg_SecondaryColor; \n",
+              "layout (location = 5)  in vec4 osg_FogCoord; \n",
+              "layout (location = 8)  in vec2 osg_MultiTexCoord0; \n",
+              "layout (location = 9)  in vec2 osg_MultiTexCoord1; \n",
+              "layout (location = 10) in vec2 osg_MultiTexCoord2; \n",
+              "layout (location = 11) in vec2 osg_MultiTexCoord3; \n",
+              "layout (location = 12) in vec2 osg_MultiTexCoord4; \n",
+              "layout (location = 13) in vec2 osg_MultiTexCoord5; \n",
+              "layout (location = 14) in vec2 osg_MultiTexCoord6; \n",
+              "layout (location = 15) in vec2 osg_MultiTexCoord7; \n"
           };
 
-          uint16_t cattr = 13; 
-          cattr = Utils::replaceAll(source,std::string("gl_Vertex"), std::string("osg_Vertex"))>0?1:0;
-          cattr = Utils::replaceAll(source,std::string("gl_Normal"), std::string("osg_Normal"))>0?2:cattr;
-          cattr = Utils::replaceAll(source,std::string("gl_Color"), std::string("osg_Color"))>0?3:cattr;
-          cattr = Utils::replaceAll(source,std::string("gl_SecondaryColor"), std::string("osg_SecondaryColor"))>0?4:cattr;
-          cattr = Utils::replaceAll(source,std::string("gl_FogCoord"), std::string("osg_FogCoord"))>0?5:cattr;
-          cattr = Utils::replaceAll(source,std::string("gl_MultiTexCoord"), std::string("osg_MultiTexCoord"))>0?8:cattr;
+          vector<std::string>  vAttr;
 
-          Utils::replaceAll(source,std::string("gl_ModelViewMatrix"), std::string("osg_ModelViewMatrix"));
-          Utils::replaceAll(source,std::string("gl_ModelViewProjectionMatrix"), std::string("osg_ModelViewProjectionMatrix"));
-          Utils::replaceAll(source,std::string("gl_ProjectionMatrix"), std::string("osg_ProjectionMatrix"));
+          Utils::replaceAll(source,"gl_Vertex"        , "osg_Vertex"        )>0?vAttr.push_back(header_attr[0]):0;
+          Utils::replaceAll(source,"gl_Normal"        , "osg_Normal"        )>0?vAttr.push_back(header_attr[1]):0;
+          Utils::replaceAll(source,"gl_Color"         , "osg_Color"         )>0?vAttr.push_back(header_attr[2]):0;
+          Utils::replaceAll(source,"gl_SecondaryColor", "osg_SecondaryColor")>0?vAttr.push_back(header_attr[3]):0;
+          Utils::replaceAll(source,"gl_FogCoord"      , "osg_FogCoord"      )>0?vAttr.push_back(header_attr[4]):0;
+          Utils::replaceAll(source,"gl_MultiTexCoord0", "osg_MultiTexCoord0")>0?vAttr.push_back(header_attr[5]):0;
+          Utils::replaceAll(source,"gl_MultiTexCoord1", "osg_MultiTexCoord1")>0?vAttr.push_back(header_attr[6]):0;
+
+          Utils::replaceAll(source,"gl_ModelViewMatrix", "osg_ModelViewMatrix");
+          Utils::replaceAll(source,"gl_ModelViewProjectionMatrix", "osg_ModelViewProjectionMatrix");
+          Utils::replaceAll(source,"gl_ProjectionMatrix", "osg_ProjectionMatrix");
           
+          Utils::replaceAll(source,std::string("attribute"), std::string("in"));
+
           std::string header;
-          for (uint16_t i =0;i< cattr; ++i )
+          for (auto it = vAttr.begin(); it != vAttr.end(); ++it )
           {
-              header += header_attr[i];
+              header += *it;
           }
 
 
@@ -564,6 +568,7 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
         node->setNodeMask(0);
 #endif
 
+#if 0
     FIXME(И еще немного хардкода как alpha2covrage оформить)
     if (       mat_name.find("ground")   !=std::string::npos   
             || mat_name.find("sea")      !=std::string::npos     
@@ -571,7 +576,22 @@ void createMaterial(osg::Node* node, osg::StateSet* stateset,const std::string& 
             || mat_name.find("concrete") !=std::string::npos 
             )
             node->setNodeMask(~REFLECTION_MASK);
+#else
+    std::ifstream no_refl_file(osgDB::findDataFile(programsHolder::GetMaterialName(mat_name) + "\\no_reflection.on"));
+
+    if ( no_refl_file.good() )
+    { 
+        node->setNodeMask(~REFLECTION_MASK);             
+    }
+#endif
     
+    std::ifstream cull_face_off_file(osgDB::findDataFile(programsHolder::GetMaterialName(mat_name) + "\\cull_face.off"));
+
+    if ( cull_face_off_file.good() )
+    { 
+        stateset->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);            
+    }    
+
     stateset->addUniform( new osg::Uniform("colorTex"      , BASE_COLOR_TEXTURE_UNIT) );
     stateset->addUniform( new osg::Uniform("normalTex"     , BASE_NORMAL_TEXTURE_UNIT) ); 
     stateset->addUniform( new osg::Uniform("nightTex"      , BASE_NIGHT_TEXTURE_UNIT) );

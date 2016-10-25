@@ -1083,11 +1083,18 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
         ++itr)
     {
         osg::State *s=(*itr)->getState();
+
+
+
 #if GLSL_VERSION > 150
 FIXME(Чудеса с Ephemeris)
         s->setUseModelViewAndProjectionUniforms(true);
+#if 0
         s->setUseVertexAttributeAliasing(true);
 #endif
+#endif
+
+//#define  DEBUG_SET_CHECK_FOR_GL_ERRORS
 
 #ifdef  DEBUG_SET_CHECK_FOR_GL_ERRORS 
         s->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
