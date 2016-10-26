@@ -18,7 +18,12 @@ namespace shaders
             else                                      \
                 return nullptr;                       \
         }                                             \
-
+  
+#if GLSL_VERSION > 400
+        #define INCLUDE_EARLY_FRAGMENT_TEST "layout(early_fragment_tests) in;  \n"
+#else
+        #define INCLUDE_EARLY_FRAGMENT_TEST
+#endif
 
 #define  LIGHT_MAPS                                                                                                  \
 "$define GET_LIGHTMAP(viewpos, in_frag) \\"                                                                          \
@@ -508,12 +513,12 @@ return vec4(dot( posEye, gl_EyePlaneS[index]),dot( posEye, gl_EyePlaneT[index] )
         "#extension GL_ARB_gpu_shader5 : enable \n"
 		"#extension GL_ARB_gpu_shader_fp64 : enable \n"
         "//       plane_mat \n"
+        
+        INCLUDE_EARLY_FRAGMENT_TEST
 
         INCLUDE_UNIFORMS
 
         STRINGIFY ( 
-\n    
-        // layout(early_fragment_tests) in;
 \n
 \n        in mat4 viewworld_matrix;
         )
@@ -1172,11 +1177,9 @@ $endif
         const char* fs = { 
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
-            "#extension GL_ARB_shader_image_load_store : enable \n"
-            "#extension GL_ARB_explicit_attrib_location : enable \n"
  		    "//       building_mat \n"
              
-            "layout(early_fragment_tests) in;  \n"
+            INCLUDE_EARLY_FRAGMENT_TEST 
 
             INCLUDE_UNIFORMS
 
@@ -1769,6 +1772,8 @@ $endif
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
   		    "//       ground_mat \n"
+            
+            INCLUDE_EARLY_FRAGMENT_TEST
 
             INCLUDE_UNIFORMS
 
@@ -2132,7 +2137,7 @@ $endif
             
             "#extension GL_ARB_gpu_shader5 : enable \n"
  		    "//       concrete_mat \n"
-
+            
             INCLUDE_VS
             INCLUDE_COMPABILITY
             "\n"       
@@ -2212,6 +2217,8 @@ $endif
             
             "#extension GL_ARB_gpu_shader5 : enable \n "
  		    "//       concrete_mat \n"
+            
+            INCLUDE_EARLY_FRAGMENT_TEST
 
             INCLUDE_UNIFORMS
             

@@ -369,9 +369,9 @@ struct client
 #endif
 
 
-#if 0
-        ADD_EVENT(3.0  , create_msg(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319") )
-        ADD_EVENT(4.0  , create_msg(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir") )
+#if 1
+        ADD_EVENT(3.0  , create_msg(10,point_3(0,250,0),cg::cpr(0), ok_aircraft, "A319","10") )
+        ADD_EVENT(4.0  , create_msg(11,cg::point_3(0 + 15,250 + 15,0),cg::cpr(0), ok_vehicle, "buksir", "11") )
         ADD_EVENT(30.0 , attach_tow_msg_t(11) )
 #else
         // ADD_EVENT(3.0  , create(10,point_3(0,0,0),cg::cpr(0), ok_aircraft, "A319","10") )

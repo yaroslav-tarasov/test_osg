@@ -11,8 +11,8 @@
 #include "sync_fsm/sync_pl_fms_state.h"
 //
 
-#include "aircraft\aircraft_shassis_impl.h"
-#include "aircraft\aircraft_rotors_impl.h"
+#include "aircraft/aircraft_shassis_impl.h"
+#include "aircraft/aircraft_rotors_impl.h"
 
 
 

@@ -298,8 +298,9 @@ namespace sync_fsm
             }
 #endif
 
-            bool takeoff = traj_->air_config_value(tar_len) && *traj_->air_config_value(tar_len) < fms::trajectory::CFG_GD;
-            
+            bool takeoff = traj_->air_config_value(tar_len) && (*traj_->air_config_value(tar_len) < fms::trajectory::CFG_LD);
+            bool landing = traj_->air_config_value(tar_len) && (*traj_->air_config_value(tar_len) == fms::trajectory::CFG_LD);
+
             double desired_speed = 0.0;
             if(traj_->speed_value(tar_len))
             {
@@ -340,9 +341,6 @@ namespace sync_fsm
 				phys_aircraft_->set_air_cfg(fms::CFG_TO/*self_.get_fms_info()->get_state().dyn_state.cfg*/);
 			}
 
-            phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
-
-
 
  #if defined(MODEL_ONLY)
             auto physpos = phys_aircraft_->get_position();
@@ -359,7 +357,7 @@ namespace sync_fsm
             self_.set_desired_nm_orien(physpos.orien);
             
 #else
-            if( /*traj_->kp_value(tar_len).z > 0.0 || takeoff &&*/true || traj_time_offset_)
+            if( traj_->kp_value(tar_len).z > 0.0 || takeoff && /*true ||*/ traj_time_offset_ || landing)  
             {
                 self_.set_desired_nm_pos(gtp.pos);
                 self_.set_desired_nm_orien(gtp.orien);
@@ -370,6 +368,9 @@ namespace sync_fsm
             else
             {
                 phys_aircraft_->force_pos_setup(false);
+                phys_aircraft_->go_to_pos(gtp.pos ,gtp.orien);
+                
+
                 auto physpos = phys_aircraft_->get_position();
                 // auto closest_tar_len = traj_->closest(phys_aircraft_->get_local_position().pos);
                 LOG_ODS_MSG( "phys_state3::update   phys_aircraft_->get_position().pos : "
@@ -398,11 +399,7 @@ namespace sync_fsm
 
         sync_wheels(dt);
         sync_rotors(dt);
-
     }
-
-
-
 
     void phys_state::on_zone_destroyed( size_t id )
     {
@@ -415,7 +412,6 @@ namespace sync_fsm
         if (fast)
             self_.switch_sync_state(create_fms_state(self_));
     }
-
 
     void phys_state::sync_wheels(double dt)
     {

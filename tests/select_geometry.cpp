@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "av/precompiled.h"
 
+namespace {
 class PickHandler : public osgGA::GUIEventHandler
 {
 public:
@@ -65,7 +66,7 @@ public:
 protected:
     osg::ref_ptr<osg::MatrixTransform> _selectionBox;
 };
-
+}
 
 
 

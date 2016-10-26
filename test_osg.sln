@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests\tests.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "osgBulletLite", "ext\osgBullet\osgBulletLite\osgBulletLite.vcxproj", "{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "av", "av\av\av.vcxproj", "{31560334-E370-40F9-8802-E9B961788EDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -52,6 +54,10 @@ Global
 		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Debug|Win32.Build.0 = Debug|Win32
 		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Release|Win32.ActiveCfg = Release|Win32
 		{39144D4D-283D-4CEF-9A4E-D0972CCA2FFE}.Release|Win32.Build.0 = Release|Win32
+		{31560334-E370-40F9-8802-E9B961788EDB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{31560334-E370-40F9-8802-E9B961788EDB}.Debug|Win32.Build.0 = Debug|Win32
+		{31560334-E370-40F9-8802-E9B961788EDB}.Release|Win32.ActiveCfg = Release|Win32
+		{31560334-E370-40F9-8802-E9B961788EDB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

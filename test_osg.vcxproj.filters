@@ -54,9 +54,6 @@
     <Filter Include="Source Files\objects\dubin_route">
       <UniqueIdentifier>{7e51963d-118e-4a3d-bfbd-c1ef62107c0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\utils">
-      <UniqueIdentifier>{1d78c02c-f2ca-4071-932d-a075c987284d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\hmi">
       <UniqueIdentifier>{812b7a33-058f-4dc5-9f1d-8064f54d4bfb}</UniqueIdentifier>
     </Filter>
@@ -267,8 +264,14 @@
     <Filter Include="Header Files\objects\labels_manager">
       <UniqueIdentifier>{afcd8920-8812-41f1-999c-7373d46529e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\hmi\fms">
+    <Filter Include="Source Files\fms">
       <UniqueIdentifier>{78b7d137-c2a8-484d-aa52-0d5dc4accf72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{3d971974-c7e1-4e9a-b159-d85b7a2b1518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\utils">
+      <UniqueIdentifier>{5455d1f1-c858-44fa-a7ca-f4a205504dca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -396,9 +399,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="_include\objects\object_creators.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="av\Visual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ext\spark\SmokeNode.h">
@@ -683,6 +683,9 @@
     <ClInclude Include="av\avCore\InstancesNum.h">
       <Filter>Source Files\av\core</Filter>
     </ClInclude>
+    <ClInclude Include="av\Visual.h">
+      <Filter>Header Files\av</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -696,9 +699,6 @@
     </ClCompile>
     <ClCompile Include="tests\main_scene.cpp">
       <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\visitors\find_node_visitor.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp">
       <Filter>Source Files\spark</Filter>
@@ -841,9 +841,6 @@
     <ClCompile Include="kernel\objects\simple_route\simple_route_view.cpp">
       <Filter>Source Files\objects\simple_route</Filter>
     </ClCompile>
-    <ClCompile Include="core\config\config.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp">
       <Filter>Source Files\objects\vehicle</Filter>
     </ClCompile>
@@ -863,16 +860,10 @@
       <Filter>Source Files\phys</Filter>
     </ClCompile>
     <ClCompile Include="kernel\fms\dubins.cpp">
-      <Filter>Source Files\hmi\fms</Filter>
+      <Filter>Source Files\fms</Filter>
     </ClCompile>
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp">
       <Filter>Source Files\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\animation_handler.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\materials.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp">
       <Filter>Source Files\objects\aircraft</Filter>
@@ -887,7 +878,7 @@
       <Filter>Source Files\objects\dubin_route</Filter>
     </ClCompile>
     <ClCompile Include="kernel\fms\trajectory.cpp">
-      <Filter>Source Files\hmi\fms</Filter>
+      <Filter>Source Files\fms</Filter>
     </ClCompile>
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
@@ -966,9 +957,6 @@
     </ClCompile>
     <ClCompile Include="av\Visual.cpp">
       <Filter>Source Files\av</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\empty_scene.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
       <Filter>Source Files\objects\airport</Filter>
@@ -1123,9 +1111,6 @@
     <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp">
       <Filter>Source Files\objects\registrator</Filter>
     </ClCompile>
-    <ClCompile Include="utils\async_load.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="av\avFx\SmokeFx.cpp">
       <Filter>Source Files\av\fx</Filter>
     </ClCompile>
@@ -1237,9 +1222,6 @@
     <ClCompile Include="kernel\objects\airport\airport_vis.cpp">
       <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
-    <ClCompile Include="utils\workqueue.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="av\avCore\InstancedAnimationManager.cpp">
       <Filter>Source Files\av\core</Filter>
     </ClCompile>
@@ -1272,9 +1254,6 @@
     </ClCompile>
     <ClCompile Include="av\avSky\LightningLayer.cpp">
       <Filter>Source Files\av\sky\orig_ephemeris</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\LoadManager.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="av\avCore\DecalRender.cpp">
       <Filter>Source Files\av\core</Filter>
@@ -1395,6 +1374,30 @@
     </ClCompile>
     <ClCompile Include="av\avCore\InstancesNum.cpp">
       <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\config\config.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\animation_handler.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\async_load.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\empty_scene.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\LoadManager.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\materials.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="av\avUtils\workqueue.cpp">
+      <Filter>Source Files\av\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

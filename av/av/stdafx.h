@@ -146,7 +146,7 @@ namespace aircraft
 //  Cg to osg and vice versa
 //
 
-#include "av/avUtils/osg_helpers.h"
+#include "osg_helpers.h"
 
 ////////////////////////////////////////////
 //  Common includes (wrong place)
@@ -164,8 +164,8 @@ namespace aircraft
 //
 
 #include "av/avCore/Database.h"
-#include "av/avUtils/visitors/find_node_visitor.h"
-#include "av/avUtils/visitors/visitors.h"
+#include "visitors/find_node_visitor.h"
+#include "visitors/visitors.h"
 #include "av/avScene.h"
 
 

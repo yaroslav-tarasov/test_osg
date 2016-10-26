@@ -1,0 +1,462 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\av">
+      <UniqueIdentifier>{26e3ca14-b01e-4330-8017-6122a8924cef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\lights">
+      <UniqueIdentifier>{36458f29-9094-4025-9932-6864eb34b780}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\lights\cult_lights">
+      <UniqueIdentifier>{5b338f44-03e9-49a4-9b78-1bf1add59a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\sky">
+      <UniqueIdentifier>{3042047f-3fea-44ff-aaea-511b2583129e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\sky\orig_ephemeris">
+      <UniqueIdentifier>{4daf5b13-85fd-47f9-aaeb-6c658c50d34f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\sm">
+      <UniqueIdentifier>{90b201b6-6ded-43be-af1d-3eeea4f22cb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\weather">
+      <UniqueIdentifier>{fdf2fd01-6ebf-4efd-88c4-eab8d76c2beb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\core">
+      <UniqueIdentifier>{75842cc2-335b-4c87-8922-bdb46e50ed57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\scene">
+      <UniqueIdentifier>{aa4723fe-253b-4747-b19d-2f726ebdfc44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\animation">
+      <UniqueIdentifier>{5f97dc23-11fa-4419-a512-fc601dec00e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\terrain">
+      <UniqueIdentifier>{76abd8c2-370c-4dee-aafa-f8627700c819}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\line">
+      <UniqueIdentifier>{739ae9d0-ea98-4a63-95ef-86deb721d611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\fx">
+      <UniqueIdentifier>{3d9c1cad-c5ed-4653-a864-c6369af408a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\av\gui">
+      <UniqueIdentifier>{1e76d810-a970-4d80-a80c-f5b2d8f4a542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av">
+      <UniqueIdentifier>{fece5290-918c-4ad6-8aa2-131b55c243b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\lights">
+      <UniqueIdentifier>{e61a6ed4-9afe-42e6-8a31-2e9964d257f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\lights\cult_lights">
+      <UniqueIdentifier>{e779d7c5-97d3-41ef-a4ab-e1febde763db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\core">
+      <UniqueIdentifier>{bc2b4a57-23dc-499b-a1db-c4fe079c33f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\scene">
+      <UniqueIdentifier>{67a65d75-f423-4e33-b39d-82194fe8fd40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\animation">
+      <UniqueIdentifier>{ed65c2bf-29c5-4aa3-b8b8-262f5e1232a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\terrain">
+      <UniqueIdentifier>{0290ac9b-b5cb-4b80-87b0-6b5cfce67863}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\line">
+      <UniqueIdentifier>{55cc4b11-cc2e-49c7-94bd-a157746df849}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sky">
+      <UniqueIdentifier>{36fd349d-b8c5-4595-9f33-8c05e56eff72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sky\orig_ephemeris">
+      <UniqueIdentifier>{2960d4ad-d039-4664-b2a3-c224cf403910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\sm">
+      <UniqueIdentifier>{e8e2a36b-b6c0-4adc-a692-eaaae8af6291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\weather">
+      <UniqueIdentifier>{23af7645-e9aa-41bb-a219-a60315bb1e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\fx">
+      <UniqueIdentifier>{6f87507f-f0e6-4aa2-a478-6a2fbbc6492a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\av\gui">
+      <UniqueIdentifier>{94f5049f-48fa-467b-9305-87024c2281d9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="av.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\InstancesNum.h">
+      <Filter>Source Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IVisual.h">
+      <Filter>Header Files\av</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Visual.h">
+      <Filter>Header Files\av</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\LightManager.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\LightMaps.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\Lights.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\NavAid.h">
+      <Filter>Header Files\av\lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\CulturalLights\NavigationalLight.h">
+      <Filter>Header Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\CulturalLights\PointLightGroup.h">
+      <Filter>Header Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLights\CulturalLights\PointLightsManager.h">
+      <Filter>Header Files\av\lights\cult_lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Database.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\DebugRenderer.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Environment.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Global.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\HalfTypeHeader.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\InstancesManager.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\InstancesManagerImpl.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\LOD.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Logo.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Object.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\PreRender.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avCore\Utils.h">
+      <Filter>Header Files\av\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avScene\Scene.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avScene\ScreenTexture.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avScene\ScreenTextureManager.h">
+      <Filter>Header Files\av\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avAnimation\AnimationObject.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avAnimation\AnimationPrototype.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avAnimation\AnimTest.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avAnimation\Bone.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avAnimation\XFileParser.h">
+      <Filter>Header Files\av\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avTerrain\Grass.h">
+      <Filter>Header Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avTerrain\Grass2.h">
+      <Filter>Header Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avTerrain\Terrain.h">
+      <Filter>Header Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avTerrain\Trees.h">
+      <Filter>Header Files\av\terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLine\Line.h">
+      <Filter>Header Files\av\line</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avLine\Ropes.h">
+      <Filter>Header Files\av\line</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avSky\CloudLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avSky\Ephemeris.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avSky\FogLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avSky\LightningLayer.h">
+      <Filter>Header Files\av\sky\orig_ephemeris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avGui\CEGUIDrawable.h">
+      <Filter>Header Files\av\gui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="av.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EnvRenderer.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="..\scn_parser.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Visual.cpp">
+      <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\LightManager.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\LightMaps.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\Lights.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\NavAid.cpp">
+      <Filter>Source Files\av\lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\CulturalLights\NavigationalLight.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\CulturalLights\PointLightGroup.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLights\CulturalLights\PointLightsManager.cpp">
+      <Filter>Source Files\av\lights\cult_lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\CelestialBodies.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\DateTime.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\EphemerisEngine.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\EphemerisModel.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\Moon.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\Sky.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\SkyDome.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\StarField.cpp">
+      <Filter>Source Files\av\sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\CloudLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\Ephemeris.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\FogLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avSky\LightningLayer.cpp">
+      <Filter>Source Files\av\sky\orig_ephemeris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ParallelSplitShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ShadowedScene.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ShadowSettings.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ShadowTechnique.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avShadows\ViewDependentShadowMap.cpp">
+      <Filter>Source Files\av\sm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avWeather\Cloud.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avWeather\FogBank.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avWeather\LocalWeather.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avWeather\PrecipitationBase.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avWeather\Weather.cpp">
+      <Filter>Source Files\av\weather</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Database.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\DebugRenderer.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\DecalRender.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Environment.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\InstancedAnimationManager.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\InstancesManager.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\InstancesManagerImpl.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\InstancesNum.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\LOD.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Logo.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\NodeTracker.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Noise.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Object.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\PreRender.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Timer.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\Utils.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avCore\XmlModel.cpp">
+      <Filter>Source Files\av\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avScene\Scene.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avScene\ScreenTexture.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avScene\ScreenTextureManager.cpp">
+      <Filter>Source Files\av\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avAnimation\AnimationObject.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avAnimation\AnimationPrototype.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avAnimation\AnimTest.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avAnimation\Bone.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avAnimation\XFileParser.cpp">
+      <Filter>Source Files\av\animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avTerrain\Grass.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avTerrain\Grass2.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avTerrain\Terrain.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avTerrain\Trees.cpp">
+      <Filter>Source Files\av\terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLine\Line.cpp">
+      <Filter>Source Files\av\line</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avLine\Ropes.cpp">
+      <Filter>Source Files\av\line</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\FireFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\FoamStreamFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\FrictionDustFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\LandingDustFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\SmokeFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avFx\SparksFx.cpp">
+      <Filter>Source Files\av\fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avGui\CEGUIDrawable.cpp">
+      <Filter>Source Files\av\gui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

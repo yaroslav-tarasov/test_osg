@@ -502,6 +502,13 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="av\avUtils\animation_handler.cpp" />
+    <ClCompile Include="av\avUtils\async_load.cpp" />
+    <ClCompile Include="av\avUtils\empty_scene.cpp" />
+    <ClCompile Include="av\avUtils\LoadManager.cpp" />
+    <ClCompile Include="av\avUtils\materials.cpp" />
+    <ClCompile Include="av\avUtils\visitors\find_node_visitor.cpp" />
+    <ClCompile Include="av\avUtils\workqueue.cpp" />
     <ClCompile Include="av\avWeather\Cloud.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
@@ -709,19 +716,6 @@
     <ClCompile Include="tests\systems\test_objects2.cpp" />
     <ClCompile Include="tests\visapp\main_modapp.cpp" />
     <ClCompile Include="tests\visapp\main_visapp.cpp" />
-    <ClCompile Include="utils\animation_handler.cpp" />
-    <ClCompile Include="utils\async_load.cpp" />
-    <ClCompile Include="utils\empty_scene.cpp" />
-    <ClCompile Include="utils\LoadManager.cpp" />
-    <ClCompile Include="utils\materials.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="utils\visitors\find_node_visitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
-    <ClCompile Include="utils\workqueue.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
     <ClCompile Include="_include\objects\bullet_importer.cpp" />
     <ClCompile Include="stdafx.cpp">

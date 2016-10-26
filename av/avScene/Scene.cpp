@@ -1337,11 +1337,11 @@ void Scene::createObjects()
             }
     }
     );
-#endif
+
     
     if(_p->_ru.valid())
 		_p->_ru->addGround( osg::Vec3(0.0f, 0.0f,-9.8f) );
-
+#endif
 
     const bool add_vehicles = true;
 
