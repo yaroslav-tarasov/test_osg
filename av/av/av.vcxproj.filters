@@ -97,6 +97,9 @@
     <Filter Include="Header Files\av\gui">
       <UniqueIdentifier>{94f5049f-48fa-467b-9305-87024c2281d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\utils">
+      <UniqueIdentifier>{89310cc0-13fe-42a7-9582-6e3b34fc489e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -457,6 +460,27 @@
     </ClCompile>
     <ClCompile Include="..\avGui\CEGUIDrawable.cpp">
       <Filter>Source Files\av\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\animation_handler.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\async_load.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\empty_scene.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\LoadManager.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\materials.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\avUtils\workqueue.cpp">
+      <Filter>Source Files\av\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@
 
 #include "av/avLine/Ropes.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 #include "objects/arresting_gear.h"
 
 namespace {

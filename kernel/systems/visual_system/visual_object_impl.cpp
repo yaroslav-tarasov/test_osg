@@ -4,8 +4,8 @@
 
 #include "visual_object_impl.h"
 #include "av/avScene/Scene.h"
-#include "animutils.h"
-#include "utils/visitors/cache_nodes_visitor.h"
+#include "av/avUtils/animutils.h"
+#include "av/avUtils/visitors/cache_nodes_visitor.h"
 
 namespace kernel
 {

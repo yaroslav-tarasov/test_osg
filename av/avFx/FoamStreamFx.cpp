@@ -7,7 +7,7 @@
 
 #include "av/avFx/FoamStreamFx.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 
 
 //

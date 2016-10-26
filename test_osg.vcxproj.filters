@@ -697,9 +697,6 @@
     <ClCompile Include="av\EnvRenderer.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="tests\main_scene.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="ext\spark\explosion_effect.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
@@ -951,9 +948,6 @@
     </ClCompile>
     <ClCompile Include="av\avShadows\ViewDependentShadowMap.cpp">
       <Filter>Source Files\av\sm</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\creators.cpp">
-      <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="av\Visual.cpp">
       <Filter>Source Files\av</Filter>

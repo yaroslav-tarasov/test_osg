@@ -7,7 +7,7 @@
 
 #include "av/avFx/FrictionDustFx.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 
 //
 // Module namespaces

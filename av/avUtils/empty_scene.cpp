@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "empty_scene.h"
 
 namespace creators

@@ -1,7 +1,7 @@
 #include "av/precompiled.h"
 
 #include "Prerender.h"
-#include "materials.h"
+#include "av/avUtils/materials.h"
 
 namespace avCore
 {

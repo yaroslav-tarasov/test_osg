@@ -1,7 +1,7 @@
 #include "av/precompiled.h"
 // #include <math/sincos.h>
 
-#include "utils/lut.h"
+#include "av/avUtils/lut.h"
 
 #include "SkyDome.h"
 

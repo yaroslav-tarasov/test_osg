@@ -3,7 +3,7 @@
 #include "geometry/lispsm_matrix.h"
 #include "geometry/custom_matrix.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 #include "av/avScene/Scene.h"
 #include "Lights.h"
 #include "LightMaps.h"

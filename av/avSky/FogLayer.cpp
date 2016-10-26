@@ -1,7 +1,7 @@
 #include "av/precompiled.h"
 
 #include "FogLayer.h"
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 
 //
 // Global namespace

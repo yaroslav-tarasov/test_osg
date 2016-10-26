@@ -3,9 +3,9 @@
 
 #include "creators.h"
 
-#include "visitors/find_tex_visitor.h"
-#include "visitors/find_animation.h"
-#include "visitors/ct_visitor.h"
+#include "av/avUtils/visitors/find_tex_visitor.h"
+#include "av/avUtils/visitors/find_animation.h"
+#include "av/avUtils/visitors/ct_visitor.h"
 
 #include "av/shaders.h"
 #include "av/avShadows/ShadowedScene.h"
@@ -14,9 +14,9 @@
 #include "av/avCore/LOD.h"
 
 #include "tests/shadow_map.h"
+#include "av/avUtils/materials.h"
 
 #include "utils/cpp_utils/str.h"
-#include "utils/materials.h"
 #include "utils/high_res_timer.h"
 
 #include "phys/RigidUpdater.h"

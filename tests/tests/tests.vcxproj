@@ -202,6 +202,7 @@
     </ClCompile>
     <ClCompile Include="..\grass_test2.cpp" />
     <ClCompile Include="..\light_test.cpp" />
+    <ClCompile Include="..\main_scene.cpp" />
     <ClCompile Include="..\main_shadows.cpp" />
     <ClCompile Include="..\main_shadows_2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

@@ -2,13 +2,13 @@
 
 #include <osgUtil/Tessellator>
 
-#include "visitors/find_tex_visitor.h"
-#include "visitors/find_animation.h"
-#include "visitors/ct_visitor.h"
-#include "visitors/materials_visitor.h"
+#include "av/avUtils/visitors/find_tex_visitor.h"
+#include "av/avUtils/visitors/find_animation.h"
+#include "av/avUtils/visitors/ct_visitor.h"
+#include "av/avUtils/visitors/materials_visitor.h"
+#include "av/avUtils/materials.h"
 
 #include "utils/high_res_timer.h"
-#include "utils/materials.h"
 
 #include "av/avScene/Scene.h"
 #include "av/avLights/LightManager.h"
@@ -27,8 +27,8 @@
 
 
 
-#include "utils/empty_scene.h"
-#include "utils/async_load.h"
+#include "av/avUtils/empty_scene.h"
+#include "av/avUtils/async_load.h"
 
 #include "common/randgen.h"
 

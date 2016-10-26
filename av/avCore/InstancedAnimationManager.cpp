@@ -6,8 +6,8 @@
 
 #include "InstancedAnimationManager.h"
 
-#include "utils/visitors/find_node_visitor.h"
-#include "utils/materials.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
+#include "av/avUtils/materials.h"
 
 #include "av/avCore/Callbacks.h"
 #include "av/avScene/Scene.h"
@@ -445,7 +445,7 @@ namespace avCore
         // get cull visitor
         osgUtil::CullVisitor * pCV = static_cast<osgUtil::CullVisitor *>(nv);
         assert(pCV);
-        
+
         if(animDataLoaded_)
             return nullptr;
 
@@ -496,7 +496,6 @@ namespace avCore
         states.reserve(max_stages);
 
         osg::Image* cullImage = new osg::Image;
-        // cullImage->setImage( max_elements_on_stage * max_stages, 1, 1, GL_R32I, GL_RED, GL_UNSIGNED_INT, (unsigned char*)indirectCommands->getDataPointer(), osg::Image::NO_DELETE );
         cullImage->allocateImage(  max_elements_on_stage * max_stages , 1, 1, GL_RED, GL_UNSIGNED_INT);
         cullTextureBuffer = new osg::TextureBuffer(cullImage);
         cullTextureBuffer->setInternalFormat( GL_R32I );
@@ -504,7 +503,11 @@ namespace avCore
         cullTextureBuffer->bindToImageUnit(BASE_CULL_TEXTURE_UNIT, osg::Texture::READ_WRITE);
         cullTextureBuffer->setUnRefImageDataAfterApply(false);
 
-        
+#if 0
+		instanced_g->getParent(0)->getOrCreateStateSet()->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));		
+		instanced_g->getParent(0)->getOrCreateStateSet()->setTextureAttribute(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON| osg::StateAttribute::OVERRIDE);
+#endif
+
     }
 
     const InstancedAnimationManager::CullStatePacks::Pack& InstancedAnimationManager::CullStatePacks::getOrCreatePack(uint8_t num)
@@ -513,8 +516,12 @@ namespace avCore
         {
             states.push_back(new Pack);
 			auto pStateSet = states.back()->ss;
-			pStateSet->setTextureAttributeAndModes(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
+
+#if 1
+			pStateSet->setTextureAttribute(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
 			pStateSet->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));
+#endif
+
 			// setup inst
 			osg::InstancesNum * pINFunc = new osg::InstancesNum(instanced_g, 0);
 			pStateSet->setAttributeAndModes(pINFunc, osg::StateAttribute::ON);

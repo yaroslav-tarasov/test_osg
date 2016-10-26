@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "workqueue.hpp"
 
 #include <iostream>

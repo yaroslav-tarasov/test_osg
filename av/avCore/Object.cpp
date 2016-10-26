@@ -12,9 +12,9 @@
 #include "av/avCore/XmlModel.h"
 #include "av/avCore/InstancesManager.h"
 
-#include "materials.h"
+#include "av/avUtils/materials.h"
 
-#include "animutils.h"
+#include "av/avUtils/animutils.h"
 
 
 namespace avCore

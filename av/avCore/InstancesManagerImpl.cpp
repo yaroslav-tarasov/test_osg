@@ -6,8 +6,8 @@
 
 #include "InstancesManagerImpl.h"
 
-#include "utils/visitors/find_node_visitor.h"
-#include "utils/materials.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
+#include "av/avUtils/materials.h"
 
 #include "av/avCore/Callbacks.h"
 

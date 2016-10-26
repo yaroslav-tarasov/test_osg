@@ -1,8 +1,8 @@
 ﻿#include "av/precompiled.h"
 
 #include "utils/high_res_timer.h"
-#include "utils/pickhandler.h"
-#include "utils/animutils.h"
+#include "av/avUtils/pickhandler.h"
+#include "av/avUtils/animutils.h"
 
 #if !defined(VISUAL_EXPORTS)
 #include "phys/RigidUpdater.h"
@@ -17,7 +17,7 @@
 #include "av/avCore/Callbacks.h"
 #include "av/avCore/Utils.h"
 
-#include "trajectory_drawer.h"
+#include "av/avUtils/trajectory_drawer.h"
 
 //Degree precision versus length
 //
@@ -69,8 +69,8 @@
 #include "tests/common/CommonFunctions"
 #include "tests/creators.h"
 
-#include "utils/async_load.h"
-#include "utils/LoadManager.h"
+#include "av/avUtils/async_load.h"
+#include "av/avUtils/LoadManager.h"
 
 #include "av/avFx/SmokeFx.h"
 #include "av/avFx/SparksFx.h"
@@ -1087,9 +1087,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
 
 
 #if GLSL_VERSION > 150
-FIXME(Чудеса с Ephemeris)
         s->setUseModelViewAndProjectionUniforms(true);
 #if 0
+        FIXME(Чудеса с Ephemeris)
         s->setUseVertexAttributeAliasing(true);
 #endif
 #endif

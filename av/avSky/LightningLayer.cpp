@@ -2,7 +2,7 @@
 
 #include "LightningLayer.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 #include "av/avCore/Callbacks.h"
 
 //

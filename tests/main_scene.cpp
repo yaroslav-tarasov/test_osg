@@ -4,8 +4,8 @@
 #include "stdafx.h"
 #include "av/precompiled.h"
 #include "creators.h"
-#include "animation_handler.h"
-#include "visitors/info_visitor.h"
+#include "av/avUtils/animation_handler.h"
+#include "av/avUtils/visitors/info_visitor.h"
 
 #include "SkyBox.h"
 #include "av/avSky/FogLayer.h"

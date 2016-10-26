@@ -7,7 +7,7 @@
 
 #include "av/avFx/FireFx.h"
 
-#include "utils/materials.h"
+#include "av/avUtils/materials.h"
 
 //
 // Module namespaces
