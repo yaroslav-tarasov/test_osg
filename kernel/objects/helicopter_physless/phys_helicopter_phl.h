@@ -17,7 +17,7 @@ namespace helicopter_physless
 
     using namespace aircraft;
 
-    struct phys_aircraft_impl
+    struct phys_heli_impl
         : phys_aircraft
     {
         static phys_aircraft_ptr create(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
@@ -28,7 +28,7 @@ namespace helicopter_physless
                                        shassis_support_ptr shassis, 
                                        size_t zone);
 
-        phys_aircraft_impl(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
+        phys_heli_impl(cg::geo_base_3 const& base, phys::system_ptr phys_sys, 
                            //meteo::meteo_cursor_ptr meteo_cursor, 
                            nodes_management::manager_ptr nodes_manager, 
                            geo_position const& initial_position, 
@@ -37,7 +37,7 @@ namespace helicopter_physless
                            phys::compound_sensor_ptr s, 
                            size_t zone);
 
-        ~phys_aircraft_impl();
+        ~phys_heli_impl();
 
 
     // phys_aircraft

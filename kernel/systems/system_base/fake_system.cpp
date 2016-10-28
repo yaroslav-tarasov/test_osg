@@ -253,6 +253,9 @@ private:
     size_t       udp_messages_size_;
     const size_t udp_msg_threshold_;
 
+protected:
+    size_t       usual_objects_to_load_;
+
 private:
     obj_set_t obj_ids_to_destroy_;
     obj_set_t destroyed_objects_;
@@ -281,13 +284,14 @@ private:
 };
 
 fake_system_base::fake_system_base(system_kind kind, msg_service& service, std::string const &objects_file_name )
-    : kind_                 (kind)
-    , msg_service_          (service, this)
-    , create_object_lock_   (false)
-    , id_randgen_           (randgen_seed_tag())
-    , udp_messages_size_    (0)
-    , udp_msg_threshold_    (1300 ) // limit for Win32
+    : kind_                  (kind)
+    , msg_service_           (service, this)
+    , create_object_lock_    (false)
+    , id_randgen_            (randgen_seed_tag())
+    , udp_messages_size_     (0)
+    , udp_msg_threshold_     (1300 ) // limit for Win32
     , block_obj_msgs_counter_(0)
+    , usual_objects_to_load_ (0)
 {
     // загружаем файл objects.xml - в нем дерево подсистем и объектов, в том числе ссылки на внешние файлы ani, fpl, bada
     tinyxml2::XMLDocument units_doc;
@@ -395,6 +399,8 @@ void fake_system_base::load_exercise(dict_cref dict)
             usual_objects.push_back(&(it->second));
     }
 
+    usual_objects_to_load_ = usual_objects.size();
+
     // некая сортировка объектов с учетом их зависимостей(???)
     vector<string> const& ordered_auto_objects = auto_object_order();
 
@@ -420,7 +426,8 @@ void fake_system_base::load_exercise(dict_cref dict)
         //profiler::add_dsc(("loading " + name).c_str());
     }
 
-    exercise_loaded_signal_();
+    // exercise_loaded_signal_();
+
     //profiler::add_dsc("signal firing");
     LogInfo("Exercise loaded in " << tc.to_double(tc.time()) << " seconds");
 
@@ -1456,14 +1463,16 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
       for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
                   LogInfo("Objects left to create: " << " seed = " << *it);
 #endif
+      
+      usual_objects_to_load_--;
 
-      if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1 )  
+      if(usual_objects_to_load_ == 0 && !ready_ /*objects_to_create_.size()==0  && obj_counter_ > 1*/ )  
       {
           exercise_loaded_signal_();
           ready_ = true;
       }
 
-#if 0
+#if 0                                                         
       LogInfo("Objects left to create: " << objects_to_create_.size() << " seed = " << seed);
 #endif
 }

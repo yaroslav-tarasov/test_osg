@@ -190,10 +190,16 @@ struct net_worker
              sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
                  sock, boost::bind(&ses_helper::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, nw_, _1), &tcp_error));  
 
+             nw_->on_all_connected();
 #if 0
              if(on_all_connected_ && vis_peers_.size() == sockets_.size())
                  on_all_connected_();
 #endif
+         }
+
+         bool all_connected() const
+         {
+              return vis_peers_.size() == sockets_.size();
          }
 
          net_worker*                                                                nw_;
@@ -394,7 +400,7 @@ private:
 
      void on_disconnected(error_code const& ec)      
      {
-         LogInfo("Client " << " disconnected with error: " << ec.message() );
+         LogInfo("Client  disconnected with error: " << ec.message() );
          delete  ses_;
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
          //_workerThread.join();
@@ -426,18 +432,29 @@ private:
          sockets_.erase(peer);
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
      }
-
+     
+     bool all_connected() const
+     {
+         return visapp_peers_.size() == sockets_.size();
+     }
 
 private:
+    
+    void on_all_connected()
+    {
+        if(on_all_connected_ && all_connected() && ses_helper_.all_connected())
+            on_all_connected_();
+    }
+
     void on_connected(network::tcp::socket& sock, network::endpoint const& peer)
     {
         LogInfo("Connected to " << peer);
 
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
             sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
+        
+        on_all_connected();
 
-        if(on_all_connected_ && visapp_peers_.size() == sockets_.size())
-            on_all_connected_();
     }
 
 private:
@@ -569,7 +586,8 @@ private:
 
     void on_ready(ready_msg const& msg)
     {
-        peers_ready_++; 
+        peers_ready_++;
+        LogInfo(" on_ready: " << peers_ready_ << " vis_peers_.size() = " << vis_peers_.size() );
         if (peers_ready_ == vis_peers_.size() )
            all_ready() ;
     }

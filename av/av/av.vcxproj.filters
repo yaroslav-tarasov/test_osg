@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\av">
       <UniqueIdentifier>{26e3ca14-b01e-4330-8017-6122a8924cef}</UniqueIdentifier>
     </Filter>
@@ -99,6 +95,10 @@
     </Filter>
     <Filter Include="Source Files\av\utils">
       <UniqueIdentifier>{89310cc0-13fe-42a7-9582-6e3b34fc489e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>

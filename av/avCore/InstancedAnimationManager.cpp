@@ -148,7 +148,7 @@ namespace avCore
 
 		// create texture to encode all matrices
 
-		unsigned int height = ((/*end-start*//*instancesData_.size()*/maxInstances_) / texture_row_data_size) + 1u;
+		unsigned int height = ((end-start) / texture_row_data_size) + 1u;
 
 		osg::ref_ptr<osg::Image>       image = new osg::Image; 
 		image->allocateImage(maxInstances_ * 4, height, 1, GL_RGBA, GL_FLOAT);
@@ -427,13 +427,7 @@ namespace avCore
     // OSG callbacks
     //
 
-#if 0
-    // update pass
-    void InstancedAnimationManager::update( osg::NodeVisitor * nv )
-    {
-    }
-#endif
-    
+
     inline double distance(const osg::Vec3& coord,const osg::Matrix& matrix)
     {
         return -((double)coord[0]*(double)matrix(0,2)+(double)coord[1]*(double)matrix(1,2)+(double)coord[2]*(double)matrix(2,2)+matrix(3,2));
@@ -453,6 +447,7 @@ namespace avCore
 
         processedIndexes_.resize(0);
         osg::Polytope& fr = pCV->getCurrentCullingSet().getFrustum();
+        //osg::RefMatrix& matrix = *pCV->getModelViewMatrix();
 
         for (unsigned i = 0; i < instancesData_.size(); ++i)
         {
@@ -460,9 +455,7 @@ namespace avCore
             const osg::Vec3& vWorldPos = inst_data.getTrans();
 
             if (pCV->isCulled(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
-            // if (!fr.contains(osg::BoundingSphere(vWorldPos, double(inst_data.getScale().x() * bs.radius()))))
             {
-                // osg::RefMatrix& matrix = *pCV->getModelViewMatrix();
                 // if(distance(vWorldPos,matrix)>50000.0)
                     continue;
             }
@@ -503,11 +496,6 @@ namespace avCore
         cullTextureBuffer->bindToImageUnit(BASE_CULL_TEXTURE_UNIT, osg::Texture::READ_WRITE);
         cullTextureBuffer->setUnRefImageDataAfterApply(false);
 
-#if 0
-		instanced_g->getParent(0)->getOrCreateStateSet()->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));		
-		instanced_g->getParent(0)->getOrCreateStateSet()->setTextureAttribute(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON| osg::StateAttribute::OVERRIDE);
-#endif
-
     }
 
     const InstancedAnimationManager::CullStatePacks::Pack& InstancedAnimationManager::CullStatePacks::getOrCreatePack(uint8_t num)
@@ -517,10 +505,8 @@ namespace avCore
             states.push_back(new Pack);
 			auto pStateSet = states.back()->ss;
 
-#if 1
 			pStateSet->setTextureAttribute(BASE_CULL_TEXTURE_UNIT, cullTextureBuffer.get(), osg::StateAttribute::ON);
 			pStateSet->addUniform(new osg::Uniform("cullTex", BASE_CULL_TEXTURE_UNIT));
-#endif
 
 			// setup inst
 			osg::InstancesNum * pINFunc = new osg::InstancesNum(instanced_g, 0);
@@ -542,18 +528,22 @@ namespace avCore
     void InstancedAnimationManager::CullStatePacks::commit (uint8_t num, const CullIndexes& ci)
     {
         auto & currentPack = *states[num].get();
-        currentPack.last_len = ci.size();
+        auto const & ci_size = currentPack.last_len = ci.size();
 		size_t baseInstance = packs_len(num);
+        
         uint32_t * data = (uint32_t*)cullTextureBuffer->getImage()->data(baseInstance);
-        memcpy(data, &ci[0], sizeof(uint32_t) * ci.size() );
-        cullTextureBuffer->getImage()->dirty();
+        if(ci_size>0)
+        {
+            memcpy(data, &ci[0], sizeof(uint32_t) * ci_size );
+            cullTextureBuffer->getImage()->dirty();
+        }
 #if 0
 		force_log fl;       
 		LOG_ODS_MSG( " CullStatePacks::commit num = " << uint32_t(num) << "  baseInstance = " << baseInstance<<  "\n");
 #endif
         auto ia = static_cast<osg::InstancesNum*>(currentPack.ss->getAttribute(static_cast<osg::StateAttribute::Type>(INSTANCES_NUM_OBJECT),0));
         if(ia)
-            ia->setNum(ci.size());
+            ia->setNum(ci_size);
 
 		currentPack.baseInstance->set(int(baseInstance));
     }

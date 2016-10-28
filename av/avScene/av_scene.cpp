@@ -223,7 +223,7 @@ private:
 
      void on_disconnected(error_code const& ec)      
      {
-         LogInfo("Client " << " disconnected with error: " << ec.message() );
+         LogInfo("Client  disconnected with error: " << ec.message() );
          delete  ses_;
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
          //_workerThread.join();

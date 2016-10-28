@@ -655,10 +655,10 @@ bool Create( osgViewer::Viewer* vw )
 	if (windows.empty()) return 1;
 
 	osg::Camera* hudCamera = createHUD();
-
+    
 	// set up cameras to render on the first window available.
 	hudCamera->setGraphicsContext(windows[0]);
-	hudCamera->setViewport(0,0,windows[0]->getTraits()->width, windows[0]->getTraits()->height);
+	hudCamera->setViewport(windows[0]->getTraits()->x,windows[0]->getTraits()->y,windows[0]->getTraits()->width, windows[0]->getTraits()->height);
 
 	vw->addSlave(hudCamera, false);
 

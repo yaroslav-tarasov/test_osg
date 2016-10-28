@@ -4,6 +4,7 @@
 #include "avCore/Logo.h"
 #include "avCore/Object.h"
 
+#include <osgViewer/api/Win32/GraphicsWindowWin32>
 
 using namespace avCore;
 
@@ -118,7 +119,7 @@ void Visual::Initialize()
 #if 0
     const std::string version( "4.3" );
     pTraits = new osg::GraphicsContext::Traits();
-    pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
+    // pTraits->inheritedWindowData           = new osgViewer::GraphicsWindowWin32::WindowData(hWnd);
     pTraits->alpha                         = 8;
     pTraits->setInheritedWindowPixelFormat = true;
     pTraits->doubleBuffer                  = true;
@@ -140,7 +141,7 @@ void Visual::Initialize()
     ::Database::initDataPaths();
 	avCore::Database::Create();
 
-	osg::setNotifyLevel( osg::WARN );   /*INFO*//*NOTICE*//*WARN*//*DEBUG_INFO*/
+	osg::setNotifyLevel( osg::INFO );   /*INFO*//*NOTICE*//*WARN*//*DEBUG_INFO*/
 	osg::setNotifyHandler( new LogFileHandler("goddamnlog.txt") );
 
 	osg::notify(osg::INFO) << "Start Visual \n";
@@ -182,7 +183,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     _viewerPtr = new osgViewer::Viewer();
 
 #ifdef NON_DLL
-    _viewerPtr->apply(new osgViewer::SingleScreen(1));
+    _viewerPtr->apply(new osgViewer::SingleScreen(0));
 #endif
 
     // Set up camera
@@ -226,7 +227,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     _viewerPtr->getCamera()->setProjectionMatrixAsFrustum(m_fLeft,m_fRight,m_fBottom,m_fTop,4.0,7000.0);
 #endif
     
-#if 1
+#if 0
     
     float fZoom = 1.0f; 
 
@@ -280,7 +281,6 @@ void Visual::CreateScene()
 
 void   Visual::SetPosition (const cg::point_3f& pos, const cg::quaternion&  orien)
 {
-	// point_3 forward_dir(0.0,1.0,0.0);
     point_3 forward_dir =  cg::normalized_safe(orien.rotate_vector(point_3(0, 1, 0))) ;
 	point_3 look_dir = forward_dir + pos;// orien.rotate_vector(forward_dir + pos);
 	avScene::GetScene()->setHomePosition(to_osg_vector3(pos),to_osg_vector3(look_dir));

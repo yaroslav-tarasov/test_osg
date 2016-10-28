@@ -52,16 +52,14 @@ namespace
 
     struct sys_updater
     {
-       typedef boost::function<void ()> on_ready_f;
 
-       sys_updater(kernel::system_ptr  sys, on_ready_f ready_f, double period = 0.001)
+
+       sys_updater(kernel::system_ptr  sys, double period = 0.001)
           : period_(period)
           , sys_(sys)
           , vis_sys_(sys)
           , vis_sys_props_(vis_sys_)
-       {
-           sys_->subscribe_exercise_loaded(ready_f);
-       }
+       {}
 
        __forceinline void update(double time)
        {
@@ -325,7 +323,7 @@ private:
 
      void on_disconnected(error_code const& ec)      
      {
-         LogInfo("Client " << " disconnected with error: " << ec.message() );
+         LogInfo("Client  disconnected with error: " << ec.message() );
          delete  ses_;
          worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
          //_workerThread.join();
@@ -448,7 +446,11 @@ struct visapp_impl
         : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
         , ready_f_  (ready_f)
-        , vis_sys_  (create_vis(props, osg_vis_, bytes), [this](){ end_this(); ready_f_(); })
+        , vis_sys_  (create_vis(props, osg_vis_, bytes, [this](){
+            //end_this();
+            osg_vis_->EndSceneCreation();
+            ready_f_();
+    }))
     {}
 
     ~visapp_impl()
@@ -461,10 +463,10 @@ struct visapp_impl
         return osg_vis_->Done();
     }
 
-    void end_this()
-    {
-        osg_vis_->EndSceneCreation();
-    }
+    //void end_this()
+    //{
+    //    osg_vis_->EndSceneCreation();
+    //}
     
     void update_property(kernel::vis_sys_props const& props)
     {
@@ -481,11 +483,13 @@ private:
 
 private:
 
-    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis, binary::bytes_cref bytes)
+    kernel::visual_system_ptr create_vis(kernel::vis_sys_props const& props, av::IVisual* vis, binary::bytes_cref bytes, const on_ready_f& ready_f)
     {
         using namespace kernel;
         
         auto ptr = create_visual_system(msg_srv_, vis, props);
+        
+        ptr->subscribe_exercise_loaded(ready_f);
         
         dict_t dic;
         binary::unwrap(bytes, dic);
@@ -498,8 +502,9 @@ private:
 private:
 	av::IVisualPtr                                              osg_vis_;
     kernel::msg_service&                                        msg_srv_;
-    sys_updater                                                 vis_sys_;
     on_ready_f                                                  ready_f_;
+    sys_updater                                                 vis_sys_;
+
 };
 
 struct visapp
@@ -588,6 +593,7 @@ struct visapp
         binary::bytes_t bts =  std::move(wrap_msg(ready_msg(0)));
         w_->send_session_clients(bts);
         ready_ = true;
+        LogInfo( " send ready to session server " << "\n");
     }
 
     void on_setup(setup_msg const& msg)
