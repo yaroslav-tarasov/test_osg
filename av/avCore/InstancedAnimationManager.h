@@ -53,13 +53,6 @@ namespace avCore
         inline osg::Node*           getMainNode()                         { return instGeodeParent_.get(); }
         osg::Node *                 getObjectInstance();                    
 
-
-#if 0
-		void                        setInstanceData(size_t idx, const osg::Matrixf& matrix);
-		const InstancedDataType &   getInstancedData() const { return instancesData_; }
-		const image_data&           getImageData()     const { return image_data_; } 
-#endif  
-
 	private:
 
 		osg::TextureRectangle*      _createAnimationTexture( image_data& idata);
@@ -72,8 +65,6 @@ namespace avCore
         void                        _commit( size_t instCounter );
 
     private:
-        // update callback
-        // void update( osg::NodeVisitor * nv );
         // cull callback
         osg::StateSet*               cull( osg::NodeVisitor * nv );
 

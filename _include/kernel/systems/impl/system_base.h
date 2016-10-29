@@ -127,6 +127,9 @@ private:
 	obj_set_t used_ids_;
 	randgen<> id_randgen_;
 
+protected:
+	size_t  usual_objects_to_load_;
+
 private:
 	void     register_obj_id   (obj_id_t id);
 	obj_id_t generate_object_id();

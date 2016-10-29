@@ -1376,6 +1376,8 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 	osg::MatrixTransform* res_node = new osg::MatrixTransform;
     
     // LogInfo("Scene::load enter " << path);
+    
+    OSG_WARN << "Scene::load(" << path <<  ") enter \n";
 
     if( path == "smoke" )
     {
@@ -1719,6 +1721,8 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
         // load("caponier",_terrainRoot, 15000, async);
         // load("ka_50",_terrainRoot, 15000, async); 
       
+
+        OSG_WARN << "Scene::load  Terrain (" << path <<  ") \n";
 
 
         return _terrainNode;
@@ -2141,9 +2145,9 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     wf(seed, path,res_node.get(),async);
 #endif
     
-    OSG_WARN << "Scene::load: " << hr_timer.set_point() << "\n";
+    OSG_WARN << "Scene::load(" << path <<  "): " << hr_timer.set_point() << "\n";
 
-    //LogInfo("Scene::load exit " << path);
+    // LogInfo("Scene::load exit " << path);
 
 
 
@@ -2252,14 +2256,12 @@ void Scene::update( osg::NodeVisitor * nv )
 	  const avCore::Environment::EnvironmentParameters & cEnvironmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
       avCore::Environment::EnvironmentParameters & environmentParameters= avCore::GetEnvironment()->GetEnvironmentParameters();
 
-	  
 #if 0
 	  if(environmentParameters.AirHumidity>10.f)
 		environmentParameters.AirHumidity = 0.0;
 	  else
 		environmentParameters.AirHumidity += 0.01f;
 #endif
-
 
 	  const double lt = nv->getFrameStamp()->getSimulationTime();
       

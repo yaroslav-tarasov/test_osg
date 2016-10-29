@@ -344,6 +344,9 @@ struct client
             init_URKE();
         else if ( g_icao_code == "URSS" )
             init_URSS();
+        else if ( g_icao_code == "UMMS" )
+            init_UMMS();
+
 
         ADD_EVENT(time , state_msg(0.0,time,factor))
 
@@ -942,6 +945,10 @@ struct client
 
         }
     }
+    
+    inline void init_UMMS()
+    {
+    }
 
     // from struct tcp_connection
     void send(void const* data, uint32_t size)
@@ -998,8 +1005,10 @@ private:
                 {
                     if((*it_h).host.ip==peer.addr.to_string())
                     {
+#if 0
                         //ADD_INIT( msgs, create_msg(176,point_3(201,392,0),cg::cpr(173) , ok_aircraft  , "AN140", "176") )
                         ADD_INIT( msgs, create_msg(155,point_3(-415,262,0),cg::cpr(0)  , ok_helicopter, "KA50", "155") )
+#endif
 #if 0
                         ADD_INIT( msgs, create_msg(156,point_3(-497,407,0),cg::cpr(0)  , ok_helicopter, "KA50", "156") )
                         ADD_INIT( msgs, create_msg(157,point_3(-422,318,0),cg::cpr(0)  , ok_helicopter, "KA50", "157") )

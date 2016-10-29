@@ -12,7 +12,7 @@
 namespace helicopter_physless
 {
 
-    phys_aircraft_ptr phys_aircraft_impl::create(cg::geo_base_3 const& base,
+    phys_aircraft_ptr phys_heli_impl::create(cg::geo_base_3 const& base,
                                     phys::system_ptr phys, 
                                     //meteo::meteo_cursor_ptr meteo_cursor, 
                                     nodes_management::manager_ptr nodes_manager, 
@@ -23,10 +23,10 @@ namespace helicopter_physless
     {
         phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager);
 
-        return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
+        return boost::make_shared<phys_heli_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
     }
 
-    phys_aircraft_impl::phys_aircraft_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor,*/ nodes_management::manager_ptr nodes_manager, geo_position const& initial_position, ada::data_t const& fsettings, shassis_support_ptr shassis, phys::compound_sensor_ptr s, size_t zone)
+    phys_heli_impl::phys_heli_impl(geo_base_3 const& base, phys::system_ptr phys, /*meteo::meteo_cursor_ptr meteo_cursor,*/ nodes_management::manager_ptr nodes_manager, geo_position const& initial_position, ada::data_t const& fsettings, shassis_support_ptr shassis, phys::compound_sensor_ptr s, size_t zone)
         : base_(base)
         , zone_(zone)
         , phys_sys_(phys)
@@ -43,7 +43,7 @@ namespace helicopter_physless
         create_phys_aircraft(initial_position, fsettings, s);
     }
 
-    phys_aircraft_impl::~phys_aircraft_impl()
+    phys_heli_impl::~phys_heli_impl()
     {
         // FIXME Testing needed 
         shassis_->visit_chassis([](shassis_group_t const&, shassis_t & shassis)
@@ -52,17 +52,17 @@ namespace helicopter_physless
         });
     }
 
-    void phys_aircraft_impl::update()
+    void phys_heli_impl::update()
     {     
         sync_phys(0.1);
     }
 
-    void phys_aircraft_impl::attach_tow(bool attached)
+    void phys_heli_impl::attach_tow(bool attached)
     {
         tow_attached_ = attached;
     }
 
-    void phys_aircraft_impl::freeze(bool freeze)
+    void phys_heli_impl::freeze(bool freeze)
     {
         freeze_ = freeze; 
         if(freeze)
@@ -73,24 +73,24 @@ namespace helicopter_physless
         }
     }
     
-    void phys_aircraft_impl::force_pos_setup(bool f)
+    void phys_heli_impl::force_pos_setup(bool f)
     {
         //phys_aircraft_->force_pos_setup(f);                                 
     }
 
-    void phys_aircraft_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
+    void phys_heli_impl::go_to_pos(geo_point_3 const& pos, cg::quaternion const& orien)
     {
         desired_position_ = pos;
         desired_orien_ = orien;
     }
     
-    void  phys_aircraft_impl::go_to_pos(geo_position const& pos)  
+    void  phys_heli_impl::go_to_pos(geo_position const& pos)  
     {
         desired_position_ = pos.pos;
         desired_orien_ = pos.orien;
     }
 
-    geo_position phys_aircraft_impl::get_position() const
+    geo_position phys_heli_impl::get_position() const
     {
         //Assert(phys_aircraft_);
 
@@ -100,7 +100,7 @@ namespace helicopter_physless
         return geo_position(root_pos, base_);
     }
 
-    decart_position phys_aircraft_impl::get_local_position() const
+    decart_position phys_heli_impl::get_local_position() const
     {
         //Assert(phys_aircraft_);
 
@@ -110,42 +110,42 @@ namespace helicopter_physless
         return root_pos;
     }
 
-    void phys_aircraft_impl::set_air_cfg(fms::air_config_t cfg)
+    void phys_heli_impl::set_air_cfg(fms::air_config_t cfg)
     {
         cfg_ = cfg;
     }
 
-    void phys_aircraft_impl::set_prediction(double prediction)
+    void phys_heli_impl::set_prediction(double prediction)
     {
         prediction_ = prediction;
     }
 
-    geo_position phys_aircraft_impl::get_wheel_position( size_t i ) const
+    geo_position phys_heli_impl::get_wheel_position( size_t i ) const
     {
         return geo_position(phys_aircraft_->get_wheel_position(i), base_);
     }
 
-    phys::rigid_body_ptr phys_aircraft_impl::get_rigid_body() const
+    phys::rigid_body_ptr phys_heli_impl::get_rigid_body() const
     {
         return phys_aircraft_;
     }
 
-    void phys_aircraft_impl::set_steer   (double steer)
+    void phys_heli_impl::set_steer   (double steer)
     {          
         phys_aircraft_->set_steer(steer);
     }
 
-    void phys_aircraft_impl::set_brake   (double brake)
+    void phys_heli_impl::set_brake   (double brake)
     {          
         phys_aircraft_->set_brake(brake);
     }
 
-    double  phys_aircraft_impl::get_steer()
+    double  phys_heli_impl::get_steer()
     {
         return  phys_aircraft_->get_steer();
     }
 
-    std::vector<phys::aircraft::contact_info_t> phys_aircraft_impl::get_body_contacts() const
+    std::vector<phys::aircraft::contact_info_t> phys_heli_impl::get_body_contacts() const
     {
         std::vector<phys::aircraft::contact_info_t> contacts = phys_aircraft_->get_body_contacts();
         for (auto it = contacts.begin(); it != contacts.end(); ++it)
@@ -154,34 +154,34 @@ namespace helicopter_physless
         return contacts;
     }
 
-    bool phys_aircraft_impl::has_wheel_contact(size_t id) const
+    bool phys_heli_impl::has_wheel_contact(size_t id) const
     {
         return phys_aircraft_->has_wheel_contact(id);
     }
 
-    double phys_aircraft_impl::wheel_skid_info(size_t id) const
+    double phys_heli_impl::wheel_skid_info(size_t id) const
     {
         return phys_aircraft_->wheel_skid_info(id);
     }
 
-    void phys_aircraft_impl::remove_wheel(size_t id)
+    void phys_heli_impl::remove_wheel(size_t id)
     {
         phys_aircraft_->remove_wheel(id);
     }
 
 
-    size_t phys_aircraft_impl::get_zone() const
+    size_t phys_heli_impl::get_zone() const
     {
         return zone_;
     }
 
-    void phys_aircraft_impl::set_malfunction(bool malfunction)
+    void phys_heli_impl::set_malfunction(bool malfunction)
     {
         has_malfunction_ = malfunction;
     }
 
 
-    void phys_aircraft_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
+    void phys_heli_impl::create_phys_aircraft(geo_position const& initial_position, ada::data_t const& fsettings, phys::compound_sensor_ptr s)
     {
 #ifndef SIMEX_MOD
         const double phys_mass_factor_ = 1; // 1000;  // 1; //  
@@ -289,7 +289,7 @@ namespace helicopter_physless
         phys_aircraft_->reset_suspension();
     }
 
-    void phys_aircraft_impl::sync_phys(double dt)
+    void phys_heli_impl::sync_phys(double dt)
     {
         if (!phys_aircraft_)
             return;

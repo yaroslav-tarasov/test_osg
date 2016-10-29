@@ -78,8 +78,6 @@ namespace kernel
 
 		std::set<uint32_t>      objects_to_create_;
 		bool                    ready_;
-		uint32_t                obj_counter_;
-
 
 	};
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "precompiled_objects.h"
 
-#include "nm/node_impl.h"
+#include "node_impl.h"
 #include "nodes_manager_common.h"
 #include "nodes_manager_view.h"
 //#include "reflection/proc/prop_attr.h"

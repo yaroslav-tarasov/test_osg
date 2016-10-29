@@ -36,16 +36,12 @@ void InstancesNum::apply(State& state) const
     { 
         _instGeode->getDrawable(i)->dirtyBound();
 
-        // if (instNum_!=instCounter)
+        auto geometry = _instGeode->getDrawable(i)->asGeometry();
+        // first turn on hardware instancing for every primitive set
+        for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
         {
-            auto geometry = _instGeode->getDrawable(i)->asGeometry();
-            // first turn on hardware instancing for every primitive set
-            for (unsigned int j = 0; j < geometry->getNumPrimitiveSets(); ++j)
-            {
-                geometry->getPrimitiveSet(j)->setNumInstances(_num);
-            }
+            geometry->getPrimitiveSet(j)->setNumInstances(_num);
         }
-
     }
 }
 

@@ -105,13 +105,14 @@ private:
 };
 
 system_base::system_base(system_kind kind, msg_service& service, std::string const &objects_file_name )
-    : kind_                 (kind)
-    , msg_service_          (service, this)
-    , create_object_lock_   (false)
-    , id_randgen_           (randgen_seed_tag())
-    , udp_messages_size_    (0)
-    , udp_msg_threshold_    (1300 ) // limit for Win32
+    : kind_                  (kind)
+    , msg_service_           (service, this)
+    , create_object_lock_    (false)
+    , id_randgen_            (randgen_seed_tag())
+    , udp_messages_size_     (0)
+    , udp_msg_threshold_     (1300 ) // limit for Win32
     , block_obj_msgs_counter_(0)
+    , usual_objects_to_load_ (0)
 {
     // загружаем файл objects.xml - в нем дерево подсистем и объектов, в том числе ссылки на внешние файлы ani, fpl, bada
     tinyxml2::XMLDocument units_doc;
@@ -218,6 +219,8 @@ void system_base::load_exercise(dict_cref dict)
         else 
             usual_objects.push_back(&(it->second));
     }
+
+    usual_objects_to_load_ = usual_objects.size();
 
     // некая сортировка объектов с учетом их зависимостей(???)
     vector<string> const& ordered_auto_objects = auto_object_order();

@@ -80,7 +80,6 @@ visual_system_impl::visual_system_impl(msg_service& service, av::IVisualPtr vis,
 	, vis_   (vis)
 	, scene_ (vis->GetScene())
 	, ready_ (false)
-	, obj_counter_(0)
 	//, viewport_ (vis->create_viewport())
 
 	, props_(props)
@@ -135,7 +134,6 @@ visual_object_ptr visual_system_impl::create_visual_object( std::string const & 
 	if (seed>0 && !ready_)
 	{
 		objects_to_create_.insert(seed);
-		obj_counter_++;
 	}
 
 	return boost::make_shared<visual_object_impl>( res, seed, async, [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
@@ -149,7 +147,6 @@ visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr
 	if (seed>0 && !ready_)
 	{
 		objects_to_create_.insert(seed);
-		obj_counter_++;
 	}
 
 	return boost::make_shared<visual_object_impl>( parent, res, seed, async,  [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
@@ -165,8 +162,9 @@ void    visual_system_impl::visual_object_created( uint32_t seed )
 	for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
 		LogInfo("Objects left to create: " << " seed = " << *it);
 #endif
+	usual_objects_to_load_--;
 
-	if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1 )  
+	if(usual_objects_to_load_ == 0 && !ready_  )  
 	{
 		exercise_loaded_signal_();
 		ready_ = true;
