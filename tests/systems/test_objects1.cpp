@@ -2,7 +2,9 @@
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 FIXME(Это что за нафиг нужно  для object_creators )
@@ -51,7 +53,7 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
 
     // Только получение без контроля  
     kernel::system_ptr csys = get_systems()->get_control_sys();
-    auto fact = dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(csys).get());
+    auto fact = dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(csys).get());
 
     kernel::creating_objects_list_t   obj_list;
 

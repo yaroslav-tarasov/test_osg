@@ -727,9 +727,6 @@
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="kernel\systems\system_base\fake_system.cpp">
-      <Filter>Source Files\systems</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\phys\BulletInterface.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
@@ -1392,6 +1389,21 @@
     </ClCompile>
     <ClCompile Include="av\avUtils\workqueue.cpp">
       <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\visual_system\visual_system_impl.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\system_base\system_base.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\common\systems_factory.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\ctrl_system\ctrl_system_impl.cpp">
+      <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\model_system\model_system_impl.cpp">
+      <Filter>Source Files\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

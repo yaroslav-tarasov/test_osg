@@ -2,7 +2,9 @@
 #include "stdafx.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 #include "kernel/systems.h"
@@ -21,9 +23,8 @@ namespace second
         , _msys(nullptr)
         , _csys(nullptr)
         , msg_service_    (boost::bind(&impl::push_back_all, this, _1))
-    {
-
-    }
+		, _sys_fab (fn_reg::function<kernel::systems_factory_ptr()>(/*"systems",*/ "create_system_factory")())
+    {}
 
     systems_ptr  impl::get_this()
     {
@@ -57,7 +58,7 @@ namespace second
     kernel::system_ptr impl::get_control_sys()
     { 
         if(!_csys)
-            _csys = create_ctrl_system(msg_service_);
+            _csys = _sys_fab->create_ctrl_system(msg_service_);
         return  _csys;
     }
 
@@ -69,7 +70,7 @@ namespace second
     kernel::system_ptr impl::get_model_sys()    
     {
         if (!_msys)
-            _msys = create_model_system(msg_service_, "place script here");
+            _msys = _sys_fab->create_model_system(msg_service_, "place script here");
         return  _msys;
     }
 

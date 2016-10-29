@@ -34,16 +34,6 @@ namespace phys {
     bool loadBulletFile(std::string name, btCompoundShape*& trimeshShape);
 }
 
-#ifdef DEPRECATED
-    #include "kernel/systems/systems_base.h"
-    #include "kernel/systems/fake_system.h"
-    #include "kernel/object_class.h"
-
-    #include "nm/nodes_manager.h" // TODO FIXME убрать нафиг
-
-    FIXME(Неправильное использование node_impl)
-    #include "nm/node_impl.h"
-#endif
 
 FIXME("deprecated")
 #include "osgbullet_helpers.h"

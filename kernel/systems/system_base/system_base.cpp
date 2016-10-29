@@ -9,12 +9,10 @@
 #include "kernel/systems/impl/messages.h"
 #include "kernel/msg_proxy.h"
 
-#include "kernel/systems/fake_system.h"
 
-#include "kernel/systems/vis_system.h"
+#include "kernel/systems/impl/system_base.h"
 #include "kernel/systems/ctrl_system.h"
 
-#include "kernel/systems/visual_system/visual_object_impl.h"
 
 #include "geometry/camera.h"
 
@@ -94,193 +92,19 @@ namespace kernel
 
     //////////////////////////////////////////////////////////////////////////
 
+ 
 
-struct model_system_impl;
-struct visual_system_impl;
-struct ctrl_system_impl;
-
-system_ptr create_model_system(msg_service& service, std::string const& script) 
-{
-    LogInfo("Creating MODEL system");
-    return kernel::system_ptr(boost::make_shared<model_system_impl>(boost::ref(service), boost::ref(script)));
-}
-
-system_ptr create_visual_system(msg_service& service, av::IVisualPtr vis, vis_sys_props const& vsp ) 
-{
-    LogInfo("Creating VISUAL system");
-    return kernel::system_ptr(boost::make_shared<visual_system_impl>(boost::ref(service),  vis, boost::ref(vsp)));
-}
-
-system_ptr create_ctrl_system( msg_service& service ) 
-{
-    LogInfo("Creating CTRL system");
-    return kernel::system_ptr(boost::make_shared<ctrl_system_impl>(boost::ref(service)));
-}
-
-struct  fake_system_base
-    : system            
-    , system_session    
-    , fake_objects_factory
-    , object_collection 
-    , boost::enable_shared_from_this<fake_system_base>
-{
-    fake_system_base(system_kind kind, msg_service& service, std::string const &objects_file_name);
-    //! деструктор
-    ~fake_system_base();
-    // system
-protected:
-    system_kind         kind                () const                    override;
-    void                update              (double time)               override;
-    void                on_msg              (binary::bytes_cref bytes)  override;
-    void                load_exercise       (dict_cref dict)            override;
-    void                save_exercise       (dict_ref  dict, bool safe_key) const      override;
-    optional<double>    update_time         () const                    override;
-    optional<double>    last_update_time    () const                    override;
-    double              atc_update_period   () const                    override;
-
-    // system_session
-protected:
-    void on_session_loaded      ();
-    void on_session_stopped     ();
-    void on_time_factor_changed (double time, double factor);
-
-    // objects_factory
-protected:
-    object_info_ptr create_object            (object_class_ptr hierarchy_class, std::string const &name)     override;
-    object_info_ptr create_object            (obj_create_data const& descr)                                  override;
-    object_info_ptr load_object_hierarchy    (dict_cref dict)                                                override;
-    void            save_object_hierarchy    (object_info_ptr objinfo, dict_ref dict, bool safe_key) const   override;    
-    object_class_vector const& object_classes() const                                                        override;
-    object_class_ptr get_object_class        (std::string const& name) const                                 override;
-
-    std::string     generate_unique_name     (std::string const &init_name) const override;
-
-private:
-	object_info_ptr local_create_object      (obj_create_data const& data);
-	void            pack_exercise            (const creating_objects_list_t& co , dict_ref dict, bool safe_key) /*const*/;
-
-private:
-    void check_destroy(std::vector<object_info_wptr> const& objs_to_destroy);
-
-    // object_collection
-protected:
-    objects_t const&    root_objects    () const override;
-    object_info_ptr     get_object      (obj_id_t object_id) const override;
-    void                destroy_object  (obj_id_t object_id) override;
-
-protected:
-    void send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd);
-
-protected:
-    void process_destroy_object( size_t object_id );
-
-protected:
-    virtual void do_pre_update  (double time);
-    virtual void do_update      (double time);
-    virtual void do_post_update (double time);
-    virtual void do_update_atc  (double time);
-
-protected:
-    network::msg_dispatcher<>&  msg_disp();
-
-protected:
-    typedef 
-        ph_map<size_t, object_info_wptr>::map_t
-        weak_objects_t;
-
-    //! дерево объектов (физически map)
-    objects_t       root_objects_; // roots
-    //! линейный набор (map) ссылок на объекты
-    weak_objects_t  objects_     ; // plain object list 
-
-protected:
-//     typedef weak_ptr<msg_keeper>    msg_keeper_ptr;
-//     typedef list<msg_keeper_ptr>    msg_keeper_ptrs; 
-
-    object_info_ptr create_object_hierarchy_impl(object_class_ptr hierarchy_class       , std::string const &name, bool is_root);
-    object_info_ptr load_object_hierarchy_impl  (object_class_ptr parent_hierarchy_class, dict_cref dict, bool is_root, bool read_id);
-
-protected:
-    vector<string> const&   auto_object_order ();
-    vector<obj_id_t>        remove_roots_order();
-
-protected:
-    typedef ph_set<obj_id_t>::set_t obj_set_t;
-
-protected:
-    system_kind     kind_;
-    msg_service_reg msg_service_;
-
-    optional<double> update_time_;
-    optional<double> last_update_time_;
-    optional<double> last_update_atc_;
-
-protected:
-    object_class_ptr root_;
-
-private:
-    // we do not want to assign equal objects id to previously created object
-    // even if it has been already removed - such a strategy makes history recording easier 
-    obj_set_t used_ids_;
-    randgen<> id_randgen_;
-
-private:
-    void     register_obj_id   (obj_id_t id);
-    obj_id_t generate_object_id();
-
-private:
-    void fire_object_created(object_info_ptr obj);
-
-private:
-    void on_object_created(msg::object_created const& msg);
-    void on_object_destroy(msg::destroy_object const& msg);
-    void on_object_msg    (msg::object_msg     const& msg);
-    void on_container_msg (msg::container_msg  const& msg);
-
-private:
-    struct msgs_blocker;
-    void block_obj_msgs  (bool block);
-    bool obj_msgs_blocked() const;
-
-private:
-    //! диспетчер сообщений для всех объектов "подсистем"
-    network::msg_dispatcher<> msg_disp_;
-
-private:
-    msg::container_msg::msgs_t tcp_messages_;
-    msg::container_msg::msgs_t udp_messages_;
-
-    size_t       udp_messages_size_;
-    const size_t udp_msg_threshold_;
-
-private:
-    obj_set_t obj_ids_to_destroy_;
-    obj_set_t destroyed_objects_;
-
-private:
-    bool create_object_lock_;
-
-private:
-    size_t       block_obj_msgs_counter_;
-
-private:
-    typedef msg::object_msg::msg_protocol_t msg_protocol_t;
-
-    optional<msg_protocol_t> msg_protocol_;
-
-};  
-
-struct fake_system_base::msgs_blocker 
+struct system_base::msgs_blocker 
     : boost::noncopyable
 {
-    msgs_blocker(fake_system_base& sb) : sb_(sb) { sb_.block_obj_msgs(true ); }
+    msgs_blocker(system_base& sb) : sb_(sb) { sb_.block_obj_msgs(true ); }
     ~msgs_blocker()                          { sb_.block_obj_msgs(false); }
 
 private:
-    fake_system_base& sb_;
+    system_base& sb_;
 };
 
-fake_system_base::fake_system_base(system_kind kind, msg_service& service, std::string const &objects_file_name )
+system_base::system_base(system_kind kind, msg_service& service, std::string const &objects_file_name )
     : kind_                 (kind)
     , msg_service_          (service, this)
     , create_object_lock_   (false)
@@ -299,25 +123,25 @@ fake_system_base::fake_system_base(system_kind kind, msg_service& service, std::
     root_ =     create_object_class(units_doc.RootElement());
 
     msg_disp_
-        .add<msg::object_created>(boost::bind(&fake_system_base::on_object_created, this, _1))
-        .add<msg::destroy_object>(boost::bind(&fake_system_base::on_object_destroy, this, _1))
-        .add<msg::object_msg    >(boost::bind(&fake_system_base::on_object_msg    , this, _1))
-        .add<msg::container_msg >(boost::bind(&fake_system_base::on_container_msg , this, _1));
+        .add<msg::object_created>(boost::bind(&system_base::on_object_created, this, _1))
+        .add<msg::destroy_object>(boost::bind(&system_base::on_object_destroy, this, _1))
+        .add<msg::object_msg    >(boost::bind(&system_base::on_object_msg    , this, _1))
+        .add<msg::container_msg >(boost::bind(&system_base::on_container_msg , this, _1));
 
     //update_id_range(service);
     update_id_range();
 }
 
-fake_system_base::~fake_system_base()
+system_base::~system_base()
 {
 }
 
-system_kind fake_system_base::kind() const
+system_kind system_base::kind() const
 {
     return kind_;
 }
 
-void fake_system_base::update (double time)
+void system_base::update (double time)
 {
     update_time_ = time;
 
@@ -354,7 +178,7 @@ void fake_system_base::update (double time)
 
 }
 
-void fake_system_base::on_msg(binary::bytes_cref bytes)
+void system_base::on_msg(binary::bytes_cref bytes)
 {
     FIXME (Проскакивает такая хрень)
     if(bytes.size()>0)
@@ -362,7 +186,7 @@ void fake_system_base::on_msg(binary::bytes_cref bytes)
 }
 
 //! базовая функция загрузки упражнения
-void fake_system_base::load_exercise(dict_cref dict)
+void system_base::load_exercise(dict_cref dict)
 {
     //profiler::reset();
 
@@ -420,14 +244,14 @@ void fake_system_base::load_exercise(dict_cref dict)
         //profiler::add_dsc(("loading " + name).c_str());
     }
 
-    exercise_loaded_signal_();
+    //exercise_loaded_signal_();
     //profiler::add_dsc("signal firing");
     LogInfo("Exercise loaded in " << tc.to_double(tc.time()) << " seconds");
 
     //profiler::out_times((sys_name(kind_) + " sys: loading exercise").c_str());
 }
 
-void fake_system_base::save_exercise(dict_ref dict, bool safe_key) const
+void system_base::save_exercise(dict_ref dict, bool safe_key) const
 {
     time_counter tc;
 
@@ -444,28 +268,28 @@ void fake_system_base::save_exercise(dict_ref dict, bool safe_key) const
     LogInfo("Exercise saved in " << tc.to_double(tc.time()));
 }
 
-optional<double>  fake_system_base::update_time() const
+optional<double>  system_base::update_time() const
 {
     return update_time_;
 }
 
-optional<double> fake_system_base::last_update_time() const
+optional<double> system_base::last_update_time() const
 {
     return last_update_time_;    
 }
 
-double  fake_system_base::atc_update_period() const
+double  system_base::atc_update_period() const
 {
     FIXME(И ведь везде хард код)
     return 4.;
 }
 
-fake_system_base::objects_t const& fake_system_base::root_objects() const
+system_base::objects_t const& system_base::root_objects() const
 {
     return root_objects_;
 }
 
-object_info_ptr fake_system_base::get_object( obj_id_t object_id ) const
+object_info_ptr system_base::get_object( obj_id_t object_id ) const
 {
     auto it = objects_.find(object_id);
     if (it == objects_.end())
@@ -474,19 +298,19 @@ object_info_ptr fake_system_base::get_object( obj_id_t object_id ) const
     return object_info_ptr(it->second);
 }
 
-void fake_system_base::destroy_object( obj_id_t object_id )
+void system_base::destroy_object( obj_id_t object_id )
 { 
     // destroy self
     msg_service_((system_kind)kind_, network::wrap_msg(msg::destroy_object(object_id)), true);
     process_destroy_object(object_id);
 }
 
-void fake_system_base::register_obj_id(obj_id_t id)
+void system_base::register_obj_id(obj_id_t id)
 {
     used_ids_.insert(id);
 }
 
-auto fake_system_base::generate_object_id() -> obj_id_t
+auto system_base::generate_object_id() -> obj_id_t
 {
     auto r = id_range();
     obj_id_t id = r.lo();
@@ -500,12 +324,12 @@ auto fake_system_base::generate_object_id() -> obj_id_t
     return id;
 }
 
-void fake_system_base::on_session_loaded() 
+void system_base::on_session_loaded() 
 {
     session_loaded_signal_() ;
 }
 
-void fake_system_base::on_session_stopped()
+void system_base::on_session_stopped()
 {
     session_stopped_signal_() ;
 
@@ -518,14 +342,14 @@ void fake_system_base::on_session_stopped()
     Assert(root_objects_.empty());
 }
 
-void fake_system_base::on_time_factor_changed (double time, double factor)
+void system_base::on_time_factor_changed (double time, double factor)
 {
     // it allows to restart atc_update after time changing (e.g. while moving slider in history)
     last_update_atc_ = size_t(time / atc_update_period()) * atc_update_period(); 
     time_factor_changed_signal_(time, factor);
 }
 
-object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std::string const &obj_name)
+object_info_ptr system_base::create_object(object_class_ptr hier_class, std::string const &obj_name)
 {
     object_info_ptr obj;
     msgs_blocker    mb(*this);
@@ -541,7 +365,7 @@ object_info_ptr fake_system_base::create_object(object_class_ptr hier_class, std
     return obj;
 }
 
-object_info_ptr fake_system_base::local_create_object(obj_create_data const& data)
+object_info_ptr system_base::local_create_object(obj_create_data const& data)
 {
 	object_info_ptr obj;
 	msgs_blocker    mb(*this);
@@ -560,7 +384,7 @@ object_info_ptr fake_system_base::local_create_object(obj_create_data const& dat
 	return obj;
 }
 
-void fake_system_base::pack_exercise(const creating_objects_list_t& co , dict_ref dict, bool safe_key) /*const*/
+void system_base::pack_exercise(const creating_objects_list_t& co , dict_ref dict, bool safe_key) /*const*/
 {
 	time_counter tc;
 
@@ -578,7 +402,7 @@ void fake_system_base::pack_exercise(const creating_objects_list_t& co , dict_re
 	LogInfo("Exercise saved in " << tc.to_double(tc.time()));
 }
 
-object_info_ptr fake_system_base::create_object(obj_create_data const& data)
+object_info_ptr system_base::create_object(obj_create_data const& data)
 {
     object_info_ptr obj;
     msgs_blocker    mb(*this);
@@ -594,7 +418,7 @@ object_info_ptr fake_system_base::create_object(obj_create_data const& data)
     return obj;
 }
 
-object_info_ptr fake_system_base::load_object_hierarchy(dict_t const& dict)
+object_info_ptr system_base::load_object_hierarchy(dict_t const& dict)
 {                                                                                                                                                                       
     object_info_ptr obj;
     msgs_blocker    mb(*this);
@@ -611,7 +435,7 @@ object_info_ptr fake_system_base::load_object_hierarchy(dict_t const& dict)
     return obj;
 }
 
-void fake_system_base::save_object_hierarchy(object_info_ptr objinfo, dict_t& dict, bool safe_key) const
+void system_base::save_object_hierarchy(object_info_ptr objinfo, dict_t& dict, bool safe_key) const
 {
     //     optional<time_counter> tc;
     //     if (objinfo->parent().expired())
@@ -665,7 +489,7 @@ inline object_info_ptr create_object(kernel::object_create_t oc, dict_copt dict 
 }
 
 
-object_info_ptr fake_system_base::create_object_hierarchy_impl(
+object_info_ptr system_base::create_object_hierarchy_impl(
     object_class_ptr   hierarchy_class, 
     std::string const& name, 
     bool               is_root)
@@ -687,7 +511,7 @@ object_info_ptr fake_system_base::create_object_hierarchy_impl(
         size_t id = generate_object_id();
         VerifyMsg(objects_.find(id) == objects_.end(), "Duplicate object id");
 
-        auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
+        auto msg_service = boost::bind(&system_base::send_obj_message, this, id, _1, _2, _3);
         auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
 
         kernel::object_create_t oc(hierarchy_class, this, id, name, children, msg_service, block_msgs, 0);
@@ -718,7 +542,7 @@ object_info_ptr fake_system_base::create_object_hierarchy_impl(
     return object_info_ptr();
 }
 
-object_info_ptr fake_system_base::load_object_hierarchy_impl(
+object_info_ptr system_base::load_object_hierarchy_impl(
     object_class_ptr      parent_hierarchy_class, 
     dict_cref             dict, 
     bool                  is_root, 
@@ -767,7 +591,7 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
     string cpp_class_name = *hierarchy_class->find_attribute("cpp_class");
 
     // create self
-    auto msg_service = boost::bind(&fake_system_base::send_obj_message, this, id, _1, _2, _3);
+    auto msg_service = boost::bind(&system_base::send_obj_message, this, id, _1, _2, _3);
     auto block_msgs  = [this](bool block){ block_obj_msgs(block); };
 
 
@@ -806,17 +630,17 @@ object_info_ptr fake_system_base::load_object_hierarchy_impl(
     return object;
 }
 
-object_class_vector const& fake_system_base::object_classes() const
+object_class_vector const& system_base::object_classes() const
 {
     return root_->classes();
 }
 
-object_class_ptr fake_system_base::get_object_class(std::string const& name) const
+object_class_ptr system_base::get_object_class(std::string const& name) const
 {
     return root_->find_class(name);
 }
 
-std::string fake_system_base::generate_unique_name(std::string const &init_name) const
+std::string system_base::generate_unique_name(std::string const &init_name) const
 {
     size_t index = 0;
     std::string unique_name;
@@ -832,7 +656,7 @@ std::string fake_system_base::generate_unique_name(std::string const &init_name)
     return unique_name;
 }
 
-void fake_system_base::fire_object_created(object_info_ptr obj)
+void system_base::fire_object_created(object_info_ptr obj)
 {
     //send to other systems
     dict_t dic;
@@ -846,7 +670,7 @@ void fake_system_base::fire_object_created(object_info_ptr obj)
 
 //////////////////////////////////////////////////////////////////////////
 // msg processing 
-void fake_system_base::on_object_created(msg::object_created const& msg)
+void system_base::on_object_created(msg::object_created const& msg)
 {
     dict_t dict;
     binary::unwrap(msg.data, dict);
@@ -854,12 +678,12 @@ void fake_system_base::on_object_created(msg::object_created const& msg)
     load_object_hierarchy(dict);
 }
 
-void fake_system_base::on_object_destroy(msg::destroy_object const& msg)
+void system_base::on_object_destroy(msg::destroy_object const& msg)
 {
     process_destroy_object(msg.obj_id);
 }
 
-void fake_system_base::on_object_msg(msg::object_msg const& msg)
+void system_base::on_object_msg(msg::object_msg const& msg)
 {
     auto it = objects_.find(msg.object_id);
     if (it == objects_.end())
@@ -916,19 +740,19 @@ void fake_system_base::on_object_msg(msg::object_msg const& msg)
     }
 }
 
-void fake_system_base::on_container_msg(msg::container_msg const& msg)
+void system_base::on_container_msg(msg::container_msg const& msg)
 {                                                      
     for (size_t i = 0; i < msg.msgs.size(); ++i)
         msg_disp_.dispatch_bytes(msg.msgs[i]);
 }
 
-void fake_system_base::do_pre_update(double time)
+void system_base::do_pre_update(double time)
 {
     for (objects_t::iterator it = root_objects_.begin(); it != root_objects_.end(); ++it)
         base_presentation_ptr(it->second)->pre_update(time);
 }
 
-void fake_system_base::do_update(double time)
+void system_base::do_update(double time)
 {
     for (objects_t::iterator it = root_objects_.begin(); it != root_objects_.end(); ++it)
     {
@@ -937,24 +761,24 @@ void fake_system_base::do_update(double time)
     }
 }
 
-void fake_system_base::do_post_update(double time)
+void system_base::do_post_update(double time)
 {
     for (objects_t::iterator it = root_objects_.begin(); it != root_objects_.end(); ++it)
         base_presentation_ptr(it->second)->post_update(time);
 }
 
-void fake_system_base::do_update_atc(double time)
+void system_base::do_update_atc(double time)
 {
     for (objects_t::iterator it = root_objects_.begin(); it != root_objects_.end(); ++it)
         base_presentation_ptr(it->second)->update_atc(time);
 }
 
-network::msg_dispatcher<>& fake_system_base::msg_disp()
+network::msg_dispatcher<>& system_base::msg_disp()
 {
     return msg_disp_;
 }
 
-void fake_system_base::block_obj_msgs(bool block)
+void system_base::block_obj_msgs(bool block)
 {
     if (block)
     {
@@ -972,7 +796,7 @@ void fake_system_base::block_obj_msgs(bool block)
 
 }
 
-void fake_system_base::send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
+void system_base::send_obj_message(size_t object_id, binary::bytes_cref bytes, bool sure, bool just_cmd)
 {
     if (obj_msgs_blocked())
     {
@@ -1028,7 +852,7 @@ void fake_system_base::send_obj_message(size_t object_id, binary::bytes_cref byt
     }
 }
 
-void fake_system_base::process_destroy_object( size_t object_id )
+void system_base::process_destroy_object( size_t object_id )
 {
     auto it = objects_.find(object_id);
     if(it == objects_.end())
@@ -1081,7 +905,7 @@ void fake_system_base::process_destroy_object( size_t object_id )
 
     check_destroy(objs_to_destroy);
 }
-vector<string> const& fake_system_base::auto_object_order()
+vector<string> const& system_base::auto_object_order()
 {
     static vector<string> res;
 
@@ -1159,7 +983,7 @@ vector<string> const& fake_system_base::auto_object_order()
     return res;
 }
 
-vector<obj_id_t> fake_system_base::remove_roots_order()
+vector<obj_id_t> system_base::remove_roots_order()
 {
     vector<obj_id_t> res;
     res.reserve(root_objects_.size());
@@ -1195,7 +1019,7 @@ vector<obj_id_t> fake_system_base::remove_roots_order()
     return res;
 }
 
-void fake_system_base::check_destroy(std::vector<object_info_wptr> const& objs_to_destroy)
+void system_base::check_destroy(std::vector<object_info_wptr> const& objs_to_destroy)
 {
     for (auto it = objs_to_destroy.begin(); it != objs_to_destroy.end(); ++it)
     {
@@ -1241,343 +1065,14 @@ void fake_system_base::check_destroy(std::vector<object_info_wptr> const& objs_t
     }
 }
 
-bool fake_system_base::obj_msgs_blocked() const
+bool system_base::obj_msgs_blocked() const
 {
     return block_obj_msgs_counter_ > 0;
 }
 
-struct model_system_impl
-    : model_system
-    , fake_system_base
-{
-    model_system_impl(msg_service& service, string const& script);
 
-    // model_system
-public:
-    double calc_step() const override;
 
-private:
-    double time_factor_;
-    double calc_step_;
 
-private:
-    // py_engine py_engine_; 
-    string    ex_script_;
 
-private:
-    bool             skip_post_update_;
-    optional<double> last_update_time_;
-};
-
-FIXME(Имя файла объектов в конструкторе это очень на круто)
-model_system_impl::model_system_impl(msg_service& service, string const& script)
-    : fake_system_base( sys_model, service, "objects.xml" )
-    , time_factor_( 0)
-    , calc_step_  (cfg().model_params.msys_step)
-    //, py_engine_  (this)
-    , ex_script_  (script)
-
-    , skip_post_update_(true)
-{
-    LogInfo("Create Model Subsystem");
-    // subscribe_session_stopped(boost::bind(&model_system_impl::on_ses_stopped, this));
-}
-
-double model_system_impl::calc_step() const
-{
-    return calc_step_ * (cg::eq_zero(time_factor_) ? 1. : time_factor_);
-}
-
-
-#pragma region visual system define
-
-
-
-struct visual_system_impl
-    : visual_system
-    , visual_system_props
-    , fake_system_base
-	, av::IFreeViewControl
-    //, victory::widget_control
-{
-    visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props);
-
-private:
-    void update       (double time) override;
-    void load_exercise(dict_cref dict) override;
-
-    // visual_system
-private:
-#ifdef ASYNC_OBJECT_LOADING
-    visual_object_ptr       create_visual_object( std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0 , bool async=true) override;
-    visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=true ) override;
-#else
-	visual_object_ptr       create_visual_object( std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0 , bool async=false) override;
-	visual_object_ptr       create_visual_object( nm::node_control_ptr parent, std::string const & res, on_object_loaded_f f = 0, uint32_t seed = 0, bool async=false ) override;
-#endif
-
-private:
-    void                    visual_object_created( uint32_t seed );
-    // visual_system_props
-private:
-
-    vis_sys_props const&    vis_props   () const;
-    void                    update_props(vis_sys_props const&);
-
-private:
-    void            init_eye  ();
-    void            update_eye();
-    cg::camera_f    eye_camera() const;
-    void            object_destroying(object_info_ptr object);
-
-private:
-	virtual void   FreeViewOn() ;
-	virtual void   FreeViewOff();
-
-private:
-    av::IVisualPtr            visual  () override;
-    av::IScenePtr             scene   () override;
-
-private:
-    DECL_LOGGER("vis_sys");
-
-private:
-    vis_sys_props           props_;
-
-    av::IVisualPtr          vis_;
-    av::IScenePtr           scene_;
-    //victory::IViewportPtr viewport_;
-
-    scoped_connection       object_destroying_connection_;
-
-//private:
-//    void init_frustum_projection();
-
-private:
-    visual_control_ptr      eye_;
-	bool                    free_cam_;
-
-
-    std::set<uint32_t>      objects_to_create_;
-    bool                    ready_;
-    uint32_t                obj_counter_;
-
-	
-};
-
-
-visual_system_impl::visual_system_impl(msg_service& service, av::IVisualPtr vis, vis_sys_props const& props)
-    : fake_system_base(sys_visual, service, "objects.xml")
-    , vis_   (vis)
-    , scene_ (vis->GetScene())
-    , ready_ (false)
-    , obj_counter_(0)
-    //, viewport_ (vis->create_viewport())
-
-    , props_(props)
-    , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&visual_system_impl::object_destroying, this, _1)))
-	, free_cam_(false)
-{
-    LogInfo("Create Visual Subsystem");
-	vis_->SetFreeViewControl(this);
-}
-
-av::IVisualPtr   visual_system_impl::visual()
-{
-    return  vis_;
-}
-
-av::IScenePtr    visual_system_impl::scene()
-{
-    return scene_;
-}
-
-void visual_system_impl::update(double time)
-{
-    fake_system_base::update(time);
-
-    // scene_->update(time);
-    if(!free_cam_)
-		update_eye();
-}
-
-vis_sys_props const& visual_system_impl::vis_props() const
-{
-    return props_;
-}
-
-void visual_system_impl::update_props(vis_sys_props const& props)
-{
-    props_ = props;
-    init_eye();
-}
-
-void visual_system_impl::load_exercise(dict_cref dict)
-{
-    fake_system_base::load_exercise(dict);
-    init_eye();
-}
-
-visual_object_ptr visual_system_impl::create_visual_object( std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
-{
-#if 0
-    LogInfo("Objects to create: " << res << " seed = " << seed);
-#endif
-    if (seed>0 && !ready_)
-    {
-        objects_to_create_.insert(seed);
-        obj_counter_++;
-    }
-
-    return boost::make_shared<visual_object_impl>( res, seed, async, [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
-}
-
-visual_object_ptr visual_system_impl::create_visual_object( nm::node_control_ptr parent,std::string const & res, on_object_loaded_f f, uint32_t seed/* = 0*/, bool async )
-{
-#if 0
-    LogInfo("Objects to create: " << res << " seed = " << seed);
-#endif
-    if (seed>0 && !ready_)
-    {
-        objects_to_create_.insert(seed);
-        obj_counter_++;
-    }
-
-    return boost::make_shared<visual_object_impl>( parent, res, seed, async,  [this,f](uint32_t seed)->void {  f(seed); this->visual_object_created(seed); });
-}
-
-void    visual_system_impl::visual_object_created( uint32_t seed )
-{
-      auto it = objects_to_create_.find(seed);
-      if(it!=objects_to_create_.end())
-          objects_to_create_.erase(it);
-
-#if 0
-      for (auto it = objects_to_create_.begin(); it!= objects_to_create_.end(); ++it)
-                  LogInfo("Objects left to create: " << " seed = " << *it);
-#endif
-
-      if(objects_to_create_.size()==0 && !ready_ && obj_counter_ > 1 )  
-      {
-          exercise_loaded_signal_();
-          ready_ = true;
-      }
-
-#if 0
-      LogInfo("Objects left to create: " << objects_to_create_.size() << " seed = " << seed);
-#endif
-}
-
-void visual_system_impl::init_eye()
-{
-    // no eye is selected if camera name is incorrect to show problem visually!!!
-    // please don't change selection logic
-#if 0
-    eye_ = (!props_.channel.camera_name.empty()) 
-        ? find_object<visual_control_ptr>(this, props_.channel.camera_name)
-        : find_first_object<visual_control_ptr>(this) ;
-
-    if (!eye_ && !props_.channel.camera_name.empty())
-        LogWarn("Can't find camera: " << props_.channel.camera_name);
-
-#else
-    eye_ = find_object<visual_control_ptr>(this, props_.channel.camera_name);
-    
-    if (!eye_ && !props_.channel.camera_name.empty())
-            LogWarn("Can't find camera: " << props_.channel.camera_name);
-
-    if(!eye_)
-        eye_ = find_first_object<visual_control_ptr>(this) ;
-#endif
-
-
-#if 0
-    viewport_->SetClarityScale(props_.channel.pixel_scale);
-    viewport_->set_geom_corr(props_.channel.cylindric_geom_corr ? victory::IViewport::explicit_cylinder : victory::IViewport::no_geom_corr);
-
-    init_frustum_projection();
-#endif
-
-    update_eye();
-
-}
-
-void visual_system_impl::update_eye()
-{
-    const auto & cam = /*debug_eye_ ? debug_eye_camera() :*/ eye_camera();
-    //viewport_->SetPosition(cam.position(), cam.orientation());
-	vis_->SetPosition(cam.position(), cg::quaternion(cam.orientation()));
-}
-
-cg::camera_f visual_system_impl::eye_camera() const
-{
-    typedef cg::rotation_3f rot_f;
-
-    cg::camera_f cam = eye_ 
-        ? cg::camera_f(point_3f(geo_base_3(props_.base_point)(eye_->pos())), cprf(eye_->orien()))
-        : cg::camera_f(point_3f(0,0,100), cprf(-90));
-    
-    cam.set_orientation((rot_f(cam.orientation()) * rot_f(cprf(props_.channel.course))).cpr());
-    return cam;
-}
-
-void visual_system_impl::object_destroying(object_info_ptr object)
-{
-    if (eye_ == object)
-        eye_.reset();
-    //else if (debug_eye_ && debug_eye_->track_object == object)
-    //    debug_eye_.reset();
-}
-
-
-void visual_system_impl::FreeViewOn()  {free_cam_ = true;}
-void visual_system_impl::FreeViewOff() {free_cam_ = false;} 
-
-
-
-#pragma  endregion
-
-
-#pragma region control system define
-
-struct ctrl_system_impl
-    : ctrl_system
-    , fake_system_base
-
-{
-
-    ctrl_system_impl(msg_service& service);
-
-private:
-    void update       (double time) override;
-
-private:
-    void            object_destroying(object_info_ptr object);
-
-private:
-    scoped_connection object_destroying_connection_;
-
-
-
-};
-
-
-ctrl_system_impl::ctrl_system_impl(msg_service& service)
-    : fake_system_base(sys_ext_ctrl, service, "objects.xml")
-    , object_destroying_connection_(this->subscribe_object_destroying(boost::bind(&ctrl_system_impl::object_destroying, this, _1)))
-{
-    LogInfo("Create Control Subsystem");
-}
-
-void ctrl_system_impl::update(double time)
-{
-    fake_system_base::update(time);
-}
-
-void ctrl_system_impl::object_destroying(object_info_ptr object)
-{
-}
-
-#pragma  endregion
 
 } // kernel

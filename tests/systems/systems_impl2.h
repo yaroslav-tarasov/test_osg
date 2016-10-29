@@ -29,7 +29,7 @@ namespace second
         kernel::system_ptr                                     _msys;
         kernel::system_ptr                                     _csys;
 
-
-
+		kernel::systems_factory_ptr							_sys_fab;
+ 
     };
 }

@@ -2,7 +2,9 @@
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 #include "common/simple_route.h"
@@ -41,7 +43,7 @@ inline object_info_ptr create_aircraft(kernel::system* csys,create_msg const& ms
     aircraft::settings_t as;
     as.kind = msg.model_name; 
     as.custom_label = msg.custom_label;
-    return  aircraft::create(dynamic_cast<fake_objects_factory*>(csys),as, gp);
+    return  aircraft::create(dynamic_cast<objects_factory*>(csys),as, gp);
 }
 
 inline kernel::obj_create_data pack_aircraft(kernel::system* csys,create_msg const& msg)
@@ -52,7 +54,7 @@ inline kernel::obj_create_data pack_aircraft(kernel::system* csys,create_msg con
     aircraft::settings_t as;
     as.kind = msg.model_name; 
     as.custom_label = msg.custom_label;
-    return  aircraft::pack(dynamic_cast<fake_objects_factory*>(csys),as, gp);
+    return  aircraft::pack(dynamic_cast<objects_factory*>(csys),as, gp);
 }
 
 inline object_info_ptr create_helicopter_phl(kernel::system* csys,create_msg const& msg)
@@ -64,7 +66,7 @@ inline object_info_ptr create_helicopter_phl(kernel::system* csys,create_msg con
     as.kind = msg.model_name;  
     as.custom_label = msg.custom_label;
 
-    return  helicopter_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+    return  helicopter_physless::create(dynamic_cast<objects_factory*>(csys),as,gp);
 }
 
 inline kernel::obj_create_data pack_helicopter_phl(kernel::system* csys,create_msg const& msg)
@@ -76,7 +78,7 @@ inline kernel::obj_create_data pack_helicopter_phl(kernel::system* csys,create_m
     as.kind = msg.model_name;  
     as.custom_label = msg.custom_label;
 
-    return  helicopter_physless::pack(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+    return  helicopter_physless::pack(dynamic_cast<objects_factory*>(csys),as,gp);
 }
 
 inline object_info_ptr create_aircraft_phl(kernel::system* csys,create_msg const& msg)
@@ -88,7 +90,7 @@ inline object_info_ptr create_aircraft_phl(kernel::system* csys,create_msg const
     as.kind = msg.model_name; // "A319"; //
     as.custom_label = msg.custom_label;
 
-    return  aircraft_physless::create(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+    return  aircraft_physless::create(dynamic_cast<objects_factory*>(csys),as,gp);
 }
 
 inline kernel::obj_create_data pack_aircraft_phl(kernel::system* csys,create_msg const& msg)
@@ -100,7 +102,7 @@ inline kernel::obj_create_data pack_aircraft_phl(kernel::system* csys,create_msg
     as.kind = msg.model_name; // "A319"; //
     as.custom_label = msg.custom_label;
 
-    return  aircraft_physless::pack(dynamic_cast<fake_objects_factory*>(csys),as,gp);
+    return  aircraft_physless::pack(dynamic_cast<objects_factory*>(csys),as,gp);
 }
 
 inline object_info_ptr create_vehicle(kernel::system* csys,create_msg const& msg)
@@ -112,7 +114,7 @@ inline object_info_ptr create_vehicle(kernel::system* csys,create_msg const& msg
     vs.model        = msg.model_name;
     vs.custom_label = msg.custom_label;
 
-    return  vehicle::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return  vehicle::create(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 inline kernel::obj_create_data pack_vehicle(kernel::system* csys,create_msg const& msg)
@@ -124,7 +126,7 @@ inline kernel::obj_create_data pack_vehicle(kernel::system* csys,create_msg cons
     vs.model        = msg.model_name;
     vs.custom_label = msg.custom_label;
 
-    return  vehicle::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return  vehicle::pack(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 
@@ -138,7 +140,7 @@ inline object_info_ptr create_flock_of_birds(kernel::system* csys, create_msg co
     vs.model        = "crow";
     vs._childAmount = msg.num_instances;
 
-    return flock::manager::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return flock::manager::create(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 inline kernel::obj_create_data pack_flock_of_birds(kernel::system* csys, create_msg const& msg)
@@ -150,7 +152,7 @@ inline kernel::obj_create_data pack_flock_of_birds(kernel::system* csys, create_
     vs.model        = "crow";
     vs._childAmount = msg.num_instances;
 
-    return flock::manager::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return flock::manager::pack(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 
@@ -162,7 +164,7 @@ inline object_info_ptr create_character(kernel::system* csys, create_msg const& 
     human::settings_t vs;
     vs.model = msg.model_name;
 
-    return human::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return human::create(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 inline kernel::obj_create_data pack_character(kernel::system* csys, create_msg const& msg)
@@ -173,7 +175,7 @@ inline kernel::obj_create_data pack_character(kernel::system* csys, create_msg c
     human::settings_t vs;
     vs.model = msg.model_name;
 
-    return human::pack(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+    return human::pack(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
  
 inline object_info_ptr create_arresting_gear(kernel::system* csys, create_msg const& msg)
@@ -184,7 +186,7 @@ inline object_info_ptr create_arresting_gear(kernel::system* csys, create_msg co
     arresting_gear::settings_t ms;
     // ms.model = "arresting_gear";
 
-    return arresting_gear::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+    return arresting_gear::create(dynamic_cast<objects_factory*>(csys),ms,gp);
 }
 
 inline kernel::obj_create_data pack_arresting_gear(kernel::system* csys, create_msg const& msg)
@@ -195,7 +197,7 @@ inline kernel::obj_create_data pack_arresting_gear(kernel::system* csys, create_
     arresting_gear::settings_t ms;
     // ms.model = "arresting_gear";
 
-    return arresting_gear::pack(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+    return arresting_gear::pack(dynamic_cast<objects_factory*>(csys),ms,gp);
 }
 
 inline object_info_ptr create_aerostat(kernel::system* csys, create_msg const& msg)
@@ -206,7 +208,7 @@ inline object_info_ptr create_aerostat(kernel::system* csys, create_msg const& m
 	aerostat::settings_t ms;
 	ms.model = "aerostat";
 
-	return aerostat::create(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+	return aerostat::create(dynamic_cast<objects_factory*>(csys),ms,gp);
 }
 
 inline kernel::obj_create_data pack_aerostat(kernel::system* csys, create_msg const& msg)
@@ -217,7 +219,7 @@ inline kernel::obj_create_data pack_aerostat(kernel::system* csys, create_msg co
     aerostat::settings_t ms;
     ms.model = "aerostat";
 
-    return aerostat::pack(dynamic_cast<fake_objects_factory*>(csys),ms,gp);
+    return aerostat::pack(dynamic_cast<objects_factory*>(csys),ms,gp);
 }
 
 inline object_info_ptr create_camera(kernel::system* csys, create_msg const& msg)
@@ -225,7 +227,7 @@ inline object_info_ptr create_camera(kernel::system* csys, create_msg const& msg
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
 
-	return camera::create(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
+	return camera::create(dynamic_cast<objects_factory*>(csys), gp ,  msg.model_name);
 }
 
 inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg const& msg)
@@ -233,12 +235,12 @@ inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg cons
     decart_position dpos(msg.pos,msg.orien);
     geo_position gp(dpos, get_base());
 
-    return camera::pack(dynamic_cast<fake_objects_factory*>(csys), gp ,  msg.model_name);
+    return camera::pack(dynamic_cast<objects_factory*>(csys), gp ,  msg.model_name);
 }
 
 object_info_ptr create_cloud_zone(kernel::system* csys, update_cloud_zone_msg const& msg)
 {
-    return  cloud_zone::create(dynamic_cast<fake_objects_factory*>(csys), msg.settings);
+    return  cloud_zone::create(dynamic_cast<objects_factory*>(csys), msg.settings);
 }
 
 
@@ -249,7 +251,7 @@ inline object_info_ptr create_rocket_flare(kernel::system* csys, create_msg cons
 
 	rocket_flare::settings_t vs;
 
-	return rocket_flare::create(dynamic_cast<fake_objects_factory*>(csys),vs,gp);
+	return rocket_flare::create(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
 object_info_ptr create_object( kernel::system* csys, create_msg const& msg)

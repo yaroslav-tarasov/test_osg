@@ -2,7 +2,9 @@
 #include "stdafx.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 #include "kernel/systems.h"
@@ -23,6 +25,7 @@ namespace first
         , _vsys(nullptr)
         , msg_service_    (boost::bind(&impl::push_back_all, this, _1))
         , msg_service_vis_(boost::bind(&impl::push_back, this, _1))
+	    , _sys_fab (fn_reg::function<kernel::systems_factory_ptr()>(/*"systems",*/ "create_system_factory")())
     {
 
     }
@@ -70,7 +73,7 @@ namespace first
     kernel::system_ptr impl::get_control_sys()
     { 
         if(!_csys)
-            _csys = create_ctrl_system(msg_service_);
+            _csys = _sys_fab->create_ctrl_system(msg_service_);
         return  _csys;
     }
 
@@ -81,14 +84,14 @@ namespace first
 
         FIXME(damn properties)
             if (!_vsys)
-                _vsys = create_visual_system(msg_service_vis_, vis, props_);
+                _vsys = _sys_fab->create_visual_system(msg_service_vis_, vis, props_);
         return  _vsys;
     }
 
     kernel::system_ptr impl::get_model_sys()    
     {
         if (!_msys)
-            _msys = create_model_system(msg_service_, "place script here");
+            _msys = _sys_fab->create_model_system(msg_service_, "place script here");
         return  _msys;
     }
 

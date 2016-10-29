@@ -6,7 +6,9 @@
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 #include "kernel/systems/vis_system.h"
@@ -60,7 +62,8 @@ namespace
           , vis_sys_(sys)
           , vis_sys_props_(vis_sys_)
        {
-           sys_->subscribe_exercise_loaded(ready_f);
+           boost::signals2::connection conn = sys_->subscribe_exercise_loaded(ready_f);
+		   // conn.disconnect();
        }
 
        __forceinline void update(double time)
@@ -448,6 +451,7 @@ struct visapp_impl
         : osg_vis_  (av::CreateVisual())
         , msg_srv_  (msg_srv)
         , ready_f_  (ready_f)
+		, sys_fab_ (fn_reg::function<kernel::systems_factory_ptr()>(/*"systems",*/ "create_system_factory")())		
         , vis_sys_  (create_vis(props, osg_vis_, bytes), [this](){ end_this(); ready_f_(); })
     {}
 
@@ -485,7 +489,7 @@ private:
     {
         using namespace kernel;
         
-        auto ptr = create_visual_system(msg_srv_, vis, props);
+        auto ptr = sys_fab_->create_visual_system(msg_srv_, vis, props);
         
         dict_t dic;
         binary::unwrap(bytes, dic);
@@ -496,10 +500,13 @@ private:
     }
 
 private:
+
 	av::IVisualPtr                                              osg_vis_;
     kernel::msg_service&                                        msg_srv_;
-    sys_updater                                                 vis_sys_;
     on_ready_f                                                  ready_f_;
+	kernel::systems_factory_ptr						        	sys_fab_;
+    sys_updater                                                 vis_sys_;
+
 };
 
 struct visapp

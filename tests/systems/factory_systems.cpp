@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 #include "kernel/systems.h"

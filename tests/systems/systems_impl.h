@@ -31,5 +31,6 @@ namespace first
         kernel::system_ptr                                     _vsys;
         kernel::system_ptr                                     _csys;
 
+		kernel::systems_factory_ptr							_sys_fab;
     };
 }

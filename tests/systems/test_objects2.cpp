@@ -2,7 +2,9 @@
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "kernel/object_class.h"
 
 FIXME(Это что за нафиг нужно  для object_creators )
@@ -59,7 +61,7 @@ void create_objects(const std::string & airport)
     {
         airport::settings_t as;
         as.icao_code = icao_code;
-        auto obj_airport = airport::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as);
+        auto obj_airport = airport::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as);
     }
     
     force_log fl5;       
@@ -69,7 +71,7 @@ void create_objects(const std::string & airport)
     {
         std::string class_name = "aircraft";
         std::string unique_name = "aircraft_0";
-        std::vector<object_class_ptr> const &classes = kernel::fake_objects_factory_ptr(_csys)->object_classes() ;
+        std::vector<object_class_ptr> const &classes = kernel::objects_factory_ptr(_csys)->object_classes() ;
 
         kernel::object_class_ptr class_ptr ;
 
@@ -80,7 +82,7 @@ void create_objects(const std::string & airport)
             std::string n = (*it)->name();
         }
 
-        auto obj = kernel::fake_objects_factory_ptr(_csys)->create_object(class_ptr, unique_name); 
+        auto obj = kernel::objects_factory_ptr(_csys)->create_object(class_ptr, unique_name); 
         nodes_management::manager_ptr manager = find_first_child<nodes_management::manager_ptr>(obj);
         manager->set_model(aircraft::get_model("A319"));
     }
@@ -90,7 +92,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "A319";
         geo_position agp(apos,quaternion(cpr(30,0,0)));
-        //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
     {
 
@@ -98,7 +100,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "SB20";
         geo_position agp(apos,quaternion(cpr(0,0,0)));
-        //auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -106,7 +108,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "A321";
         geo_position agp(apos,quaternion(cpr(60,0,0)));
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -114,7 +116,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "B737";
         geo_position agp(apos,quaternion(cpr(60,0,0)));
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -122,7 +124,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "B744";
         geo_position agp(apos,quaternion(cpr(60,0,0)));
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -130,7 +132,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "B763";
         geo_position agp(apos,quaternion(cpr(60,0,0)));
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -142,7 +144,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "AN26";//"A333";
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     {
@@ -154,7 +156,7 @@ void create_objects(const std::string & airport)
         aircraft::settings_t as;
         as.kind = "A319";//"A333";
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
-//      auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+//      auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     force_log fl2;       
@@ -167,7 +169,7 @@ void create_objects(const std::string & airport)
 
         aircraft::settings_t as;
         as.kind = "KA27";
-        //auto obj_aircraft2 = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        //auto obj_aircraft2 = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
     }
 
     fms::trajectory::keypoints_t  kpts;
@@ -210,7 +212,7 @@ void create_objects(const std::string & airport)
 
         aircraft::settings_t as;
         as.kind = "A319";
-//      auto obj_aircraft = aircraft::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+//      auto obj_aircraft = aircraft::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
 //      aircraft::int_control_ptr(obj_aircraft)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
     }
 	
@@ -229,7 +231,7 @@ void create_objects(const std::string & airport)
 
 #if 0
         //geo_position agp(apos,quaternion(cpr(60,0,0)));
-        auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),as,agp);
+        auto obj_aircraft2 = aircraft_physless::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),as,agp);
 //      aircraft::int_control_ptr(obj_aircraft2)->set_trajectory(fms::trajectory::create(kpts,crs,vls));
 #endif
     }
@@ -247,7 +249,7 @@ void create_objects(const std::string & airport)
 		geo_position vgp(vpos,quaternion(cpr(30 + 180,0,0)));
 
 #if 0
-		auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+		auto obj_vehicle = vehicle::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
 #endif
 		force_log fl9;       
 		LOG_ODS_MSG( "create_objects(const std::string& airport): vehicle::create " << hr_timer.set_point() << "\n");
@@ -260,7 +262,7 @@ void create_objects(const std::string & airport)
 	cg::geo_point_3 vpos(0.00065,0.00095,0.0);
 	geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-	//auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	//auto obj_vehicle = vehicle::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
 
 	}
 
@@ -271,7 +273,7 @@ void create_objects(const std::string & airport)
 		cg::geo_point_3 vpos(0.00055,0.0009,0.0);
 		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-	//	auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	//	auto obj_vehicle = vehicle::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
 	}
 
 
@@ -282,7 +284,7 @@ void create_objects(const std::string & airport)
 		cg::geo_point_3 vpos(0.0005,0.0009,0.0);
 		geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-	//	auto obj_vehicle = vehicle::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+	//	auto obj_vehicle = vehicle::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
 	}
 
     //const kernel::object_collection  *  col = dynamic_cast<kernel::object_collection *>(_csys.get());
@@ -295,7 +297,7 @@ void create_objects(const std::string & airport)
 
     simple_route::settings_t srs;
     srs.speed = 6;
-    auto sr_obj = simple_route::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),srs,vgp.pos);
+    auto sr_obj = simple_route::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),srs,vgp.pos);
 
     force_log fl6;       
     LOG_ODS_MSG( "create_objects(const std::string& airport): simple_route::create " << hr_timer.set_point() << "\n");
@@ -308,7 +310,7 @@ void create_objects(const std::string & airport)
         cg::geo_point_3 vpos(0.00055,0.0009,300.0);
         geo_position vgp(vpos,quaternion(cpr(30,0,0)));
 
-        auto obj_flock_manager = flock::manager::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+        auto obj_flock_manager = flock::manager::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
     }
 #endif
 
@@ -319,7 +321,7 @@ void create_objects(const std::string & airport)
 		cg::geo_point_3 vpos(0.00055,0.0009,300.0);
 		geo_position vgp(vpos,quaternion(cpr(30)));
 
-		auto obj_aerostat = aerostat::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+		auto obj_aerostat = aerostat::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
 	}
 #endif
 
@@ -330,7 +332,7 @@ void create_objects(const std::string & airport)
         cg::geo_point_3 vpos(0.00055,/*0.0009*/0.0,2.0);
         geo_position vgp(vpos, point_3(0,10,0), quaternion(cpr(30,0,0)), point_3());
 
-        auto obj_aerostat = human::create(dynamic_cast<fake_objects_factory*>(kernel::fake_objects_factory_ptr(_csys).get()),vs,vgp);
+        auto obj_aerostat = human::create(dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(_csys).get()),vs,vgp);
     }
 #endif
 }

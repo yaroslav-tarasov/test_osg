@@ -22,7 +22,9 @@
 #include "cloud_zone/cloud_zone_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 
 #include "objects/objects_factory.h"
 
@@ -32,7 +34,7 @@ namespace
 
     std::list<obj_create_data> creating_objects_list_t;
 
-    inline object_info_ptr sys_object_create(fake_objects_factory* sys, obj_create_data const& descr)
+    inline object_info_ptr sys_object_create(objects_factory* sys, obj_create_data const& descr)
     {
          return sys->create_object(descr);
     }
@@ -44,7 +46,7 @@ namespace aircraft
 
 using namespace kernel;
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "aircraft";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -60,7 +62,7 @@ using namespace kernel;
         return ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
@@ -71,7 +73,7 @@ namespace flock
 {
     namespace manager
     {
-        obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+        obj_create_data pack(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
         {
             const std::string class_name = "flock_manager";
             const std::string unique_name = sys->generate_unique_name(class_name);
@@ -79,7 +81,7 @@ namespace flock
             return obj_create_data(class_name, unique_name, dict::wrap(manager_data(sett, state_t(init_pos.pos, init_pos.orien))));	
         }
 
-        object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+        object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
         {
             return sys_object_create(sys, pack( sys, sett, init_pos));	
         }
@@ -89,7 +91,7 @@ namespace flock
 namespace human
 {
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "human";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -103,7 +105,7 @@ namespace human
         return ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
@@ -112,7 +114,7 @@ namespace human
 namespace aerostat
 {
 
-	obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+	obj_create_data pack(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
 	{
 		const std::string class_name = "aerostat";
 		const std::string unique_name = sys->generate_unique_name(class_name);
@@ -124,7 +126,7 @@ namespace aerostat
 		return ocd;	
 	}
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
          return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
@@ -135,7 +137,7 @@ namespace vehicle
 {
     using namespace kernel;
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "vehicle";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -147,7 +149,7 @@ namespace vehicle
         return ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
     {
         return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
@@ -158,7 +160,7 @@ namespace simple_route
 {
     using namespace kernel;
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
     {
         const std::string class_name = "simple_route";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -169,7 +171,7 @@ namespace simple_route
         return  ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett,const cg::geo_point_3& init_pos)
     {
         return sys_object_create(sys, pack( sys, sett, init_pos));	
     }
@@ -181,7 +183,7 @@ namespace aircraft_physless
 
     using namespace kernel;
     
-    obj_create_data pack(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "aircraft_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -195,7 +197,7 @@ namespace aircraft_physless
         return ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         return sys_object_create(sys, aircraft_physless::pack( sys, sett, init_pos));	
     }
@@ -207,7 +209,7 @@ namespace helicopter_physless
 
     using namespace kernel;
 
-    obj_create_data pack(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    obj_create_data pack(objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "helicopter_physless";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -221,7 +223,7 @@ namespace helicopter_physless
         return  ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys,const aircraft::settings_t& sett,const geo_position& init_pos)
     {
         return sys_object_create(sys, helicopter_physless::pack( sys, sett, init_pos));
     }
@@ -233,7 +235,7 @@ namespace airport
 
     using namespace kernel;
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett)
     {
         const std::string class_name = "airport";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -249,7 +251,7 @@ namespace airport
         return  ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett)
     {
         return sys_object_create(sys, pack( sys, sett));
     }
@@ -259,7 +261,7 @@ namespace camera
 {
 	using namespace kernel;
 
-	obj_create_data pack(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
+	obj_create_data pack(objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
 	{
 		const std::string class_name = "camera";
 		const std::string unique_name = name?*name:sys->generate_unique_name(class_name);
@@ -276,7 +278,7 @@ namespace camera
 		return  ocd;	
 	}
 
-    object_info_ptr create(fake_objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
+    object_info_ptr create(objects_factory* sys,const geo_position& init_pos, boost::optional<std::string> name)
     {
         return sys_object_create(sys, pack( sys,  init_pos, name));
     }
@@ -286,7 +288,7 @@ namespace rocket_flare
 {
 	using namespace kernel;
 
-	obj_create_data pack(fake_objects_factory* sys,const settings_t& sett, const geo_position& init_pos)
+	obj_create_data pack(objects_factory* sys,const settings_t& sett, const geo_position& init_pos)
 	{
 		const std::string class_name = "rocket_flare";
 		const std::string unique_name = sys->generate_unique_name(class_name);
@@ -302,7 +304,7 @@ namespace rocket_flare
         return  ocd;	
 	}
 
-	object_info_ptr create(fake_objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
+	object_info_ptr create(objects_factory* sys,const settings_t& sett,const geo_position& init_pos)
 	{
 		return sys_object_create(sys, pack( sys, sett, init_pos));	
 	}
@@ -312,7 +314,7 @@ namespace rocket_flare
 namespace cloud_zone
 {
 
-    obj_create_data pack(fake_objects_factory* sys,const settings_t& sett)
+    obj_create_data pack(objects_factory* sys,const settings_t& sett)
     {
         const std::string class_name = "cloud_zone";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -326,7 +328,7 @@ namespace cloud_zone
         return ocd;	
     }
 
-    object_info_ptr create(fake_objects_factory* sys,const settings_t& sett)
+    object_info_ptr create(objects_factory* sys,const settings_t& sett)
     {
         return sys_object_create(sys, pack( sys, sett));	
     }
@@ -336,14 +338,14 @@ namespace cloud_zone
 namespace auto_object
 {
 
-    obj_create_data pack(fake_objects_factory* sys, const std::string& class_name)
+    obj_create_data pack(objects_factory* sys, const std::string& class_name)
     {
         const std::string unique_name = sys->generate_unique_name(class_name);
 
         return obj_create_data(class_name, /*unique_name*/class_name);	
     }
 
-    object_info_ptr create(fake_objects_factory* sys, const std::string& class_name)
+    object_info_ptr create(objects_factory* sys, const std::string& class_name)
     {
         return sys_object_create(sys, pack( sys, class_name));	
     }

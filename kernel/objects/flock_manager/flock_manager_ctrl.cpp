@@ -6,7 +6,9 @@
 
 //       Для создания дочерних объектов (чет фуфел какой-то)
 FIXME(Создание множества дочерних объектов и клонирование)
+#if 0
 #include "kernel/systems/fake_system.h"
+#endif
 #include "flock_child/flock_child_view.h"
 #include "nodes_manager/nodes_manager_view.h"
 
@@ -19,7 +21,7 @@ using namespace kernel;
 
 namespace child 
 {
-    object_info_ptr create(fake_objects_factory* sys, uint32_t   parent_id, const settings_t& sett,const geo_position& init_pos)
+    object_info_ptr create(objects_factory* sys, uint32_t   parent_id, const settings_t& sett,const geo_position& init_pos)
     {
         const std::string class_name = "flock_child";
         const std::string unique_name = sys->generate_unique_name(class_name);
@@ -59,7 +61,7 @@ void ctrl::update( double time )
 	int count = settings_._childAmount - roamers_.size();
 	if (count>0)
 	{
-		auto * of = dynamic_cast<kernel::fake_objects_factory*>(sys_);
+		auto * of = dynamic_cast<kernel::objects_factory*>(sys_);
 
 		simplerandgen  rnd(static_cast<unsigned>(::time(nullptr)));
 

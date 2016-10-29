@@ -80,7 +80,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NON_DLL;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;ANIM_TURN_OFF;NSOFTBODY_WORLD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext\EASTL\include;$(SolutionDir)\ext\include;$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\_include\kernel;$(SolutionDir)\_include\kernel\systems;$(SolutionDir)\_include\application;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\GFSDK_HBAO\lib;$(OSG_DIR)\..\SmartBody\src\SmartBody;$(OSG_DIR)\..\SmartBody\include\steersuite;$(OSG_DIR)\..\SmartBody\include\bonebus;$(OSG_DIR)\..\SmartBody\include\vhcl;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;D:\Work\prj\flex-080\flex\core;$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext\EASTL\include;$(SolutionDir)\ext\include;$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\_include\kernel;$(SolutionDir)\_include\kernel\systems;$(SolutionDir)\kernel\systems;$(SolutionDir)\_include\application;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\GFSDK_HBAO\lib;$(OSG_DIR)\..\SmartBody\src\SmartBody;$(OSG_DIR)\..\SmartBody\include\steersuite;$(OSG_DIR)\..\SmartBody\include\bonebus;$(OSG_DIR)\..\SmartBody\include\vhcl;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;D:\Work\prj\flex-080\flex\core;$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -725,9 +725,23 @@
     <ClCompile Include="kernel\phys\rocket_flare_phys.cpp" />
     <ClCompile Include="kernel\phys\static_convex.cpp" />
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp" />
+    <ClCompile Include="kernel\systems\common\systems_factory.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\ctrl_system\ctrl_system_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\systems\model_system\model_system_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\systems\objects_base\base_view.cpp" />
-    <ClCompile Include="kernel\systems\system_base\fake_system.cpp" />
+    <ClCompile Include="kernel\systems\system_base\system_base.cpp" />
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp" />
+    <ClCompile Include="kernel\systems\visual_system\visual_system_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="tests\systems\factory_systems.cpp" />
     <ClCompile Include="tests\systems\systems_impl.cpp" />
     <ClCompile Include="tests\systems\systems_impl2.cpp" />
