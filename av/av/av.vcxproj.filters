@@ -100,6 +100,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\av\shaders">
+      <UniqueIdentifier>{d0cbf64f-7558-4b66-8683-c57f3ec2a263}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hmi">
+      <UniqueIdentifier>{821bb8d4-d9ae-4154-a518-7266ff404fd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hmi">
+      <UniqueIdentifier>{27e8efe4-fd5e-4e66-8936-c8de992f0603}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -109,9 +118,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="av.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\avCore\InstancesNum.h">
@@ -237,15 +243,15 @@
     <ClInclude Include="..\avGui\CEGUIDrawable.h">
       <Filter>Header Files\av\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\_include\application\main_window.h">
+      <Filter>Header Files\hmi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\_include\application\menu.h">
+      <Filter>Header Files\hmi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="av.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\EnvRenderer.cpp">
@@ -481,6 +487,21 @@
     </ClCompile>
     <ClCompile Include="..\avUtils\workqueue.cpp">
       <Filter>Source Files\av\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shaders.cpp">
+      <Filter>Source Files\av\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hmi\gui_vis\main_window_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hmi\gui_vis\menu_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hmi\gui_vis\panels\time_panel_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
+      <Filter>Source Files\hmi</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

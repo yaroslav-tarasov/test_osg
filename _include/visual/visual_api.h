@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef NON_DLL
+#ifdef STATIC_VISUAL_API
 # define VISUAL_API
 #else
 #ifdef  VISUAL_EXPORTS

@@ -1,17 +1,17 @@
 #include "stdafx.h"
 
-#include "empty_scene.h"
-#include "animutils.h"
+#include "av/avUtils/empty_scene.h"
+#include "av/avUtils/animutils.h"
 #include "av/precompiled.h"
-#include "PickHandler.h"
+#include "av/avUtils/PickHandler.h"
 
-#include "osg_helpers.h"
+#include "av/avUtils/osg_helpers.h"
 
 #include <osgAnimation/RigGeometry>
 #include <osgAnimation/RigTransformHardware>
 #include <osgAnimation/BoneMapVisitor>
 
-#include "utils\visitors\find_node_visitor.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
 
 #include "creators.h"
 #include "av/avCore/InstancedData.h"

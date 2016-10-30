@@ -56,12 +56,6 @@
     <ClCompile Include="bullet_exporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\visitors\find_node_visitor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\materials.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\av\avCore\Utils.cpp">
       <Filter>Source Files\av\avCore</Filter>
     </ClCompile>
@@ -79,6 +73,12 @@
     </ClCompile>
     <ClCompile Include="..\..\av\shaders.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\materials.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

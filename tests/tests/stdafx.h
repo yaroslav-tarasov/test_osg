@@ -78,8 +78,10 @@ enum objects_t{
 //
 
 #include "av/avCore/Database.h"
-#include "visitors/find_node_visitor.h"
-#include "visitors/visitors.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
+#include "av/avUtils/visitors/visitors.h"
 #include "av/avScene.h"
 
+#include "nodes_management_fwd.h"
 
+namespace nm = nodes_management;

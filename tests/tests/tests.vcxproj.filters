@@ -149,9 +149,6 @@
     <ClCompile Include="..\creators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\utils\empty_scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\kernel\fms\dubins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -230,20 +227,26 @@
     <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\materials.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\anim_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\utils\animation_handler.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\main_scene.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\visitors\find_node_visitor.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\materials.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\animation_handler.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\empty_scene.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avCore\InstancesNum.cpp">
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

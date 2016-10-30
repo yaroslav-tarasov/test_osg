@@ -152,10 +152,15 @@ void simple2()
     gl_Position = gl_ModelViewProjectionMatrix * mV * vec4( vertex, 1.0 );
 }
 
+void simple()
+{
+	 gl_Position = gl_ModelViewProjectionMatrix * vec4( gl_Vertex.xyz, 1.0 );
+}
+
 void main()
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-	simple2();
+	simple();
 }
 
 	

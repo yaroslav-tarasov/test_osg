@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "common/dyn_lib.h"
+#include "common/dyn_lib.h"
 
 namespace app
 {
@@ -30,8 +30,12 @@ main_window_ptr create_main_win();
 
 } // end of namespace app
 
-//#if defined(GUI_ATTR_LIB) || defined(GUI_BASE_LIB) || defined(GUI_IPO_LIB) || defined(GUI_ATC_LIB) || defined(PARKING_LIB) || defined(ANI_LOADER_LIB)
-//# define BASAPPLIC_API __HELPER_DL_EXPORT
-//#else
-//# define BASAPPLIC_API __HELPER_DL_IMPORT
-//#endif
+#if !defined(STATIC_BASAPPLIC_API)
+#if defined(GUI_ATTR_LIB) || defined(GUI_BASE_LIB) || defined(GUI_IPO_LIB) || defined(GUI_ATC_LIB) || defined(PARKING_LIB) || defined(ANI_LOADER_LIB) || defined(GUI_AV_LIB)
+# define BASAPPLIC_API __HELPER_DL_EXPORT
+#else
+# define BASAPPLIC_API __HELPER_DL_IMPORT
+#endif
+#else 
+# define BASAPPLIC_API 
+#endif

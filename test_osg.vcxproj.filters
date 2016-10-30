@@ -273,6 +273,9 @@
     <Filter Include="Source Files\av\utils">
       <UniqueIdentifier>{5455d1f1-c858-44fa-a7ca-f4a205504dca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\shaders">
+      <UniqueIdentifier>{3c75f406-f5de-4d99-89f5-69568f69ae4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="misc\shaders\tess_quad.tcs">
@@ -952,9 +955,6 @@
     <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
       <Filter>Source Files\objects\airport</Filter>
     </ClCompile>
-    <ClCompile Include="av\shaders.cpp">
-      <Filter>Source Files\shaders</Filter>
-    </ClCompile>
     <ClCompile Include="ext\spark\SmokeNode.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
@@ -1404,6 +1404,9 @@
     </ClCompile>
     <ClCompile Include="kernel\systems\model_system\model_system_impl.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="av\shaders.cpp">
+      <Filter>Source Files\av\shaders</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,19 +3,18 @@
 
 #include "stdafx.h"
 
-#include "empty_scene.h"
-#include "animutils.h"
-
-#include "osg_helpers.h"
-
 #include <osgAnimation/RigGeometry>
 #include <osgAnimation/RigTransformHardware>
 #include <osgAnimation/BoneMapVisitor>
 #include <osg/TextureRectangle>
 
-#include "utils/visitors/find_node_visitor.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
+#include "av/avUtils/empty_scene.h"
+#include "av/avUtils/animutils.h"
+#include "av/avUtils/osg_helpers.h"
 
 #include "av/avCore/InstancedData.h"
+
 #include "core_anim.h"
 
 

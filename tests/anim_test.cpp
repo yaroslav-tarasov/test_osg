@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "creators.h"
 #include "av/shaders.h"
-#include "animation_handler.h"
+#include "av/avUtils/animation_handler.h"
 
 
 static const std::string animationName("Default");

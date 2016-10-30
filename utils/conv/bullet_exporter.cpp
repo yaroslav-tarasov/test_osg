@@ -5,9 +5,8 @@
 #include <osgbCollision/CollisionShapes.h>
 #include <osgbCollision/Utils.h>
 
-#include "osg_helpers.h"
-//#include "phys/bullet_helpers.h"
-#include "visitors/find_node_visitor.h"
+#include "av/avUtils/osg_helpers.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
 
 //#ifndef _DEBUG
 //#pragma comment(lib, "osgbCollision.lib")

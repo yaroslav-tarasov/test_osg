@@ -833,7 +833,9 @@ bool Scene::Initialize( osgViewer::Viewer* vw)
     // Initialize particle engine
     // 
 
+#if !defined(VISUAL_EXPORTS)
     spark::init();
+#endif
 
 #ifdef SCREEN_TEXTURE    
     //
@@ -1379,6 +1381,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
     
     OSG_WARN << "Scene::load(" << path <<  ") enter \n";
 
+#if !defined(VISUAL_EXPORTS)
     if( path == "smoke" )
     {
         osg::Node* pat =  parent?findFirstNode(parent,"pat",FindNodeVisitor::not_exact,osg::NodeVisitor::TRAVERSE_PARENTS):nullptr;
@@ -1401,6 +1404,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
         return res_node;
     }
+#endif
 
     if( path == "arrested_gear.scg" )
     {

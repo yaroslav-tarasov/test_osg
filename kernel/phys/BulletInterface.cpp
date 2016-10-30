@@ -163,9 +163,9 @@ namespace aircraft
 #else
             cs_body = osgbCollision::btCompoundShapeFromOSGGeodes( body,CONVEX_HULL_SHAPE_PROXYTYPE,osgbCollision::Y,3 );
 #endif
-			sh_f->setNodeMask(/*0xffffffff*/0x00010000);
-			sh_r_r->setNodeMask(/*0xffffffff*/0x00010000);
-			sh_r_l->setNodeMask(/*0xffffffff*/0x00010000);
+			sh_f->setNodeMask(REFLECTION_MASK/*0x00010000*/);
+			sh_r_r->setNodeMask(REFLECTION_MASK/*0x00010000*/);
+			sh_r_l->setNodeMask(REFLECTION_MASK/*0x00010000*/);
 
             if(cs_body)
 			    cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);
@@ -229,7 +229,7 @@ namespace ray_cast_vehicle
             btCollisionShape* cs_body   = osgbCollision::/*btConvexHullCollisionShapeFromOSG*//*btConvexTriMeshCollisionShapeFromOSG*/btTriMeshCollisionShapeFromOSG( body );
         
             for (auto it = wheels.begin();it != wheels.end();++it)
-                (*it)->setNodeMask(/*0xffffffff*/0x00010000);
+                (*it)->setNodeMask(REFLECTION_MASK/*0x00010000*/);
 
 
             cs.cs_->addChildShape(btTransform(btQuaternion(0,0,0),to_bullet_vector3(cs.offset_)),cs_body);

@@ -54,7 +54,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>$(OSG_DIR)\glm_971\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OSG_DIR)\glm_971\include;$(SolutionDir)\_include\kernel;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -70,7 +70,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\ext\osgBullet;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\$(OSG_WITH_VER)\build\include;$(OSG_DIR)\$(OSG_WITH_VER)\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BULLET_DIR)\Extras\Serialize\BulletFileLoader;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;$(OSG_DIR)\glm_971\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);..;$(SolutionDir);$(SolutionDir)\ext;$(SolutionDir)\ext\osgBullet;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\application;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\_include\kernel;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(OSG_DIR)\3rdparty\include;$(OSG_DIR)\$(OSG_WITH_VER)\build\include;$(OSG_DIR)\$(OSG_WITH_VER)\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;C:\Work\bullet-2.82-r2704\src;$(BULLET_DIR)\src;$(BULLET_DIR)\Extras\Serialize\BulletWorldImporter;$(BULLET_DIR)\Extras\Serialize\BulletFileLoader;$(BOOST_INCLUDE);$(BOOST_DIR);$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;$(OSG_DIR)\glm_971\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -121,6 +121,10 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\..\av\avCore\InstancesNum.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\av\avCore\LOD.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
@@ -145,24 +149,30 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\animation_handler.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\empty_scene.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\materials.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="..\..\av\avUtils\visitors\find_node_visitor.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="..\..\av\shaders.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\..\core\config\config.cpp" />
     <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
-    <ClCompile Include="..\..\utils\animation_handler.cpp" />
-    <ClCompile Include="..\..\utils\empty_scene.cpp" />
-    <ClCompile Include="..\..\utils\materials.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-    </ClCompile>
     <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\utils\visitors\find_node_visitor.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\..\_include\objects\bullet_importer.cpp" />
     <ClCompile Include="..\animation_test.cpp" />
@@ -202,7 +212,9 @@
     </ClCompile>
     <ClCompile Include="..\grass_test2.cpp" />
     <ClCompile Include="..\light_test.cpp" />
-    <ClCompile Include="..\main_scene.cpp" />
+    <ClCompile Include="..\main_scene.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\main_shadows.cpp" />
     <ClCompile Include="..\main_shadows_2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

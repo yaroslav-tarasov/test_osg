@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "application/application_fwd.h"
+#include "application/application_fwd.h"
 #include "application/panels_fwd.h"
 #include "application/widget.h"
 //#include "common/event.h"
@@ -50,6 +50,6 @@ struct vis_settings_panel
     DECLARE_EVENT(set_global_intensity , (float) );
 };
 
-/*BASAPPLIC_API*/ vis_settings_panel_ptr create_vis_settings_panel( const zones_t &zones, const app::settings_t& s);
+BASAPPLIC_API vis_settings_panel_ptr create_vis_settings_panel( const zones_t &zones, const app::settings_t& s);
 
 } // end of namespace app

@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////////
 // Generic helper definitions for shared library support
 #if defined _WIN32 || defined __CYGWIN__
-  //#define __HELPER_DL_IMPORT __declspec(dllimport)
-  //#define __HELPER_DL_EXPORT __declspec(dllexport)  
-  #define __HELPER_DL_IMPORT
-  #define __HELPER_DL_EXPORT
+	#define __HELPER_DL_IMPORT __declspec(dllimport)
+	#define __HELPER_DL_EXPORT __declspec(dllexport)  
+  //#define __HELPER_DL_IMPORT
+  //#define __HELPER_DL_EXPORT
   #define __HELPER_DL_LOCAL
   #pragma warning (disable:4251)
 #else

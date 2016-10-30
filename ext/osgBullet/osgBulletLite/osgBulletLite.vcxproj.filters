@@ -32,9 +32,6 @@
     <ClCompile Include="osgBulletLite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\osgbCollision\BoundingCylinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

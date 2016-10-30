@@ -49,7 +49,7 @@ void createDAIGeometry( osg::Geometry& geom, int nInstances=1 )
 Grass::Grass ()
 {
 
-	_instances	= 1024.0f;		// grid cells _instances*_instances // 40 bydef
+	_instances	= 1024/*1024.0f*/;		// grid cells _instances*_instances // 40 bydef
 	_spacing		= 0.2f;		// spacing
 	_heightAdjust	= 0.0f;
 	_grassStretch	= 0.1f;

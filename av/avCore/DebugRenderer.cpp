@@ -1,5 +1,6 @@
 #include "DebugRenderer.h"
 #include <osgbCollision/Utils.h>
+#include "av/avCore/Global.h"
 
 #include <iostream>
 
@@ -113,7 +114,7 @@ void DebugRenderer::setEnabled( bool enable )
     }
     else
     {
-        _group->setNodeMask( /*0xffffffff*/0x00010000 );
+        _group->setNodeMask( REFLECTION_MASK/*0x00010000*/ );
     }
     _enabled = enable;
 }

@@ -3,7 +3,10 @@
 #include "kernel/systems/vis_system.h"
 
 #include "visual_object_impl.h"
+#include "av/avCore/Global.h"
 #include "av/avScene/Scene.h"
+
+
 #include "av/avUtils/animutils.h"
 #include "av/avUtils/visitors/cache_nodes_visitor.h"
 
@@ -162,7 +165,7 @@ namespace kernel
     void visual_object_impl::set_visible(bool visible)
     {
         if(p_->node_) 
-            p_->node_->setNodeMask(visible?/*0xffffffff*/0x00010000:0);
+            p_->node_->setNodeMask(visible?REFLECTION_MASK/*0x00010000*/:0);
     }
 
     bool visual_object_impl::get_visible()

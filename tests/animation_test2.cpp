@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "empty_scene.h"
-#include "animutils.h"
+#include "av/avUtils/empty_scene.h"
+#include "av/avUtils/animutils.h"
 #include "av/precompiled.h"
-#include "PickHandler.h"
+#include "av/avUtils/PickHandler.h"
 
-#include "osg_helpers.h"
+#include "av/avUtils/osg_helpers.h"
 
 const bool walking = true;
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "visitors/info_visitor.h"
-#include "visitors/find_tex_visitor.h"
+#include "av/avUtils/visitors/info_visitor.h"
+#include "av/avUtils/visitors/find_tex_visitor.h"
 #include "creators.h"
 #include "av/shaders.h"
 

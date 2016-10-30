@@ -5,6 +5,8 @@
 #include "nodes_manager_view.h"
 #include "nodes_manager_visual.h"
 
+#include "av/avCore/Global.h"
+
 namespace nodes_management
 {
 
@@ -287,7 +289,7 @@ void vis_node_impl::sync_position()
 
     for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
     {
-        (*(it))->setNodeMask(visible?/*0xffffffff*/0x00010000:0);   // set_process_flag(visible);
+        (*(it))->setNodeMask(visible?REFLECTION_MASK/*0x00010000*/:0);   // set_process_flag(visible);
     }
 
     if (visible)

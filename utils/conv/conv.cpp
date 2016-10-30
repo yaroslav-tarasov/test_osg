@@ -2,15 +2,16 @@
 
 #include "OrientationConverter.h"
 #include "optimize_nodes.h"
-#include "visitors/visitors.h"
-#include "visitors/find_node_visitor.h"
 
 #include "alloc/pool_stl.h"
 #include "reflection/proc/binary.h"
 #include "atc/model_structure.h"
-#include "osg_helpers.h"
-#include "visitors/heil_visitor.h"
-#include "utils/materials.h"
+
+#include "av/avUtils/osg_helpers.h"  
+#include "av/avUtils/visitors/visitors.h"
+#include "av/avUtils/visitors/find_node_visitor.h"
+#include "av/avUtils/visitors/heil_visitor.h"
+#include "av/avUtils/materials.h"
 
 
 typedef std::vector<std::string> FileNameList;

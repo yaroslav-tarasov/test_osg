@@ -16,6 +16,6 @@ struct time_panel
     virtual void set_time(double time) = 0;
 };
 
-/*BASAPPLIC_API*/ time_panel_ptr create_time_panel();
+BASAPPLIC_API time_panel_ptr create_time_panel();
 
 } // end of namespace app

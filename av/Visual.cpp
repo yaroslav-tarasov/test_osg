@@ -182,7 +182,7 @@ void Visual::InitializeViewer(osg::ref_ptr<osg::GraphicsContext::Traits> cTraits
     // Create viewer and 
     _viewerPtr = new osgViewer::Viewer();
 
-#ifdef NON_DLL
+#ifdef STATIC_VISUAL_API
     _viewerPtr->apply(new osgViewer::SingleScreen(0));
 #endif
 
