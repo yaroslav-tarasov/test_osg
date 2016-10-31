@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "environment_view.h"
 #include "environment_common.h"
 #include "kernel/object_info.h"

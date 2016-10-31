@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "simple_route_ctrl.h"
 
 namespace simple_route

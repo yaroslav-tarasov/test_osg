@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "aerostat_ctrl.h"
 
 namespace aerostat

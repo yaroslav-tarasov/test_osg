@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "human_model_states.h"
 #include "human_model.h"
 

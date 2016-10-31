@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "meteo_proxy_view.h"
 
 namespace meteo_proxy

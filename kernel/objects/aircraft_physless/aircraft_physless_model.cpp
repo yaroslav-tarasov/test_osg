@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "aircraft_physless_model.h"
 #include "aircraft_physless_common.h"
 #include "common/chassis_common.h"

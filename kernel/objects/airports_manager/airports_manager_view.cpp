@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "airports_manager_view.h"
 
 namespace airports_manager

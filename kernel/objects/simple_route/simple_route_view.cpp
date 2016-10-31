@@ -1,7 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
-
 #include "simple_route_view.h"
 #include "reflection/proc/binary.h"
 
@@ -118,12 +114,14 @@ void view::point_dragged(size_t idx, ani::point_pos const& new_pos)
 void view::on_point_added(msg::add_point_msg const& pnt)
 {
      point_added(pnt.idx,ani::point_pos(0,pnt.pos));
+#if 0
      LOG_ODS_MSG("on_point_added -------\n" 
                 << "pnt.idx=" << pnt.idx 
                 << " pnt.pos.x= " << pnt.pos.lat 
                 << " pnt.pos.y= " << pnt.pos.lon 
                 << " anchor_points().size()= " << anchor_points().size()
                 << "\n");
+#endif
 }
 
 void view::on_settings(msg::settings_msg_t const& settings)

@@ -2,9 +2,6 @@
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"
-#if 0
-#include "kernel/systems/fake_system.h"
-#endif
 #include "kernel/object_class.h"
 
 FIXME(Это что за нафиг нужно  для object_creators )
@@ -30,6 +27,7 @@ FIXME(Это что за нафиг нужно  для object_creators )
 
 #include "utils/krv_import.h"
 
+#include "objects/common/net_object_factory.h"
 
 using namespace kernel;
 
@@ -77,13 +75,12 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
     force_log fl;       
     LOG_ODS_MSG( "pack_objects(const std::string& airport): airport::settings_t " << hr_timer.set_point() << "\n");
     
-    if( auto f = fn_reg::function<kernel::obj_create_data (kernel::system*, net_layer::msg::create_msg const&)>( "pack_object"))
-        for (auto it = msg.data.begin(); it != msg.data.end(); ++it)
-        {
-                net_layer::msg::create_msg m;
-                network::safe_read_msg(*it,m);
-                obj_list.push_back(f(csys.get(), m).add_data(m.ext_id));
-        }
+    for (auto it = msg.data.begin(); it != msg.data.end(); ++it)
+    {
+        net_layer::msg::create_msg m;
+        network::safe_read_msg(*it,m);
+        obj_list.push_back(pack_object(csys.get(), m).add_data(m.ext_id));
+    }
     
     csys->pack_exercise(obj_list, dict, true);
 

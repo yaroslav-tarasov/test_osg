@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "aircraft_fms_model.h"
 
 #include "fms/traj_calc.h"

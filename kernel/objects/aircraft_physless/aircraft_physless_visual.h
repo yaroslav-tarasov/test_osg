@@ -4,7 +4,7 @@
 #include "common/visual_objects_support_fwd.h"
 #include "common/labels_management.h"
 
-#include "av/avFx/Fx.h"
+#include "av/Fx.h"
 
 namespace aircraft_physless
 {

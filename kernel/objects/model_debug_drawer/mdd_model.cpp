@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "mdd_model.h"
 #include "remote_render.h"
 

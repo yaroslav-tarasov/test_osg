@@ -1,10 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
-
-//#include "objects/helicopter_physless.h"
-//#include "helicopter_physless/helicopter_physless_common.h"
-
 #include "sync_heli_phys_state.h"
 #include "sync_heli_transition_phys_fms.h"
 #include "sync_heli_none_state.h"

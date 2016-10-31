@@ -1,5 +1,3 @@
-#include "precompiled_objects.h"
-
 #include "labels_manager_view.h"
 
 namespace labels_manager

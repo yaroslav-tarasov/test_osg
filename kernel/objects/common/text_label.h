@@ -4,6 +4,10 @@
 #include "common/labels_management.h"
 #include "common/visual_objects_support_fwd.h"
 
+#include <osg/Geode>
+#include <osgText/Text>
+#include <osg/ComputeBoundsVisitor>
+
 namespace visual_objects
 {
     struct label_support : labels_management::label_provider

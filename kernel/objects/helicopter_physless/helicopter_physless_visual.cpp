@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "helicopter_physless_visual.h"
 
 #include "ext/spark/SmokeNode.h"

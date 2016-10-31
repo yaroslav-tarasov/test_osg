@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "dubin_route_ctrl.h"
 
 namespace dubin_route

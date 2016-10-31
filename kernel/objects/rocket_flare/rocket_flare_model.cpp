@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "rocket_flare_model.h"
 //#include "common/collect_collision.h"
 #include "phys/sensor.h"

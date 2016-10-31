@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "node_tree_iterator.h"
 
 namespace nodes_management

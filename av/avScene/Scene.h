@@ -7,7 +7,7 @@
 #include "av/avLights/LightMaps.h"
 #include "av/avCore/DecalRender.h"
 #include "av/ISky.h"
-#include "av/avFx/Fx.h"
+#include "av/Fx.h"
 
 #include "visual/visual_api.h"
 

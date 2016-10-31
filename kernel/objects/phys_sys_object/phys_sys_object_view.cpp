@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "phys_sys_object_view.h"
 
 namespace phys

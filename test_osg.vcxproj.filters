@@ -724,9 +724,6 @@
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
-    <ClCompile Include="_include\objects\bullet_importer.cpp">
-      <Filter>Source Files\phys</Filter>
-    </ClCompile>
     <ClCompile Include="kernel\systems\visual_system\visual_object_impl.cpp">
       <Filter>Source Files\systems</Filter>
     </ClCompile>
@@ -1407,6 +1404,9 @@
     </ClCompile>
     <ClCompile Include="av\shaders.cpp">
       <Filter>Source Files\av\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\bullet_importer.cpp">
+      <Filter>Source Files\phys</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 #include "helicopter_physless_view.h"
 #include "common/visual_objects_support_fwd.h"
-#include "av/avFx/Fx.h"
+#include "av/Fx.h"
 #include "common/labels_management.h"
 
 

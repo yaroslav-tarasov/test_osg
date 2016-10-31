@@ -4,7 +4,6 @@
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
 #include "kernel/systems/systems_base.h"
-#include "kernel/systems/fake_system.h"
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 #include "common/ext_msgs.h"

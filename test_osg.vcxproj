@@ -585,127 +585,424 @@
     <ClCompile Include="hmi\gui_vis\panels\vis_settings_panel_impl.cpp" />
     <ClCompile Include="kernel\fms\dubins.cpp" />
     <ClCompile Include="kernel\fms\trajectory.cpp" />
-    <ClCompile Include="kernel\objects\ada\ada_view.cpp" />
-    <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\aerostat\aerostat_model.cpp" />
-    <ClCompile Include="kernel\objects\aerostat\aerostat_view.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_shassis_impl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_view.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\aircraft_visual.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\phys_aircraft.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fsm.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_none_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp" />
-    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_ext_model.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\phys_aircraft_phl.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp" />
-    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp" />
-    <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp" />
-    <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\airport\airport_model.cpp" />
-    <ClCompile Include="kernel\objects\airport\airport_view.cpp" />
-    <ClCompile Include="kernel\objects\airport\airport_vis.cpp" />
-    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_model.cpp" />
-    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_view.cpp" />
-    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_vis.cpp" />
-    <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\camera\camera_model.cpp" />
-    <ClCompile Include="kernel\objects\camera\camera_view.cpp" />
-    <ClCompile Include="kernel\objects\camera\camera_vis.cpp" />
+    <ClCompile Include="kernel\objects\ada\ada_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aerostat\aerostat_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_rotors_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_shassis_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\aircraft_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\phys_aircraft.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fms_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_fsm.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_none_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_phys_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_fms_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft\sync_fsm\sync_transition_phys_fms.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_ext_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_fms\aircraft_fms_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\aircraft_physless_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\phys_aircraft_phl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fms_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_fsm.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_none_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_phys_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_fms_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\aircraft_physless\sync_fsm\sync_pl_transition_phys_fms.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airports_manager\airports_manager_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\airport\airport_vis.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\arresting_gear\arresting_gear_vis.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\camera\camera_vis.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_ctrl.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_view.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\cloud_zone\cloud_zone_vis.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\common\net_object_factory.cpp" />
     <ClCompile Include="kernel\objects\common\objects_factory.cpp" />
-    <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp" />
-    <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp" />
-    <ClCompile Include="kernel\objects\environment\environment_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\environment\environment_view.cpp" />
-    <ClCompile Include="kernel\objects\environment\environment_visual.cpp" />
-    <ClCompile Include="kernel\objects\flock_child\flock_child_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp" />
-    <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp" />
-    <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\flock_manager\flock_manager_model.cpp" />
-    <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_model.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_view.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_visual.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\phys_helicopter_phl.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.cpp" />
-    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.cpp" />
-    <ClCompile Include="kernel\objects\human\human_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\human\human_model.cpp" />
-    <ClCompile Include="kernel\objects\human\human_model_states.cpp" />
-    <ClCompile Include="kernel\objects\human\human_view.cpp" />
-    <ClCompile Include="kernel\objects\human\human_visual.cpp" />
+    <ClCompile Include="kernel\objects\conditions\meteo_proxy_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\dubin_route\dubin_route_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\environment\environment_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\environment\environment_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\environment\environment_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_child\flock_child_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\flock_manager\flock_manager_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\helicopter_physless_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\phys_helicopter_phl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fms_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_fsm.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_none_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_phys_state.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_fms_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\helicopter_physless\sync_fsm\sync_heli_transition_phys_fms.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_model_states.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\human\human_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\objects\labels_manager\labels_manager_view.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="kernel\objects\labels_manager\labels_manager_vis.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h</ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_model.cpp" />
-    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp" />
-    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp" />
-    <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp" />
-    <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp" />
-    <ClCompile Include="kernel\objects\object_reg\objects_reg_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\object_reg\objects_reg_model.cpp" />
-    <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp" />
-    <ClCompile Include="kernel\objects\object_reg\objects_reg_visual.cpp" />
-    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp" />
-    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp" />
-    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_model.cpp" />
-    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_view.cpp" />
-    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_vis.cpp" />
-    <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\simple_route\simple_route_view.cpp" />
-    <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp" />
-    <ClCompile Include="kernel\objects\vehicle\vehicle_model.cpp" />
-    <ClCompile Include="kernel\objects\vehicle\vehicle_model_states.cpp" />
-    <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp" />
-    <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp" />
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\mdd_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\model_debug_drawer\remote_render.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\mod_node_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\nodes_manager_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\node_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\node_tree_iterator.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\nodes_manager\vis_node_impl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\object_reg\objects_reg_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\phys_sys_object\phys_sys_object_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\rocket_flare\rocket_flare_vis.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\simple_route\simple_route_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\simple_route\simple_route_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\vehicle\vehicle_ctrl.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\vehicle\vehicle_model.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\vehicle\vehicle_model_states.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\vehicle\vehicle_view.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\objects\vehicle\vehicle_visual.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\phys\aerostat_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
     <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
@@ -716,6 +1013,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="kernel\phys\bullet_importer.cpp" />
     <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
     <ClCompile Include="kernel\phys\character_phys.cpp" />
     <ClCompile Include="kernel\phys\flock_child_phys.cpp" />
@@ -750,7 +1048,6 @@
     <ClCompile Include="tests\visapp\main_modapp.cpp" />
     <ClCompile Include="tests\visapp\main_visapp.cpp" />
     <ClCompile Include="_include\bada\bada_import.cpp" />
-    <ClCompile Include="_include\objects\bullet_importer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

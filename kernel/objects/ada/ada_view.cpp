@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "ada_view.h"
 
 // #include "config/config.h"

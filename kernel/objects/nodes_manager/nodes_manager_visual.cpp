@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "nodes_manager_visual.h"
 #include "vis_node_impl.h"
 

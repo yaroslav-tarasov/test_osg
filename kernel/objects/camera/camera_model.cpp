@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "camera_model.h"
 #include "objects/nodes_management.h"
 

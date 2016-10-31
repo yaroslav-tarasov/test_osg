@@ -47,6 +47,7 @@
 #undef RELATIVE
 #include <osgAnimation/MorphGeometry>
 #include <osgAnimation/BasicAnimationManager>
+#include <osgAnimation/TimelineAnimationManager>
 
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>
@@ -73,8 +74,7 @@
 #include <osgViewer/ViewerEventHandlers>
 #include <osgViewer/Version>
 
-#include <osgAnimation/BasicAnimationManager>
-#include <osgAnimation/TimelineAnimationManager>
+
 
 #include <osgParticle/ExplosionEffect>
 #include <osgParticle/ExplosionDebrisEffect>

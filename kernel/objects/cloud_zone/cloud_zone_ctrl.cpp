@@ -1,4 +1,3 @@
-#include "precompiled_objects.h"
 #include "cloud_zone_ctrl.h"
 
 #include "common/cloud_zone.h"

@@ -2,9 +2,6 @@
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"
-#if 0
-#include "kernel/systems/fake_system.h"
-#endif
 #include "kernel/object_class.h"
 
 #include "common/simple_route.h"
@@ -24,10 +21,9 @@
 #include "rocket_flare/rocket_flare_common.h"
 
 #include "arresting_gear/arresting_gear_common.h"
-#include "objects_factory.h"
+#include "objects/objects_factory.h"
 
 #include "common/ext_msgs.h"
-#include "utils/krv_import.h"
 
 
 namespace {
@@ -238,63 +234,65 @@ inline kernel::obj_create_data pack_camera(kernel::system* csys, create_msg cons
     return camera::pack(dynamic_cast<objects_factory*>(csys), gp ,  msg.model_name);
 }
 
-object_info_ptr create_cloud_zone(kernel::system* csys, update_cloud_zone_msg const& msg)
-{
-    return  cloud_zone::create(dynamic_cast<objects_factory*>(csys), msg.settings);
 }
+
 
 
 inline object_info_ptr create_rocket_flare(kernel::system* csys, create_msg const& msg)
 {
-	decart_position dpos(msg.pos,msg.orien);
-	geo_position gp(dpos, get_base());
+    decart_position dpos(msg.pos,msg.orien);
+    geo_position gp(dpos, get_base());
 
-	rocket_flare::settings_t vs;
+    rocket_flare::settings_t vs;
 
-	return rocket_flare::create(dynamic_cast<objects_factory*>(csys),vs,gp);
+    return rocket_flare::create(dynamic_cast<objects_factory*>(csys),vs,gp);
 }
 
-object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
+
+namespace kernel 
 {
-    if(msg.object_kind & ok_vehicle)
-        return create_vehicle(csys, msg);
-    else if ( msg.object_kind == ok_flock_of_birds)
-        return create_flock_of_birds(csys, msg);
-    else if ( msg.object_kind ==ok_human)
-        return create_character(csys, msg);
-    else if ( msg.object_kind == ok_helicopter)
-        return create_helicopter_phl(csys, msg); 
-	else if ( msg.object_kind == ok_rocket_flare)
-		return create_rocket_flare(csys, msg); 
-    else if( msg.object_kind == ok_camera)
-        return create_camera(csys, msg);
-    else
-        return create_aircraft(csys, msg); //create_aircraft_phl(csys, msg);  //  FIXME вместо чекера можно создать какой-нибудь более дурной объект
+    object_info_ptr create_cloud_zone(kernel::system* csys, update_cloud_zone_msg const& msg)
+    {
+        return  cloud_zone::create(dynamic_cast<objects_factory*>(csys), msg.settings);
+    }
+
+    object_info_ptr create_object( kernel::system* csys, create_msg const& msg)
+    {
+        if(msg.object_kind & ok_vehicle)
+            return create_vehicle(csys, msg);
+        else if ( msg.object_kind == ok_flock_of_birds)
+            return create_flock_of_birds(csys, msg);
+        else if ( msg.object_kind ==ok_human)
+            return create_character(csys, msg);
+        else if ( msg.object_kind == ok_helicopter)
+            return create_helicopter_phl(csys, msg); 
+	    else if ( msg.object_kind == ok_rocket_flare)
+		    return create_rocket_flare(csys, msg); 
+        else if( msg.object_kind == ok_camera)
+            return create_camera(csys, msg);
+        else
+            return create_aircraft(csys, msg); //create_aircraft_phl(csys, msg);  //  FIXME вместо чекера можно создать какой-нибудь более дурной объект
+
+    }
+
+    kernel::obj_create_data pack_object( kernel::system* csys, create_msg const& msg)
+    {
+        if(msg.object_kind & ok_vehicle)
+            return pack_vehicle(csys, msg);
+        else if ( msg.object_kind == ok_flock_of_birds)
+            return pack_flock_of_birds(csys, msg);
+        else if ( msg.object_kind ==ok_human)
+            return pack_character(csys, msg);
+        else if ( msg.object_kind == ok_helicopter)
+            return pack_helicopter_phl(csys, msg); 
+        else if( msg.object_kind == ok_camera)
+            return pack_camera(csys, msg);
+        else
+            return pack_aircraft(csys, msg); //pack_aircraft_phl(csys, msg);  //  FIXME вместо чекера можно создать какой-нибудь более дурной объект
+
+    }
 
 }
-
-kernel::obj_create_data pack_object( kernel::system* csys, create_msg const& msg)
-{
-    if(msg.object_kind & ok_vehicle)
-        return pack_vehicle(csys, msg);
-    else if ( msg.object_kind == ok_flock_of_birds)
-        return pack_flock_of_birds(csys, msg);
-    else if ( msg.object_kind ==ok_human)
-        return pack_character(csys, msg);
-    else if ( msg.object_kind == ok_helicopter)
-        return pack_helicopter_phl(csys, msg); 
-    else if( msg.object_kind == ok_camera)
-        return pack_camera(csys, msg);
-    else
-        return pack_aircraft(csys, msg); //pack_aircraft_phl(csys, msg);  //  FIXME вместо чекера можно создать какой-нибудь более дурной объект
-
-}
-
-}
-
-
-
-AUTO_REG_NAME(create_cloud_zone, create_cloud_zone)
 
 AUTO_REG_NAME(create_object, create_object)
 AUTO_REG_NAME(pack_object, pack_object)

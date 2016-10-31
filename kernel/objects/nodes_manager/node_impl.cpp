@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "node_impl.h"
 #include "nodes_manager_common.h"
 #include "nodes_manager_view.h"
@@ -72,12 +69,13 @@ void node_impl::pre_update(double time)
     {
 #ifdef TIME_DEBUG
         force_log fl;
-#endif
+
         LOG_ODS_MSG( "pre_update(double time) dt <= 0 node name : " << name() << "  dt=" << dt 
             << " time "   << time
             << " time_ "   << *time_
 			<< " node_type: " << (this->as_visual_node()?std::string("visual"):(this->as_model_node()?std::string("model"):std::string("control")))
             << "\n" );
+#endif
          return;
     }
 
@@ -100,7 +98,7 @@ void node_impl::pre_update(double time)
 	            point_3 e_pos = cg::geo_base_3(get_base())(extrapolated_position_.global().pos);
 #ifdef TIME_DEBUG
                 force_log fl;
-#endif
+
 	            LOG_ODS_MSG( "pre_update(double time) node name :" << name() << " time "   << time  << "  extr_pos_.global().pos: lat:"  <<  e_pos.x << "  lon:" << e_pos.y << "  z: " << e_pos.z << "  dt=" << dt 
 	                << " dpos.x "   << position_.global().dpos.x
 	                << " dpos.y "   << position_.global().dpos.y
@@ -110,6 +108,7 @@ void node_impl::pre_update(double time)
 	                //<< " ddpos.y "  << position_.global().ddpos.y
 	                //<< " ddpos.z "  << position_.global().ddpos.z
 	                << "\n" );
+#endif
             }
             extrapolated_position_reseted();
         }

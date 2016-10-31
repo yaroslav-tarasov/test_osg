@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "arresting_gear_view.h"
 
 namespace arresting_gear

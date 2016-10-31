@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "helicopter_physless_view.h"
 #include "helicopter_physless_common.h"
 

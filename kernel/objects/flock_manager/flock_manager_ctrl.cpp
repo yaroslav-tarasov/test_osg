@@ -1,14 +1,8 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "flock_manager_ctrl.h"
 #include "common/randgen.h"
 
 //       Для создания дочерних объектов (чет фуфел какой-то)
 FIXME(Создание множества дочерних объектов и клонирование)
-#if 0
-#include "kernel/systems/fake_system.h"
-#endif
 #include "flock_child/flock_child_view.h"
 #include "nodes_manager/nodes_manager_view.h"
 

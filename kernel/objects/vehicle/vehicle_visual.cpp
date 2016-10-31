@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "vehicle_visual.h"
 #include "common/text_label.h"
 

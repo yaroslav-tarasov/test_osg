@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "aircraft_physless/aircraft_physless_common.h"
 
 #include "sync_pl_phys_state.h"

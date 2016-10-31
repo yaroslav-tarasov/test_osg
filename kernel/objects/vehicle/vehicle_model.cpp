@@ -1,7 +1,3 @@
-
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "vehicle_model.h"
 //#include "common/collect_collision.h"
 #include "geometry/filter.h"

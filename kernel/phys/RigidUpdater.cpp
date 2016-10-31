@@ -6,9 +6,6 @@
 #include "BulletInterface.h"
 
 #include "kernel/systems/systems_base.h"
-#if 0
-#include "kernel/systems/fake_system.h"
-#endif
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
 

@@ -1,9 +1,7 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
-#include "vehicle.h"
-#include "vehicle_ctrl.h"
+#include "objects/vehicle.h"
 #include "objects/ada.h"
+#include "vehicle_ctrl.h"
+
 
 
 namespace vehicle

@@ -1,4 +1,3 @@
-#include "precompiled_objects.h"
 #include "cloud_zone_view.h"
 
 namespace cloud_zone

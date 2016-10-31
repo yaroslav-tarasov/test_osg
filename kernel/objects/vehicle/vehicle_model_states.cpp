@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "vehicle_model_states.h"
 #include "vehicle_model.h"
 
@@ -173,17 +170,6 @@ void go_to_pos_state::update(model * self,double time, double dt)
     double         cur_course = self->course();
     double         cur_speed  = self->speed();
     
-    std::stringstream cstr;
-
-    cstr << std::setprecision(8) 
-        << "x:  "         << cur_pos.lat
-        << "    y: "      << cur_pos.lon
-        << "    curs :  " << cur_course 
-        << "    cur_speed:  " << cur_speed 
-        << "\n" ;
-
-    OutputDebugString(cstr.str().c_str());
-
     double max_speed = 0;
 
     cur_pos += cg::point_2(cg::polar_point_2(1., cur_course)) * cur_speed * dt;

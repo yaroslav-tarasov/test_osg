@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "nodes_manager_view.h"
 #include "nodes_manager_common.h"
 #include "node_tree_iterator.h"

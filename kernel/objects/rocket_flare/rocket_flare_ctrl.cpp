@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "rocket_flare_ctrl.h"
 
 namespace rocket_flare

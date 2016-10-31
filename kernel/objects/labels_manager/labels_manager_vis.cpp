@@ -1,4 +1,3 @@
-#include "precompiled_objects.h"
 #include "labels_manager_vis.h"
 
 #include "common/aircraft.h"

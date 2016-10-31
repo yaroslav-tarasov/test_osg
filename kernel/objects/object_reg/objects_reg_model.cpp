@@ -1,14 +1,11 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "objects_reg_model.h"
-//#include "objects\common\aircraft_physless.h"
-#include "objects\common\vehicle.h"
-#include "flock_manager\flock_manager_common.h"
-#include "objects\common\flock_manager.h"
-#include "objects\common\human.h"
-#include "objects\common\aircraft.h"
-#include "objects\common\camera_common.h"
+//#include "common/aircraft_physless.h"
+#include "common/vehicle.h"
+#include "flock_manager/flock_manager_common.h"
+#include "common/flock_manager.h"
+#include "common/human.h"
+#include "common/aircraft.h"
+#include "common/camera_common.h"
 
 namespace objects_reg
 {

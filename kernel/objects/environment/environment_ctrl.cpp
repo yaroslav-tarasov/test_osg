@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "environment_ctrl.h"
 #include "environment_common.h"
 

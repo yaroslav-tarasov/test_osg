@@ -60,7 +60,7 @@
 //  CG-Lib
 //
 #include "common/meta.h"
-#include "cg_math.h"
+#include "common/av_math.h"
 
 #include "common/points.h"
 #include "common/util.h"

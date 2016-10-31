@@ -1,16 +1,13 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "objects_reg_ctrl.h"
 
 #include "objects/vehicle.h"
-#include "objects/common/airport.h"
 #include "objects/environment.h"
-#include "objects/common/camera_common.h"
-#include "objects/common/arresting_gear.h"
+#include "common/airport.h"
+#include "common/camera_common.h"
+#include "common/arresting_gear.h"
 
 #include "common/ext_msgs.h"
-
+#include "common/net_object_factory.h"
 
 namespace objects_reg
 {
@@ -61,8 +58,8 @@ ctrl::ctrl( kernel::object_create_t const& oc, dict_copt dict)
         .add<net_layer::msg::update_cloud_zone_msg >(boost::bind(on_update_cloud_zone     , this, _1))	
         ;
 
-	create_object_f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
-
+	// create_object_f_ = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::create_msg const&)>( "create_object");
+    create_object_f_  = &create_object;
 }
 
 void ctrl::on_object_created(object_info_ptr object)
@@ -143,16 +140,12 @@ void ctrl::inject_msg(net_layer::msg::update_cloud_zone_msg const& msg)
     {
         kernel::object_info_ptr  obj = nullptr;
         
-        auto create_object_f = fn_reg::function<kernel::object_info_ptr (kernel::system*, net_layer::msg::update_cloud_zone_msg const&)>( "create_cloud_zone");
-        if(create_object_f)
-        {
-             obj = create_object_f(sys_, msg);
+        obj = create_cloud_zone(sys_, msg);
 
-            if (obj)
-            {
-                e2o_[msg.ext_id] = obj->object_id();
-                regs_objects_[msg.ext_id] = obj;
-            }
+        if (obj)
+        {
+            e2o_[msg.ext_id] = obj->object_id();
+            regs_objects_[msg.ext_id] = obj;
         }
     }
 

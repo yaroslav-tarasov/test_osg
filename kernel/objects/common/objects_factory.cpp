@@ -22,9 +22,6 @@
 #include "cloud_zone/cloud_zone_view.h"
 
 #include "nodes_manager/nodes_manager_view.h"
-#if 0
-#include "kernel/systems/fake_system.h"
-#endif
 
 #include "objects/objects_factory.h"
 

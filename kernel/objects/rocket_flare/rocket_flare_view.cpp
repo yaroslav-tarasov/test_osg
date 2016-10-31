@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "rocket_flare_view.h"
 
 namespace rocket_flare

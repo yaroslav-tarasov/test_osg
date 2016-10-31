@@ -7,9 +7,9 @@ namespace visual_objects
     struct effect_support_traits
     {
         static const char*          effect_node_name ()    { return "FireFx"; }
-        static float                base_alpha       ()    { return 0.2; }
-        static float                effect_end_duration () { return 10.0; }
-        static float                base_factor       ()   { return 4.0; }
+        static float                base_alpha       ()    { return 0.2f; }
+        static float                effect_end_duration () { return 10.0f; }
+        static float                base_factor       ()   { return 4.0f; }
     };
 
     template <  typename T, typename EffectInterface, typename Traits >

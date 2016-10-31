@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
 #include "aircraft_visual.h"
 
 #include "common/text_label.h"

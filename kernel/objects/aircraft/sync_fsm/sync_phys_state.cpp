@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "sync_phys_state.h"
 #include "sync_transition_phys_fms.h"
 #include "sync_none_state.h"

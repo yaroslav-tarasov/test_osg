@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "aircraft_physless_ctrl.h"
 #include "objects/ada.h"
 

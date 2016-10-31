@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "mod_node_impl.h"
 #include "nodes_manager_view.h"
 

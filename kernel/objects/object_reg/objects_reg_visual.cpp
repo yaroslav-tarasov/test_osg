@@ -1,9 +1,6 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "objects_reg_visual.h"
 
-#include "objects/common/camera_common.h"
+#include "common/camera_common.h"
 
 #include "common/ext_msgs.h"
 

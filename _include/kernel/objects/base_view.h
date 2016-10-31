@@ -1,7 +1,7 @@
 #pragma once
 #include "network/msg_dispatcher.h"
 #include "kernel/object_info_fwd.h"
-#include "object_data_fwd.h"
+#include "kernel/object_data_fwd.h"
 //#include "kernel/systems/history_system.h"
 //#include "python/utils.h"
 

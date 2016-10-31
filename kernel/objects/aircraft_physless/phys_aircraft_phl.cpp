@@ -1,8 +1,6 @@
-#include "stdafx.h"
-
 #include "ada/ada.h"
 #include "phys/phys_sys_fwd.h"
-#include "aircraft.h"
+#include "objects/aircraft.h"
 #include "phys_aircraft_phl.h"
 #include "phys/phys_sys.h"
 

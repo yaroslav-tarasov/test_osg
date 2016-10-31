@@ -1,7 +1,3 @@
-#include "stdafx.h" 
-// FIXME
-#include "precompiled_objects.h"
-
 #include "vehicle_view.h"
 
 namespace vehicle

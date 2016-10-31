@@ -7,7 +7,7 @@ namespace visual_objects
     struct fire_trace_support;
 }
 
-#include "av/avFx/Fx.h"
+#include "av/Fx.h"
 
 namespace rocket_flare
 {

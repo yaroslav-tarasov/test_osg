@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "sync_heli_transition_fms_phys.h"
 #include "sync_heli_phys_state.h"
 #include "sync_heli_none_state.h"

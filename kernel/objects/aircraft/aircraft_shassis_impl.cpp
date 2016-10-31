@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "aircraft_shassis_impl.h"
 
 namespace aircraft

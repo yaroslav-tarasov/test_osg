@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "ada/ada.h"
 #include "phys/phys_sys_fwd.h"
 #include "aircraft.h"

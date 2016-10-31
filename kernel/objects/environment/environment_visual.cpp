@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "environment_visual.h"
 
 #include "common/airport.h"

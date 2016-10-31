@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "airport_view.h"
 #include "objects/ani.h"
 //#include "db_connector/db_connector.h"

@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "flock_child_ctrl.h"
 
 namespace flock
