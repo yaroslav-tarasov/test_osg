@@ -188,9 +188,6 @@
     <ClCompile Include="..\..\av\avCore\XmlModel.cpp">
       <Filter>Source Files\av</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\_include\objects\bullet_importer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\MyGui\MYGUIManager.cpp">
       <Filter>Source Files\mygui</Filter>
     </ClCompile>
@@ -247,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="..\..\av\avCore\InstancesNum.cpp">
       <Filter>Source Files\av</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\kernel\phys\bullet_importer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

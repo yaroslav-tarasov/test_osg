@@ -171,10 +171,10 @@
     </ClCompile>
     <ClCompile Include="..\..\core\config\config.cpp" />
     <ClCompile Include="..\..\kernel\fms\dubins.cpp" />
+    <ClCompile Include="..\..\kernel\phys\bullet_importer.cpp" />
     <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\..\_include\objects\bullet_importer.cpp" />
     <ClCompile Include="..\animation_test.cpp" />
     <ClCompile Include="..\animation_test2.cpp" />
     <ClCompile Include="..\animation_test3.cpp" />
