@@ -27,10 +27,10 @@ struct visual_object_impl
 
     void set_object_loaded()             override;
 
-#ifdef ASYNC_OBJECT_LOADING
+
 private:
     void object_loaded( uint32_t seed );
-#endif
+
     uint32_t                            seed_;
     on_object_loaded_f                    ol_;
     bool                               async_;

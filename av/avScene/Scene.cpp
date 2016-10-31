@@ -85,7 +85,9 @@
 //  ext
 //
 
+#if !defined(VISUAL_EXPORTS)
 #include "spark/osgspark.h"
+#endif
 
 //#define PPU_TEST
 #ifdef PPU_TEST
@@ -2146,7 +2148,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 		res_node/*.get()*/,
 		async);
 #else
-    wf(seed, path,res_node.get(),async);
+    wf(seed, path,res_node/*.get()*/,async);
 #endif
     
     OSG_WARN << "Scene::load(" << path <<  "): " << hr_timer.set_point() << "\n";

@@ -5,8 +5,10 @@
 #include "common/forsage.h"
 #include "common/smoke_support.h"
 #include "common/landing_dust_support.h"
-#include "ext/spark/SmokeNode.h"
 
+#if !defined(VISUAL_EXPORTS)
+#include "ext/spark/SmokeNode.h"
+#endif
 
 namespace aircraft_physless
 {
@@ -35,10 +37,10 @@ namespace aircraft_physless
 #ifndef ASYNC_OBJECT_LOADING  
 
         ls_ = boost::make_shared<visual_objects::label_support>(
-            vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg"), settings_.custom_label);
+            vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg"), settings_.custom_label);
 
         ps_ = boost::make_shared<visual_objects::parashute_support>(
-            vsys->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
+            vsys_->create_visual_object(nm::node_control_ptr(root()),"parachute.scg",0,0,false));
 
 #endif
         start_  = boost::bind(&visual::on_malfunction_changed, this, aircraft::MF_FIRE_ON_BOARD );
@@ -161,6 +163,7 @@ namespace aircraft_physless
             });
         }
 
+#if !defined(VISUAL_EXPORTS)
         if (smoke_object_ && engines_nodes_.size()>0)
         {
             if (root_visible)
@@ -180,6 +183,7 @@ namespace aircraft_physless
             else
                 smoke_object_->set_visible(false);
         }
+#endif
         
 #if 0
         if (landing_dust_object_)

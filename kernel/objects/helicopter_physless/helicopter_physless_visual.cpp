@@ -1,11 +1,14 @@
 #include "helicopter_physless_visual.h"
 
-#include "ext/spark/SmokeNode.h"
 #include "common/morphs_support.h"
 #include "common/text_label.h"
 #include "common/parachute.h"
 #include "common/forsage.h"
 #include "common/smoke_support.h"
+
+#if !defined(VISUAL_EXPORTS)
+#include "ext/spark/SmokeNode.h"
+#endif
 
 namespace helicopter_physless
 {
@@ -33,7 +36,7 @@ namespace helicopter_physless
 
 #ifndef ASYNC_OBJECT_LOADING         
         //fill_nodes();
-        label_object_ = vsys->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
+        label_object_ = vsys_->create_visual_object(nm::node_control_ptr(root()),"text_label.scg");
         ls_ = boost::make_shared<visual_objects::label_support>(label_object_, settings_.custom_label);
 #endif
 		// start_  = boost::bind(&visual::smoke_sfx_t::on_malfunction_changed, &smoke_sfx_, aircraft::MF_FIRE_ON_BOARD );
@@ -118,6 +121,7 @@ namespace helicopter_physless
         FIXME(Где инициализация?)
 		//fill_nodes();
 
+#if !defined(VISUAL_EXPORTS)
         if (smoke_object_ && engine_node_)
         {
             if (nodes_management::vis_node_info_ptr(root())->is_visible())
@@ -137,6 +141,7 @@ namespace helicopter_physless
             else
                 smoke_object_->set_visible(false);
         }
+#endif
 
         if (smoke_sup_)
         {

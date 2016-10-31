@@ -109,7 +109,7 @@ namespace kernel
             object_loaded( seed_ );
     }
 
-#ifdef ASYNC_OBJECT_LOADING    
+ 
     void visual_object_impl::object_loaded( uint32_t seed )
     {
          if(seed_==seed)
@@ -136,7 +136,7 @@ namespace kernel
 		   object_loaded_signal_(seed);
          }
     }
-#endif
+
 
     osg::ref_ptr<osg::Node> visual_object_impl::node() const
     {
