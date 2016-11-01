@@ -10,7 +10,7 @@
 #include "common/boost.h"
 #include "common/stl.h"
 #include "common/osg_inc.h"
-#include "common/misc.h"
+#include "common/av_misc.h"
 #include "common/bullet.h"
 
 #include "common/av_math.h"
