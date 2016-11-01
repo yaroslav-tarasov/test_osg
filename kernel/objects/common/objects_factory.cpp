@@ -1,6 +1,3 @@
-#include "stdafx.h"
-#include "precompiled_objects.h"
-
 #include "kernel/systems/systems_base.h"
 
 #include "concept_object/concept_object.h"

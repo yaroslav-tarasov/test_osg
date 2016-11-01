@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "kernel/systems_fwd.h"
 
 #include "kernel/systems/systems_base.h"

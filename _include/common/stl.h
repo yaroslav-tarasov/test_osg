@@ -13,7 +13,10 @@
 #include <unordered_map>
 #include <memory>
 #include <queue>
-#include <string>
+#include <map>
+#include <set>
+#include <stack>
+
 ////////////////////////////////////////////////
 
 using std::deque;

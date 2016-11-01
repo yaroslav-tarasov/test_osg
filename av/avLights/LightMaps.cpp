@@ -266,7 +266,7 @@ protected:
 
     cg::frustum_clipper                  lightmap_clipper_;
 
-    ITexturePtr                          color_buf_;
+    osg::ref_ptr<osg::Texture2D>         color_buf_;
     unsigned                             _tex_dim;
     
     std::vector<SpotRenderVertex>        vertices_;

@@ -1,7 +1,3 @@
-#include "stdafx.h"
-
-#include "precompiled_objects.h"
-
 #include "kernel/objects/base_view.h"
 
 namespace kernel

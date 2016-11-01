@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "dubins.h"
-#include "trajectory.h"
+#include "fms/trajectory.h"
 
 namespace fms
 {

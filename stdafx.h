@@ -16,8 +16,9 @@
 //  Common includes
 //
 
-#include "common/boost.h"
 #include "common/stl.h"
+#include "common/boost.h"
+
 
 #include "common/osg_inc.h"
 #include "common/bullet.h"
@@ -27,7 +28,7 @@
 #include "common/qt.h"
 #endif
 
-#include "common/misc.h"
+#include "common/av_misc.h"
 
 #pragma warning(disable:4996)
 

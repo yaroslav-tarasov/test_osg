@@ -1,8 +1,3 @@
-#pragma region precompile
-#include "kernel/object_class.h"
-#include "kernel/systems/systems_base.h"
-#include "kernel/systems/impl/messages.h"
-#pragma  endregion
 #include "ctrl_system_impl.h"
 
 

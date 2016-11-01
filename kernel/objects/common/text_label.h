@@ -38,7 +38,7 @@ namespace visual_objects
         {
             const auto& geode = label_->asGeode();
 
-            for(int i=0;i<geode->getNumDrawables(); ++i)
+            for(size_t i=0;i<geode->getNumDrawables(); ++i)
             {
                 if(auto dtext =  dynamic_cast<osgText::Text*>(geode->getDrawable(i)))
                 {

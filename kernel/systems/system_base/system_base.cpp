@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "kernel/object_class.h"
 #include "kernel/systems/systems_base.h"
 #include "kernel/systems.h"

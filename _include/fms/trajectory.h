@@ -1,6 +1,7 @@
 #pragma once
 
 #include "geometry/curve.h"
+#include "trajectory_fwd.h"
 
 namespace fms
 {
@@ -14,11 +15,6 @@ inline cg::quaternion from_dubin(double course)
 {
 	return cg::cpr(90 - cg::rad2grad()*course);
 }
-
-struct trajectory;
-
-typedef polymorph_ptr<trajectory> trajectory_ptr;
-
 
 
 struct traj_data
@@ -42,12 +38,14 @@ struct traj_data
 		__forceinline air_config_t operator()(const air_config_t &a, const air_config_t &b, double t) const
 		{
 			
+#if 0
             force_log fl;
             LOG_ODS_MSG( "air_config_t operator() : "
                 << "    a: " << unsigned(a) 
                 << "    b: " << unsigned(b) 
                 << "    t: " << t 
                 << "\n" );
+#endif
             return t>=1.0?b:a;
 		}
 	};    

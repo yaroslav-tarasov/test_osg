@@ -4,9 +4,6 @@
 namespace avCore
 {
 
-    typedef osg::Texture2D               ITexture;
-    typedef osg::ref_ptr<osg::Texture2D> ITexturePtr;
-
     struct DecalRenderer : osg::Group
     {
         virtual void SetVisible( bool vis ) = 0;

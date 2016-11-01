@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "object_class_impl.h"
 
 #include "xml/xml.h"
