@@ -1,4 +1,4 @@
-#include <utils/performance_counter.h>
+#include <av/avUtils/performance_counter.h>
 
 
 #include "avCore.h"
@@ -46,11 +46,11 @@ bool Timer::PreUpdate()
         else
         {
             if (m_SimulationTimeCounter == -1) // initialization
-                m_SimulationTimeCounter = Utils::PerformaceCounter::get_counter();
+                m_SimulationTimeCounter = Utils::PerformanceCounter::get_counter();
 
-            const __int64 counter = Utils::PerformaceCounter::get_counter();
+            const __int64 counter = Utils::PerformanceCounter::get_counter();
             const __int64 delta = counter - m_SimulationTimeCounter;
-            const double deltaSec  = Utils::PerformaceCounter::delta_s(delta);
+            const double deltaSec  = Utils::PerformanceCounter::delta_s(delta);
 
             m_SimulationTimeCounter = counter;
             m_SimulationTimeDelta = m_SimulationTimeScale * deltaSec;
@@ -95,9 +95,9 @@ double Timer::GetSimulationTime() const
 void Timer::UpdateFrameTime()
 {
     if (m_FrameTimeCounter == -1)
-        m_FrameTimeCounter = Utils::PerformaceCounter::get_counter();
-    const __int64 frameTimeCounter = Utils::PerformaceCounter::get_counter();
-    m_FrameTimeDelta =Utils::PerformaceCounter::delta_s(frameTimeCounter - m_FrameTimeCounter);
+        m_FrameTimeCounter = Utils::PerformanceCounter::get_counter();
+    const __int64 frameTimeCounter = Utils::PerformanceCounter::get_counter();
+    m_FrameTimeDelta =Utils::PerformanceCounter::delta_s(frameTimeCounter - m_FrameTimeCounter);
     m_FrameTimeCounter = frameTimeCounter;
     m_FrameTime += m_FrameTimeDelta;
 }

@@ -1,7 +1,9 @@
 #ifndef FIND_NODE_VISITOR_H
 #define FIND_NODE_VISITOR_H
 
-class FindNodeVisitor : public osg::NodeVisitor 
+#include "visual_api.h"
+
+class VISUAL_API FindNodeVisitor : public osg::NodeVisitor 
 {
 public: 
     enum match_type_t  {exact,not_exact};
