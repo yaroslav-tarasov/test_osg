@@ -5,17 +5,17 @@
 namespace Utils {
 
 
-struct PerformaceCounter
+struct PerformanceCounter
 {
     typedef void (*undefined_tag)();
     static __forceinline void undefined() {}
 
 
-    __forceinline PerformaceCounter( const undefined_tag )
+    __forceinline PerformanceCounter( const undefined_tag )
     {
     }
 
-    __forceinline PerformaceCounter()
+    __forceinline PerformanceCounter()
     {
         reset();
     }

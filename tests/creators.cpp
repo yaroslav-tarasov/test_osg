@@ -781,10 +781,10 @@ nodes_array_t loadAirplaneParts(std::string name)
             return light;
         };
 
-        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
-        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
-        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
-        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
+        osg::ref_ptr<osg::Geode> red_light   = CreateLight(utils::red_color,std::string("red"),nullptr);
+        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(utils::blue_color,std::string("blue"),nullptr);
+        osg::ref_ptr<osg::Geode> green_light = CreateLight(utils::green_color,std::string("green"),nullptr);
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(utils::white_color,std::string("white_blink"),new effects::BlinkNode(utils::white_color,utils::gray_color));
         
         lod0 =  findFirstNode(model_file,"Lod0");
         lod3 =  findFirstNode(model_file,"Lod3");
@@ -1037,10 +1037,10 @@ osg::Node* loadHelicopter()
             return light;
         };
 
-        osg::ref_ptr<osg::Geode> red_light   = CreateLight(red_color,std::string("red"),nullptr);
-        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(blue_color,std::string("blue"),nullptr);
-        osg::ref_ptr<osg::Geode> green_light = CreateLight(green_color,std::string("green"),nullptr);
-        osg::ref_ptr<osg::Geode> white_light = CreateLight(white_color,std::string("white_blink"),new effects::BlinkNode(white_color,gray_color));
+        osg::ref_ptr<osg::Geode> red_light   = CreateLight(utils::red_color,std::string("red"),nullptr);
+        osg::ref_ptr<osg::Geode> blue_light  = CreateLight(utils::blue_color,std::string("blue"),nullptr);
+        osg::ref_ptr<osg::Geode> green_light = CreateLight(utils::green_color,std::string("green"),nullptr);
+        osg::ref_ptr<osg::Geode> white_light = CreateLight(utils::white_color,std::string("white_blink"),new effects::BlinkNode(utils::white_color,utils::gray_color));
 
         auto addAsChild = [=](std::string root,osg::Node* child)->osg::Node* {
             auto tail = findFirstNode(model_file,root.c_str());
@@ -1458,7 +1458,7 @@ nodes_array_t createModel( osg::ref_ptr<osg::LightSource>& ls,bool overlay, osgS
 		
 		//for(auto it = wln_list.begin(); it != wln_list.end(); ++it )
 		//{
-		//	(*it)->setUpdateCallback(new effects::BlinkNode(white_color,black_color));
+		//	(*it)->setUpdateCallback(new effects::BlinkNode(utils::white_color,utils::black_color));
 		//}
 		     
         auto p_copy = 

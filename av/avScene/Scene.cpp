@@ -1982,7 +1982,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 					if((*it)->getName() == "tail")
 					{ 
-						pnt._color      = creators::white_color * 0.01f;
+						pnt._color      = utils::white_color * 0.01f;
 						need_to_add     = true;
 					}
                 
@@ -2014,7 +2014,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 					if((*it)->getName() == "port")
 					{   
-						pnt._color      = red_color * 0.01f;
+						pnt._color      = utils::red_color * 0.01f;
 						need_to_add     = true;
 						pnt._sector = sector;
                     
@@ -2035,7 +2035,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 					if((*it)->getName() == "starboard") 
 					{
-						pnt._color =  green_color * 0.01f ;
+						pnt._color =  utils::green_color * 0.01f ;
 						need_to_add     = true;
 						pnt._sector = sector;
                     
@@ -2057,7 +2057,7 @@ osg::Node*   Scene::load(const std::string path,osg::Node* parent, uint32_t seed
 
 					if(boost::starts_with((*it)->getName(), "strobe_")) 
 					{
-						pnt._color  = white_color * 0.01f;
+						pnt._color  = utils::white_color * 0.01f;
 						pnt._blinkSequence = new osgSim::BlinkSequence;
 						pnt._blinkSequence->addPulse( 0.05,
 							osg::Vec4( 1., 1., 1., 1. ) );
