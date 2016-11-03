@@ -4,8 +4,8 @@
 #include "cpp_utils/polymorph_ptr.h"
 #include "phys_sys.h"
 #include "phys_sys_common.h"
-#include "flock.h"
-#include "sensor.h"
+#include "phys/flock.h"
+#include "phys/sensor.h"
 
 
 namespace phys

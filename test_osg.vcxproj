@@ -79,7 +79,7 @@
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>STATIC_VISUAL_API;STATIC_BASAPPLIC_API;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;ANIM_TURN_OFF;NSOFTBODY_WORLD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PHYS_SYS_STATIC_API;STATIC_SYSTEM_API;STATIC_VISUAL_API;STATIC_BASAPPLIC_API;CG_PRIMITIVES;DISABLE_ROBUST_COMPUTATIONS;WIN32;_WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;ASYNC_OBJECT_LOADING;ANIM_TURN_OFF;NSOFTBODY_WORLD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;$(SolutionDir);$(SolutionDir)\ext\EASTL\include;$(SolutionDir)\ext\include;$(SolutionDir)\ext;$(SolutionDir)\utils;$(SolutionDir)\_include;$(SolutionDir)\_include\atc;$(SolutionDir)\core;$(SolutionDir)\_include\objects;$(SolutionDir)\_include\objects\impl;$(SolutionDir)\_include\kernel;$(SolutionDir)\_include\kernel\systems;$(SolutionDir)\kernel\systems;$(SolutionDir)\_include\application;$(SolutionDir)\kernel;$(SolutionDir)\kernel\objects;$(SIMEX_DIR)\src\_Include;$(SIMEX_DIR)\src\_Include\network;$(SIMEX_DIR)\src\_Include\objects;$(SIMEX_DIR)\ext\include;$(SIMEX_DIR)\src\core\cluster\_cluster_include;$(OSG_DIR)\GFSDK_HBAO\lib;$(OSG_DIR)\..\SmartBody\src\SmartBody;$(OSG_DIR)\..\SmartBody\include\steersuite;$(OSG_DIR)\..\SmartBody\include\bonebus;$(OSG_DIR)\..\SmartBody\include\vhcl;$(OSG_DIR)\osgPPU\include;$(OSG_DIR)\SPARK-1.5.5\include;$(OSG_DIR)\cegui-0.8.4\cegui\include;$(OSG_DIR)\cegui-0.8.4\build\cegui\include;$(OSG_DIR)\glm_971\include;C:\Work\bullet-2.82-r2704\src;$(SolutionDir)\ext\pugixml-1.4\src;$(SolutionDir)\common;$(SolutionDir)\bada;D:\Work\prj\flex-080\flex\core;$(CUDA_PATH)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/Zm200 %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -1009,24 +1009,68 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_object.h;</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="kernel\phys\aerostat_phys.cpp" />
-    <ClCompile Include="kernel\phys\aircraft_phys.cpp" />
-    <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp" />
-    <ClCompile Include="kernel\phys\arresting_gear_phys.cpp" />
-    <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp" />
-    <ClCompile Include="kernel\phys\BulletInterface.cpp" />
+    <ClCompile Include="kernel\phys\aerostat_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\aircraft_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\aircraft_phys_lite.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\arresting_gear_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\AVGLDebugDrawer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\BulletInterface.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\phys\BulletMTInterface.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="kernel\phys\bullet_importer.cpp" />
-    <ClCompile Include="kernel\phys\bvh_static_mesh.cpp" />
-    <ClCompile Include="kernel\phys\character_phys.cpp" />
-    <ClCompile Include="kernel\phys\flock_child_phys.cpp" />
-    <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp" />
-    <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp" />
-    <ClCompile Include="kernel\phys\RigidUpdater.cpp" />
-    <ClCompile Include="kernel\phys\rocket_flare_phys.cpp" />
+    <ClCompile Include="kernel\phys\bullet_importer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\bvh_static_mesh.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\character_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\flock_child_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\helicopter_phys_lite.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\ray_cast_vehicle.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\RigidUpdater.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="kernel\phys\rocket_flare_phys.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h;precompiled_phys.h;</ForcedIncludeFiles>
+    </ClCompile>
     <ClCompile Include="kernel\phys\static_convex.cpp" />
     <ClCompile Include="kernel\systems\common\object_class_impl.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>

@@ -5,7 +5,7 @@
 #include "phys_sys.h"
 #include "phys_sys_common.h"
 #include "aircraft.h"
-#include "sensor.h"
+#include "phys/sensor.h"
 
 
 namespace phys

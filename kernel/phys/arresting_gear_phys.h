@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cpp_utils/polymorph_ptr.h"
-#include "sensor.h"
+#include "phys/sensor.h"
 
 
 namespace phys

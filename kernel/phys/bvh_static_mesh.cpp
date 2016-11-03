@@ -1,11 +1,7 @@
-#include "stdafx.h"
-
-#include <btBulletDynamicsCommon.h>
-#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
 #include "bvh_static_mesh.h"
-#include "rigid_body_info.h"
+
 
 namespace phys
 {

@@ -1,11 +1,5 @@
 #pragma once
 
-#include "rigid_body_info.h"
-#include "cpp_utils/polymorph_ptr.h"
-#include "phys_sys.h"
-#include "phys_sys_common.h"
-#include "vehicle.h"
-#include "sensor.h"
 
 namespace phys
 {

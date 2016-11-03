@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "utils/high_res_timer.h"
 
 #include "RigidUpdater.h"

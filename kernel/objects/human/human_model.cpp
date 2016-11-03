@@ -487,7 +487,7 @@ void model::create_phys()
 	cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
 	//phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
-	phys::compound_sensor_ptr s = phys::character::fill_cs(nodes_manager_); 
+	phys::compound_sensor_ptr s = phys::character::fill_cs(nodes_manager_->get_model()); 
 	decart_position p(base(pos()), orien());
 
 	phys::character::params_t  params;

@@ -5,7 +5,7 @@
 #include "common/phys_sys.h" 
 #include "phys_sys.h"
 #include "phys_sys_common.h" //FIXME  Â stdafx phys_sys
-#include "sensor.h"
+#include "phys/sensor.h"
 
 #include "common/debug_render.h"
 
