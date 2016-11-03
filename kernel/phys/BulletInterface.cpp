@@ -1,18 +1,10 @@
-#include "stdafx.h"
-
 #include "utils/high_res_timer.h"
-
-#include <btBulletDynamicsCommon.h> 
-#include <BulletSoftBody/btSoftBodyHelpers.h>
-#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
-#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
-#include <BulletSoftBody/btSoftBody.h>
 
 #include "BulletInterface.h"
 
 #include "bullet_helpers.h"
 
-#include "sensor.h"
+#include "phys/sensor.h"
 
 #include "aircraft_phys.h"
 #include "aircraft_phys_lite.h"
@@ -312,14 +304,14 @@ namespace phys
     namespace aircraft
     {
 
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+        compound_sensor_ptr fill_cs(const std::string& model_name)
         {
             wheels_info_t wi;
             aircraft::params_t p;
             compound_sensor_impl cs;
-			const std::string model_name = manager->get_model();
+			// const std::string model_name = manager->get_model();
 
-            ::aircraft::fill_cs(model_name, /*nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),*/wi,p,cs);
+            ::aircraft::fill_cs(model_name, wi,p,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -328,13 +320,13 @@ namespace phys
 
     namespace ray_cast_vehicle
     {
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+        compound_sensor_ptr fill_cs(const std::string& model_name)
         {
             wheels_info_t wi;
             compound_sensor_impl cs;
-            const std::string model_name = manager->get_model();
+            //const std::string model_name = manager->get_model();
 
-            ::ray_cast_vehicle::fill_cs(model_name, /*nm::node_impl_ptr(manager->get_node(0))->as_osg_node(),*/wi,cs);
+            ::ray_cast_vehicle::fill_cs(model_name, wi,cs);
 
             return boost::make_shared<compound_sensor_impl>(cs.cs_,cs.offset_);
         }
@@ -342,10 +334,10 @@ namespace phys
 
     namespace flock
     {
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+        compound_sensor_ptr fill_cs(const std::string& model_name)
         {
             compound_sensor_impl cs;
-            const std::string model_name = manager->get_model();
+            //const std::string model_name = manager->get_model();
 
             ::flock::fill_cs(model_name,cs);
 
@@ -355,10 +347,10 @@ namespace phys
 
 	namespace character
 	{
-		compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+		compound_sensor_ptr fill_cs(const std::string& model_name)
 		{
 			compound_sensor_impl cs;
-			const std::string model_name = manager->get_model();
+			//const std::string model_name = manager->get_model();
 
 			::character::fill_cs(model_name,cs);
 
@@ -368,10 +360,10 @@ namespace phys
 
 	namespace aerostat
 	{
-		compound_sensor_ptr fill_cs(nm::manager_ptr manager)
+		compound_sensor_ptr fill_cs(const std::string& model_name)
 		{
 			compound_sensor_impl cs;
-			const std::string model_name = manager->get_model();
+			//const std::string model_name = manager->get_model();
 
 			::aerostat::fill_cs(model_name,cs);
 

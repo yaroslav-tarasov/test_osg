@@ -61,7 +61,7 @@ typedef polymorph_ptr<ext_ctrl_sys>         ext_ctrl_sys_ptr;
 
 } // namespace kernel
 
-#ifdef USE_DLL
+#if !defined(STATIC_SYSTEM_API)
 #ifdef SYSTEMS_LIB
 #   define SYSTEMS_API __HELPER_DL_EXPORT
 #else

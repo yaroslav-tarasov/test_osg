@@ -1,19 +1,6 @@
-#include "stdafx.h"
-
-#include <btBulletDynamicsCommon.h>
-#include <BulletSoftBody/btSoftBodyHelpers.h>
-#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
-#include "rocket_flare.h"
-#include "rigid_body_info.h"
-#include "cpp_utils/polymorph_ptr.h"
-#include "phys_sys.h"
-#include "phys_sys_common.h"
-
 #include "rocket_flare_phys.h"
-
-
 
 namespace phys
 {

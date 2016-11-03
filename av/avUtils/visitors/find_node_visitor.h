@@ -1,7 +1,7 @@
 #ifndef FIND_NODE_VISITOR_H
 #define FIND_NODE_VISITOR_H
 
-#include "visual_api.h"
+#include "visual/visual_api.h"
 
 class VISUAL_API FindNodeVisitor : public osg::NodeVisitor 
 {

@@ -87,5 +87,12 @@ namespace phys
 	typedef polymorph_ptr<sensor_t> sensor_ptr;
 }
 
-
-
+#if !defined(PHYS_SYS_STATIC_API)
+#ifdef PHYS_SYS_LIB
+#   define PHYS_SYS_API __HELPER_DL_EXPORT
+#else
+#   define PHYS_SYS_API __HELPER_DL_IMPORT
+#endif
+#else
+#   define PHYS_SYS_API
+#endif

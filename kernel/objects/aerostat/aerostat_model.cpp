@@ -83,7 +83,7 @@ void model::create_phys()
     cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
     //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
-    phys::compound_sensor_ptr s = phys::aerostat::fill_cs(nodes_manager_); 
+    phys::compound_sensor_ptr s = phys::aerostat::fill_cs(nodes_manager_->get_model()); 
     decart_position p(/*veh_transform.translation()*/base(state_.pos), /*cg::quaternion(veh_transform.rotation().cpr())*/state_.orien);
     
     phys::aerostat::params_t  params;

@@ -65,7 +65,7 @@ namespace aircraft
         // phys::compound_sensor_t s;
         // if (!fill_sensor(nodes_manager, s))
         //     return phys_aircraft_ptr();
-        phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager);
+        phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager->get_model());
 
         return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
     }

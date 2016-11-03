@@ -721,7 +721,7 @@ void model::create_phys_vehicle()
     cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
     //phys::sensor_ptr s = collect_collision(nodes_manager_, body_node_);
-    phys::compound_sensor_ptr s = phys::ray_cast_vehicle::fill_cs(nodes_manager_);
+    phys::compound_sensor_ptr s = phys::ray_cast_vehicle::fill_cs(nodes_manager_->get_model());
 
     body_transform_inv_ =  cg::transform_4(); 
     // FIXME TYV  сдается мне нефига не нужный код 

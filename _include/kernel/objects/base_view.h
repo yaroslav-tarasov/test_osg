@@ -103,7 +103,7 @@ protected:
 // base view
 
 //! базовый класс для любого "представления" 
-struct /*SYSTEMS_API*/ base_view_presentation
+struct SYSTEMS_API base_view_presentation
     : kernel::base_presentation // базовый интерфейс представления
     //, kernel::history_prs     // now history is generic for all objects
 {

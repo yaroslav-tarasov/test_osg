@@ -1,7 +1,3 @@
-#include "stdafx.h"
-
-#include <btBulletDynamicsCommon.h>
-#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "bullet_helpers.h"
 
 #include "aerostat_phys.h"

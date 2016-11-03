@@ -67,7 +67,7 @@ void model::create_phys()
     cg::geo_base_3 base = phys_->get_base(*phys_zone_);
 
 #if 0
-    phys::compound_sensor_ptr s = phys::arresting_gear::fill_cs(nodes_manager_); 
+    phys::compound_sensor_ptr s = phys::arresting_gear::fill_cs(nodes_manager_->get_model()); 
 #endif
     decart_position p(base(state_.pos), state_.orien);
 

@@ -19,7 +19,7 @@ namespace aircraft_physless
                                     shassis_support_ptr shassis,
                                     size_t zone)
     {
-        phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager);
+        phys::compound_sensor_ptr s = phys::aircraft::fill_cs(nodes_manager->get_model());
 
         return boost::make_shared<phys_aircraft_impl>(base, phys, /*meteo_cursor,*/ nodes_manager, initial_position, fsettings, shassis, s, zone);
     }

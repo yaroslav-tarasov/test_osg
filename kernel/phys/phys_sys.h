@@ -1,10 +1,11 @@
 #pragma once
 
 #include "phys/phys_sys_fwd.h"
-//#include "sensor.h"
-#include "objects/aircraft.h"
 #include "atc/position.h"
+
+//#include "phys/sensor.h"
 #include "phys/flock.h"
+#include "phys/vehicle.h"
 #include "phys/character.h"
 #include "phys/aerostat.h"
 #include "phys/aircraft.h"
@@ -81,27 +82,27 @@ namespace phys
 
     namespace aircraft
     {
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+        compound_sensor_ptr fill_cs(const std::string& model_name);
     }
 
     namespace ray_cast_vehicle
     {
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+        compound_sensor_ptr fill_cs(const std::string& model_name);
     }
 
     namespace flock
     {
-        compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+        compound_sensor_ptr fill_cs(const std::string& model_name);
     }
 
 	namespace character
 	{
-		compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+		compound_sensor_ptr fill_cs(const std::string& model_name);
 	}
 
 	namespace aerostat
 	{
-		compound_sensor_ptr fill_cs(nm::manager_ptr manager);
+		compound_sensor_ptr fill_cs(const std::string& model_name);
 	}
 }
 
