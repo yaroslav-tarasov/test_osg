@@ -21,7 +21,7 @@ int main( int argc, char** argv )
 
 
 
-	auto fp = fn_reg::function<int( int argc, char** argv )>("main_light_test");
+	auto fp = fn_reg::function<int( int argc, char** argv )>("main_sparse_texture");
 
 	if(name) 
 		fp = fn_reg::function<int( int argc, char** argv )>(*name);

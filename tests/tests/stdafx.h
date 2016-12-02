@@ -22,7 +22,7 @@
 #include "common/qt.h"
 #endif
 
-#include "common/misc.h"
+#include "common/av_misc.h"
 
 
 /////////////////////////////////
