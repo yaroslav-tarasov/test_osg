@@ -5,6 +5,8 @@
 #include "application/main_window.h"
 #include "application/menu.h"
 
+#include "kernel/systems/vis_system.h"
+
 namespace airport 
 {
 

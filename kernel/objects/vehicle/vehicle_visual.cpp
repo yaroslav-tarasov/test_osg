@@ -1,6 +1,7 @@
 #include "vehicle_visual.h"
 #include "common/text_label.h"
 
+#include "kernel/systems/vis_system.h"
 
 namespace vehicle
 {

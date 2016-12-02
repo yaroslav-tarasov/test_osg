@@ -20,6 +20,7 @@ struct node_impl : public node_control
 {
 public:
 
+#if 0
 #ifndef DEPRECATED
     node_impl( osg::Node* n,  view  * manager )
         : node_(n)
@@ -27,6 +28,7 @@ public:
     {
         node_->getUserValue("id",node_id_);
     }
+#endif
 #endif
 
     node_impl(view * manager, node_impl const&  parent, model_structure::node_data const& data, uint32_t id);
@@ -108,8 +110,10 @@ protected:
     mutable node_position                         prev_extrapolated_position_;
     mutable optional<node_info_ptr>               rel_node_;
 #ifndef DEPRECATED
+#if 0
     //std::vector<osg::ref_ptr<osg::NodeCallback>>  childs_callbacks_;
     osg::ref_ptr<osg::Node>                       node_;
+#endif
     mutable std::string                           name_;
 #endif
     boost::optional<bool>                         visibility_;

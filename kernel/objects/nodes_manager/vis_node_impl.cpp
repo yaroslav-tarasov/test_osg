@@ -33,7 +33,7 @@ vis_node_impl::vis_node_impl( view * manager, binary::input_stream & stream )
 
 void vis_node_impl::on_visual_object_created()
 {
-    fill_victory_nodes();
+    fill_visual_nodes();
 	need_update_ = true;
     sync_position();
 
@@ -45,10 +45,10 @@ void vis_node_impl::on_visual_object_created()
 	anim_queue_.clear();
 }
 
-void vis_node_impl::fill_victory_nodes()
+void vis_node_impl::fill_visual_nodes()
 {
     visual* vis_manager = dynamic_cast<visual*>(manager_);
-    victory_nodes_.clear();
+    visual_nodes_.clear();
     auto vo = vis_manager->visual_object();
 
     if (vo)
@@ -58,16 +58,16 @@ void vis_node_impl::fill_victory_nodes()
         {
             if (*jt=="root")
             {
-                 victory_nodes_.push_back(vo->node().get());
+                 visual_nodes_.push_back(vo->node().get());
                  continue;
             }
 
             // if (auto visnode = findFirstNode(vo->node().get(), *jt))
             if (auto visnode = vo->get_node(*jt))
             {
-                victory_nodes_.push_back(visnode);
+                visual_nodes_.push_back(visnode);
 
-                FIXME(fill_victory_nodes Need to be realized)
+                FIXME(fill_visual_nodes Need to be realized)
                 //if (texture_ && visnode->as_root())
                 //    visnode->as_root()->set_base_texture(*texture_);
             }
@@ -77,7 +77,7 @@ void vis_node_impl::fill_victory_nodes()
         {
             if (*jt=="root")
             {
-                victory_nodes_.push_back(vo->node().get());
+                visual_nodes_.push_back(vo->node().get());
                 continue;
             }
 
@@ -87,9 +87,9 @@ void vis_node_impl::fill_victory_nodes()
 
             if (auto visnode = vo->get_node(*jt))
             {
-                victory_nodes_.push_back(visnode);
+                visual_nodes_.push_back(visnode);
 
-                FIXME(fill_victory_nodes Need to be realized)
+                FIXME(fill_visual_nodes Need to be realized)
                     //if (texture_ && visnode->as_root())
                     //    visnode->as_root()->set_base_texture(*texture_);
             }
@@ -159,11 +159,13 @@ void vis_node_impl::on_animation(msg::node_animation const& anim, bool deffered)
     pm = anim.from < 0?osgAnimation::Animation::LOOP:pm;
 
 #if 1
-    if (victory_nodes_.size()>0)
+    if (visual_nodes_.size()>0)
     {
 
-    auto root = victory_nodes_[0];
-    node_     = victory_nodes_[0];
+    auto root = visual_nodes_[0];
+#if 0
+    node_     = visual_nodes_[0];
+#endif
     
         if ( manager_.valid() )
         {   
@@ -284,7 +286,7 @@ void vis_node_impl::sync_position()
 
     bool visible = is_visible();
 
-    for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+    for (auto it = visual_nodes_.begin(); it != visual_nodes_.end(); ++it)
     {
         (*(it))->setNodeMask(visible?REFLECTION_MASK/*0x00010000*/:0);   // set_process_flag(visible);
     }
@@ -294,7 +296,7 @@ void vis_node_impl::sync_position()
         if (position_.is_local())
         {
             cg::transform_4f tr(cg::as_translation(point_3f(extrapolated_position_.local().pos)), rotation_3f((extrapolated_position_.local().orien ).rotation()));
-            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+            for (auto it = visual_nodes_.begin(); it != visual_nodes_.end(); ++it)
                 if ((*(it))->asTransform() && !boost::starts_with((*(it))->getName(),"shassi_") )
                 if((*(it))->asTransform()->asMatrixTransform())
                     (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
@@ -305,7 +307,7 @@ void vis_node_impl::sync_position()
             point_3f offset = base(extrapolated_position_.global().pos);
 
             cg::transform_4f tr(cg::as_translation(offset), rotation_3f((extrapolated_position_.global().orien ).rotation()));
-            for (auto it = victory_nodes_.begin(); it != victory_nodes_.end(); ++it)
+            for (auto it = visual_nodes_.begin(); it != visual_nodes_.end(); ++it)
                 if ((*(it))->asTransform() && !boost::starts_with((*(it))->getName(),"shassi_") )
                 if((*(it))->asTransform()->asMatrixTransform())
                 (*(it))->asTransform()->asMatrixTransform()->setMatrix(to_osg_transform(tr));
@@ -319,7 +321,7 @@ void vis_node_impl::sync_position()
 
 vis_node_control::vis_nodes_t const& vis_node_impl::vis_nodes() const
 {
-    return victory_nodes_;
+    return visual_nodes_;
 }
              
 } // nodes_management

@@ -1,5 +1,6 @@
 #include "human_visual.h"
 
+#include "kernel/systems/vis_system.h"
 
 namespace human
 {

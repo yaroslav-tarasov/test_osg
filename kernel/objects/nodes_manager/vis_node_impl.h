@@ -28,7 +28,7 @@ namespace nodes_management
         void on_visual_object_created();
 
     private:
-        void fill_victory_nodes();
+        void fill_visual_nodes();
         void extrapolated_position_reseted() override; 
         void sync_position();
 
@@ -53,7 +53,7 @@ namespace nodes_management
         animation_duration_t                                                amd_;
 
         mutable optional<bool>							                visible_;
-        std::vector<osg::ref_ptr<osg::Node>>                      victory_nodes_;
+        vis_nodes_t                                                visual_nodes_;
 
         bool													   user_visible_;
 

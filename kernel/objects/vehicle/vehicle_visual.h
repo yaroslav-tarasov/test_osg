@@ -2,7 +2,7 @@
 #include "vehicle_view.h"
 #include "network/msg_dispatcher.h"
 #include "objects/impl/local_position.h"
-#include "kernel/systems/vis_system.h"
+#include "kernel/systems_fwd.h"
 
 #include "common/visual_objects_support_fwd.h"
 

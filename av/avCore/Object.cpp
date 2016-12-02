@@ -11,6 +11,7 @@
 #include "av/avCore/Utils.h"
 #include "av/avCore/XmlModel.h"
 #include "av/avCore/InstancesManager.h"
+#include "av/avCore/DatabaseHelper.h"
 
 #include "av/avUtils/materials.h"
 
