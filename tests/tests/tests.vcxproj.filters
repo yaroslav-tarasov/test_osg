@@ -221,9 +221,6 @@
     <ClCompile Include="..\common\CommonFunctions.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\utils\visitors\ComputeTriMeshVisitor.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\anim_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -47,6 +47,10 @@ GLAPI void APIENTRY glTexPageCommitmentARB (GLenum target, GLint level, GLint xo
 #endif
 #endif /* GL_ARB_sparse_texture */
 
+#define GL_TEXTURE_BASE_LEVEL 0x813C
+#define GL_TEXTURE_MAX_LEVEL 0x813D
+#define GL_TEXTURE_2D_ARRAY	 GL_TEXTURE_2D_ARRAY_EXT
+
 namespace  {
     
     class SPTGLExtensions;
@@ -147,6 +151,9 @@ namespace  {
     
     class SparseTexture  : public osg::Texture2DArray
     {
+
+
+
     public:
 
         typedef  SPTGLExtensions Extensions;
@@ -158,6 +165,14 @@ namespace  {
         {
             setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
             setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR_MIPMAP_NEAREST);
+			 GLsizei const Size(16384);
+			
+			_textureWidth   =  GLsizei(Size);
+	        _textureHeight  =  GLsizei(Size);
+			_textureDepth   =  1;
+			_internalFormat =  GL_RGBA8;
+			_sourceFormat   =  GL_RGBA;
+			_sourceType     =  GL_UNSIGNED_BYTE;
         }
 
 
@@ -168,78 +183,313 @@ namespace  {
             // current OpenGL context.
             const unsigned int contextID = state.getContextID();
 
+#if 0
             const Texture2DArray::Extensions* extensions = Texture2DArray::getExtensions(contextID,true);
+#endif
+			    
+			const osg::GLExtensions* extensions = osg::GLExtensions::Get(contextID,true);
 
-            _init(extensions, getExtensions(contextID,true));
 
-            osg::Texture2DArray::apply(state);
+
+            //osg::Texture2DArray::apply(state);
+
+			osg::Texture::TextureObjectManager* tom = Texture::getTextureObjectManager(contextID).get();
+			osg::ElapsedTime elapsedTime(&(tom->getApplyTime()));
+			tom->getNumberApplied()++;
+
+
+			// if not supported, then return
+			if (!extensions->isTexture2DArraySupported || !extensions->isTexture3DSupported)
+			{
+				OSG_WARN<<"Warning: Texture2DArray::apply(..) failed, 2D texture arrays are not support by OpenGL driver."<<std::endl;
+				return;
+			}
+
+			// get the texture object for the current contextID.
+			TextureObject* textureObject = getTextureObject(contextID);
+
+			GLsizei textureDepth = computeTextureDepth();
+
+			if (textureObject && textureDepth>0)
+			{
+				const osg::Image* image = (_images.size()>0) ? _images[0].get() : 0;
+				if (image && getModifiedCount(0, contextID) != image->getModifiedCount())
+				{
+					// compute the internal texture format, this set the _internalFormat to an appropriate value.
+					computeInternalFormat();
+
+					GLsizei new_width, new_height, new_numMipmapLevels;
+
+					// compute the dimensions of the texture.
+					computeRequiredTextureDimensions(state, *image, new_width, new_height, new_numMipmapLevels);
+
+					if (!textureObject->match(GL_TEXTURE_2D_ARRAY_EXT, new_numMipmapLevels, _internalFormat, new_width, new_height, textureDepth, _borderWidth))
+					{
+						Texture::releaseTextureObject(contextID, _textureObjectBuffer[contextID].get());
+						_textureObjectBuffer[contextID] = 0;
+						textureObject = 0;
+					}
+				}
+			}
+
+			// if we already have an texture object, then
+			if (textureObject)
+			{
+				// bind texture object
+				textureObject->bind();
+
+				// if texture parameters changed, then reset them
+				if (getTextureParameterDirty(state.getContextID())) applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT,state);
+
+				// if subload is specified, then use it to subload the images to GPU memory
+				if (_subloadCallback.valid())
+				{
+					_subloadCallback->subload(*this,state);
+				}
+				else
+				{
+					GLsizei n = 0;
+					for(Images::const_iterator itr = _images.begin();
+						itr != _images.end();
+						++itr)
+					{
+						osg::Image* image = itr->get();
+						if (image)
+						{
+							if (getModifiedCount(n,contextID) != image->getModifiedCount())
+							{
+								applyTexImage2DArray_subload(state, image, n, _textureWidth, _textureHeight, image->r(), _internalFormat, _numMipmapLevels);
+								getModifiedCount(n,contextID) = image->getModifiedCount();
+							}
+							n += image->r();
+						}
+					}
+				}
+
+			}
+
+			// there is no texture object, but exists a subload callback, so use it to upload images
+			else if (_subloadCallback.valid())
+			{
+				// generate texture (i.e. glGenTexture) and apply parameters
+				textureObject = generateAndAssignTextureObject(contextID, GL_TEXTURE_2D_ARRAY_EXT);
+				textureObject->bind();
+				applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT, state);
+				_subloadCallback->load(*this,state);
+			}
+
+			// nothing before, but we have valid images, so do manual upload and create texture object manually
+			// TODO: we assume _images[0] is valid, however this may not be always the case
+			//       some kind of checking for the first valid image is required (Art, may 2008)
+			else if (imagesValid())
+			{
+				// compute the internal texture format, this set the _internalFormat to an appropriate value.
+				computeInternalFormat();
+
+				// compute the dimensions of the texture.
+				computeRequiredTextureDimensions(state,*_images[0],_textureWidth, _textureHeight, _numMipmapLevels);
+
+				// create texture object
+				textureObject = generateAndAssignTextureObject(
+					contextID, GL_TEXTURE_2D_ARRAY_EXT,_numMipmapLevels, _internalFormat, _textureWidth, _textureHeight, textureDepth,0);
+
+				// bind texture
+				textureObject->bind();
+				applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT, state);
+
+				// First we need to allocate the texture memory
+				int sourceFormat = _sourceFormat ? _sourceFormat : _internalFormat;
+
+				if( isCompressedInternalFormat( sourceFormat ) &&
+					sourceFormat == _internalFormat &&
+					extensions->isCompressedTexImage3DSupported() )
+				{
+					extensions->glCompressedTexImage3D( GL_TEXTURE_2D_ARRAY_EXT, 0, _internalFormat,
+						_textureWidth, _textureHeight, textureDepth, _borderWidth,
+						_images[0]->getImageSizeInBytes() * textureDepth,
+						0);
+				}
+				else
+				{
+					// Override compressed source format with safe GL_RGBA value which not generate error
+					// We can safely do this as source format is not important when source data is NULL
+					if( isCompressedInternalFormat( sourceFormat ) )
+						sourceFormat = GL_RGBA;
+
+					extensions->glTexImage3D( GL_TEXTURE_2D_ARRAY_EXT, 0, _internalFormat,
+						_textureWidth, _textureHeight, textureDepth, _borderWidth,
+						sourceFormat, _sourceType ? _sourceType : GL_UNSIGNED_BYTE,
+						0);
+				}
+
+				// For certain we have to manually allocate memory for mipmaps if images are compressed
+				// if not allocated OpenGL will produce errors on mipmap upload.
+				// I have not tested if this is necessary for plain texture formats but
+				// common sense suggests its required as well.
+				if( _min_filter != LINEAR && _min_filter != NEAREST && _images[0]->isMipmap() )
+				{
+					allocateMipmap( state );
+				}
+
+				GLsizei n = 0;
+				for(Images::const_iterator itr = _images.begin();
+					itr != _images.end();
+					++itr)
+				{
+					osg::Image* image = itr->get();
+					if (image)
+					{
+						if (getModifiedCount(n,contextID) != image->getModifiedCount())
+						{
+							applyTexImage2DArray_subload(state, image, n, _textureWidth, _textureHeight, image->r(), _internalFormat, _numMipmapLevels);
+							getModifiedCount(n,contextID) = image->getModifiedCount();
+						}
+						n += image->r();
+					}
+				}
+
+				const osg::GLExtensions* extensions = state.get<osg::GLExtensions>();
+				// source images have no mipmamps but we could generate them...
+				if( _min_filter != LINEAR && _min_filter != NEAREST && !_images[0]->isMipmap() &&
+					_useHardwareMipMapGeneration && extensions->isGenerateMipMapSupported )
+				{
+					_numMipmapLevels = osg::Image::computeNumberOfMipmapLevels( _textureWidth, _textureHeight );
+					generateMipmap( state );
+				}
+
+				textureObject->setAllocated(_numMipmapLevels, _internalFormat, _textureWidth, _textureHeight, textureDepth,0);
+
+				// unref image data?
+				if (isSafeToUnrefImageData(state))
+				{
+					SparseTexture* non_const_this = const_cast<SparseTexture*>(this);
+					for(Images::iterator itr = non_const_this->_images.begin();
+						itr != non_const_this->_images.end();
+						++itr)
+					{
+						osg::Image* image = itr->get();
+						if (image && image->getDataVariance()==STATIC)
+						{
+							*itr = NULL;
+						}
+					}
+				}
+
+			}
+
+			// No images present, but dimensions are set. So create empty texture
+			else if ( (_textureWidth > 0) && (_textureHeight > 0) && (_textureDepth > 0) && (_internalFormat!=0) )
+			{
+				auto spte = getExtensions(contextID,true);
+
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+				
+				// generate texture
+				textureObject = generateAndAssignTextureObject(
+					contextID, GL_TEXTURE_2D_ARRAY_EXT,_numMipmapLevels,_internalFormat, _textureWidth, _textureHeight, _textureDepth,0);
+
+				textureObject->bind();
+				applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT,state);
+
+				GLsizei const Size(16384);
+				std::size_t const Levels = gli::levels(static_cast<double>(Size));
+				std::size_t const MaxLevels = 4;
+
+
+
+				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
+
+				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
+
+				osg::Vec3i PageSize;
+				spte->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSize._v[0]);
+				spte->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSize._v[1]);
+				spte->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSize._v[2]);
+
+				std::vector<glm::u8vec4> Page;
+				Page.resize(static_cast<std::size_t>(PageSize.x() * PageSize.y() * PageSize.z()));
+
+				osg::Vec3i Page3DSize;
+				spte->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &Page3DSize._v[0]);
+				spte->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &Page3DSize._v[1]);
+				spte->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &Page3DSize._v[2]); 
+
+#if 0
+				extensions->glTexImage3D( GL_TEXTURE_2D_ARRAY_EXT, 0, _internalFormat,
+					_textureWidth, _textureHeight, _textureDepth,
+					_borderWidth,
+					_sourceFormat ? _sourceFormat : _internalFormat,
+					_sourceType ? _sourceType : GL_UNSIGNED_BYTE,
+					0);
+#endif
+
+				GLsizei  width =  _textureWidth;
+				GLsizei  height =  _textureHeight;
+				for (int i = 0; i < MaxLevels; i++) {
+					extensions->glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, i, _internalFormat, width, height, /*depth*/_textureDepth, 0, _sourceFormat, _sourceType, NULL);
+					width = std::max(1, (width / 2));
+					height = std::max(1, (height / 2));
+				}
+
+				for(std::size_t Level = 0; Level < MaxLevels; ++Level)
+				{
+					GLsizei LevelSize = (Size >> Level);
+					GLsizei TileCountY = LevelSize / PageSize.y();
+					GLsizei TileCountX = LevelSize / PageSize.x();
+
+					for(GLsizei j = 0; j < TileCountY; ++j)
+						for(GLsizei i = 0; i < TileCountX; ++i)
+						{
+							if(glm::abs(glm::length(glm::vec2(i, j) / glm::vec2(TileCountX, TileCountY) * 2.0f - 1.0f)) > 1.0f)
+								continue;
+
+							std::fill(Page.begin(), Page.end(), glm::u8vec4(
+								static_cast<unsigned char>(float(i) / float(LevelSize / PageSize.x()) * 255),
+								static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y()) * 255),
+								static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
+
+							spte->glTexturePageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+								static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
+								static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
+								GL_TRUE);
+
+							extensions->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+								static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
+								static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
+								GL_RGBA, GL_UNSIGNED_BYTE,
+								&Page[0][0]);
+						}
+				}
+
+
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+			}
+
+			// nothing before, so just unbind the texture target
+			else
+			{
+				glBindTexture( GL_TEXTURE_2D_ARRAY_EXT, 0 );
+			}
+
+			// if texture object is now valid and we have to allocate mipmap levels, then
+			if (textureObject != 0 && _texMipmapGenerationDirtyList[contextID])
+			{
+				generateMipmap(state);
+			}
+
+
         }
 
         //static void setExtensions(unsigned int contextID,Extensions* extensions);
         static Extensions* getExtensions(unsigned int contextID,bool createIfNotInitalized);
     
     private:
-        void _init( const Texture2DArray::Extensions* t2da_extensions, Extensions* extensions) const
+        void _init( /*const Texture2DArray::Extensions**/const osg::GLExtensions* t2da_extensions, Extensions* extensions) const
         {
             if(!_binit)
             {
-                GLsizei const Size(16384);
-                std::size_t const Levels = gli::levels(static_cast<double>(Size));
-                std::size_t const MaxLevels = 4;
-		        
-                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-                glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-                glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
-
-                glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
-
-                osg::Vec3i PageSize;
-                extensions->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSize._v[0]);
-                extensions->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSize._v[1]);
-                extensions->glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSize._v[2]);
-                
-                std::vector<glm::u8vec4> Page;
-                Page.resize(static_cast<std::size_t>(PageSize.x() * PageSize.y() * PageSize.z()));
-
-                osg::Vec3i Page3DSize;
-                extensions->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &Page3DSize._v[0]);
-                extensions->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &Page3DSize._v[1]);
-                extensions->glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &Page3DSize._v[2]); 
-
-
-                for(std::size_t Level = 0; Level < MaxLevels; ++Level)
-                {
-                    GLsizei LevelSize = (Size >> Level);
-                    GLsizei TileCountY = LevelSize / PageSize.y();
-                    GLsizei TileCountX = LevelSize / PageSize.x();
-
-                    for(GLsizei j = 0; j < TileCountY; ++j)
-                        for(GLsizei i = 0; i < TileCountX; ++i)
-                        {
-                            if(glm::abs(glm::length(glm::vec2(i, j) / glm::vec2(TileCountX, TileCountY) * 2.0f - 1.0f)) > 1.0f)
-                                continue;
-
-                            std::fill(Page.begin(), Page.end(), glm::u8vec4(
-                                static_cast<unsigned char>(float(i) / float(LevelSize / PageSize.x()) * 255),
-                                static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y()) * 255),
-                                static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
-
-                            extensions->glTexturePageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-                                static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
-                                static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
-                                GL_TRUE);
-
-                            t2da_extensions->glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-                                static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
-                                static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
-                                GL_RGBA, GL_UNSIGNED_BYTE,
-                                &Page[0][0]);
-                        }
-                }
-
-
- 		        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
                 
                 _binit = true;
             }
@@ -327,7 +577,7 @@ namespace  {
             "void main(void) \n"
             "{ \n"
             "\n"
-            "    Color = texture(Diffuse, vec3(In.Texcoord.st, 0.0)); \n"
+			"    Color = texture(Diffuse, vec3(In.Texcoord.st, 0.0)); \n"
             "}\n";
 
 
