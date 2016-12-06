@@ -14,6 +14,8 @@
 #include "common/boost.h"
 #include "common/stl.h"
 
+
+#include <GL/glcorearb.h>
 #include "common/osg_inc.h"
 #include "common/bullet.h"
 #include "common/debug.h"
