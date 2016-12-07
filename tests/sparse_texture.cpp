@@ -64,7 +64,7 @@ namespace  {
         void lowestCommonDenominator( const SPTGLExtensions &rhs );
         void setupGLExtensions( unsigned int contextID );
 
-        void glTexturePageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const;
+        void glTexPageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const;
         void glGetInternalformativ     (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
         void glTexStorage3D            (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
 
@@ -135,7 +135,7 @@ namespace  {
         return bsptExtensions[contextID].get();
     }
 
-    void SPTGLExtensions::glTexturePageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const
+    void SPTGLExtensions::glTexPageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const
     {
 
         if ( _glTexPageCommitmentARB )
@@ -338,7 +338,7 @@ namespace  {
 #if 1
                     const page_t& p = _to_uncommit_pages.back();
                     
-                    spte->glTexturePageCommitmentARB(GL_TEXTURE_2D_ARRAY, p.level,
+                    spte->glTexPageCommitmentARB(GL_TEXTURE_2D_ARRAY, p.level,
                         p.xoffset, p.yoffset, p.zoffset,
                         p.width, p.height, p.depth,
                         GL_FALSE);
@@ -544,7 +544,7 @@ namespace  {
 								static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y()) * 255),
 								static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
 
-							spte->glTexturePageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+							spte->glTexPageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 								static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
 								static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
 								GL_TRUE);
