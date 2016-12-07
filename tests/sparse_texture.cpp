@@ -64,16 +64,19 @@ namespace  {
         void lowestCommonDenominator( const SPTGLExtensions &rhs );
         void setupGLExtensions( unsigned int contextID );
 
-        void glTexturePageCommitmentARB(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const;
-        void glGetInternalformativ(GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
+        void glTexturePageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const;
+        void glGetInternalformativ     (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
+        void glTexStorage3D            (GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
 
         static SPTGLExtensions* getExtensions( unsigned int contextID,bool createIfNotInitalized );
     protected:
 
-        typedef void ( GL_APIENTRY *TexturePageCommitmentARB ) (GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit);
-        typedef void ( GL_APIENTRY *GetInternalformativ)     (GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
-        TexturePageCommitmentARB _glTexturePageCommitmentARB;
+        typedef void ( GL_APIENTRY *TexturePageCommitmentARB ) ( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit);
+        typedef void ( GL_APIENTRY *GetInternalformativ)       ( GLenum target, GLenum internalformat, GLenum pname, GLsizei bufSize, GLint* params);
+        typedef void ( GL_APIENTRY * TexStorage3D)             ( GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
+        TexturePageCommitmentARB _glTexPageCommitmentARB;
         GetInternalformativ      _glGetInternalformativ;
+        TexStorage3D             _glTexStorage3D;
     };
 
     SPTGLExtensions::SPTGLExtensions( unsigned int contextID )
@@ -84,31 +87,40 @@ namespace  {
     SPTGLExtensions::SPTGLExtensions( const SPTGLExtensions &rhs )
         : Referenced()
     {
-        _glTexturePageCommitmentARB           = rhs._glTexturePageCommitmentARB;
+        _glTexPageCommitmentARB           = rhs._glTexPageCommitmentARB;
         _glGetInternalformativ                = rhs._glGetInternalformativ;
+        _glTexStorage3D                = rhs._glTexStorage3D;
     }
 
 
     void SPTGLExtensions::lowestCommonDenominator( const SPTGLExtensions &rhs )
     {
-        if ( !rhs._glTexturePageCommitmentARB )
+        if ( !rhs._glTexPageCommitmentARB )
         {
-            _glTexturePageCommitmentARB = rhs._glTexturePageCommitmentARB;
+            _glTexPageCommitmentARB = rhs._glTexPageCommitmentARB;
         }
 
         if ( !rhs._glGetInternalformativ )
         {
             _glGetInternalformativ = rhs._glGetInternalformativ;
         }
+
+        if ( !rhs._glTexStorage3D )
+        {
+            _glTexStorage3D = rhs._glTexStorage3D;
+        }
     }
 
     void SPTGLExtensions::setupGLExtensions( unsigned int contextID )
     {
-        _glTexturePageCommitmentARB = 0;
-        osg::setGLExtensionFuncPtr( _glTexturePageCommitmentARB, "glTexturePageCommitmentARB", "glTexturePageCommitmentEXT" );
+        _glTexPageCommitmentARB = 0;
+        osg::setGLExtensionFuncPtr( _glTexPageCommitmentARB, "glTexPageCommitmentARB"/*, "glTexturePageCommitmentEXT"*/ );
 
         _glGetInternalformativ = 0;
         osg::setGLExtensionFuncPtr( _glGetInternalformativ, "glGetInternalformativ" );
+
+        _glTexStorage3D = 0;
+        osg::setGLExtensionFuncPtr( _glTexStorage3D, "glTexStorage3D" );
     }
 
     typedef osg::buffered_value< osg::ref_ptr<SPTGLExtensions> > BufferedSPTGLExtensions;
@@ -123,12 +135,12 @@ namespace  {
         return bsptExtensions[contextID].get();
     }
 
-    void SPTGLExtensions::glTexturePageCommitmentARB(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const
+    void SPTGLExtensions::glTexturePageCommitmentARB(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLboolean commit) const
     {
 
-        if ( _glTexturePageCommitmentARB )
+        if ( _glTexPageCommitmentARB )
         {
-            _glTexturePageCommitmentARB( texture, level, xoffset, yoffset, zoffset, width, height, depth, commit );
+            _glTexPageCommitmentARB( target, level, xoffset, yoffset, zoffset, width, height, depth, commit );
         }
         else
         {
@@ -149,10 +161,54 @@ namespace  {
         }
     }
     
-    class SparseTexture  : public osg::Texture2DArray
+    
+    void SPTGLExtensions::glTexStorage3D( GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth)
     {
 
+        if ( _glTexStorage3D )
+        {
+            _glTexStorage3D( target, levels, internalformat, width, height, depth);
+        }
+        else
+        {
+            OSG_WARN<<"Error: glGetInternalformativ not supported by OpenGL driver"<<std::endl;
+        }
+    }
 
+    class SparseTexture  : public osg::Texture2DArray
+    {
+        struct page_t
+        {
+            page_t()
+                : level  (0)
+                , xoffset(0)
+                , yoffset(0)
+                , zoffset(0)
+                , width  (0)
+                , height (0)
+                , depth  (0)
+            {}
+
+            page_t( GLint   level, GLint   xoffset,  GLint   yoffset,  GLint   zoffset,  GLsizei width, GLsizei height,  GLsizei depth)
+                : level  (level)
+                , xoffset(xoffset)
+                , yoffset(yoffset)
+                , zoffset(zoffset)
+                , width  (width)
+                , height (height)
+                , depth  (depth)
+            {}
+
+            GLint   level;
+            GLint   xoffset;
+            GLint   yoffset;
+            GLint   zoffset;
+            GLsizei width;
+            GLsizei height;
+            GLsizei depth;
+        };
+
+        typedef std::vector<page_t> pages_t; 
 
     public:
 
@@ -183,14 +239,13 @@ namespace  {
             // current OpenGL context.
             const unsigned int contextID = state.getContextID();
 
-#if 0
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
+			const osg::GLExtensions* extensions = osg::GLExtensions::Get(contextID,true);
+#else
             const Texture2DArray::Extensions* extensions = Texture2DArray::getExtensions(contextID,true);
 #endif
-			    
-			const osg::GLExtensions* extensions = osg::GLExtensions::Get(contextID,true);
-
-
-
+            auto spte = getExtensions(contextID,true);
+            
             //osg::Texture2DArray::apply(state);
 
 			osg::Texture::TextureObjectManager* tom = Texture::getTextureObjectManager(contextID).get();
@@ -199,7 +254,11 @@ namespace  {
 
 
 			// if not supported, then return
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
 			if (!extensions->isTexture2DArraySupported || !extensions->isTexture3DSupported)
+#else
+			if (!extensions->isTexture2DArraySupported() || !extensions->isTexture3DSupported())
+#endif
 			{
 				OSG_WARN<<"Warning: Texture2DArray::apply(..) failed, 2D texture arrays are not support by OpenGL driver."<<std::endl;
 				return;
@@ -208,7 +267,11 @@ namespace  {
 			// get the texture object for the current contextID.
 			TextureObject* textureObject = getTextureObject(contextID);
 
-			GLsizei textureDepth = computeTextureDepth();
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
+			const GLsizei textureDepth = computeTextureDepth();
+#else
+            const GLsizei textureDepth = _textureDepth;
+#endif
 
 			if (textureObject && textureDepth>0)
 			{
@@ -249,7 +312,7 @@ namespace  {
 				else
 				{
 					GLsizei n = 0;
-					for(Images::const_iterator itr = _images.begin();
+					for(auto itr = _images.begin();
 						itr != _images.end();
 						++itr)
 					{
@@ -258,7 +321,11 @@ namespace  {
 						{
 							if (getModifiedCount(n,contextID) != image->getModifiedCount())
 							{
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
 								applyTexImage2DArray_subload(state, image, n, _textureWidth, _textureHeight, image->r(), _internalFormat, _numMipmapLevels);
+#else
+                                applyTexImage2DArray_subload(state, image, _textureWidth, _textureHeight, n, _internalFormat, _numMipmapLevels);
+#endif
 								getModifiedCount(n,contextID) = image->getModifiedCount();
 							}
 							n += image->r();
@@ -266,23 +333,38 @@ namespace  {
 					}
 				}
 
+                if(_to_uncommit_pages.size()>0)
+                {
+#if 1
+                    const page_t& p = _to_uncommit_pages.back();
+                    
+                    spte->glTexturePageCommitmentARB(GL_TEXTURE_2D_ARRAY, p.level,
+                        p.xoffset, p.yoffset, p.zoffset,
+                        p.width, p.height, p.depth,
+                        GL_FALSE);
+#endif
+                     _to_uncommit_pages.pop_back();
+                }
 			}
 
 			// there is no texture object, but exists a subload callback, so use it to upload images
 			else if (_subloadCallback.valid())
 			{
+#if 0
 				// generate texture (i.e. glGenTexture) and apply parameters
 				textureObject = generateAndAssignTextureObject(contextID, GL_TEXTURE_2D_ARRAY_EXT);
 				textureObject->bind();
 				applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT, state);
 				_subloadCallback->load(*this,state);
+#endif
 			}
 
 			// nothing before, but we have valid images, so do manual upload and create texture object manually
 			// TODO: we assume _images[0] is valid, however this may not be always the case
 			//       some kind of checking for the first valid image is required (Art, may 2008)
-			else if (imagesValid())
+			else if (!_images.empty() && imagesValid())
 			{
+#if 0
 				// compute the internal texture format, this set the _internalFormat to an appropriate value.
 				computeInternalFormat();
 
@@ -332,7 +414,7 @@ namespace  {
 				}
 
 				GLsizei n = 0;
-				for(Images::const_iterator itr = _images.begin();
+				for(auto itr = _images.begin();
 					itr != _images.end();
 					++itr)
 				{
@@ -348,10 +430,17 @@ namespace  {
 					}
 				}
 
+                bool isGenerateMipMapSupported; 
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
 				const osg::GLExtensions* extensions = state.get<osg::GLExtensions>();
+                isGenerateMipMapSupported = extensions->isGenerateMipMapSupported;
+#else
+                const Texture::Extensions* extensions = Texture::getExtensions(contextID,true);
+                isGenerateMipMapSupported = extensions->isGenerateMipMapSupported();
+#endif
 				// source images have no mipmamps but we could generate them...
 				if( _min_filter != LINEAR && _min_filter != NEAREST && !_images[0]->isMipmap() &&
-					_useHardwareMipMapGeneration && extensions->isGenerateMipMapSupported )
+					_useHardwareMipMapGeneration && isGenerateMipMapSupported )
 				{
 					_numMipmapLevels = osg::Image::computeNumberOfMipmapLevels( _textureWidth, _textureHeight );
 					generateMipmap( state );
@@ -363,7 +452,7 @@ namespace  {
 				if (isSafeToUnrefImageData(state))
 				{
 					SparseTexture* non_const_this = const_cast<SparseTexture*>(this);
-					for(Images::iterator itr = non_const_this->_images.begin();
+					for(auto itr = non_const_this->_images.begin();
 						itr != non_const_this->_images.end();
 						++itr)
 					{
@@ -374,19 +463,25 @@ namespace  {
 						}
 					}
 				}
-
+#endif
 			}
 
 			// No images present, but dimensions are set. So create empty texture
 			else if ( (_textureWidth > 0) && (_textureHeight > 0) && (_textureDepth > 0) && (_internalFormat!=0) )
 			{
-				auto spte = getExtensions(contextID,true);
+
 
 				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-				
+
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )				
 				// generate texture
 				textureObject = generateAndAssignTextureObject(
 					contextID, GL_TEXTURE_2D_ARRAY_EXT,_numMipmapLevels,_internalFormat, _textureWidth, _textureHeight, _textureDepth,0);
+#else
+                // generate texture
+                _textureObjectBuffer[contextID] = textureObject = generateTextureObject(
+                    this, contextID, GL_TEXTURE_2D_ARRAY_EXT,_numMipmapLevels,_internalFormat,_textureWidth,_textureHeight,_textureDepth,0);
+#endif
 
 				textureObject->bind();
 				applyTexParameters(GL_TEXTURE_2D_ARRAY_EXT,state);
@@ -395,11 +490,8 @@ namespace  {
 				std::size_t const Levels = gli::levels(static_cast<double>(Size));
 				std::size_t const MaxLevels = 4;
 
-
-
 				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
-
 				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
 
 				osg::Vec3i PageSize;
@@ -424,13 +516,16 @@ namespace  {
 					0);
 #endif
 
+#if 0
 				GLsizei  width =  _textureWidth;
 				GLsizei  height =  _textureHeight;
-				for (int i = 0; i < MaxLevels; i++) {
+				for (int i = 0; i < Levels; i++) {
 					extensions->glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, i, _internalFormat, width, height, /*depth*/_textureDepth, 0, _sourceFormat, _sourceType, NULL);
 					width = std::max(1, (width / 2));
 					height = std::max(1, (height / 2));
 				}
+#endif
+                spte->glTexStorage3D(GL_TEXTURE_2D_ARRAY, Levels, GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
 
 				for(std::size_t Level = 0; Level < MaxLevels; ++Level)
 				{
@@ -459,6 +554,13 @@ namespace  {
 								static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1,
 								GL_RGBA, GL_UNSIGNED_BYTE,
 								&Page[0][0]);
+
+
+                            _pages.push_back(page_t(static_cast<GLint>(Level),
+                                static_cast<GLsizei>(PageSize.x() * i) , static_cast<GLsizei>(PageSize.y() * j) , 0,
+                                static_cast<GLsizei>(PageSize.x()), static_cast<GLsizei>(PageSize.y()), 1) );
+
+
 						}
 				}
 
@@ -483,9 +585,34 @@ namespace  {
 
         //static void setExtensions(unsigned int contextID,Extensions* extensions);
         static Extensions* getExtensions(unsigned int contextID,bool createIfNotInitalized);
-    
+
+        osg::Image* getImage(unsigned int layer) override
+        {
+            return (layer<static_cast<unsigned int>(_images.size())) ? _images[layer].get() : 0;
+        }
+
+        const osg::Image* getImage(unsigned int layer) const  override
+        {
+            return (layer<static_cast<unsigned int>(_images.size())) ? _images[layer].get() : 0;
+        }
+
+        void uncommitOne()
+        {
+            if(_pages.size()>0)  
+            {
+                _to_uncommit_pages.push_back(_pages.back());
+               _pages.pop_back();
+            }
+        }
+
     private:
-        void _init( /*const Texture2DArray::Extensions**/const osg::GLExtensions* t2da_extensions, Extensions* extensions) const
+        void _init( 
+#if (((OSG_VERSION_MAJOR>=3) && (OSG_VERSION_MINOR>3)) )
+            const osg::GLExtensions* t2da_extensions
+#else
+            const Texture2DArray::Extensions* t2da_extensions
+#endif
+            , Extensions* extensions) const
         {
             if(!_binit)
             {
@@ -497,7 +624,10 @@ namespace  {
 
     private:
         mutable bool _binit;
-    };
+        mutable pages_t      _pages;
+        mutable pages_t      _to_uncommit_pages;
+ 
+   };
 
     SparseTexture::Extensions* SparseTexture::getExtensions(unsigned int contextID,bool createIfNotInitalized)
     {
@@ -632,7 +762,30 @@ osg::Geometry*    CreateGeometry()
     return geom;
 }
 
+class DeleteCallback: public osg::NodeCallback
+{
+public:
+      DeleteCallback( SparseTexture* spt, double rate = 1.0 )
+        : _rate(rate) 
+        , _spt(spt)
+        , _prev_time(0.0)
+      {}
 
+      virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)         
+      {
+          double   curr_time = nv->getFrameStamp()->getSimulationTime();
+          if(curr_time -_prev_time > _rate)
+          {
+              _spt->uncommitOne();
+              _prev_time = curr_time;
+          }
+      }
+
+private:
+    const double     _rate;
+    double   _prev_time;
+    SparseTexture* _spt;
+};
 
 }
 
@@ -655,12 +808,16 @@ int main_sparse_texture( int argc, char** argv )
     
     auto program = createProgram("sparse_texture",vertexShaderSource,fragmentShaderSource);
 
-    ss->setTextureAttribute(0, new SparseTexture());
+    auto spt =  new SparseTexture();
+    ss->setTextureAttribute(0, spt );
     ss->addUniform( new osg::Uniform("Diffuse", 0) );
     ss->setAttributeAndModes(program);	
-
+    teapot->setUpdateCallback(new DeleteCallback(spt, 1));
 
     osgViewer::Viewer viewer(arguments);
+
+
+
 
     viewer.getCamera()->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
     //viewer.getCamera()->setProjectionMatrix(osg::Matrixd::identity());
@@ -669,8 +826,19 @@ int main_sparse_texture( int argc, char** argv )
 
     viewer.getCamera()->setCullingMode( osg::CullSettings::NO_CULLING );
 	viewer.apply(new osgViewer::SingleScreen(1));
-
+       viewer.addEventHandler( new osgViewer::StatsHandler );
     viewer.setSceneData( root.get() );
+
+    osgViewer::Viewer::Windows windows;
+    viewer.getWindows(windows);
+    for(osgViewer::Viewer::Windows::iterator itr = windows.begin();
+        itr != windows.end();
+        ++itr)
+    {
+        osg::State *s=(*itr)->getState();
+        s->setCheckForGLErrors(osg::State::ONCE_PER_ATTRIBUTE);
+    }
+
     return viewer.run();
 }
 
