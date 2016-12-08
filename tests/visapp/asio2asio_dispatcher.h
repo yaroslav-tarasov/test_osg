@@ -13,10 +13,10 @@ namespace network
             typedef  boost::function<void()> stop_f;
             typedef  boost::function<void()> fwd_f;
 
-            dispatcher(start_f start, stop_f stop)
+            dispatcher()
                 : io_   (nullptr)
-                , start_(start)
-                , stop_ (stop)
+                //, start_(start)
+                //, stop_ (stop)
             {
                thread_ = in_place(bind(&dispatcher::run, this));
             }
