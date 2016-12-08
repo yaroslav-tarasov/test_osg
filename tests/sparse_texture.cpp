@@ -527,11 +527,23 @@ namespace  {
 #endif
                 spte->glTexStorage3D(GL_TEXTURE_2D_ARRAY, Levels, GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
 
+
+
 				for(std::size_t Level = 0; Level < MaxLevels; ++Level)
 				{
 					GLsizei LevelSize = (Size >> Level);
 					GLsizei TileCountY = LevelSize / PageSize.y();
 					GLsizei TileCountX = LevelSize / PageSize.x();
+                    
+                    glm::u8vec4 level_colors[] = {
+                        glm::u8vec4(255, 255, 255, 255),
+                        glm::u8vec4(255,   0,   0, 255),
+                        glm::u8vec4(  0, 255,   0, 255),
+                        glm::u8vec4(  0,   0, 255, 255),
+                        glm::u8vec4(255, 255,   0, 255),
+                        glm::u8vec4(255,   0, 255, 255),
+                        glm::u8vec4(  0, 255, 255, 255)
+                    }; 
 
 					for(GLsizei j = 0; j < TileCountY; ++j)
 						for(GLsizei i = 0; i < TileCountX; ++i)
@@ -539,10 +551,14 @@ namespace  {
 							if(glm::abs(glm::length(glm::vec2(i, j) / glm::vec2(TileCountX, TileCountY) * 2.0f - 1.0f)) > 1.0f)
 								continue;
 
-							std::fill(Page.begin(), Page.end(), glm::u8vec4(
-								static_cast<unsigned char>(float(i) / float(LevelSize / PageSize.x()) * 255),
-								static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y()) * 255),
-								static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
+#if 0
+                            std::fill(Page.begin(), Page.end(), glm::u8vec4(
+                                static_cast<unsigned char>(float(i) / float(LevelSize / PageSize.x()) * 255),
+                                static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y()) * 255),
+                                static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
+#else
+                            std::fill(Page.begin(), Page.end(), level_colors[Level % 7]);
+#endif
 
 							spte->glTexPageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 								static_cast<GLsizei>(PageSize.x()) * i, static_cast<GLsizei>(PageSize.y()) * j, 0,
@@ -812,7 +828,7 @@ int main_sparse_texture( int argc, char** argv )
     ss->setTextureAttribute(0, spt );
     ss->addUniform( new osg::Uniform("Diffuse", 0) );
     ss->setAttributeAndModes(program);	
-    teapot->setUpdateCallback(new DeleteCallback(spt, 1));
+    teapot->setUpdateCallback(new DeleteCallback(spt, 0.1));
 
     osgViewer::Viewer viewer(arguments);
 

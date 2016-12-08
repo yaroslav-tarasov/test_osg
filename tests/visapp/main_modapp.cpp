@@ -231,11 +231,7 @@ struct net_worker
          delete  ses_;
      }
 
-     boost::asio::io_service* GetService()
-     {
-         return worker_service_;
-     }
-     
+
      void disconnect(error_code const& err)
      {
          //worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
@@ -300,24 +296,30 @@ private:
      void run()
      {
          async_services_initializer asi(false);
-         
-         ses_helper_.init();
-         
+
+         init();
+
+         boost::system::error_code ec;
          worker_service_ = &(asi.get_service());
-         
          boost::asio::io_service::work skwark(asi.get_service());
-
-         calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
-
-         
-		 boost::system::error_code ec;
          size_t ret = worker_service_->run(ec);
 
+         deinit();
+
+         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
+     }
+
+     void init()
+     {
+         ses_helper_.init();
+         calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
+     }
+
+     void deinit()
+     {
          ses_helper_.reset();
          calc_timer_.reset();
          sockets_.clear();
-
-         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
      }
 
      uint32_t next_id()
@@ -468,7 +470,7 @@ private:
     std::shared_ptr<boost::asio::io_service::work>                                       work_;
     const  endpoint                                                                  mod_peer_;
     const  endpoint                                                                      peer_;
-                  
+
 private:
     on_receive_f                                                      on_receive_;
     on_ses_receive_f                                                 on_ses_recv_;
@@ -746,9 +748,7 @@ int main_modapp( int argc, char** argv )
     //hide_console();
 
     boost::asio::io_service  service_;
-    typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
-    work_ptr dummy_work(new boost::asio::io_service::work(service_));
-    
+    boost::asio::io_service::work  dw(service_);
 
     __main_srvc__ = &service_;
 

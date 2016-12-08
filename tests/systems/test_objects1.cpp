@@ -4,29 +4,14 @@
 #include "kernel/systems/systems_base.h"
 #include "kernel/object_class.h"
 
-FIXME(Это что за нафиг нужно  для object_creators )
-#include "common/simple_route.h"
-#include "objects/flock_manager/flock_manager_common.h"
-#include "common/flock_manager.h"
-#include "objects/aerostat/aerostat_common.h"
-#include "common/aerostat.h"
-#include "vehicle/vehicle_common.h"
 #include "airport/airport_common.h"
-#include "aircraft/aircraft_common.h"
 
-#include "objects/human/human_common.h"
-#include "common/human.h"
 
 #include "arresting_gear/arresting_gear_common.h"
-
 #include "objects_factory.h"
-
 #include "common/ext_msgs.h"
-
 #include "factory_systems.h"
-
 #include "utils/krv_import.h"
-
 #include "objects/common/net_object_factory.h"
 
 using namespace kernel;

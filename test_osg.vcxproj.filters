@@ -1408,5 +1408,8 @@
     <ClCompile Include="kernel\phys\bullet_importer.cpp">
       <Filter>Source Files\phys</Filter>
     </ClCompile>
+    <ClCompile Include="tests\visapp\asio2asio_initializer.cpp">
+      <Filter>Source Files\tests\separate</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

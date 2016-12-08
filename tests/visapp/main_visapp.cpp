@@ -20,6 +20,9 @@
 
 #include "reflection/proc/prop_tree.h"
 
+#include "asio2asio_dispatcher.h"
+#include "asio2asio_initializer.h"
+
 #ifdef _WIN32
     #include  <mmsystem.h>  // timerBeginPeriod
 #endif
@@ -142,7 +145,10 @@ struct net_worker
 
          void on_recieve(const void* data, size_t size, endpoint const& peer)
          {
+#if 0
              __main_srvc__->post(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
+#endif
+             network::asio2asio::disp().call_main(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
          }
 
 		 void send_clients(binary::bytes_cref data)
@@ -182,18 +188,21 @@ struct net_worker
          , done_       (false)
          , ses_helper_ (this)
      {
-          worker_thread_ = boost::thread(&net_worker::run, this);
+#if 0
+         worker_thread_ = boost::thread(&net_worker::run, this);
+#else
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::init, this));
+#endif
+          
      }
      
      ~net_worker()
      {
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::deinit, this));
+#if 0
          worker_thread_.join();
+#endif
          delete  ses_;
-     }
-
-     boost::asio::io_service* GetService()
-     {
-         return worker_service_;
      }
 
      void done()
@@ -203,17 +212,26 @@ struct net_worker
 
      void send(void const* data, uint32_t size)
      {
+#if 0
          worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)));
+#endif
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(data, size)) );
      }
      
      void send (binary::bytes_cref bytes)
      {
+#if 0
          worker_service_->post(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+#endif
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
 
 	 void send_session_clients (binary::bytes_cref bytes)
 	 {
+#if 0
 		 worker_service_->post(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+#endif
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
 	 }
 
      void reset_time(double new_time)
@@ -231,25 +249,32 @@ private:
      {
          async_services_initializer asi(false);
 
-         ses_helper_.init();
-         mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, mod_peer_ ), tcp_error));
+         init();
 
+         boost::system::error_code ec;
          worker_service_ = &(asi.get_service());
-         
          boost::asio::io_service::work skwark(asi.get_service());
-
-         calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
-
-		 boost::system::error_code ec;
          size_t ret = worker_service_->run(ec);
 
-
-         ses_helper_.reset();
-         mod_acc_.reset();
-         calc_timer_.reset();
-         socket_.reset();
+         deinit();
 
          __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
+     }
+
+     void init()
+     {
+         mod_acc_.reset(new  async_acceptor (mod_peer_, boost::bind(&net_worker::on_accepted, this, _1, mod_peer_ ), tcp_error));
+
+         ses_helper_.init();
+         calc_timer_   = ses_->create_timer ( period_, boost::bind(&net_worker::on_timer, this ,_1) , 1, false);
+     }
+
+     void deinit()
+     {
+         mod_acc_.reset();
+         ses_helper_.reset();
+         calc_timer_.reset();
+         socket_.reset();
      }
 
      uint32_t next_id()
@@ -312,7 +337,10 @@ private:
 
      void on_recieve(const void* data, size_t size, endpoint const& peer)
      {
+#if 0
          __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size) , peer));
+#endif
+         network::asio2asio::disp().call_main(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size) , peer));
      }
 
      void do_receive(binary::bytes_ptr data , endpoint const& peer) 
@@ -583,7 +611,7 @@ struct visapp
     {    
         gt_.set_time(time);
         //force_log fl;       
-        LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
+        //LOG_ODS_MSG( " void visapp::update(double time) " << time << "\n");
     }
  
     void on_ready()
@@ -736,12 +764,18 @@ int main_visapp( int argc, char** argv )
     timer_res();
     //hide_console();
 
+#if 0
     boost::asio::io_service  service_;
-    typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
-    work_ptr dummy_work(new boost::asio::io_service::work(service_));
-    
+    boost::asio::io_service::work  dw(service_);
+#endif
 
+    asio2asio_initializer   service_(asio2asio_initializer::start_f(), asio2asio_initializer::stop_f());
+
+#if 0
     __main_srvc__ = &service_;
+#endif
+
+    __main_srvc__ = &asio2asio_initializer::get_service();
 
     try
     {
