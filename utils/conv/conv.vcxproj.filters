@@ -75,10 +75,10 @@
       <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="..\..\av\avUtils\visitors\find_node_visitor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\av</Filter>
     </ClCompile>
     <ClCompile Include="..\..\av\avUtils\materials.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\av</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

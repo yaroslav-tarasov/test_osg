@@ -126,6 +126,7 @@
     <ClInclude Include="..\avTerrain\Grass2.h" />
     <ClInclude Include="..\avTerrain\Terrain.h" />
     <ClInclude Include="..\avTerrain\Trees.h" />
+    <ClInclude Include="..\avUtils\visitors\find_node_visitor.h" />
     <ClInclude Include="..\IVisual.h" />
     <ClInclude Include="..\Visual.h" />
     <ClInclude Include="stdafx.h" />

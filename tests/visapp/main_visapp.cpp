@@ -101,8 +101,10 @@ struct net_worker
 {
      typedef boost::function<void(const void* data, size_t size, endpoint peer)>   on_receive_f;
      typedef boost::function<void(const void* data, size_t size)>                  on_ses_receive_f;
-
      typedef boost::function<void(double time)>                                    on_update_f;     
+
+     typedef boost::function<void()>                                          on_all_connected_f; 
+     
 
      struct ses_helper
      {
@@ -110,14 +112,9 @@ struct net_worker
              : nw_ (nw)
          {}
          
-         ~ses_helper()
-         {
-
-         }
-
          void init()
          {
-             ses_acc_.reset(new  async_acceptor (nw_->peer_, boost::bind(&ses_helper::on_accepted, this, _1, nw_->peer_ ), tcp_error));
+             ses_acc_.reset(new  async_acceptor (nw_->ses_serv_, boost::bind(&ses_helper::on_accepted, this, _1, nw_->ses_serv_ ), tcp_error));
          }
 
          void reset()
@@ -130,9 +127,9 @@ struct net_worker
          {
              const uint32_t id = peer.port;
              sockets_.push_back(std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock 
-                 , boost::bind(&ses_helper::on_recieve, this, _1,_2, peer)
-                 , boost::bind(&net_worker::on_disconnected, nw_, _1, id)
-                 , boost::bind(&net_worker::on_error, nw_, _1, id)
+                 , boost::bind(&ses_helper::on_recieve, this, _1, _2, peer)
+                 , boost::bind(&net_worker::on_disconnected, nw_, _1, peer)
+                 , boost::bind(&net_worker::on_error,        nw_, _1, peer)
                  )));        
 
              LogInfo("Client " << peer << " accepted");
@@ -170,14 +167,16 @@ struct net_worker
          net_worker*                                               nw_;
      };
 
-     net_worker(const  endpoint &  peer, const endpoint& mod_peer, on_receive_f on_recv ,on_ses_receive_f on_ses_recv , on_update_f on_update)
+
+     net_worker(const  endpoint &  ses_serv, const endpoint& mod_peer, on_receive_f on_recv ,on_ses_receive_f on_ses_recv , on_update_f on_update, on_all_connected_f on_all_connected)
          : period_     (cfg().model_params.msys_step)
          , ses_        (net_layer::create_session(binary::bytes_t(), true))
          , mod_peer_   (mod_peer)
-         , peer_       (peer)
+         , ses_serv_   (ses_serv)
          , on_receive_ (on_recv)
          , on_ses_recv_ (on_ses_recv)
          , on_update_  (on_update)
+         , on_all_connected_ (on_all_connected)
          , done_       (false)
          , ses_helper_ (this)
      {
@@ -236,7 +235,7 @@ private:
          mod_acc_.reset();
          ses_helper_.reset();
          calc_timer_.reset();
-         socket_.reset();
+         data_socket_.reset();
      }
 
      uint32_t next_id()
@@ -251,7 +250,7 @@ private:
          size_t size = binary::size(*data);
          error_code_t ec;
 
-         socket_->send(binary::raw_ptr(*data), size);
+         data_socket_->send(binary::raw_ptr(*data), size);
          if (ec)
          {
              LogError("TCP send error: " << ec.message());
@@ -282,12 +281,12 @@ private:
      void on_accepted(network::tcp::socket& sock, endpoint const& peer)
      {
          const uint32_t id = peer.port;
-         if(!socket_)
+         if(!data_socket_)
          {
-             socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
+             data_socket_ = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper( sock
                  , boost::bind(&net_worker::on_recieve, this, _1,_2, peer)
-                 , boost::bind(&net_worker::on_disconnected, this, _1, id)
-                 , boost::bind(&net_worker::on_error, this, _1, id)
+                 , boost::bind(&net_worker::on_disconnected, this, _1, peer)
+                 , boost::bind(&net_worker::on_error, this, _1, peer)
                  ));        
              LogInfo("Client " << peer << " accepted");
          }
@@ -316,38 +315,54 @@ private:
          //_workerThread.join();
      }
 
-     void on_disconnected(boost::system::error_code const& ec, uint32_t sock_id)
+     void on_disconnected(boost::system::error_code const& ec, endpoint const& peer)
      {  
-         LogInfo("Client " << sock_id << " disconnected with error: " << ec.message() );
+         LogInfo("Client " << peer.to_string() << " disconnected with error: " << ec.message() );
+
          // sockets_.erase(sock_id);
-         socket_.reset();
+         data_socket_.reset();
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
        	
 		 network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
      }
 
-     void on_error(boost::system::error_code const& ec, uint32_t sock_id)
+     void on_error(boost::system::error_code const& ec, endpoint const& peer)
      {
          LogError("TCP error: " << ec.message());
-         // sockets_.erase(sock_id);
-         socket_.reset();
+         //data_sockets_.erase(peer);
+         data_socket_.reset();
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
      }
 
 private:
+     bool all_connected() const
+     {
+        return true; /*clients_.size() == data_sockets_.size();*/
+     }
+
+#if 0
+     void on_all_connected()
+     {
+         if(on_all_connected_ && all_connected() && ses_helper_.all_connected())
+             on_all_connected_();
+     }
+#endif
+
+private:
     boost::scoped_ptr<async_acceptor>                           mod_acc_   ;
-    std::shared_ptr<tcp_fragment_wrapper>                       socket_;
+    std::shared_ptr<tcp_fragment_wrapper>                       data_socket_;
     
     ses_helper                                                  ses_helper_;
+
 private:
     const  endpoint                                             mod_peer_;
-    const  endpoint                                             peer_;
+    const  endpoint                                             ses_serv_;
 
 private:
     on_receive_f                                                on_receive_;
     on_ses_receive_f                                            on_ses_recv_;
     on_update_f                                                 on_update_;
-
+    on_all_connected_f                                          on_all_connected_;
 
 private:
     bool                                                        done_;
@@ -512,6 +527,7 @@ struct visapp
             , boost::bind(&visapp::on_recv,this, _1, _2, _3)
             , boost::bind(&msg_dispatcher<uint32_t>::dispatch, &disp_, _1, _2, 0)
             , boost::bind(&visapp::update, this, _1)
+            , [](){}
             ));
 
         props_ = in_place();
@@ -726,8 +742,8 @@ int main_visapp( int argc, char** argv )
     try
     {
         using boost::asio::ip::address_v4;
-        endpoint proxy_peer(endpoint(address_v4(0),net_layer::visapp_ses_port));
-        endpoint mod_peer  (endpoint(address_v4(0),net_layer::visapp_data_port));
+        const endpoint proxy_peer(endpoint(address_v4(0),net_layer::visapp_ses_port));
+        const endpoint mod_peer  (endpoint(address_v4(0),net_layer::visapp_data_port));
 
         visapp  va(proxy_peer, mod_peer);
 

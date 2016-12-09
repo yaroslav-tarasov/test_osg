@@ -169,6 +169,15 @@ namespace aircraft
 #include "av/avUtils/visitors/visitors.h"
 #include "av/avScene.h"
 
+namespace utils
+{
+    const osg::Vec4 red_color   (100.0f, 0.0f, 0.0f, 100.0f);
+    const osg::Vec4 blue_color  (0.0f, 0.0f, 100.0f, 100.0f);
+    const osg::Vec4 green_color (0.0f, 100.0f, 0.0f, 100.0f);
+    const osg::Vec4 white_color (100.0f, 100.0f, 100.0f, 100.0f);
+    const osg::Vec4 black_color (0.0f,0.0f,0.0f,100.0f);
+    const osg::Vec4 gray_color  (0.8f,0.8f,0.8f,100.0f);
+}
 
 #endif // precompile_header
 

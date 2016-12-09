@@ -6,37 +6,20 @@
 
 #include "airport/airport_common.h"
 
-
-#include "arresting_gear/arresting_gear_common.h"
 #include "objects_factory.h"
 #include "common/ext_msgs.h"
 #include "factory_systems.h"
-#include "utils/krv_import.h"
 #include "objects/common/net_object_factory.h"
 
 using namespace kernel;
 
-namespace 
-{
-    inline std::string data_file(std::string icao_code)
-    {
-        if (icao_code == "UUEE")
-            return "log_sochi_4.txt";
-        else if (icao_code == "URSS")
-            return "log_sochi_4.txt";
-        else if (icao_code == "UMMS" || icao_code == "UMMS")
-            return "log_minsk.txt";
 
-        return "";
-    }
 
-void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
+void pack_objects(kernel::system* sys, const net_layer::msg::setup_msg& msg, dict_t& dict)
 {
     high_res_timer     hr_timer;
 
-    // Только получение без контроля  
-    kernel::system_ptr csys = get_systems()->get_control_sys();
-    auto fact = dynamic_cast<objects_factory*>(kernel::objects_factory_ptr(csys).get());
+    auto fact = dynamic_cast<objects_factory*>(sys);
 
     kernel::creating_objects_list_t   obj_list;
 
@@ -64,14 +47,13 @@ void pack_objects(const net_layer::msg::setup_msg& msg, dict_t& dict)
     {
         net_layer::msg::create_msg m;
         network::safe_read_msg(*it,m);
-        obj_list.push_back(pack_object(csys.get(), m).add_data(m.ext_id));
+        obj_list.push_back(pack_object(sys, m).add_data(m.ext_id));
     }
     
-    csys->pack_exercise(obj_list, dict, true);
+    sys->pack_exercise(obj_list, dict, true);
 
 }
 
-}
 
-AUTO_REG(pack_objects)
+
 

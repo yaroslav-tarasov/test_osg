@@ -739,9 +739,10 @@ private:
         using namespace binary;
         using namespace kernel;
 
+        void pack_objects(kernel::system* sys, const net_layer::msg::setup_msg& msg, dict_t& dict);
+
         dict_t dict;
-        if(auto fp = fn_reg::function<void(const setup_msg&, dict_t& dict)>("pack_objects"))
-            fp(msg, dict);
+        pack_objects(ctrl_sys_.get(), msg, dict);
 
         reg_obj_ = objects_reg::control_ptr(find_object<object_info_ptr>(dynamic_cast<kernel::object_collection*>(ctrl_sys_.get()),"aircraft_reg")) ;   
 

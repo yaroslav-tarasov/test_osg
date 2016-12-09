@@ -109,6 +109,9 @@
     <Filter Include="Header Files\hmi">
       <UniqueIdentifier>{27e8efe4-fd5e-4e66-8936-c8de992f0603}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\av\utils">
+      <UniqueIdentifier>{6ac42f8d-4c9e-486f-8019-e78cf10a3270}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -248,6 +251,9 @@
     </ClInclude>
     <ClInclude Include="..\..\_include\application\menu.h">
       <Filter>Header Files\hmi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\avUtils\visitors\find_node_visitor.h">
+      <Filter>Header Files\av\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
