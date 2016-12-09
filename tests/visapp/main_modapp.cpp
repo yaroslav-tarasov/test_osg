@@ -17,9 +17,12 @@
 #include "objects/registrator.h"
 
 #include "net_layer/net_worker.h"
-#include  "net_layer/app_ports.h"
+#include "net_layer/app_ports.h"
 
 #include <boost/container/map.hpp>
+
+#include "asio2asio_dispatcher.h"
+#include "asio2asio_initializer.h"
 
 #ifdef _WIN32
 #include  <mmsystem.h>  // timerBeginPeriod
@@ -40,12 +43,10 @@ using namespace net_layer::msg;
 
 namespace
 {
-    boost::asio::io_service* __main_srvc__ = 0;
-
     void tcp_error(error_code const& err)
     {
         LogError("Error happened: " << err);
-        __main_srvc__->stop();
+        		network::asio2asio::disp().call_main(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
     }
 
     struct updater
@@ -130,7 +131,7 @@ struct net_worker
 
          void on_recieve(const void* data, size_t size, endpoint const& peer)
          {
-             __main_srvc__->post(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
+             network::asio2asio::disp().call_main(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
          }
 
          void do_recieve(binary::bytes_ptr data )
@@ -147,7 +148,7 @@ struct net_worker
              {
 
                  (*it).port = net_layer::visapp_ses_port;
-                 cons_[*it].reset(  new async_connector(*it, boost::bind(&ses_helper::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, nw_, _1) , tcp_error));
+                 cons_[*it].reset(  new async_connector(*it, boost::bind(&ses_helper::on_connected, this, _1, _2), [](error_code const& err){}/*boost::bind(&net_worker::disconnect, nw_, _1)*/ , tcp_error));
 
              }
 
@@ -187,13 +188,9 @@ struct net_worker
              LogInfo("Session helper connected to " << peer);
 
              sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-                 sock, boost::bind(&ses_helper::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, nw_, _1), &tcp_error));  
+                 sock, boost::bind(&ses_helper::on_recieve, this, _1, _2, peer), [](error_code const& err){tcp_error(err);}/*boost::bind(&net_worker::disconnect, nw_, _1)*/, &tcp_error));  
 
              nw_->on_all_connected();
-#if 0
-             if(on_all_connected_ && vis_peers_.size() == sockets_.size())
-                 on_all_connected_();
-#endif
          }
 
          bool all_connected() const
@@ -222,20 +219,15 @@ struct net_worker
          , peer_       (peer)
          , ses_helper_ (this)
      {
-          worker_thread_ = boost::thread(&net_worker::run, this);
+          network::asio2asio::disp().call_asio(boost::bind(&net_worker::init, this));
      }
      
      ~net_worker()
      {
-         worker_thread_.join();
+         deinit();
          delete  ses_;
      }
 
-
-     void disconnect(error_code const& err)
-     {
-         //worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
-     }
 
      void done()
      {
@@ -244,22 +236,22 @@ struct net_worker
 
      void send_proxy(void const* data, uint32_t size)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(data, size)));
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(data, size)));
      }
      
      void send_proxy (binary::bytes_cref bytes)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send_proxy, this, 0, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
       
      void send_clients (binary::bytes_cref bytes)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
      
      void send_session_clients (binary::bytes_cref bytes)
      {
-         worker_service_->post(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
+         network::asio2asio::disp().call_asio(boost::bind(&net_worker::do_send_session_clients, this, binary::make_bytes_ptr(&bytes[0], bytes.size())));
      }
 
      void reset_time(double new_time)
@@ -276,38 +268,20 @@ struct net_worker
      {  
          visapp_peers_  = vis_peers;
         
-         worker_service_->post([this]()
+         network::asio2asio::disp().call_asio([this]()
          {
              ses_helper_.vis_connect(visapp_peers_);
-         } );
-         
-         worker_service_->post([this]()
-         {
+
              for (auto it = visapp_peers_.begin(); it!= visapp_peers_.end(); ++it )
              {
                  (*it).port = net_layer::visapp_data_port;
-                 cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), boost::bind(&net_worker::disconnect, this, _1) , tcp_error));
+                 cons_[*it].reset(  new async_connector(*it, boost::bind(&net_worker::on_connected, this, _1, _2), [](error_code const& err){tcp_error(err);}/*boost::bind(&net_worker::disconnect, this, _1)*/ , tcp_error));
              }
          } );
 
      }
 
 private:
-     void run()
-     {
-         async_services_initializer asi(false);
-
-         init();
-
-         boost::system::error_code ec;
-         worker_service_ = &(asi.get_service());
-         boost::asio::io_service::work skwark(asi.get_service());
-         size_t ret = worker_service_->run(ec);
-
-         deinit();
-
-         __main_srvc__->post(boost::bind(&boost::asio::io_service::stop, __main_srvc__));
-     }
 
      void init()
      {
@@ -390,7 +364,7 @@ private:
 
      void on_recieve(const void* data, size_t size, endpoint const& peer)
      {
-          __main_srvc__->post(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
+          network::asio2asio::disp().call_main(boost::bind(&net_worker::do_receive, this, binary::make_bytes_ptr(data, size)) );
      }
      
      void do_receive(binary::bytes_ptr data/*, endpoint const& peer*/) 
@@ -403,7 +377,7 @@ private:
      {
          LogInfo("Client  disconnected with error: " << ec.message() );
          delete  ses_;
-         worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+         network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
          //_workerThread.join();
      }
 
@@ -413,7 +387,7 @@ private:
          sockets_.erase(peer);
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
          // delete  ses_;
-         worker_service_->post([this]()
+         network::asio2asio::disp().call_asio([this]()
          {
              for (auto it = visapp_peers_.begin(); it!= visapp_peers_.end(); ++it )
              {
@@ -421,7 +395,7 @@ private:
              }
          } );
 
-         worker_service_->post(boost::bind(&boost::asio::io_service::stop, worker_service_));
+         network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
 #if 0
          delete  ses_;
 #endif
@@ -452,7 +426,7 @@ private:
         LogInfo("Connected to " << peer);
 
         sockets_[peer] = std::shared_ptr<tcp_fragment_wrapper>(new tcp_fragment_wrapper(
-            sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), boost::bind(&net_worker::disconnect, this, _1), &tcp_error));  
+            sock, boost::bind(&net_worker::on_recieve, this, _1, _2, peer), [](error_code const& err){tcp_error(err);}/*boost::bind(&net_worker::disconnect, this, _1)*/, &tcp_error));  
         
         on_all_connected();
 
@@ -465,9 +439,6 @@ private:
    
     ses_helper                                                                     ses_helper_;
 private:
-    boost::thread                                                               worker_thread_;
-    boost::asio::io_service*                                                   worker_service_;
-    std::shared_ptr<boost::asio::io_service::work>                                       work_;
     const  endpoint                                                                  mod_peer_;
     const  endpoint                                                                      peer_;
 
@@ -747,10 +718,7 @@ int main_modapp( int argc, char** argv )
     timer_res();
     //hide_console();
 
-    boost::asio::io_service  service_;
-    boost::asio::io_service::work  dw(service_);
-
-    __main_srvc__ = &service_;
+    asio2asio_initializer   asi;
 
     try
     {
@@ -758,9 +726,7 @@ int main_modapp( int argc, char** argv )
         endpoint peer(cfg().network.local_address);
         mod_app ma(peer);
 
-        boost::system::error_code ec;
-        __main_srvc__->run(ec);
-
+	    asi.run_main();
     }
     catch(verify_error const& err)
     {

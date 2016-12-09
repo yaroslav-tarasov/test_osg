@@ -55,9 +55,14 @@ namespace network
                     func();
             }
 
-            boost::asio::io_service& get_service()
+            boost::asio::io_service& get_main_service()
             {
                 return main_;
+            }
+            
+            boost::asio::io_service& get_io_service()
+            {
+                return *io_;
             }
 
         private:

@@ -14,7 +14,7 @@ asio2asio_initializer::~asio2asio_initializer()
 
 boost::asio::io_service& asio2asio_initializer::get_service()
 {
-    return network::asio2asio::disp().get_service();
+    return network::asio2asio::disp().get_main_service();
 }
 
 void asio2asio_initializer::run_main()

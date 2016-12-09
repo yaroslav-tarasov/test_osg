@@ -43,31 +43,21 @@ using namespace net_layer::msg;
 
 namespace
 {
-#if 0
-    boost::asio::io_service* __main_srvc__ = 0;
-#endif
-
-
     void tcp_error(error_code const& err)
     {
         LogError("Error happened: " << err);
-#if 0
-		__main_srvc__->stop();
-#endif
-		network::asio2asio::disp().call_main(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_service()));
+		network::asio2asio::disp().call_main(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
     }
 
     struct sys_updater
     {
 
-
-       sys_updater(kernel::system_ptr  sys, double period = 0.001)
+        sys_updater(kernel::system_ptr  sys, double period = 0.001)
           : period_(period)
           , sys_(sys)
           , vis_sys_(sys)
           , vis_sys_props_(vis_sys_)
        {}
-		   // conn.disconnect();
 
        __forceinline void update(double time)
        {
@@ -152,6 +142,12 @@ struct net_worker
          {
              network::asio2asio::disp().call_main(boost::bind(&ses_helper::do_recieve, this, binary::make_bytes_ptr(data, size) ));
          }
+         
+         void do_recieve(binary::bytes_ptr data )
+         {
+             if (nw_->on_ses_recv_)
+                 nw_->on_ses_recv_(binary::raw_ptr(*data), binary::size(*data));
+         }
 
 		 void send_clients(binary::bytes_cref data)
 		 {
@@ -168,11 +164,6 @@ struct net_worker
 			 }
 		 }
 
-         void do_recieve(binary::bytes_ptr data )
-         {
-             if (nw_->on_ses_recv_)
-                 nw_->on_ses_recv_(binary::raw_ptr(*data), binary::size(*data));
-         }
 
          boost::scoped_ptr<async_acceptor>                    ses_acc_;
          std::vector<std::shared_ptr<tcp_fragment_wrapper>>   sockets_;
@@ -321,7 +312,7 @@ private:
      {
          LogInfo("Client  disconnected with error: " << ec.message() );
          delete  ses_;
-		 network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop,  &network::asio2asio::disp().get_service()));
+		 network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop,  &network::asio2asio::disp().get_main_service()));
          //_workerThread.join();
      }
 
@@ -332,7 +323,7 @@ private:
          socket_.reset();
          // peers_.erase(std::find_if(peers_.begin(), peers_.end(), [sock_id](std::pair<id_type, uint32_t> p) { return p.second == sock_id; }));
        	
-		 network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_service()));
+		 network::asio2asio::disp().call_asio(boost::bind(&boost::asio::io_service::stop, &network::asio2asio::disp().get_main_service()));
      }
 
      void on_error(boost::system::error_code const& ec, uint32_t sock_id)
@@ -731,9 +722,6 @@ int main_visapp( int argc, char** argv )
     //hide_console();
 
     asio2asio_initializer   asi;
-#if 0
-     __main_srvc__ = &asio2asio_initializer::get_service();
-#endif
 
     try
     {
