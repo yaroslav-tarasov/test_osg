@@ -34,12 +34,6 @@ class /*OSG_EXPORT*/ InstancesNum : public StateAttribute
             return 0; // Passed all the above comparison macros, so must be equal.
         }
 
-        virtual bool getModeUsage(StateAttribute::ModeUsage& usage) const
-        {
-            // usage.usesMode(GL_BLEND);
-            return true;
-        }
-
         void setNum (uint32_t num) {_num = num;}
         uint32_t getNum () const { return _num;}
 
