@@ -218,12 +218,12 @@ void CEGUIDrawable::drawImplementation( osg::RenderInfo& renderInfo ) const
 
         CEGUI::DefaultResourceProvider* resource =
             static_cast<CEGUI::DefaultResourceProvider*>( CEGUI::System::getSingleton().getResourceProvider() );
-        resource->setResourceGroupDirectory( "schemes", "./datafiles/schemes/" );
-        resource->setResourceGroupDirectory( "imagesets", "./datafiles/imagesets/" );
-        resource->setResourceGroupDirectory( "fonts", "./datafiles/fonts/" );
-        resource->setResourceGroupDirectory( "layouts", "./datafiles/layouts/" );
-        resource->setResourceGroupDirectory( "looknfeels", "./datafiles/looknfeel/" );
-        resource->setResourceGroupDirectory( "lua_scripts", "./datafiles/lua_scripts/" );
+        resource->setResourceGroupDirectory( "schemes"    , cfg().path.data + "/hmi/datafiles/schemes/"     );
+        resource->setResourceGroupDirectory( "imagesets"  , cfg().path.data + "/hmi/datafiles/imagesets/"   );
+        resource->setResourceGroupDirectory( "fonts"      , cfg().path.data + "/hmi/datafiles/fonts/"       );
+        resource->setResourceGroupDirectory( "layouts"    , cfg().path.data + "/hmi/datafiles/layouts/"     );
+        resource->setResourceGroupDirectory( "looknfeels" , cfg().path.data + "/hmi/datafiles/looknfeel/"   );
+        resource->setResourceGroupDirectory( "lua_scripts", cfg().path.data + "/hmi/datafiles/lua_scripts/" );
 
         CEGUI::ImageManager::setImagesetDefaultResourceGroup( "imagesets" );
         CEGUI::Font::setDefaultResourceGroup( "fonts" );

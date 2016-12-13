@@ -1,14 +1,11 @@
 #include "stdafx.h"
 
-#include "av/Visual.h"
-
 #include "async_services/async_services.h"
 #include "network/msg_dispatcher.h"
 #include "kernel/systems.h"
 #include "kernel/systems/systems_base.h"
 #include "kernel/object_class.h"
 #include "kernel/msg_proxy.h"
-#include "kernel/systems/vis_system.h"
 #include "common/ext_msgs.h"
 #include "common/ext_msgs2.h"
 #include "common/time_counter.h"

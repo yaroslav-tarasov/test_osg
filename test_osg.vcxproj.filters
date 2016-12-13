@@ -955,9 +955,6 @@
     <ClCompile Include="ext\spark\SmokeNode.cpp">
       <Filter>Source Files\spark</Filter>
     </ClCompile>
-    <ClCompile Include="tests\systems\test_objects1.cpp">
-      <Filter>Source Files\tests\systems</Filter>
-    </ClCompile>
     <ClCompile Include="av\avLights\LightManager.cpp">
       <Filter>Source Files\av\lights</Filter>
     </ClCompile>
@@ -1410,6 +1407,9 @@
     </ClCompile>
     <ClCompile Include="tests\visapp\asio2asio_initializer.cpp">
       <Filter>Source Files\tests\separate</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\systems\pack_object.cpp">
+      <Filter>Source Files\tests\systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

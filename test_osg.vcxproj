@@ -1105,9 +1105,9 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h; precompiled_objects.h;</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="tests\systems\factory_systems.cpp" />
+    <ClCompile Include="tests\systems\pack_object.cpp" />
     <ClCompile Include="tests\systems\systems_impl.cpp" />
     <ClCompile Include="tests\systems\systems_impl2.cpp" />
-    <ClCompile Include="tests\systems\test_objects1.cpp" />
     <ClCompile Include="tests\systems\test_objects2.cpp" />
     <ClCompile Include="tests\visapp\asio2asio_initializer.cpp">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdafx.h</ForcedIncludeFiles>
