@@ -1,5 +1,6 @@
 #pragma once
 
+#if 0
 struct large_int
 {
     large_int(long val=0)
@@ -43,6 +44,29 @@ private:
      large_int     _frequency;
      large_int     _last_point;
 };
+#else
+
+class  high_res_timer
+{
+public:
+    
+    inline double set_point() 
+    {   
+        auto interval = pc_.time_s();
+        pc_.reset();
+        return interval;
+    }
+
+    inline double get_delta() 
+    {   
+        return pc_.time_s();
+    }
+
+private:
+    PerformanceCounter  pc_;
+};
+
+#endif
 
 
 struct time_measure_helper_t
