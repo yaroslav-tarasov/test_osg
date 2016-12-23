@@ -90,7 +90,7 @@ void ScreenTexture::drawImplementation( osg::RenderInfo & renderInfo ) const
     GLint oldDrawFBO = 0;
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING_EXT, &oldDrawFBO);
 
-    // recrreate FBO, is sizes were changed
+    // recreate FBO, is sizes were changed
     if (viewport->width() != _texture->getTextureWidth() || viewport->height() != _texture->getTextureHeight())
     {
         //_resolveFbo = new osg::FrameBufferObject();
