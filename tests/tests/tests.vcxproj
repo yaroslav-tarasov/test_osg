@@ -185,6 +185,7 @@
     <ClCompile Include="..\animation_test4.cpp" />
     <ClCompile Include="..\animation_test5.cpp" />
     <ClCompile Include="..\anim_test.cpp" />
+    <ClCompile Include="..\async_loading_test.cpp" />
     <ClCompile Include="..\bump_mapping.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

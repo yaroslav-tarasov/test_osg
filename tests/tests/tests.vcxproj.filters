@@ -246,5 +246,8 @@
     <ClCompile Include="..\..\kernel\phys\bullet_importer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\async_loading_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

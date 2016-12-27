@@ -328,11 +328,13 @@ struct client
         , timer_    (boost::bind(&client::update, this))
     {
        
-		traj_trp2_.resize(stress_landing);
+		traj_trp2_.reserve(stress_landing);
+#if 1
 		for (int i=0;i<stress_landing;++i)
 		{ 
-			traj_trp2_[i] = fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0 + i * 25, 250.0 ));
+			traj_trp2_.emplace_back( fill_trajectory(krv::data_getter("log_e_su_vz_tramplin_pos_ar_gear.txt", 10.0 + i * 25, 250.0 )));
 		}
+#endif
 
 		disp_
             .add<ready_msg                 >(boost::bind(&client::on_remote_ready      , this, _1))
@@ -772,7 +774,7 @@ struct client
             //ADD_EVENT(14.0  , create_msg(173,point_3(587,437,0),cg::cpr(173), ok_aircraft, "L39", "173") ) 
 			
 #if 1       // Arrested gear test
-            for (int i=0;i<stress_landing;++i)
+            for (int i=0;i<traj_trp2_.size();++i)
 			{ 
 				const uint32_t hull_number = 472 + i;
 				auto const model  = /*"MIG29K"*/"A319"/*"SU25"*//*"MIG29"*//*"L39"*/;
