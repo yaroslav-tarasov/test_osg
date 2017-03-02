@@ -130,7 +130,20 @@ int main_teapot( int argc, char** argv )
 	teapot->addDrawable( new TeapotDrawable(1.0f) );
 	//root->addChild(teapot);
     
-    
+    osg::CopyOp  copyop =  osg::CopyOp::DEEP_COPY_ALL
+        & ~osg::CopyOp::DEEP_COPY_PRIMITIVES 
+        & ~osg::CopyOp::DEEP_COPY_ARRAYS
+        & ~osg::CopyOp::DEEP_COPY_IMAGES
+        & ~osg::CopyOp::DEEP_COPY_TEXTURES  
+        & ~osg::CopyOp::DEEP_COPY_STATEATTRIBUTES
+#if 0
+        & ~osg::CopyOp::DEEP_COPY_STATESETS
+        & ~osg::CopyOp::DEEP_COPY_UNIFORMS
+#endif
+        & ~osg::CopyOp::DEEP_COPY_DRAWABLES
+        //& ~osg::CopyOp::DEEP_COPY_CALLBACKS  // wo anim
+        ;
+
     osg::ref_ptr<osg::Geode> smthg = new osg::Geode;
     auto geom = _createGeometry();
     add_something(geom);
@@ -142,14 +155,23 @@ int main_teapot( int argc, char** argv )
     osg::MatrixTransform* first = new osg::MatrixTransform(mat);
     osg::MatrixTransform* second = new osg::MatrixTransform;
     
-    first->addChild(smthg);
-    second->addChild(smthg/* osg::clone(smthg.get(),osg::CopyOp::DEEP_COPY_ALL)*/);
+    osg::PositionAttitudeTransform* pat = new  osg::PositionAttitudeTransform;
+    
+    pat->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,1.0,0.0,1.0)));
+    pat->addChild(smthg);
+    osg::Node* pat2 = copyop(pat);
+
+    auto uni = pat2->getStateSet()->getUniform("color");
+    uni->set(osg::Vec4(1.0,0.0,0.0,1.0));
+
+    first->addChild(pat);
+    second->addChild(pat2/*copyop(smthg)*//* osg::clone(smthg.get(),osg::CopyOp::DEEP_COPY_ALL)*/);
 
     root->addChild(first);
     root->addChild(second);
 
-    first->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,1.0,0.0,1.0)));
-    second->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,0.0,0.0,1.0)));
+
+    // second->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,0.0,0.0,1.0)));
 
     osgViewer::Viewer viewer(arguments);
 
