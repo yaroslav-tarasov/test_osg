@@ -274,6 +274,7 @@ void Private::AddGeometry( osg::Geometry * g )
 	g->setUseDisplayList(false);
 	g->setUseVertexBufferObjects(true);
 	g->setDataVariance(osg::Object::DYNAMIC);
+
 }
 
 void Private::AddPolyline( std::vector<cg::point_2f> const & positions, cg::colorf const & col, float w )
@@ -495,7 +496,7 @@ void Private::SetupProjection( cg::frustum_f const & view_frustum, cg::range_2f 
 // update uniform
 void Private::UpdateTextureMatrix( bool enabled )
 {
-    if (enabled && we_see_smth_ && !vertices_.empty())
+    if (enabled && we_see_smth_ && (!vertices_.empty() || _geodeExt->getNumDrawables()>0 ))
     {
         _decalmapMatrix->set(to_osg_matrix(tex_matr_.transpose()));
     }

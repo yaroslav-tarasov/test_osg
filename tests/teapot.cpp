@@ -24,9 +24,10 @@ char vertexShaderSource[] =
 char fragmentShaderSource[] = 
     "#extension GL_ARB_gpu_shader5 : enable \n"
     "\n"
+    "uniform vec4 color;\n"
     "void main(void) \n"
     "{ \n"
-    "    gl_FragColor = vec4(1.0,1.0,0.0,1.0); \n"
+    "    gl_FragColor = color; \n"
     "}\n";
 
 }
@@ -134,7 +135,21 @@ int main_teapot( int argc, char** argv )
     auto geom = _createGeometry();
     add_something(geom);
     smthg->addDrawable(geom);
-    root->addChild(smthg);
+    
+    osg::Matrix mat; 
+    mat.setTrans(osg::Vec3(100,100, 0));
+
+    osg::MatrixTransform* first = new osg::MatrixTransform(mat);
+    osg::MatrixTransform* second = new osg::MatrixTransform;
+    
+    first->addChild(smthg);
+    second->addChild(smthg/* osg::clone(smthg.get(),osg::CopyOp::DEEP_COPY_ALL)*/);
+
+    root->addChild(first);
+    root->addChild(second);
+
+    first->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,1.0,0.0,1.0)));
+    second->getOrCreateStateSet()->addUniform(new osg::Uniform("color", osg::Vec4(1.0,0.0,0.0,1.0)));
 
     osgViewer::Viewer viewer(arguments);
 

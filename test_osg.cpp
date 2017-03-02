@@ -20,7 +20,6 @@ int main( int argc, char** argv )
         name = am.extract<std::string>("name");
 
 
-    
     auto fp = fn_reg::function<int( int argc, char** argv )>("av_scene");// main_phys_viewer main_morph "main_anim_test" main_mrt "av_scene"  main_grass_test  main_asio_test main_patched_lowlevel
 
     if(name) 
