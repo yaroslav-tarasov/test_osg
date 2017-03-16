@@ -85,3 +85,16 @@ enum objects_t{
 #include "nodes_management_fwd.h"
 
 namespace nm = nodes_management;
+
+
+#include <btBulletCollisionCommon.h>
+#include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btSoftBodyHelpers.h>
+#include <BulletSoftBody/btSoftBody.h>
+
+#include "btBulletWorldImporter.h"
+#include <btBulletFile.h>

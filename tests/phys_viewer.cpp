@@ -35,7 +35,7 @@
 #include "BulletDynamics/Character/btCharacterControllerInterface.h"
 #include "DynamicCharacterController.h"
 
-#include "utils/visitors/ComputeTriMeshVisitor.h"
+#include "av/avUtils/visitors/ComputeTriMeshVisitor.h"
 
 #include "av/avCore/Object.h"
 
