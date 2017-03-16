@@ -112,6 +112,9 @@
     <Filter Include="Header Files\av\utils">
       <UniqueIdentifier>{6ac42f8d-4c9e-486f-8019-e78cf10a3270}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\av\sea">
+      <UniqueIdentifier>{ce1cdcf9-5a31-4d73-8f2d-d265bd5be898}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -254,6 +257,18 @@
     </ClInclude>
     <ClInclude Include="..\avUtils\visitors\find_node_visitor.h">
       <Filter>Header Files\av\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\svSea\AreaCurrentWakes.h">
+      <Filter>Source Files\av\sea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\svSea\Clipmap.h">
+      <Filter>Source Files\av\sea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\svSea\OverlayFrustumCalculator.h">
+      <Filter>Source Files\av\sea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\svSea\WaterOverlayNode.h">
+      <Filter>Source Files\av\sea</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -508,6 +523,18 @@
     </ClCompile>
     <ClCompile Include="..\..\hmi\gui_vis\panels\vis_settings_panel_impl.cpp">
       <Filter>Source Files\hmi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\svSea\AreaCurrentWakes.cpp">
+      <Filter>Source Files\av\sea</Filter>
+    </ClCompile>
+    <ClCompile Include="..\svSea\Clipmap.cpp">
+      <Filter>Source Files\av\sea</Filter>
+    </ClCompile>
+    <ClCompile Include="..\svSea\OverlayFrustumCalculator.cpp">
+      <Filter>Source Files\av\sea</Filter>
+    </ClCompile>
+    <ClCompile Include="..\svSea\WaterOverlayNode.cpp">
+      <Filter>Source Files\av\sea</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "av/precompiled.h"
-#include "visitors/info_visitor.h"
-#include "visitors/find_tex_visitor.h"
+// #include "visitors/info_visitor.h"
+#include "av/avUtils/visitors/find_tex_visitor.h"
 #include "creators.h"
 #include "av/avSky/FogLayer.h"
 #include "av/avCore/Prerender.h"
@@ -79,6 +79,8 @@ int main_tex_test( int argc, char** argv )
     osg::ArgumentParser arguments(&argc,argv);
 
     osgViewer::Viewer viewer(arguments);
+	
+	osgDB::Registry::instance()->setOptions(new osgDB::Options("dds_flip dds_dxt1_rgba ")); 
 
     osg::ref_ptr<osg::MatrixTransform> root = new osg::MatrixTransform;
     //root->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0f),1.0f,0.0f,0.0f));
@@ -98,37 +100,17 @@ int main_tex_test( int argc, char** argv )
     
     osg::ref_ptr<osg::Node> sub_model = osgDB::readNodeFile( "glider.osg" );
 
-    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(osgDB::readImageFile("a_319_aeroflot.png"/*"Fieldstone.jpg"*/));
+    osg::ref_ptr<osg::Texture2D> texture_to_change = new osg::Texture2D(osgDB::readImageFile("a_319_aeroflot.png"/*"Fieldstone.jpg"*/));
 
+#if 0
     creators::nodes_array_t plane = creators::loadAirplaneParts("a_319");
     auto airplane = plane[1];
+#endif
+	const std::string name = "ka27";//"a_319";
+    osg::ref_ptr<osg::Node> airplane = osgDB::readNodeFile("data/models/" + name + "/" + name + ".dae"); //".osgb"
 
-    // osg::Node*  airplane = // creators::loadAirplane();
-    
-    //InfoVisitor infoVisitor;
-    //airplane->accept( infoVisitor );
+	osg::ref_ptr<osg::Node> airplane_copy =  osg::clone(airplane.get(),osg::CopyOp::DEEP_COPY_ALL           /* & ~osg::CopyOp::DEEP_COPY_DRAWABLES*/	);
 
-    //findNodeVisitor findNode("Body_",findNodeVisitor::not_exact); 
-    //airplane->accept(findNode);
-    //auto a_node =  findNode.getFirst();
-    //
-    //findNodeByType<osg::Geode> findGeode; 
-    //a_node->accept(findGeode);
-    //auto g_node =  findGeode.getFirst();
-    
-    //auto dr = g_node->asGeode()->getDrawable(0);
-    //
-    //auto dr_num =  g_node->asGeode()->getNumDrawables();
-
-    // g_node->setNodeMask(0);
-
-    //osg::StateSet* stateset = g_node->asGeode()->getDrawable(0)->getOrCreateStateSet();
-    // А вот тут у нас координаты не пойми чего
-    // osg::Array* a = g_node->asGeode()->getDrawable(0)->asGeometry()->getTexCoordArray(1);
-
-    //stateset->setTextureAttributeAndModes( 0, /*texture.get()*/new osg::Texture2D());
-    //g_node->setStateSet(stateset);
-    
     osg::ref_ptr<osg::Light> light = new osg::Light;
     light->setLightNum( 0 );
     light->setAmbient(osg::Vec4(0.2, 0.2, 0.2, 1));
@@ -148,17 +130,19 @@ int main_tex_test( int argc, char** argv )
     effet->setEnabled(false);
 #endif
 
+#if 0
 	osg::ref_ptr<avSky::FogLayer> skyFogLayer = new avSky::FogLayer(root->asGroup());
     root->addChild(skyFogLayer.get());
     skyFogLayer->setFogParams(osg::Vec3f(1.5,1.5,1.5),0.1);    // (вроде начинаем с 0.1 до максимум 1.0)
     float coeff = skyFogLayer->getFogExp2Coef();
+#endif
     
     osg::StateSet * pCommonStateSet = airplane->getOrCreateStateSet();
     pCommonStateSet->setNestRenderBins(false);
     pCommonStateSet->setRenderBinDetails(/*RENDER_BIN_SOLID_MODELS*/100, "RenderBin");
 
 
-#if 1
+#if 0
     int tex_width = 1024, tex_height = 1024;
 
 
@@ -217,8 +201,15 @@ int main_tex_test( int argc, char** argv )
     // effet->setUpDemo();
     // effet->setEnabled(false);
     root->addChild(source);
-    root->addChild(airplane/*effet.get()*/);
+
+
+	osg::PositionAttitudeTransform*	pat = new osg::PositionAttitudeTransform;
+	pat->addChild(airplane_copy);
+	pat->setPosition(osg::Vec3(100, 100, 0));
+    root->addChild(pat/*effet.get()*/);
     root->addChild(sub_model.get());
+
+	root->addChild(airplane/*effet.get()*/);
 
 #if 0
     // add creation of main reflection texture
@@ -240,11 +231,13 @@ int main_tex_test( int argc, char** argv )
     // osgDB::writeNodeFile(*root,"tex_test_blank.osgt");
 	
 	// Set the clear color to black
-    viewer.getCamera()->setClearColor(osg::Vec4(1.0,0,0,1));
+    //viewer.getCamera()->setClearColor(osg::Vec4(1.0,0,0,1));
+	viewer.apply(new osgViewer::SingleScreen(0));
 
-    viewer.addEventHandler( new TexChangeHandler( root.get(), texture.get() ) );
+    viewer.addEventHandler( new TexChangeHandler( root.get(), texture_to_change.get() ) );
+#if 0
 	viewer.addEventHandler( new avSky::FogHandler([&](osg::Vec4f v){skyFogLayer->setFogParams(osg::Vec3f(1.0,1.0,1.0),v.w());}, osg::Vec3f(0.5,0.5,0.5) ));
-    // Add some useful handlers to see stats, wireframe and onscreen help
+#endif    // Add some useful handlers to see stats, wireframe and onscreen help
     viewer.addEventHandler(new osgViewer::StatsHandler);
     viewer.addEventHandler(new osgGA::StateSetManipulator(root->getOrCreateStateSet()));
     viewer.addEventHandler(new osgViewer::HelpHandler);

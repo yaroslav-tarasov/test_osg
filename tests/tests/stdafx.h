@@ -14,6 +14,8 @@
 #include "common/boost.h"
 #include "common/stl.h"
 
+#include "osgnanovg/precompile_nvg.h"
+
 #include "common/osg_inc.h"
 #include "common/bullet.h"
 #include "common/debug.h"
@@ -85,3 +87,13 @@ enum objects_t{
 #include "nodes_management_fwd.h"
 
 namespace nm = nodes_management;
+
+namespace utils
+{
+	const osg::Vec4 red_color   (100.0f, 0.0f, 0.0f, 100.0f);
+	const osg::Vec4 blue_color  (0.0f, 0.0f, 100.0f, 100.0f);
+	const osg::Vec4 green_color (0.0f, 100.0f, 0.0f, 100.0f);
+	const osg::Vec4 white_color (100.0f, 100.0f, 100.0f, 100.0f);
+	const osg::Vec4 black_color (0.0f,0.0f,0.0f,100.0f);
+	const osg::Vec4 gray_color  (0.8f,0.8f,0.8f,100.0f);
+}

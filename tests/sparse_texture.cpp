@@ -49,7 +49,9 @@ GLAPI void APIENTRY glTexPageCommitmentARB (GLenum target, GLint level, GLint xo
 
 #define GL_TEXTURE_BASE_LEVEL 0x813C
 #define GL_TEXTURE_MAX_LEVEL 0x813D
+#ifndef GL_TEXTURE_2D_ARRAY
 #define GL_TEXTURE_2D_ARRAY	 GL_TEXTURE_2D_ARRAY_EXT
+#endif
 
 namespace  {
     

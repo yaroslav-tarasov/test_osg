@@ -31,10 +31,9 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{3c3df4cf-024f-4a24-8458-8e536f7cc1ab}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ReadMe.txt" />
-    <None Include="packages.config" />
+    <Filter Include="Source Files\nanovg">
+      <UniqueIdentifier>{f4296432-4f98-4d5f-96a3-00b8e01e4697}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -248,6 +247,12 @@
     </ClCompile>
     <ClCompile Include="..\async_loading_test.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\osgnanovg\osgnanovg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\osgnanovg\nanovg\nanovg.c">
+      <Filter>Source Files\nanovg</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
