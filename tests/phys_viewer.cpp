@@ -35,7 +35,7 @@
 #include "BulletDynamics/Character/btCharacterControllerInterface.h"
 #include "DynamicCharacterController.h"
 
-#include "utils/visitors/ComputeTriMeshVisitor.h"
+#include "av/avUtils/visitors/ComputeTriMeshVisitor.h"
 
 #include "av/avCore/Object.h"
 
@@ -114,7 +114,7 @@ int main_phys_viewer( int argc, char** argv )
     osg::Group* launchHandlerAttachPoint = new osg::Group;
     root->addChild( launchHandlerAttachPoint );
     
-    std::string         model_name = "eisk";
+    std::string         model_name = "a_319";
     
     auto obj = avCore::createObject(model_name, 10);
     osg::ref_ptr< osg::Node > rootModel( obj->getOrCreateNode() );
@@ -125,12 +125,12 @@ int main_phys_viewer( int argc, char** argv )
     }
     
     btCompoundShape*        cs_;
-    bool loaded = phys::loadBulletFile(cfg().path.data + "/areas/" + model_name + "/" + model_name + ".bullet",  cs_);
+    bool loaded = phys::loadBulletFile(cfg().path.data + "/models/" + model_name + "/" + model_name + ".bullet",  cs_);
     if(loaded)
     {
         const btTransform ct0 = cs_->getChildTransform(0);
         // cs.offset_ = from_bullet_vector3(ct0.getOrigin()); 
-        cs_->setLocalScaling( btVector3(0.013,0.013,0.013));
+        // cs_->setLocalScaling( btVector3(0.013,0.013,0.013));
         addRigidBody( bw, cs_ );
     }
 

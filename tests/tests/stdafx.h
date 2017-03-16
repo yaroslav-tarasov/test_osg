@@ -97,3 +97,14 @@ namespace utils
 	const osg::Vec4 black_color (0.0f,0.0f,0.0f,100.0f);
 	const osg::Vec4 gray_color  (0.8f,0.8f,0.8f,100.0f);
 }
+#include <btBulletCollisionCommon.h>
+#include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btSoftBodyHelpers.h>
+#include <BulletSoftBody/btSoftBody.h>
+
+#include "btBulletWorldImporter.h"
+#include <btBulletFile.h>
